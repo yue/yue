@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 
 import("clang.gni")
+import("//build/config/chromecast_build.gni")
 
 config("find_bad_constructs") {
   if (clang_use_chrome_plugins) {
@@ -16,28 +17,16 @@ config("find_bad_constructs") {
         "-Xclang",
         "-load",
         "-Xclang",
-        rebase_path(
-            "//third_party/llvm-build/Release+Asserts/lib/libFindBadConstructs.dylib",
-            root_build_dir),
+        rebase_path("${clang_base_path}/lib/libFindBadConstructs.dylib",
+                    root_build_dir),
       ]
-    } else if (is_linux) {
+    } else if (is_linux || is_android) {
       cflags += [
         "-Xclang",
         "-load",
         "-Xclang",
-        rebase_path(
-            "//third_party/llvm-build/Release+Asserts/lib/libFindBadConstructs.so",
-            root_build_dir),
-      ]
-    }
-
-    # https://crbug.com/441916
-    if (is_android || is_linux || is_mac) {
-      cflags += [
-        "-Xclang",
-        "-plugin-arg-find-bad-constructs",
-        "-Xclang",
-        "check-templates",
+        rebase_path("${clang_base_path}/lib/libFindBadConstructs.so",
+                    root_build_dir),
       ]
     }
 
@@ -46,7 +35,28 @@ config("find_bad_constructs") {
       "-add-plugin",
       "-Xclang",
       "find-bad-constructs",
+      "-Xclang",
+      "-plugin-arg-find-bad-constructs",
+      "-Xclang",
+      "check-templates",
+      "-Xclang",
+      "-plugin-arg-find-bad-constructs",
+      "-Xclang",
+      "follow-macro-expansion",
+      "-Xclang",
+      "-plugin-arg-find-bad-constructs",
+      "-Xclang",
+      "check-implicit-copy-ctors",
     ]
+
+    if ((is_linux || is_android) && !is_chromecast) {
+      cflags += [
+        "-Xclang",
+        "-plugin-arg-find-bad-constructs",
+        "-Xclang",
+        "check-ipc",
+      ]
+    }
   }
 }
 

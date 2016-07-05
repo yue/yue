@@ -16,3 +16,6 @@
 [submodule "testing/gtest"]
 	path = testing/gtest
 	url = https://github.com/google/googletest/
+[submodule "tools/gyp"]
+	path = tools/gyp
+	url = https://chromium.googlesource.com/external/gyp
