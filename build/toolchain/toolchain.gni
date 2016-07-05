@@ -1,0 +1,38 @@
+# Copyright 2015 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+# Toolchain-related configuration that may be needed outside the context of the
+# toolchain() rules themselves.
+
+# Subdirectory within root_out_dir for shared library files.
+# TODO(agrieve): GYP sets this to "lib" for Linux & Android, but this won't work
+#     in GN until support for loadable_module() is added.
+#     See: https://codereview.chromium.org/1236503002/
+shlib_subdir = "."
+
+# Root out dir for shared library files.
+root_shlib_dir = root_out_dir
+if (shlib_subdir != ".") {
+  root_shlib_dir += "/$shlib_subdir"
+}
+
+# Extension for shared library files (including leading dot).
+if (is_mac || is_ios) {
+  shlib_extension = ".dylib"
+} else if (is_android && is_component_build) {
+  # By appending .cr, we prevent name collisions with libraries already
+  # loaded by the Android zygote.
+  shlib_extension = ".cr.so"
+} else if (is_posix) {
+  shlib_extension = ".so"
+} else {
+  assert(false, "Platform not supported")
+}
+
+# Prefix for shared library files.
+if (is_posix) {
+  shlib_prefix = "lib"
+} else {
+  shlib_prefix = ""
+}

@@ -1,0 +1,64 @@
+# Copyright (c) 2014 The Native Client Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/config/nacl/config.gni")
+import("//build/toolchain/gcc_toolchain.gni")
+
+# This template defines a NaCl toolchain.
+#
+# It requires the following variables specifying the executables to run:
+#  - cc
+#  - cxx
+#  - ar
+#  - ld
+# and the following which is used in the toolchain_args
+#  - toolchain_cpu  (What "current_cpu" should be set to when invoking a
+#                    build using this toolchain.)
+
+template("nacl_toolchain") {
+  assert(defined(invoker.cc), "nacl_toolchain() must specify a \"cc\" value")
+  assert(defined(invoker.cxx), "nacl_toolchain() must specify a \"cxx\" value")
+  assert(defined(invoker.ar), "nacl_toolchain() must specify a \"ar\" value")
+  assert(defined(invoker.ld), "nacl_toolchain() must specify a \"ld\" value")
+  assert(defined(invoker.toolchain_cpu),
+         "nacl_toolchain() must specify a \"toolchain_cpu\"")
+  gcc_toolchain(target_name) {
+    toolchain_os = "nacl"
+
+    if (defined(invoker.executable_extension)) {
+      executable_extension = invoker.executable_extension
+    } else {
+      executable_extension = ".nexe"
+    }
+
+    forward_variables_from(invoker,
+                           [
+                             "ar",
+                             "cc",
+                             "cxx",
+                             "deps",
+                             "ld",
+                             "link_outputs",
+                             "postlink",
+                             "toolchain_cpu",
+                           ])
+    if (defined(invoker.is_clang)) {
+      is_clang = invoker.is_clang
+    }
+    if (defined(invoker.is_pnacl)) {
+      is_pnacl = invoker.is_pnacl
+    }
+    if (defined(invoker.is_nacl_glibc)) {
+      is_nacl_glibc = invoker.is_nacl_glibc
+    }
+    if (defined(invoker.symbol_level)) {
+      symbol_level = invoker.symbol_level
+    }
+
+    # We do not suport component builds with the NaCl toolchains.
+    is_component_build = false
+
+    rebuild_define = "NACL_TC_REV=" + invoker.toolchain_revision
+  }
+}

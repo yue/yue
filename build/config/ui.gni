@@ -1,0 +1,27 @@
+# Copyright 2014 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+# This file contains UI-related build flags. It should theoretically be in the
+# src/ui directory and only things that depend on the ui module should get the
+# definitions.
+#
+# However, today we have many "bad" dependencies on some of these flags from,
+# e.g. base, so they need to be global.
+#
+# See also build/config/features.gni
+
+declare_args() {
+  # Indicates if Ozone is enabled. Ozone is a low-level library layer for Linux
+  # that does not require X11.
+  use_ozone = false
+}
+
+# Additional dependent variables -----------------------------------------------
+#
+# These variables depend on other variables and can't be set externally.
+
+# Indicates if the UI toolkit depends on X11.
+use_x11 = is_linux && !use_ozone
+
+use_ozone_evdev = use_ozone

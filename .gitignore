@@ -1,0 +1,9 @@
+.DS_Store
+.tags*
+/out/
+node_modules/
+*.xcodeproj
+*.swp
+*.pyc
+debug.log
+npm-debug.log

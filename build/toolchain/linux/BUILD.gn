@@ -1,0 +1,105 @@
+# Copyright 2013 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/config/sysroot.gni")
+import("//build/toolchain/clang.gni")
+import("//build/toolchain/gcc_toolchain.gni")
+
+gcc_toolchain("arm") {
+  cc = "arm-linux-gnueabi-gcc"
+  cxx = "arm-linux-gnueabi-g++"
+
+  ar = "arm-linux-gnueabi-ar"
+  ld = cxx
+  readelf = "arm-linux-gnueabi-readelf"
+  nm = "arm-linux-gnueabi-nm"
+
+  toolchain_cpu = "arm"
+  toolchain_os = "linux"
+  is_clang = false
+}
+
+gcc_toolchain("clang_x86") {
+  if (use_clang_type_profiler) {
+    prefix = rebase_path("//third_party/llvm-allocated-type/Linux_ia32/bin",
+                         root_build_dir)
+  } else {
+    prefix = rebase_path("//third_party/llvm-build/Release+Asserts/bin",
+                         root_build_dir)
+  }
+  cc = "$prefix/clang"
+  cxx = "$prefix/clang++"
+  readelf = "readelf"
+  nm = "nm"
+  ar = "ar"
+  ld = cxx
+
+  toolchain_cpu = "x86"
+  toolchain_os = "linux"
+  is_clang = true
+}
+
+gcc_toolchain("x86") {
+  cc = "gcc"
+  cxx = "g++"
+
+  readelf = "readelf"
+  nm = "nm"
+  ar = "ar"
+  ld = cxx
+
+  toolchain_cpu = "x86"
+  toolchain_os = "linux"
+  is_clang = false
+}
+
+gcc_toolchain("clang_x64") {
+  if (use_clang_type_profiler) {
+    prefix = rebase_path("//third_party/llvm-allocated-type/Linux_x64/bin",
+                         root_build_dir)
+  } else {
+    prefix = rebase_path("//third_party/llvm-build/Release+Asserts/bin",
+                         root_build_dir)
+  }
+  cc = "$prefix/clang"
+  cxx = "$prefix/clang++"
+
+  readelf = "readelf"
+  nm = "nm"
+  ar = "ar"
+  ld = cxx
+
+  toolchain_cpu = "x64"
+  toolchain_os = "linux"
+  is_clang = true
+}
+
+gcc_toolchain("x64") {
+  cc = "gcc"
+  cxx = "g++"
+
+  readelf = "readelf"
+  nm = "nm"
+  ar = "ar"
+  ld = cxx
+
+  toolchain_cpu = "x64"
+  toolchain_os = "linux"
+  is_clang = false
+}
+
+gcc_toolchain("mipsel") {
+  cc = "mipsel-linux-gnu-gcc"
+  cxx = "mipsel-linux-gnu-g++"
+  ar = "mipsel-linux-gnu-ar"
+  ld = cxx
+  readelf = "mipsel-linux-gnu-readelf"
+  nm = "mipsel-linux-gnu-nm"
+
+  toolchain_cpu = "mipsel"
+  toolchain_os = "linux"
+  is_clang = false
+  use_ccache = false
+  use_goma = false
+}

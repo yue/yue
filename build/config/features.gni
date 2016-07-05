@@ -1,0 +1,50 @@
+# Copyright 2014 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+# This file contains Chrome-feature-related build flags (see ui.gni for
+# UI-related ones). These should theoretically be moved to the build files of
+# the features themselves.
+#
+# However, today we have many "bad" dependencies on some of these flags from,
+# e.g. base, so they need to be global to match the GYP configuration. Also,
+# anything that needs a grit define must be in either this file or ui.gni.
+#
+# PLEASE TRY TO AVOID ADDING FLAGS TO THIS FILE in cases where grit isn't
+# required. See the declare_args block of BUILDCONFIG.gn for advice on how
+# to set up feature flags.
+
+import("//build/config/chrome_build.gni")
+if (is_android) {
+  import("//build/config/android/config.gni")
+}
+
+declare_args() {
+  # Enables Native Client support.
+  # TODO(GYP): Get NaCl linking on other platforms.
+  # Also, see if we can always get rid of enable_nacl_untrusted and
+  # enable_pnacl and always build them if enable_nacl is true.
+  # The "is_nacl" part of the condition is needed to ensure that
+  # the untrusted code is built properly; arguably it should be
+  # guarded by "is_nacl" directly rather than enable_nacl_untrusted, but
+  # this will go away when Mac and Win are working and we can just use
+  # the commented out logic.
+  # Eventually we want this to be:
+  #   enable_nacl = !is_ios && !is_android
+  enable_nacl = (is_linux && current_cpu == "x64") || is_nacl
+  enable_nacl_untrusted = enable_nacl
+  enable_pnacl = enable_nacl_untrusted
+}
+
+# Additional dependent variables -----------------------------------------------
+
+# libudev usage.
+use_udev = is_linux && !is_fnl
+
+# The seccomp-bpf sandbox is only supported on three architectures
+# currently.
+# Do not disable seccomp_bpf anywhere without talking to
+# security@chromium.org!
+use_seccomp_bpf = (is_linux || is_android) &&
+                  (current_cpu == "x86" || current_cpu == "x64" ||
+                   current_cpu == "arm" || current_cpu == "mipsel")

@@ -1,0 +1,166 @@
+# Copyright (c) 2014 The Native Client Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/config/sysroot.gni")
+import("//build/config/nacl/config.gni")
+import("//build/toolchain/nacl_toolchain.gni")
+
+# Add the toolchain revision as a preprocessor define so that sources are
+# rebuilt when a toolchain is updated.
+# Idea we could use the toolchain deps feature, but currently that feature is
+# bugged and does not trigger a rebuild.
+# https://code.google.com/p/chromium/issues/detail?id=431880
+# Calls to get the toolchain revision are relatively slow, so do them all in a
+# single batch to amortize python startup, etc.
+revisions = exec_script("//native_client/build/get_toolchain_revision.py",
+                        [
+                          "nacl_x86_glibc",
+                          "pnacl_newlib",
+                        ],
+                        "trim list lines")
+nacl_x86_glibc_rev = revisions[0]
+pnacl_newlib_rev = revisions[1]
+
+nacl_toolchain("newlib_pnacl") {
+  toolchain_package = "pnacl_newlib"
+  toolchain_revision = pnacl_newlib_rev
+  toolchain_cpu = "pnacl"
+  toolprefix =
+      rebase_path("${nacl_toolchain_dir}/${toolchain_package}/bin/pnacl-",
+                  root_build_dir)
+
+  is_clang = true
+  is_pnacl = true
+  cc = toolprefix + "clang"
+  cxx = toolprefix + "clang++"
+  ar = toolprefix + "ar"
+  ld = cxx
+  executable_extension = ".pexe.debug"
+
+  finalize = toolprefix + "finalize"
+  nonfinal_file =
+      "{{root_out_dir}}/{{target_output_name}}${executable_extension}"
+  finalized_file = "{{root_out_dir}}/{{target_output_name}}.pexe"
+  postlink = "$finalize $nonfinal_file -o $finalized_file"
+  link_outputs = [ finalized_file ]
+
+  # TODO(smklein): Don't modify symbol_level from the default value once
+  # PNaCl's LLVM version has been updated to use more efficient debug info.
+  # See: https://github.com/domokit/mojo/issues/554
+  symbol_level = 0
+}
+
+nacl_toolchain("glibc_x86") {
+  toolchain_package = "nacl_x86_glibc"
+  toolchain_revision = nacl_x86_glibc_rev
+  toolchain_cpu = "x86"
+  toolprefix =
+      rebase_path("${nacl_toolchain_dir}/${toolchain_package}/bin/i686-nacl-",
+                  root_build_dir)
+  is_clang = false
+  is_nacl_glibc = true
+
+  cc = toolprefix + "gcc"
+  cxx = toolprefix + "g++"
+  ar = toolprefix + "ar"
+  ld = cxx
+}
+
+nacl_toolchain("glibc_x64") {
+  toolchain_package = "nacl_x86_glibc"
+  toolchain_revision = nacl_x86_glibc_rev
+  toolchain_cpu = "x64"
+  toolprefix =
+      rebase_path("${nacl_toolchain_dir}/${toolchain_package}/bin/x86_64-nacl-",
+                  root_build_dir)
+  is_clang = false
+  is_nacl_glibc = true
+
+  cc = toolprefix + "gcc"
+  cxx = toolprefix + "g++"
+  ar = toolprefix + "ar"
+  ld = cxx
+}
+
+template("nacl_clang_toolchain") {
+  toolchain_cpu = target_name
+  assert(defined(invoker.toolchain_tuple), "Must define toolchain_tuple")
+
+  toolchain_package = "pnacl_newlib"
+  toolchain_revision = pnacl_newlib_rev
+  toolprefix = rebase_path("${nacl_toolchain_dir}/${toolchain_package}/bin/" +
+                               invoker.toolchain_tuple + "-",
+                           root_build_dir)
+
+  nacl_toolchain("clang_newlib_" + toolchain_cpu) {
+    is_clang = true
+    cc = toolprefix + "clang"
+    cxx = toolprefix + "clang++"
+    ar = toolprefix + "ar"
+    ld = cxx
+  }
+}
+
+template("nacl_irt_toolchain") {
+  toolchain_cpu = target_name
+  assert(defined(invoker.toolchain_tuple), "Must define toolchain_tuple")
+
+  toolchain_package = "pnacl_newlib"
+  toolchain_revision = pnacl_newlib_rev
+  toolprefix = rebase_path("${nacl_toolchain_dir}/${toolchain_package}/bin/" +
+                               invoker.toolchain_tuple + "-",
+                           root_build_dir)
+
+  link_irt = rebase_path("//native_client/build/link_irt.py", root_build_dir)
+
+  tls_edit_label =
+      "//native_client/src/tools/tls_edit:tls_edit($host_toolchain)"
+  host_toolchain_out_dir =
+      rebase_path(get_label_info(tls_edit_label, "root_out_dir"),
+                  root_build_dir)
+  tls_edit = "${host_toolchain_out_dir}/tls_edit"
+
+  nacl_toolchain("irt_" + toolchain_cpu) {
+    is_clang = true
+    cc = toolprefix + "clang"
+    cxx = toolprefix + "clang++"
+    ar = toolprefix + "ar"
+    readelf = toolprefix + "readelf"
+
+    # Always build the IRT with full debugging symbols, regardless of
+    # how Chromium itself is being built (or other NaCl executables).
+    symbol_level = 2
+
+    # Some IRT implementations (notably, Chromium's) contain C++ code,
+    # so we need to link w/ the C++ linker.
+    ld = "${python_path} ${link_irt} --tls-edit=${tls_edit} --link-cmd=${cxx} --readelf-cmd=${readelf}"
+
+    # TODO(ncbray): depend on link script
+    deps = [
+      tls_edit_label,
+    ]
+  }
+}
+
+template("nacl_clang_toolchains") {
+  assert(defined(invoker.toolchain_tuple), "Must define toolchain_tuple")
+  nacl_clang_toolchain(target_name) {
+    toolchain_tuple = invoker.toolchain_tuple
+  }
+  nacl_irt_toolchain(target_name) {
+    toolchain_tuple = invoker.toolchain_tuple
+  }
+}
+
+nacl_clang_toolchains("x86") {
+  toolchain_tuple = "i686-nacl"
+}
+
+nacl_clang_toolchains("x64") {
+  toolchain_tuple = "x86_64-nacl"
+}
+
+nacl_clang_toolchains("arm") {
+  toolchain_tuple = "arm-nacl"
+}

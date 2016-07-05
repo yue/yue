@@ -1,0 +1,22 @@
+# Copyright 2015 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+declare_args() {
+  # Native Client supports both Newlib and Glibc C libraries where Newlib
+  # is assumed to be the default one; use this to determine whether Glibc
+  # is being used instead.
+  is_nacl_glibc = false
+
+  # TODO(ncbray): support ASAN once NaCl's GN build is unforked.
+  # TODO(cstout): support fnl/musl build in nacl
+  mojo_use_nacl_nonsfi = (is_linux || is_android) && !is_asan && !is_fnl
+
+  # TODO(vtl): This now seems totally redundant.
+  mojo_use_nacl = mojo_use_nacl_nonsfi
+}
+
+nacl_toolchain_dir = "//native_client/toolchain/${host_os}_x86"
+
+nacl_irt_toolchain = "//build/toolchain/nacl:irt_" + target_cpu
+is_nacl_irt = current_toolchain == nacl_irt_toolchain
