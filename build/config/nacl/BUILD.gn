@@ -6,14 +6,22 @@ import("//build/config/nacl/config.gni")
 
 # Native Client Definitions
 config("nacl_defines") {
-  defines = [
-    "_DEFAULT_SOURCE=1",
-    "_BSD_SOURCE=1",
-    "_POSIX_C_SOURCE=199506",
-    "_XOPEN_SOURCE=600",
-    "_GNU_SOURCE=1",
-    "__STDC_LIMIT_MACROS=1",
-  ]
+  if (is_linux || is_android || is_nacl) {
+    defines = [
+      "_POSIX_C_SOURCE=199506",
+      "_XOPEN_SOURCE=600",
+      "_GNU_SOURCE=1",
+      "__STDC_LIMIT_MACROS=1",
+    ]
+  } else if (is_win) {
+    defines = [ "__STDC_LIMIT_MACROS=1" ]
+  }
+
+  if (current_cpu == "pnacl" && !is_nacl_nonsfi) {
+    # TODO: Remove the following definition once NACL_BUILD_ARCH and
+    # NACL_BUILD_SUBARCH are defined by the PNaCl toolchain.
+    defines += [ "NACL_BUILD_ARCH=pnacl" ]
+  }
 }
 
 config("nexe_defines") {
@@ -23,20 +31,38 @@ config("nexe_defines") {
   ]
 }
 
+config("nacl_warnings") {
+  if (is_win) {
+    # Some NaCl code uses forward declarations of static const variables,
+    # with initialized definitions later on.  (The alternative would be
+    # many, many more forward declarations of everything used in that
+    # const variable's initializer before the definition.)  The Windows
+    # compiler is too stupid to notice that there is an initializer later
+    # in the file, and warns about the forward declaration.
+    cflags = [ "/wd4132" ]
+  }
+}
+
 # The base target that all targets in the NaCl build should depend on.
 # This allows configs to be modified for everything in the NaCl build, even when
 # the NaCl build is composed into the Chrome build.  (GN has no functionality to
-# add flags to everythin in //native_client, having a base target works around
+# add flags to everything in //native_client, having a base target works around
 # that limitation.)
 source_set("nacl_base") {
-  public_configs = [ ":nacl_defines" ]
+  public_configs = [
+    ":nacl_defines",
+    ":nacl_warnings",
+  ]
   if (current_os == "nacl") {
     public_configs += [ ":nexe_defines" ]
   }
 }
 
 config("compiler") {
+  configs = []
   cflags = []
+  ldflags = []
+  libs = []
 
   if (is_clang && current_cpu != "pnacl") {
     # -no-integrated-as is the default in nacl-clang for historical
@@ -46,6 +72,29 @@ config("compiler") {
     # on x86-64 to preserve sandbox base address hiding.  Use it
     # everywhere for consistency (and possibly quicker builds).
     cflags += [ "-integrated-as" ]
+  }
+  if (is_nacl_nonsfi) {
+    cflags += [ "--pnacl-allow-translate" ]
+    ldflags += [
+      "--pnacl-allow-translate",
+      "--pnacl-allow-native",
+      "-Wl,--noirt",
+      "-Wt,--noirt",
+      "-Wt,--noirtshim",
+
+      # The clang driver automatically injects -lpthread when using libc++, but
+      # the toolchain doesn't have it yet.  To get around this, use
+      # -nodefaultlibs and make each executable target depend on
+      # "//native_client/src/nonsfi/irt:nacl_sys_private".
+      "-nodefaultlibs",
+    ]
+    libs += [
+      "c++",
+      "m",
+      "c",
+      "pnaclmm",
+    ]
+    include_dirs = [ "//native_client/src/public/linux_syscalls" ]
   }
 
   asmflags = cflags

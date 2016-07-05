@@ -11,50 +11,78 @@ declare_args() {
   # The absolute path of the sysroot that is applied when compiling using
   # the target toolchain.
   target_sysroot = ""
+
+  # The absolute path to directory containing sysroots for linux 32 and 64bit
+  target_sysroot_dir = ""
+
+  use_sysroot = true
 }
 
-if (current_toolchain == default_toolchain && target_sysroot != "") {
+if (is_linux && target_sysroot_dir != "") {
+  if (current_cpu == "x64") {
+    sysroot = target_sysroot_dir + "/wheezy-x64"
+  } else if (current_cpu == "x86") {
+    sysroot = target_sysroot_dir + "/wheezy-ia32"
+  }
+} else if (current_os == target_os && current_cpu == target_cpu &&
+           target_sysroot != "") {
   sysroot = target_sysroot
 } else if (is_android) {
   import("//build/config/android/config.gni")
   if (current_cpu == "x86") {
-    sysroot = rebase_path("$android_ndk_root/$x86_android_sysroot_subdir")
+    sysroot = "$android_ndk_root/$x86_android_sysroot_subdir"
   } else if (current_cpu == "arm") {
-    sysroot = rebase_path("$android_ndk_root/$arm_android_sysroot_subdir")
+    sysroot = "$android_ndk_root/$arm_android_sysroot_subdir"
   } else if (current_cpu == "mipsel") {
-    sysroot = rebase_path("$android_ndk_root/$mips_android_sysroot_subdir")
+    sysroot = "$android_ndk_root/$mips_android_sysroot_subdir"
   } else if (current_cpu == "x64") {
-    sysroot = rebase_path("$android_ndk_root/$x86_64_android_sysroot_subdir")
+    sysroot = "$android_ndk_root/$x86_64_android_sysroot_subdir"
   } else if (current_cpu == "arm64") {
-    sysroot = rebase_path("$android_ndk_root/$arm64_android_sysroot_subdir")
-  } else if (current_cpu == "mips64") {
-    sysroot = rebase_path("$android_ndk_root/$mips64_android_sysroot_subdir")
+    sysroot = "$android_ndk_root/$arm64_android_sysroot_subdir"
+  } else if (current_cpu == "mips64el") {
+    sysroot = "$android_ndk_root/$mips64_android_sysroot_subdir"
   } else {
     sysroot = ""
   }
-} else if (is_fnl) {
-  assert(false, "FNL needs target_sysroot")
-} else if (is_linux && is_chrome_branded && is_official_build) {
-  # For official builds, use the sysroot checked into the internal source repo
-  # so that the builds work on older versions of Linux.
+} else if (is_linux && !is_chromeos && use_sysroot) {
+  # By default build against a sysroot image downloaded from Cloud Storage
+  # during gclient runhooks.
   if (current_cpu == "x64") {
-    sysroot =
-        rebase_path("//chrome/installer/linux/debian_wheezy_amd64-sysroot")
+    sysroot = "//build/linux/debian_wheezy_amd64-sysroot"
   } else if (current_cpu == "x86") {
-    sysroot = rebase_path("//chrome/installer/linux/debian_wheezy_i386-sysroot")
+    sysroot = "//build/linux/debian_wheezy_i386-sysroot"
+  } else if (current_cpu == "mipsel") {
+    sysroot = "//build/linux/debian_wheezy_mips-sysroot"
+  } else if (current_cpu == "arm") {
+    sysroot = "//build/linux/debian_wheezy_arm-sysroot"
+  } else if (current_cpu == "arm64") {
+    sysroot = "//build/linux/debian_jessie_arm64-sysroot"
   } else {
     # Any other builds don't use a sysroot.
     sysroot = ""
   }
-} else if (is_linux) {
-  if (current_cpu == "mipsel") {
-    sysroot = rebase_path("//mipsel-sysroot/sysroot")
-  } else {
-    sysroot = ""
+
+  if (sysroot != "") {
+    # Our sysroot images only contains gcc 4.6 headers, but chromium requires
+    # gcc 4.9. Clang is able to detect and work with the 4.6 headers while
+    # gcc is not. This check can be removed if we ever update to a more modern
+    # sysroot.
+    assert(is_clang, "sysroot images require clang (try use_sysroot=false)")
+
+    _script_arch = current_cpu
+    if (_script_arch == "x86") {
+      _script_arch = "i386"
+    } else if (_script_arch == "x64") {
+      _script_arch = "amd64"
+    }
+    assert(
+        exec_script("//build/dir_exists.py",
+                    [ rebase_path(sysroot) ],
+                    "string") == "True",
+        "Missing sysroot ($sysroot). To fix, run: build/linux/sysroot_scripts/install-sysroot.py --arch=$_script_arch")
   }
 } else if (is_mac) {
   import("//build/config/mac/mac_sdk.gni")
-
   sysroot = mac_sdk_path
 } else if (is_ios) {
   import("//build/config/ios/ios_sdk.gni")

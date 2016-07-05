@@ -15,13 +15,7 @@ declare_args() {
   # Indicates if Ozone is enabled. Ozone is a low-level library layer for Linux
   # that does not require X11.
   use_ozone = false
+
+  # Whether we should use glib, a low level C utility library.
+  use_glib = false
 }
-
-# Additional dependent variables -----------------------------------------------
-#
-# These variables depend on other variables and can't be set externally.
-
-# Indicates if the UI toolkit depends on X11.
-use_x11 = is_linux && !use_ozone
-
-use_ozone_evdev = use_ozone

@@ -148,6 +148,18 @@ config("default_libs") {
     # instead the targets that use the less common ones (e.g. wininet or
     # winspool) should include those explicitly.
     libs = [
+      "comdlg32.lib",
+      "dbghelp.lib",
+      "delayimp.lib",
+      "ole32.lib",
+      "oleaut32.lib",
+      "psapi.lib",
+      "shell32.lib",
+      "user32.lib",
+      "uuid.lib",
+      "version.lib",
+      "ws2_32.lib",
+
       # Please don't add more stuff here. We should actually be making this
       # list smaller, since all common things should be covered. If you need
       # some extra libraries, please just add a libs = [ "foo.lib" ] to your
