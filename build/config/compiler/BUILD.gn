@@ -837,6 +837,13 @@ if (is_clang) {
       "-Wno-shift-negative-value",
     ]
   }
+
+  # The base library is using deprecated APIs.
+  if (is_mac) {
+    default_warning_flags += [
+      "-Wno-deprecated-declarations",
+    ]
+  }
 }
 
 # chromium_code ---------------------------------------------------------------

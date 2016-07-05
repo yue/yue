@@ -4,3 +4,18 @@
 [submodule "third_party/buildtools"]
 	path = third_party/buildtools
 	url = https://chromium.googlesource.com/chromium/buildtools
+[submodule "third_party/modp_b64"]
+	path = third_party/modp_b64
+	url = https://chromium.googlesource.com/chromium/src/third_party/modp_b64
+[submodule "third_party/icu"]
+	path = third_party/icu
+	url = https://chromium.googlesource.com/chromium/deps/icu
+[submodule "testing/gmock"]
+	path = testing/gmock
+	url = https://chromium.googlesource.com/external/googlemock
+[submodule "third_party/zlib"]
+	path = third_party/zlib
+	url = https://chromium.googlesource.com/chromium/src/third_party/zlib
+[submodule "testing/gtest"]
+	path = testing/gtest
+	url = https://github.com/google/googletest/

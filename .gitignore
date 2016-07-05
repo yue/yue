@@ -1,6 +1,7 @@
 .DS_Store
 .tags*
 /out/
+/third_party/llvm-build/
 node_modules/
 *.xcodeproj
 *.swp
