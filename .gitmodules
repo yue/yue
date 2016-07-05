@@ -1,3 +1,6 @@
 [submodule "base"]
 	path = base
 	url = https://github.com/domokit/base
+[submodule "third_party/buildtools"]
+	path = third_party/buildtools
+	url = https://chromium.googlesource.com/chromium/buildtools
