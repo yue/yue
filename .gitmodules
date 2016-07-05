@@ -1,9 +1,6 @@
 [submodule "base"]
 	path = base
 	url = https://github.com/domokit/base
-[submodule "third_party/buildtools"]
-	path = third_party/buildtools
-	url = https://chromium.googlesource.com/chromium/buildtools
 [submodule "third_party/modp_b64"]
 	path = third_party/modp_b64
 	url = https://chromium.googlesource.com/chromium/src/third_party/modp_b64
