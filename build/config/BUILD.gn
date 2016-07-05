@@ -46,10 +46,6 @@ config("feature_flags") {
   if (dcheck_always_on) {
     defines += [ "DCHECK_ALWAYS_ON=1" ]
   }
-  if (use_udev) {
-    # TODO(brettw) should probably be "=1".
-    defines += [ "USE_UDEV" ]
-  }
   if (use_ozone) {
     defines += [ "USE_OZONE=1" ]
   }

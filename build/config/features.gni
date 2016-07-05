@@ -35,16 +35,3 @@ declare_args() {
   enable_nacl_untrusted = enable_nacl
   enable_pnacl = enable_nacl_untrusted
 }
-
-# Additional dependent variables -----------------------------------------------
-
-# libudev usage.
-use_udev = is_linux && !is_fnl
-
-# The seccomp-bpf sandbox is only supported on three architectures
-# currently.
-# Do not disable seccomp_bpf anywhere without talking to
-# security@chromium.org!
-use_seccomp_bpf = (is_linux || is_android) &&
-                  (current_cpu == "x86" || current_cpu == "x64" ||
-                   current_cpu == "arm" || current_cpu == "mipsel")

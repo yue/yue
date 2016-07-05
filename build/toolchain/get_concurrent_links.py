@@ -5,12 +5,13 @@
 # This script computs the number of concurrent links we want to run in the build
 # as a function of machine spec. It's based on GetDefaultConcurrentLinks in GYP.
 
+import optparse
 import os
 import re
 import subprocess
 import sys
 
-def GetDefaultConcurrentLinks():
+def _GetDefaultConcurrentLinks(is_lto):
   # Inherit the legacy environment variable for people that have set it in GYP.
   pool_size = int(os.getenv('GYP_LINK_CONCURRENCY', 0))
   if pool_size:
@@ -35,7 +36,9 @@ def GetDefaultConcurrentLinks():
     stat = MEMORYSTATUSEX(dwLength=ctypes.sizeof(MEMORYSTATUSEX))
     ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(stat))
 
-    mem_limit = max(1, stat.ullTotalPhys / (4 * (2 ** 30)))  # total / 4GB
+    # VS 2015 uses 20% more working set than VS 2013 and can consume all RAM
+    # on a 64 GB machine.
+    mem_limit = max(1, stat.ullTotalPhys / (5 * (2 ** 30)))  # total / 5GB
     hard_cap = max(1, int(os.getenv('GYP_LINK_CONCURRENCY_MAX', 2**32)))
     return min(mem_limit, hard_cap)
   elif sys.platform.startswith('linux'):
@@ -46,8 +49,14 @@ def GetDefaultConcurrentLinks():
           match = memtotal_re.match(line)
           if not match:
             continue
+          mem_total_gb = float(match.group(1)) / (2 ** 20)
           # Allow 8Gb per link on Linux because Gold is quite memory hungry
-          return max(1, int(match.group(1)) / (8 * (2 ** 20)))
+          mem_per_link_gb = 8
+          if is_lto:
+            mem_total_gb -= 10 # Reserve
+            # For LTO builds the RAM requirements are even higher
+            mem_per_link_gb = 24
+          return int(max(1, mem_total_gb / mem_per_link_gb))
     return 1
   elif sys.platform == 'darwin':
     try:
@@ -61,4 +70,15 @@ def GetDefaultConcurrentLinks():
     # TODO(scottmg): Implement this for other platforms.
     return 1
 
-print GetDefaultConcurrentLinks()
+def main():
+  parser = optparse.OptionParser()
+  parser.add_option('--lto', action="store_true", default=False,
+                    help='This is an LTO build with higher memory requirements')
+  parser.disable_interspersed_args()
+  options, args = parser.parse_args()
+
+  print _GetDefaultConcurrentLinks(is_lto=options.lto)
+  return 0
+
+if __name__ == '__main__':
+  sys.exit(main())

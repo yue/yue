@@ -3,41 +3,39 @@
 # found in the LICENSE file.
 
 import("//build/config/sysroot.gni")
-import("//build/toolchain/clang.gni")
 import("//build/toolchain/gcc_toolchain.gni")
 
-gcc_toolchain("arm") {
-  cc = "arm-linux-gnueabi-gcc"
-  cxx = "arm-linux-gnueabi-g++"
+clang_toolchain("clang_arm") {
+  toolchain_cpu = "arm"
+  toolchain_os = "linux"
+  toolprefix = "arm-linux-gnueabihf-"
+}
 
-  ar = "arm-linux-gnueabi-ar"
+clang_toolchain("clang_arm64") {
+  toolchain_cpu = "arm64"
+  toolchain_os = "linux"
+  toolprefix = "aarch64-linux-gnu-"
+}
+
+gcc_toolchain("arm") {
+  toolprefix = "arm-linux-gnueabihf-"
+
+  cc = "${toolprefix}gcc"
+  cxx = "${toolprefix}g++"
+
+  ar = "${toolprefix}ar"
   ld = cxx
-  readelf = "arm-linux-gnueabi-readelf"
-  nm = "arm-linux-gnueabi-nm"
+  readelf = "${toolprefix}readelf"
+  nm = "${toolprefix}nm"
 
   toolchain_cpu = "arm"
   toolchain_os = "linux"
   is_clang = false
 }
 
-gcc_toolchain("clang_x86") {
-  if (use_clang_type_profiler) {
-    prefix = rebase_path("//third_party/llvm-allocated-type/Linux_ia32/bin",
-                         root_build_dir)
-  } else {
-    prefix = rebase_path("//third_party/llvm-build/Release+Asserts/bin",
-                         root_build_dir)
-  }
-  cc = "$prefix/clang"
-  cxx = "$prefix/clang++"
-  readelf = "readelf"
-  nm = "nm"
-  ar = "ar"
-  ld = cxx
-
+clang_toolchain("clang_x86") {
   toolchain_cpu = "x86"
   toolchain_os = "linux"
-  is_clang = true
 }
 
 gcc_toolchain("x86") {
@@ -54,25 +52,9 @@ gcc_toolchain("x86") {
   is_clang = false
 }
 
-gcc_toolchain("clang_x64") {
-  if (use_clang_type_profiler) {
-    prefix = rebase_path("//third_party/llvm-allocated-type/Linux_x64/bin",
-                         root_build_dir)
-  } else {
-    prefix = rebase_path("//third_party/llvm-build/Release+Asserts/bin",
-                         root_build_dir)
-  }
-  cc = "$prefix/clang"
-  cxx = "$prefix/clang++"
-
-  readelf = "readelf"
-  nm = "nm"
-  ar = "ar"
-  ld = cxx
-
+clang_toolchain("clang_x64") {
   toolchain_cpu = "x64"
   toolchain_os = "linux"
-  is_clang = true
 }
 
 gcc_toolchain("x64") {
@@ -89,6 +71,11 @@ gcc_toolchain("x64") {
   is_clang = false
 }
 
+clang_toolchain("clang_mipsel") {
+  toolchain_cpu = "mipsel"
+  toolchain_os = "linux"
+}
+
 gcc_toolchain("mipsel") {
   cc = "mipsel-linux-gnu-gcc"
   cxx = "mipsel-linux-gnu-g++"
@@ -100,6 +87,6 @@ gcc_toolchain("mipsel") {
   toolchain_cpu = "mipsel"
   toolchain_os = "linux"
   is_clang = false
-  use_ccache = false
+  cc_wrapper = ""
   use_goma = false
 }

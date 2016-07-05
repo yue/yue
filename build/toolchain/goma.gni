@@ -11,6 +11,12 @@ declare_args() {
   # Set to true to enable distributed compilation using Goma.
   use_goma = false
 
-  # Absolute directory containing the Goma source code.
-  goma_dir = getenv("HOME") + "/goma"
+  # Set the default value based on the platform.
+  if (is_win) {
+    # Absolute directory containing the Goma source code.
+    goma_dir = "C:\goma\goma-win64"
+  } else {
+    # Absolute directory containing the Goma source code.
+    goma_dir = getenv("HOME") + "/goma"
+  }
 }
