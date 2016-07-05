@@ -9,6 +9,5 @@ executable("myapp") {
 
   deps = [
     "//base",
-    "//base:base_static",
   ]
 }
