@@ -2,6 +2,9 @@
 .tags*
 /out/
 /third_party/llvm-build/
+/build/linux/debian_wheezy_amd64-sysroot/
+/build/linux/debian_wheezy_i386-sysroot/
+/build/linux/debian_wheezy_arm-sysroot/
 node_modules/
 *.xcodeproj
 *.swp
