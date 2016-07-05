@@ -1,0 +1,3 @@
+[submodule "base"]
+	path = base
+	url = https://github.com/domokit/base
