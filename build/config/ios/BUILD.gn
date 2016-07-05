@@ -1,0 +1,39 @@
+# Copyright 2014 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/config/ios/ios_sdk.gni")
+import("//build/config/sysroot.gni")
+import("//build/toolchain/toolchain.gni")
+
+# This is included by reference in the //build/config/compiler:runtime_library
+# config that is applied to all targets. It is here to separate out the logic
+# that is iOS-only. Please see that target for advice on what should go in
+# :runtime_library vs. :compiler.
+config("runtime_library") {
+  common_flags = [
+    "-isysroot",
+    sysroot,
+
+    "-stdlib=libc++",
+  ]
+
+  if (use_ios_simulator) {
+    common_flags += [ "-mios-simulator-version-min=$ios_deployment_target" ]
+  } else {
+    common_flags += [ "-miphoneos-version-min=$ios_deployment_target" ]
+  }
+
+  asmflags = common_flags
+  cflags = common_flags
+  ldflags = common_flags
+
+  # TODO(ios): Remove once Xcode's libc++ has LLVM r256325.
+  if (use_xcode_clang) {
+    cflags += [
+      "-isystem",
+      rebase_path("//third_party/llvm-build/Release+Asserts/include/c++/v1",
+                  root_build_dir),
+    ]
+  }
+}

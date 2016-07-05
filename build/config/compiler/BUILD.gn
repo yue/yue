@@ -427,12 +427,6 @@ config("compiler") {
     # things like which functions are considered deprecated.)
     cflags_cc += [ "-stdlib=libc++" ]
     ldflags += [ "-stdlib=libc++" ]
-    if (!is_component_build && !is_asan) {
-      ldflags += [
-        "-L",
-        rebase_path("//third_party/libc++-static", root_build_dir),
-      ]
-    }
   }
 
   # Add flags for link-time optimization. These flags enable

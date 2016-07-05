@@ -6,12 +6,18 @@ import("//build/config/chrome_build.gni")
 
 declare_args() {
   # Minimum supported version of the Mac SDK.
-  mac_sdk_min = "10.6"
+  mac_sdk_min = "10.10"
 
-  # Path to a specific version of the Mac SDKJ, not including a backslash at
+  # Minimum supported version of OSX.
+  mac_deployment_target = "10.7"
+
+  # Path to a specific version of the Mac SDK, not including a backslash at
   # the end. If empty, the path to the lowest version greater than or equal to
   # mac_sdk_min is used.
   mac_sdk_path = ""
+
+  # The SDK name as accepted by xcodebuild.
+  mac_sdk_name = "macosx"
 }
 
 find_sdk_args = [ "--print_sdk_path" ]
@@ -31,11 +37,37 @@ find_sdk_lines =
     exec_script("//build/mac/find_sdk.py", find_sdk_args, "list lines")
 mac_sdk_version = find_sdk_lines[1]
 if (mac_sdk_path == "") {
-  # TODO(brettw) http://crbug.com/335325  when everybody moves to XCode 5 we
-  # can remove the --print_sdk_path argument to find_sdk and instead just use
-  # the following two lines to get the path. Although it looks longer here, it
-  # saves forking a process in find_sdk.py so will be faster.
-  #mac_sdk_root = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX"
-  #mac_sdk_path = mac_sdk_root + mac_sdk_version + ".sdk"
   mac_sdk_path = find_sdk_lines[0]
+}
+
+script_name = "//build/config/mac/sdk_info.py"
+_mac_sdk_result = exec_script(script_name, [ mac_sdk_name ], "scope")
+mac_sdk_build = _mac_sdk_result.sdk_build
+xcode_version = _mac_sdk_result.xcode_version
+xcode_build = _mac_sdk_result.xcode_build
+machine_os_build = _mac_sdk_result.machine_os_build
+
+if (mac_sdk_version != mac_sdk_min &&
+    exec_script("//build/check_return_value.py",
+                [
+                  "test",
+                  xcode_version,
+                  "-ge",
+                  "0730",
+                ],
+                "value") != 1) {
+  print(
+      "********************************************************************************")
+  print(
+      " WARNING: The Mac OS X SDK is incompatible with the version of Xcode. To fix,")
+  print(
+      "          either upgrade Xcode to the latest version or install the Mac OS X")
+  print(
+      "          $mac_sdk_min_build_override SDK. For more information, see https://crbug.com/620127.")
+  print()
+  print(" Current SDK Version:   $mac_sdk_version")
+  print(" Current Xcode Version: $xcode_version ($xcode_build)")
+  print(
+      "********************************************************************************")
+  assert(false, "SDK is incompatible with Xcode")
 }
