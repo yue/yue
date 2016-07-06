@@ -17,25 +17,25 @@ if (process.platform === 'win32') {
   gn += '.exe'
 }
 
+// Print command output by default.
+const execSyncWrapper = (command, options = { stdio: 'inherit' }) => {
+  return execSync(command, options)
+}
+
 // Parse args.
-let target = 'out/Default'
+let dir = 'out/Default'
 const args = process.argv.slice(2).filter((arg) => {
-  if (!arg.startsWith('-')) {
-    target = arg
+  if (arg.includes('/') && !arg.startsWith('-')) {
+    dir = arg
     return false
   } else {
     return true
   }
 })
 
-// Print command output by default.
-const execSyncWrapper = (command, options = { stdio: 'inherit' }) => {
-  return execSync(command, options)
-}
-
 // Run command and pass args.
 const runSync = (command, commandArgs = []) => {
-  commandArgs = commandArgs.concat(args).concat(target)
+  commandArgs = commandArgs.concat(dir).concat(args)
   return spawnSync(command, commandArgs, { stdio: 'inherit' })
 }
 
@@ -43,4 +43,4 @@ const runSync = (command, commandArgs = []) => {
 process.on('uncaughtException', () => process.exit(1))
 
 // Export public APIs.
-module.exports = { ninja, gn, target, args, runSync, execSync: execSyncWrapper }
+module.exports = { ninja, gn, runSync, execSync: execSyncWrapper }
