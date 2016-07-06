@@ -2,12 +2,27 @@
 # Use of this source code is governed by the MIT license that can be
 # found in the LICENSE file.
 
+import("//testing/test.gni")
+
 executable("myapp") {
   sources = [
-    "main.cc",
+    "myapp.cc",
   ]
 
   deps = [
     "//base",
+  ]
+}
+
+test("myapp_unittests") {
+  sources = [
+    "myapp_unittests.cc",
+    "test/run_all_unittests.cc",
+  ]
+
+  deps = [
+    ":myapp",
+    "//base/test:test_support",
+    "//testing/gtest",
   ]
 }
