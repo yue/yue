@@ -18,6 +18,6 @@ if (process.platform !== 'win32') {
 
 execSync('git submodule sync --recursive')
 execSync('git submodule update --init --recursive')
-execSync(`buildtools/${process.platform}/${gn} gen out/Default`, {
+execSync(`tools/build/${process.platform}/${gn} gen out/Default`, {
   stdio: 'inherit'
 })

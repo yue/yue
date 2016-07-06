@@ -12,6 +12,6 @@ process.on('uncaughtException', () => process.exit(1))
 
 const gn = process.platform === 'win32' ? 'gn.exe' : 'gn'
 
-execSync(`buildtools/${process.platform}/${gn} args out/Default`, {
+execSync(`tools/build/${process.platform}/${gn} args out/Default`, {
   stdio: 'inherit'
 })

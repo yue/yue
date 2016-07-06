@@ -14,9 +14,9 @@ const sha1 = {
   win32: '9650b4ea6657e98ae3677f53b3b4b881eafed468',
 }
 
-const buildtools = path.resolve(__dirname, '..', 'buildtools')
+const buildtools = path.resolve(__dirname, '..', 'tools', 'build')
 for (const platform in sha1) {
-  const filename = platform === 'win' ? 'gn.exe' : 'gn'
+  const filename = platform === 'win32' ? 'gn.exe' : 'gn'
   const gnPath = path.join(buildtools, platform, filename)
   downloadGn(sha1[platform], gnPath)
 }

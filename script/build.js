@@ -12,6 +12,6 @@ process.on('uncaughtException', () => process.exit(1))
 
 const ninja = process.platform === 'win32' ? 'ninja.exe' : 'ninja'
 
-execSync(`buildtools/${process.platform}/${ninja} -C out/Default`, {
+execSync(`tools/build/${process.platform}/${ninja} -C out/Default`, {
   stdio: 'inherit'
 })
