@@ -24,6 +24,45 @@ config("libxml_config") {
   ]
 }
 
+config("libxml_warnings") {
+  if (is_win) {
+    cflags_c = [
+      "/wd4018",  # Signed/unsigned mismatch in comparison.
+      "/wd4267",  # TODO(brucedawson): http://crbug.com/554200 fix C4267
+      "/wd4311",  # and C4311 warnings.
+    ]
+  }
+  if (is_clang) {
+    cflags = [
+      # libxml passes `const unsigned char*` through `const char*`.
+      "-Wno-pointer-sign",
+
+      # pattern.c and uri.c both have an intentional `for (...);` /
+      # `while(...);` loop. I submitted a patch to move the `'` to its own
+      # line, but until that's landed suppress the warning:
+      "-Wno-empty-body",
+
+      # debugXML.c compares array 'arg' to NULL.
+      "-Wno-tautological-pointer-compare",
+
+      # threads.c attempts to forward declare a pthread_equal which doesn't
+      # match the prototype in pthreads.h
+      "-Wno-ignored-attributes",
+
+      # libxml casts from int to long to void*.
+      "-Wno-int-to-void-pointer-cast",
+
+      # libxml passes a volatile LPCRITICAL_SECTION* to a function expecting
+      # a void* volatile*.
+      "-Wno-incompatible-pointer-types",
+
+      # trio_is_special_quantity and trio_is_negative are only
+      # used with certain preprocessor defines set.
+      "-Wno-unused-function",
+    ]
+  }
+}
+
 static_library("libxml") {
   output_name = "libxml2"
   sources = [
@@ -38,13 +77,15 @@ static_library("libxml") {
     "src/HTMLtree.c",
     "src/SAX.c",
     "src/SAX2.c",
-    "src/acconfig.h",
+    "src/buf.c",
+    "src/buf.h",
     "src/c14n.c",
     "src/catalog.c",
     "src/chvalid.c",
     "src/debugXML.c",
     "src/dict.c",
     "src/elfgcchack.h",
+    "src/enc.h",
     "src/encoding.c",
     "src/entities.c",
     "src/error.c",
@@ -103,8 +144,10 @@ static_library("libxml") {
     "src/parserInternals.c",
     "src/pattern.c",
     "src/relaxng.c",
+    "src/save.h",
     "src/schematron.c",
     "src/threads.c",
+    "src/timsort.h",
     "src/tree.c",
 
     #"src/trio.c",
@@ -132,12 +175,20 @@ static_library("libxml") {
     "src/xmlwriter.c",
     "src/xpath.c",
     "src/xpointer.c",
+
+    #"src/xzlib.c",
+    "src/xzlib.h",
     "win32/config.h",
     "win32/include/libxml/xmlversion.h",
   ]
 
   configs -= [ "//build/config/compiler:chromium_code" ]
-  configs += [ "//build/config/compiler:no_chromium_code" ]
+  configs += [
+    "//build/config/compiler:no_chromium_code",
+
+    # Must be after no_chromium_code for warning flags to be ordered correctly.
+    ":libxml_warnings",
+  ]
 
   public_configs = [ ":libxml_config" ]
   public_deps = [
@@ -147,33 +198,12 @@ static_library("libxml") {
     "//third_party/zlib",
   ]
 
-  if (is_win) {
-    cflags_c = [ "/wd4101" ]  # Unreferenced local variable.
-  } else if (is_mac || is_android) {
+  if (is_mac || is_ios || is_android) {
     # http://www.xmlsoft.org/threads.html says that this is required when using
     # libxml from several threads, which can possibly happen in chrome. On
     # linux, this is picked up by transitivity from pkg-config output from
     # build/linux/system.gyp.
     defines = [ "_REENTRANT" ]
-  }
-
-  if (is_clang) {
-    cflags = [
-      # libxml passes `const unsigned char*` through `const char*`.
-      "-Wno-pointer-sign",
-
-      # pattern.c and uri.c both have an intentional `for (...);` /
-      # `while(...);` loop. I submitted a patch to move the `'` to its own
-      # line, but until that's landed suppress the warning:
-      "-Wno-empty-body",
-
-      # debugXML.c compares array 'arg' to NULL.
-      "-Wno-tautological-pointer-compare",
-
-      # threads.c attempts to forward declare a pthread_equal which doesn't
-      # match the prototype in pthreads.h
-      "-Wno-ignored-attributes",
-    ]
   }
 
   include_dirs = [ "$os_include" ]
