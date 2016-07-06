@@ -11,7 +11,14 @@ executable("myapp") {
 
   deps = [
     "//base",
+    "//build/win:default_exe_manifest",
   ]
+
+  # Build as GUI program.
+  # if (is_win) {
+  #   configs -= [ "//build/config/win:console" ]
+  #   configs += [ "//build/config/win:windowed" ]
+  # }
 }
 
 test("myapp_unittests") {
