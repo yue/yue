@@ -20,18 +20,4 @@ if (is_android) {
 }
 
 declare_args() {
-  # Enables Native Client support.
-  # TODO(GYP): Get NaCl linking on other platforms.
-  # Also, see if we can always get rid of enable_nacl_untrusted and
-  # enable_pnacl and always build them if enable_nacl is true.
-  # The "is_nacl" part of the condition is needed to ensure that
-  # the untrusted code is built properly; arguably it should be
-  # guarded by "is_nacl" directly rather than enable_nacl_untrusted, but
-  # this will go away when Mac and Win are working and we can just use
-  # the commented out logic.
-  # Eventually we want this to be:
-  #   enable_nacl = !is_ios && !is_android
-  enable_nacl = (is_linux && current_cpu == "x64") || is_nacl
-  enable_nacl_untrusted = enable_nacl
-  enable_pnacl = enable_nacl_untrusted
 }
