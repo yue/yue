@@ -4,14 +4,6 @@
 // Use of this source code is governed by the MIT license that can be
 // found in the LICENSE file.
 
-const path = require('path')
-const {execSync} = require('child_process')
+const {gn, execSync} = require('./common')
 
-process.chdir(path.dirname(__dirname))
-process.on('uncaughtException', () => process.exit(1))
-
-const gn = process.platform === 'win32' ? 'gn.exe' : 'gn'
-
-execSync(`tools/build/${process.platform}/${gn} args out/Default`, {
-  stdio: 'inherit'
-})
+execSync(`${gn} args out/Default`)
