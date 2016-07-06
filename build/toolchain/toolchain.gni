@@ -15,6 +15,8 @@ declare_args() {
   allow_posix_link_time_opt =
       target_os == "linux" && !is_chromeos && target_cpu == "x64" &&
       is_chrome_branded && is_official_build
+  # We are not using gold in this boilerplate.
+  allow_posix_link_time_opt = false
 
   # Set to true to use lld, the LLVM linker. This flag may be used on Windows
   # with the shipped LLVM toolchain, or on Linux with a self-built top-of-tree
