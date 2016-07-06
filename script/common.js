@@ -9,8 +9,8 @@ const {execSync, spawnSync} = require('child_process')
 process.chdir(path.dirname(__dirname))
 
 // Common paths.
-const ninja = path.join('tools', 'build', process.platform, 'ninja')
-const gn = path.join('tools', 'build', process.platform, 'gn')
+let ninja = path.join('tools', 'build', process.platform, 'ninja')
+let gn = path.join('tools', 'build', process.platform, 'gn')
 
 if (process.platform === 'win32') {
   ninja += '.exe'
