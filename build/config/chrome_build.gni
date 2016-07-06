@@ -6,5 +6,5 @@ declare_args() {
   # Select the desired branding flavor. False means normal Chromium branding,
   # true means official Google Chrome branding (requires extra Google-internal
   # resources).
-  is_chrome_branded = true
+  is_chrome_branded = false
 }
