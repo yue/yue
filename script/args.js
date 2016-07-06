@@ -4,6 +4,6 @@
 // Use of this source code is governed by the MIT license that can be
 // found in the LICENSE file.
 
-const {gn, execSync} = require('./common')
+const {gn, runSync} = require('./common')
 
-execSync(`${gn} args out/Default`)
+runSync(gn, ['args'])

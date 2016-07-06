@@ -4,7 +4,7 @@
 // Use of this source code is governed by the MIT license that can be
 // found in the LICENSE file.
 
-const {gn, execSync} = require('./common')
+const {gn, execSync, runSync} = require('./common')
 
 if (process.platform !== 'win32') {
   execSync('python tools/clang/scripts/update.py')
@@ -12,4 +12,4 @@ if (process.platform !== 'win32') {
 
 execSync('git submodule sync --recursive')
 execSync('git submodule update --init --recursive')
-execSync(`${gn} gen out/Default`)
+runSync(gn, ['gen'])

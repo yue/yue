@@ -4,6 +4,6 @@
 // Use of this source code is governed by the MIT license that can be
 // found in the LICENSE file.
 
-const {ninja, execSync} = require('./common')
+const {ninja, runSync} = require('./common')
 
-execSync(`${ninja} -C out/Default`)
+runSync(ninja, ['-C'])
