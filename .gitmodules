@@ -22,3 +22,6 @@
 [submodule "base"]
 	path = base
 	url = https://chromium.googlesource.com/chromium/src/base
+[submodule "build/toolchain"]
+	path = build/toolchain
+	url = https://chromium.googlesource.com/chromium/src/build/toolchain
