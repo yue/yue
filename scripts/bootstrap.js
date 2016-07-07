@@ -4,13 +4,15 @@
 // Use of this source code is governed by the MIT license that can be
 // found in the LICENSE file.
 
+const {fork} = require('child_process')
+
 const {gn, execSync, runSync} = require('./common')
 
 if (process.platform !== 'win32') {
   execSync('python tools/clang/scripts/update.py')
 }
 if (process.platform === 'linux') {
-  execSync('python scripts/update-gold.js')
+  fork('scripts/update-gold.js')
 }
 
 execSync('git submodule sync --recursive')

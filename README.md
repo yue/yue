@@ -7,29 +7,29 @@ The boilerplate to create projects using Chromium's base library.
 Bootstrap:
 
 ```bash
-./script/bootstrap.js
+./scripts/bootstrap.js
 ```
 
 Change args of configuration:
 
 ```bash
-./script/args.js
+./scripts/args.js
 ```
 
 Build:
 
 ```bash
-./script/build.js
+./scripts/build.js
 ```
 
 Build a specified target:
 
 ```bash
-./script/build.js base_unittests
+./scripts/build.js base_unittests
 ```
 
 Build a specified target under a configuration:
 
 ```bash
-./script/build.js out/Default base_unittests
+./scripts/build.js out/Default base_unittests
 ```
