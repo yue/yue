@@ -23,11 +23,15 @@ const execSyncWrapper = (command, options = { stdio: 'inherit' }) => {
 }
 
 // Parse args.
+let verbose = false
 let dir = 'out/Default'
 const args = process.argv.slice(2).filter((arg) => {
   if (arg.includes('/') && !arg.startsWith('-')) {
     dir = arg
     return false
+  } else if (arg === '-v' || arg === '--verbose') {
+    verbose = true
+    return true
   } else {
     return true
   }
@@ -40,7 +44,9 @@ const runSync = (command, commandArgs = []) => {
 }
 
 // Don't log out Node.js stack trace.
-process.on('uncaughtException', () => process.exit(1))
+if (!verbose) {
+  process.on('uncaughtException', () => process.exit(1))
+}
 
 // Export public APIs.
 module.exports = { ninja, gn, runSync, execSync: execSyncWrapper }
