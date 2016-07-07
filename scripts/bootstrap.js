@@ -4,7 +4,7 @@
 // Use of this source code is governed by the MIT license that can be
 // found in the LICENSE file.
 
-const {fork} = require('child_process')
+const {spawnSync} = require('child_process')
 
 const {gn, execSync, runSync} = require('./common')
 
@@ -12,7 +12,7 @@ if (process.platform !== 'win32') {
   execSync('python tools/clang/scripts/update.py')
 }
 if (process.platform === 'linux') {
-  fork('scripts/update-gold.js')
+  spawnSync(process.execPath, ['scripts/update-gold.js'], { stdio: 'inherit' })
 }
 
 execSync('git submodule sync --recursive')
