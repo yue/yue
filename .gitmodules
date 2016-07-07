@@ -19,3 +19,6 @@
 [submodule "third_party/tcmalloc/chromium"]
 	path = third_party/tcmalloc/chromium
 	url = https://chromium.googlesource.com/chromium/src/third_party/tcmalloc/chromium
+[submodule "base"]
+	path = base
+	url = https://chromium.googlesource.com/chromium/src/base
