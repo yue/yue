@@ -8,6 +8,9 @@ const {execSync, spawnSync} = require('child_process')
 // Switch to root dir.
 process.chdir(path.dirname(__dirname))
 
+// We are not using toolchain from depot_tools.
+process.env.DEPOT_TOOLS_WIN_TOOLCHAIN = 0
+
 // Common paths.
 let ninja = path.join('tools', 'build', process.platform, 'ninja')
 let gn = path.join('tools', 'build', process.platform, 'gn')
