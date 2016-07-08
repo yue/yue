@@ -1,6 +1,6 @@
 # base-boilerplate
 
-The boilerplate to create projects using Chromium's base library.
+The boilerplate to create projects using Chromium's `base` and `net` libraries.
 
 ## Usage
 
