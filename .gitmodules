@@ -34,3 +34,6 @@
 [submodule "third_party/boringssl/src"]
 	path = third_party/boringssl/src
 	url = https://boringssl.googlesource.com/boringssl.git
+[submodule "sdch/open-vcdiff"]
+	path = sdch/open-vcdiff
+	url = https://chromium.googlesource.com/external/github.com/google/open-vcdiff
