@@ -12,10 +12,6 @@
 # See also build/config/features.gni
 
 declare_args() {
-  # Indicates if Ozone is enabled. Ozone is a low-level library layer for Linux
-  # that does not require X11.
-  use_ozone = false
-
   # Whether we should use glib, a low level C utility library.
   use_glib = false
 }

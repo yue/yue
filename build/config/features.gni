@@ -20,4 +20,6 @@ if (is_android) {
 }
 
 declare_args() {
+  # Multicast DNS.
+  enable_mdns = is_win || is_linux
 }

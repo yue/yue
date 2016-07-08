@@ -49,6 +49,8 @@ and http://lists.apple.com/archives/apple-cdsa/2008/Aug/msg00008.html
 
 Modifications:
 - Removed unneeded definitions for internal Apple CSP DL enums and structs
+- Added a suppression for the warning "-Wdeprecated-declarations" since CSSM
+  APIs are deprecated since OSX 10.7.
 
 dnsinfo.h from:
 http://www.opensource.apple.com/source/configd/configd-453.19/dnsinfo/dnsinfo.h

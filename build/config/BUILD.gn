@@ -5,6 +5,7 @@
 import("//build/config/allocator.gni")
 import("//build/config/chrome_build.gni")
 import("//build/config/chromecast_build.gni")
+import("//build/config/crypto.gni")
 import("//build/config/dcheck_always_on.gni")
 import("//build/config/features.gni")
 import("//build/config/sanitizers/sanitizers.gni")
@@ -47,8 +48,20 @@ declare_args() {
 config("feature_flags") {
   # Don't use deprecated V8 APIs anywhere.
   defines = [ "V8_DEPRECATION_WARNINGS" ]
+  if (enable_mdns) {
+    defines += [ "ENABLE_MDNS=1" ]
+  }
   if (dcheck_always_on) {
     defines += [ "DCHECK_ALWAYS_ON=1" ]
+  }
+  if (use_glib) {
+    defines += [ "USE_GLIB=1" ]
+  }
+  if (use_openssl_certs) {
+    defines += [ "USE_OPENSSL_CERTS=1" ]
+  }
+  if (use_nss_certs) {
+    defines += [ "USE_NSS_CERTS=1" ]
   }
   if (use_allocator != "tcmalloc") {
     defines += [ "NO_TCMALLOC" ]

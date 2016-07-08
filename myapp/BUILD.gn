@@ -11,6 +11,7 @@ executable("myapp") {
 
   deps = [
     "//base",
+    "//net",
     "//build/win:default_exe_manifest",
   ]
 

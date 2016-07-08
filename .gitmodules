@@ -25,3 +25,12 @@
 [submodule "build/toolchain"]
 	path = build/toolchain
 	url = https://chromium.googlesource.com/chromium/src/build/toolchain
+[submodule "net"]
+	path = net
+	url = https://github.com/zcbenz/net.git
+[submodule "crypto"]
+	path = crypto
+	url = https://chromium.googlesource.com/chromium/src/crypto
+[submodule "third_party/boringssl/src"]
+	path = third_party/boringssl/src
+	url = https://boringssl.googlesource.com/boringssl.git

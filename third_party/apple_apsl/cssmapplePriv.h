@@ -1,15 +1,15 @@
 /*
  * Copyright (c) 2000-2004 Apple Computer, Inc. All Rights Reserved.
- * 
+ *
  * @APPLE_LICENSE_HEADER_START@
- * 
+ *
  * This file contains Original Code and/or Modifications of Original Code
  * as defined in and that are subject to the Apple Public Source License
  * Version 2.0 (the 'License'). You may not use this file except in
  * compliance with the License. Please obtain a copy of the License at
  * http://www.opensource.apple.com/apsl/ and read it before using this
  * file.
- * 
+ *
  * The Original Code and all software distributed under the License are
  * distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, EITHER
  * EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
@@ -17,26 +17,31 @@
  * FITNESS FOR A PARTICULAR PURPOSE, QUIET ENJOYMENT OR NON-INFRINGEMENT.
  * Please see the License for the specific language governing rights and
  * limitations under the License.
- * 
+ *
  * @APPLE_LICENSE_HEADER_END@
  *
  * cssmapplePriv.h -- Private CSSM features specific to Apple's Implementation
  */
- 
+
 #ifndef _CSSMAPPLE_PRIV_H_
 #define _CSSMAPPLE_PRIV_H_  1
 
 #include <Security/cssmtype.h>
 #include <Security/cssmapple.h>
 
+// CSSM functions are deprecated as of OSX 10.7, but have no replacement.
+// https://bugs.chromium.org/p/chromium/issues/detail?id=590914#c1
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
- 
-/* 
- * Options for X509TP's CSSM_TP_CertGroupVerify for policy 
- * CSSMOID_APPLE_TP_REVOCATION_OCSP. A pointer to, and length of, one 
- * of these is optionally placed in 
+
+/*
+ * Options for X509TP's CSSM_TP_CertGroupVerify for policy
+ * CSSMOID_APPLE_TP_REVOCATION_OCSP. A pointer to, and length of, one
+ * of these is optionally placed in
  * CSSM_TP_VERIFY_CONTEXT.Cred->Policy.PolicyIds[n].FieldValue.
  */
 
@@ -64,7 +69,7 @@ enum {
 };
 
 typedef struct {
-	uint32							Version;	
+	uint32							Version;
 	CSSM_APPLE_TP_OCSP_OPT_FLAGS	Flags;
 	CSSM_DATA_PTR					LocalResponder;		/* URI */
 	CSSM_DATA_PTR					LocalResponderCert;	/* X509 DER encoded cert */
@@ -73,5 +78,7 @@ typedef struct {
 #ifdef __cplusplus
 }
 #endif
+
+#pragma clang diagnostic pop  // "-Wdeprecated-declarations"
 
 #endif	/* _CSSMAPPLE_PRIV_H_ */
