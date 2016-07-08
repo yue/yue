@@ -37,3 +37,9 @@
 [submodule "sdch/open-vcdiff"]
 	path = sdch/open-vcdiff
 	url = https://chromium.googlesource.com/external/github.com/google/open-vcdiff
+[submodule "third_party/yasm/binaries"]
+	path = third_party/yasm/binaries
+	url = https://chromium.googlesource.com/chromium/deps/yasm/binaries/
+[submodule "third_party/yasm/source/patched-yasm"]
+	path = third_party/yasm/source/patched-yasm
+	url = https://chromium.googlesource.com/chromium/deps/yasm/patched-yasm
