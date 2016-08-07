@@ -1,4 +1,94 @@
 # Copyright 2016 Cheng Zhao. All rights reserved.
 
 source_set("luajit") {
+  if (target_os == "win") {
+    defines = ["LUAJIT_OS=LUAJIT_OS_WINDOWS"]
+  } else if (target_os == "linux") {
+    defines = ["LUAJIT_OS=LUAJIT_OS_LINUX"]
+  } else if (target_os == "mac" || target_os == "ios") {
+    defines = ["LUAJIT_OS=LUAJIT_OS_OSX"]
+  } else {
+    defines = ["LUAJIT_OS=LUAJIT_OS_OTHER"]
+  }
+}
+
+executable("minilua") {
+  sources = [
+    "src/host/minilua.c",
+  ]
+}
+
+action("generate_buildvm_arch_h") {
+  hostlua = "$root_out_dir/minilua"
+  dasm_lua = "dynasm/dynasm.lua"
+  dasm_asc = "src/vm_$target_cpu.dasc"
+  buildvm_arch_h = "$target_gen_dir/buildvm_arch.h"
+
+  # Translated from src/Makefile, do not change the seqeunce.
+  dasm_flags = []
+  if (target_cpu != "mips" && target_cpu != "ppc") {
+    dasm_flags += ["-D", "ENDIAN_LE"]
+  } else {
+    assert(false, "Unsupported cpu: " + target_cpu)
+  }
+  if (target_cpu == "x64" || target_cpu == "arm64") {
+    dasm_flags += ["-D", "P64"]
+  }
+  if (target_cpu != "arm64" && target_os != "ios") {
+    dasm_flags += ["-D", "JIT"]
+  }
+  if (target_os != "console") {
+    dasm_flags += ["-D", "FFI"]
+  }
+  if (target_cpu == "arm" || target_cpu == "arm64") {
+    dasm_flags += ["-D", "DUALNUM"]
+    if (arm_float_abi == "soft" || arm_float_abi == "softfp") {
+      dasm_flags += ["-D", "HFABI"]
+    } else {
+      dasm_flags += ["-D", "FPU"]
+    }
+  } else {
+    dasm_flags += ["-D", "HFABI"]
+  }
+  if (target_os == "ios") {
+    dasm_flags += ["-D", "NO_UNWIND"]
+  }
+  if (target_cpu == "arm" || target_cpu == "arm64") {
+    dasm_flags += ["-D", "VER=${arm_version}0"]
+  } else {
+    dasm_flags += ["-D", "VER="]
+  }
+  if (target_cpu == "x86") {
+    dasm_flags += ["-D", "SSE"]
+  }
+  if (target_os == "ios") {
+    dasm_flags += ["-D", "IOS"]
+  }
+
+  script = "//build/run.py"
+  inputs = [ hostlua, dasm_lua ]
+  outputs = [ buildvm_arch_h ]
+  args = [ rebase_path(hostlua), rebase_path(dasm_lua) ] + dasm_flags +
+         ["-o", rebase_path(buildvm_arch_h), rebase_path(dasm_asc) ]
+
+  deps = [ ":minilua($host_toolchain)" ]
+}
+
+executable("buildvm") {
+  include_dirs = [
+    "src",
+    "$target_gen_dir",
+  ]
+  sources = [
+    "src/host/buildvm.c",
+    "src/host/buildvm.h",
+    "src/host/buildvm_asm.c",
+    "src/host/buildvm_peobj.c",
+    "src/host/buildvm_libbc.h",
+    "src/host/buildvm_lib.c",
+    "src/host/buildvm_fold.c",
+  ]
+  cflags = [ "-Wno-shift-overflow" ]
+
+  deps = [ ":generate_buildvm_arch_h" ]
 }

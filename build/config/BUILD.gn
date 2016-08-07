@@ -46,8 +46,7 @@ declare_args() {
 #
 # For now we define these globally to match the current GYP build.
 config("feature_flags") {
-  # Don't use deprecated V8 APIs anywhere.
-  defines = [ "V8_DEPRECATION_WARNINGS" ]
+  defines = []
   if (enable_mdns) {
     defines += [ "ENABLE_MDNS=1" ]
   }
