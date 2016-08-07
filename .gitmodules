@@ -43,3 +43,6 @@
 [submodule "third_party/yasm/source/patched-yasm"]
 	path = third_party/yasm/source/patched-yasm
 	url = https://chromium.googlesource.com/chromium/deps/yasm/patched-yasm
+[submodule "third_party/luajit"]
+	path = third_party/luajit
+	url = https://github.com/LuaJIT/LuaJIT

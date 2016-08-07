@@ -4,31 +4,25 @@
 
 import("//testing/test.gni")
 
-executable("myapp") {
+executable("yue") {
   sources = [
-    "myapp.cc",
+    "yue.cc",
   ]
 
   deps = [
     "//base",
+    "//third_party/luajit",
     "//build/win:default_exe_manifest",
   ]
-
-  # Build as GUI program.
-  # if (is_win) {
-  #   configs -= [ "//build/config/win:console" ]
-  #   configs += [ "//build/config/win:windowed" ]
-  # }
 }
 
-test("myapp_unittests") {
+test("yue_unittests") {
   sources = [
-    "myapp_unittests.cc",
     "test/run_all_unittests.cc",
   ]
 
   deps = [
-    ":myapp",
+    ":yue",
     "//base/test:test_support",
     "//testing/gtest",
   ]

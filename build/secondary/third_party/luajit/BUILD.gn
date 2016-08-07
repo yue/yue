@@ -1,0 +1,4 @@
+# Copyright 2016 Cheng Zhao. All rights reserved.
+
+source_set("luajit") {
+}
