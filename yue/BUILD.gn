@@ -11,7 +11,7 @@ executable("yue") {
 
   deps = [
     "//base",
-    "//third_party/luajit",
+    "//third_party/lua:liblua",
     "//build/win:default_exe_manifest",
   ]
 }
