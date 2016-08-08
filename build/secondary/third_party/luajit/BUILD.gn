@@ -78,21 +78,30 @@ lj_libdef_h = "$target_gen_dir/lj_libdef.h"
 lj_recdef_h = "$target_gen_dir/lj_recdef.h"
 lj_folddef_h = "$target_gen_dir/lj_folddef.h"
 
+# Keep the original order to generate the same bytecode.
 ljlib_files = [
   "src/lib_base.c",
-  "src/lib_bit.c",
-  "src/lib_debug.c",
-  "src/lib_ffi.c",
-  "src/lib_io.c",
-  "src/lib_jit.c",
   "src/lib_math.c",
-  "src/lib_os.c",
-  "src/lib_package.c",
+  "src/lib_bit.c",
   "src/lib_string.c",
   "src/lib_table.c",
+  "src/lib_io.c",
+  "src/lib_os.c",
+  "src/lib_package.c",
+  "src/lib_debug.c",
+  "src/lib_jit.c",
+  "src/lib_ffi.c",
 ]
 
-source_set("luajit") {
+config("luajit_excutable_config") {
+  include_dirs = [ "src" ]
+  if (target_os == "mac" && target_cpu == "x64") {
+    ldflags = [ "-pagezero_size", "10000", "-image_base", "100000000" ]
+  }
+}
+
+static_library("luajit") {
+  defines = luajit_defines
   include_dirs = [ "$target_gen_dir" ]
   sources = ljlib_files + [
     ljvm_bout,
@@ -220,15 +229,18 @@ source_set("luajit") {
     "src/lj_vmevent.c",
     "src/lj_vmevent.h",
     "src/lj_vmmath.c",
-    "src/ljamalg.c",
     "src/lua.h",
     "src/lua.hpp",
     "src/luaconf.h",
-    "src/luajit.c",
     "src/luajit.h",
     "src/lualib.h",
   ]
   cflags = [ "-Wno-varargs" ]
+
+  public_configs = [ ":luajit_excutable_config" ]
+  if (!is_win) {
+    configs -= [ "//build/config/gcc:symbol_visibility_hidden" ]
+  }
 
   deps = [
     ":generate_ljvm_s",
@@ -239,6 +251,13 @@ source_set("luajit") {
     ":generate_lj_folddef_h",
     ":generate_vmdef_lua",
   ]
+}
+
+executable("luajit_interpreter") {
+  defines = luajit_defines
+  sources = [ "src/luajit.c" ]
+  configs -= [ "//build/config/compiler:default_optimization" ]
+  deps = [ ":luajit" ]
 }
 
 executable("minilua") {
