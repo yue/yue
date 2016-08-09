@@ -29,6 +29,7 @@ TEST_F(LuaTest, PushesToStack) {
   ASSERT_EQ(str1, "str1");
   int number;
   ASSERT_TRUE(lua::To(state_, -3, &number));
+  ASSERT_FALSE(lua::To(state_, -1, &number));
   ASSERT_EQ(number, 1);
   ASSERT_EQ(lua::GetTop(state_), 3);
 }
@@ -64,9 +65,11 @@ void FunctionWithArgs(int, const std::string&) {
 }
 
 TEST_F(LuaTest, PCallWithoutReturnValue) {
-  EXPECT_TRUE(lua::PCall(state_, base::Bind(&FunctionWithoutReturnValue)));
+  ASSERT_TRUE(lua::Push(state_, base::Bind(&FunctionWithoutReturnValue)));
+  EXPECT_TRUE(lua::PCall(state_, nullptr));
   ASSERT_EQ(lua::GetTop(state_), 0);
-  EXPECT_TRUE(lua::PCall(state_, base::Bind(&FunctionWithArgs, 123, "test")));
+  ASSERT_TRUE(lua::Push(state_, base::Bind(&FunctionWithArgs)));
+  EXPECT_TRUE(lua::PCall(state_, nullptr, 123, "test"));
   ASSERT_EQ(lua::GetTop(state_), 0);
 }
 
@@ -81,13 +84,15 @@ std::string FunctionReturnsString(base::StringPiece str) {
 TEST_F(LuaTest, PCallWithReturnValue) {
   int num = 42;
   int out = 0;
-  ASSERT_TRUE(lua::PCall(state_, base::Bind(&FunctionReturnsInt), &out, num));
+  ASSERT_TRUE(lua::Push(state_, base::Bind(&FunctionReturnsInt)));
+  ASSERT_TRUE(lua::PCall(state_, &out, num));
   EXPECT_EQ(num, out);
   ASSERT_EQ(lua::GetTop(state_), 0);
+
   base::StringPiece str = "valar morghulis";
   std::string str_out;
-  ASSERT_TRUE(lua::PCall(state_, base::Bind(&FunctionReturnsString),
-                         &str_out, str));
+  ASSERT_TRUE(lua::Push(state_, base::Bind(&FunctionReturnsString)));
+  ASSERT_TRUE(lua::PCall(state_, &str_out, str));
   EXPECT_EQ(str_out, str);
   ASSERT_EQ(lua::GetTop(state_), 0);
 }

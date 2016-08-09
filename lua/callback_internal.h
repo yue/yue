@@ -42,6 +42,7 @@ bool GetNextArgument(State* state, int index, int create_flags, T* result) {
 }
 
 // Get how many values would be returned for the type.
+// TODO(zcbenz): Support multiple arguments.
 template<typename ReturnType>
 struct ReturnValues {
   static const int count = 1;

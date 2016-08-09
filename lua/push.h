@@ -7,6 +7,8 @@
 #ifndef LUA_PUSH_H_
 #define LUA_PUSH_H_
 
+#include <string>
+
 #include "base/strings/string_piece.h"
 #include "lua/state.h"
 

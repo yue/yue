@@ -16,16 +16,14 @@ namespace lua {
 // The push operation for callback.
 template<typename Sig>
 inline bool Push(State* state, const base::Callback<Sig>& callback) {
-  return false;
+  return internal::PushCFunction(state, callback);
 }
 
-// Safely call the function under lua environment,
+// Safely call the function on top of stack.
 // When error happens, this API returns false and leaves the error on stack.
 template<typename ReturnType, typename... ArgTypes>
-inline bool PCall(State* state,
-                  const base::Callback<ReturnType(ArgTypes...)>& callback,
-                  ReturnType* result, ArgTypes... args) {
-  if (!internal::PushCFunction(state, callback) || !Push(state, args...))
+inline bool PCall(State* state, ReturnType* result, ArgTypes... args) {
+  if (!Push(state, args...))
     return false;
 
   if (lua_pcall(state, sizeof...(ArgTypes),
@@ -36,15 +34,11 @@ inline bool PCall(State* state,
   return Pop(state, result);
 }
 
-// The PCall version without return value.
+// Passing nullptr means there is no result expected.
 template<typename... ArgTypes>
-inline bool PCall(State* state,
-                  const base::Callback<void(ArgTypes...)>& callback,
-                  ArgTypes... args) {
-  if (!internal::PushCFunction(state, callback) || !Push(state, args...))
-    return false;
-
-  return lua_pcall(state, sizeof...(ArgTypes), 0, 0) == LUA_OK;
+inline bool PCall(State* state, nullptr_t, ArgTypes... args) {
+  return Push(state, args...) &&
+         lua_pcall(state, sizeof...(ArgTypes), 0, 0) == LUA_OK;
 }
 
 }  // namespace lua
