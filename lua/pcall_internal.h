@@ -2,8 +2,8 @@
 // Use of this source code is governed by the MIT license that can be
 // found in the LICENSE file.
 
-#ifndef LUA_CALLBACK_INTERNAL_H_
-#define LUA_CALLBACK_INTERNAL_H_
+#ifndef LUA_PCALL_INTERNAL_H_
+#define LUA_PCALL_INTERNAL_H_
 
 #include "base/callback.h"
 #include "lua/push.h"
@@ -173,6 +173,7 @@ struct Dispatcher<ReturnType(ArgTypes...)> {
       Invoker<Indices, ArgTypes...> invoker(state, holder->flags);
       if (!invoker.IsOK()) {
         // TODO(zcbenz): Get the index of failing argument.
+        // TODO(zcbenz): Give details of type information.
         Push(state, "Failed to convert arguments");
         break;
       }
@@ -210,4 +211,4 @@ inline bool PushCFunction(State* state,
 
 }  // namespace lua
 
-#endif  // LUA_CALLBACK_INTERNAL_H_
+#endif  // LUA_PCALL_INTERNAL_H_

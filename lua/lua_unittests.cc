@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 #include "base/bind.h"
-#include "lua/callback.h"
+#include "lua/pcall.h"
 #include "lua/lua.h"
 #include "lua/pop.h"
 #include "testing/gtest/include/gtest/gtest.h"

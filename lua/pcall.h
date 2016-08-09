@@ -4,10 +4,10 @@
 //
 // Extending the APIs for base::Callback.
 
-#ifndef LUA_CALLBACK_H_
-#define LUA_CALLBACK_H_
+#ifndef LUA_PCALL_H_
+#define LUA_PCALL_H_
 
-#include "lua/callback_internal.h"
+#include "lua/pcall_internal.h"
 #include "lua/pop.h"
 #include "lua/push.h"
 
@@ -43,4 +43,4 @@ inline bool PCall(State* state, nullptr_t, ArgTypes... args) {
 
 }  // namespace lua
 
-#endif  // LUA_CALLBACK_H_
+#endif  // LUA_PCALL_H_
