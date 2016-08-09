@@ -2,19 +2,36 @@
 # Use of this source code is governed by the MIT license that can be
 # found in the LICENSE file.
 
+import("//testing/test.gni")
+
 source_set("lua") {
   sources = [
     "callback.h",
+    "callback_internal.cc",
     "callback_internal.h",
     "lua.cc",
     "lua.h",
     "state.h",
     "to.h",
+    "pop.h",
     "push.h",
   ]
 
   deps = [
     "//base",
     "//third_party/lua:liblua",
+  ]
+}
+
+test("lua_unittests") {
+  sources = [
+    "lua_unittests.cc",
+    "test/run_all_unittests.cc",
+  ]
+
+  deps = [
+    ":lua",
+    "//base/test:test_support",
+    "//testing/gtest",
   ]
 }

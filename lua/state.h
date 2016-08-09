@@ -14,12 +14,12 @@ namespace lua {
 using State = lua_State;
 
 // Manages the created lua_State.
-class MangedState {
+class ManagedState {
  public:
-  MangedState() : state_(luaL_newstate()) {
+  ManagedState() : state_(luaL_newstate()) {
   }
 
-  ~MangedState() {
+  ~ManagedState() {
     lua_close(state_);
   }
 
@@ -28,7 +28,7 @@ class MangedState {
  private:
   State* state_;
 
-  DISALLOW_COPY_AND_ASSIGN(MangedState);
+  DISALLOW_COPY_AND_ASSIGN(ManagedState);
 };
 
 }  // namespace lua

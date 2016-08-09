@@ -12,19 +12,8 @@
 
 namespace lua {
 
-// Enable push arbitrary args at the same time.
-template<typename ArgType, typename... ArgTypes>
-inline bool Push(State* state, ArgType arg, ArgTypes... args) {
-  return Push(state, arg) && Push(state, args...);
-}
-
-// Needed by the arbitrary length version of Push.
-inline bool Push(State* state) {
-  return true;
-}
-
 // Specialized push for each type.
-inline bool Push(State* state, lua_Integer number) {
+inline bool Push(State* state, int number) {
   lua_pushinteger(state, number);
   return true;
 }
@@ -32,6 +21,27 @@ inline bool Push(State* state, lua_Integer number) {
 inline bool Push(State* state, base::StringPiece str) {
   lua_pushlstring(state, str.data(), str.length());
   return true;  // ignore memory errors.
+}
+
+inline bool Push(State* state, const std::string& str) {
+  lua_pushlstring(state, str.data(), str.length());
+  return true;  // ignore memory errors.
+}
+
+inline bool Push(State* state, const char* str) {
+  lua_pushstring(state, str);
+  return true;  // ignore memory errors.
+}
+
+// Needed by the arbitrary length version of Push.
+inline bool Push(State* state) {
+  return true;
+}
+
+// Enable push arbitrary args at the same time.
+template<typename ArgType, typename... ArgTypes>
+inline bool Push(State* state, ArgType arg, ArgTypes... args) {
+  return Push(state, arg) && Push(state, args...);
 }
 
 }  // namespace lua

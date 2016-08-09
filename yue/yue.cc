@@ -17,7 +17,7 @@ int main(int argc, const char *argv[]) {
   settings.logging_dest = logging::LOG_TO_SYSTEM_DEBUG_LOG;
   logging::InitLogging(settings);
 
-  lua::MangedState state;
+  lua::ManagedState state;
   if (!state) {
     LOG(ERROR) << "Failed to create state.";
     return 1;
