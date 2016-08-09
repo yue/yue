@@ -6,6 +6,7 @@ import("//testing/test.gni")
 
 source_set("lua") {
   sources = [
+    "call_context.h",
     "pcall.h",
     "pcall_internal.cc",
     "pcall_internal.h",

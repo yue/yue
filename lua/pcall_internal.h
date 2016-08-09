@@ -6,16 +6,13 @@
 #define LUA_PCALL_INTERNAL_H_
 
 #include "base/callback.h"
+#include "lua/call_context.h"
 #include "lua/push.h"
 #include "lua/to.h"
 
 namespace lua {
 
 namespace internal {
-
-enum PushCFunctionFlags {
-  HolderIsFirstArgument = 1 << 0,
-};
 
 template<typename T>
 struct CallbackParamTraits {
@@ -31,14 +28,22 @@ struct CallbackParamTraits<const T*> {
 };
 
 template<typename T>
-bool GetNextArgument(State* state, int index, int create_flags, T* result) {
-  if (index == 0 && (create_flags & HolderIsFirstArgument) != 0) {
+inline bool GetNextArgument(CallContext* context, int index, T* result) {
+  if (index == 0 && (context->create_flags & HolderIsFirstArgument) != 0) {
     // TODO(zcbenz): Add support for classes.
     return false;
   } else {
     // Lua uses 1-index array.
-    return To(state, index + 1, result);;
+    return To(context->state, index + 1, result);;
   }
+}
+
+// For advanced use cases, we allow callers to request the unparsed CallContext
+// object and poke around in it directly.
+inline bool GetNextArgument(CallContext* context, int index,
+                            CallContext** result) {
+  *result = context;
+  return true;
 }
 
 // Get how many values would be returned for the type.
@@ -104,10 +109,11 @@ struct ArgumentHolder {
   using ArgLocalType = typename CallbackParamTraits<ArgType>::LocalType;
 
   ArgLocalType value;
-  bool ok;
+  const bool ok;
 
-  ArgumentHolder(State* state, int create_flags)
-      : ok(GetNextArgument(state, index, create_flags, &value)) {}
+  ArgumentHolder(CallContext* context)
+      : ok(GetNextArgument(context, index, &value)) {
+  }
 };
 
 // Class template for converting arguments from JavaScript to C++ and running
@@ -123,9 +129,9 @@ class Invoker<IndicesHolder<indices...>, ArgTypes...>
   // C++ has always been strict about the class initialization order,
   // so it is guaranteed ArgumentHolders will be initialized (and thus, will
   // extract arguments from Arguments) in the right order.
-  Invoker(State* state, int create_flags)
-      : ArgumentHolder<indices, ArgTypes>(state, create_flags)...,
-        state_(state) {}
+  explicit Invoker(CallContext* context)
+      : ArgumentHolder<indices, ArgTypes>(context)...,
+        context_(context) {}
 
   bool IsOK() {
     return And(ArgumentHolder<indices, ArgTypes>::ok...);
@@ -134,7 +140,7 @@ class Invoker<IndicesHolder<indices...>, ArgTypes...>
   template<typename ReturnType>
   bool DispatchToCallback(base::Callback<ReturnType(ArgTypes...)> callback) {
     ReturnType ret = callback.Run(ArgumentHolder<indices, ArgTypes>::value...);
-    return Push(state_, ret);
+    return Push(context_->state, ret);
   }
 
   // In C++, you can declare the function foo(void), but you can't pass a void
@@ -152,7 +158,7 @@ class Invoker<IndicesHolder<indices...>, ArgTypes...>
     return arg1 && And(args...);
   }
 
-  State* state_;
+  CallContext* context_;
 };
 
 // DispatchToCallback converts all the lua arguments to C++ types and
@@ -167,24 +173,25 @@ struct Dispatcher<ReturnType(ArgTypes...)> {
     HolderT* holder = static_cast<HolderT*>(
         lua_touserdata(state, lua_upvalueindex(1)));
 
-    bool ok = false;
+    CallContext context(state, holder->flags);
     do {  // Make sure C++ stack is destroyed before calling lua_error.
       using Indices = typename IndicesGenerator<sizeof...(ArgTypes)>::type;
-      Invoker<Indices, ArgTypes...> invoker(state, holder->flags);
+      Invoker<Indices, ArgTypes...> invoker(&context);
       if (!invoker.IsOK()) {
         // TODO(zcbenz): Get the index of failing argument.
         // TODO(zcbenz): Give details of type information.
+        context.has_error = true;
         Push(state, "Failed to convert arguments");
         break;
       }
       if (!invoker.DispatchToCallback(holder->callback)) {
+        context.has_error = true;
         Push(state, "Failed to convert result");
         break;
       }
-      ok = true;
     } while (false);
 
-    if (!ok) {  // Throw error after we are out of C++ stack.
+    if (context.has_error) {  // Throw error after we are out of C++ stack.
       lua_error(state);
       NOTREACHED() << "Code after lua_error() gets called";
       return -1;
