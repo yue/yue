@@ -20,6 +20,11 @@ inline bool Push(State* state, int number) {
   return true;
 }
 
+inline bool Push(State* state, nullptr_t) {
+  lua_pushnil(state);
+  return true;
+}
+
 inline bool Push(State* state, base::StringPiece str) {
   lua_pushlstring(state, str.data(), str.length());
   return true;  // ignore memory errors.

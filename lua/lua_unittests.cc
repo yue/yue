@@ -58,10 +58,28 @@ TEST_F(LuaTest, PopsValues) {
   ASSERT_EQ(lua::GetTop(state_), 0);
 }
 
-void FunctionWithoutReturnValue() {
+TEST_F(LuaTest, PCallWithInvalidValue) {
+  std::string str;
+  ASSERT_TRUE(lua::Push(state_, nullptr));
+  EXPECT_FALSE(lua::PCall(state_, nullptr));
+  ASSERT_EQ(lua::GetTop(state_), 1);
+  ASSERT_TRUE(lua::Pop(state_, &str));
+  ASSERT_EQ(str, "attempt to call a nil value");
 }
 
 void FunctionWithArgs(int, const std::string&) {
+}
+
+TEST_F(LuaTest, PCallWithInsufficientArgs) {
+  std::string str;
+  ASSERT_TRUE(lua::Push(state_, base::Bind(&FunctionWithArgs)));
+  EXPECT_FALSE(lua::PCall(state_, nullptr, 123));
+  ASSERT_TRUE(lua::Pop(state_, &str));
+  ASSERT_EQ(str, "Failed to convert arguments");
+  ASSERT_EQ(lua::GetTop(state_), 0);
+}
+
+void FunctionWithoutReturnValue() {
 }
 
 TEST_F(LuaTest, PCallWithoutReturnValue) {
