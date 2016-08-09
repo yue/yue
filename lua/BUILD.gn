@@ -4,9 +4,12 @@
 
 source_set("lua") {
   sources = [
+    "callback.h",
+    "callback_internal.h",
     "lua.cc",
     "lua.h",
     "state.h",
+    "to.h",
     "push.h",
   ]
 

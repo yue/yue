@@ -12,12 +12,26 @@
 
 namespace lua {
 
-inline void Push(State* state, lua_Integer number) {
-  lua_pushinteger(state, number);
+// Enable push arbitrary args at the same time.
+template<typename ArgType, typename... ArgTypes>
+inline bool Push(State* state, ArgType arg, ArgTypes... args) {
+  return Push(state, arg) && Push(state, args...);
 }
 
-inline void Push(State* state, base::StringPiece str) {
+// Needed by the arbitrary length version of Push.
+inline bool Push(State* state) {
+  return true;
+}
+
+// Specialized push for each type.
+inline bool Push(State* state, lua_Integer number) {
+  lua_pushinteger(state, number);
+  return true;
+}
+
+inline bool Push(State* state, base::StringPiece str) {
   lua_pushlstring(state, str.data(), str.length());
+  return true;  // ignore memory errors.
 }
 
 }  // namespace lua
