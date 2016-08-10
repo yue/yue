@@ -6,4 +6,4 @@
 
 const {ninja, runSync} = require('./common')
 
-runSync(ninja, ['-C'])
+process.exit(runSync(ninja, ['-C']).status)
