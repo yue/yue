@@ -57,6 +57,19 @@ TEST_F(LuaTest, PopsValues) {
   ASSERT_EQ(lua::GetTop(state_), 0);
 }
 
+TEST_F(LuaTest, TupleRepresentsMultipleValues) {
+  std::tuple<int, int ,int> rets;
+  ASSERT_TRUE(lua::Push(state_, 1, 2, 3, 4));
+  ASSERT_TRUE(lua::Pop(state_, &rets));
+  EXPECT_EQ(std::get<0>(rets), 2);
+  EXPECT_EQ(std::get<1>(rets), 3);
+  EXPECT_EQ(std::get<2>(rets), 4);
+  int fourth;
+  ASSERT_TRUE(lua::Pop(state_, &fourth));
+  ASSERT_EQ(fourth, 1);
+  ASSERT_EQ(lua::GetTop(state_), 0);
+}
+
 TEST_F(LuaTest, PCallWithInvalidValue) {
   std::string str;
   ASSERT_TRUE(lua::Push(state_, nullptr));
