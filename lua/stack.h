@@ -76,7 +76,7 @@ inline bool To(State* state, int index, std::tuple<ArgTypes...>* out) {
 }
 
 // Thin wrapper for lua_pop.
-inline void Pop(State* state, size_t n) {
+inline void PopAndIgnore(State* state, size_t n) {
   lua_pop(state, n);
 }
 
@@ -84,7 +84,7 @@ inline void Pop(State* state, size_t n) {
 template<typename T>
 inline bool Pop(State* state, T* result) {
   if (To(state, -Values<T>::count, result)) {
-    Pop(state, Values<T>::count);
+    PopAndIgnore(state, Values<T>::count);
     return true;
   } else {
     return false;
@@ -95,7 +95,7 @@ inline bool Pop(State* state, T* result) {
 template<typename... ArgTypes>
 inline bool Pop(State* state, ArgTypes... args) {
   if (To(state, -static_cast<int>(sizeof...(args)), args...)) {
-    Pop(state, sizeof...(args));
+    PopAndIgnore(state, sizeof...(args));
     return true;
   } else {
     return false;

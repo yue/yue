@@ -51,6 +51,17 @@ inline LuaType RawGet<int>(State* state, int index, int key) {
   return static_cast<LuaType>(lua_rawgeti(state, index, key));
 }
 
+// Get and pop the value.
+template<typename Key, typename Value>
+inline bool RawGet(State* state, int index, Key key, Value* out) {
+  RawGet(state, index, key);
+  if (!Pop(state, out)) {
+    PopAndIgnore(state, 1);  // keep the stack untouched when failed
+    return false;
+  }
+  return true;
+}
+
 }  // namespace lua
 
 #endif  // LUA_TABLE_H_

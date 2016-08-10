@@ -26,7 +26,7 @@ TEST_F(LuaTest, PushesToStack) {
   base::StringPiece str1;
   ASSERT_TRUE(lua::To(state_, -2, &str1));
   ASSERT_EQ(str1, "str1");
-  int number;
+  double number;
   ASSERT_TRUE(lua::To(state_, -3, &number));
   ASSERT_FALSE(lua::To(state_, -1, &number));
   ASSERT_EQ(number, 1);
@@ -178,4 +178,20 @@ TEST_F(LuaTest, RawSetGet) {
   EXPECT_EQ(v2, "v2");
   EXPECT_EQ(v3, "v3");
   EXPECT_EQ(lua::RawGet(state_, 1, "non-exist"), lua::LuaType::Nil);
+}
+
+TEST_F(LuaTest, RawGetWithPop) {
+  lua::PushNewTable(state_);
+  lua::RawSet(state_, 1, "key", 123);
+  std::string str;
+  ASSERT_TRUE(lua::RawGet(state_, 1, "key", &str));
+  ASSERT_EQ(str, "123");
+  ASSERT_EQ(lua::GetTop(state_), 1);
+  int number;
+  ASSERT_TRUE(lua::RawGet(state_, 1, "key", &number));
+  ASSERT_EQ(number, 123);
+  ASSERT_EQ(lua::GetTop(state_), 1);
+  bool b;
+  ASSERT_FALSE(lua::RawGet(state_, 1, "key", &b));
+  ASSERT_EQ(lua::GetTop(state_), 1);
 }
