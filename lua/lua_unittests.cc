@@ -128,3 +128,17 @@ TEST_F(LuaTest, PCallWithReturnValue) {
   EXPECT_EQ(str_out, str);
   ASSERT_EQ(lua::GetTop(state_), 0);
 }
+
+std::tuple<std::string, int> FunctionReturnsTuple(
+    const std::string& str, int number) {
+  return std::make_tuple(str, number);
+}
+
+TEST_F(LuaTest, PCallWithMultipleReturnValues) {
+  ASSERT_TRUE(lua::Push(state_, base::Bind(&FunctionReturnsTuple)));
+  std::tuple<std::string, int> out;
+  ASSERT_TRUE(lua::PCall(state_, &out, "str", 123));
+  EXPECT_EQ(std::get<0>(out), "str");
+  EXPECT_EQ(std::get<1>(out), 123);
+  ASSERT_EQ(lua::GetTop(state_), 0);
+}

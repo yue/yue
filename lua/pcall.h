@@ -24,8 +24,7 @@ inline bool PCall(State* state, ReturnType* result, ArgTypes... args) {
   if (!Push(state, args...))
     return false;
 
-  if (lua_pcall(state, sizeof...(ArgTypes),
-                internal::ReturnValues<ReturnType>::count,
+  if (lua_pcall(state, sizeof...(ArgTypes), Values<ReturnType>::count,
                 0 /* no message handler */) != LUA_OK)
     return false;
 

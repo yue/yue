@@ -14,6 +14,23 @@
 
 namespace lua {
 
+// Get how many lua values the type represents.
+template<typename T>
+struct Values {
+  static const int count = 1;
+};
+
+template<>
+struct Values<void> {
+  static const int count = 0;
+};
+
+template<typename... ArgTypes>
+struct Values<std::tuple<ArgTypes...>> {
+  static const int count = sizeof...(ArgTypes);
+};
+
+// Defines how C++ types and lua types re converted.
 template<typename T, typename Enable = void>
 struct Type {};
 

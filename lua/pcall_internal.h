@@ -5,6 +5,8 @@
 #ifndef LUA_PCALL_INTERNAL_H_
 #define LUA_PCALL_INTERNAL_H_
 
+#include <tuple>
+
 #include "base/callback.h"
 #include "lua/call_context.h"
 #include "lua/stack.h"
@@ -44,18 +46,6 @@ inline bool GetArgument(CallContext* context, int index, CallContext** result) {
   return true;
 }
 
-// Get how many values would be returned for the type.
-// TODO(zcbenz): Support multiple arguments.
-template<typename ReturnType>
-struct ReturnValues {
-  static const int count = 1;
-};
-
-template<>
-struct ReturnValues<void> {
-  static const int count = 0;
-};
-
 // CallbackHolder and CallbackHolderBase are used to pass a base::Callback from
 // PushCFunction through DispatchToCallback, where it is invoked.
 
@@ -84,22 +74,6 @@ class CallbackHolder : public CallbackHolderBase {
   DISALLOW_COPY_AND_ASSIGN(CallbackHolder);
 };
 
-// Classes for generating and storing an argument pack of integer indices
-// (based on well-known "indices trick", see: http://goo.gl/bKKojn):
-template <size_t... indices>
-struct IndicesHolder {};
-
-template <size_t requested_index, size_t... indices>
-struct IndicesGenerator {
-  using type = typename IndicesGenerator<requested_index - 1,
-                                         requested_index - 1,
-                                         indices...>::type;
-};
-template <size_t... indices>
-struct IndicesGenerator<0, indices...> {
-  using type = IndicesHolder<indices...>;
-};
-
 // Class template for extracting and storing single argument for callback
 // at position |index|.
 template <size_t index, typename ArgType>
@@ -109,7 +83,7 @@ struct ArgumentHolder {
   ArgLocalType value;
   const bool ok;
 
-  ArgumentHolder(CallContext* context)
+  explicit ArgumentHolder(CallContext* context)
       : ok(GetArgument(context, index, &value)) {
     if (!ok) {
       context->invalid_arg = index + 1;
@@ -141,15 +115,24 @@ class Invoker<IndicesHolder<indices...>, ArgTypes...>
   }
 
   template<typename ReturnType>
-  bool DispatchToCallback(base::Callback<ReturnType(ArgTypes...)> callback) {
-    ReturnType ret = callback.Run(ArgumentHolder<indices, ArgTypes>::value...);
-    return Push(context_->state, ret);
+  bool DispatchToCallback(
+      const base::Callback<ReturnType(ArgTypes...)>& callback) {
+    return Push(context_->state,
+                callback.Run(ArgumentHolder<indices, ArgTypes>::value...));
+  }
+
+  // This callback returns multiple values.
+  template<typename... ReturnTypes>
+  bool DispatchToCallback(
+      const base::Callback<std::tuple<ReturnTypes...>(ArgTypes...)>& callback) {
+    return Push(context_->state,
+                callback.Run(ArgumentHolder<indices, ArgTypes>::value...));
   }
 
   // In C++, you can declare the function foo(void), but you can't pass a void
   // expression to foo. As a result, we must specialize the case of Callbacks
   // that have the void return type.
-  bool DispatchToCallback(base::Callback<void(ArgTypes...)> callback) {
+  bool DispatchToCallback(const base::Callback<void(ArgTypes...)>& callback) {
     callback.Run(ArgumentHolder<indices, ArgTypes>::value...);
     return true;
   }
@@ -211,7 +194,7 @@ struct Dispatcher<ReturnType(ArgTypes...)> {
       return -1;
     }
 
-    return internal::ReturnValues<ReturnType>::count;
+    return Values<ReturnType>::count;
   }
 };
 

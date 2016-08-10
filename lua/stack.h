@@ -7,6 +7,9 @@
 #ifndef LUA_STACK_H_
 #define LUA_STACK_H_
 
+#include <tuple>
+
+#include "lua/template_util.h"
 #include "lua/types.h"
 
 namespace lua {
@@ -20,6 +23,20 @@ inline bool Push(State* state) {
 template<typename ArgType, typename... ArgTypes>
 inline bool Push(State* state, ArgType arg, ArgTypes... args) {
   return Type<ArgType>::Push(state, arg) && Push(state, args...);
+}
+
+// The helper function for the tuple version of Push.
+template<typename Tuple, size_t... Indices>
+inline bool Push(State* state, const Tuple& packed,
+                 internal::IndicesHolder<Indices...>) {
+  return Push(state, std::get<Indices>(packed)...);
+}
+
+// Treat std::tuple as unpacked args.
+template<typename... ArgTypes>
+inline bool Push(State* state, const std::tuple<ArgTypes...>& packed) {
+  return Push(state, packed,
+              typename internal::IndicesGenerator<sizeof...(ArgTypes)>::type());
 }
 
 // Helpers for pushing strings.
@@ -45,6 +62,20 @@ inline bool To(State* state, int index, ArgType* arg, ArgTypes... args) {
   return Type<ArgType>::To(state, index, arg) && To(state, index + 1, args...);
 }
 
+// The helper function for the tuple version of To.
+template<typename Tuple, size_t... Indices>
+inline bool To(State* state, int index, Tuple* out,
+               internal::IndicesHolder<Indices...>) {
+  return To(state, index, &std::get<Indices>(*out)...);
+}
+
+// Get multiple values from stack.
+template<typename... ArgTypes>
+inline bool To(State* state, int index, std::tuple<ArgTypes...>* out) {
+  return To(state, index, out,
+            typename internal::IndicesGenerator<sizeof...(ArgTypes)>::type());
+}
+
 // Thin wrapper for lua_pop.
 inline void Pop(State* state, size_t n) {
   lua_pop(state, n);
@@ -53,8 +84,8 @@ inline void Pop(State* state, size_t n) {
 // Get the values and pop them from statck.
 template<typename T>
 inline bool Pop(State* state, T* result) {
-  if (To(state, -1, result)) {
-    Pop(state, 1);
+  if (To(state, -Values<T>::count, result)) {
+    Pop(state, Values<T>::count);
     return true;
   } else {
     return false;
