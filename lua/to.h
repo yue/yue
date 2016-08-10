@@ -28,7 +28,7 @@ inline bool To(State* state, int index, base::StringPiece* out) {
   if (!str)
     return false;
   *out = str;
-  return true;
+  return true;  // ignore memory errors.
 }
 
 inline bool To(State* state, int index, std::string* out) {

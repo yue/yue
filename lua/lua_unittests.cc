@@ -90,7 +90,7 @@ TEST_F(LuaTest, PCallWithWrongArgs) {
   ASSERT_TRUE(lua::Push(state_, base::Bind(&FunctionWithArgs)));
   EXPECT_FALSE(lua::PCall(state_, nullptr, "test", 123));
   ASSERT_TRUE(lua::Pop(state_, &str));
-  ASSERT_EQ(str, "error converting arg at index 1 from string");
+  ASSERT_EQ(str, "error converting arg at index 1 from string to integer");
   ASSERT_EQ(lua::GetTop(state_), 0);
 }
 

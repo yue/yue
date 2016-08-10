@@ -29,6 +29,9 @@ struct CallContext {
 
   // The index (1-based) of the arg that failed to convert.
   int invalid_arg = 0;
+
+  // The name of the invalid arg.
+  const char* invalid_arg_name = nullptr;
 };
 
 }  // namespace lua

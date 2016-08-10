@@ -9,6 +9,7 @@
 #include "lua/call_context.h"
 #include "lua/push.h"
 #include "lua/to.h"
+#include "lua/type_name.h"
 
 namespace lua {
 
@@ -112,8 +113,10 @@ struct ArgumentHolder {
 
   ArgumentHolder(CallContext* context)
       : ok(GetArgument(context, index, &value)) {
-    if (!ok)
+    if (!ok) {
       context->invalid_arg = index + 1;
+      context->invalid_arg_name = TypeName<ArgType>::value;
+    }
   }
 };
 
@@ -191,12 +194,12 @@ struct Dispatcher<ReturnType(ArgTypes...)> {
       using Indices = typename IndicesGenerator<sizeof...(ArgTypes)>::type;
       Invoker<Indices, ArgTypes...> invoker(&context);
       if (!invoker.IsOK()) {
-        // TODO(zcbenz): Give details of type information.
         context.has_error = true;
         PushFormatedString(
-            state, "error converting arg at index %d from %s",
+            state, "error converting arg at index %d from %s to %s",
             context.invalid_arg,
-            lua_typename(state, lua_type(state, context.invalid_arg)));
+            lua_typename(state, lua_type(state, context.invalid_arg)),
+            context.invalid_arg_name);
       } else if (!invoker.DispatchToCallback(holder->callback)) {
         context.has_error = true;
         Push(state, "Failed to convert result");
