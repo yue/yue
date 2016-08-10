@@ -10,13 +10,9 @@ source_set("lua") {
     "pcall.h",
     "pcall_internal.cc",
     "pcall_internal.h",
-    "lua.cc",
-    "lua.h",
+    "stack.h",
     "state.h",
-    "to.h",
-    "type_name.h",
-    "pop.h",
-    "push.h",
+    "types.h",
   ]
 
   deps = [

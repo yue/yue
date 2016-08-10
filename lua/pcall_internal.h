@@ -7,9 +7,7 @@
 
 #include "base/callback.h"
 #include "lua/call_context.h"
-#include "lua/push.h"
-#include "lua/to.h"
-#include "lua/type_name.h"
+#include "lua/stack.h"
 
 namespace lua {
 
@@ -115,7 +113,8 @@ struct ArgumentHolder {
       : ok(GetArgument(context, index, &value)) {
     if (!ok) {
       context->invalid_arg = index + 1;
-      context->invalid_arg_name = TypeName<ArgType>::value;
+      context->invalid_arg_name =
+          Type<typename CallbackParamTraits<ArgType>::LocalType>::name;
     }
   }
 };

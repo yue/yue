@@ -8,8 +8,6 @@
 #define LUA_PCALL_H_
 
 #include "lua/pcall_internal.h"
-#include "lua/pop.h"
-#include "lua/push.h"
 
 namespace lua {
 

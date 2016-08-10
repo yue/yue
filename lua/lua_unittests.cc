@@ -4,8 +4,7 @@
 
 #include "base/bind.h"
 #include "lua/pcall.h"
-#include "lua/lua.h"
-#include "lua/pop.h"
+#include "lua/stack.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 class LuaTest : public testing::Test {
