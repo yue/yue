@@ -131,17 +131,17 @@ struct Type<std::string> {
   }
 };
 
+template<size_t n>
+struct Type<const char[n]> {
+  static inline void Push(State* state, const char* str) {
+    lua_pushlstring(state, str, n - 1);
+  }
+};
+
 template<>
 struct Type<const char*> {
   static inline void Push(State* state, const char* str) {
     lua_pushstring(state, str);
-  }
-};
-
-template<size_t n>
-struct Type<char[n]> {
-  static inline void Push(State* state, const char* str) {
-    lua_pushlstring(state, str, n);
   }
 };
 

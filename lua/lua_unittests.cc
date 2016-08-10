@@ -19,10 +19,10 @@ class LuaTest : public testing::Test {
 TEST_F(LuaTest, PushesToStack) {
   lua::Push(state_, 1);
   lua::Push(state_, "str1");
-  lua::Push(state_, "str2");
+  lua::Push(state_, "strr2");
   std::string str2;
   ASSERT_TRUE(lua::To(state_, -1, &str2));
-  ASSERT_EQ(str2, "str2");
+  ASSERT_EQ(str2, "strr2");
   base::StringPiece str1;
   ASSERT_TRUE(lua::To(state_, -2, &str1));
   ASSERT_EQ(str1, "str1");
@@ -182,12 +182,15 @@ TEST_F(LuaTest, RawSetGet) {
 
 TEST_F(LuaTest, RawGetWithPop) {
   lua::PushNewTable(state_);
-  lua::RawSet(state_, 1, "key", 123);
+  lua::RawSet(state_, 1, 123, "oldvalue");
+  lua::RawSet(state_, 1, "key", 123, 123, "value");
   std::string str;
   int number;
   ASSERT_TRUE(lua::RawGetAndPop(state_, 1, "key", &str, "key", &number));
   EXPECT_EQ(str, "123");
   EXPECT_EQ(number, 123);
+  ASSERT_TRUE(lua::RawGetAndPop(state_, 1, 123, &str));
+  EXPECT_EQ(str, "value");
   EXPECT_EQ(lua::GetTop(state_), 1);
   bool b;
   ASSERT_FALSE(lua::RawGetAndPop(state_, 1, "key", &b));

@@ -2,7 +2,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 //
-// Helper functions to manipulate lua's stack.
+// APIs to manipulate lua's stack.
 
 #ifndef LUA_STACK_H_
 #define LUA_STACK_H_
@@ -14,14 +14,33 @@
 
 namespace lua {
 
-// Needed by the arbitrary length version of Push.
+// Function template for Type<ArgType>::Push.
+template<typename ArgType>
+inline void Push(State* state, const ArgType& arg) {
+  Type<ArgType>::Push(state, arg);
+}
+
+// Optimized version for string iterals.
+template<size_t n, typename... ArgTypes>
+inline void Push(State* state, const char (&str)[n]) {
+  Type<const char[n]>::Push(state, str);
+}
+
+// Special version when user passes "const char*".
+// This is to work around "const ArgType&" unable to deduce "const char*".
+template<size_t n, typename... ArgTypes>
+inline void Push(State* state, const char* str) {
+  Type<const char*>::Push(state, str);
+}
+
+// Certain template functions are pushing nothing.
 inline void Push(State* state) {
 }
 
 // Enable push arbitrary args at the same time.
 template<typename ArgType, typename... ArgTypes>
 inline void Push(State* state, const ArgType& arg, ArgTypes... args) {
-  Type<ArgType>::Push(state, arg);
+  Push(state, arg);
   Push(state, args...);
 }
 
