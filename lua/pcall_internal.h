@@ -28,20 +28,19 @@ struct CallbackParamTraits<const T*> {
 };
 
 template<typename T>
-inline bool GetNextArgument(CallContext* context, int index, T* result) {
+inline bool GetArgument(CallContext* context, int index, T* result) {
   if (index == 0 && (context->create_flags & HolderIsFirstArgument) != 0) {
     // TODO(zcbenz): Add support for classes.
     return false;
   } else {
     // Lua uses 1-index array.
-    return To(context->state, index + 1, result);;
+    return To(context->state, index + 1, result);
   }
 }
 
 // For advanced use cases, we allow callers to request the unparsed CallContext
 // object and poke around in it directly.
-inline bool GetNextArgument(CallContext* context, int index,
-                            CallContext** result) {
+inline bool GetArgument(CallContext* context, int index, CallContext** result) {
   *result = context;
   return true;
 }
@@ -112,7 +111,9 @@ struct ArgumentHolder {
   const bool ok;
 
   ArgumentHolder(CallContext* context)
-      : ok(GetNextArgument(context, index, &value)) {
+      : ok(GetArgument(context, index, &value)) {
+    if (!ok)
+      context->invalid_arg = index + 1;
   }
 };
 
@@ -169,27 +170,38 @@ struct Dispatcher {};
 template <typename ReturnType, typename... ArgTypes>
 struct Dispatcher<ReturnType(ArgTypes...)> {
   static int DispatchToCallback(State* state) {
+    // Check for args length.
+    int args_got = lua_gettop(state);
+    int args_expected = static_cast<int>(sizeof...(ArgTypes));
+    if (args_got < args_expected) {
+      PushFormatedString(state, "insufficient args, expecting %d but got %d",
+                         args_expected, args_got);
+      lua_error(state);
+      NOTREACHED() << "Code after lua_error() gets called";
+      return -1;
+    }
+
+    // Receive the callback from userdata.
     typedef CallbackHolder<ReturnType(ArgTypes...)> HolderT;
     HolderT* holder = static_cast<HolderT*>(
         lua_touserdata(state, lua_upvalueindex(1)));
 
     CallContext context(state, holder->flags);
-    do {  // Make sure C++ stack is destroyed before calling lua_error.
+    {  // Make sure C++ stack is destroyed before calling lua_error.
       using Indices = typename IndicesGenerator<sizeof...(ArgTypes)>::type;
       Invoker<Indices, ArgTypes...> invoker(&context);
       if (!invoker.IsOK()) {
-        // TODO(zcbenz): Get the index of failing argument.
         // TODO(zcbenz): Give details of type information.
         context.has_error = true;
-        Push(state, "Failed to convert arguments");
-        break;
-      }
-      if (!invoker.DispatchToCallback(holder->callback)) {
+        PushFormatedString(
+            state, "error converting arg at index %d from %s",
+            context.invalid_arg,
+            lua_typename(state, lua_type(state, context.invalid_arg)));
+      } else if (!invoker.DispatchToCallback(holder->callback)) {
         context.has_error = true;
         Push(state, "Failed to convert result");
-        break;
       }
-    } while (false);
+    }
 
     if (context.has_error) {  // Throw error after we are out of C++ stack.
       lua_error(state);

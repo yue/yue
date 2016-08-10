@@ -75,7 +75,22 @@ TEST_F(LuaTest, PCallWithInsufficientArgs) {
   ASSERT_TRUE(lua::Push(state_, base::Bind(&FunctionWithArgs)));
   EXPECT_FALSE(lua::PCall(state_, nullptr, 123));
   ASSERT_TRUE(lua::Pop(state_, &str));
-  ASSERT_EQ(str, "Failed to convert arguments");
+  ASSERT_EQ(str, "insufficient args, expecting 2 but got 1");
+  ASSERT_EQ(lua::GetTop(state_), 0);
+
+  ASSERT_TRUE(lua::Push(state_, base::Bind(&FunctionWithArgs)));
+  EXPECT_FALSE(lua::PCall(state_, nullptr));
+  ASSERT_TRUE(lua::Pop(state_, &str));
+  ASSERT_EQ(str, "insufficient args, expecting 2 but got 0");
+  ASSERT_EQ(lua::GetTop(state_), 0);
+}
+
+TEST_F(LuaTest, PCallWithWrongArgs) {
+  std::string str;
+  ASSERT_TRUE(lua::Push(state_, base::Bind(&FunctionWithArgs)));
+  EXPECT_FALSE(lua::PCall(state_, nullptr, "test", 123));
+  ASSERT_TRUE(lua::Pop(state_, &str));
+  ASSERT_EQ(str, "error converting arg at index 1 from string");
   ASSERT_EQ(lua::GetTop(state_), 0);
 }
 

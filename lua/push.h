@@ -25,6 +25,11 @@ inline bool Push(State* state, nullptr_t) {
   return true;
 }
 
+inline bool Push(State* state, bool b) {
+  lua_pushboolean(state, b);
+  return true;
+}
+
 inline bool Push(State* state, base::StringPiece str) {
   lua_pushlstring(state, str.data(), str.length());
   return true;  // ignore memory errors.
@@ -37,6 +42,18 @@ inline bool Push(State* state, const std::string& str) {
 
 inline bool Push(State* state, const char* str) {
   lua_pushstring(state, str);
+  return true;  // ignore memory errors.
+}
+
+// Helpers for pushing strings.
+PRINTF_FORMAT(2, 3)
+inline bool PushFormatedString(State* state,
+                               _Printf_format_string_ const char* format,
+                               ...)  {
+  va_list ap;
+  va_start(ap, format);
+  lua_pushvfstring(state, format, ap);
+  va_end(ap);
   return true;  // ignore memory errors.
 }
 
