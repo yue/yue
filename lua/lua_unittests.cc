@@ -159,7 +159,23 @@ TEST_F(LuaTest, PCallWithMultipleReturnValues) {
 TEST_F(LuaTest, RawSetGet) {
   lua::PushNewTable(state_);
   ASSERT_EQ(lua::GetTop(state_), 1);
-  lua::RawSet(state_, 1, "key", 123);
-  lua::RawSet(state_, 1, "key", 123, 123, "value");
-  lua::RawSet(state_, 1, "key", 123, 123, "value", 123, 123);
+  lua::RawSet(state_, 1, "key1", 1);
+  lua::RawSet(state_, 1, "key2", 2, 1, "v1");
+  lua::RawSet(state_, 1, "key3", 3, 2, "v2", 3, "v3");
+  EXPECT_EQ(lua::RawGet(state_, 1, "key1"), lua::LuaType::Number);
+  EXPECT_EQ(lua::RawGet(state_, 1, "key2"), lua::LuaType::Number);
+  EXPECT_EQ(lua::RawGet(state_, 1, "key3"), lua::LuaType::Number);
+  EXPECT_EQ(lua::RawGet(state_, 1, 1), lua::LuaType::String);
+  EXPECT_EQ(lua::RawGet(state_, 1, 2), lua::LuaType::String);
+  EXPECT_EQ(lua::RawGet(state_, 1, 3), lua::LuaType::String);
+  int i1, i2, i3;
+  std::string v1, v2, v3;
+  ASSERT_TRUE(lua::Pop(state_, &i1, &i2, &i3, &v1, &v2, &v3));
+  EXPECT_EQ(i1, 1);
+  EXPECT_EQ(i2, 2);
+  EXPECT_EQ(i3, 3);
+  EXPECT_EQ(v1, "v1");
+  EXPECT_EQ(v2, "v2");
+  EXPECT_EQ(v3, "v3");
+  EXPECT_EQ(lua::RawGet(state_, 1, "non-exist"), lua::LuaType::Nil);
 }

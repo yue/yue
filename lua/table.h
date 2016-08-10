@@ -38,7 +38,18 @@ inline void RawSet(State* state, int index, Key key, Value value,
   RawSet(state, index, args...);
 }
 
-// Thin wrapper of lua_rawget.
+// Generic version of lua_rawget.
+template<typename Key>
+inline LuaType RawGet(State* state, int index, Key key) {
+  Push(state, key);
+  return static_cast<LuaType>(lua_rawget(state, index));
+}
+
+// Optimize for lua_rawgeti.
+template<>
+inline LuaType RawGet<int>(State* state, int index, int key) {
+  return static_cast<LuaType>(lua_rawgeti(state, index, key));
+}
 
 }  // namespace lua
 
