@@ -138,6 +138,13 @@ struct Type<const char*> {
   }
 };
 
+template<size_t n>
+struct Type<char[n]> {
+  static inline void Push(State* state, const char* str) {
+    lua_pushlstring(state, str, n);
+  }
+};
+
 }  // namespace lua
 
 #endif  // LUA_TYPES_H_

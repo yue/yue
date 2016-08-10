@@ -72,8 +72,7 @@ struct ArgumentHolder {
       : ok(GetArgument(context, index, &value)) {
     if (!ok) {
       context->invalid_arg = index + 1;
-      context->invalid_arg_name =
-          Type<typename CallbackParamTraits<ArgType>::LocalType>::name;
+      context->invalid_arg_name = Type<ArgLocalType>::name;
     }
   }
 };

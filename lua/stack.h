@@ -20,7 +20,7 @@ inline void Push(State* state) {
 
 // Enable push arbitrary args at the same time.
 template<typename ArgType, typename... ArgTypes>
-inline void Push(State* state, ArgType arg, ArgTypes... args) {
+inline void Push(State* state, const ArgType& arg, ArgTypes... args) {
   Type<ArgType>::Push(state, arg);
   Push(state, args...);
 }
