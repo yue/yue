@@ -51,15 +51,46 @@ inline LuaType RawGet<int>(State* state, int index, int key) {
   return static_cast<LuaType>(lua_rawgeti(state, index, key));
 }
 
-// Get and pop the value.
-template<typename Key, typename Value>
-inline bool RawGet(State* state, int index, Key key, Value* out) {
+// Allow getting arbitrary values.
+template<typename Key, typename... ArgTypes>
+inline void RawGet(State* state, int index, Key key, ArgTypes... args) {
   RawGet(state, index, key);
-  if (!Pop(state, out)) {
-    PopAndIgnore(state, 1);  // keep the stack untouched when failed
-    return false;
-  }
-  return true;
+  RawGet(state, index, args...);
+}
+
+// Helper function: Call RawGet for all keys and ignore the out.
+template<typename Key, typename Value, typename... ArgTypes>
+inline void RawGetKeyPairHelper(State* state, int index, Key key, Value* out) {
+  RawGet(state, index, key);
+}
+template<typename Key, typename Value, typename... ArgTypes>
+inline void RawGetKeyPairHelper(State* state, int index, Key key, Value* out,
+                                ArgTypes... args) {
+  RawGetKeyPairHelper(state, index, key, out);
+  RawGetKeyPairHelper(state, index, args...);
+}
+
+// Helper function: Call To for all values and ignore the key.
+template<typename Key, typename Value>
+inline bool ToKeyPairHelper(State* state, int index, Key key, Value* out) {
+  return To(state, index, out);
+}
+template<typename Key, typename Value, typename... ArgTypes>
+inline bool ToKeyPairHelper(State* state, int index, Key key, Value* out,
+                            ArgTypes... args) {
+  return ToKeyPairHelper(state, index, key, out) &&
+         ToKeyPairHelper(state, index + 1, args...);
+}
+
+// Allow getting and poping arbitrary values.
+template<typename Key, typename Value, typename... ArgTypes>
+inline bool RawGetAndPop(State* state, int index, Key key, Value* out,
+                         ArgTypes... args) {
+  int current_top = GetTop(state);
+  RawGetKeyPairHelper(state, index, key, out, args...);
+  bool success = ToKeyPairHelper(state, current_top + 1, key, out, args...);
+  SetTop(state, current_top);
+  return success;
 }
 
 }  // namespace lua

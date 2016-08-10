@@ -184,14 +184,12 @@ TEST_F(LuaTest, RawGetWithPop) {
   lua::PushNewTable(state_);
   lua::RawSet(state_, 1, "key", 123);
   std::string str;
-  ASSERT_TRUE(lua::RawGet(state_, 1, "key", &str));
-  ASSERT_EQ(str, "123");
-  ASSERT_EQ(lua::GetTop(state_), 1);
   int number;
-  ASSERT_TRUE(lua::RawGet(state_, 1, "key", &number));
-  ASSERT_EQ(number, 123);
-  ASSERT_EQ(lua::GetTop(state_), 1);
+  ASSERT_TRUE(lua::RawGetAndPop(state_, 1, "key", &str, "key", &number));
+  EXPECT_EQ(str, "123");
+  EXPECT_EQ(number, 123);
+  EXPECT_EQ(lua::GetTop(state_), 1);
   bool b;
-  ASSERT_FALSE(lua::RawGet(state_, 1, "key", &b));
+  ASSERT_FALSE(lua::RawGetAndPop(state_, 1, "key", &b));
   ASSERT_EQ(lua::GetTop(state_), 1);
 }
