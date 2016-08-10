@@ -13,16 +13,15 @@ namespace lua {
 
 // The push operation for callback.
 template<typename Sig>
-inline bool Push(State* state, const base::Callback<Sig>& callback) {
-  return internal::PushCFunction(state, callback);
+inline void Push(State* state, const base::Callback<Sig>& callback) {
+  internal::PushCFunction(state, callback);
 }
 
 // Safely call the function on top of stack.
 // When error happens, this API returns false and leaves the error on stack.
 template<typename ReturnType, typename... ArgTypes>
 inline bool PCall(State* state, ReturnType* result, ArgTypes... args) {
-  if (!Push(state, args...))
-    return false;
+  Push(state, args...);
 
   if (lua_pcall(state, sizeof...(ArgTypes), Values<ReturnType>::count,
                 0 /* no message handler */) != LUA_OK)
@@ -34,8 +33,8 @@ inline bool PCall(State* state, ReturnType* result, ArgTypes... args) {
 // Passing nullptr means there is no result expected.
 template<typename... ArgTypes>
 inline bool PCall(State* state, nullptr_t, ArgTypes... args) {
-  return Push(state, args...) &&
-         lua_pcall(state, sizeof...(ArgTypes), 0, 0) == LUA_OK;
+  Push(state, args...);
+  return lua_pcall(state, sizeof...(ArgTypes), 0, 0) == LUA_OK;
 }
 
 }  // namespace lua

@@ -12,6 +12,7 @@ source_set("lua") {
     "pcall_internal.h",
     "stack.h",
     "state.h",
+    "table.h",
     "types.h",
   ]
 

@@ -15,40 +15,39 @@
 namespace lua {
 
 // Needed by the arbitrary length version of Push.
-inline bool Push(State* state) {
-  return true;
+inline void Push(State* state) {
 }
 
 // Enable push arbitrary args at the same time.
 template<typename ArgType, typename... ArgTypes>
-inline bool Push(State* state, ArgType arg, ArgTypes... args) {
-  return Type<ArgType>::Push(state, arg) && Push(state, args...);
+inline void Push(State* state, ArgType arg, ArgTypes... args) {
+  Type<ArgType>::Push(state, arg);
+  Push(state, args...);
 }
 
 // The helper function for the tuple version of Push.
 template<typename Tuple, size_t... Indices>
-inline bool Push(State* state, const Tuple& packed,
+inline void Push(State* state, const Tuple& packed,
                  internal::IndicesHolder<Indices...>) {
-  return Push(state, std::get<Indices>(packed)...);
+  Push(state, std::get<Indices>(packed)...);
 }
 
 // Treat std::tuple as unpacked args.
 template<typename... ArgTypes>
-inline bool Push(State* state, const std::tuple<ArgTypes...>& packed) {
-  return Push(state, packed,
-              typename internal::IndicesGenerator<sizeof...(ArgTypes)>::type());
+inline void Push(State* state, const std::tuple<ArgTypes...>& packed) {
+  Push(state, packed,
+       typename internal::IndicesGenerator<sizeof...(ArgTypes)>::type());
 }
 
 // Helpers for pushing strings.
 PRINTF_FORMAT(2, 3)
-inline bool PushFormatedString(State* state,
+inline void PushFormatedString(State* state,
                                _Printf_format_string_ const char* format,
                                ...)  {
   va_list ap;
   va_start(ap, format);
   lua_pushvfstring(state, format, ap);
   va_end(ap);
-  return true;  // ignore memory errors.
 }
 
 // Needed by the arbitrary length version of toxxx.

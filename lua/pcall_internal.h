@@ -5,8 +5,6 @@
 #ifndef LUA_PCALL_INTERNAL_H_
 #define LUA_PCALL_INTERNAL_H_
 
-#include <tuple>
-
 #include "base/callback.h"
 #include "lua/call_context.h"
 #include "lua/stack.h"
@@ -115,26 +113,17 @@ class Invoker<IndicesHolder<indices...>, ArgTypes...>
   }
 
   template<typename ReturnType>
-  bool DispatchToCallback(
+  void DispatchToCallback(
       const base::Callback<ReturnType(ArgTypes...)>& callback) {
-    return Push(context_->state,
-                callback.Run(ArgumentHolder<indices, ArgTypes>::value...));
-  }
-
-  // This callback returns multiple values.
-  template<typename... ReturnTypes>
-  bool DispatchToCallback(
-      const base::Callback<std::tuple<ReturnTypes...>(ArgTypes...)>& callback) {
-    return Push(context_->state,
-                callback.Run(ArgumentHolder<indices, ArgTypes>::value...));
+    Push(context_->state,
+         callback.Run(ArgumentHolder<indices, ArgTypes>::value...));
   }
 
   // In C++, you can declare the function foo(void), but you can't pass a void
   // expression to foo. As a result, we must specialize the case of Callbacks
   // that have the void return type.
-  bool DispatchToCallback(const base::Callback<void(ArgTypes...)>& callback) {
+  void DispatchToCallback(const base::Callback<void(ArgTypes...)>& callback) {
     callback.Run(ArgumentHolder<indices, ArgTypes>::value...);
-    return true;
   }
 
  private:
@@ -182,9 +171,8 @@ struct Dispatcher<ReturnType(ArgTypes...)> {
             context.invalid_arg,
             lua_typename(state, lua_type(state, context.invalid_arg)),
             context.invalid_arg_name);
-      } else if (!invoker.DispatchToCallback(holder->callback)) {
-        context.has_error = true;
-        Push(state, "Failed to convert result");
+      } else {
+        invoker.DispatchToCallback(holder->callback);
       }
     }
 
@@ -200,7 +188,7 @@ struct Dispatcher<ReturnType(ArgTypes...)> {
 
 // Push the function on stack without wrapping it with pcall.
 template<typename Sig>
-inline bool PushCFunction(State* state,
+inline void PushCFunction(State* state,
                           const base::Callback<Sig>& callback,
                           int callback_flags = 0) {
   typedef CallbackHolder<Sig> HolderT;
@@ -208,7 +196,6 @@ inline bool PushCFunction(State* state,
   new(holder) HolderT(state, callback, callback_flags);
 
   lua_pushcclosure(state, &internal::Dispatcher<Sig>::DispatchToCallback, 1);
-  return true;  // ignore memory errors.
 }
 
 }  // namespace internal

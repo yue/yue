@@ -8,11 +8,26 @@
 #define LUA_TYPES_H_
 
 #include <string>
+#include <tuple>
 
 #include "base/strings/string_piece.h"
 #include "lua/state.h"
 
 namespace lua {
+
+// Possible lua types.
+enum class LuaType {
+  None          = LUA_TNONE,
+  Nil           = LUA_TNIL,
+  Number        = LUA_TNUMBER,
+  Boolean       = LUA_TBOOLEAN,
+  String        = LUA_TSTRING,
+  Table         = LUA_TTABLE,
+  Function      = LUA_TFUNCTION,
+  UserData      = LUA_TUSERDATA,
+  Thread        = LUA_TTHREAD,
+  LightUserData = LUA_TLIGHTUSERDATA,
+};
 
 // Get how many lua values the type represents.
 template<typename T>
@@ -37,9 +52,8 @@ struct Type {};
 template<>
 struct Type<int> {
   static constexpr const char* name = "integer";
-  static inline bool Push(State* state, int number) {
+  static inline void Push(State* state, int number) {
     lua_pushinteger(state, number);
-    return true;
   }
   static inline bool To(State* state, int index, int* out) {
     int success = 0;
@@ -53,9 +67,8 @@ struct Type<int> {
 template<>
 struct Type<double> {
   static constexpr const char* name = "number";
-  static inline bool Push(State* state, double number) {
+  static inline void Push(State* state, double number) {
     lua_pushnumber(state, number);
-    return true;
   }
   static inline bool To(State* state, int index, double* out) {
     int success = 0;
@@ -69,9 +82,8 @@ struct Type<double> {
 template<>
 struct Type<bool> {
   static constexpr const char* name = "boolean";
-  static inline bool Push(State* state, bool b) {
+  static inline void Push(State* state, bool b) {
     lua_pushboolean(state, b);
-    return true;
   }
   static inline bool To(State* state, int index, bool* out) {
     if (!lua_isboolean(state, index))
@@ -84,18 +96,16 @@ struct Type<bool> {
 template<>
 struct Type<nullptr_t> {
   static constexpr const char* name = "nil";
-  static inline bool Push(State* state, nullptr_t) {
+  static inline void Push(State* state, nullptr_t) {
     lua_pushnil(state);
-    return true;
   }
 };
 
 template<>
 struct Type<base::StringPiece> {
   static constexpr const char* name = "string";
-  static inline bool Push(State* state, base::StringPiece str) {
+  static inline void Push(State* state, base::StringPiece str) {
     lua_pushlstring(state, str.data(), str.length());
-    return true;  // ignore memory errors.
   }
   static inline bool To(State* state, int index, base::StringPiece* out) {
     const char* str = lua_tostring(state, index);
@@ -109,9 +119,8 @@ struct Type<base::StringPiece> {
 template<>
 struct Type<std::string> {
   static constexpr const char* name = "string";
-  static inline bool Push(State* state, const std::string& str) {
+  static inline void Push(State* state, const std::string& str) {
     lua_pushlstring(state, str.data(), str.length());
-    return true;  // ignore memory errors.
   }
   static inline bool To(State* state, int index, std::string* out) {
     const char* str = lua_tostring(state, index);
@@ -124,9 +133,8 @@ struct Type<std::string> {
 
 template<>
 struct Type<const char*> {
-  static inline bool Push(State* state, const char* str) {
+  static inline void Push(State* state, const char* str) {
     lua_pushstring(state, str);
-    return true;  // ignore memory errors.
   }
 };
 
