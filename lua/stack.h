@@ -77,7 +77,7 @@ inline bool To(State* state, int index, std::tuple<ArgTypes...>* out) {
 
 // Thin wrapper for lua_pop.
 inline void PopAndIgnore(State* state, size_t n) {
-  lua_pop(state, n);
+  lua_pop(state, static_cast<int>(n));
 }
 
 // Get the values and pop them from statck.

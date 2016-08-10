@@ -60,7 +60,7 @@ struct Type<int> {
     int ret = lua_tointegerx(state, index, &success);
     if (success)
       *out = ret;
-    return success;
+    return success != 0;
   }
 };
 
@@ -75,7 +75,7 @@ struct Type<double> {
     int ret = lua_tonumberx(state, index, &success);
     if (success)
       *out = ret;
-    return success;
+    return success != 0;
   }
 };
 
@@ -88,7 +88,7 @@ struct Type<bool> {
   static inline bool To(State* state, int index, bool* out) {
     if (!lua_isboolean(state, index))
       return false;
-    *out = lua_toboolean(state, index);
+    *out = lua_toboolean(state, index) != 0;
     return true;
   }
 };

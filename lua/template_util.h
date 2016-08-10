@@ -25,6 +25,20 @@ struct IndicesGenerator<0, indices...> {
   using type = IndicesHolder<indices...>;
 };
 
+// Deduce the proper type for callback parameters.
+template<typename T>
+struct CallbackParamTraits {
+  typedef T LocalType;
+};
+template<typename T>
+struct CallbackParamTraits<const T&> {
+  typedef T LocalType;
+};
+template<typename T>
+struct CallbackParamTraits<const T*> {
+  typedef T* LocalType;
+};
+
 }  // namespace internal
 
 }  // namespace lua

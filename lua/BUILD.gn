@@ -16,6 +16,12 @@ source_set("lua") {
     "types.h",
   ]
 
+  if (is_win) {
+    cflags = [
+      "/wd4189",  # local variable is initialized but not referenced
+    ]
+  }
+
   deps = [
     "//base",
     "//third_party/lua:liblua",

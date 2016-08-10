@@ -168,6 +168,7 @@ config("default_libs") {
       "oleaut32.lib",
       "psapi.lib",
       "shell32.lib",
+      "shlwapi.lib",
       "user32.lib",
       "uuid.lib",
       "version.lib",

@@ -14,19 +14,6 @@ namespace lua {
 namespace internal {
 
 template<typename T>
-struct CallbackParamTraits {
-  typedef T LocalType;
-};
-template<typename T>
-struct CallbackParamTraits<const T&> {
-  typedef T LocalType;
-};
-template<typename T>
-struct CallbackParamTraits<const T*> {
-  typedef T* LocalType;
-};
-
-template<typename T>
 inline bool GetArgument(CallContext* context, int index, T* result) {
   if (index == 0 && (context->create_flags & HolderIsFirstArgument) != 0) {
     // TODO(zcbenz): Add support for classes.
