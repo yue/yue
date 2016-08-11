@@ -286,4 +286,8 @@ TEST_F(LuaTest, CallbackWithMultipleReturns) {
   ASSERT_TRUE(lua::To(state_, 1, &callback2));
   ASSERT_EQ(callback2.Run(2, 3, 4, 5), 2);
   EXPECT_EQ(lua::GetTop(state_), 1);
+  base::Callback<void(void)> callback3;
+  ASSERT_TRUE(lua::To(state_, 1, &callback3));
+  callback3.Run();
+  EXPECT_EQ(lua::GetTop(state_), 1);
 }
