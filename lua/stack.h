@@ -9,6 +9,7 @@
 
 #include <tuple>
 
+#include "base/compiler_specific.h"
 #include "lua/template_util.h"
 #include "lua/types.h"
 
@@ -39,7 +40,7 @@ inline void Push(State* state) {
 
 // Enable push arbitrary args at the same time.
 template<typename ArgType, typename... ArgTypes>
-inline void Push(State* state, const ArgType& arg, ArgTypes... args) {
+inline void Push(State* state, const ArgType& arg, const ArgTypes&... args) {
   Push(state, arg);
   Push(state, args...);
 }
@@ -76,7 +77,7 @@ inline bool To(State* state, int index) {
 
 // Enable getting arbitrary args at the same time.
 template<typename ArgType, typename... ArgTypes>
-inline bool To(State* state, int index, ArgType* arg, ArgTypes... args) {
+inline bool To(State* state, int index, ArgType* arg, const ArgTypes&... args) {
   return Type<ArgType>::To(state, index, arg) && To(state, index + 1, args...);
 }
 

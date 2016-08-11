@@ -13,6 +13,7 @@ source_set("lua") {
     "stack.h",
     "state.h",
     "table.h",
+    "table_internal.h",
     "types.h",
   ]
 

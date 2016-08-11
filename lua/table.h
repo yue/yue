@@ -7,6 +7,9 @@
 #ifndef LUA_TABLE_H_
 #define LUA_TABLE_H_
 
+#include <tuple>
+
+#include "lua/table_internal.h"
 #include "lua/stack.h"
 
 namespace lua {
@@ -34,7 +37,7 @@ inline void RawSet(State* state, int index, int key, const Value& value) {
 // Allow setting arbitrary key/value pairs.
 template<typename Key, typename Value, typename... ArgTypes>
 inline void RawSet(State* state, int index, const Key& key, const Value& value,
-                   ArgTypes... args) {
+                   const ArgTypes&... args) {
   RawSet(state, index, key, value);
   RawSet(state, index, args...);
 }
@@ -53,7 +56,8 @@ inline LuaType RawGet(State* state, int index, int key) {
 
 // Allow getting arbitrary values.
 template<typename Key, typename... ArgTypes>
-inline void RawGet(State* state, int index, const Key& key, ArgTypes... args) {
+inline void RawGet(State* state, int index, const Key& key,
+                   const ArgTypes&... args) {
   RawGet(state, index, key);
   RawGet(state, index, args...);
 }
@@ -66,7 +70,7 @@ inline void RawGetKeyPairHelper(State* state, int index, const Key& key,
 }
 template<typename Key, typename Value, typename... ArgTypes>
 inline void RawGetKeyPairHelper(State* state, int index, const Key& key,
-                                Value* out, ArgTypes... args) {
+                                Value* out, const ArgTypes&... args) {
   RawGetKeyPairHelper(state, index, key, out);
   RawGetKeyPairHelper(state, index, args...);
 }
@@ -79,7 +83,7 @@ inline bool ToKeyPairHelper(State* state, int index, const Key& key,
 }
 template<typename Key, typename Value, typename... ArgTypes>
 inline bool ToKeyPairHelper(State* state, int index, const Key& key, Value* out,
-                            ArgTypes... args) {
+                            const ArgTypes&... args) {
   return ToKeyPairHelper(state, index, key, out) &&
          ToKeyPairHelper(state, index + 1, args...);
 }
@@ -87,12 +91,23 @@ inline bool ToKeyPairHelper(State* state, int index, const Key& key, Value* out,
 // Allow getting and poping arbitrary values.
 template<typename Key, typename Value, typename... ArgTypes>
 inline bool RawGetAndPop(State* state, int index, const Key& key, Value* out,
-                         ArgTypes... args) {
+                         const ArgTypes&... args) {
   int current_top = GetTop(state);
   RawGetKeyPairHelper(state, index, key, out, args...);
   bool success = ToKeyPairHelper(state, current_top + 1, key, out, args...);
   SetTop(state, current_top);
   return success;
+}
+
+// The safe wrapper for the unsafe lua_settable.
+// When failed, false is returned and the error is left on stack.
+template<typename... ArgTypes>
+inline bool Set(State* state, int index, const ArgTypes&... args) {
+  std::tuple<const ArgTypes&...> args_refs(args...);
+  lua_pushcfunction(state, &internal::UnsafeSetWrapper<const ArgTypes&...>);
+  lua_pushlightuserdata(state, &args_refs);
+  lua_pushvalue(state, index);
+  return lua_pcall(state, 2, 0, 0) == LUA_OK;
 }
 
 }  // namespace lua
