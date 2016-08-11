@@ -31,6 +31,20 @@ inline bool GetArgument(CallContext* context, int index, CallContext** result) {
   return true;
 }
 
+// Deduce the proper type for callback parameters.
+template<typename T>
+struct CallbackParamTraits {
+  typedef T LocalType;
+};
+template<typename T>
+struct CallbackParamTraits<const T&> {
+  typedef T LocalType;
+};
+template<typename T>
+struct CallbackParamTraits<const T*> {
+  typedef T* LocalType;
+};
+
 // CallbackHolder and CallbackHolderBase are used to pass a base::Callback from
 // PushCFunction through DispatchToCallback, where it is invoked.
 

@@ -207,3 +207,20 @@ TEST_F(LuaTest, SetGet) {
   EXPECT_EQ(v2, "value2");
   EXPECT_EQ(v3, "value3");
 }
+
+TEST_F(LuaTest, GetAndPop) {
+  lua::PushNewTable(state_);
+  ASSERT_EQ(lua::GetTop(state_), 1);
+  ASSERT_TRUE(lua::Set(state_, 1, "key1", true, "key2", "value2", 3, "value3"));
+  bool v1;
+  std::string v2, v3;
+  ASSERT_TRUE(lua::GetAndPop(state_, 1, "key1", &v1, "key2", &v2, 3, &v3));
+  ASSERT_EQ(lua::GetTop(state_), 1);
+  EXPECT_EQ(v1, true);
+  EXPECT_EQ(v2, "value2");
+  EXPECT_EQ(v3, "value3");
+  ASSERT_FALSE(lua::GetAndPop(state_, 1, "key1", &v2));
+  std::string error;
+  ASSERT_TRUE(lua::Pop(state_, &error));
+  EXPECT_EQ(error, "error converting values");
+}

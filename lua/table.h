@@ -121,6 +121,25 @@ inline bool Get(State* state, int index, const ArgTypes&... args) {
   return lua_pcall(state, 2, sizeof...(ArgTypes), 0) == LUA_OK;
 }
 
+// Use Get to receive table members and pop them out of stack.
+// When failed, false is returned and the error is left on stack.
+template<typename... ArgTypes>
+inline bool GetAndPop(State* state, int index, const ArgTypes&... args) {
+  std::tuple<const ArgTypes&...> args_refs(args...);
+  int current_top = GetTop(state);
+  lua_pushcfunction(state,
+                    &internal::UnsafeGetAndPopWrapper<const ArgTypes&...>);
+  lua_pushlightuserdata(state, &args_refs);
+  lua_pushvalue(state, index);
+  if (lua_pcall(state, 2, sizeof...(ArgTypes) / 2, 0) != LUA_OK)
+    return false;
+  bool success = ToKeyPairHelper(state, current_top + 1, args...);
+  SetTop(state, current_top);
+  if (!success)  // Push an error to match the behavior of pcall.
+    Push(state, "error converting values");
+  return success;
+}
+
 }  // namespace lua
 
 #endif  // LUA_TABLE_H_

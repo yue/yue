@@ -121,6 +121,39 @@ int UnsafeGetWrapper(State* state) {
   return sizeof...(ArgTypes);
 }
 
+// Strip the out args from args and feed the keys to UnsafeGet.
+void UnsafeGetKeyPairHelper(State* state, int index) {
+}
+template<typename Key, typename Value, typename... ArgTypes>
+void UnsafeGetKeyPairHelper(State* state, int index, const Key& key, Value* out,
+                            const ArgTypes&... args) {
+  UnsafeGet(state, index, key);
+  UnsafeGetKeyPairHelper(state, index, args...);
+}
+
+// Tuple version of UnsafeGetKeyPairHelper.
+template<typename Tuple, size_t... Indices>
+inline void UnsafeGetKeyPairHelper(State* state, int index, const Tuple& packed,
+                                   internal::IndicesHolder<Indices...>) {
+  UnsafeGetKeyPairHelper(state, index, std::get<Indices>(packed)...);
+}
+template<typename... ArgTypes>
+void UnsafeGetKeyPairHelper(State* state, int index,
+                            const std::tuple<ArgTypes...>& packed) {
+  UnsafeGetKeyPairHelper(
+      state, index, packed,
+      typename internal::IndicesGenerator<sizeof...(ArgTypes)>::type());
+}
+
+// The wrapper used by GetAndPop.
+template<typename... ArgTypes>
+int UnsafeGetAndPopWrapper(State* state) {
+  const std::tuple<const ArgTypes&...>& args =
+      *static_cast<std::tuple<const ArgTypes&...>*>(lua_touserdata(state, 1));
+  UnsafeGetKeyPairHelper(state, 2, args);
+  return sizeof...(ArgTypes) / 2;
+}
+
 }  // namespace internal
 
 }  // namespace lua
