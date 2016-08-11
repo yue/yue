@@ -194,13 +194,13 @@ TEST_F(LuaTest, RawGetWithPop) {
   ASSERT_EQ(lua::GetTop(state_), 1);
 }
 
-TEST_F(LuaTest, SetGet) {
+TEST_F(LuaTest, PSetGet) {
   lua::PushNewTable(state_);
   ASSERT_EQ(lua::GetTop(state_), 1);
-  ASSERT_TRUE(lua::Set(state_, 1, "key1", 1, "key2", "value2", 3, "value3"));
+  ASSERT_TRUE(lua::PSet(state_, 1, "key1", 1, "key2", "value2", 3, "value3"));
   int v1;
   std::string v2, v3;
-  ASSERT_TRUE(lua::Get(state_, 1, "key1", "key2", 3));
+  ASSERT_TRUE(lua::PGet(state_, 1, "key1", "key2", 3));
   ASSERT_EQ(lua::GetTop(state_), 4);
   ASSERT_TRUE(lua::Pop(state_, &v1, &v2, &v3));
   EXPECT_EQ(v1, 1);
@@ -208,18 +208,18 @@ TEST_F(LuaTest, SetGet) {
   EXPECT_EQ(v3, "value3");
 }
 
-TEST_F(LuaTest, GetAndPop) {
+TEST_F(LuaTest, PGetAndPop) {
   lua::PushNewTable(state_);
   ASSERT_EQ(lua::GetTop(state_), 1);
-  ASSERT_TRUE(lua::Set(state_, 1, "key1", true, "key2", "value2", 3, "value3"));
+  ASSERT_TRUE(lua::PSet(state_, 1, "key1", true, "key2", "v2", 3, "value3"));
   bool v1;
   std::string v2, v3;
-  ASSERT_TRUE(lua::GetAndPop(state_, 1, "key1", &v1, "key2", &v2, 3, &v3));
+  ASSERT_TRUE(lua::PGetAndPop(state_, 1, "key1", &v1, "key2", &v2, 3, &v3));
   ASSERT_EQ(lua::GetTop(state_), 1);
   EXPECT_EQ(v1, true);
-  EXPECT_EQ(v2, "value2");
+  EXPECT_EQ(v2, "v2");
   EXPECT_EQ(v3, "value3");
-  ASSERT_FALSE(lua::GetAndPop(state_, 1, "key1", &v2));
+  ASSERT_FALSE(lua::PGetAndPop(state_, 1, "key1", &v2));
   std::string error;
   ASSERT_TRUE(lua::Pop(state_, &error));
   EXPECT_EQ(error, "error converting values");

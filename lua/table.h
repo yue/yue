@@ -102,7 +102,7 @@ inline bool RawGetAndPop(State* state, int index, const Key& key, Value* out,
 // The safe wrapper for the unsafe lua_settable.
 // When failed, false is returned and the error is left on stack.
 template<typename... ArgTypes>
-inline bool Set(State* state, int index, const ArgTypes&... args) {
+inline bool PSet(State* state, int index, const ArgTypes&... args) {
   std::tuple<const ArgTypes&...> args_refs(args...);
   lua_pushcfunction(state, &internal::UnsafeSetWrapper<const ArgTypes&...>);
   lua_pushlightuserdata(state, &args_refs);
@@ -113,7 +113,7 @@ inline bool Set(State* state, int index, const ArgTypes&... args) {
 // The safe wrapper for the unsafe lua_gettable.
 // When failed, false is returned and the error is left on stack.
 template<typename... ArgTypes>
-inline bool Get(State* state, int index, const ArgTypes&... args) {
+inline bool PGet(State* state, int index, const ArgTypes&... args) {
   std::tuple<const ArgTypes&...> args_refs(args...);
   lua_pushcfunction(state, &internal::UnsafeGetWrapper<const ArgTypes&...>);
   lua_pushlightuserdata(state, &args_refs);
@@ -124,7 +124,7 @@ inline bool Get(State* state, int index, const ArgTypes&... args) {
 // Use Get to receive table members and pop them out of stack.
 // When failed, false is returned and the error is left on stack.
 template<typename... ArgTypes>
-inline bool GetAndPop(State* state, int index, const ArgTypes&... args) {
+inline bool PGetAndPop(State* state, int index, const ArgTypes&... args) {
   std::tuple<const ArgTypes&...> args_refs(args...);
   int current_top = GetTop(state);
   lua_pushcfunction(state,
