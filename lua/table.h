@@ -44,14 +44,14 @@ inline void RawSet(State* state, int index, const Key& key, const Value& value,
 
 // Generic version of lua_rawget.
 template<typename Key>
-inline LuaType RawGet(State* state, int index, const Key& key) {
+inline void RawGet(State* state, int index, const Key& key) {
   Push(state, key);
-  return static_cast<LuaType>(lua_rawget(state, index));
+  lua_rawget(state, index);
 }
 
 // Optimize for lua_rawgeti.
-inline LuaType RawGet(State* state, int index, int key) {
-  return static_cast<LuaType>(lua_rawgeti(state, index, key));
+inline void RawGet(State* state, int index, int key) {
+  lua_rawgeti(state, index, key);
 }
 
 // Allow getting arbitrary values.
@@ -108,6 +108,17 @@ inline bool Set(State* state, int index, const ArgTypes&... args) {
   lua_pushlightuserdata(state, &args_refs);
   lua_pushvalue(state, index);
   return lua_pcall(state, 2, 0, 0) == LUA_OK;
+}
+
+// The safe wrapper for the unsafe lua_gettable.
+// When failed, false is returned and the error is left on stack.
+template<typename... ArgTypes>
+inline bool Get(State* state, int index, const ArgTypes&... args) {
+  std::tuple<const ArgTypes&...> args_refs(args...);
+  lua_pushcfunction(state, &internal::UnsafeGetWrapper<const ArgTypes&...>);
+  lua_pushlightuserdata(state, &args_refs);
+  lua_pushvalue(state, index);
+  return lua_pcall(state, 2, sizeof...(ArgTypes), 0) == LUA_OK;
 }
 
 }  // namespace lua

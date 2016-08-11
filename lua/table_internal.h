@@ -69,6 +69,58 @@ int UnsafeSetWrapper(State* state) {
   return 0;
 }
 
+// The generic version of lua_gettable.
+template<typename Key>
+inline void UnsafeGet(State* state, int index, const Key& key) {
+  Push(state, key);
+  lua_gettable(state, index);
+}
+
+// Optimize for lua_geti.
+template<typename Value>
+inline void UnsafeGet(State* state, int index, int key) {
+  lua_geti(state, index, key);
+}
+
+// Optimize for lua_getfield.
+template<typename Value>
+inline void UnsafeGet(State* state, int index, const char* key) {
+  lua_getfield(state, index, key);
+}
+
+// Allow getting arbitrary keys.
+template<typename Key, typename... ArgTypes>
+inline void UnsafeGet(State* state, int index, const Key& key,
+                      const ArgTypes&... args) {
+  UnsafeGet(state, index, key);
+  UnsafeGet(state, index, args...);
+}
+
+// The helper function for the tuple version of UnsafeGet.
+template<typename Tuple, size_t... Indices>
+inline void UnsafeGet(State* state, int index, const Tuple& packed,
+                      internal::IndicesHolder<Indices...>) {
+  return UnsafeGet(state, index, std::get<Indices>(packed)...);
+}
+
+// The tuple version of UnsafeGet.
+template<typename... ArgTypes>
+inline void UnsafeGet(State* state, int index,
+                      const std::tuple<ArgTypes...>& packed) {
+  return UnsafeGet(
+      state, index, packed,
+      typename internal::IndicesGenerator<sizeof...(ArgTypes)>::type());
+}
+
+// The wrapper used by Get to call UnsafeGet.
+template<typename... ArgTypes>
+int UnsafeGetWrapper(State* state) {
+  const std::tuple<const ArgTypes&...>& args =
+      *static_cast<std::tuple<const ArgTypes&...>*>(lua_touserdata(state, 1));
+  UnsafeGet(state, 2, args);
+  return sizeof...(ArgTypes);
+}
+
 }  // namespace internal
 
 }  // namespace lua

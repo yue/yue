@@ -29,6 +29,11 @@ enum class LuaType {
   LightUserData = LUA_TLIGHTUSERDATA,
 };
 
+// Thin wrapper of lua_type.
+inline LuaType GetType(State* state, int index) {
+  return static_cast<LuaType>(lua_type(state, index));
+}
+
 // Get how many lua values the type represents.
 template<typename T>
 struct Values {
