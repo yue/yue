@@ -14,9 +14,28 @@
 
 namespace lua {
 
-// Thin wrapper of lua_newtable.
-inline void PushNewTable(State* state) {
-  lua_newtable(state);
+// Thin wrapper of lua_createtable.
+inline void PushNewTable(State* state, int nargs = 0, int nrec = 0) {
+  lua_createtable(state, nargs, nrec);
+}
+
+// Get length of table (or any other value).
+inline void PushLen(State* state, int index) {
+  lua_len(state, index);
+}
+inline int Len(State* state, int index) {
+  PushLen(state, index);
+  int length = lua_tointeger(state, -1);
+  lua_pop(state, 1);
+  return length;
+}
+
+// Thin wrappers of lua_getmetatable and lua_setmetatable.
+inline void SetMetaTable(State* state, int index) {
+  lua_setmetatable(state, index);
+}
+inline bool GetMetaTable(State* state, int index) {
+  return lua_getmetatable(state, index) == 1;
 }
 
 // The generic version of lua_rawset.

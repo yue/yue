@@ -2,7 +2,10 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
+#include <memory>
+
 #include "base/bind.h"
+#include "lua/handle.h"
 #include "lua/pcall.h"
 #include "lua/table.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -223,4 +226,17 @@ TEST_F(LuaTest, PGetAndPop) {
   std::string error;
   ASSERT_TRUE(lua::Pop(state_, &error));
   EXPECT_EQ(error, "error converting values");
+}
+
+TEST_F(LuaTest, Handle) {
+  lua::PushNewTable(state_);
+  int original_registry_len = lua::Len(state_, LUA_REGISTRYINDEX);
+  std::unique_ptr<lua::Handle> handle(new lua::Handle(state_));
+  ASSERT_EQ(lua::Len(state_, LUA_REGISTRYINDEX), original_registry_len + 1);
+  ASSERT_EQ(lua::GetTop(state_), 0);
+  handle->Get();
+  ASSERT_EQ(lua::GetTop(state_), 1);
+  ASSERT_EQ(lua::GetType(state_, -1), lua::LuaType::Table);
+  handle.reset();
+  ASSERT_EQ(lua::Len(state_, LUA_REGISTRYINDEX), original_registry_len);
 }
