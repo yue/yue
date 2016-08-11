@@ -13,6 +13,11 @@ namespace lua {
 
 namespace internal {
 
+// Flags of PushCFunction
+enum PushCFunctionFlags {
+  HolderIsFirstArgument = 1 << 0,
+};
+
 template<typename T>
 inline bool GetArgument(CallContext* context, int index, T* result) {
   if (index == 0 && (context->create_flags & HolderIsFirstArgument) != 0) {

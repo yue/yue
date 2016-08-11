@@ -22,16 +22,9 @@ inline void Push(State* state, const ArgType& arg) {
 }
 
 // Optimized version for string iterals.
-template<size_t n, typename... ArgTypes>
+template<size_t n>
 inline void Push(State* state, const char (&str)[n]) {
   Type<const char[n]>::Push(state, str);
-}
-
-// Special version when user passes "const char*".
-// This is to work around "const ArgType&" unable to deduce "const char*".
-template<size_t n, typename... ArgTypes>
-inline void Push(State* state, const char* str) {
-  Type<const char*>::Push(state, str);
 }
 
 // Certain template functions are pushing nothing.

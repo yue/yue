@@ -5,6 +5,8 @@
 #ifndef LUA_TEMPLATE_UTIL_H_
 #define LUA_TEMPLATE_UTIL_H_
 
+#include <type_traits>
+
 namespace lua {
 
 namespace internal {
@@ -24,6 +26,14 @@ template <size_t... indices>
 struct IndicesGenerator<0, indices...> {
   using type = IndicesHolder<indices...>;
 };
+
+// Type trait for detecting function pointer.
+template <typename Fun>
+struct is_function_pointer
+    : std::integral_constant<
+          bool,
+          std::is_pointer<Fun>::value &&
+          std::is_function<typename std::remove_pointer<Fun>::type>::value> {};
 
 }  // namespace internal
 

@@ -9,10 +9,6 @@
 
 namespace lua {
 
-enum PCallFunctionFlags {
-  HolderIsFirstArgument = 1 << 0,
-};
-
 // A class used by PCall to provide information of current call.
 struct CallContext {
   explicit CallContext(State* state, int create_flags)

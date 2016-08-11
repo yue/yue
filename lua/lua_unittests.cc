@@ -4,7 +4,6 @@
 
 #include <memory>
 
-#include "base/bind.h"
 #include "lua/handle.h"
 #include "lua/pcall.h"
 #include "lua/table.h"
@@ -87,13 +86,13 @@ void FunctionWithArgs(int, const std::string&) {
 
 TEST_F(LuaTest, PCallWithInsufficientArgs) {
   std::string str;
-  lua::Push(state_, base::Bind(&FunctionWithArgs));
+  lua::Push(state_, &FunctionWithArgs);
   EXPECT_FALSE(lua::PCall(state_, nullptr, 123));
   ASSERT_TRUE(lua::Pop(state_, &str));
   ASSERT_EQ(str, "insufficient args, expecting 2 but got 1");
   ASSERT_EQ(lua::GetTop(state_), 0);
 
-  lua::Push(state_, base::Bind(&FunctionWithArgs));
+  lua::Push(state_, &FunctionWithArgs);
   EXPECT_FALSE(lua::PCall(state_, nullptr));
   ASSERT_TRUE(lua::Pop(state_, &str));
   ASSERT_EQ(str, "insufficient args, expecting 2 but got 0");
@@ -102,7 +101,7 @@ TEST_F(LuaTest, PCallWithInsufficientArgs) {
 
 TEST_F(LuaTest, PCallWithWrongArgs) {
   std::string str;
-  lua::Push(state_, base::Bind(&FunctionWithArgs));
+  lua::Push(state_, &FunctionWithArgs);
   EXPECT_FALSE(lua::PCall(state_, nullptr, "test", 123));
   ASSERT_TRUE(lua::Pop(state_, &str));
   ASSERT_EQ(str, "error converting arg at index 1 from string to integer");
@@ -113,10 +112,10 @@ void FunctionWithoutReturnValue() {
 }
 
 TEST_F(LuaTest, PCallWithoutReturnValue) {
-  lua::Push(state_, base::Bind(&FunctionWithoutReturnValue));
+  lua::Push(state_, &FunctionWithoutReturnValue);
   EXPECT_TRUE(lua::PCall(state_, nullptr));
   ASSERT_EQ(lua::GetTop(state_), 0);
-  lua::Push(state_, base::Bind(&FunctionWithArgs));
+  lua::Push(state_, &FunctionWithArgs);
   EXPECT_TRUE(lua::PCall(state_, nullptr, 123, "test"));
   ASSERT_EQ(lua::GetTop(state_), 0);
 }
@@ -132,14 +131,14 @@ std::string FunctionReturnsString(base::StringPiece str) {
 TEST_F(LuaTest, PCallWithReturnValue) {
   int num = 42;
   int out = 0;
-  lua::Push(state_, base::Bind(&FunctionReturnsInt));
+  lua::Push(state_, &FunctionReturnsInt);
   ASSERT_TRUE(lua::PCall(state_, &out, num));
   EXPECT_EQ(num, out);
   ASSERT_EQ(lua::GetTop(state_), 0);
 
   base::StringPiece str = "valar morghulis";
   std::string str_out;
-  lua::Push(state_, base::Bind(&FunctionReturnsString));
+  lua::Push(state_, &FunctionReturnsString);
   ASSERT_TRUE(lua::PCall(state_, &str_out, str));
   EXPECT_EQ(str_out, str);
   ASSERT_EQ(lua::GetTop(state_), 0);
@@ -151,7 +150,7 @@ std::tuple<std::string, int> FunctionReturnsTuple(
 }
 
 TEST_F(LuaTest, PCallWithMultipleReturnValues) {
-  lua::Push(state_, base::Bind(&FunctionReturnsTuple));
+  lua::Push(state_, &FunctionReturnsTuple);
   std::tuple<std::string, int> out;
   ASSERT_TRUE(lua::PCall(state_, &out, "str", 123));
   EXPECT_EQ(std::get<0>(out), "str");
