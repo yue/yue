@@ -33,7 +33,7 @@ source_set("lua") {
 
 test("lua_unittests") {
   sources = [
-    "lua_unittests.cc",
+    "lua_unittest.cc",
     "test/run_all_unittests.cc",
   ]
 

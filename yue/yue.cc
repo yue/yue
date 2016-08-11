@@ -23,10 +23,5 @@ int main(int argc, const char *argv[]) {
     return 1;
   }
 
-  if (!lua::PCall(state, base::Bind(&PMain))) {
-    LOG(ERROR) << "PMain failed.";
-    return 2;
-  }
-
   return 0;
 }
