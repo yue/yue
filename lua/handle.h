@@ -5,19 +5,30 @@
 #ifndef LUA_HANDLE_H_
 #define LUA_HANDLE_H_
 
+#include <memory>
+
 #include "lua/state.h"
 
 namespace lua {
 
-// Puts the value on top of stack to registry and holds a reference to it.
+// Puts the value of index to registry and holds a reference to it.
 class Handle {
  public:
-  explicit Handle(State* state)
-      : state_(state), ref_(luaL_ref(state, LUA_REGISTRYINDEX)) {}
-  ~Handle() { luaL_unref(state_, LUA_REGISTRYINDEX, ref_); }
+  static std::unique_ptr<Handle> New(State* state, int index) {
+    lua_pushvalue(state, index);
+    return std::unique_ptr<Handle>(new Handle(state));
+  }
+
+  ~Handle() {
+    luaL_unref(state_, LUA_REGISTRYINDEX, ref_);
+  }
 
   // Puts the value back to stack.
-  void Get() { lua_rawgeti(state_, LUA_REGISTRYINDEX, ref_); }
+  void Push() const { lua_rawgeti(state_, LUA_REGISTRYINDEX, ref_); }
+
+ protected:
+  explicit Handle(State* state)
+      : state_(state), ref_(luaL_ref(state, LUA_REGISTRYINDEX)) {}
 
  private:
   State* state_;
