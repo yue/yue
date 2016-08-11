@@ -7,10 +7,11 @@ import("//testing/test.gni")
 source_set("lua") {
   sources = [
     "call_context.h",
+    "callback.h",
+    "callback_internal.cc",
+    "callback_internal.h",
     "handle.h",
     "pcall.h",
-    "pcall_internal.cc",
-    "pcall_internal.h",
     "stack.h",
     "state.h",
     "table.h",

@@ -2,12 +2,13 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef LUA_PCALL_INTERNAL_H_
-#define LUA_PCALL_INTERNAL_H_
+#ifndef LUA_CALLBACK_INTERNAL_H_
+#define LUA_CALLBACK_INTERNAL_H_
 
 #include "base/callback.h"
 #include "lua/call_context.h"
-#include "lua/stack.h"
+#include "lua/handle.h"
+#include "lua/pcall.h"
 
 namespace lua {
 
@@ -203,8 +204,32 @@ inline void PushCFunction(State* state,
   lua_pushcclosure(state, &internal::Dispatcher<Sig>::DispatchToCallback, 1);
 }
 
+// Call PCall for the gloal handle.
+// TODO(zcbenz): Report errors.
+template<typename ReturnType, typename...ArgTypes>
+struct PCallHelper {
+  static ReturnType Run(State* state, const std::unique_ptr<Handle>& handle,
+                        ArgTypes... args) {
+    ReturnType result = ReturnType();
+    handle->Push();
+    PCall(state, &result, args...);
+    return result;
+  }
+};
+
+// The void return type version for PCallHelper.
+// TODO(zcbenz): Report errors.
+template<typename...ArgTypes>
+struct PCallHelper<void, ArgTypes...> {
+  static void Run(State* state, const std::unique_ptr<Handle>& handle,
+                  ArgTypes... args) {
+    handle->Push();
+    PCall(state, nullptr, args...);
+  }
+};
+
 }  // namespace internal
 
 }  // namespace lua
 
-#endif  // LUA_PCALL_INTERNAL_H_
+#endif  // LUA_CALLBACK_INTERNAL_H_

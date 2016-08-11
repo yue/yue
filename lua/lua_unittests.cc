@@ -4,8 +4,7 @@
 
 #include <memory>
 
-#include "lua/handle.h"
-#include "lua/pcall.h"
+#include "lua/callback.h"
 #include "lua/table.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
@@ -242,11 +241,49 @@ TEST_F(LuaTest, Handle) {
 
 TEST_F(LuaTest, Callback) {
   lua::Push(state_, &FunctionReturnsInt);
-  base::Callback<int(int)> callback1;
-  ASSERT_TRUE(lua::Pop(state_, &callback1));
+  base::Callback<int(int)> callback;
+  ASSERT_TRUE(lua::Pop(state_, &callback));
   ASSERT_EQ(lua::GetTop(state_), 0);
-  ASSERT_EQ(callback1.Run(123), 123);
+  ASSERT_EQ(callback.Run(123), 123);
   ASSERT_EQ(lua::GetTop(state_), 0);
-  ASSERT_EQ(callback1.Run(456), 456);
+  ASSERT_EQ(callback.Run(456), 456);
   ASSERT_EQ(lua::GetTop(state_), 0);
+}
+
+void FunctionChangesPtr(int* ptr) {
+  *ptr = 456;
+}
+
+TEST_F(LuaTest, CallbackWithVoidReturn) {
+  int ret = 123;
+  lua::Push(state_, base::Bind(&FunctionChangesPtr, &ret));
+  base::Callback<void(int)> callback;
+  ASSERT_TRUE(lua::Pop(state_, &callback));
+  ASSERT_EQ(lua::GetTop(state_), 0);
+  callback.Run(123);
+  ASSERT_EQ(ret, 456);
+  ret = 123;
+  callback.Run(123);
+  ASSERT_EQ(ret, 456);
+  ASSERT_EQ(lua::GetTop(state_), 0);
+}
+
+std::tuple<int, int, int, int> FunctionReturnsMultipleIntegers(
+    int i1, int i2, int i3, int i4) {
+  return std::make_tuple(i1, i2, i3, i4);
+}
+
+TEST_F(LuaTest, CallbackWithMultipleReturns) {
+  lua::Push(state_, &FunctionReturnsMultipleIntegers);
+  base::Callback<std::tuple<int, int>(int, int, int, int)> callback1;
+  ASSERT_TRUE(lua::To(state_, 1, &callback1));
+  ASSERT_EQ(lua::GetTop(state_), 1);
+  std::tuple<int, int> ret1 = callback1.Run(1, 2, 3, 4);
+  EXPECT_EQ(lua::GetTop(state_), 1);
+  EXPECT_EQ(std::get<0>(ret1), 1);
+  EXPECT_EQ(std::get<1>(ret1), 2);
+  base::Callback<int(int, int, int, int)> callback2;
+  ASSERT_TRUE(lua::To(state_, 1, &callback2));
+  ASSERT_EQ(callback2.Run(2, 3, 4, 5), 2);
+  EXPECT_EQ(lua::GetTop(state_), 1);
 }
