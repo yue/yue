@@ -227,16 +227,16 @@ TEST_F(LuaTest, PGetAndPop) {
 }
 
 TEST_F(LuaTest, Handle) {
-  int original_registry_len = lua::Len(state_, LUA_REGISTRYINDEX);
+  int original_registry_len = lua::RawLen(state_, LUA_REGISTRYINDEX);
   lua::PushNewTable(state_);
   std::unique_ptr<lua::Handle> handle(lua::Handle::New(state_, -1));
-  ASSERT_EQ(lua::Len(state_, LUA_REGISTRYINDEX), original_registry_len + 1);
+  ASSERT_EQ(lua::RawLen(state_, LUA_REGISTRYINDEX), original_registry_len + 1);
   ASSERT_EQ(lua::GetTop(state_), 1);
   handle->Push();
   ASSERT_EQ(lua::GetTop(state_), 2);
   ASSERT_EQ(lua::GetType(state_, -1), lua::LuaType::Table);
   handle.reset();
-  ASSERT_EQ(lua::Len(state_, LUA_REGISTRYINDEX), original_registry_len);
+  ASSERT_EQ(lua::RawLen(state_, LUA_REGISTRYINDEX), original_registry_len);
 }
 
 TEST_F(LuaTest, Callback) {

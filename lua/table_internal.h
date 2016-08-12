@@ -114,7 +114,7 @@ inline void UnsafeGet(State* state, int index,
 
 // The wrapper used by Get to call UnsafeGet.
 template<typename... ArgTypes>
-int UnsafeGetWrapper(State* state) {
+inline int UnsafeGetWrapper(State* state) {
   const std::tuple<const ArgTypes&...>& args =
       *static_cast<std::tuple<const ArgTypes&...>*>(lua_touserdata(state, 1));
   UnsafeGet(state, 2, args);
@@ -122,11 +122,11 @@ int UnsafeGetWrapper(State* state) {
 }
 
 // Strip the out args from args and feed the keys to UnsafeGet.
-void UnsafeGetKeyPairHelper(State* state, int index) {
+inline void UnsafeGetKeyPairHelper(State* state, int index) {
 }
 template<typename Key, typename Value, typename... ArgTypes>
-void UnsafeGetKeyPairHelper(State* state, int index, const Key& key, Value* out,
-                            const ArgTypes&... args) {
+inline void UnsafeGetKeyPairHelper(State* state, int index, const Key& key,
+                                   Value* out, const ArgTypes&... args) {
   UnsafeGet(state, index, key);
   UnsafeGetKeyPairHelper(state, index, args...);
 }
@@ -138,8 +138,8 @@ inline void UnsafeGetKeyPairHelper(State* state, int index, const Tuple& packed,
   UnsafeGetKeyPairHelper(state, index, std::get<Indices>(packed)...);
 }
 template<typename... ArgTypes>
-void UnsafeGetKeyPairHelper(State* state, int index,
-                            const std::tuple<ArgTypes...>& packed) {
+inline void UnsafeGetKeyPairHelper(State* state, int index,
+                                   const std::tuple<ArgTypes...>& packed) {
   UnsafeGetKeyPairHelper(
       state, index, packed,
       typename internal::IndicesGenerator<sizeof...(ArgTypes)>::type());
@@ -147,7 +147,7 @@ void UnsafeGetKeyPairHelper(State* state, int index,
 
 // The wrapper used by GetAndPop.
 template<typename... ArgTypes>
-int UnsafeGetAndPopWrapper(State* state) {
+inline int UnsafeGetAndPopWrapper(State* state) {
   const std::tuple<const ArgTypes&...>& args =
       *static_cast<std::tuple<const ArgTypes&...>*>(lua_touserdata(state, 1));
   UnsafeGetKeyPairHelper(state, 2, args);

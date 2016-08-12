@@ -20,14 +20,8 @@ inline void PushNewTable(State* state, int nargs = 0, int nrec = 0) {
 }
 
 // Get length of table (or any other value).
-inline void PushLen(State* state, int index) {
-  lua_len(state, index);
-}
-inline int Len(State* state, int index) {
-  PushLen(state, index);
-  int length = lua_tointeger(state, -1);
-  lua_pop(state, 1);
-  return length;
+inline int RawLen(State* state, int index) {
+  return lua_rawlen(state, index);
 }
 
 // Thin wrappers of lua_getmetatable and lua_setmetatable.
