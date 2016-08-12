@@ -30,11 +30,19 @@ inline void Push(State* state, const char (&str)[n]) {
 // Thin wrapper for lua_pushvalue.
 struct ValueOnStack {
   ValueOnStack(State* state, int index) : index(AbsIndex(state, index)) {}
-  operator int() const { return index; }
   int index;
 };
 inline void Push(State* state, ValueOnStack index) {
-  lua_pushvalue(state, index);
+  lua_pushvalue(state, index.index);
+}
+
+// Thin wrapper for raw C function.
+struct CFunction {
+  explicit CFunction(lua_CFunction func) : func(func) {}
+  lua_CFunction func;
+};
+inline void Push(State* state, CFunction func) {
+  lua_pushcfunction(state, func.func);
 }
 
 // Certain template functions are pushing nothing.

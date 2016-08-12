@@ -75,7 +75,7 @@ class CallbackHolder : public CallbackHolderBase {
 
 // Class template for extracting and storing single argument for callback
 // at position |index|.
-template <size_t index, typename ArgType>
+template<size_t index, typename ArgType>
 struct ArgumentHolder {
   using ArgLocalType = typename CallbackParamTraits<ArgType>::LocalType;
 
@@ -93,10 +93,10 @@ struct ArgumentHolder {
 
 // Class template for converting arguments from JavaScript to C++ and running
 // the callback with them.
-template <typename IndicesType, typename... ArgTypes>
+template<typename IndicesType, typename... ArgTypes>
 class Invoker {};
 
-template <size_t... indices, typename... ArgTypes>
+template<size_t... indices, typename... ArgTypes>
 class Invoker<IndicesHolder<indices...>, ArgTypes...>
     : public ArgumentHolder<indices, ArgTypes>... {
  public:
@@ -128,7 +128,7 @@ class Invoker<IndicesHolder<indices...>, ArgTypes...>
 
  private:
   static bool And() { return true; }
-  template <typename... T>
+  template<typename... T>
   static bool And(bool arg1, T... args) {
     return arg1 && And(args...);
   }
@@ -138,10 +138,10 @@ class Invoker<IndicesHolder<indices...>, ArgTypes...>
 
 // DispatchToCallback converts all the lua arguments to C++ types and
 // invokes the base::Callback.
-template <typename Sig>
+template<typename Sig>
 struct Dispatcher {};
 
-template <typename ReturnType, typename... ArgTypes>
+template<typename ReturnType, typename... ArgTypes>
 struct Dispatcher<ReturnType(ArgTypes...)> {
   static int DispatchToCallback(State* state) {
     // Check for args length.
@@ -183,6 +183,13 @@ struct Dispatcher<ReturnType(ArgTypes...)> {
     }
 
     return Values<ReturnType>::count;
+  }
+};
+
+template<typename ReturnType, typename... ArgTypes>
+struct Dispatcher<ReturnType(CallContext* context, ArgTypes...)> {
+  static int DispatchToCallback(State* state) {
+    return Dispatcher<ReturnType(ArgTypes...)>::DispatchToCallback(state);
   }
 };
 

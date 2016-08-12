@@ -13,22 +13,22 @@ namespace internal {
 
 // Classes for generating and storing an argument pack of integer indices
 // (based on well-known "indices trick", see: http://goo.gl/bKKojn):
-template <size_t... indices>
+template<size_t... indices>
 struct IndicesHolder {};
 
-template <size_t requested_index, size_t... indices>
+template<size_t requested_index, size_t... indices>
 struct IndicesGenerator {
   using type = typename IndicesGenerator<requested_index - 1,
                                          requested_index - 1,
                                          indices...>::type;
 };
-template <size_t... indices>
+template<size_t... indices>
 struct IndicesGenerator<0, indices...> {
   using type = IndicesHolder<indices...>;
 };
 
 // Type trait for detecting function pointer.
-template <typename Fun>
+template<typename Fun>
 struct is_function_pointer
     : std::integral_constant<
           bool,

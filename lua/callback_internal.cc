@@ -4,15 +4,16 @@
 
 #include "lua/callback_internal.h"
 
+#include "lua/table.h"
+
 namespace lua {
 
 namespace internal {
 
 CallbackHolderBase::CallbackHolderBase(State* state) {
-  lua_newtable(state);
-  lua_pushcfunction(state, &OnGC);
-  lua_setfield(state, -2, "__gc");
-  lua_setmetatable(state, -2);
+  PushNewTable(state);
+  RawSet(state, -1, "__gc", CFunction(&OnGC));
+  SetMetaTable(state, -2);
 }
 
 // static

@@ -17,6 +17,8 @@ class WrappableBase {
   WrappableBase();
   virtual ~WrappableBase();
 
+  static int OnGC(State* state);
+
  private:
   DISALLOW_COPY_AND_ASSIGN(WrappableBase);
 };
