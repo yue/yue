@@ -27,6 +27,16 @@ inline void Push(State* state, const char (&str)[n]) {
   Type<const char[n]>::Push(state, str);
 }
 
+// Thin wrapper for lua_pushvalue.
+struct ValueOnStack {
+  ValueOnStack(State* state, int index) : index(AbsIndex(state, index)) {}
+  operator int() const { return index; }
+  int index;
+};
+inline void Push(State* state, ValueOnStack index) {
+  lua_pushvalue(state, index);
+}
+
 // Certain template functions are pushing nothing.
 inline void Push(State* state) {
 }
@@ -122,6 +132,16 @@ inline void SetTop(State* state, int index) {
 
 inline int GetTop(State* state) {
   return lua_gettop(state);
+}
+
+// Thin wrapper of lua_compare.
+enum class CompareOp {
+  EQ = LUA_OPEQ,
+  LT = LUA_OPLT,
+  LE = LUA_OPLE,
+};
+inline bool Compare(State* state, int index1, int index2, CompareOp op) {
+  return lua_compare(state, index1, index2, static_cast<int>(op)) == 1;
 }
 
 }  // namespace lua

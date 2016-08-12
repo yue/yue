@@ -21,13 +21,7 @@ enum PushCFunctionFlags {
 
 template<typename T>
 inline bool GetArgument(CallContext* context, int index, T* result) {
-  if (index == 0 && (context->create_flags & HolderIsFirstArgument) != 0) {
-    // TODO(zcbenz): Add support for classes.
-    return false;
-  } else {
-    // Lua uses 1-index array.
-    return To(context->state, index + 1, result);
-  }
+  return To(context->state, index + 1, result);
 }
 
 // For advanced use cases, we allow callers to request the unparsed CallContext
@@ -47,7 +41,7 @@ struct CallbackParamTraits<const T&> {
   typedef T LocalType;
 };
 template<typename T>
-struct CallbackParamTraits<const T*> {
+struct CallbackParamTraits<T*> {
   typedef T* LocalType;
 };
 

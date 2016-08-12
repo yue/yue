@@ -17,6 +17,9 @@ source_set("lua") {
     "table.h",
     "table_internal.h",
     "types.h",
+    "wrappable.h",
+    "wrappable_internal.cc",
+    "wrappable_internal.h",
   ]
 
   if (is_win) {
@@ -34,6 +37,7 @@ source_set("lua") {
 test("lua_unittests") {
   sources = [
     "lua_unittest.cc",
+    "wrappable_unittest.cc",
     "test/run_all_unittests.cc",
   ]
 

@@ -136,17 +136,25 @@ struct Type<std::string> {
   }
 };
 
+template<>
+struct Type<const char*> {
+  static constexpr const char* name = "string";
+  static inline void Push(State* state, const char* str) {
+    lua_pushstring(state, str);
+  }
+  static inline bool To(State* state, int index, const char** out) {
+    const char* str = lua_tostring(state, index);
+    if (!str)
+      return false;
+    *out = str;
+    return true;  // ignore memory errors.
+  }
+};
+
 template<size_t n>
 struct Type<const char[n]> {
   static inline void Push(State* state, const char* str) {
     lua_pushlstring(state, str, n - 1);
-  }
-};
-
-template<>
-struct Type<const char*> {
-  static inline void Push(State* state, const char* str) {
-    lua_pushstring(state, str);
   }
 };
 
