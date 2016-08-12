@@ -17,6 +17,7 @@ namespace internal {
 template<typename Key, typename Value>
 inline void UnsafeSet(State* state, int index, const Key& key,
                       const Value& value) {
+  index = lua_absindex(state, index);
   Push(state, key, value);
   lua_settable(state, index);
 }
@@ -24,6 +25,7 @@ inline void UnsafeSet(State* state, int index, const Key& key,
 // Optimize for lua_seti.
 template<typename Value>
 inline void UnsafeSet(State* state, int index, int key, const Value& value) {
+  index = lua_absindex(state, index);
   Push(state, value);
   lua_seti(state, index, key);
 }
@@ -32,6 +34,7 @@ inline void UnsafeSet(State* state, int index, int key, const Value& value) {
 template<typename Value>
 inline void UnsafeSet(State* state, int index, const char* key,
                       const Value& value) {
+  index = lua_absindex(state, index);
   Push(state, value);
   lua_setfield(state, index, key);
 }
@@ -72,6 +75,7 @@ int UnsafeSetWrapper(State* state) {
 // The generic version of lua_gettable.
 template<typename Key>
 inline void UnsafeGet(State* state, int index, const Key& key) {
+  index = lua_absindex(state, index);
   Push(state, key);
   lua_gettable(state, index);
 }

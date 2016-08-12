@@ -36,6 +36,7 @@ inline bool GetMetaTable(State* state, int index) {
 template<typename Key, typename Value>
 inline void RawSet(State* state, int index, const Key& key,
                    const Value& value) {
+  index = AbsIndex(state, index);
   Push(state, key, value);
   lua_rawset(state, index);
 }
@@ -43,6 +44,7 @@ inline void RawSet(State* state, int index, const Key& key,
 // Optimize for lua_rawseti.
 template<typename Value>
 inline void RawSet(State* state, int index, int key, const Value& value) {
+  index = AbsIndex(state, index);
   Push(state, value);
   lua_rawseti(state, index, key);
 }
@@ -58,12 +60,14 @@ inline void RawSet(State* state, int index, const Key& key, const Value& value,
 // Generic version of lua_rawget.
 template<typename Key>
 inline void RawGet(State* state, int index, const Key& key) {
+  index = AbsIndex(state, index);
   Push(state, key);
   lua_rawget(state, index);
 }
 
 // Optimize for lua_rawgeti.
 inline void RawGet(State* state, int index, int key) {
+  index = AbsIndex(state, index);
   lua_rawgeti(state, index, key);
 }
 
@@ -71,6 +75,7 @@ inline void RawGet(State* state, int index, int key) {
 template<typename Key, typename... ArgTypes>
 inline void RawGet(State* state, int index, const Key& key,
                    const ArgTypes&... args) {
+  index = AbsIndex(state, index);
   RawGet(state, index, key);
   RawGet(state, index, args...);
 }
@@ -84,6 +89,7 @@ inline void RawGetKeyPairHelper(State* state, int index, const Key& key,
 template<typename Key, typename Value, typename... ArgTypes>
 inline void RawGetKeyPairHelper(State* state, int index, const Key& key,
                                 Value* out, const ArgTypes&... args) {
+  index = AbsIndex(state, index);
   RawGetKeyPairHelper(state, index, key, out);
   RawGetKeyPairHelper(state, index, args...);
 }

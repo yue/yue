@@ -161,10 +161,10 @@ TEST_F(LuaTest, RawSetGet) {
   lua::PushNewTable(state_);
   ASSERT_EQ(lua::GetTop(state_), 1);
   lua::RawSet(state_, 1, "key1", 1);
-  lua::RawSet(state_, 1, "key2", 2, 1, "v1");
-  lua::RawSet(state_, 1, "key3", 3, 2, "v2", 3, "v3");
+  lua::RawSet(state_, -1, "key2", 2, 1, "v1");
+  lua::RawSet(state_, -1, "key3", 3, 2, "v2", 3, "v3");
   ASSERT_EQ(lua::GetTop(state_), 1);
-  lua::RawGet(state_, 1, "key1", "key2", "key3", 1, 2, 3);
+  lua::RawGet(state_, -1, "key1", "key2", "key3", 1, 2, 3);
   int i1, i2, i3;
   std::string v1, v2, v3;
   ASSERT_TRUE(lua::Pop(state_, &i1, &i2, &i3, &v1, &v2, &v3));
@@ -174,7 +174,7 @@ TEST_F(LuaTest, RawSetGet) {
   EXPECT_EQ(v1, "v1");
   EXPECT_EQ(v2, "v2");
   EXPECT_EQ(v3, "v3");
-  lua::RawGet(state_, 1, "non-exist");
+  lua::RawGet(state_, -1, "non-exist");
   EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Nil);
 }
 
