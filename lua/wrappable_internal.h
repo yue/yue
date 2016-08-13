@@ -5,7 +5,7 @@
 #ifndef LUA_WRAPPABLE_INTERNAL_H_
 #define LUA_WRAPPABLE_INTERNAL_H_
 
-#include "lua/state.h"
+#include "lua/handle.h"
 
 namespace lua {
 
@@ -13,13 +13,19 @@ namespace internal {
 
 // Base class of Wrappable for handling object lifetime.
 class WrappableBase {
+ public:
+  // Convert the class to Lua and push it on stack.
+  void Push(State* state) const;
+
  protected:
-  WrappableBase();
+  explicit WrappableBase(State* state);
   virtual ~WrappableBase();
 
   static int OnGC(State* state);
 
  private:
+  const Weak handle_;
+
   DISALLOW_COPY_AND_ASSIGN(WrappableBase);
 };
 

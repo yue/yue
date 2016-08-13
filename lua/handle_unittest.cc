@@ -50,7 +50,6 @@ TEST_F(HandleTest, GC) {
   lua::SetTop(state_, 0);
 
   lua::CollectGarbage(state_);
-  lua::CollectGarbage(state_);
   ASSERT_EQ(changed, 456);
 }
 
@@ -61,16 +60,14 @@ TEST_F(HandleTest, Weak) {
   lua::RawSet(state_, 2, "__gc", base::Bind(&OnGC, &changed));
   lua::SetMetaTable(state_, 1);
   ASSERT_EQ(lua::GetTop(state_), 1);
-  lua::Weak handle(state_, 1);
+  lua::Weak handle(state_, -1);
   ASSERT_EQ(lua::GetTop(state_), 1);
-  lua::SetTop(state_, 0);
 
   handle.Push(state_);
-  EXPECT_EQ(lua::GetTop(state_), 1);
-  EXPECT_EQ(lua::GetType(state_, 1), lua::LuaType::Table);
+  EXPECT_EQ(lua::GetTop(state_), 2);
+  EXPECT_TRUE(lua::Compare(state_, 1, 2, lua::CompareOp::EQ));
   lua::SetTop(state_, 0);
 
-  lua::CollectGarbage(state_);
   lua::CollectGarbage(state_);
   ASSERT_EQ(changed, 456);
 }

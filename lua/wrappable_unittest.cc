@@ -20,7 +20,7 @@ class WrappableTest : public testing::Test {
 class TestClass : public lua::Wrappable<TestClass> {
  public:
   static constexpr const char* name = "TestClass";
-  static void SetMetaTable(lua::State* state, int index);
+  static void BuildMetaTable(lua::State* state, int index);
 
   int Method1(int n) {
     return n;
@@ -30,16 +30,26 @@ class TestClass : public lua::Wrappable<TestClass> {
     return str;
   }
 
+  void SetPtr(int* ptr) {
+    ptr_ = ptr;
+  }
+
  private:
   friend class lua::Wrappable<TestClass>;
 
-  TestClass() {}
-  ~TestClass() override {}
+  explicit TestClass(lua::State* state)
+      : lua::Wrappable<TestClass>(state), ptr_(nullptr) {}
+  ~TestClass() override {
+    if (ptr_)
+      *ptr_ = 456;
+  }
+
+  int* ptr_;
 
   DISALLOW_COPY_AND_ASSIGN(TestClass);
 };
 
-void TestClass::SetMetaTable(lua::State* state, int index) {
+void TestClass::BuildMetaTable(lua::State* state, int index) {
   RawSet(state, index,
          "new", &TestClass::NewInstance<>,
          "method1", &TestClass::Method1,
@@ -56,4 +66,45 @@ TEST_F(WrappableTest, PushNewClass) {
   EXPECT_EQ(lua::GetType(state_, -2), lua::LuaType::Function);
   EXPECT_EQ(lua::GetType(state_, -3), lua::LuaType::Function);
   EXPECT_EQ(lua::GetType(state_, -4), lua::LuaType::Function);
+}
+
+TEST_F(WrappableTest, PushNewInstanceInC) {
+  TestClass::PushNewClass(state_);
+  lua::PopAndIgnore(state_, 1);
+  lua::Push(state_, TestClass::NewInstance(state_));
+  EXPECT_EQ(lua::GetTop(state_), 1);
+  EXPECT_EQ(lua::GetType(state_, 1), lua::LuaType::UserData);
+  lua::GetMetaTable(state_, 1);
+  EXPECT_EQ(lua::GetTop(state_), 2);
+  EXPECT_EQ(lua::GetType(state_, 2), lua::LuaType::Table);
+
+  ASSERT_TRUE(lua::PGet(state_, 1, "method1"));
+  int result = 456;
+  ASSERT_TRUE(lua::PCall(state_, &result, lua::ValueOnStack(state_, 1), 123));
+  ASSERT_EQ(result, 123);
+}
+
+TEST_F(WrappableTest, PushNewInstanceInLua) {
+  TestClass::PushNewClass(state_);
+  ASSERT_TRUE(lua::PGet(state_, 1, "new"));
+  TestClass* instance;
+  EXPECT_TRUE(lua::PCall(state_, &instance));
+  EXPECT_NE(instance, nullptr);
+
+  lua::Push(state_, instance);
+  ASSERT_TRUE(lua::PGet(state_, 1, "method2"));
+  std::string result;
+  ASSERT_TRUE(lua::PCall(state_, &result, instance, 123));
+  ASSERT_EQ(result, "123");
+}
+
+TEST_F(WrappableTest, GC) {
+  TestClass::PushNewClass(state_);
+  TestClass* instance = TestClass::NewInstance(state_);
+
+  int changed = 123;
+  instance->SetPtr(&changed);
+
+  lua::CollectGarbage(state_);
+  ASSERT_EQ(changed, 456);
 }

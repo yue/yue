@@ -8,10 +8,16 @@ namespace lua {
 
 namespace internal {
 
-WrappableBase::WrappableBase() {
+WrappableBase::WrappableBase(State* state) : handle_(state, -1) {
+  DCHECK_EQ(GetType(state, -1), LuaType::UserData);
 }
 
 WrappableBase::~WrappableBase() {
+}
+
+void WrappableBase::Push(State* state) const {
+  handle_.Push(state);
+  DCHECK_EQ(GetType(state, -1), LuaType::UserData);
 }
 
 // static
