@@ -11,8 +11,8 @@ namespace lua {
 
 // A class used by PCall to provide information of current call.
 struct CallContext {
-  explicit CallContext(State* state, int create_flags)
-      : state(state), create_flags(create_flags) {}
+  explicit CallContext(State* state)
+      : state(state) {}
 
   // The lua state.
   State* state;
@@ -20,8 +20,8 @@ struct CallContext {
   // Whether there is error on stack.
   bool has_error = false;
 
-  // The flags passed when creating the call.
-  const int create_flags = 0;
+  // The index (1-based) of current arg.
+  int current_arg = 1;
 
   // The index (1-based) of the arg that failed to convert.
   int invalid_arg = 0;

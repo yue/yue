@@ -47,8 +47,7 @@ struct Type<T, typename std::enable_if<
                    std::is_member_function_pointer<T>::value>::type> {
   static constexpr const char* name = "method";
   static inline void Push(State* state, T callback) {
-    int flags = internal::HolderIsFirstArgument;
-    internal::PushCFunction(state, base::Bind(callback), flags);
+    internal::PushCFunction(state, base::Bind(callback));
   }
 };
 

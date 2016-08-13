@@ -86,13 +86,13 @@ TEST_F(LuaTest, PCallWithInsufficientArgs) {
   lua::Push(state_, &FunctionWithArgs);
   EXPECT_FALSE(lua::PCall(state_, nullptr, 123));
   ASSERT_TRUE(lua::Pop(state_, &str));
-  ASSERT_EQ(str, "insufficient args, expecting 2 but got 1");
+  ASSERT_EQ(str, "insufficient args, only 1 supplied");
   ASSERT_EQ(lua::GetTop(state_), 0);
 
   lua::Push(state_, &FunctionWithArgs);
   EXPECT_FALSE(lua::PCall(state_, nullptr));
   ASSERT_TRUE(lua::Pop(state_, &str));
-  ASSERT_EQ(str, "insufficient args, expecting 2 but got 0");
+  ASSERT_EQ(str, "insufficient args, only 0 supplied");
   ASSERT_EQ(lua::GetTop(state_), 0);
 }
 
@@ -102,6 +102,44 @@ TEST_F(LuaTest, PCallWithWrongArgs) {
   EXPECT_FALSE(lua::PCall(state_, nullptr, "test", 123));
   ASSERT_TRUE(lua::Pop(state_, &str));
   ASSERT_EQ(str, "error converting arg at index 1 from string to integer");
+  ASSERT_EQ(lua::GetTop(state_), 0);
+}
+
+void FunctionWithState(lua::State* state, int, const std::string&) {
+}
+
+TEST_F(LuaTest, PCallWithState) {
+  std::string str;
+  lua::Push(state_, &FunctionWithState);
+  EXPECT_FALSE(lua::PCall(state_, nullptr, 123));
+  ASSERT_TRUE(lua::Pop(state_, &str));
+  ASSERT_EQ(str, "insufficient args, only 1 supplied");
+  ASSERT_EQ(lua::GetTop(state_), 0);
+
+  lua::Push(state_, &FunctionWithState);
+  EXPECT_FALSE(lua::PCall(state_, nullptr));
+  ASSERT_TRUE(lua::Pop(state_, &str));
+  ASSERT_EQ(str, "insufficient args, only 0 supplied");
+  ASSERT_EQ(lua::GetTop(state_), 0);
+
+  lua::Push(state_, &FunctionWithState);
+  EXPECT_FALSE(lua::PCall(state_, nullptr, "test", 123));
+  ASSERT_TRUE(lua::Pop(state_, &str));
+  ASSERT_EQ(str, "error converting arg at index 1 from string to integer");
+  ASSERT_EQ(lua::GetTop(state_), 0);
+}
+
+void FunctionThrowError(lua::CallContext* context) {
+  lua::Push(context->state, "custom error");
+  context->has_error = true;
+}
+
+TEST_F(LuaTest, PCallWithCustomError) {
+  std::string str;
+  lua::Push(state_, &FunctionThrowError);
+  EXPECT_FALSE(lua::PCall(state_, nullptr));
+  ASSERT_TRUE(lua::Pop(state_, &str));
+  ASSERT_EQ(str, "custom error");
   ASSERT_EQ(lua::GetTop(state_), 0);
 }
 

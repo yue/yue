@@ -14,23 +14,6 @@ namespace lua {
 
 namespace internal {
 
-// Flags of PushCFunction
-enum PushCFunctionFlags {
-  HolderIsFirstArgument = 1 << 0,
-};
-
-template<typename T>
-inline bool GetArgument(CallContext* context, int index, T* result) {
-  return To(context->state, index + 1, result);
-}
-
-// For advanced use cases, we allow callers to request the unparsed CallContext
-// object and poke around in it directly.
-inline bool GetArgument(CallContext* context, int index, CallContext** result) {
-  *result = context;
-  return true;
-}
-
 // Deduce the proper type for callback parameters.
 template<typename T>
 struct CallbackParamTraits {
@@ -63,11 +46,10 @@ class CallbackHolderBase {
 template<typename Sig>
 class CallbackHolder : public CallbackHolderBase {
  public:
-  CallbackHolder(State* state, const base::Callback<Sig>& callback, int flags)
-      : CallbackHolderBase(state), callback(callback), flags(flags) {}
+  CallbackHolder(State* state, const base::Callback<Sig>& callback)
+      : CallbackHolderBase(state), callback(callback) {}
 
   base::Callback<Sig> callback;
-  int flags;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(CallbackHolder);
@@ -83,12 +65,30 @@ struct ArgumentHolder {
   const bool ok;
 
   explicit ArgumentHolder(CallContext* context)
-      : ok(GetArgument(context, index, &value)) {
-    if (!ok) {
-      context->invalid_arg = index + 1;
+      : ok(To(context->state, context->current_arg, &value)) {
+    if (ok) {
+      context->current_arg++;
+    } else {
+      context->invalid_arg = context->current_arg;
       context->invalid_arg_name = Type<ArgLocalType>::name;
     }
   }
+};
+
+// The holder for State*.
+template<size_t index>
+struct ArgumentHolder<index, State*> {
+  State* value;
+  const bool ok = true;
+  explicit ArgumentHolder(CallContext* context) : value(context->state) {}
+};
+
+// The holder for CallContext*
+template<size_t index>
+struct ArgumentHolder<index, CallContext*> {
+  CallContext* value;
+  const bool ok = true;
+  explicit ArgumentHolder(CallContext* context) : value(context) {}
 };
 
 // Class template for converting arguments from JavaScript to C++ and running
@@ -144,33 +144,27 @@ struct Dispatcher {};
 template<typename ReturnType, typename... ArgTypes>
 struct Dispatcher<ReturnType(ArgTypes...)> {
   static int DispatchToCallback(State* state) {
-    // Check for args length.
-    int args_got = lua_gettop(state);
-    int args_expected = static_cast<int>(sizeof...(ArgTypes));
-    if (args_got < args_expected) {
-      PushFormatedString(state, "insufficient args, expecting %d but got %d",
-                         args_expected, args_got);
-      lua_error(state);
-      NOTREACHED() << "Code after lua_error() gets called";
-      return -1;
-    }
-
     // Receive the callback from userdata.
     typedef CallbackHolder<ReturnType(ArgTypes...)> HolderT;
     HolderT* holder = static_cast<HolderT*>(
         lua_touserdata(state, lua_upvalueindex(1)));
 
-    CallContext context(state, holder->flags);
+    CallContext context(state);
     {  // Make sure C++ stack is destroyed before calling lua_error.
       using Indices = typename IndicesGenerator<sizeof...(ArgTypes)>::type;
       Invoker<Indices, ArgTypes...> invoker(&context);
       if (!invoker.IsOK()) {
         context.has_error = true;
-        PushFormatedString(
-            state, "error converting arg at index %d from %s to %s",
-            context.invalid_arg,
-            lua_typename(state, lua_type(state, context.invalid_arg)),
-            context.invalid_arg_name);
+        if (GetType(state, context.invalid_arg) == LuaType::None) {
+          PushFormatedString(state, "insufficient args, only %d supplied",
+                             context.invalid_arg -1);
+        } else {
+          PushFormatedString(
+              state, "error converting arg at index %d from %s to %s",
+              context.invalid_arg,
+              lua_typename(state, lua_type(state, context.invalid_arg)),
+              context.invalid_arg_name);
+        }
       } else {
         invoker.DispatchToCallback(holder->callback);
       }
@@ -186,21 +180,12 @@ struct Dispatcher<ReturnType(ArgTypes...)> {
   }
 };
 
-template<typename ReturnType, typename... ArgTypes>
-struct Dispatcher<ReturnType(CallContext* context, ArgTypes...)> {
-  static int DispatchToCallback(State* state) {
-    return Dispatcher<ReturnType(ArgTypes...)>::DispatchToCallback(state);
-  }
-};
-
 // Push the function on stack without wrapping it with pcall.
 template<typename Sig>
-inline void PushCFunction(State* state,
-                          const base::Callback<Sig>& callback,
-                          int callback_flags = 0) {
+inline void PushCFunction(State* state, const base::Callback<Sig>& callback) {
   typedef CallbackHolder<Sig> HolderT;
   void* holder = lua_newuserdata(state, sizeof(HolderT));
-  new(holder) HolderT(state, callback, callback_flags);
+  new(holder) HolderT(state, callback);
 
   lua_pushcclosure(state, &internal::Dispatcher<Sig>::DispatchToCallback, 1);
 }
