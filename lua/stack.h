@@ -36,7 +36,16 @@ inline void Push(State* state, ValueOnStack index) {
   lua_pushvalue(state, index.index);
 }
 
-// Thin wrapper for raw C function.
+// Thin wrapper for lua_pushlightuserdata.
+struct LightUserData {
+  LightUserData(void* data) : data(data) {}
+  void* data;
+};
+inline void Push(State* state, LightUserData data) {
+  lua_pushlightuserdata(state, data.data);
+}
+
+// Thin wrapper for lua_pushcfunction.
 struct CFunction {
   explicit CFunction(lua_CFunction func) : func(func) {}
   lua_CFunction func;
@@ -141,6 +150,19 @@ inline void SetTop(State* state, int index) {
 inline int GetTop(State* state) {
   return lua_gettop(state);
 }
+
+// Automatically clear the values on stack.
+class StackAutoReset {
+ public:
+  explicit StackAutoReset(State* state) : state_(state), top_(GetTop(state)) {}
+  ~StackAutoReset() { SetTop(state_, top_); }
+
+ private:
+  State* state_;
+  int top_;
+
+  DISALLOW_COPY_AND_ASSIGN(StackAutoReset);
+};
 
 // Thin wrapper of lua_compare.
 enum class CompareOp {

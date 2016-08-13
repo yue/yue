@@ -2,8 +2,6 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include <memory>
-
 #include "lua/callback.h"
 #include "lua/table.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -224,19 +222,6 @@ TEST_F(LuaTest, PGetAndPop) {
   std::string error;
   ASSERT_TRUE(lua::Pop(state_, &error));
   EXPECT_EQ(error, "error converting values");
-}
-
-TEST_F(LuaTest, Handle) {
-  int original_registry_len = lua::RawLen(state_, LUA_REGISTRYINDEX);
-  lua::PushNewTable(state_);
-  std::unique_ptr<lua::Handle> handle(lua::Handle::New(state_, -1));
-  ASSERT_EQ(lua::RawLen(state_, LUA_REGISTRYINDEX), original_registry_len + 1);
-  ASSERT_EQ(lua::GetTop(state_), 1);
-  handle->Push();
-  ASSERT_EQ(lua::GetTop(state_), 2);
-  ASSERT_EQ(lua::GetType(state_, -1), lua::LuaType::Table);
-  handle.reset();
-  ASSERT_EQ(lua::RawLen(state_, LUA_REGISTRYINDEX), original_registry_len);
 }
 
 TEST_F(LuaTest, Callback) {

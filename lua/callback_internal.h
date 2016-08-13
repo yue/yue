@@ -208,11 +208,11 @@ inline void PushCFunction(State* state,
 // Call PCall for the gloal handle.
 template<typename ReturnType, typename...ArgTypes>
 struct PCallHelper {
-  static ReturnType Run(State* state, const std::unique_ptr<Handle>& handle,
+  static ReturnType Run(State* state, const std::unique_ptr<Persistent>& handle,
                         ArgTypes... args) {
     ReturnType result = ReturnType();
     int top = GetTop(state);
-    handle->Push();
+    handle->Push(state);
     PCall(state, &result, args...);
     SetTop(state, top);  // reset everything on stack
     return result;
@@ -222,10 +222,10 @@ struct PCallHelper {
 // The void return type version for PCallHelper.
 template<typename...ArgTypes>
 struct PCallHelper<void, ArgTypes...> {
-  static void Run(State* state, const std::unique_ptr<Handle>& handle,
+  static void Run(State* state, const std::unique_ptr<Persistent>& handle,
                   ArgTypes... args) {
     int top = GetTop(state);
-    handle->Push();
+    handle->Push(state);
     PCall(state, nullptr, args...);
     SetTop(state, top);  // reset everything on stack
   }

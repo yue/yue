@@ -10,6 +10,7 @@ source_set("lua") {
     "callback.h",
     "callback_internal.cc",
     "callback_internal.h",
+    "handle.cc",
     "handle.h",
     "pcall.h",
     "stack.h",
@@ -36,6 +37,7 @@ source_set("lua") {
 
 test("lua_unittests") {
   sources = [
+    "handle_unittest.cc",
     "lua_unittest.cc",
     "wrappable_unittest.cc",
     "test/run_all_unittests.cc",

@@ -26,7 +26,7 @@ struct Type<base::Callback<ReturnType(ArgTypes...)>> {
     if (GetType(state, index) != LuaType::Function)
       return false;
     *out = base::Bind(&internal::PCallHelper<ReturnType, ArgTypes...>::Run,
-                      state, Handle::New(state, index));
+                      state, Persistent::New(state, index));
     return true;
   }
 };
