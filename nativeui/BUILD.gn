@@ -4,25 +4,28 @@
 
 import("//testing/test.gni")
 
-executable("yue") {
+source_set("nativeui") {
   sources = [
-    "yue.cc",
+    "init.h",
+    "init_mac.mm",
+    "window.h",
+    "window_mac.mm",
   ]
 
   deps = [
     "//base",
-    "//lua",
-    "//nativeui",
+    "//ui/gfx/geometry",
   ]
 }
 
-test("yue_unittests") {
+test("nativeui_unittests") {
   sources = [
+    "window_unittest.cc",
     "test/run_all_unittests.cc",
   ]
 
   deps = [
-    ":yue",
+    ":nativeui",
     "//base/test:test_support",
     "//testing/gtest",
   ]
