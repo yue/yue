@@ -11,3 +11,21 @@ source_set("gfx_export") {
     "gfx_export.h",
   ]
 }
+
+component("gfx") {
+  sources = [
+    "mac/coordinate_conversion.h",
+    "mac/coordinate_conversion.mm",
+  ]
+
+  # This is part of the gfx component in the component build.
+  defines = [ "GFX_IMPLEMENTATION" ]
+
+  public_deps = [
+    "//base",
+    "//ui/gfx/geometry",
+  ]
+  deps = [
+    ":gfx_export",
+  ]
+}

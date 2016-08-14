@@ -7,6 +7,7 @@
 #import <Cocoa/Cocoa.h>
 
 #include "base/mac/scoped_nsobject.h"
+#include "ui/gfx/mac/coordinate_conversion.h"
 
 namespace nu {
 
@@ -20,7 +21,7 @@ Window::Window(const Options& options)
                          NSClosableWindowMask | NSResizableWindowMask |
                          NSTexturedBackgroundWindowMask;
   impl_->window_.reset([[NSWindow alloc]
-      initWithContentRect:NSRectFromCGRect(options.bounds.ToCGRect())
+      initWithContentRect:gfx::ScreenRectToNSRect(options.content_bounds)
                 styleMask:styleMask
                   backing:NSBackingStoreBuffered
                     defer:YES]);

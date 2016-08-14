@@ -4,7 +4,11 @@
 
 #include "base/command_line.h"
 #include "base/logging.h"
+#include "base/message_loop/message_loop.h"
+#include "base/run_loop.h"
 #include "lua/callback.h"
+#include "nativeui/init.h"
+#include "nativeui/window.h"
 
 int main(int argc, const char *argv[]) {
   base::CommandLine::Init(argc, argv);
@@ -33,6 +37,14 @@ int main(int argc, const char *argv[]) {
     LOG(ERROR) << "Error run script: " << error;
     return 1;
   }
+
+  nu::Initialize();
+  nu::Window::Options options = { gfx::Rect(0, 0, 800, 600) };
+  nu::Window window(options);
+  window.SetVisible(true);
+
+  base::MessageLoop message_loop(base::MessageLoop::TYPE_UI);
+  base::RunLoop().Run();
 
   return 0;
 }

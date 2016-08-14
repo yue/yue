@@ -10,6 +10,7 @@ namespace nu {
 
 void Initialize() {
   [NSApplication sharedApplication];
+  [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
 }
 
 }  // namespace nu

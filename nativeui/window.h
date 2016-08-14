@@ -21,7 +21,7 @@ struct WindowImplMac;
 NATIVEUI_EXPORT class Window {
  public:
   struct Options {
-    gfx::Rect bounds;
+    gfx::Rect content_bounds;
   };
 
   explicit Window(const Options& options);

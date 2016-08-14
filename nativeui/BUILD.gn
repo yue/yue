@@ -14,7 +14,7 @@ source_set("nativeui") {
 
   deps = [
     "//base",
-    "//ui/gfx/geometry",
+    "//ui/gfx",
   ]
 }
 
