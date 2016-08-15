@@ -21,15 +21,13 @@ NATIVEUI_EXPORT class Window {
   explicit Window(const Options& options);
   virtual ~Window();
 
-  NativeWindow GetNativeWindow() const { return window_.Get(); }
-
   void SetContentView(View* view);
 
   void SetVisible(bool visible);
   bool IsVisible() const;
 
  private:
-  ScopedNativeWindow window_;
+  NativeWindow window_;
 
   DISALLOW_COPY_AND_ASSIGN(Window);
 };

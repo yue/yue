@@ -6,14 +6,13 @@
 
 #import <Cocoa/Cocoa.h>
 
-#include "nativeui/scoped_types_mac.h"
-
 namespace nu {
 
-View::View() {
+View::View() : view_(nil) {
 }
 
 View::~View() {
+  [view_ release];
 }
 
 }  // namespace nu

@@ -7,7 +7,6 @@
 #import <Cocoa/Cocoa.h>
 
 #include "base/strings/sys_string_conversions.h"
-#include "nativeui/scoped_types_mac.h"
 
 namespace nu {
 
@@ -18,20 +17,18 @@ Label::Label() {
   label.bordered = NO;
   label.editable = NO;
   label.selectable = NO;
-  view_.Reset(label);
+  set_view(label);
 }
 
 Label::~Label() {
 }
 
 void Label::SetText(const std::string& text) {
-  static_cast<NSTextField*>(GetNativeView()).stringValue =
-      base::SysUTF8ToNSString(text);
+  static_cast<NSTextField*>(view()).stringValue = base::SysUTF8ToNSString(text);
 }
 
 std::string Label::GetText() {
-  return base::SysNSStringToUTF8(
-      static_cast<NSTextField*>(GetNativeView()).stringValue);
+  return base::SysNSStringToUTF8(static_cast<NSTextField*>(view()).stringValue);
 }
 
 }  // namespace nu

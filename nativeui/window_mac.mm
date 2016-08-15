@@ -6,7 +6,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-#include "nativeui/scoped_types_mac.h"
 #include "ui/gfx/mac/coordinate_conversion.h"
 
 namespace nu {
@@ -15,29 +14,30 @@ Window::Window(const Options& options) {
   NSUInteger styleMask = NSTitledWindowMask | NSMiniaturizableWindowMask |
                          NSClosableWindowMask | NSResizableWindowMask |
                          NSTexturedBackgroundWindowMask;
-  window_.Reset([[NSWindow alloc]
+  window_ = [[NSWindow alloc]
       initWithContentRect:gfx::ScreenRectToNSRect(options.content_bounds)
                 styleMask:styleMask
                   backing:NSBackingStoreBuffered
-                    defer:YES]);
+                    defer:YES];
 }
 
 Window::~Window() {
+  [window_ release];
 }
 
 void Window::SetContentView(View* view) {
-  [GetNativeWindow() setContentView:view->GetNativeView()];
+  [window_ setContentView:view->view()];
 }
 
 void Window::SetVisible(bool visible) {
   if (visible)
-    [GetNativeWindow() orderFrontRegardless];
+    [window_ orderFrontRegardless];
   else
-    [GetNativeWindow() orderOut:nil];
+    [window_ orderOut:nil];
 }
 
 bool Window::IsVisible() const {
-  return [GetNativeWindow() isVisible];
+  return [window_ isVisible];
 }
 
 }  // namespace nu

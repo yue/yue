@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "nativeui/nativeui_export.h"
-#include "nativeui/scoped_types.h"
+#include "nativeui/types.h"
 #include "ui/gfx/geometry/rect.h"
 
 namespace nu {
@@ -16,15 +16,17 @@ namespace nu {
 // The base class for all kinds of views.
 NATIVEUI_EXPORT class View {
  public:
-  NativeView GetNativeView() const { return view_.Get(); }
+  NativeView view() const { return view_; }
 
  protected:
   View();
   virtual ~View();
 
-  ScopedNativeView view_;
+  void set_view(NativeView view) { view_ = view; }
 
  private:
+  NativeView view_;
+
   DISALLOW_COPY_AND_ASSIGN(View);
 };
 
