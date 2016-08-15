@@ -27,6 +27,7 @@ source_set("nativeui") {
 
 test("nativeui_unittests") {
   sources = [
+    "label_unittest.cc",
     "window_unittest.cc",
     "test/run_all_unittests.cc",
   ]

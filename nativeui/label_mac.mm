@@ -6,22 +6,32 @@
 
 #import <Cocoa/Cocoa.h>
 
+#include "base/strings/sys_string_conversions.h"
 #include "nativeui/scoped_types_mac.h"
 
 namespace nu {
 
-Label::Label() : View(nullptr) {
+Label::Label() {
   NSTextField* label =
       [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 0, 0)];
   label.drawsBackground = NO;
   label.bordered = NO;
   label.editable = NO;
   label.selectable = NO;
-  label.stringValue = @"test";
   view_.Reset(label);
 }
 
 Label::~Label() {
+}
+
+void Label::SetText(const std::string& text) {
+  static_cast<NSTextField*>(GetNativeView()).stringValue =
+      base::SysUTF8ToNSString(text);
+}
+
+std::string Label::GetText() {
+  return base::SysNSStringToUTF8(
+      static_cast<NSTextField*>(GetNativeView()).stringValue);
 }
 
 }  // namespace nu

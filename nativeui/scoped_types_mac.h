@@ -2,6 +2,9 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
+#ifndef NATIVEUI_SCOPED_TYPES_MAC_H_
+#define NATIVEUI_SCOPED_TYPES_MAC_H_
+
 #include "nativeui/scoped_types.h"
 
 #include "base/mac/scoped_nsobject.h"
@@ -32,3 +35,5 @@ T* ScopedNSObject<T>::Get() const {
 }
 
 }  // namespace nu
+
+#endif  // NATIVEUI_SCOPED_TYPES_MAC_H_

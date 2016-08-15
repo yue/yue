@@ -5,6 +5,8 @@
 #ifndef NATIVEUI_LABEL_H_
 #define NATIVEUI_LABEL_H_
 
+#include <string>
+
 #include "nativeui/view.h"
 
 namespace nu {
@@ -13,6 +15,9 @@ class Label : public View {
  public:
   Label();
   ~Label() override;
+
+  void SetText(const std::string& text);
+  std::string GetText();
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Label);

@@ -11,10 +11,6 @@
 namespace nu {
 
 View::View() {
-  view_.Reset([[NSView alloc] initWithFrame:NSMakeRect(0, 0, 0, 0)]);
-}
-
-View::View(nullptr_t) {
 }
 
 View::~View() {

@@ -16,13 +16,11 @@ namespace nu {
 // The base class for all kinds of views.
 NATIVEUI_EXPORT class View {
  public:
-  View();
-  virtual ~View();
-
   NativeView GetNativeView() const { return view_.Get(); }
 
  protected:
-  explicit View(nullptr_t);
+  View();
+  virtual ~View();
 
   ScopedNativeView view_;
 

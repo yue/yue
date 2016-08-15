@@ -41,7 +41,8 @@ int main(int argc, const char *argv[]) {
 
   nu::Initialize();
   nu::Label label;
-  nu::Window::Options options = { gfx::Rect(0, 0, 800, 600) };
+  label.SetText("test");
+  nu::Window::Options options = { gfx::Rect(400, 400, 100, 100) };
   nu::Window window(options);
   window.SetContentView(&label);
   window.SetVisible(true);
