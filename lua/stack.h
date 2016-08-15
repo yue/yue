@@ -38,7 +38,7 @@ inline void Push(State* state, ValueOnStack index) {
 
 // Thin wrapper for lua_pushlightuserdata.
 struct LightUserData {
-  LightUserData(void* data) : data(data) {}
+  explicit LightUserData(void* data) : data(data) {}
   void* data;
 };
 inline void Push(State* state, LightUserData data) {

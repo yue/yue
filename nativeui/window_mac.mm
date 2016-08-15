@@ -6,21 +6,16 @@
 
 #import <Cocoa/Cocoa.h>
 
-#include "base/mac/scoped_nsobject.h"
+#include "nativeui/scoped_types_mac.h"
 #include "ui/gfx/mac/coordinate_conversion.h"
 
 namespace nu {
 
-struct WindowImplMac {
-  base::scoped_nsobject<NSWindow> window_;
-};
-
-Window::Window(const Options& options)
-    : impl_(new WindowImplMac()) {
+Window::Window(const Options& options) {
   NSUInteger styleMask = NSTitledWindowMask | NSMiniaturizableWindowMask |
                          NSClosableWindowMask | NSResizableWindowMask |
                          NSTexturedBackgroundWindowMask;
-  impl_->window_.reset([[NSWindow alloc]
+  window_.Reset([[NSWindow alloc]
       initWithContentRect:gfx::ScreenRectToNSRect(options.content_bounds)
                 styleMask:styleMask
                   backing:NSBackingStoreBuffered
@@ -30,15 +25,19 @@ Window::Window(const Options& options)
 Window::~Window() {
 }
 
+void Window::SetContentView(View* view) {
+  [GetNativeWindow() setContentView:view->GetNativeView()];
+}
+
 void Window::SetVisible(bool visible) {
   if (visible)
-    [impl_->window_ orderFrontRegardless];
+    [GetNativeWindow() orderFrontRegardless];
   else
-    [impl_->window_ orderOut:nil];
+    [GetNativeWindow() orderOut:nil];
 }
 
 bool Window::IsVisible() const {
-  return [impl_->window_ isVisible];
+  return [GetNativeWindow() isVisible];
 }
 
 }  // namespace nu

@@ -7,15 +7,9 @@
 
 #include <memory>
 
-#include "base/callback_list.h"
-#include "nativeui/nativeui_export.h"
-#include "ui/gfx/geometry/rect.h"
+#include "nativeui/view.h"
 
 namespace nu {
-
-#if defined(OS_MACOSX)
-struct WindowImplMac;
-#endif
 
 // The native window.
 NATIVEUI_EXPORT class Window {
@@ -27,14 +21,15 @@ NATIVEUI_EXPORT class Window {
   explicit Window(const Options& options);
   virtual ~Window();
 
+  NativeWindow GetNativeWindow() const { return window_.Get(); }
+
+  void SetContentView(View* view);
+
   void SetVisible(bool visible);
   bool IsVisible() const;
 
  private:
-#if defined(OS_MACOSX)
-  // Stores Mac specific data.
-  std::unique_ptr<WindowImplMac> impl_;
-#endif
+  ScopedNativeWindow window_;
 
   DISALLOW_COPY_AND_ASSIGN(Window);
 };

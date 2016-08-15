@@ -8,6 +8,13 @@ source_set("nativeui") {
   sources = [
     "init.h",
     "init_mac.mm",
+    "scoped_types.h",
+    "scoped_types_mac.h",
+    "types.h",
+    "view.h",
+    "view_mac.mm",
+    "label.h",
+    "label_mac.mm",
     "window.h",
     "window_mac.mm",
   ]

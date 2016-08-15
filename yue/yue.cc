@@ -8,6 +8,7 @@
 #include "base/run_loop.h"
 #include "lua/callback.h"
 #include "nativeui/init.h"
+#include "nativeui/label.h"
 #include "nativeui/window.h"
 
 int main(int argc, const char *argv[]) {
@@ -39,8 +40,10 @@ int main(int argc, const char *argv[]) {
   }
 
   nu::Initialize();
+  nu::Label label;
   nu::Window::Options options = { gfx::Rect(0, 0, 800, 600) };
   nu::Window window(options);
+  window.SetContentView(&label);
   window.SetVisible(true);
 
   base::MessageLoop message_loop(base::MessageLoop::TYPE_UI);
