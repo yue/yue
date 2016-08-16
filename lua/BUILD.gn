@@ -19,8 +19,7 @@ source_set("lua") {
     "table_internal.h",
     "types.h",
     "wrappable.h",
-    "wrappable_internal.cc",
-    "wrappable_internal.h",
+    "wrappable.cc",
   ]
 
   if (is_win) {

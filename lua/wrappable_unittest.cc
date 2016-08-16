@@ -17,7 +17,7 @@ class WrappableTest : public testing::Test {
   lua::ManagedState state_;
 };
 
-class TestClass : public lua::Wrappable<TestClass> {
+class TestClass : public lua::Wrappable {
  public:
   static constexpr const char* name = "TestClass";
   static void BuildMetaTable(lua::State* state, int index);
@@ -35,10 +35,10 @@ class TestClass : public lua::Wrappable<TestClass> {
   }
 
  private:
-  friend class lua::Wrappable<TestClass>;
+  friend class lua::MetaTable<TestClass>;
 
   explicit TestClass(lua::State* state)
-      : lua::Wrappable<TestClass>(state), ptr_(nullptr) {}
+      : lua::Wrappable(state), ptr_(nullptr) {}
   ~TestClass() override {
     if (ptr_)
       *ptr_ = 456;
@@ -51,13 +51,13 @@ class TestClass : public lua::Wrappable<TestClass> {
 
 void TestClass::BuildMetaTable(lua::State* state, int index) {
   RawSet(state, index,
-         "new", &TestClass::NewInstance<>,
+         "new", &lua::MetaTable<TestClass>::NewInstance<>,
          "method1", &TestClass::Method1,
          "method2", &TestClass::Method2);
 }
 
 TEST_F(WrappableTest, PushNewClass) {
-  TestClass::PushNewClass(state_);
+  lua::MetaTable<TestClass>::Push(state_);
   EXPECT_EQ(lua::GetTop(state_), 1);
   EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Table);
   lua::RawGet(state_, -1, "method1", "method2", "__gc", "__index");
@@ -69,9 +69,9 @@ TEST_F(WrappableTest, PushNewClass) {
 }
 
 TEST_F(WrappableTest, PushNewInstanceInC) {
-  TestClass::PushNewClass(state_);
+  lua::MetaTable<TestClass>::Push(state_);
   lua::PopAndIgnore(state_, 1);
-  lua::Push(state_, TestClass::NewInstance(state_));
+  lua::Push(state_, lua::MetaTable<TestClass>::NewInstance(state_));
   EXPECT_EQ(lua::GetTop(state_), 1);
   EXPECT_EQ(lua::GetType(state_, 1), lua::LuaType::UserData);
   lua::GetMetaTable(state_, 1);
@@ -85,7 +85,7 @@ TEST_F(WrappableTest, PushNewInstanceInC) {
 }
 
 TEST_F(WrappableTest, PushNewInstanceInLua) {
-  TestClass::PushNewClass(state_);
+  lua::MetaTable<TestClass>::Push(state_);
   ASSERT_TRUE(lua::PGet(state_, 1, "new"));
   TestClass* instance;
   EXPECT_TRUE(lua::PCall(state_, &instance));
@@ -99,8 +99,8 @@ TEST_F(WrappableTest, PushNewInstanceInLua) {
 }
 
 TEST_F(WrappableTest, GC) {
-  TestClass::PushNewClass(state_);
-  TestClass* instance = TestClass::NewInstance(state_);
+  lua::MetaTable<TestClass>::Push(state_);
+  TestClass* instance = lua::MetaTable<TestClass>::NewInstance(state_);
 
   int changed = 123;
   instance->SetPtr(&changed);

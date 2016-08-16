@@ -5,25 +5,43 @@
 #ifndef LUA_WRAPPABLE_H_
 #define LUA_WRAPPABLE_H_
 
+#include "lua/handle.h"
 #include "lua/table.h"
-#include "lua/wrappable_internal.h"
 
 namespace lua {
 
 // Inherit this to provide metatable based class in lua.
-template<typename T>
-class Wrappable : public internal::WrappableBase {
+class Wrappable {
  public:
-  // Create the metatable of class and push it on stack.
-  static void PushNewClass(State* state) {
+  // Convert the class to Lua and push it on stack.
+  void Push(State* state) const;
+
+ protected:
+  explicit Wrappable(State* state);
+  virtual ~Wrappable();
+
+  static int OnGC(State* state);
+
+ private:
+  const Weak handle_;
+
+  DISALLOW_COPY_AND_ASSIGN(Wrappable);
+};
+
+// Generate metatable for Wrappable classes.
+template<typename T>
+class MetaTable {
+ public:
+  // Create the metatable for T and push it on stack.
+  static void Push(State* state) {
     if (luaL_newmetatable(state, T::name) == 1) {
       RawSet(state, -1, "__index", ValueOnStack(state, -1),
-                        "__gc", CFunction(&OnGC));
+                        "__gc", CFunction(&T::OnGC));
       T::BuildMetaTable(state, -1);
     }
   }
 
-  // Create an instance of the class.
+  // Create an instance of T.
   // The returned pointer is managed by lua, so avoid keeping it.
   template<typename... ArgTypes>
   static T* NewInstance(State* state, const ArgTypes&... args) {
@@ -36,19 +54,12 @@ class Wrappable : public internal::WrappableBase {
     SetMetaTable(state, -2);
     return instance;
   }
-
- protected:
-  explicit Wrappable(State* state) : internal::WrappableBase(state) {}
-  ~Wrappable() override {}
-
- private:
-  DISALLOW_COPY_AND_ASSIGN(Wrappable);
 };
 
 // The default type information for any subclass of Wrappable.
 template<typename T>
 struct Type<T*, typename std::enable_if<std::is_convertible<
-                    T*, internal::WrappableBase*>::value>::type> {
+                    T*, Wrappable*>::value>::type> {
   static constexpr const char* name = T::name;
   static inline bool To(State* state, int index, T** out) {
     if (GetType(state, index) != lua::LuaType::UserData ||
