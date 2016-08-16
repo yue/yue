@@ -6,23 +6,37 @@
 
 namespace lua {
 
-Wrappable::Wrappable(State* state) : handle_(state, -1) {
-  DCHECK_EQ(GetType(state, -1), LuaType::UserData);
-}
+namespace internal {
 
-Wrappable::~Wrappable() {
-}
+namespace {
 
-void Wrappable::Push(State* state) const {
-  handle_.Push(state);
-  DCHECK_EQ(GetType(state, -1), LuaType::UserData);
-}
+const char* kPointerWrapperTableName = "yue.internal.pointerwrappertable";
+
+}  // namespace
 
 // static
-int Wrappable::OnGC(State* state) {
-  auto* self = static_cast<Wrappable*>(lua_touserdata(state, 1));
-  self->~Wrappable();
-  return 0;
+void PointerWrapperBase::Push(State* state, void* ptr) {
+  luaL_getmetatable(state, kPointerWrapperTableName);
+  DCHECK_EQ(GetType(state, -1), LuaType::Table);
+  RawGet(state, -1, LightUserData(ptr));
+  lua_remove(state, -2);
+  DCHECK_EQ(GetType(state, -1), LuaType::UserData);
 }
+
+PointerWrapperBase::PointerWrapperBase(State* state, void* ptr) {
+  DCHECK_EQ(GetType(state, -1), LuaType::UserData);
+  StackAutoReset reset(state);
+  if (luaL_newmetatable(state, kPointerWrapperTableName) == 1) {
+    PushNewTable(state, 0, 1);
+    RawSet(state, -1, "__mode", "v");
+    SetMetaTable(state, -2);
+  }
+  RawSet(state, -1, LightUserData(ptr), ValueOnStack(state, -2));
+}
+
+PointerWrapperBase::~PointerWrapperBase() {
+}
+
+}  // namespace internal
 
 }  // namespace lua

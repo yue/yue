@@ -49,6 +49,15 @@ inline void RawSet(State* state, int index, int key, const Value& value) {
   lua_rawseti(state, index, key);
 }
 
+// Optimize for lua_rawsetp.
+template<typename Value>
+inline void RawSet(State* state, int index, LightUserData key,
+                   const Value& value) {
+  index = AbsIndex(state, index);
+  Push(state, value);
+  lua_rawsetp(state, index, key.data);
+}
+
 // Allow setting arbitrary key/value pairs.
 template<typename Key, typename Value, typename... ArgTypes>
 inline void RawSet(State* state, int index, const Key& key, const Value& value,
@@ -69,6 +78,12 @@ inline void RawGet(State* state, int index, const Key& key) {
 inline void RawGet(State* state, int index, int key) {
   index = AbsIndex(state, index);
   lua_rawgeti(state, index, key);
+}
+
+// Optimize for lua_rawgetp.
+inline void RawGet(State* state, int index, LightUserData key) {
+  index = AbsIndex(state, index);
+  lua_rawgetp(state, index, key.data);
 }
 
 // Allow getting arbitrary values.

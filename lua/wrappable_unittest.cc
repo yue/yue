@@ -17,10 +17,9 @@ class WrappableTest : public testing::Test {
   lua::ManagedState state_;
 };
 
-class TestClass : public lua::Wrappable {
+class TestClass : public base::RefCounted<TestClass> {
  public:
-  static constexpr const char* name = "TestClass";
-  static void BuildMetaTable(lua::State* state, int index);
+  TestClass() : ptr_(nullptr) {}
 
   int Method1(int n) {
     return n;
@@ -35,11 +34,9 @@ class TestClass : public lua::Wrappable {
   }
 
  private:
-  friend class lua::MetaTable<TestClass>;
+  friend class base::RefCounted<TestClass>;
 
-  explicit TestClass(lua::State* state)
-      : lua::Wrappable(state), ptr_(nullptr) {}
-  ~TestClass() override {
+  ~TestClass() {
     if (ptr_)
       *ptr_ = 456;
   }
@@ -49,12 +46,20 @@ class TestClass : public lua::Wrappable {
   DISALLOW_COPY_AND_ASSIGN(TestClass);
 };
 
-void TestClass::BuildMetaTable(lua::State* state, int index) {
-  RawSet(state, index,
-         "new", &lua::MetaTable<TestClass>::NewInstance<>,
-         "method1", &TestClass::Method1,
-         "method2", &TestClass::Method2);
-}
+namespace lua {
+
+template<>
+struct Type<TestClass> {
+  static constexpr const char* name = "TestClass";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "new", &MetaTable<TestClass>::NewInstance<>,
+           "method1", &TestClass::Method1,
+           "method2", &TestClass::Method2);
+  }
+};
+
+}  // namespace lua
 
 TEST_F(WrappableTest, PushNewClass) {
   lua::MetaTable<TestClass>::Push(state_);
