@@ -6,6 +6,7 @@
 #define LUA_WRAPPABLE_INTERNAL_H_
 
 #include "base/memory/ref_counted.h"
+#include "lua/table.h"
 
 namespace lua {
 

@@ -5,8 +5,7 @@
 #ifndef LUA_WRAPPABLE_H_
 #define LUA_WRAPPABLE_H_
 
-#include "lua/table.h"
-#include "lua/wrappable_internal.h"
+#include "lua/metatable_internal.h"
 
 namespace lua {
 

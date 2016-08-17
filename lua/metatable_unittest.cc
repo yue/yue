@@ -5,10 +5,10 @@
 #include <string>
 
 #include "lua/callback.h"
-#include "lua/wrappable.h"
+#include "lua/metatable.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-class WrappableTest : public testing::Test {
+class MetaTableTest : public testing::Test {
  protected:
   void SetUp() override {
     lua::SetTop(state_, 0);
@@ -61,7 +61,7 @@ struct Type<TestClass> {
 
 }  // namespace lua
 
-TEST_F(WrappableTest, PushNewClass) {
+TEST_F(MetaTableTest, PushNewClass) {
   lua::MetaTable<TestClass>::Push(state_);
   EXPECT_EQ(lua::GetTop(state_), 1);
   EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Table);
@@ -73,7 +73,7 @@ TEST_F(WrappableTest, PushNewClass) {
   EXPECT_EQ(lua::GetType(state_, -4), lua::LuaType::Function);
 }
 
-TEST_F(WrappableTest, PushNewInstanceInC) {
+TEST_F(MetaTableTest, PushNewInstanceInC) {
   lua::MetaTable<TestClass>::Push(state_);
   lua::PopAndIgnore(state_, 1);
   lua::Push(state_, lua::MetaTable<TestClass>::NewInstance(state_));
@@ -89,7 +89,7 @@ TEST_F(WrappableTest, PushNewInstanceInC) {
   ASSERT_EQ(result, 123);
 }
 
-TEST_F(WrappableTest, PushNewInstanceInLua) {
+TEST_F(MetaTableTest, PushNewInstanceInLua) {
   lua::MetaTable<TestClass>::Push(state_);
   ASSERT_TRUE(lua::PGet(state_, 1, "new"));
   TestClass* instance;
@@ -103,7 +103,7 @@ TEST_F(WrappableTest, PushNewInstanceInLua) {
   ASSERT_EQ(result, "123");
 }
 
-TEST_F(WrappableTest, GC) {
+TEST_F(MetaTableTest, GC) {
   lua::MetaTable<TestClass>::Push(state_);
   TestClass* instance = lua::MetaTable<TestClass>::NewInstance(state_);
 
@@ -114,7 +114,7 @@ TEST_F(WrappableTest, GC) {
   ASSERT_EQ(changed, 456);
 }
 
-TEST_F(WrappableTest, GCWithCReference) {
+TEST_F(MetaTableTest, GCWithCReference) {
   lua::MetaTable<TestClass>::Push(state_);
   scoped_refptr<TestClass> instance =
       lua::MetaTable<TestClass>::NewInstance(state_);
@@ -158,7 +158,7 @@ struct Type<DerivedClass> {
 
 }  // namespace lua
 
-TEST_F(WrappableTest, IndependentDerivedClass) {
+TEST_F(MetaTableTest, IndependentDerivedClass) {
   lua::MetaTable<DerivedClass>::Push(state_);
   lua::PopAndIgnore(state_, 1);
   lua::Push(state_, lua::MetaTable<DerivedClass>::NewInstance(state_, 1, "b"));
@@ -175,7 +175,7 @@ TEST_F(WrappableTest, IndependentDerivedClass) {
   ASSERT_EQ(b, "b");
 }
 
-TEST_F(WrappableTest, DerivedClassInheritanceChain) {
+TEST_F(MetaTableTest, DerivedClassInheritanceChain) {
   lua::MetaTable<DerivedClass>::Push<TestClass>(state_);
   EXPECT_EQ(lua::GetTop(state_), 1);
   std::string name;
@@ -191,7 +191,7 @@ TEST_F(WrappableTest, DerivedClassInheritanceChain) {
   ASSERT_EQ(name, "TestClass");
 }
 
-TEST_F(WrappableTest, DerivedClassMethods) {
+TEST_F(MetaTableTest, DerivedClassMethods) {
   lua::MetaTable<DerivedClass>::Push<TestClass>(state_);
   DerivedClass* instance =
       lua::MetaTable<DerivedClass>::NewInstance(state_, 456, "str");
@@ -243,7 +243,7 @@ struct Type<DerivedClass2> {
 
 }  // namespace lua
 
-TEST_F(WrappableTest, DeeplyDerivedClassInheritanceChain) {
+TEST_F(MetaTableTest, DeeplyDerivedClassInheritanceChain) {
   lua::MetaTable<DerivedClass2>::Push<DerivedClass, TestClass>(state_);
   EXPECT_EQ(lua::GetTop(state_), 1);
   std::string name;
@@ -267,7 +267,7 @@ TEST_F(WrappableTest, DeeplyDerivedClassInheritanceChain) {
   ASSERT_EQ(name, "TestClass");
 }
 
-TEST_F(WrappableTest, DeeplyDerivedClassGC) {
+TEST_F(MetaTableTest, DeeplyDerivedClassGC) {
   lua::MetaTable<DerivedClass2>::Push<DerivedClass, TestClass>(state_);
   DerivedClass2* d2 = lua::MetaTable<DerivedClass2>::NewInstance(state_);
   int changed_d2 = 0;

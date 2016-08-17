@@ -7,19 +7,20 @@ import("//testing/test.gni")
 source_set("lua") {
   sources = [
     "call_context.h",
+    "callback.cc",
     "callback.h",
-    "callback_internal.cc",
     "callback_internal.h",
     "handle.cc",
     "handle.h",
+    "metatable.cc",
+    "metatable.h",
+    "metatable_internal.h",
     "pcall.h",
     "stack.h",
     "state.h",
     "table.h",
     "table_internal.h",
     "types.h",
-    "wrappable.h",
-    "wrappable.cc",
   ]
 
   if (is_win) {
@@ -38,7 +39,7 @@ test("lua_unittests") {
   sources = [
     "handle_unittest.cc",
     "lua_unittest.cc",
-    "wrappable_unittest.cc",
+    "metatable_unittest.cc",
     "test/run_all_unittests.cc",
   ]
 
