@@ -27,13 +27,20 @@ struct MetaTable {
   static T* NewInstance(State* state, const ArgTypes&... args) {
     StackAutoReset reset(state);
     T* instance = new T(args...);
+    PushNewWrapper(state, instance);
+    return instance;
+  }
+
+  // Create a new lua wrapper for T.
+  static void PushNewWrapper(State* state, T* instance) {
     void* memory = lua_newuserdata(state, sizeof(internal::PointerWrapper<T>));
     new(memory) internal::PointerWrapper<T>(state, instance);
+    static_assert(std::is_standard_layout<internal::PointerWrapper<T>>::value,
+                  "The internal::PointerWrapper<T> must be standard layout");
     luaL_getmetatable(state, Type<T>::name);
     DCHECK_EQ(lua::GetType(state, -1), lua::LuaType::Table)
         << "The class must be created before creating the instance";
     SetMetaTable(state, -2);
-    return instance;
   }
 
   // Check if current metatable is base of the metatable on top of stack.
@@ -72,7 +79,8 @@ struct Type<T*, typename std::enable_if<std::is_convertible<
     return true;
   }
   static inline void Push(State* state, T* ptr) {
-    internal::PointerWrapperBase::Push(state, ptr);
+    if (!internal::PointerWrapperBase::Push(state, ptr))
+      MetaTable<T>::PushNewWrapper(state, ptr);
   }
 };
 

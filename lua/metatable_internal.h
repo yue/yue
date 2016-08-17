@@ -16,33 +16,39 @@ namespace internal {
 class PointerWrapperBase {
  public:
   // Convert the class to Lua and push it on stack.
-  static void Push(State* state, void* ptr);
-
-  // Call destructors on garbage collection.
-  static int OnGC(State* state);
+  static bool Push(State* state, void* ptr);
 
  protected:
   PointerWrapperBase(State* state, void* ptr);
-  virtual ~PointerWrapperBase();
 
  private:
   DISALLOW_COPY_AND_ASSIGN(PointerWrapperBase);
 };
 
 // The specialized Wrappable class for storing refcounted class.
+// We need to guareentee that PointerWrapper is standard layout, since we may
+// use convertions like PointerWrapper<Derive> to PointerWrapper<Base>.
 template<typename T>
 class PointerWrapper : public PointerWrapperBase {
  public:
+  // Call destructors on garbage collection.
+  static int OnGC(State* state) {
+    auto* self = static_cast<PointerWrapper*>(lua_touserdata(state, 1));
+    self->~PointerWrapper();
+    return 0;
+  }
+
   PointerWrapper(State* state, T* t) : PointerWrapperBase(state, t), ptr_(t) {
     ptr_->AddRef();
-  }
-  ~PointerWrapper() override {
-    ptr_->Release();
   }
 
   T* get() const { return ptr_; }
 
  private:
+  ~PointerWrapper() {
+    ptr_->Release();
+  }
+
   T* ptr_;
 };
 
@@ -57,7 +63,7 @@ struct InheritanceChain {
     if (luaL_newmetatable(state, Type<T>::name) == 1) {
       RawSet(state, -1,
              "__index", ValueOnStack(state, -1),
-             "__gc", CFunction(PointerWrapperBase::OnGC));
+             "__gc", CFunction(PointerWrapper<T>::OnGC));
       Type<T>::BuildMetaTable(state, -1);
     }
   }

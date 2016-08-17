@@ -15,19 +15,20 @@ const char* kPointerWrapperTableName = "yue.internal.pointerwrappertable";
 }  // namespace
 
 // static
-void PointerWrapperBase::Push(State* state, void* ptr) {
+bool PointerWrapperBase::Push(State* state, void* ptr) {
+  int top = GetTop(state);
   luaL_getmetatable(state, kPointerWrapperTableName);
-  DCHECK_EQ(GetType(state, -1), LuaType::Table);
+  if (GetType(state, -1) != LuaType::Table) {
+    SetTop(state, top);
+    return false;
+  }
   RawGet(state, -1, LightUserData(ptr));
+  if (GetType(state, -1) != LuaType::UserData) {
+    SetTop(state, top);
+    return false;
+  }
   lua_remove(state, -2);
-  DCHECK_EQ(GetType(state, -1), LuaType::UserData);
-}
-
-// static
-int PointerWrapperBase::OnGC(State* state) {
-  auto* self = static_cast<PointerWrapperBase*>(lua_touserdata(state, 1));
-  self->~PointerWrapperBase();
-  return 0;
+  return true;
 }
 
 PointerWrapperBase::PointerWrapperBase(State* state, void* ptr) {
@@ -39,9 +40,6 @@ PointerWrapperBase::PointerWrapperBase(State* state, void* ptr) {
     SetMetaTable(state, -2);
   }
   RawSet(state, -1, LightUserData(ptr), ValueOnStack(state, -2));
-}
-
-PointerWrapperBase::~PointerWrapperBase() {
 }
 
 }  // namespace internal

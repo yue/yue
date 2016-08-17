@@ -302,3 +302,32 @@ TEST_F(MetaTableTest, BaseConvertToDerivedClass) {
   DerivedClass2* d2;
   ASSERT_FALSE(lua::Pop(state_, &d2));
 }
+
+TEST_F(MetaTableTest, PushWithoutNewInstance) {
+  lua::MetaTable<DerivedClass2>::Push<DerivedClass, TestClass>(state_);
+  DerivedClass2* d2 = new DerivedClass2;
+  lua::Push(state_, d2);
+  TestClass* b;
+  ASSERT_TRUE(lua::Pop(state_, &b));
+  EXPECT_EQ(d2, b);
+}
+
+TEST_F(MetaTableTest, PushWithoutNewInstanceAfterGC) {
+  lua::MetaTable<DerivedClass2>::Push<DerivedClass, TestClass>(state_);
+  lua::Push(state_, new DerivedClass2);
+
+  TestClass* b;
+  ASSERT_TRUE(lua::To(state_, -1, &b));
+  int changed = 0;
+  b->SetPtr(&changed);
+
+  scoped_refptr<TestClass> keep(b);
+  lua::SetTop(state_, 0);
+  lua::CollectGarbage(state_);
+  EXPECT_EQ(changed, 0);
+
+  lua::Push(state_, keep.get());
+  keep = nullptr;
+  ASSERT_TRUE(lua::To(state_, -1, &b));
+  EXPECT_NE(b, nullptr);
+}
