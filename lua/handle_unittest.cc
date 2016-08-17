@@ -20,7 +20,7 @@ class HandleTest : public testing::Test {
 };
 
 TEST_F(HandleTest, Persistent) {
-  int original_registry_len = lua::RawLen(state_, LUA_REGISTRYINDEX);
+  size_t original_registry_len = lua::RawLen(state_, LUA_REGISTRYINDEX);
   lua::PushNewTable(state_);
   std::unique_ptr<lua::Persistent> handle(lua::Persistent::New(state_, -1));
   ASSERT_EQ(lua::RawLen(state_, LUA_REGISTRYINDEX), original_registry_len + 1);

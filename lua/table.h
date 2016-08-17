@@ -20,7 +20,7 @@ inline void PushNewTable(State* state, int nargs = 0, int nrec = 0) {
 }
 
 // Get length of table (or any other value).
-inline int RawLen(State* state, int index) {
+inline size_t RawLen(State* state, int index) {
   return lua_rawlen(state, index);
 }
 
