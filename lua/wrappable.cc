@@ -23,6 +23,13 @@ void PointerWrapperBase::Push(State* state, void* ptr) {
   DCHECK_EQ(GetType(state, -1), LuaType::UserData);
 }
 
+// static
+int PointerWrapperBase::OnGC(State* state) {
+  auto* self = static_cast<PointerWrapperBase*>(lua_touserdata(state, 1));
+  self->~PointerWrapperBase();
+  return 0;
+}
+
 PointerWrapperBase::PointerWrapperBase(State* state, void* ptr) {
   DCHECK_EQ(GetType(state, -1), LuaType::UserData);
   StackAutoReset reset(state);

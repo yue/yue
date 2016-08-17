@@ -51,10 +51,6 @@ struct Type<T*, typename std::enable_if<std::is_convertible<
         RawLen(state, index) != sizeof(internal::PointerWrapper<T>) ||
         !GetMetaTable(state, index))
       return false;
-    // Verify the metatable name.
-    base::StringPiece table_name;
-    if (!RawGetAndPop(state, -1, "__name", &table_name) || table_name != name)
-      return false;
     // Convert pointer to actual class.
     auto* wrapper = static_cast<internal::PointerWrapper<T>*>(
         lua_touserdata(state, index));

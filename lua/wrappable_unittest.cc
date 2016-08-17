@@ -270,19 +270,17 @@ TEST_F(WrappableTest, DeeplyDerivedClassInheritanceChain) {
 TEST_F(WrappableTest, DeeplyDerivedClassGC) {
   lua::MetaTable<DerivedClass2>::Push<DerivedClass, TestClass>(state_);
   DerivedClass2* d2 = lua::MetaTable<DerivedClass2>::NewInstance(state_);
-  lua::Push(state_, d2);
   int changed_d2 = 0;
   d2->SetPtr(&changed_d2);
-  lua::SetTop(state_, 0);
-  lua::CollectGarbage(state_);
-  EXPECT_EQ(changed_d2, 789);
-}
-
-TEST_F(WrappableTest, BaseClassConvert) {
-  lua::MetaTable<DerivedClass2>::Push<DerivedClass, TestClass>(state_);
-  DerivedClass2* d2 = lua::MetaTable<DerivedClass2>::NewInstance(state_);
-  lua::Push(state_, d2);
 
   TestClass* b;
+  lua::Push(state_, d2);
   ASSERT_TRUE(lua::To(state_, -1, &b));
+  int changed_b = 0;
+  b->SetPtr(&changed_b);
+
+  lua::SetTop(state_, 0);
+  lua::CollectGarbage(state_);
+  EXPECT_EQ(changed_b, 456);
+  EXPECT_EQ(changed_d2, 789);
 }
