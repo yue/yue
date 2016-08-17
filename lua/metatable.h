@@ -35,6 +35,18 @@ struct MetaTable {
     SetMetaTable(state, -2);
     return instance;
   }
+
+  // Check if current metatable is base of the metatable on top of stack.
+  static bool IsBaseOf(State* state) {
+    StackAutoReset reset(state);
+    base::StringPiece name;
+    if (RawGetAndPop(state, -1, "__name", &name) && name == Type<T>::name)
+      return true;
+    if (!GetMetaTable(state, -1))
+      return false;
+    RawGet(state, -1, "__index");
+    return IsBaseOf(state);
+  }
 };
 
 // The default type information for RefCounted class.
@@ -42,13 +54,16 @@ template<typename T>
 struct Type<T*, typename std::enable_if<std::is_convertible<
                     T*, base::subtle::RefCountedBase*>::value>::type> {
   static constexpr const char* name = Type<T>::name;
-  static inline bool To(State* state, int index, T** out) {
+  static bool To(State* state, int index, T** out) {
     index = AbsIndex(state, index);
     StackAutoReset reset(state);
     // Verify the type and length.
     if (GetType(state, index) != lua::LuaType::UserData ||
         RawLen(state, index) != sizeof(internal::PointerWrapper<T>) ||
         !GetMetaTable(state, index))
+      return false;
+    // Verify fine the inheritance chain.
+    if (!MetaTable<T>::IsBaseOf(state))
       return false;
     // Convert pointer to actual class.
     auto* wrapper = static_cast<internal::PointerWrapper<T>*>(

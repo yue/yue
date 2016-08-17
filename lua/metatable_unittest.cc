@@ -284,3 +284,21 @@ TEST_F(MetaTableTest, DeeplyDerivedClassGC) {
   EXPECT_EQ(changed_b, 456);
   EXPECT_EQ(changed_d2, 789);
 }
+
+TEST_F(MetaTableTest, BaseCallDerivedClassMethods) {
+  lua::MetaTable<DerivedClass2>::Push<DerivedClass, TestClass>(state_);
+  TestClass* b = lua::MetaTable<TestClass>::NewInstance(state_);
+  ASSERT_TRUE(lua::PGet(state_, 1, "a"));
+  ASSERT_FALSE(lua::PCall(state_, nullptr, b, 123));
+  std::string error;
+  ASSERT_TRUE(lua::Pop(state_, &error));
+  ASSERT_EQ(error, "error converting arg at index 1 "
+                   "from userdata to DerivedClass");
+}
+
+TEST_F(MetaTableTest, BaseConvertToDerivedClass) {
+  lua::MetaTable<DerivedClass2>::Push<DerivedClass, TestClass>(state_);
+  lua::Push(state_, lua::MetaTable<TestClass>::NewInstance(state_));
+  DerivedClass2* d2;
+  ASSERT_FALSE(lua::Pop(state_, &d2));
+}
