@@ -27,6 +27,14 @@ template<typename T>
 struct CallbackParamTraits<T*> {
   typedef T* LocalType;
 };
+template<typename T>
+struct CallbackParamTraits<const T*> {
+  typedef T* LocalType;
+};
+template<>
+struct CallbackParamTraits<const char*> {
+  typedef const char* LocalType;
+};
 
 // CallbackHolder and CallbackHolderBase are used to pass a base::Callback from
 // PushCFunction through DispatchToCallback, where it is invoked.

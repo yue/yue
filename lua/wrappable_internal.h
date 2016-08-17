@@ -45,6 +45,33 @@ class PointerWrapper : public PointerWrapperBase {
   scoped_refptr<T> ptr_;
 };
 
+// Create metattable inheritance chain for T and its BaseTypes.
+template<typename T>
+struct InheritanceChain {
+  // This method doesn't have to be a template method, but because the
+  // "template Push" requires Push to be a template method, we have to add a
+  // template here to make the compiler choose this method.
+  template<size_t n = 0>
+  static inline void Push(State* state) {
+    if (luaL_newmetatable(state, Type<T>::name) == 1) {
+      RawSet(state, -1,
+             "__index", ValueOnStack(state, -1),
+             "__gc", CFunction(OnGC<PointerWrapper<T>>));
+      Type<T>::BuildMetaTable(state, -1);
+    }
+  }
+
+  template<typename Base, typename...BaseTypes>
+  static inline void Push(State* state) {
+    InheritanceChain<T>::Push(state);
+    InheritanceChain<Base>::template Push<BaseTypes...>(state);
+    PushNewTable(state, 0, 1);
+    RawSet(state, -1, "__index", ValueOnStack(state, -2));
+    SetMetaTable(state, -3);
+    PopAndIgnore(state, 1);
+  }
+};
+
 }  // namespace internal
 
 }  // namespace lua

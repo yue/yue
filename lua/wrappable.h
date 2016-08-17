@@ -10,16 +10,16 @@
 
 namespace lua {
 
-// Generate metatable for Wrappable classes.
+// Generate metatable for native classes.
 template<typename T>
 struct MetaTable {
   // Create the metatable for T and push it on stack.
   static void Push(State* state) {
-    if (luaL_newmetatable(state, Type<T>::name) == 1) {
-      RawSet(state, -1, "__index", ValueOnStack(state, -1),
-                        "__gc", CFunction(Type<T*>::gc));
-      Type<T>::BuildMetaTable(state, -1);
-    }
+    internal::InheritanceChain<T>::Push(state);
+  }
+  template<typename... BaseTypes>
+  static void Push(State* state) {
+    internal::InheritanceChain<T>::template Push<BaseTypes...>(state);
   }
 
   // Create an instance of T.
@@ -41,14 +41,21 @@ struct MetaTable {
 // The default type information for RefCounted class.
 template<typename T>
 struct Type<T*, typename std::enable_if<std::is_convertible<
-                    T*, base::RefCounted<T>*>::value>::type> {
+                    T*, base::subtle::RefCountedBase*>::value>::type> {
   static constexpr const char* name = Type<T>::name;
-  static constexpr lua_CFunction gc =
-      internal::OnGC<internal::PointerWrapper<T>>;
   static inline bool To(State* state, int index, T** out) {
+    index = AbsIndex(state, index);
+    StackAutoReset reset(state);
+    // Verify the type and length.
     if (GetType(state, index) != lua::LuaType::UserData ||
-        RawLen(state, index) != sizeof(internal::PointerWrapper<T>))
+        RawLen(state, index) != sizeof(internal::PointerWrapper<T>) ||
+        !GetMetaTable(state, index))
       return false;
+    // Verify the metatable name.
+    base::StringPiece table_name;
+    if (!RawGetAndPop(state, -1, "__name", &table_name) || table_name != name)
+      return false;
+    // Convert pointer to actual class.
     auto* wrapper = static_cast<internal::PointerWrapper<T>*>(
         lua_touserdata(state, index));
     *out = wrapper->get();

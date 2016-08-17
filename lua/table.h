@@ -49,13 +49,12 @@ inline void RawSet(State* state, int index, int key, const Value& value) {
   lua_rawseti(state, index, key);
 }
 
-// Optimize for lua_rawsetp.
-template<typename Value>
-inline void RawSet(State* state, int index, LightUserData key,
-                   const Value& value) {
-  index = AbsIndex(state, index);
-  Push(state, value);
-  lua_rawsetp(state, index, key.data);
+// Use the value on top of stack as key.
+struct PopTopValue {};
+template<typename Key>
+inline void RawSet(State* state, int index, const Key& key, PopTopValue) {
+  Push(state, key);
+  lua_rawset(state, index);
 }
 
 // Allow setting arbitrary key/value pairs.
