@@ -10,7 +10,6 @@
 #include "base/memory/ref_counted.h"
 #include "nativeui/nativeui_export.h"
 #include "nativeui/types.h"
-#include "ui/gfx/geometry/rect.h"
 
 namespace nu {
 
@@ -18,6 +17,27 @@ namespace nu {
 NATIVEUI_EXPORT class View : public base::RefCounted<View> {
  public:
   NativeView view() const { return view_; }
+
+  // Add/Remove children.
+  void AddChildView(View* view);
+  void AddChildViewAt(View* view, int index);
+  void RemoveChildView(View* view);
+
+  // Set parent.
+  void SetParent(View* view);
+
+  // Get children.
+  int child_count() const { return static_cast<int>(children_.size()); }
+  bool has_children() const { return !children_.empty(); }
+  View* child_at(int index) const {
+    if (index < 0 || index >= child_count())
+      return nullptr;
+    return children_[index].get();
+  }
+
+  // Get parent.
+  const View* parent() const { return parent_; }
+  View* parent() { return parent_; }
 
  protected:
   View();
@@ -28,6 +48,11 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
  private:
   friend class base::RefCounted<View>;
 
+  // Relationships.
+  View* parent_ = nullptr;
+  std::vector<scoped_refptr<View>> children_;
+
+  // The native implementation.
   NativeView view_;
 };
 

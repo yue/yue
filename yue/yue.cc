@@ -24,6 +24,8 @@ int main(int argc, const char *argv[]) {
     return 1;
   }
 
+  base::MessageLoop message_loop(base::MessageLoop::TYPE_UI);
+
   lua::ManagedState state;
   if (!state) {
     LOG(ERROR) << "Failed to create state.";
@@ -40,14 +42,13 @@ int main(int argc, const char *argv[]) {
   }
 
   nu::Initialize();
-  nu::Label label;
-  label.SetText("test");
   nu::Window::Options options = { gfx::Rect(400, 400, 100, 100) };
-  nu::Window window(options);
-  window.SetContentView(&label);
-  window.SetVisible(true);
+  scoped_refptr<nu::Window> window(new nu::Window(options));
+  nu::Label* label = new nu::Label;
+  label->SetText("test");
+  window->SetContentView(label);
+  window->SetVisible(true);
 
-  base::MessageLoop message_loop(base::MessageLoop::TYPE_UI);
   base::RunLoop().Run();
 
   return 0;

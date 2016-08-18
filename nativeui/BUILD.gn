@@ -8,8 +8,10 @@ source_set("nativeui") {
   sources = [
     "init.h",
     "types.h",
+    "view.cc",
     "view.h",
     "label.h",
+    "window.cc",
     "window.h",
     "mac/init_mac.mm",
     "mac/label_mac.mm",
@@ -26,6 +28,7 @@ source_set("nativeui") {
 test("nativeui_unittests") {
   sources = [
     "label_unittest.cc",
+    "view_unittest.cc",
     "window_unittest.cc",
     "test/run_all_unittests.cc",
   ]

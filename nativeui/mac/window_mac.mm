@@ -25,7 +25,7 @@ Window::~Window() {
   [window_ release];
 }
 
-void Window::SetContentView(View* view) {
+void Window::PlatformSetContentView(View* view) {
   [window_ setContentView:view->view()];
 }
 

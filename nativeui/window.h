@@ -6,6 +6,7 @@
 #define NATIVEUI_WINDOW_H_
 
 #include "nativeui/view.h"
+#include "ui/gfx/geometry/rect.h"
 
 namespace nu {
 
@@ -19,6 +20,7 @@ NATIVEUI_EXPORT class Window : public base::RefCounted<Window> {
   explicit Window(const Options& options);
 
   void SetContentView(View* view);
+  View* GetContentView() const;
 
   void SetVisible(bool visible);
   bool IsVisible() const;
@@ -29,7 +31,11 @@ NATIVEUI_EXPORT class Window : public base::RefCounted<Window> {
  private:
   friend class base::RefCounted<Window>;
 
+  // Following platform implementations should only be called by wrappers.
+  void PlatformSetContentView(View* view);
+
   NativeWindow window_;
+  scoped_refptr<View> content_view_;
 };
 
 }  // namespace nu
