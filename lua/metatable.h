@@ -2,8 +2,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef LUA_WRAPPABLE_H_
-#define LUA_WRAPPABLE_H_
+#ifndef LUA_METATABLE_H_
+#define LUA_METATABLE_H_
 
 #include "lua/metatable_internal.h"
 
@@ -86,4 +86,4 @@ struct Type<T*, typename std::enable_if<std::is_convertible<
 
 }  // namespace lua
 
-#endif  // LUA_WRAPPABLE_H_
+#endif  // LUA_METATABLE_H_

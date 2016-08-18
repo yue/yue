@@ -2,8 +2,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef LUA_WRAPPABLE_INTERNAL_H_
-#define LUA_WRAPPABLE_INTERNAL_H_
+#ifndef LUA_METATABLE_INTERNAL_H_
+#define LUA_METATABLE_INTERNAL_H_
 
 #include "base/memory/ref_counted.h"
 #include "lua/table.h"
@@ -59,18 +59,22 @@ struct InheritanceChain {
   // "template Push" requires Push to be a template method, we have to add a
   // template here to make the compiler choose this method.
   template<size_t n = 0>
-  static inline void Push(State* state) {
+  static inline bool Push(State* state) {
     if (luaL_newmetatable(state, Type<T>::name) == 1) {
       RawSet(state, -1,
              "__index", ValueOnStack(state, -1),
              "__gc", CFunction(PointerWrapper<T>::OnGC));
       Type<T>::BuildMetaTable(state, -1);
+      return true;
+    } else {
+      return false;
     }
   }
 
   template<typename Base, typename...BaseTypes>
   static inline void Push(State* state) {
-    InheritanceChain<T>::Push(state);
+    if (!InheritanceChain<T>::Push(state))  // already built metattable.
+      return;
     InheritanceChain<Base>::template Push<BaseTypes...>(state);
     PushNewTable(state, 0, 1);
     RawSet(state, -1, "__index", ValueOnStack(state, -2));
@@ -83,4 +87,4 @@ struct InheritanceChain {
 
 }  // namespace lua
 
-#endif  // LUA_WRAPPABLE_INTERNAL_H_
+#endif  // LUA_METATABLE_INTERNAL_H_

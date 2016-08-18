@@ -330,4 +330,8 @@ TEST_F(MetaTableTest, PushWithoutNewInstanceAfterGC) {
   keep = nullptr;
   ASSERT_TRUE(lua::To(state_, -1, &b));
   EXPECT_NE(b, nullptr);
+
+  lua::SetTop(state_, 0);
+  lua::CollectGarbage(state_);
+  EXPECT_EQ(changed, 456);
 }
