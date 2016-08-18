@@ -5,8 +5,6 @@
 #ifndef NATIVEUI_WINDOW_H_
 #define NATIVEUI_WINDOW_H_
 
-#include <memory>
-
 #include "nativeui/view.h"
 
 namespace nu {

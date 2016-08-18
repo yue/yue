@@ -7,14 +7,14 @@ import("//testing/test.gni")
 source_set("nativeui") {
   sources = [
     "init.h",
-    "init_mac.mm",
     "types.h",
     "view.h",
-    "view_mac.mm",
     "label.h",
-    "label_mac.mm",
     "window.h",
-    "window_mac.mm",
+    "mac/init_mac.mm",
+    "mac/label_mac.mm",
+    "mac/view_mac.mm",
+    "mac/window_mac.mm",
   ]
 
   deps = [
