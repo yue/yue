@@ -239,7 +239,8 @@ struct Type<DerivedClass2> {
   using base = DerivedClass;
   static constexpr const char* name = "DerivedClass2";
   static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index, "new", &MetaTable<DerivedClass2>::NewInstance<>);
+    RawSet(state, index, "new", &MetaTable<DerivedClass2>::NewInstance<>,
+                         "c", &DerivedClass2::C);
   }
 };
 
@@ -336,4 +337,70 @@ TEST_F(MetaTableTest, PushWithoutNewInstanceAfterGC) {
   lua::SetTop(state_, 0);
   lua::CollectGarbage(state_);
   EXPECT_EQ(changed, 456);
+}
+
+TEST_F(MetaTableTest, PushMultipleBaseClasses) {
+  lua::MetaTable<DerivedClass2>::Push(state_);
+  lua::Push(state_, new DerivedClass2);
+  lua::Push(state_, new DerivedClass(123, "test"));
+  lua::Push(state_, new TestClass);
+  TestClass* b1;
+  TestClass* b2;
+  TestClass* b3;
+  ASSERT_TRUE(lua::Pop(state_, &b1, &b2, &b3));
+
+  int changed_1 = 0;
+  int changed_2 = 0;
+  int changed_3 = 0;
+  scoped_refptr<TestClass> s1(b1);
+  scoped_refptr<TestClass> s2(b2);
+  scoped_refptr<TestClass> s3(b3);
+  s1->SetPtr(&changed_1);
+  s2->SetPtr(&changed_2);
+  s3->SetPtr(&changed_3);
+
+  lua::SetTop(state_, 0);
+  lua::CollectGarbage(state_);
+
+  EXPECT_EQ(changed_1, 0);
+  EXPECT_EQ(changed_2, 0);
+  EXPECT_EQ(changed_3, 0);
+
+  lua::Push(state_, s1.get(), s2.get(), s3.get());
+  s1 = nullptr;
+  s2 = nullptr;
+  s3 = nullptr;
+
+  EXPECT_EQ(changed_1, 0);
+  EXPECT_EQ(changed_2, 0);
+  EXPECT_EQ(changed_3, 0);
+
+  lua::SetTop(state_, 0);
+  lua::CollectGarbage(state_);
+
+  EXPECT_EQ(changed_1, 456);
+  EXPECT_EQ(changed_2, 456);
+  EXPECT_EQ(changed_3, 456);
+}
+
+TEST_F(MetaTableTest, ConvertedBaseWithoutParentMethods) {
+  lua::MetaTable<DerivedClass2>::Push(state_);
+  lua::Push(state_, new DerivedClass2);
+
+  ASSERT_TRUE(lua::PGet(state_, 1, "a", "b", "c"));
+  EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Function);
+  EXPECT_EQ(lua::GetType(state_, -2), lua::LuaType::Function);
+  EXPECT_EQ(lua::GetType(state_, -3), lua::LuaType::Function);
+
+  DerivedClass* d1;
+  ASSERT_TRUE(lua::To(state_, 2, &d1));
+  scoped_refptr<DerivedClass> keep(d1);
+  lua::SetTop(state_, 0);
+  lua::CollectGarbage(state_);
+
+  lua::Push(state_, keep.get());
+  ASSERT_TRUE(lua::PGet(state_, 1, "a", "b", "c"));
+  EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Nil);
+  EXPECT_EQ(lua::GetType(state_, -2), lua::LuaType::Function);
+  EXPECT_EQ(lua::GetType(state_, -3), lua::LuaType::Function);
 }
