@@ -15,4 +15,12 @@ View::~View() {
   [view_ release];
 }
 
+void View::PlatformAddChildView(View* view) {
+  [view_ addSubview:view->view_];
+}
+
+void View::PlatformRemoveChildView(View* view) {
+  [view->view_ removeFromSuperview];
+}
+
 }  // namespace nu

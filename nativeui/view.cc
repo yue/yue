@@ -20,8 +20,9 @@ void View::AddChildViewAt(View* view, int index) {
   if (view->parent_)
     return;
 
-  view->SetParent(this);
+  view->parent_ = this;
   children_.insert(children_.begin() + index, view);
+  PlatformAddChildView(view);
 }
 
 void View::RemoveChildView(View* view) {
@@ -31,10 +32,7 @@ void View::RemoveChildView(View* view) {
 
   view->parent_ = nullptr;
   children_.erase(i);
-}
-
-void View::SetParent(View* view) {
-  parent_ = view;
+  PlatformRemoveChildView(view);
 }
 
 }  // namespace nu

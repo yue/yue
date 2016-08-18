@@ -23,9 +23,6 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
   void AddChildViewAt(View* view, int index);
   void RemoveChildView(View* view);
 
-  // Set parent.
-  void SetParent(View* view);
-
   // Get children.
   int child_count() const { return static_cast<int>(children_.size()); }
   bool has_children() const { return !children_.empty(); }
@@ -47,6 +44,10 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
 
  private:
   friend class base::RefCounted<View>;
+
+  // Following platform implementations should only be called by wrappers.
+  void PlatformAddChildView(View* view);
+  void PlatformRemoveChildView(View* view);
 
   // Relationships.
   View* parent_ = nullptr;
