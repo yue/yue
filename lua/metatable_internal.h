@@ -52,30 +52,37 @@ class PointerWrapper : public PointerWrapperBase {
   T* ptr_;
 };
 
-// Create metattable inheritance chain for T and its BaseTypes.
+// Create metatable for T, returns true if the metattable has already been
+// created.
 template<typename T>
-struct InheritanceChain {
-  // This method doesn't have to be a template method, but because the
-  // "template Push" requires Push to be a template method, we have to add a
-  // template here to make the compiler choose this method.
-  template<size_t n = 0>
-  static inline bool Push(State* state) {
-    if (luaL_newmetatable(state, Type<T>::name) == 1) {
-      RawSet(state, -1,
-             "__index", ValueOnStack(state, -1),
-             "__gc", CFunction(PointerWrapper<T>::OnGC));
-      Type<T>::BuildMetaTable(state, -1);
-      return true;
-    } else {
-      return false;
-    }
-  }
+bool PushSingleTypeMetaTable(State* state) {
+  if (luaL_newmetatable(state, Type<T>::name) == 0)
+    return true;
 
-  template<typename Base, typename...BaseTypes>
+  RawSet(state, -1, "__index", ValueOnStack(state, -1),
+                    "__gc", CFunction(PointerWrapper<T>::OnGC));
+  Type<T>::BuildMetaTable(state, -1);
+  return false;
+}
+
+// Create metattable inheritance chain for T and its BaseTypes.
+template<typename T, typename Enable = void>
+struct InheritanceChain {
+  // There is no base type.
   static inline void Push(State* state) {
-    if (!InheritanceChain<T>::Push(state))  // already built metattable.
+    PushSingleTypeMetaTable<T>(state);
+  }
+};
+
+template<typename T>
+struct InheritanceChain<T, typename std::enable_if<std::is_class<
+                               typename Type<T>::base>::value>::type> {
+  static inline void Push(State* state) {
+    if (PushSingleTypeMetaTable<T>(state))  // already created.
       return;
-    InheritanceChain<Base>::template Push<BaseTypes...>(state);
+
+    // Inherit from base type's metatable.
+    InheritanceChain<typename Type<T>::base>::Push(state);
     PushNewTable(state, 0, 1);
     RawSet(state, -1, "__index", ValueOnStack(state, -2));
     SetMetaTable(state, -3);

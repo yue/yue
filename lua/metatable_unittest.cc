@@ -147,6 +147,7 @@ namespace lua {
 
 template<>
 struct Type<DerivedClass> {
+  using base = TestClass;
   static constexpr const char* name = "DerivedClass";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
@@ -176,7 +177,7 @@ TEST_F(MetaTableTest, IndependentDerivedClass) {
 }
 
 TEST_F(MetaTableTest, DerivedClassInheritanceChain) {
-  lua::MetaTable<DerivedClass>::Push<TestClass>(state_);
+  lua::MetaTable<DerivedClass>::Push(state_);
   EXPECT_EQ(lua::GetTop(state_), 1);
   std::string name;
   ASSERT_TRUE(lua::RawGetAndPop(state_, 1, "__name", &name));
@@ -192,7 +193,7 @@ TEST_F(MetaTableTest, DerivedClassInheritanceChain) {
 }
 
 TEST_F(MetaTableTest, DerivedClassMethods) {
-  lua::MetaTable<DerivedClass>::Push<TestClass>(state_);
+  lua::MetaTable<DerivedClass>::Push(state_);
   DerivedClass* instance =
       lua::MetaTable<DerivedClass>::NewInstance(state_, 456, "str");
   lua::Push(state_, instance);
@@ -235,6 +236,7 @@ namespace lua {
 
 template<>
 struct Type<DerivedClass2> {
+  using base = DerivedClass;
   static constexpr const char* name = "DerivedClass2";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index, "new", &MetaTable<DerivedClass2>::NewInstance<>);
@@ -244,7 +246,7 @@ struct Type<DerivedClass2> {
 }  // namespace lua
 
 TEST_F(MetaTableTest, DeeplyDerivedClassInheritanceChain) {
-  lua::MetaTable<DerivedClass2>::Push<DerivedClass, TestClass>(state_);
+  lua::MetaTable<DerivedClass2>::Push(state_);
   EXPECT_EQ(lua::GetTop(state_), 1);
   std::string name;
   ASSERT_TRUE(lua::RawGetAndPop(state_, 1, "__name", &name));
@@ -268,7 +270,7 @@ TEST_F(MetaTableTest, DeeplyDerivedClassInheritanceChain) {
 }
 
 TEST_F(MetaTableTest, DeeplyDerivedClassGC) {
-  lua::MetaTable<DerivedClass2>::Push<DerivedClass, TestClass>(state_);
+  lua::MetaTable<DerivedClass2>::Push(state_);
   DerivedClass2* d2 = lua::MetaTable<DerivedClass2>::NewInstance(state_);
   int changed_d2 = 0;
   d2->SetPtr(&changed_d2);
@@ -286,7 +288,7 @@ TEST_F(MetaTableTest, DeeplyDerivedClassGC) {
 }
 
 TEST_F(MetaTableTest, BaseCallDerivedClassMethods) {
-  lua::MetaTable<DerivedClass2>::Push<DerivedClass, TestClass>(state_);
+  lua::MetaTable<DerivedClass2>::Push(state_);
   TestClass* b = lua::MetaTable<TestClass>::NewInstance(state_);
   ASSERT_TRUE(lua::PGet(state_, 1, "a"));
   ASSERT_FALSE(lua::PCall(state_, nullptr, b, 123));
@@ -297,14 +299,14 @@ TEST_F(MetaTableTest, BaseCallDerivedClassMethods) {
 }
 
 TEST_F(MetaTableTest, BaseConvertToDerivedClass) {
-  lua::MetaTable<DerivedClass2>::Push<DerivedClass, TestClass>(state_);
+  lua::MetaTable<DerivedClass2>::Push(state_);
   lua::Push(state_, lua::MetaTable<TestClass>::NewInstance(state_));
   DerivedClass2* d2;
   ASSERT_FALSE(lua::Pop(state_, &d2));
 }
 
 TEST_F(MetaTableTest, PushWithoutNewInstance) {
-  lua::MetaTable<DerivedClass2>::Push<DerivedClass, TestClass>(state_);
+  lua::MetaTable<DerivedClass2>::Push(state_);
   DerivedClass2* d2 = new DerivedClass2;
   lua::Push(state_, d2);
   TestClass* b;
@@ -313,7 +315,7 @@ TEST_F(MetaTableTest, PushWithoutNewInstance) {
 }
 
 TEST_F(MetaTableTest, PushWithoutNewInstanceAfterGC) {
-  lua::MetaTable<DerivedClass2>::Push<DerivedClass, TestClass>(state_);
+  lua::MetaTable<DerivedClass2>::Push(state_);
   lua::Push(state_, new DerivedClass2);
 
   TestClass* b;

@@ -16,10 +16,6 @@ struct MetaTable {
   static void Push(State* state) {
     internal::InheritanceChain<T>::Push(state);
   }
-  template<typename... BaseTypes>
-  static void Push(State* state) {
-    internal::InheritanceChain<T>::template Push<BaseTypes...>(state);
-  }
 
   // Create an instance of T.
   // The returned pointer is managed by lua, so avoid keeping it.
