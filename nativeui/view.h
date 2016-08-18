@@ -7,6 +7,7 @@
 
 #include <vector>
 
+#include "base/memory/ref_counted.h"
 #include "nativeui/nativeui_export.h"
 #include "nativeui/types.h"
 #include "ui/gfx/geometry/rect.h"
@@ -14,7 +15,7 @@
 namespace nu {
 
 // The base class for all kinds of views.
-NATIVEUI_EXPORT class View {
+NATIVEUI_EXPORT class View : public base::RefCounted<View> {
  public:
   NativeView view() const { return view_; }
 
@@ -25,9 +26,9 @@ NATIVEUI_EXPORT class View {
   void set_view(NativeView view) { view_ = view; }
 
  private:
-  NativeView view_;
+  friend class base::RefCounted<View>;
 
-  DISALLOW_COPY_AND_ASSIGN(View);
+  NativeView view_;
 };
 
 }  // namespace nu

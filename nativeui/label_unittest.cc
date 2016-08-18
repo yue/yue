@@ -14,7 +14,7 @@ class LabelTest : public testing::Test {
 };
 
 TEST_F(LabelTest, SetText) {
-  nu::Label label;
-  label.SetText("test");
-  ASSERT_EQ(label.GetText(), "test");
+  scoped_refptr<nu::Label> label(new nu::Label);
+  label->SetText("test");
+  ASSERT_EQ(label->GetText(), "test");
 }

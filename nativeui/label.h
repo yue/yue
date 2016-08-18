@@ -14,13 +14,12 @@ namespace nu {
 class Label : public View {
  public:
   Label();
-  ~Label() override;
 
   void SetText(const std::string& text);
   std::string GetText();
 
- private:
-  DISALLOW_COPY_AND_ASSIGN(Label);
+ protected:
+  ~Label() override;
 };
 
 }  // namespace nu

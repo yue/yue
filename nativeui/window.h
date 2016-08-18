@@ -12,24 +12,26 @@
 namespace nu {
 
 // The native window.
-NATIVEUI_EXPORT class Window {
+NATIVEUI_EXPORT class Window : public base::RefCounted<Window> {
  public:
   struct Options {
     gfx::Rect content_bounds;
   };
 
   explicit Window(const Options& options);
-  virtual ~Window();
 
   void SetContentView(View* view);
 
   void SetVisible(bool visible);
   bool IsVisible() const;
 
- private:
-  NativeWindow window_;
+ protected:
+  virtual ~Window();
 
-  DISALLOW_COPY_AND_ASSIGN(Window);
+ private:
+  friend class base::RefCounted<Window>;
+
+  NativeWindow window_;
 };
 
 }  // namespace nu

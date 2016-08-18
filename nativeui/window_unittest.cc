@@ -15,9 +15,9 @@ class WindowTest : public testing::Test {
 
 TEST_F(WindowTest, SetVisible) {
   nu::Window::Options options;
-  nu::Window window(options);
-  window.SetVisible(true);
-  ASSERT_TRUE(window.IsVisible());
-  window.SetVisible(false);
-  ASSERT_FALSE(window.IsVisible());
+  scoped_refptr<nu::Window> window(new nu::Window(options));
+  window->SetVisible(true);
+  ASSERT_TRUE(window->IsVisible());
+  window->SetVisible(false);
+  ASSERT_FALSE(window->IsVisible());
 }
