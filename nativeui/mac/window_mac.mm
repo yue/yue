@@ -10,23 +10,8 @@
 
 namespace nu {
 
-Window::Window(const Options& options) {
-  NSUInteger styleMask = NSTitledWindowMask | NSMiniaturizableWindowMask |
-                         NSClosableWindowMask | NSResizableWindowMask |
-                         NSTexturedBackgroundWindowMask;
-  window_ = [[NSWindow alloc]
-      initWithContentRect:gfx::ScreenRectToNSRect(options.content_bounds)
-                styleMask:styleMask
-                  backing:NSBackingStoreBuffered
-                    defer:YES];
-}
-
 Window::~Window() {
   [window_ release];
-}
-
-void Window::PlatformSetContentView(View* view) {
-  [window_ setContentView:view->view()];
 }
 
 void Window::SetVisible(bool visible) {
@@ -38,6 +23,21 @@ void Window::SetVisible(bool visible) {
 
 bool Window::IsVisible() const {
   return [window_ isVisible];
+}
+
+void Window::PlatformInit(const Options& options) {
+  NSUInteger styleMask = NSTitledWindowMask | NSMiniaturizableWindowMask |
+                         NSClosableWindowMask | NSResizableWindowMask |
+                         NSTexturedBackgroundWindowMask;
+  window_ = [[NSWindow alloc]
+      initWithContentRect:gfx::ScreenRectToNSRect(options.content_bounds)
+                styleMask:styleMask
+                  backing:NSBackingStoreBuffered
+                    defer:YES];
+}
+
+void Window::PlatformSetContentView(View* view) {
+  [window_ setContentView:view->view()];
 }
 
 }  // namespace nu

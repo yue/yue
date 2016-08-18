@@ -7,6 +7,7 @@
 #include "base/message_loop/message_loop.h"
 #include "base/run_loop.h"
 #include "lua/callback.h"
+#include "nativeui/container.h"
 #include "nativeui/init.h"
 #include "nativeui/label.h"
 #include "nativeui/window.h"
@@ -44,9 +45,11 @@ int main(int argc, const char *argv[]) {
   nu::Initialize();
   nu::Window::Options options = { gfx::Rect(400, 400, 100, 100) };
   scoped_refptr<nu::Window> window(new nu::Window(options));
+  nu::Container* container = new nu::Container;
+  window->SetContentView(container);
   nu::Label* label = new nu::Label;
   label->SetText("test");
-  window->SetContentView(label);
+  container->AddChildView(label);
   window->SetVisible(true);
 
   base::RunLoop().Run();

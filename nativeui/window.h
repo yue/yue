@@ -32,6 +32,7 @@ NATIVEUI_EXPORT class Window : public base::RefCounted<Window> {
   friend class base::RefCounted<Window>;
 
   // Following platform implementations should only be called by wrappers.
+  void PlatformInit(const Options& options);
   void PlatformSetContentView(View* view);
 
   NativeWindow window_;

@@ -4,7 +4,14 @@
 
 #include "nativeui/window.h"
 
+#include "nativeui/container.h"
+
 namespace nu {
+
+Window::Window(const Options& options) : content_view_(new Container) {
+  PlatformInit(options);
+  PlatformSetContentView(content_view_.get());
+}
 
 void Window::SetContentView(View* view) {
   PlatformSetContentView(view);

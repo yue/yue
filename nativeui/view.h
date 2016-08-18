@@ -42,12 +42,12 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
 
   void set_view(NativeView view) { view_ = view; }
 
+  // Platform-dependent implementations.
+  virtual void PlatformAddChildView(View* view);
+  virtual void PlatformRemoveChildView(View* view);
+
  private:
   friend class base::RefCounted<View>;
-
-  // Following platform implementations should only be called by wrappers.
-  void PlatformAddChildView(View* view);
-  void PlatformRemoveChildView(View* view);
 
   // Relationships.
   View* parent_ = nullptr;

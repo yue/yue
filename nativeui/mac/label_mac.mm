@@ -11,8 +11,7 @@
 namespace nu {
 
 Label::Label() {
-  NSTextField* label =
-      [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 0, 0)];
+  NSTextField* label = [[NSTextField alloc] initWithFrame:NSZeroRect];
   label.drawsBackground = NO;
   label.bordered = NO;
   label.editable = NO;

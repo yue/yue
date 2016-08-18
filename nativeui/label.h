@@ -11,7 +11,7 @@
 
 namespace nu {
 
-class Label : public View {
+NATIVEUI_EXPORT class Label : public View {
  public:
   Label();
 
