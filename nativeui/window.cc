@@ -8,14 +8,15 @@
 
 namespace nu {
 
-Window::Window(const Options& options) : content_view_(new Container) {
+Window::Window(const Options& options) {
   PlatformInit(options);
-  PlatformSetContentView(content_view_.get());
+  SetContentView(new Container);
 }
 
 void Window::SetContentView(View* view) {
   PlatformSetContentView(view);
   content_view_ = view;
+  content_view_->Layout();
 }
 
 View* Window::GetContentView() const {

@@ -6,6 +6,7 @@ import("//testing/test.gni")
 
 source_set("nativeui") {
   sources = [
+    "container.cc",
     "container.h",
     "init.h",
     "types.h",
@@ -14,6 +15,10 @@ source_set("nativeui") {
     "label.h",
     "window.cc",
     "window.h",
+    "layout/fill_layout.cc",
+    "layout/fill_layout.h",
+    "layout/layout_manager.cc",
+    "layout/layout_manager.h",
     "mac/container_mac.mm",
     "mac/init_mac.mm",
     "mac/label_mac.mm",
@@ -29,6 +34,7 @@ source_set("nativeui") {
 
 test("nativeui_unittests") {
   sources = [
+    "container_unittest.cc",
     "label_unittest.cc",
     "view_unittest.cc",
     "window_unittest.cc",

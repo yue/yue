@@ -10,11 +10,13 @@ class LabelTest : public testing::Test {
  protected:
   void SetUp() override {
     nu::Initialize();
+    label_ = new nu::Label;
   }
+
+  scoped_refptr<nu::Label> label_;
 };
 
 TEST_F(LabelTest, SetText) {
-  scoped_refptr<nu::Label> label(new nu::Label);
-  label->SetText("test");
-  ASSERT_EQ(label->GetText(), "test");
+  label_->SetText("test");
+  ASSERT_EQ(label_->GetText(), "test");
 }

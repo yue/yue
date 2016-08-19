@@ -7,6 +7,7 @@
 #import <Cocoa/Cocoa.h>
 
 #include "base/logging.h"
+#include "nativeui/layout/layout_manager.h"
 
 @interface ContainerView : NSView {
  @private
@@ -30,8 +31,7 @@
   DCHECK_EQ(static_cast<int>([[self subviews] count]), wrapper_->child_count())
       << "Subviews do not match children views";
 
-  if (wrapper_->child_count() > 0)
-    wrapper_->child_at(0)->SetBounds(wrapper_->GetBounds());
+  wrapper_->Layout();
 }
 
 - (void)resizeSubviewsWithOldSize:(NSSize)oldBoundsSize {
@@ -42,21 +42,8 @@
 
 namespace nu {
 
-Container::Container() {
+void Container::PlatformInit() {
   set_view([[ContainerView alloc] initWithWrapper:this]);
-}
-
-Container::~Container() {
-}
-
-void Container::PlatformAddChildView(View* child) {
-  View::PlatformAddChildView(child);
-  [static_cast<ContainerView*>(view()) adjustSubviews];
-}
-
-void Container::PlatformRemoveChildView(View* child) {
-  View::PlatformRemoveChildView(child);
-  [static_cast<ContainerView*>(view()) adjustSubviews];
 }
 
 }  // namespace nu

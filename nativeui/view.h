@@ -41,6 +41,9 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
   void SetBounds(const gfx::Rect& bounds);
   gfx::Rect GetBounds();
 
+  // Make layout manager do a layout operation.
+  virtual void Layout();
+
  protected:
   View();
   virtual ~View();
@@ -48,8 +51,8 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
   void set_view(NativeView view) { view_ = view; }
 
   // Platform-dependent implementations.
-  virtual void PlatformAddChildView(View* view);
-  virtual void PlatformRemoveChildView(View* view);
+  void PlatformAddChildView(View* view);
+  void PlatformRemoveChildView(View* view);
 
  private:
   friend class base::RefCounted<View>;

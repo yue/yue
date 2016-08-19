@@ -27,6 +27,8 @@ void View::AddChildViewAt(View* view, int index) {
   view->parent_ = this;
   children_.insert(children_.begin() + index, view);
   PlatformAddChildView(view);
+
+  Layout();
 }
 
 void View::RemoveChildView(View* view) {
@@ -37,6 +39,12 @@ void View::RemoveChildView(View* view) {
   view->parent_ = nullptr;
   children_.erase(i);
   PlatformRemoveChildView(view);
+
+  Layout();
+}
+
+void View::Layout() {
+  // Do nothing in base.
 }
 
 }  // namespace nu

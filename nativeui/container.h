@@ -9,16 +9,25 @@
 
 namespace nu {
 
+class LayoutManager;
+
 NATIVEUI_EXPORT class Container : public View {
  public:
   Container();
 
- protected:
-  void PlatformAddChildView(View* view) override;
-  void PlatformRemoveChildView(View* view) override;
+  void SetLayoutManager(LayoutManager* layout_manager);
+  LayoutManager* GetLayoutManager() const;
+
+  // View:
+  void Layout() override;
 
  protected:
   ~Container() override;
+
+  void PlatformInit();
+
+ private:
+  scoped_refptr<LayoutManager> layout_manager_;
 };
 
 }  // namespace nu
