@@ -99,9 +99,9 @@ struct Type<bool> {
 };
 
 template<>
-struct Type<nullptr_t> {
+struct Type<std::nullptr_t> {
   static constexpr const char* name = "nil";
-  static inline void Push(State* state, nullptr_t) {
+  static inline void Push(State* state, std::nullptr_t) {
     lua_pushnil(state);
   }
 };

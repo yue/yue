@@ -28,6 +28,9 @@ namespace nu {
 #if defined(OS_MACOSX)
 typedef NSView* NativeView;
 typedef NSWindow* NativeWindow;
+#elif defined(OS_LINUX)
+typedef GtkWidget* NativeView;
+typedef GtkWindow* NativeWindow;
 #endif
 
 }  // namespace nu

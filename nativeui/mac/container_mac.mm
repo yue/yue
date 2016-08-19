@@ -7,7 +7,6 @@
 #import <Cocoa/Cocoa.h>
 
 #include "base/logging.h"
-#include "nativeui/layout/layout_manager.h"
 
 @interface ContainerView : NSView {
  @private

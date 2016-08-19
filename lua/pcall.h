@@ -24,7 +24,7 @@ inline bool PCall(State* state, ReturnType* result, const ArgTypes&... args) {
 
 // Passing nullptr means there is no result expected.
 template<typename... ArgTypes>
-inline bool PCall(State* state, nullptr_t, const ArgTypes&... args) {
+inline bool PCall(State* state, std::nullptr_t, const ArgTypes&... args) {
   Push(state, args...);
   return lua_pcall(state, sizeof...(ArgTypes), 0, 0) == LUA_OK;
 }

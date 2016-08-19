@@ -25,6 +25,11 @@ source_set("nativeui") {
     "layout/fill_layout.cc",
     "layout/fill_layout.h",
     "layout/layout_manager.h",
+    "gtk/container_gtk.cc",
+    "gtk/init_gtk.cc",
+    "gtk/label_gtk.cc",
+    "gtk/view_gtk.cc",
+    "gtk/window_gtk.cc",
     "mac/container_mac.mm",
     "mac/init_mac.mm",
     "mac/label_mac.mm",
@@ -39,9 +44,9 @@ source_set("nativeui") {
 
   if (is_linux) {
     if (use_gtk3) {
-      configs += [ "//build/config/linux/gtk3" ]
+      public_configs = [ "//build/config/linux/gtk3" ]
     } else {
-      configs += [ "//build/config/linux/gtk2" ]
+      public_configs = [ "//build/config/linux/gtk2" ]
     }
   }
 }

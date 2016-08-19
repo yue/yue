@@ -409,6 +409,13 @@ if (!is_linux) {
     "*_linux_unittest.cc",
     "*\blinux/*",
   ]
+  sources_assignment_filter += [
+    "*_gtk.h",
+    "*_gtk.cc",
+    "*_gtk_unittest.h",
+    "*_gtk_unittest.cc",
+    "*\bgtk/*",
+  ]
 }
 if (!is_android) {
   sources_assignment_filter += [

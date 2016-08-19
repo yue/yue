@@ -395,7 +395,7 @@ config("compiler") {
     # GNU extension).
     # TODO(thakis): Eventually switch this to c++11 instead,
     # http://crbug.com/427584
-    cflags_cc += [ "-std=gnu++11" ]
+    cflags_cc += [ "-std=c++11" ]
   } else if (!is_win && !is_nacl) {
     # TODO(mcgrathr) - the NaCl GCC toolchain doesn't support either gnu++11
     # or c++11; we technically don't need this toolchain any more, but there

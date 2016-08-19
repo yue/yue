@@ -4,6 +4,8 @@
 
 #include "nativeui/view.h"
 
+#include <algorithm>
+
 #include "base/logging.h"
 
 namespace nu {

@@ -19,6 +19,7 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
  public:
   NativeView view() const { return view_; }
 
+  // TODO(zcbenz): Child view belongs to container.
   // Add/Remove children.
   void AddChildView(View* view);
   void AddChildViewAt(View* view, int index);
