@@ -4,12 +4,13 @@
 
 #include "nativeui/init.h"
 
-#include <gtk/gtk.h>
+#include "nativeui/gtk/gtk_event_loop.h"
 
 namespace nu {
 
 void Initialize() {
   gtk_init(nullptr, nullptr);
+  GtkEventLoop::GetInstance();
 }
 
 }  // namespace nu

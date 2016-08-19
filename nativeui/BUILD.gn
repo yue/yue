@@ -26,6 +26,8 @@ source_set("nativeui") {
     "layout/fill_layout.h",
     "layout/layout_manager.h",
     "gtk/container_gtk.cc",
+    "gtk/gtk_event_loop.cc",
+    "gtk/gtk_event_loop.h",
     "gtk/init_gtk.cc",
     "gtk/label_gtk.cc",
     "gtk/view_gtk.cc",
