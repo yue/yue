@@ -6,6 +6,7 @@
 
 #import <Cocoa/Cocoa.h>
 
+#include "nativeui/container.h"
 #include "ui/gfx/mac/coordinate_conversion.h"
 
 namespace nu {
