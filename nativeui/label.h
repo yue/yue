@@ -13,7 +13,7 @@ namespace nu {
 
 NATIVEUI_EXPORT class Label : public View {
  public:
-  Label();
+  explicit Label(const std::string& text = "");
 
   void SetText(const std::string& text);
   std::string GetText();

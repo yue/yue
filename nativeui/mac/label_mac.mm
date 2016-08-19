@@ -10,12 +10,13 @@
 
 namespace nu {
 
-Label::Label() {
+Label::Label(const std::string& text) {
   NSTextField* label = [[NSTextField alloc] initWithFrame:NSZeroRect];
   label.drawsBackground = NO;
   label.bordered = NO;
   label.editable = NO;
   label.selectable = NO;
+  label.stringValue = base::SysUTF8ToNSString(text);
   set_view(label);
 }
 

@@ -18,11 +18,21 @@ View::~View() {
 }
 
 void View::SetBounds(const gfx::Rect& bounds) {
-  [view_ setFrame:gfx::ScreenRectToNSRect(bounds)];
+  CGRect frame = bounds.ToCGRect();
+  if (parent_) {
+    frame.origin.y = parent_->GetBounds().height() -
+                     (frame.origin.y + frame.size.height);
+  }
+  [view_ setFrame:frame];
 }
 
 gfx::Rect View::GetBounds() {
-  return gfx::ScreenRectFromNSRect([view_ frame]);
+  gfx::Rect bounds(NSRectToCGRect([view_ frame]));
+  if (parent_) {
+    bounds.set_y(parent_->GetBounds().height() -
+                 (bounds.y() + bounds.height()));
+  }
+  return bounds;
 }
 
 void View::PlatformAddChildView(View* view) {

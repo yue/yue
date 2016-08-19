@@ -10,6 +10,7 @@
 #include "nativeui/container.h"
 #include "nativeui/init.h"
 #include "nativeui/label.h"
+#include "nativeui/layout/box_layout.h"
 #include "nativeui/window.h"
 
 int main(int argc, const char *argv[]) {
@@ -46,10 +47,11 @@ int main(int argc, const char *argv[]) {
   nu::Window::Options options = { gfx::Rect(400, 400, 100, 100) };
   scoped_refptr<nu::Window> window(new nu::Window(options));
   nu::Container* container = new nu::Container;
+  container->SetLayoutManager(
+      new nu::BoxLayout(container, nu::BoxLayout::Vertical));
+  container->AddChildView(new nu::Label("line1"));
+  container->AddChildView(new nu::Label("line2"));
   window->SetContentView(container);
-  nu::Label* label = new nu::Label;
-  label->SetText("test");
-  container->AddChildView(label);
   window->SetVisible(true);
 
   base::RunLoop().Run();
