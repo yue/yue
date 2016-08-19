@@ -23,12 +23,4 @@ gfx::Rect View::GetBounds() {
   return gfx::Rect(0, 0, requisition.width, requisition.height);
 }
 
-void View::PlatformAddChildView(View* view) {
-  gtk_container_add(GTK_CONTAINER(view_), view->view());
-}
-
-void View::PlatformRemoveChildView(View* view) {
-  gtk_container_remove(GTK_CONTAINER(view_), view->view());
-}
-
 }  // namespace nu

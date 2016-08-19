@@ -15,7 +15,6 @@ source_set("nativeui") {
     "container.h",
     "init.h",
     "types.h",
-    "view.cc",
     "view.h",
     "label.h",
     "window.cc",

@@ -4,7 +4,6 @@
 
 #include "nativeui/init.h"
 #include "nativeui/label.h"
-#include "nativeui/window.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 class ViewTest : public testing::Test {
@@ -16,33 +15,6 @@ class ViewTest : public testing::Test {
 
   scoped_refptr<nu::View> view_;
 };
-
-TEST_F(ViewTest, AddChildView) {
-  nu::Label* v1 = new nu::Label;
-  nu::Label* v2 = new nu::Label;
-  view_->AddChildView(v1);
-  view_->AddChildView(v2);
-  EXPECT_EQ(view_->child_at(0), v1);
-  EXPECT_EQ(view_->child_at(1), v2);
-}
-
-TEST_F(ViewTest, AddChildViewAt) {
-  nu::Label* v1 = new nu::Label;
-  nu::Label* v2 = new nu::Label;
-  view_->AddChildView(v1);
-  view_->AddChildViewAt(v2, 0);
-  EXPECT_EQ(view_->child_at(0), v2);
-  EXPECT_EQ(view_->child_at(1), v1);
-}
-
-TEST_F(ViewTest, RemoveChildView) {
-  nu::Label* v1 = new nu::Label;
-  nu::Label* v2 = new nu::Label;
-  view_->AddChildView(v1);
-  view_->AddChildView(v2);
-  view_->RemoveChildView(v1);
-  EXPECT_EQ(view_->child_at(0), v2);
-}
 
 TEST_F(ViewTest, Bounds) {
   gfx::Rect bounds(100, 100, 200, 200);

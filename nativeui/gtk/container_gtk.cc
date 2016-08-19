@@ -11,5 +11,13 @@ void Container::PlatformInit() {
   g_object_ref_sink(view());
 }
 
+void Container::PlatformAddChildView(View* child) {
+  gtk_container_add(GTK_CONTAINER(view()), child->view());
+}
+
+void Container::PlatformRemoveChildView(View* child) {
+  gtk_container_remove(GTK_CONTAINER(view()), child->view());
+}
+
 }  // namespace nu
 

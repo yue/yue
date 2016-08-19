@@ -5,6 +5,8 @@
 #ifndef NATIVEUI_CONTAINER_H_
 #define NATIVEUI_CONTAINER_H_
 
+#include <vector>
+
 #include "nativeui/view.h"
 
 namespace nu {
@@ -15,18 +17,37 @@ NATIVEUI_EXPORT class Container : public View {
  public:
   Container();
 
+  // Layouts.
   void SetLayoutManager(LayoutManager* layout_manager);
   LayoutManager* GetLayoutManager() const;
 
-  // View:
-  void Layout() override;
+  virtual void Layout();
+
+  // Add/Remove children.
+  void AddChildView(View* view);
+  void AddChildViewAt(View* view, int index);
+  void RemoveChildView(View* view);
+
+  // Get children.
+  int child_count() const { return static_cast<int>(children_.size()); }
+  bool has_children() const { return !children_.empty(); }
+  View* child_at(int index) const {
+    if (index < 0 || index >= child_count())
+      return nullptr;
+    return children_[index].get();
+  }
 
  protected:
   ~Container() override;
 
   void PlatformInit();
+  void PlatformAddChildView(View* view);
+  void PlatformRemoveChildView(View* view);
 
  private:
+  // Relationships.
+  std::vector<scoped_refptr<View>> children_;
+
   scoped_refptr<LayoutManager> layout_manager_;
 };
 

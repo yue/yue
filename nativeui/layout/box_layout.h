@@ -9,7 +9,7 @@
 
 namespace nu {
 
-class BoxLayout : public LayoutManager {
+NATIVEUI_EXPORT class BoxLayout : public LayoutManager {
  public:
   enum Orientation {
     Horizontal,
@@ -18,7 +18,7 @@ class BoxLayout : public LayoutManager {
   explicit BoxLayout(Orientation orientation);
 
   // LayoutManager:
-  void Layout(View* host) override;
+  void Layout(Container* host) override;
 
  protected:
   ~BoxLayout() override;

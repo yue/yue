@@ -11,8 +11,13 @@ Window::~Window() {
 }
 
 void Window::SetVisible(bool visible) {
-  gtk_widget_set_visible(GTK_WIDGET(window_), visible);
-  gtk_widget_show_all(GTK_WIDGET(window_));
+  if (visible) {
+    gtk_window_set_focus_on_map(window_, false);
+    gtk_widget_set_visible(GTK_WIDGET(window_), visible);
+    gtk_window_set_focus_on_map(window_, true);
+  } else {
+    gtk_widget_set_visible(GTK_WIDGET(window_), visible);
+  }
 }
 
 bool Window::IsVisible() const {
@@ -26,11 +31,11 @@ void Window::PlatformInit(const Options& options) {
                               options.content_bounds.height());
 }
 
-void Window::PlatformSetContentView(View* view) {
+void Window::PlatformSetContentView(Container* container) {
   GtkWidget* child = gtk_bin_get_child(GTK_BIN(window_));
   if (child)
     gtk_container_remove(GTK_CONTAINER(window_), child);
-  gtk_container_add(GTK_CONTAINER(window_), view->view());
+  gtk_container_add(GTK_CONTAINER(window_), container->view());
 }
 
 }  // namespace nu

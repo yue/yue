@@ -12,7 +12,7 @@ BoxLayout::BoxLayout(Orientation orientation) : orientation_(orientation) {
 BoxLayout::~BoxLayout() {
 }
 
-void BoxLayout::Layout(View* host) {
+void BoxLayout::Layout(Container* host) {
   if (host->child_count() == 0)
     return;
 

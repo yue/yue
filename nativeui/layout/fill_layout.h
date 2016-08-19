@@ -9,12 +9,12 @@
 
 namespace nu {
 
-class FillLayout : public LayoutManager {
+NATIVEUI_EXPORT class FillLayout : public LayoutManager {
  public:
   FillLayout();
 
   // LayoutManager:
-  void Layout(View* host) override;
+  void Layout(Container* host) override;
 
  protected:
   ~FillLayout() override;

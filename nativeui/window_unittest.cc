@@ -3,7 +3,6 @@
 // LICENSE file.
 
 #include "nativeui/init.h"
-#include "nativeui/label.h"
 #include "nativeui/window.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
@@ -19,7 +18,7 @@ class WindowTest : public testing::Test {
 
 TEST_F(WindowTest, ContentView) {
   EXPECT_NE(window_->GetContentView(), nullptr);
-  scoped_refptr<nu::View> view(new nu::Label);
+  scoped_refptr<nu::Container> view(new nu::Container);
   window_->SetContentView(view.get());
   EXPECT_EQ(window_->GetContentView(), view.get());
 }

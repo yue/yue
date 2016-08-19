@@ -5,8 +5,6 @@
 #ifndef NATIVEUI_VIEW_H_
 #define NATIVEUI_VIEW_H_
 
-#include <vector>
-
 #include "base/memory/ref_counted.h"
 #include "nativeui/nativeui_export.h"
 #include "nativeui/types.h"
@@ -14,36 +12,23 @@
 
 namespace nu {
 
+class Container;
+
 // The base class for all kinds of views.
 NATIVEUI_EXPORT class View : public base::RefCounted<View> {
  public:
   NativeView view() const { return view_; }
 
-  // TODO(zcbenz): Child view belongs to container.
-  // Add/Remove children.
-  void AddChildView(View* view);
-  void AddChildViewAt(View* view, int index);
-  void RemoveChildView(View* view);
-
-  // Get children.
-  int child_count() const { return static_cast<int>(children_.size()); }
-  bool has_children() const { return !children_.empty(); }
-  View* child_at(int index) const {
-    if (index < 0 || index >= child_count())
-      return nullptr;
-    return children_[index].get();
-  }
-
-  // Get parent.
-  const View* parent() const { return parent_; }
-  View* parent() { return parent_; }
-
   // Change/Get position and size.
   void SetBounds(const gfx::Rect& bounds);
   gfx::Rect GetBounds();
 
-  // Make layout manager do a layout operation.
-  virtual void Layout();
+  // Get parent.
+  const Container* parent() const { return parent_; }
+  Container* parent() { return parent_; }
+
+  // Set parent, can only be used internally for now.
+  void set_parent(Container* parent) { parent_ = parent; }
 
  protected:
   View();
@@ -51,16 +36,11 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
 
   void set_view(NativeView view) { view_ = view; }
 
-  // Platform-dependent implementations.
-  void PlatformAddChildView(View* view);
-  void PlatformRemoveChildView(View* view);
-
  private:
   friend class base::RefCounted<View>;
 
   // Relationships.
-  View* parent_ = nullptr;
-  std::vector<scoped_refptr<View>> children_;
+  Container* parent_ = nullptr;
 
   // The native implementation.
   NativeView view_;

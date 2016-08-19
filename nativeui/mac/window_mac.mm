@@ -36,8 +36,8 @@ void Window::PlatformInit(const Options& options) {
                     defer:YES];
 }
 
-void Window::PlatformSetContentView(View* view) {
-  [window_ setContentView:view->view()];
+void Window::PlatformSetContentView(Container* container) {
+  [window_ setContentView:container->view()];
 }
 
 }  // namespace nu

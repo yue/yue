@@ -45,4 +45,12 @@ void Container::PlatformInit() {
   set_view([[ContainerView alloc] initWithWrapper:this]);
 }
 
+void Container::PlatformAddChildView(View* view) {
+  [view() addSubview:view->view_];
+}
+
+void Container::PlatformRemoveChildView(View* view) {
+  [view->view() removeFromSuperview];
+}
+
 }  // namespace nu

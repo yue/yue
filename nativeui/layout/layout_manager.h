@@ -5,13 +5,13 @@
 #ifndef NATIVEUI_LAYOUT_LAYOUT_MANAGER_H_
 #define NATIVEUI_LAYOUT_LAYOUT_MANAGER_H_
 
-#include "nativeui/view.h"
+#include "nativeui/container.h"
 
 namespace nu {
 
 NATIVEUI_EXPORT class LayoutManager : public base::RefCounted<LayoutManager> {
  public:
-  virtual void Layout(View* host) = 0;
+  virtual void Layout(Container* host) = 0;
 
  protected:
   LayoutManager() {}
