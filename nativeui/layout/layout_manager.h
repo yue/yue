@@ -11,19 +11,14 @@ namespace nu {
 
 NATIVEUI_EXPORT class LayoutManager : public base::RefCounted<LayoutManager> {
  public:
-  explicit LayoutManager(View* host);
-
-  virtual void Layout() = 0;
+  virtual void Layout(View* host) = 0;
 
  protected:
-  virtual ~LayoutManager();
-
-  View* host() const { return host_; }
+  LayoutManager() {}
+  virtual ~LayoutManager() {}
 
  private:
   friend class base::RefCounted<LayoutManager>;
-
-  View* host_;  // weak ptr.
 };
 
 }  // namespace nu

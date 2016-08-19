@@ -15,10 +15,10 @@ class BoxLayout : public LayoutManager {
     Horizontal,
     Vertical,
   };
-  BoxLayout(View* host, Orientation orientation);
+  explicit BoxLayout(Orientation orientation);
 
   // LayoutManager:
-  void Layout() override;
+  void Layout(View* host) override;
 
  protected:
   ~BoxLayout() override;

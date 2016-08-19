@@ -11,10 +11,10 @@ namespace nu {
 
 class FillLayout : public LayoutManager {
  public:
-  explicit FillLayout(View* host);
+  FillLayout();
 
   // LayoutManager:
-  void Layout() override;
+  void Layout(View* host) override;
 
  protected:
   ~FillLayout() override;

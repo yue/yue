@@ -6,7 +6,7 @@
 
 namespace nu {
 
-LayoutManager::LayoutManager(View* host) : host_(host) {
+LayoutManager::LayoutManager
 }
 
 LayoutManager::~LayoutManager() {

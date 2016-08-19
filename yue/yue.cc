@@ -47,10 +47,14 @@ int main(int argc, const char *argv[]) {
   nu::Window::Options options = { gfx::Rect(400, 400, 100, 100) };
   scoped_refptr<nu::Window> window(new nu::Window(options));
   nu::Container* container = new nu::Container;
-  container->SetLayoutManager(
-      new nu::BoxLayout(container, nu::BoxLayout::Vertical));
-  container->AddChildView(new nu::Label("line1"));
-  container->AddChildView(new nu::Label("line2"));
+  container->SetLayoutManager(new nu::BoxLayout(nu::BoxLayout::Horizontal));
+  container->AddChildView(new nu::Label("col1"));
+  container->AddChildView(new nu::Label("col2"));
+  nu::Container* sub = new nu::Container;
+  sub->SetLayoutManager(new nu::BoxLayout(nu::BoxLayout::Vertical));
+  sub->AddChildView(new nu::Label("line1"));
+  sub->AddChildView(new nu::Label("line2"));
+  container->AddChildView(sub);
   window->SetContentView(container);
   window->SetVisible(true);
 

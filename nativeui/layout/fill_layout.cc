@@ -6,15 +6,15 @@
 
 namespace nu {
 
-FillLayout::FillLayout(View* host) : LayoutManager(host) {
+FillLayout::FillLayout() {
 }
 
 FillLayout::~FillLayout() {
 }
 
-void FillLayout::Layout() {
-  if (host()->child_count() > 0)
-    host()->child_at(0)->SetBounds(host()->GetBounds());
+void FillLayout::Layout(View* host) {
+  if (host->child_count() > 0)
+    host->child_at(0)->SetBounds(host->GetBounds());
 }
 
 }  // namespace nu

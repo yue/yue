@@ -8,7 +8,7 @@
 
 namespace nu {
 
-Container::Container() : layout_manager_(new FillLayout(this)) {
+Container::Container() : layout_manager_(new FillLayout) {
   PlatformInit();
 }
 
@@ -26,7 +26,7 @@ LayoutManager* Container::GetLayoutManager() const {
 
 void Container::Layout() {
   DCHECK(layout_manager_.get());
-  layout_manager_->Layout();
+  layout_manager_->Layout(this);
 }
 
 }  // namespace nu
