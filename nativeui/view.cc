@@ -4,6 +4,8 @@
 
 #include "nativeui/view.h"
 
+#include "base/logging.h"
+
 namespace nu {
 
 void View::AddChildView(View* view) {
@@ -17,8 +19,10 @@ void View::AddChildViewAt(View* view, int index) {
     return;
 
   // TODO(zcbenz): support moving views.
-  if (view->parent_)
+  if (view->parent_) {
+    LOG(ERROR) << "The view already has a parent.";
     return;
+  }
 
   view->parent_ = this;
   children_.insert(children_.begin() + index, view);

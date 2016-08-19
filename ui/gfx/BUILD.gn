@@ -29,3 +29,22 @@ component("gfx") {
     ":gfx_export",
   ]
 }
+
+static_library("test_support") {
+  testonly = true
+  sources = [
+    "test/gfx_util.cc",
+    "test/gfx_util.h",
+  ]
+
+  public_deps = [
+    ":gfx",
+  ]
+
+  deps = [
+    "//base",
+    "//base/test:test_support",
+    "//testing/gtest",
+    "//ui/gfx/geometry",
+  ]
+}

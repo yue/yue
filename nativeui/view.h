@@ -10,6 +10,7 @@
 #include "base/memory/ref_counted.h"
 #include "nativeui/nativeui_export.h"
 #include "nativeui/types.h"
+#include "ui/gfx/geometry/rect.h"
 
 namespace nu {
 
@@ -35,6 +36,10 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
   // Get parent.
   const View* parent() const { return parent_; }
   View* parent() { return parent_; }
+
+  // Change/Get position and size.
+  void SetBounds(const gfx::Rect& bounds);
+  gfx::Rect GetBounds();
 
  protected:
   View();

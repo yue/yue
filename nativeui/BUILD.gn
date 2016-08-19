@@ -39,5 +39,6 @@ test("nativeui_unittests") {
     ":nativeui",
     "//base/test:test_support",
     "//testing/gtest",
+    "//ui/gfx:test_support",
   ]
 }

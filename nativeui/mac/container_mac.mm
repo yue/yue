@@ -30,10 +30,8 @@
   DCHECK_EQ(static_cast<int>([[self subviews] count]), wrapper_->child_count())
       << "Subviews do not match children views";
 
-  if ([[self subviews] count] > 0) {
-    NSView* content = [[self subviews] objectAtIndex:0];
-    [content setFrame:[self bounds]];
-  }
+  if (wrapper_->child_count() > 0)
+    wrapper_->child_at(0)->SetBounds(wrapper_->GetBounds());
 }
 
 - (void)resizeSubviewsWithOldSize:(NSSize)oldBoundsSize {

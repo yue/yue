@@ -43,3 +43,9 @@ TEST_F(ViewTest, RemoveChildView) {
   view_->RemoveChildView(v1);
   EXPECT_EQ(view_->child_at(0), v2);
 }
+
+TEST_F(ViewTest, Bounds) {
+  gfx::Rect bounds(100, 100, 200, 200);
+  view_->SetBounds(bounds);
+  EXPECT_EQ(view_->GetBounds(), bounds);
+}

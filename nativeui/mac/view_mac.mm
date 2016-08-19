@@ -6,6 +6,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+#include "ui/gfx/mac/coordinate_conversion.h"
+
 namespace nu {
 
 View::View() : view_(nil) {
@@ -13,6 +15,14 @@ View::View() : view_(nil) {
 
 View::~View() {
   [view_ release];
+}
+
+void View::SetBounds(const gfx::Rect& bounds) {
+  [view_ setFrame:gfx::ScreenRectToNSRect(bounds)];
+}
+
+gfx::Rect View::GetBounds() {
+  return gfx::ScreenRectFromNSRect([view_ frame]);
 }
 
 void View::PlatformAddChildView(View* view) {

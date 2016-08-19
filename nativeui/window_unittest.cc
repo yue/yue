@@ -18,7 +18,7 @@ class WindowTest : public testing::Test {
 };
 
 TEST_F(WindowTest, ContentView) {
-  EXPECT_EQ(window_->GetContentView(), nullptr);
+  EXPECT_NE(window_->GetContentView(), nullptr);
   scoped_refptr<nu::View> view(new nu::Label);
   window_->SetContentView(view.get());
   EXPECT_EQ(window_->GetContentView(), view.get());
