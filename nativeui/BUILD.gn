@@ -4,6 +4,11 @@
 
 import("//testing/test.gni")
 
+declare_args() {
+  # Whether to build for GTK+3.
+  use_gtk3 = false
+}
+
 source_set("nativeui") {
   sources = [
     "container.cc",
@@ -31,6 +36,14 @@ source_set("nativeui") {
     "//base",
     "//ui/gfx",
   ]
+
+  if (is_linux) {
+    if (use_gtk3) {
+      configs += [ "//build/config/linux/gtk3" ]
+    } else {
+      configs += [ "//build/config/linux/gtk2" ]
+    }
+  }
 }
 
 test("nativeui_unittests") {
