@@ -196,17 +196,24 @@ WindowImpl::~WindowImpl() {
   }
 }
 
-void WindowImpl::SetBounds(const gfx::Rect& dip_bounds) {
-  gfx::Rect bounds = DIPToScreenRect(hwnd_, dip_bounds);
+void WindowImpl::SetPixelBounds(const gfx::Rect& bounds) {
   SetWindowPos(hwnd_, NULL,
                bounds.x(), bounds.y(), bounds.width(), bounds.height(),
                SWP_NOACTIVATE | SWP_NOZORDER);
 }
 
-gfx::Rect WindowImpl::GetBounds() {
+gfx::Rect WindowImpl::GetPixelBounds() {
   RECT r;
   GetWindowRect(hwnd_, &r);
-  return ScreenToDIPRect(hwnd_, gfx::Rect(r));
+  return gfx::Rect(r);
+}
+
+void WindowImpl::SetBounds(const gfx::Rect& dip_bounds) {
+  SetPixelBounds(DIPToScreenRect(hwnd_, dip_bounds));
+}
+
+gfx::Rect WindowImpl::GetBounds() {
+  return ScreenToDIPRect(hwnd_, GetPixelBounds());
 }
 
 HICON WindowImpl::GetDefaultWindowIcon() const {

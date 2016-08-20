@@ -30,6 +30,9 @@ class WindowImpl {
              DWORD window_ex_style = 0);
   virtual ~WindowImpl();
 
+  void SetPixelBounds(const gfx::Rect& pixel_bounds);
+  gfx::Rect GetPixelBounds();
+
   void SetBounds(const gfx::Rect& bounds);
   gfx::Rect GetBounds();
 

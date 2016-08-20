@@ -8,6 +8,30 @@
 
 namespace nu {
 
+namespace {
+
+class TopLevelWindow : public WindowImpl {
+ public:
+  explicit TopLevelWindow(Window* delegate) : delegate_(delegate) {}
+
+  CR_BEGIN_MSG_MAP_EX(TopLevelWindow)
+    CR_MSG_WM_SIZE(OnSize)
+  CR_END_MSG_MAP()
+
+ private:
+  void OnSize(UINT param, const gfx::Size& size);
+
+  Window* delegate_;
+};
+
+void TopLevelWindow::OnSize(UINT param, const gfx::Size& size) {
+  if (delegate_->GetContentView())
+    delegate_->GetContentView()->view()->SetPixelBounds(
+        gfx::Rect(gfx::Point(), size));
+}
+
+}  // namespace
+
 Window::~Window() {
   delete window_;
 }
@@ -21,7 +45,7 @@ bool Window::IsVisible() const {
 }
 
 void Window::PlatformInit(const Options& options) {
-  window_ = new WindowImpl;
+  window_ = new TopLevelWindow(this);
   window_->SetBounds(options.content_bounds);
 }
 
