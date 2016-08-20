@@ -29,6 +29,8 @@ void Window::PlatformInit(const Options& options) {
   gtk_window_set_default_size(window_,
                               options.content_bounds.width(),
                               options.content_bounds.height());
+  gtk_window_move(window_, options.content_bounds.x(),
+                           options.content_bounds.y());
 }
 
 void Window::PlatformSetContentView(Container* container) {

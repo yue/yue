@@ -6,9 +6,27 @@
 
 namespace nu {
 
+namespace {
+
+void OnSizeAllocate(GtkWidget* view, GtkAllocation* alloc,
+                    Container* container) {
+  // Ignore empty sizes on initialization.
+  if (alloc->x == -1 && alloc->y == -1 &&
+      alloc->width == 1 && alloc->height == 1)
+    return;
+
+  container->Layout();
+}
+
+}  // namespace
+
 void Container::PlatformInit() {
   set_view(gtk_fixed_new());
   g_object_ref_sink(view());
+  gtk_widget_show(view());
+
+  g_signal_connect_after(
+      view(), "size-allocate", G_CALLBACK(OnSizeAllocate), this);
 }
 
 void Container::PlatformAddChildView(View* child) {
@@ -20,4 +38,3 @@ void Container::PlatformRemoveChildView(View* child) {
 }
 
 }  // namespace nu
-

@@ -4,6 +4,8 @@
 
 #include "nativeui/view.h"
 
+#include "nativeui/container.h"
+
 namespace nu {
 
 View::View() : view_(nullptr) {
@@ -14,13 +16,20 @@ View::~View() {
 }
 
 void View::SetBounds(const gfx::Rect& bounds) {
-  gtk_widget_set_size_request(view_, bounds.width(), bounds.height());
+  GdkRectangle rect = { bounds.x(), bounds.y(),
+                        bounds.width(), bounds.height() };
+  if (parent()) {
+    // The size allocation is relative to the window instead of parent.
+    rect.x += parent()->GetBounds().x();
+    rect.y += parent()->GetBounds().y();
+  }
+  gtk_widget_size_allocate(view_, &rect);
 }
 
 gfx::Rect View::GetBounds() {
-  GtkRequisition requisition;
-  gtk_widget_size_request(view_, &requisition);
-  return gfx::Rect(0, 0, requisition.width, requisition.height);
+  GdkRectangle rect;
+  gtk_widget_get_allocation(view_, &rect);
+  return gfx::Rect(rect.x, rect.y, rect.width, rect.height);
 }
 
 }  // namespace nu

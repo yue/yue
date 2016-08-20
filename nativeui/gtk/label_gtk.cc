@@ -9,6 +9,7 @@ namespace nu {
 Label::Label(const std::string& text) {
   set_view(gtk_label_new(text.c_str()));
   g_object_ref_sink(view());
+  gtk_widget_show(view());
 }
 
 Label::~Label() {

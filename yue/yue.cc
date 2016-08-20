@@ -44,7 +44,7 @@ int main(int argc, const char *argv[]) {
   }
 
   nu::Initialize();
-  nu::Window::Options options = { gfx::Rect(400, 400, 100, 100) };
+  nu::Window::Options options = { gfx::Rect(100, 100, 400, 400) };
   scoped_refptr<nu::Window> window(new nu::Window(options));
   nu::Container* container = new nu::Container;
   container->SetLayoutManager(new nu::BoxLayout(nu::BoxLayout::Horizontal));
