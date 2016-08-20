@@ -85,7 +85,7 @@ declare_args() {
   # Enable fatal linker warnings. Building Chromium with certain versions
   # of binutils can cause linker warning.
   # See: https://bugs.chromium.org/p/chromium/issues/detail?id=457359
-  fatal_linker_warnings = true
+  fatal_linker_warnings = false
 }
 
 if (is_clang && !is_nacl) {
