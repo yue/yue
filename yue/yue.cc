@@ -2,6 +2,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
+#include "base/at_exit.h"
 #include "base/command_line.h"
 #include "base/logging.h"
 #include "base/message_loop/message_loop.h"
@@ -14,6 +15,7 @@
 #include "nativeui/window.h"
 
 int main(int argc, const char *argv[]) {
+  base::AtExitManager exit_manager;
   base::CommandLine::Init(argc, argv);
 
   logging::LoggingSettings settings;
@@ -35,6 +37,7 @@ int main(int argc, const char *argv[]) {
   }
   luaL_openlibs(state);
 
+#if 0
   if (luaL_loadfile(state, cmd->GetArgs()[0].c_str()) != LUA_OK ||
       !lua::PCall(state, nullptr)) {
     std::string error;
@@ -42,6 +45,7 @@ int main(int argc, const char *argv[]) {
     LOG(ERROR) << "Error run script: " << error;
     return 1;
   }
+#endif
 
   nu::Initialize();
   nu::Window::Options options = { gfx::Rect(100, 100, 400, 400) };

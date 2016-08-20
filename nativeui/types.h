@@ -7,9 +7,7 @@
 
 #include "build/build_config.h"
 
-#if defined(OS_WIN)
-#include <windows.h>  // NOLINT
-#elif defined(OS_LINUX)
+#if defined(OS_LINUX)
 #include <gtk/gtk.h>  // NOLINT
 #endif
 
@@ -25,12 +23,19 @@ class NSWindow;
 
 namespace nu {
 
+#if defined(OS_WIN)
+class WindowImpl;
+#endif
+
 #if defined(OS_MACOSX)
 typedef NSView* NativeView;
 typedef NSWindow* NativeWindow;
 #elif defined(OS_LINUX)
 typedef GtkWidget* NativeView;
 typedef GtkWindow* NativeWindow;
+#elif defined(OS_WIN)
+typedef WindowImpl* NativeView;
+typedef WindowImpl* NativeWindow;
 #endif
 
 }  // namespace nu

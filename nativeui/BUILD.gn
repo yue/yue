@@ -36,6 +36,15 @@ source_set("nativeui") {
     "mac/label_mac.mm",
     "mac/view_mac.mm",
     "mac/window_mac.mm",
+    "win/container_win.cc",
+    "win/init_win.cc",
+    "win/label_win.cc",
+    "win/view_win.cc",
+    "win/screen.cc",
+    "win/screen.h",
+    "win/window_impl.cc",
+    "win/window_impl.h",
+    "win/window_win.cc",
   ]
 
   deps = [
@@ -49,6 +58,10 @@ source_set("nativeui") {
     } else {
       public_configs = [ "//build/config/linux/gtk2" ]
     }
+  } else if (is_win) {
+    libs = [
+      "gdi32.lib",
+    ]
   }
 }
 

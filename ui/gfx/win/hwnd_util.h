@@ -40,10 +40,6 @@ GFX_EXPORT void CenterAndSizeWindow(HWND parent,
 // CreateWindow.
 GFX_EXPORT void CheckWindowCreated(HWND hwnd);
 
-// Shows |window|'s system menu (at a specified |point| in screen coordinates).
-GFX_EXPORT void ShowSystemMenu(HWND window);
-GFX_EXPORT void ShowSystemMenuAtPoint(HWND window, const gfx::Point& point);
-
 // Returns the window you can use to parent a top level window.
 // Note that in some cases we create child windows not parented to its final
 // container so in those cases you should pass true in |get_real_hwnd|.

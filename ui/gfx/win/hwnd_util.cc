@@ -203,29 +203,6 @@ void CheckWindowCreated(HWND hwnd) {
   }
 }
 
-void ShowSystemMenu(HWND window) {
-  RECT rect;
-  GetWindowRect(window, &rect);
-  Point point = Point(base::i18n::IsRTL() ? rect.right : rect.left, rect.top);
-  static const int kSystemMenuOffset = 10;
-  point.Offset(base::i18n::IsRTL() ? -kSystemMenuOffset : kSystemMenuOffset,
-               kSystemMenuOffset);
-  ShowSystemMenuAtPoint(window, point);
-}
-
-void ShowSystemMenuAtPoint(HWND window, const Point& point) {
-  UINT flags = TPM_LEFTBUTTON | TPM_RIGHTBUTTON | TPM_RETURNCMD;
-  if (base::i18n::IsRTL())
-    flags |= TPM_RIGHTALIGN;
-  HMENU menu = GetSystemMenu(window, FALSE);
-
-  const int command =
-      TrackPopupMenu(menu, flags, point.x(), point.y(), 0, window, NULL);
-
-  if (command)
-    SendMessage(window, WM_SYSCOMMAND, command, 0);
-}
-
 extern "C" {
   typedef HWND (*RootWindow)();
 }
