@@ -4,6 +4,7 @@
 
 #include "nativeui/init.h"
 #include "nativeui/label.h"
+#include "nativeui/layout/fill_layout.h"
 #include "nativeui/window.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
@@ -69,4 +70,10 @@ TEST_F(ContainerTest, Layout) {
   EXPECT_EQ(container_->layout_count(), 2);
   container_->SetBounds(gfx::Rect(0, 0, 100, 200));
   EXPECT_EQ(container_->layout_count(), 3);
+}
+
+TEST_F(ContainerTest, ChangeLayoutManager) {
+  EXPECT_EQ(container_->layout_count(), 1);
+  container_->SetLayoutManager(new nu::FillLayout);
+  EXPECT_EQ(container_->layout_count(), 2);
 }

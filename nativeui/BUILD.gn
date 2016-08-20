@@ -58,6 +58,8 @@ test("nativeui_unittests") {
     "label_unittest.cc",
     "view_unittest.cc",
     "window_unittest.cc",
+    "layout/fill_layout_unittest.cc",
+    "layout/box_layout_unittest.cc",
     "test/run_all_unittests.cc",
   ]
 
