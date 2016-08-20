@@ -20,9 +20,16 @@ void View::SetBounds(const gfx::Rect& bounds) {
   view_->SetBounds(bounds);
 }
 
-gfx::Rect View::GetBounds() {
+gfx::Rect View::GetBounds() const {
   return view_->GetBounds();
 }
 
-}  // namespace nu
+void View::SetPixelBounds(const gfx::Rect& bounds) {
+  view_->SetPixelBounds(bounds);
+}
 
+gfx::Rect View::GetPixelBounds() const {
+  return view_->GetPixelBounds();
+}
+
+}  // namespace nu

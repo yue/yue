@@ -27,13 +27,21 @@ void View::SetBounds(const gfx::Rect& bounds) {
   [view_ setFrame:frame];
 }
 
-gfx::Rect View::GetBounds() {
+gfx::Rect View::GetBounds() const {
   gfx::Rect bounds(NSRectToCGRect([view_ frame]));
   if (parent_) {
     bounds.set_y(parent_->GetBounds().height() -
                  (bounds.y() + bounds.height()));
   }
   return bounds;
+}
+
+void View::SetPixelBounds(const gfx::Rect& bounds) {
+  SetBounds(bounds);
+}
+
+gfx::Rect View::GetPixelBounds() const {
+  return GetBounds();
 }
 
 }  // namespace nu

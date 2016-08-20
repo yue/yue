@@ -21,7 +21,11 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
 
   // Change/Get position and size.
   void SetBounds(const gfx::Rect& bounds);
-  gfx::Rect GetBounds();
+  gfx::Rect GetBounds() const;
+
+  // The real pixel bounds that depends on the scale factor.
+  void SetPixelBounds(const gfx::Rect& bounds);
+  gfx::Rect GetPixelBounds() const;
 
   // Get parent.
   const Container* parent() const { return parent_; }

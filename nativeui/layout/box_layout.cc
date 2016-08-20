@@ -17,17 +17,17 @@ void BoxLayout::Layout(Container* host) {
     return;
 
   if (orientation_ == Horizontal) {
-    int per_width = host->GetBounds().width() / host->child_count();
-    int height = host->GetBounds().height();
+    int per_width = host->GetPixelBounds().width() / host->child_count();
+    int height = host->GetPixelBounds().height();
     for (int i = 0; i < host->child_count(); ++i) {
-      host->child_at(i)->SetBounds(
+      host->child_at(i)->SetPixelBounds(
           gfx::Rect(per_width * i, 0, per_width, height));
     }
   } else {
-    int per_height = host->GetBounds().height() / host->child_count();
-    int width = host->GetBounds().width();
+    int per_height = host->GetPixelBounds().height() / host->child_count();
+    int width = host->GetPixelBounds().width();
     for (int i = 0; i < host->child_count(); ++i) {
-      host->child_at(i)->SetBounds(
+      host->child_at(i)->SetPixelBounds(
           gfx::Rect(0, per_height * i, width, per_height));
     }
   }

@@ -26,10 +26,18 @@ void View::SetBounds(const gfx::Rect& bounds) {
   gtk_widget_size_allocate(view_, &rect);
 }
 
-gfx::Rect View::GetBounds() {
+gfx::Rect View::GetBounds() const {
   GdkRectangle rect;
   gtk_widget_get_allocation(view_, &rect);
   return gfx::Rect(rect.x, rect.y, rect.width, rect.height);
+}
+
+void View::SetPixelBounds(const gfx::Rect& bounds) {
+  SetBounds(bounds);
+}
+
+gfx::Rect View::GetPixelBounds() const {
+  return GetBounds();
 }
 
 }  // namespace nu
