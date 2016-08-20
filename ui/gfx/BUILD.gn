@@ -16,6 +16,10 @@ component("gfx") {
   sources = [
     "mac/coordinate_conversion.h",
     "mac/coordinate_conversion.mm",
+    "win/hwnd_util.cc",
+    "win/hwnd_util.h",
+    "win/msg_util.h",
+
   ]
 
   # This is part of the gfx component in the component build.
