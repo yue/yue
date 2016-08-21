@@ -222,8 +222,15 @@ void WindowImpl::SetPixelBounds(const gfx::Rect& bounds) {
 
 gfx::Rect WindowImpl::GetPixelBounds() {
   RECT r;
-  GetWindowRect(hwnd_, &r);
-  return gfx::Rect(r);
+  ::GetWindowRect(hwnd_, &r);
+  gfx::Rect bounds(r);
+  if (::GetParent(hwnd_)) {
+    ::MapWindowPoints(HWND_DESKTOP, GetParent(hwnd_),
+                      reinterpret_cast<LPPOINT>(&r), 1);
+    bounds.set_x(r.left);
+    bounds.set_y(r.top);
+  }
+  return bounds;
 }
 
 void WindowImpl::SetBounds(const gfx::Rect& dip_bounds) {

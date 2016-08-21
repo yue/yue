@@ -12,7 +12,6 @@ SubwinView::SubwinView(base::StringPiece16 class_name,
                        DWORD window_style, DWORD window_ex_style)
     : WindowImpl(class_name, SubwinHolder::GetInstance()->hwnd(),
                  window_style, window_ex_style) {
-  ShowWindow(hwnd(), SW_SHOW);
 }
 
 SubwinView::~SubwinView() {
