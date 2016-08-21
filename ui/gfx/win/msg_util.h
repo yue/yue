@@ -24,7 +24,7 @@
 // but must use BEGIN_MSG_MAP_EX for classes that don't derive from
 // CWindowImpl/CDialogImpl.
 
-#define CR_BEGIN_MSG_MAP_EX(theClass)                             \
+#define CR_BEGIN_MSG_MAP_EX(theClass, parent)                     \
  public:                                                          \
   BOOL m_bMsgHandled;                                             \
   /* "handled" management for cracked handlers */                 \
@@ -37,17 +37,21 @@
                             LRESULT& lResult,                     \
                             DWORD dwMsgMapID = 0) override {      \
     BOOL bOldMsgHandled = m_bMsgHandled;                          \
-    BOOL bRet = _ProcessWindowMessage(                            \
+    int bRet = _ProcessWindowMessage(                             \
         hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID);         \
     m_bMsgHandled = bOldMsgHandled;                               \
+    if (bRet == 2)  /* neither true not false */ {                \
+      return parent::ProcessWindowMessage(                        \
+          hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID);       \
+    }                                                             \
     return bRet;                                                  \
   }                                                               \
-  BOOL _ProcessWindowMessage(HWND hWnd,                           \
-                             UINT uMsg,                           \
-                             WPARAM wParam,                       \
-                             LPARAM lParam,                       \
-                             LRESULT& lResult,                    \
-                             DWORD dwMsgMapID) {                  \
+  int _ProcessWindowMessage(HWND hWnd,                            \
+                            UINT uMsg,                            \
+                            WPARAM wParam,                        \
+                            LPARAM lParam,                        \
+                            LRESULT& lResult,                     \
+                            DWORD dwMsgMapID) {                   \
     BOOL bHandled = TRUE;                                         \
     hWnd;                                                         \
     uMsg;                                                         \
@@ -62,8 +66,8 @@
 #define CR_END_MSG_MAP()                                      \
   break;                                                      \
   default:                                                    \
-    NOTREACHED() << "Invalid message map ID: " << dwMsgMapID; \
-    break;                                                    \
+    LOG(ERROR) << "parent to: " << dwMsgMapID;                \
+    return 2;                                                 \
     }                                                         \
     return FALSE;                                             \
     }

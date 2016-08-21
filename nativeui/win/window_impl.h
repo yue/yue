@@ -22,12 +22,6 @@ namespace nu {
 // a HWND. This class also hosts the windows procedure used by all Windows.
 class WindowImpl {
  public:
-  static const DWORD kWindowDefaultChildStyle;
-  static const DWORD kWindowDefaultStyle;
-
-  WindowImpl(base::StringPiece16 class_name = L"",
-             DWORD window_style = kWindowDefaultStyle,
-             DWORD window_ex_style = 0);
   virtual ~WindowImpl();
 
   void SetPixelBounds(const gfx::Rect& pixel_bounds);
@@ -40,6 +34,14 @@ class WindowImpl {
   HWND hwnd() const { return hwnd_; }
 
  protected:
+  static const DWORD kWindowDefaultChildStyle;
+  static const DWORD kWindowDefaultStyle;
+
+  WindowImpl(base::StringPiece16 class_name = L"",
+             HWND parent = NULL,
+             DWORD window_style = kWindowDefaultStyle,
+             DWORD window_ex_style = 0);
+
   // Returns the default window icon to use for windows of this type.
   virtual HICON GetDefaultWindowIcon() const;
   virtual HICON GetSmallWindowIcon() const;

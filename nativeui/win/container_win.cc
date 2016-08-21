@@ -4,12 +4,12 @@
 
 #include "nativeui/container.h"
 
-#include "nativeui/win/window_impl.h"
+#include "nativeui/win/subwin_view.h"
 
 namespace nu {
 
 void Container::PlatformInit() {
-  set_view(new WindowImpl);
+  set_view(new SubwinView());
 }
 
 void Container::PlatformAddChildView(View* child) {

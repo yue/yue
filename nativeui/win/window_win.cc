@@ -14,7 +14,8 @@ class TopLevelWindow : public WindowImpl {
  public:
   explicit TopLevelWindow(Window* delegate) : delegate_(delegate) {}
 
-  CR_BEGIN_MSG_MAP_EX(TopLevelWindow)
+ protected:
+  CR_BEGIN_MSG_MAP_EX(TopLevelWindow, WindowImpl)
     CR_MSG_WM_SIZE(OnSize)
   CR_END_MSG_MAP()
 

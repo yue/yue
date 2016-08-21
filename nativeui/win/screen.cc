@@ -47,7 +47,7 @@ float GetScaleFactorForHWND(HWND hwnd) {
 
   DCHECK(monitor);
   if (base::win::IsProcessPerMonitorDpiAware()) {
-    static auto get_dpi_for_monitor_func = [](){
+    static auto get_dpi_for_monitor_func = []() {
       using GetDpiForMonitorPtr = decltype(::GetDpiForMonitor)*;
       HMODULE shcore_dll = ::LoadLibrary(L"shcore.dll");
       if (shcore_dll) {

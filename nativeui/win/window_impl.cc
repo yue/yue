@@ -163,14 +163,25 @@ const DWORD WindowImpl::kWindowDefaultChildStyle =
 const DWORD WindowImpl::kWindowDefaultStyle =
     WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN;
 
-WindowImpl::WindowImpl(base::StringPiece16 class_name,
+WindowImpl::WindowImpl(base::StringPiece16 class_name, HWND parent,
                        DWORD window_style, DWORD window_ex_style)
     : class_style_(CS_DBLCLKS), hwnd_(NULL) {
+  if (parent == HWND_DESKTOP) {
+    // Only non-child windows can have HWND_DESKTOP (0) as their parent.
+    CHECK((window_style & WS_CHILD) == 0);
+    parent = gfx::GetWindowToParentTo(false);
+  } else if (parent == ::GetDesktopWindow()) {
+    // Any type of window can have the "Desktop Window" as their parent.
+    parent = gfx::GetWindowToParentTo(true);
+  } else if (parent != HWND_MESSAGE) {
+    CHECK(::IsWindow(parent));
+  }
+
   HWND hwnd = CreateWindowEx(
       window_ex_style,
       class_name.empty() ? reinterpret_cast<wchar_t*>(GetWindowClassAtom())
                          : class_name.data(),
-      NULL, window_style, -1, -1, 1, 1, NULL, NULL, NULL, this);
+      NULL, window_style, -1, -1, 1, 1, parent, NULL, NULL, this);
   // First nccalcszie (during CreateWindow) for captioned windows is
   // deliberately ignored so force a second one here to get the right
   // non-client set up.
@@ -180,19 +191,23 @@ WindowImpl::WindowImpl(base::StringPiece16 class_name,
                  SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOREDRAW);
   }
 
-  gfx::CheckWindowCreated(hwnd_);
-
-  // The window procedure should have set the data for us.
-  CHECK_EQ(this, gfx::GetWindowUserData(hwnd));
+  // For custom window we the hwnd_ is assigned in WM_NCCREATE.
+  if (class_name.empty()) {
+    // The window procedure should have set the data for us.
+    gfx::CheckWindowCreated(hwnd_);
+    CHECK_EQ(this, gfx::GetWindowUserData(hwnd));
+  } else {
+    hwnd_ = hwnd;
+    gfx::SetWindowUserData(hwnd, this);
+  }
 }
 
 WindowImpl::~WindowImpl() {
   if (::IsWindow(hwnd_)) {
-    DCHECK_EQ(::GetParent(hwnd_), static_cast<HANDLE>(NULL))
-        << "Killing a window while it is still a child";
-
     gfx::SetWindowUserData(hwnd_, NULL);
-    ::DestroyWindow(hwnd_);
+
+    if (::GetParent(hwnd_) == NULL)
+      ::DestroyWindow(hwnd_);
   }
 }
 
@@ -240,7 +255,7 @@ LRESULT WindowImpl::OnWndProc(UINT message, WPARAM w_param, LPARAM l_param) {
 }
 
 BOOL WindowImpl::ProcessWindowMessage(
-    HWND, UINT, WPARAM, LPARAM, LRESULT&, DWORD) {
+    HWND, UINT, WPARAM, LPARAM, LRESULT&, DWORD dwMsgMapID) {
   return false;
 }
 

@@ -6,12 +6,12 @@
 
 #include "base/strings/string_util.h"
 #include "base/strings/utf_string_conversions.h"
-#include "nativeui/win/window_impl.h"
+#include "nativeui/win/subwin_view.h"
 
 namespace nu {
 
 Label::Label(const std::string& text) {
-  set_view(new WindowImpl);
+  set_view(new SubwinView(base::StringPiece16(L"static")));
 }
 
 Label::~Label() {
@@ -30,5 +30,3 @@ std::string Label::GetText() {
 }
 
 }  // namespace nu
-
-
