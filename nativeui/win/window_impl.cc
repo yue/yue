@@ -200,6 +200,10 @@ WindowImpl::WindowImpl(base::StringPiece16 class_name, HWND parent,
     hwnd_ = hwnd;
     gfx::SetWindowUserData(hwnd, this);
   }
+
+  // Cache the window's scale factor.
+  // TODO(zcbenz): Refresh the window when DPI changes.
+  scale_factor_ = GetScaleFactorForHWND(hwnd_);
 }
 
 WindowImpl::~WindowImpl() {
@@ -234,11 +238,11 @@ gfx::Rect WindowImpl::GetPixelBounds() {
 }
 
 void WindowImpl::SetBounds(const gfx::Rect& dip_bounds) {
-  SetPixelBounds(DIPToScreenRect(hwnd_, dip_bounds));
+  SetPixelBounds(ScaleToEnclosingRect(dip_bounds, scale_factor_));
 }
 
 gfx::Rect WindowImpl::GetBounds() {
-  return ScreenToDIPRect(hwnd_, GetPixelBounds());
+  return ScaleToEnclosingRect(GetPixelBounds(), 1.0f / scale_factor_);
 }
 
 HICON WindowImpl::GetDefaultWindowIcon() const {

@@ -73,6 +73,9 @@ class WindowImpl {
   // Style of the class to use.
   UINT class_style_;
 
+  // The scale factor of current window.
+  float scale_factor_;
+
   // Our hwnd.
   HWND hwnd_;
 

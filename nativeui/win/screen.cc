@@ -9,6 +9,7 @@
 
 #include "base/win/scoped_hdc.h"
 #include "base/win/win_util.h"
+#include "ui/gfx/geometry/rect.h"
 
 namespace nu {
 
@@ -41,6 +42,8 @@ float GetDPIScale() {
   return GetScalingFactorFromDPI(GetDPI().width());
 }
 
+}  // namespace
+
 // Returns |hwnd|'s scale factor.
 float GetScaleFactorForHWND(HWND hwnd) {
   HMONITOR monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
@@ -67,20 +70,6 @@ float GetScaleFactorForHWND(HWND hwnd) {
     }
   }
   return GetDPIScale();
-}
-
-}  // namespace
-
-gfx::Rect ScreenToDIPRect(HWND hwnd, const gfx::Rect& pixel_bounds) {
-  float scale_factor = GetScaleFactorForHWND(hwnd);
-  gfx::Rect dip_rect = ScaleToEnclosingRect(pixel_bounds, 1.0f / scale_factor);
-  return dip_rect;
-}
-
-gfx::Rect DIPToScreenRect(HWND hwnd, const gfx::Rect& dip_bounds) {
-  float scale_factor = GetScaleFactorForHWND(hwnd);
-  gfx::Rect screen_rect = ScaleToEnclosingRect(dip_bounds, scale_factor);
-  return screen_rect;
 }
 
 }  // namespace nu

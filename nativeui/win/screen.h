@@ -7,21 +7,10 @@
 
 #include <windows.h>
 
-#include "ui/gfx/geometry/rect.h"
-
 namespace nu {
 
-// Converts a screen physical rect to a screen DIP rect.
-// The DPI scale is performed relative to the display nearest to |hwnd|.
-// If |hwnd| is null, scaling will be performed to the display nearest to
-// |pixel_bounds|.
-gfx::Rect ScreenToDIPRect(HWND hwnd, const gfx::Rect& pixel_bounds);
-
-// Converts a screen DIP rect to a screen physical rect.
-// The DPI scale is performed relative to the display nearest to |hwnd|.
-// If |hwnd| is null, scaling will be performed to the display nearest to
-// |dip_bounds|.
-gfx::Rect DIPToScreenRect(HWND hwnd, const gfx::Rect& dip_bounds);
+// Returns |hwnd|'s scale factor.
+float GetScaleFactorForHWND(HWND hwnd);
 
 }  // namespace nu
 
