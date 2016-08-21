@@ -11,7 +11,10 @@
 namespace nu {
 
 Label::Label(const std::string& text) {
-  set_view(new SubwinView(base::StringPiece16(L"static")));
+  set_view(new SubwinView(
+      base::StringPiece16(L"static"),
+      WS_CHILD | WS_VISIBLE | SS_CENTER | SS_CENTERIMAGE));
+  SetText(text);
 }
 
 Label::~Label() {
@@ -24,7 +27,7 @@ void Label::SetText(const std::string& text) {
 
 std::string Label::GetText() {
   base::string16 title;
-  int length = GetWindowTextLength(view()->hwnd()) + 1;
+  int length = GetWindowTextLengthW(view()->hwnd()) + 1;
   GetWindowTextW(view()->hwnd(), base::WriteInto(&title, length), length);
   return base::UTF16ToUTF8(title);
 }

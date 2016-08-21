@@ -8,8 +8,30 @@
 
 namespace nu {
 
+namespace {
+
+class ContainerView : public SubwinView {
+ public:
+  explicit ContainerView(Container* container) : container_(container) {}
+  ~ContainerView() override {}
+
+ protected:
+  CR_BEGIN_MSG_MAP_EX(SubwinView, WindowImpl)
+    CR_MSG_WM_SIZE(OnSize)
+  CR_END_MSG_MAP()
+
+  void OnSize(UINT param, const gfx::Size& size) {
+    container_->Layout();
+  }
+
+ private:
+  Container* container_;
+};
+
+}  // namespace
+
 void Container::PlatformInit() {
-  set_view(new SubwinView());
+  set_view(new ContainerView(this));
 }
 
 void Container::PlatformAddChildView(View* child) {

@@ -16,13 +16,6 @@ class SubwinView : public WindowImpl {
              DWORD window_style = kWindowDefaultChildStyle,
              DWORD window_ex_style = 0);
   ~SubwinView() override;
-
- protected:
-  CR_BEGIN_MSG_MAP_EX(SubwinView, WindowImpl)
-    CR_MSG_WM_SIZE(OnSize)
-  CR_END_MSG_MAP()
-
-  virtual void OnSize(UINT param, const gfx::Size& size);
 };
 
 }  // namespace nu

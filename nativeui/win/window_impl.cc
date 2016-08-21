@@ -203,18 +203,21 @@ WindowImpl::WindowImpl(base::StringPiece16 class_name, HWND parent,
 }
 
 WindowImpl::~WindowImpl() {
-  if (::IsWindow(hwnd_)) {
-    gfx::SetWindowUserData(hwnd_, NULL);
+  if (!::IsWindow(hwnd_))  // handle already destroyed.
+    return;
 
-    if (::GetParent(hwnd_) == NULL)
-      ::DestroyWindow(hwnd_);
-  }
+  if (::GetParent(hwnd_) == NULL)  // removing a child window.
+    ::SetParent(hwnd_, NULL);
+
+  gfx::SetWindowUserData(hwnd_, NULL);
+  ::DestroyWindow(hwnd_);
 }
 
 void WindowImpl::SetPixelBounds(const gfx::Rect& bounds) {
   SetWindowPos(hwnd_, NULL,
                bounds.x(), bounds.y(), bounds.width(), bounds.height(),
                SWP_NOACTIVATE | SWP_NOZORDER);
+  RedrawWindow(hwnd_, NULL, NULL, RDW_INVALIDATE | RDW_ALLCHILDREN);
 }
 
 gfx::Rect WindowImpl::GetPixelBounds() {

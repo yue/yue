@@ -51,6 +51,7 @@ void Window::PlatformInit(const Options& options) {
 }
 
 void Window::PlatformSetContentView(Container* container) {
+  SetParent(container->view()->hwnd(), window_->hwnd());
 }
 
 }  // namespace nu
