@@ -5,30 +5,23 @@
 #ifndef NATIVEUI_WIN_WINDOW_IMPL_H_
 #define NATIVEUI_WIN_WINDOW_IMPL_H_
 
-#include <windows.h>
-
 #include <string>
 
 #include "base/logging.h"
-#include "base/macros.h"
 #include "base/strings/string_piece.h"
-#include "ui/gfx/geometry/rect.h"
-#include "ui/gfx/gfx_export.h"
+#include "nativeui/win/base_view.h"
 #include "ui/gfx/win/msg_util.h"
 
 namespace nu {
 
 // A convenience class that encapsulates the details of creating and destroying
 // a HWND. This class also hosts the windows procedure used by all Windows.
-class WindowImpl {
+class WindowImpl : public BaseView {
  public:
   virtual ~WindowImpl();
 
-  void SetPixelBounds(const gfx::Rect& pixel_bounds);
-  gfx::Rect GetPixelBounds();
-
-  void SetBounds(const gfx::Rect& bounds);
-  gfx::Rect GetBounds();
+  void SetPixelBounds(const gfx::Rect& pixel_bounds) override;
+  gfx::Rect GetPixelBounds() override;
 
   // Returns the HWND associated with this Window.
   HWND hwnd() const { return hwnd_; }
@@ -73,13 +66,8 @@ class WindowImpl {
   // Style of the class to use.
   UINT class_style_;
 
-  // The scale factor of current window.
-  float scale_factor_;
-
   // Our hwnd.
   HWND hwnd_;
-
-  DISALLOW_COPY_AND_ASSIGN(WindowImpl);
 };
 
 }  // namespace nu

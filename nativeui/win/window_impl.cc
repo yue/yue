@@ -165,10 +165,10 @@ const DWORD WindowImpl::kWindowDefaultStyle =
 
 WindowImpl::WindowImpl(base::StringPiece16 class_name, HWND parent,
                        DWORD window_style, DWORD window_ex_style)
-    : class_style_(CS_DBLCLKS), hwnd_(NULL) {
+    : BaseView(false), class_style_(CS_DBLCLKS), hwnd_(NULL) {
   if (parent == HWND_DESKTOP) {
     // Only non-child windows can have HWND_DESKTOP (0) as their parent.
-    CHECK((window_style & WS_CHILD) == 0);
+    CHECK_EQ(static_cast<int>(window_style & WS_CHILD), 0);
     parent = gfx::GetWindowToParentTo(false);
   } else if (parent == ::GetDesktopWindow()) {
     // Any type of window can have the "Desktop Window" as their parent.
@@ -201,9 +201,7 @@ WindowImpl::WindowImpl(base::StringPiece16 class_name, HWND parent,
     gfx::SetWindowUserData(hwnd, this);
   }
 
-  // Cache the window's scale factor.
-  // TODO(zcbenz): Refresh the window when DPI changes.
-  scale_factor_ = GetScaleFactorForHWND(hwnd_);
+  Init(hwnd_, GetScaleFactorForHWND(hwnd_));
 }
 
 WindowImpl::~WindowImpl() {
@@ -235,14 +233,6 @@ gfx::Rect WindowImpl::GetPixelBounds() {
     bounds.set_y(r.top);
   }
   return bounds;
-}
-
-void WindowImpl::SetBounds(const gfx::Rect& dip_bounds) {
-  SetPixelBounds(ScaleToEnclosingRect(dip_bounds, scale_factor_));
-}
-
-gfx::Rect WindowImpl::GetBounds() {
-  return ScaleToEnclosingRect(GetPixelBounds(), 1.0f / scale_factor_);
 }
 
 HICON WindowImpl::GetDefaultWindowIcon() const {

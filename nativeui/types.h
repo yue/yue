@@ -24,6 +24,7 @@ class NSWindow;
 namespace nu {
 
 #if defined(OS_WIN)
+class BaseView;
 class WindowImpl;
 #endif
 
@@ -34,7 +35,7 @@ typedef NSWindow* NativeWindow;
 typedef GtkWidget* NativeView;
 typedef GtkWindow* NativeWindow;
 #elif defined(OS_WIN)
-typedef WindowImpl* NativeView;
+typedef BaseView* NativeView;
 typedef WindowImpl* NativeWindow;
 #endif
 
