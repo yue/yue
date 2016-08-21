@@ -4,24 +4,27 @@
 
 #include "nativeui/container.h"
 
-#include "nativeui/win/subwin_view.h"
+#include "nativeui/win/virtual_view.h"
 
 namespace nu {
 
 namespace {
 
-class ContainerView : public SubwinView {
+class ContainerView : public VirtualView {
  public:
   explicit ContainerView(Container* container) : container_(container) {}
   ~ContainerView() override {}
 
- protected:
-  CR_BEGIN_MSG_MAP_EX(SubwinView, WindowImpl)
-    CR_MSG_WM_SIZE(OnSize)
-  CR_END_MSG_MAP()
-
-  void OnSize(UINT param, const gfx::Size& size) {
+  void SetPixelBounds(const gfx::Rect& pixel_bounds) override {
+    VirtualView::SetPixelBounds(pixel_bounds);
     container_->Layout();
+  }
+
+  void SetParent(BaseView* parent) override {
+    VirtualView::SetParent(parent);
+    // Refresh all children when parent window changes.
+    for (int i = 0; i < container_->child_count(); ++i)
+      container_->child_at(i)->view()->SetParent(this);
   }
 
  private:

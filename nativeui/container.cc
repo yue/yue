@@ -60,8 +60,8 @@ void Container::RemoveChildView(View* view) {
   if (i == children_.end())
     return;
 
-  PlatformRemoveChildView(view);
   view->set_parent(nullptr);
+  PlatformRemoveChildView(view);
   children_.erase(i);
 
   Layout();

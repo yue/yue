@@ -38,6 +38,8 @@ source_set("nativeui") {
     "mac/window_mac.mm",
     "win/base_view.cc",
     "win/base_view.h",
+    "win/virtual_view.cc",
+    "win/virtual_view.h",
     "win/subwin_holder.cc",
     "win/subwin_holder.h",
     "win/subwin_view.cc",

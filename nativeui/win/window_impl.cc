@@ -165,7 +165,7 @@ const DWORD WindowImpl::kWindowDefaultStyle =
 
 WindowImpl::WindowImpl(base::StringPiece16 class_name, HWND parent,
                        DWORD window_style, DWORD window_ex_style)
-    : BaseView(false), class_style_(CS_DBLCLKS), hwnd_(NULL) {
+    : BaseView(false), class_style_(CS_DBLCLKS) {
   if (parent == HWND_DESKTOP) {
     // Only non-child windows can have HWND_DESKTOP (0) as their parent.
     CHECK_EQ(static_cast<int>(window_style & WS_CHILD), 0);
@@ -216,26 +216,27 @@ WindowImpl::~WindowImpl() {
 }
 
 void WindowImpl::SetPixelBounds(const gfx::Rect& bounds) {
-  SetWindowPos(hwnd_, NULL,
-               bounds.x(), bounds.y(), bounds.width(), bounds.height(),
+  bounds_ = bounds;
+
+  // Calculate the bounds relative to parent HWND.
+  gfx::Point pos(bounds.origin());
+  for (BaseView* p = parent(); p && p->is_virtual(); p = p->parent()) {
+    gfx::Point offset = p->GetPixelBounds().origin();
+    pos.set_x(pos.x() + offset.x());
+    pos.set_y(pos.y() + offset.y());
+  }
+
+  SetWindowPos(hwnd_, NULL, pos.x(), pos.y(), bounds.width(), bounds.height(),
                SWP_NOACTIVATE | SWP_NOZORDER);
   RedrawWindow(hwnd_, NULL, NULL, RDW_INVALIDATE | RDW_ALLCHILDREN);
 }
 
 gfx::Rect WindowImpl::GetPixelBounds() {
-  RECT r;
-  ::GetWindowRect(hwnd_, &r);
-  gfx::Rect bounds(r);
-  if (::GetParent(hwnd_)) {
-    ::MapWindowPoints(HWND_DESKTOP, GetParent(hwnd_),
-                      reinterpret_cast<LPPOINT>(&r), 1);
-    bounds.set_x(r.left);
-    bounds.set_y(r.top);
-  }
-  return bounds;
+  return bounds_;
 }
 
 void WindowImpl::SetParent(BaseView* parent) {
+  BaseView::SetParent(parent);
   ::SetParent(hwnd_, parent ? parent->hwnd() : NULL);
 }
 

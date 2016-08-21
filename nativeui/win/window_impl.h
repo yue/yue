@@ -69,7 +69,10 @@ class WindowImpl : public BaseView {
   UINT class_style_;
 
   // Our hwnd.
-  HWND hwnd_;
+  HWND hwnd_ = NULL;
+
+  // The bounds relative to parent BaseView.
+  gfx::Rect bounds_;
 };
 
 }  // namespace nu
