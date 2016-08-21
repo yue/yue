@@ -17,10 +17,12 @@ class TopLevelWindow : public WindowImpl {
  protected:
   CR_BEGIN_MSG_MAP_EX(TopLevelWindow, WindowImpl)
     CR_MSG_WM_SIZE(OnSize)
+    CR_MESSAGE_HANDLER_EX(WM_SETCURSOR, OnSetCursor);
   CR_END_MSG_MAP()
 
  private:
   void OnSize(UINT param, const gfx::Size& size);
+  LRESULT OnSetCursor(UINT message, WPARAM w_param, LPARAM l_param);
 
   Window* delegate_;
 };
@@ -31,18 +33,46 @@ void TopLevelWindow::OnSize(UINT param, const gfx::Size& size) {
         gfx::Rect(gfx::Point(), size));
 }
 
+LRESULT TopLevelWindow::OnSetCursor(UINT message,
+                                    WPARAM w_param, LPARAM l_param) {
+  // Reimplement the necessary default behavior here. Calling DefWindowProc can
+  // trigger weird non-client painting for non-glass windows with custom frames.
+  wchar_t* cursor = IDC_ARROW;
+  switch (LOWORD(l_param)) {
+    case HTSIZE:
+      cursor = IDC_SIZENWSE;
+      break;
+    case HTLEFT:
+    case HTRIGHT:
+      cursor = IDC_SIZEWE;
+      break;
+    case HTTOP:
+    case HTBOTTOM:
+      cursor = IDC_SIZENS;
+      break;
+    case HTTOPLEFT:
+    case HTBOTTOMRIGHT:
+      cursor = IDC_SIZENWSE;
+      break;
+    case HTTOPRIGHT:
+    case HTBOTTOMLEFT:
+      cursor = IDC_SIZENESW;
+      break;
+    case LOWORD(HTERROR):  // Use HTERROR's LOWORD value for valid comparison.
+      SetMsgHandled(FALSE);
+      break;
+    default:
+      // Use the default value, IDC_ARROW.
+      break;
+  }
+  ::SetCursor(LoadCursor(NULL, cursor));
+  return 1;
+}
+
 }  // namespace
 
 Window::~Window() {
   delete window_;
-}
-
-void Window::SetVisible(bool visible) {
-  ShowWindow(window_->hwnd(), visible ? SW_SHOWNOACTIVATE : SW_HIDE);
-}
-
-bool Window::IsVisible() const {
-  return !!::IsWindowVisible(window_->hwnd());
 }
 
 void Window::PlatformInit(const Options& options) {
@@ -52,6 +82,14 @@ void Window::PlatformInit(const Options& options) {
 
 void Window::PlatformSetContentView(Container* container) {
   SetParent(container->view()->hwnd(), window_->hwnd());
+}
+
+void Window::SetVisible(bool visible) {
+  ShowWindow(window_->hwnd(), visible ? SW_SHOWNOACTIVATE : SW_HIDE);
+}
+
+bool Window::IsVisible() const {
+  return !!::IsWindowVisible(window_->hwnd());
 }
 
 }  // namespace nu
