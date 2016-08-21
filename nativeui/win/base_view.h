@@ -20,12 +20,10 @@ class BaseView {
   virtual void SetPixelBounds(const gfx::Rect& pixel_bounds) = 0;
   virtual gfx::Rect GetPixelBounds() = 0;
 
-  void SetBounds(const gfx::Rect& bounds) {
-    SetPixelBounds(ScaleToEnclosingRect(bounds, scale_factor()));
-  }
-  gfx::Rect GetBounds() {
-    return ScaleToEnclosingRect(GetPixelBounds(), 1.0f / scale_factor());
-  }
+  virtual void SetParent(BaseView* parent) = 0;
+
+  void SetBounds(const gfx::Rect& bounds);
+  gfx::Rect GetBounds();
 
   HWND hwnd() const { return hwnd_; }
   bool is_virtual() const { return is_virtual_; }
@@ -34,10 +32,7 @@ class BaseView {
  protected:
   explicit BaseView(bool is_virtual) : is_virtual_(is_virtual) {}
 
-  void Init(HWND hwnd, float scale_factor) {
-    hwnd_ = hwnd;
-    scale_factor_ = scale_factor;
-  }
+  void Init(HWND hwnd, float scale_factor);
 
  private:
   bool is_virtual_;

@@ -35,11 +35,11 @@ void Container::PlatformInit() {
 }
 
 void Container::PlatformAddChildView(View* child) {
-  SetParent(child->view()->hwnd(), view()->hwnd());
+  child->view()->SetParent(view());
 }
 
 void Container::PlatformRemoveChildView(View* child) {
-  SetParent(child->view()->hwnd(), NULL);
+  child->view()->SetParent(nullptr);
 }
 
 }  // namespace nu

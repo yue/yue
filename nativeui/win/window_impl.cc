@@ -235,6 +235,10 @@ gfx::Rect WindowImpl::GetPixelBounds() {
   return bounds;
 }
 
+void WindowImpl::SetParent(BaseView* parent) {
+  ::SetParent(hwnd_, parent ? parent->hwnd() : NULL);
+}
+
 HICON WindowImpl::GetDefaultWindowIcon() const {
   return nullptr;
 }

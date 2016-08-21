@@ -23,6 +23,8 @@ class WindowImpl : public BaseView {
   void SetPixelBounds(const gfx::Rect& pixel_bounds) override;
   gfx::Rect GetPixelBounds() override;
 
+  void SetParent(BaseView* parent) override;
+
   // Returns the HWND associated with this Window.
   HWND hwnd() const { return hwnd_; }
 

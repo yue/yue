@@ -36,6 +36,7 @@ source_set("nativeui") {
     "mac/label_mac.mm",
     "mac/view_mac.mm",
     "mac/window_mac.mm",
+    "win/base_view.cc",
     "win/base_view.h",
     "win/subwin_holder.cc",
     "win/subwin_holder.h",
