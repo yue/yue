@@ -25,7 +25,7 @@ namespace nu {
 
 #if defined(OS_WIN)
 class BaseView;
-class WindowImpl;
+class BaseWindow;
 #endif
 
 #if defined(OS_MACOSX)
@@ -36,7 +36,7 @@ typedef GtkWidget* NativeView;
 typedef GtkWindow* NativeWindow;
 #elif defined(OS_WIN)
 typedef BaseView* NativeView;
-typedef WindowImpl* NativeWindow;
+typedef BaseWindow* NativeWindow;
 #endif
 
 }  // namespace nu

@@ -4,8 +4,7 @@
 
 #include "nativeui/view.h"
 
-#include "nativeui/container.h"
-#include "nativeui/win/window_impl.h"
+#include "nativeui/win/base_view.h"
 
 namespace nu {
 

@@ -11,10 +11,38 @@ namespace nu {
 SubwinView::SubwinView(base::StringPiece16 class_name,
                        DWORD window_style, DWORD window_ex_style)
     : WindowImpl(class_name, SubwinHolder::GetInstance()->hwnd(),
-                 window_style, window_ex_style) {
+                 window_style, window_ex_style),
+      BaseView(false) {
 }
 
 SubwinView::~SubwinView() {
+}
+
+void SubwinView::SetPixelBounds(const gfx::Rect& bounds) {
+  BaseView::SetPixelBounds(bounds);
+
+  // Calculate the bounds relative to parent HWND.
+  gfx::Point pos(bounds.origin());
+  for (BaseView* p = parent(); p && p->is_virtual(); p = p->parent()) {
+    gfx::Point offset = p->GetPixelBounds().origin();
+    pos.set_x(pos.x() + offset.x());
+    pos.set_y(pos.y() + offset.y());
+  }
+
+  SetWindowPos(hwnd(), NULL, pos.x(), pos.y(), bounds.width(), bounds.height(),
+               SWP_NOACTIVATE | SWP_NOZORDER);
+  RedrawWindow(hwnd(), NULL, NULL, RDW_INVALIDATE | RDW_ALLCHILDREN);
+}
+
+void SubwinView::SetParent(BaseView* parent) {
+  BaseView::SetParent(parent);
+  ::SetParent(hwnd(),
+              parent && parent->window() ? parent->window()->hwnd() : NULL);
+}
+
+void SubwinView::BecomeContentView(BaseWindow* parent) {
+  BaseView::BecomeContentView(parent);
+  ::SetParent(hwnd(), parent ? parent->hwnd() : NULL);
 }
 
 }  // namespace nu

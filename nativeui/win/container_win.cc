@@ -4,30 +4,39 @@
 
 #include "nativeui/container.h"
 
-#include "nativeui/win/virtual_view.h"
+#include "nativeui/win/base_view.h"
 
 namespace nu {
 
 namespace {
 
-class ContainerView : public VirtualView {
+class ContainerView : public BaseView {
  public:
-  explicit ContainerView(Container* container) : container_(container) {}
+  explicit ContainerView(Container* container)
+      : BaseView(true), container_(container) {}
   ~ContainerView() override {}
 
   void SetPixelBounds(const gfx::Rect& pixel_bounds) override {
-    VirtualView::SetPixelBounds(pixel_bounds);
+    BaseView::SetPixelBounds(pixel_bounds);
     container_->Layout();
   }
 
   void SetParent(BaseView* parent) override {
-    VirtualView::SetParent(parent);
-    // Refresh all children when parent window changes.
+    BaseView::SetParent(parent);
+    RefreshParentTree();
+  }
+
+  void BecomeContentView(BaseWindow* parent) override {
+    BaseView::BecomeContentView(parent);
+    RefreshParentTree();
+  }
+
+ private:
+  void RefreshParentTree() {
     for (int i = 0; i < container_->child_count(); ++i)
       container_->child_at(i)->view()->SetParent(this);
   }
 
- private:
   Container* container_;
 };
 

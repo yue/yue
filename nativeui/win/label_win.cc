@@ -21,14 +21,15 @@ Label::~Label() {
 }
 
 void Label::SetText(const std::string& text) {
-  base::string16 title = base::UTF8ToUTF16(text);
-  SetWindowTextW(view()->hwnd(), title.c_str());
+  HWND hwnd = static_cast<SubwinView*>(view())->hwnd();
+  SetWindowTextW(hwnd, base::UTF8ToUTF16(text).c_str());
 }
 
 std::string Label::GetText() {
+  HWND hwnd = static_cast<SubwinView*>(view())->hwnd();
   base::string16 title;
-  int length = GetWindowTextLengthW(view()->hwnd()) + 1;
-  GetWindowTextW(view()->hwnd(), base::WriteInto(&title, length), length);
+  int length = GetWindowTextLengthW(hwnd) + 1;
+  GetWindowTextW(hwnd, base::WriteInto(&title, length), length);
   return base::UTF16ToUTF8(title);
 }
 

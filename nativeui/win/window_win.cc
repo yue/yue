@@ -4,15 +4,41 @@
 
 #include "nativeui/window.h"
 
+#include "nativeui/win/base_view.h"
 #include "nativeui/win/window_impl.h"
 
 namespace nu {
 
 namespace {
 
-class TopLevelWindow : public WindowImpl {
+class TopLevelWindow : public WindowImpl, public BaseWindow {
  public:
-  explicit TopLevelWindow(Window* delegate) : delegate_(delegate) {}
+  explicit TopLevelWindow(Window* delegate)
+    : WindowImpl(), BaseWindow(hwnd()), delegate_(delegate) {}
+
+  // Fix duplicate hwnd() declaration in WindowImpl and BaseWindow.
+  HWND hwnd() const { return WindowImpl::hwnd(); }
+
+  void SetPixelBounds(const gfx::Rect& bounds) {
+    SetWindowPos(hwnd(), NULL,
+                 bounds.x(), bounds.y(), bounds.width(), bounds.height(),
+                 SWP_NOACTIVATE | SWP_NOZORDER);
+    RedrawWindow(hwnd(), NULL, NULL, RDW_INVALIDATE | RDW_ALLCHILDREN);
+  }
+
+  gfx::Rect GetPixelBounds() {
+    RECT r;
+    GetWindowRect(hwnd(), &r);
+    return gfx::Rect(r);;
+  }
+
+  void SetBounds(const gfx::Rect& bounds) {
+    SetPixelBounds(ScaleToEnclosingRect(bounds, scale_factor()));
+  }
+
+  gfx::Rect GetBounds() {
+    return ScaleToEnclosingRect(GetPixelBounds(), 1.0f / scale_factor());
+  }
 
  protected:
   CR_BEGIN_MSG_MAP_EX(TopLevelWindow, WindowImpl)
@@ -76,12 +102,14 @@ Window::~Window() {
 }
 
 void Window::PlatformInit(const Options& options) {
-  window_ = new TopLevelWindow(this);
-  window_->SetBounds(options.content_bounds);
+  TopLevelWindow* win = new TopLevelWindow(this);
+  win->SetBounds(options.content_bounds);
+
+  window_ = win;
 }
 
 void Window::PlatformSetContentView(Container* container) {
-  container->view()->SetParent(window_);
+  container->view()->BecomeContentView(window_);
 }
 
 void Window::SetVisible(bool visible) {
