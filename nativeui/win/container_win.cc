@@ -26,7 +26,7 @@ class ContainerView : public BaseView {
     RefreshParentTree();
   }
 
-  void BecomeContentView(BaseWindow* parent) override {
+  void BecomeContentView(WindowImpl* parent) override {
     BaseView::BecomeContentView(parent);
     RefreshParentTree();
   }

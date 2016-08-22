@@ -4,13 +4,7 @@
 
 #include "nativeui/win/base_view.h"
 
-#include "nativeui/win/screen.h"
-
 namespace nu {
-
-BaseWindow::BaseWindow(HWND hwnd)
-    : hwnd_(hwnd), scale_factor_(GetScaleFactorForHWND(hwnd)) {
-}
 
 void BaseView::SetPixelBounds(const gfx::Rect& bounds) {
   bounds_ = bounds;
@@ -40,7 +34,7 @@ void BaseView::SetParent(BaseView* parent) {
     bounds_ = ScaleToEnclosingRect(bounds_, scale_factor() / old_scale_factor);
 }
 
-void BaseView::BecomeContentView(BaseWindow* parent) {
+void BaseView::BecomeContentView(WindowImpl* parent) {
   float old_scale_factor = scale_factor();
 
   is_content_view_ = true;

@@ -40,7 +40,7 @@ void SubwinView::SetParent(BaseView* parent) {
               parent && parent->window() ? parent->window()->hwnd() : NULL);
 }
 
-void SubwinView::BecomeContentView(BaseWindow* parent) {
+void SubwinView::BecomeContentView(WindowImpl* parent) {
   BaseView::BecomeContentView(parent);
   ::SetParent(hwnd(), parent ? parent->hwnd() : NULL);
 }

@@ -11,13 +11,10 @@ namespace nu {
 
 namespace {
 
-class TopLevelWindow : public WindowImpl, public BaseWindow {
+class TopLevelWindow : public WindowImpl {
  public:
   explicit TopLevelWindow(Window* delegate)
-    : WindowImpl(), BaseWindow(hwnd()), delegate_(delegate) {}
-
-  // Fix duplicate hwnd() declaration in WindowImpl and BaseWindow.
-  HWND hwnd() const { return WindowImpl::hwnd(); }
+    : WindowImpl(), delegate_(delegate) {}
 
   void SetPixelBounds(const gfx::Rect& bounds) {
     SetWindowPos(hwnd(), NULL,

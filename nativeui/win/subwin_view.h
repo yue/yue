@@ -20,7 +20,7 @@ class SubwinView : public WindowImpl, public BaseView {
 
   void SetPixelBounds(const gfx::Rect& pixel_bounds) override;
   void SetParent(BaseView* parent) override;
-  void BecomeContentView(BaseWindow* parent) override;
+  void BecomeContentView(WindowImpl* parent) override;
 };
 
 }  // namespace nu

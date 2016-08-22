@@ -7,31 +7,11 @@
 
 #include <windows.h>
 
-#include "base/macros.h"
-#include "ui/gfx/geometry/rect.h"
+#include "nativeui/win/window_impl.h"
 
 namespace nu {
 
-// The common base for windows.
-class BaseWindow {
- public:
-  virtual ~BaseWindow() {}
-
-  HWND hwnd() const { return hwnd_; }
-  float scale_factor() const { return scale_factor_; }
-
- protected:
-  explicit BaseWindow(HWND hwnd);
-
- private:
-  HWND hwnd_;
-
-  // The scale factor of current window.
-  // TODO(zcbenz): Refresh the window when DPI changes.
-  float scale_factor_;
-
-  DISALLOW_COPY_AND_ASSIGN(BaseWindow);
-};
+class WindowImpl;
 
 // The common base for native window based view and directui view.
 class BaseView {
@@ -44,14 +24,14 @@ class BaseView {
 
   // Set the parent view.
   virtual void SetParent(BaseView* parent);
-  virtual void BecomeContentView(BaseWindow* parent);
+  virtual void BecomeContentView(WindowImpl* parent);
 
   // Returns DIP bounds according to window's scale factor.
   void SetBounds(const gfx::Rect& bounds);
   gfx::Rect GetBounds();
 
   // Parent view and host window.
-  BaseWindow* window() const { return window_; }
+  WindowImpl* window() const { return window_; }
   BaseView* parent() const { return parent_; }
 
   // Whether it is the content view.
@@ -70,7 +50,7 @@ class BaseView {
   bool is_virtual_;
 
   bool is_content_view_ = false;
-  BaseWindow* window_ = nullptr;
+  WindowImpl* window_ = nullptr;
   BaseView* parent_ = nullptr;
 
   // The bounds relative to parent.

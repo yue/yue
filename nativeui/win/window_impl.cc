@@ -200,6 +200,8 @@ WindowImpl::WindowImpl(base::StringPiece16 class_name, HWND parent,
     hwnd_ = hwnd;
     gfx::SetWindowUserData(hwnd, this);
   }
+
+  scale_factor_ = GetScaleFactorForHWND(hwnd_);
 }
 
 WindowImpl::~WindowImpl() {
