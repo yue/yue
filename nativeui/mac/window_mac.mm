@@ -10,6 +10,24 @@
 
 namespace nu {
 
+namespace {
+
+gfx::Rect ContentToWindowBounds(NSWindow* window, const gfx::Rect& bounds) {
+  gfx::Rect window_bounds([window frameRectForContentRect:bounds.ToCGRect()]);
+  int frame_height = window_bounds.height() - bounds.height();
+  window_bounds.set_y(window_bounds.y() - frame_height);
+  return window_bounds;
+}
+
+gfx::Rect WindowToContentBounds(NSWindow* window, const gfx::Rect& bounds) {
+  gfx::Rect content_bounds([window contentRectForFrameRect:bounds.ToCGRect()]);
+  int frame_height = bounds.height() - content_bounds.height();
+  content_bounds.set_y(content_bounds.y() + frame_height);
+  return content_bounds;
+}
+
+}  // namespace
+
 Window::~Window() {
   [window_ release];
 }
@@ -30,18 +48,12 @@ void Window::PlatformSetContentView(Container* container) {
   container->Layout();
 }
 
-gfx::Rect Window::ContentBoundsToWindowBounds(const gfx::Rect& bounds) const {
-  gfx::Rect window_bounds([window_ frameRectForContentRect:bounds.ToCGRect()]);
-  int frame_height = window_bounds.height() - bounds.height();
-  window_bounds.set_y(window_bounds.y() - frame_height);
-  return window_bounds;
+void Window::SetContentBounds(const gfx::Rect& bounds) {
+  SetBounds(ContentToWindowBounds(window_, bounds));
 }
 
-gfx::Rect Window::WindowBoundsToContentBounds(const gfx::Rect& bounds) const {
-  gfx::Rect content_bounds([window_ contentRectForFrameRect:bounds.ToCGRect()]);
-  int frame_height = bounds.height() - content_bounds.height();
-  content_bounds.set_y(content_bounds.y() + frame_height);
-  return content_bounds;
+gfx::Rect Window::GetContentBounds() const {
+  return WindowToContentBounds(window_, GetBounds());
 }
 
 void Window::SetBounds(const gfx::Rect& bounds) {

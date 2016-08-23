@@ -38,12 +38,12 @@ void Window::PlatformSetContentView(Container* container) {
   ForceSizeAllocation(window_, container->view());
 }
 
-gfx::Rect Window::ContentBoundsToWindowBounds(const gfx::Rect& bounds) const {
-  return bounds;
+void Window::SetContentBounds(const gfx::Rect& bounds) {
+  SetBounds(bounds);
 }
 
-gfx::Rect Window::WindowBoundsToContentBounds(const gfx::Rect& bounds) const {
-  return bounds;
+gfx::Rect Window::GetContentBounds() const {
+  return GetBounds();
 }
 
 void Window::SetBounds(const gfx::Rect& bounds) {
