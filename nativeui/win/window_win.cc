@@ -29,6 +29,14 @@ class TopLevelWindow : public WindowImpl {
     return gfx::Rect(r);
   }
 
+  gfx::Rect GetContentPixelBounds() {
+    RECT r;
+    GetClientRect(hwnd(), &r);
+    POINT point = { r.left, r.top };
+    ClientToScreen(hwnd(), &point);
+    return gfx::Rect(point.x, point.y, r.right - r.left, r.bottom - r.top);
+  }
+
  protected:
   CR_BEGIN_MSG_MAP_EX(TopLevelWindow, WindowImpl)
     CR_MSG_WM_SIZE(OnSize)
@@ -51,6 +59,9 @@ void TopLevelWindow::OnSize(UINT param, const gfx::Size& size) {
 }
 
 void TopLevelWindow::OnPaint(HDC dc) {
+  PAINTSTRUCT ps;
+  BeginPaint(hwnd(), &ps);
+  EndPaint(hwnd(), &ps);
 }
 
 LRESULT TopLevelWindow::OnSetCursor(UINT message,
@@ -113,7 +124,6 @@ void Window::PlatformInit(const Options& options) {
 
 void Window::PlatformSetContentView(Container* container) {
   container->view()->BecomeContentView(window_);
-  container->Layout();
 }
 
 void Window::SetContentBounds(const gfx::Rect& bounds) {
@@ -124,12 +134,8 @@ void Window::SetContentBounds(const gfx::Rect& bounds) {
 
 gfx::Rect Window::GetContentBounds() const {
   TopLevelWindow* win = static_cast<TopLevelWindow*>(window_);
-  RECT r;
-  GetClientRect(win->hwnd(), &r);
-  POINT point = { r.left, r.top };
-  ClientToScreen(win->hwnd(), &point);
-  gfx::Rect bounds(point.x, point.y, r.right - r.left, r.bottom - r.top);
-  return ScaleToEnclosingRect(bounds, 1.0f / win->scale_factor());
+  return ScaleToEnclosingRect(win->GetContentPixelBounds(),
+                              1.0f / win->scale_factor());
 }
 
 void Window::SetBounds(const gfx::Rect& bounds) {
@@ -139,8 +145,8 @@ void Window::SetBounds(const gfx::Rect& bounds) {
 
 gfx::Rect Window::GetBounds() const {
   TopLevelWindow* win = static_cast<TopLevelWindow*>(window_);
-  gfx::Rect bounds = win->GetPixelBounds();
-  return ScaleToEnclosingRect(bounds, 1.0f / win->scale_factor());
+  return ScaleToEnclosingRect(win->GetPixelBounds(),
+                              1.0f / win->scale_factor());
 }
 
 void Window::SetVisible(bool visible) {

@@ -37,12 +37,14 @@ void SubwinView::SetPixelBounds(const gfx::Rect& bounds) {
 void SubwinView::SetParent(BaseView* parent) {
   BaseView::SetParent(parent);
   ::SetParent(hwnd(),
-              parent && parent->window() ? parent->window()->hwnd() : NULL);
+              parent && parent->window() ? parent->window()->hwnd()
+                                         : SubwinHolder::GetInstance()->hwnd());
 }
 
 void SubwinView::BecomeContentView(WindowImpl* parent) {
   BaseView::BecomeContentView(parent);
-  ::SetParent(hwnd(), parent ? parent->hwnd() : NULL);
+  ::SetParent(hwnd(), parent ? parent->hwnd()
+                             : SubwinHolder::GetInstance()->hwnd());
 }
 
 }  // namespace nu
