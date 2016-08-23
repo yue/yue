@@ -6,12 +6,24 @@
 
 namespace nu {
 
+namespace {
+
+// Force window to allocate size for content view.
+void ForceSizeAllocation(GtkWindow* window, GtkWidget* view) {
+  GdkRectangle rect = { 0, 0 };
+  gtk_window_get_size(window, &rect.width, &rect.height);
+  gtk_widget_size_allocate(view, &rect);
+}
+
+}  // namespace
+
 Window::~Window() {
   gtk_widget_destroy(GTK_WIDGET(window_));
 }
 
 void Window::PlatformInit(const Options& options) {
   window_ = GTK_WINDOW(gtk_window_new(GTK_WINDOW_TOPLEVEL));
+  gtk_window_set_focus_on_map(window_, false);
   gtk_window_set_default_size(window_,
                               options.content_bounds.width(),
                               options.content_bounds.height());
@@ -24,6 +36,8 @@ void Window::PlatformSetContentView(Container* container) {
   if (child)
     gtk_container_remove(GTK_CONTAINER(window_), child);
   gtk_container_add(GTK_CONTAINER(window_), container->view());
+
+  ForceSizeAllocation(window_, container->view());
 }
 
 gfx::Rect Window::ContentBoundsToWindowBounds(const gfx::Rect& bounds) const {
@@ -38,9 +52,7 @@ void Window::SetBounds(const gfx::Rect& bounds) {
   gtk_window_move(window_, bounds.x(), bounds.y());
   gtk_window_resize(window_, bounds.width(), bounds.height());
 
-  // GTK+ does not allocate size when window is hidden.
-  if (!IsVisible())
-    GetContentView()->SetBounds(gfx::Rect(gfx::Point(), bounds.size()));
+  ForceSizeAllocation(window_, GetContentView()->view());
 }
 
 gfx::Rect Window::GetBounds() const {
@@ -51,13 +63,7 @@ gfx::Rect Window::GetBounds() const {
 }
 
 void Window::SetVisible(bool visible) {
-  if (visible) {
-    gtk_window_set_focus_on_map(window_, false);
-    gtk_widget_set_visible(GTK_WIDGET(window_), visible);
-    gtk_window_set_focus_on_map(window_, true);
-  } else {
-    gtk_widget_set_visible(GTK_WIDGET(window_), visible);
-  }
+  gtk_widget_set_visible(GTK_WIDGET(window_), visible);
 }
 
 bool Window::IsVisible() const {
