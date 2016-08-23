@@ -22,6 +22,15 @@ NATIVEUI_EXPORT class Window : public base::RefCounted<Window> {
   void SetContentView(Container* view);
   Container* GetContentView() const;
 
+  void SetContentBounds(const gfx::Rect& bounds);
+  gfx::Rect GetContentBounds() const;
+
+  gfx::Rect ContentBoundsToWindowBounds(const gfx::Rect& bounds) const;
+  gfx::Rect WindowBoundsToContentBounds(const gfx::Rect& bounds) const;
+
+  void SetBounds(const gfx::Rect& bounds);
+  gfx::Rect GetBounds() const;
+
   void SetVisible(bool visible);
   bool IsVisible() const;
 

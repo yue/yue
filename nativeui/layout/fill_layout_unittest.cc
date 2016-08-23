@@ -27,8 +27,8 @@ TEST_F(FillLayoutTest, FillChild) {
   nu::Container* c2 = new nu::Container;
   window_->GetContentView()->AddChildView(c1);
   window_->GetContentView()->AddChildView(c2);
-  window_->GetContentView()->SetBounds(bounds);
-  EXPECT_EQ(c1->GetBounds(), bounds);
+  window_->SetContentBounds(bounds);
+  EXPECT_EQ(c1->GetBounds(), gfx::Rect(300, 400));
 }
 
 TEST_F(FillLayoutTest, FillChildChild) {
@@ -37,7 +37,7 @@ TEST_F(FillLayoutTest, FillChildChild) {
   nu::Container* c2 = new nu::Container;
   c1->AddChildView(c2);
   window_->GetContentView()->AddChildView(c1);
-  window_->GetContentView()->SetBounds(bounds);
-  EXPECT_EQ(c1->GetBounds(), bounds);
-  EXPECT_EQ(c2->GetBounds(), bounds);
+  window_->SetContentBounds(bounds);
+  EXPECT_EQ(c1->GetBounds(), gfx::Rect(300, 400));
+  EXPECT_EQ(c2->GetBounds(), gfx::Rect(300, 400));
 }

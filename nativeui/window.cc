@@ -23,4 +23,12 @@ Container* Window::GetContentView() const {
   return content_view_.get();
 }
 
+void Window::SetContentBounds(const gfx::Rect& bounds) {
+  SetBounds(ContentBoundsToWindowBounds(bounds));
+}
+
+gfx::Rect Window::GetContentBounds() const {
+  return WindowBoundsToContentBounds(GetBounds());
+}
+
 }  // namespace nu

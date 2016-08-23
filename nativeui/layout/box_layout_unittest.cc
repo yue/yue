@@ -27,7 +27,7 @@ TEST_F(BoxLayoutTest, ListChild) {
   nu::Container* c2 = new nu::Container;
   window_->GetContentView()->AddChildView(c1);
   window_->GetContentView()->AddChildView(c2);
-  window_->GetContentView()->SetBounds(bounds);
+  window_->SetContentBounds(bounds);
   EXPECT_EQ(c1->GetBounds(), gfx::Rect(0, 0, 300, 200));
   EXPECT_EQ(c2->GetBounds(), gfx::Rect(0, 200, 300, 200));
 }
@@ -39,7 +39,7 @@ TEST_F(BoxLayoutTest, ListChildChild) {
   c1->SetLayoutManager(new nu::BoxLayout(nu::BoxLayout::Vertical));
   c1->AddChildView(c2);
   window_->GetContentView()->AddChildView(c1);
-  window_->GetContentView()->SetBounds(bounds);
+  window_->SetContentBounds(bounds);
   EXPECT_EQ(c1->GetBounds(), gfx::Rect(0, 0, 300, 400));
   EXPECT_EQ(c2->GetBounds(), gfx::Rect(0, 0, 300, 400));
 }
@@ -52,7 +52,7 @@ TEST_F(BoxLayoutTest, ListChildHorizontal) {
   nu::Container* c2 = new nu::Container;
   window_->GetContentView()->AddChildView(c1);
   window_->GetContentView()->AddChildView(c2);
-  window_->GetContentView()->SetBounds(bounds);
+  window_->SetContentBounds(bounds);
   EXPECT_EQ(c1->GetBounds(), gfx::Rect(0, 0, 150, 400));
   EXPECT_EQ(c2->GetBounds(), gfx::Rect(150, 0, 150, 400));
 }
