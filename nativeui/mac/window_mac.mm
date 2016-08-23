@@ -19,7 +19,7 @@ void Window::PlatformInit(const Options& options) {
                          NSClosableWindowMask | NSResizableWindowMask |
                          NSTexturedBackgroundWindowMask;
   window_ = [[NSWindow alloc]
-      initWithContentRect:gfx::ScreenRectToNSRect(options.content_bounds)
+      initWithContentRect:gfx::ScreenRectToNSRect(options.bounds)
                 styleMask:styleMask
                   backing:NSBackingStoreBuffered
                     defer:YES];

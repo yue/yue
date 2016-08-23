@@ -165,7 +165,9 @@ const DWORD WindowImpl::kWindowDefaultStyle =
 
 WindowImpl::WindowImpl(base::StringPiece16 class_name, HWND parent,
                        DWORD window_style, DWORD window_ex_style)
-    : class_style_(CS_DBLCLKS) {
+    : class_style_(CS_DBLCLKS),
+      window_style_(window_style),
+      window_ex_style_(window_ex_style) {
   if (parent == HWND_DESKTOP) {
     // Only non-child windows can have HWND_DESKTOP (0) as their parent.
     CHECK_EQ(static_cast<int>(window_style & WS_CHILD), 0);

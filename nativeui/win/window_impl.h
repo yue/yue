@@ -24,8 +24,13 @@ class WindowImpl {
 
   // Returns the HWND associated with this Window.
   HWND hwnd() const { return hwnd_; }
+
   // Window's scale factor.
   float scale_factor() const { return scale_factor_; }
+
+  // Window styles.
+  DWORD window_style() const { return window_style_; }
+  DWORD window_ex_style() const { return window_ex_style_; }
 
  protected:
   static const DWORD kWindowDefaultChildStyle;
@@ -73,6 +78,10 @@ class WindowImpl {
   // The scale factor of current window.
   // TODO(zcbenz): Refresh the window when DPI changes.
   float scale_factor_ = 1.0f;
+
+  // Window styles.
+  DWORD window_style_;
+  DWORD window_ex_style_;
 };
 
 }  // namespace nu

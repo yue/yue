@@ -8,6 +8,19 @@ namespace nu {
 
 void BaseView::SetPixelBounds(const gfx::Rect& bounds) {
   bounds_ = bounds;
+
+  // Refresh the origin to parent HWND.
+  if (parent()) {
+    gfx::Point po = parent()->GetWindowPixelOrigin();
+    window_origin_.set_x(bounds.x() + po.x());
+    window_origin_.set_y(bounds.y() + po.y());
+  } else if (window_) {
+    DCHECK(is_content_view_);
+    window_origin_ = bounds.origin();
+  } else {
+    DCHECK(!is_content_view_);
+    window_origin_ = gfx::Point();
+  }
 }
 
 gfx::Rect BaseView::GetPixelBounds() {
@@ -20,6 +33,10 @@ void BaseView::SetBounds(const gfx::Rect& bounds) {
 
 gfx::Rect BaseView::GetBounds() {
   return ScaleToEnclosingRect(GetPixelBounds(), 1.0f / scale_factor());
+}
+
+gfx::Point BaseView::GetWindowPixelOrigin() {
+  return window_origin_;
 }
 
 void BaseView::SetParent(BaseView* parent) {

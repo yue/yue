@@ -29,7 +29,7 @@ def list_files(directories, filters):
 
 def call_cpplint(files):
   cpplint = os.path.join(SOURCE_ROOT, 'tools', 'cpplint.py')
-  subprocess.check_call([cpplint] + files)
+  subprocess.check_call([sys.executable, cpplint] + files)
 
 
 if __name__ == '__main__':

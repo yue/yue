@@ -23,8 +23,8 @@ void SubwinView::SetPixelBounds(const gfx::Rect& bounds) {
 
   // Calculate the bounds relative to parent HWND.
   gfx::Point pos(bounds.origin());
-  for (BaseView* p = parent(); p && p->is_virtual(); p = p->parent()) {
-    gfx::Point offset = p->GetPixelBounds().origin();
+  if (parent()) {
+    gfx::Point offset = parent()->GetWindowPixelOrigin();
     pos.set_x(pos.x() + offset.x());
     pos.set_y(pos.y() + offset.y());
   }
@@ -32,6 +32,16 @@ void SubwinView::SetPixelBounds(const gfx::Rect& bounds) {
   SetWindowPos(hwnd(), NULL, pos.x(), pos.y(), bounds.width(), bounds.height(),
                SWP_NOACTIVATE | SWP_NOZORDER);
   RedrawWindow(hwnd(), NULL, NULL, RDW_INVALIDATE | RDW_ALLCHILDREN);
+}
+
+gfx::Point SubwinView::GetWindowPixelOrigin() {
+  if (parent()) {
+    gfx::Point origin = GetBounds().origin();
+    gfx::Point offset = parent()->GetWindowPixelOrigin();
+    return gfx::Point(origin.x() + offset.x(), origin.y() + offset.y());
+  } else {
+    return gfx::Point();
+  }
 }
 
 void SubwinView::SetParent(BaseView* parent) {

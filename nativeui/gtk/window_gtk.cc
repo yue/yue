@@ -24,11 +24,9 @@ Window::~Window() {
 void Window::PlatformInit(const Options& options) {
   window_ = GTK_WINDOW(gtk_window_new(GTK_WINDOW_TOPLEVEL));
   gtk_window_set_focus_on_map(window_, false);
-  gtk_window_set_default_size(window_,
-                              options.content_bounds.width(),
-                              options.content_bounds.height());
-  gtk_window_move(window_, options.content_bounds.x(),
-                           options.content_bounds.y());
+  gtk_window_set_default_size(window_, options.bounds.width(),
+                                       options.bounds.height());
+  gtk_window_move(window_, options.bounds.x(), options.bounds.y());
 }
 
 void Window::PlatformSetContentView(Container* container) {

@@ -14,7 +14,7 @@ namespace nu {
 NATIVEUI_EXPORT class Window : public base::RefCounted<Window> {
  public:
   struct Options {
-    gfx::Rect content_bounds;
+    gfx::Rect bounds;
   };
 
   explicit Window(const Options& options);

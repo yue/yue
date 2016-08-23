@@ -40,11 +40,13 @@ class TopLevelWindow : public WindowImpl {
  protected:
   CR_BEGIN_MSG_MAP_EX(TopLevelWindow, WindowImpl)
     CR_MSG_WM_SIZE(OnSize)
+    CR_MSG_WM_PAINT(OnPaint)
     CR_MESSAGE_HANDLER_EX(WM_SETCURSOR, OnSetCursor);
   CR_END_MSG_MAP()
 
  private:
   void OnSize(UINT param, const gfx::Size& size);
+  void OnPaint(HDC dc);
   LRESULT OnSetCursor(UINT message, WPARAM w_param, LPARAM l_param);
 
   Window* delegate_;
@@ -54,6 +56,9 @@ void TopLevelWindow::OnSize(UINT param, const gfx::Size& size) {
   if (delegate_->GetContentView())
     delegate_->GetContentView()->view()->SetPixelBounds(
         gfx::Rect(gfx::Point(), size));
+}
+
+void TopLevelWindow::OnPaint(HDC dc) {
 }
 
 LRESULT TopLevelWindow::OnSetCursor(UINT message,
@@ -100,13 +105,39 @@ Window::~Window() {
 
 void Window::PlatformInit(const Options& options) {
   TopLevelWindow* win = new TopLevelWindow(this);
-  win->SetBounds(options.content_bounds);
-
   window_ = win;
+
+  SetBounds(options.bounds);
 }
 
 void Window::PlatformSetContentView(Container* container) {
   container->view()->BecomeContentView(window_);
+  container->Layout();
+}
+
+gfx::Rect Window::ContentBoundsToWindowBounds(const gfx::Rect& bounds) const {
+  RECT rect = bounds.ToRECT();
+  AdjustWindowRectEx(&rect, window_->window_style(),
+                     FALSE, window_->window_ex_style());
+  return gfx::Rect(rect);
+}
+
+gfx::Rect Window::WindowBoundsToContentBounds(const gfx::Rect& bounds) const {
+  RECT rect;
+  SetRectEmpty(&rect);
+  AdjustWindowRectEx(&rect, window_->window_style(),
+                     FALSE, window_->window_ex_style());
+  gfx::Rect content_bounds(bounds);
+  content_bounds.Subtract(gfx::Rect(rect));
+  return content_bounds;
+}
+
+void Window::SetBounds(const gfx::Rect& bounds) {
+  static_cast<TopLevelWindow*>(window_)->SetBounds(bounds);
+}
+
+gfx::Rect Window::GetBounds() const {
+  return static_cast<TopLevelWindow*>(window_)->GetBounds();
 }
 
 void Window::SetVisible(bool visible) {

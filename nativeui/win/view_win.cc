@@ -31,4 +31,13 @@ gfx::Rect View::GetPixelBounds() const {
   return view_->GetPixelBounds();
 }
 
+gfx::Point View::GetWindowOrigin() const {
+  return ScaleToFlooredPoint(GetWindowPixelOrigin(),
+                             1.0f / view_->scale_factor());
+}
+
+gfx::Point View::GetWindowPixelOrigin() const {
+  return view_->GetWindowPixelOrigin();
+}
+
 }  // namespace nu
