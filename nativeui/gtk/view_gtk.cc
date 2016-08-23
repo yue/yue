@@ -20,8 +20,9 @@ void View::SetBounds(const gfx::Rect& bounds) {
                         bounds.width(), bounds.height() };
   if (parent()) {
     // The size allocation is relative to the window instead of parent.
-    rect.x += parent()->GetBounds().x();
-    rect.y += parent()->GetBounds().y();
+    gfx::Point pb = parent()->GetWindowOrigin();
+    rect.x += pb.x();
+    rect.y += pb.y();
   }
   gtk_widget_size_allocate(view_, &rect);
 }
@@ -29,6 +30,12 @@ void View::SetBounds(const gfx::Rect& bounds) {
 gfx::Rect View::GetBounds() const {
   GdkRectangle rect;
   gtk_widget_get_allocation(view_, &rect);
+  if (parent()) {
+    // The size allocation is relative to the window instead of parent.
+    gfx::Point pb = parent()->GetWindowOrigin();
+    rect.x -= pb.x();
+    rect.y -= pb.y();
+  }
   return gfx::Rect(rect.x, rect.y, rect.width, rect.height);
 }
 
@@ -38,6 +45,16 @@ void View::SetPixelBounds(const gfx::Rect& bounds) {
 
 gfx::Rect View::GetPixelBounds() const {
   return GetBounds();
+}
+
+gfx::Point View::GetWindowOrigin() const {
+  GdkRectangle rect;
+  gtk_widget_get_allocation(view_, &rect);
+  return gfx::Point(rect.x, rect.y);
+}
+
+gfx::Point View::GetWindowPixelOrigin() const {
+  return GetWindowOrigin();
 }
 
 }  // namespace nu

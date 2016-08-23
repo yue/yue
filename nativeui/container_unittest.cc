@@ -74,6 +74,15 @@ TEST_F(ContainerTest, Layout) {
   EXPECT_EQ(container_->layout_count(), 3);
 }
 
+TEST_F(ContainerTest, VisibleLayout) {
+  window_->SetVisible(true);
+  EXPECT_GE(container_->layout_count(), 1);
+  container_->AddChildView(new nu::Container);
+  EXPECT_GE(container_->layout_count(), 2);
+  window_->SetBounds(gfx::Rect(0, 0, 100, 200));
+  EXPECT_GE(container_->layout_count(), 3);
+}
+
 TEST_F(ContainerTest, ChangeLayoutManager) {
   EXPECT_EQ(container_->layout_count(), 1);
   container_->SetLayoutManager(new nu::FillLayout);
@@ -103,6 +112,7 @@ TEST_F(ContainerTest, MoveBetweenContainers) {
   container_->AddChildView(c1);
   container_->AddChildView(c2);
   window_->SetContentBounds(gfx::Rect(0, 0, 200, 400));
+  EXPECT_EQ(container_->GetBounds(), gfx::Rect(0, 0, 200, 400));
   EXPECT_EQ(v1->GetBounds(), gfx::Rect(0, 0, 100, 200));
   EXPECT_EQ(v2->GetBounds(), gfx::Rect(0, 200, 100, 200));
   EXPECT_EQ(v1->GetWindowOrigin(), gfx::Point(0, 0));
