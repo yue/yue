@@ -14,8 +14,8 @@ Window::Window(const Options& options) {
 }
 
 void Window::SetContentView(Container* container) {
-  PlatformSetContentView(container);
   content_view_ = container;
+  PlatformSetContentView(container);
 }
 
 Container* Window::GetContentView() const {

@@ -27,6 +27,7 @@ void Window::PlatformInit(const Options& options) {
 
 void Window::PlatformSetContentView(Container* container) {
   [window_ setContentView:container->view()];
+  container->Layout();
 }
 
 gfx::Rect Window::ContentBoundsToWindowBounds(const gfx::Rect& bounds) const {
