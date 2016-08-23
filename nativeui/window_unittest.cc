@@ -23,7 +23,6 @@ TEST_F(WindowTest, Bounds) {
   EXPECT_EQ(window_->GetContentBounds(), bounds);
   window_->SetBounds(window_bounds);
   EXPECT_EQ(window_->GetBounds(), window_bounds);
-  EXPECT_EQ(window_->GetContentBounds(), bounds);
 }
 
 TEST_F(WindowTest, ContentView) {

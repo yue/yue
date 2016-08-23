@@ -34,16 +34,6 @@ void SubwinView::SetPixelBounds(const gfx::Rect& bounds) {
   RedrawWindow(hwnd(), NULL, NULL, RDW_INVALIDATE | RDW_ALLCHILDREN);
 }
 
-gfx::Point SubwinView::GetWindowPixelOrigin() {
-  if (parent()) {
-    gfx::Point origin = GetBounds().origin();
-    gfx::Point offset = parent()->GetWindowPixelOrigin();
-    return gfx::Point(origin.x() + offset.x(), origin.y() + offset.y());
-  } else {
-    return gfx::Point();
-  }
-}
-
 void SubwinView::SetParent(BaseView* parent) {
   BaseView::SetParent(parent);
   ::SetParent(hwnd(),

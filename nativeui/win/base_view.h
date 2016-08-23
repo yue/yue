@@ -22,11 +22,12 @@ class BaseView {
   virtual void SetPixelBounds(const gfx::Rect& pixel_bounds);
   virtual gfx::Rect GetPixelBounds();
 
-  virtual gfx::Point GetWindowPixelOrigin();
-
   // Set the parent view.
   virtual void SetParent(BaseView* parent);
   virtual void BecomeContentView(WindowImpl* parent);
+
+  // Get the offset to parent HWND.
+  gfx::Point GetWindowPixelOrigin();
 
   // Returns DIP bounds according to window's scale factor.
   void SetBounds(const gfx::Rect& bounds);

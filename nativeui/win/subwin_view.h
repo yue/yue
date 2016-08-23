@@ -19,7 +19,6 @@ class SubwinView : public WindowImpl, public BaseView {
   ~SubwinView() override;
 
   void SetPixelBounds(const gfx::Rect& pixel_bounds) override;
-  gfx::Point GetWindowPixelOrigin() override;
   void SetParent(BaseView* parent) override;
   void BecomeContentView(WindowImpl* parent) override;
 };
