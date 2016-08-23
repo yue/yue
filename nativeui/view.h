@@ -27,6 +27,10 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
   void SetPixelBounds(const gfx::Rect& bounds);
   gfx::Rect GetPixelBounds() const;
 
+  // Gets the offset to the parent window.
+  gfx::Point GetWindowOrigin() const;
+  gfx::Point GetWindowPixelOrigin() const;
+
   // Get parent.
   const Container* parent() const { return parent_; }
   Container* parent() { return parent_; }

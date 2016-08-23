@@ -32,6 +32,7 @@ TEST_F(WindowTest, ContentView) {
   scoped_refptr<nu::Container> view(new nu::Container);
   window_->SetContentView(view.get());
   EXPECT_EQ(window_->GetContentView(), view.get());
+  EXPECT_EQ(view->GetWindowPixelOrigin(), gfx::Point(0, 0));
 }
 
 TEST_F(WindowTest, Visible) {

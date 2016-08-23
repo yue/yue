@@ -30,6 +30,8 @@ TEST_F(BoxLayoutTest, ListChild) {
   window_->SetContentBounds(bounds);
   EXPECT_EQ(c1->GetBounds(), gfx::Rect(0, 0, 300, 200));
   EXPECT_EQ(c2->GetBounds(), gfx::Rect(0, 200, 300, 200));
+  EXPECT_EQ(c1->GetWindowOrigin(), gfx::Point(0, 0));
+  EXPECT_EQ(c2->GetWindowOrigin(), gfx::Point(0, 200));
 }
 
 TEST_F(BoxLayoutTest, ListChildChild) {
@@ -42,6 +44,8 @@ TEST_F(BoxLayoutTest, ListChildChild) {
   window_->SetContentBounds(bounds);
   EXPECT_EQ(c1->GetBounds(), gfx::Rect(0, 0, 300, 400));
   EXPECT_EQ(c2->GetBounds(), gfx::Rect(0, 0, 300, 400));
+  EXPECT_EQ(c1->GetWindowOrigin(), gfx::Point(0, 0));
+  EXPECT_EQ(c2->GetWindowOrigin(), gfx::Point(0, 0));
 }
 
 TEST_F(BoxLayoutTest, ListChildHorizontal) {
@@ -55,4 +59,6 @@ TEST_F(BoxLayoutTest, ListChildHorizontal) {
   window_->SetContentBounds(bounds);
   EXPECT_EQ(c1->GetBounds(), gfx::Rect(0, 0, 150, 400));
   EXPECT_EQ(c2->GetBounds(), gfx::Rect(150, 0, 150, 400));
+  EXPECT_EQ(c1->GetWindowOrigin(), gfx::Point(0, 0));
+  EXPECT_EQ(c2->GetWindowOrigin(), gfx::Point(150, 0));
 }

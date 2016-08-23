@@ -105,6 +105,8 @@ TEST_F(ContainerTest, MoveBetweenContainers) {
   window_->SetContentBounds(gfx::Rect(0, 0, 200, 400));
   EXPECT_EQ(v1->GetBounds(), gfx::Rect(0, 0, 100, 200));
   EXPECT_EQ(v2->GetBounds(), gfx::Rect(0, 200, 100, 200));
+  EXPECT_EQ(v1->GetWindowOrigin(), gfx::Point(0, 0));
+  EXPECT_EQ(v2->GetWindowOrigin(), gfx::Point(0, 200));
 
   c1->RemoveChildView(v1.get());
   c1->RemoveChildView(v2.get());
@@ -112,4 +114,6 @@ TEST_F(ContainerTest, MoveBetweenContainers) {
   c2->AddChildView(v2.get());
   EXPECT_EQ(v1->GetBounds(), gfx::Rect(0, 0, 50, 400));
   EXPECT_EQ(v2->GetBounds(), gfx::Rect(50, 0, 50, 400));
+  EXPECT_EQ(v1->GetWindowOrigin(), gfx::Point(100, 0));
+  EXPECT_EQ(v2->GetWindowOrigin(), gfx::Point(150, 0));
 }

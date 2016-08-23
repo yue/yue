@@ -44,4 +44,18 @@ gfx::Rect View::GetPixelBounds() const {
   return GetBounds();
 }
 
+gfx::Point View::GetWindowOrigin() const {
+  if (!view_.window || !view_.window.contentView)
+    return GetBounds().origin();
+  NSRect contentFrame = view_.window.contentView.frame;
+  gfx::Rect bounds([view_ convertRect:view_.bounds
+                               toView:view_.window.contentView]);
+  return gfx::Point(bounds.x(),
+                    NSHeight(contentFrame) - (bounds.y() + bounds.height()));
+}
+
+gfx::Point View::GetWindowPixelOrigin() const {
+  return GetWindowOrigin();
+}
+
 }  // namespace nu

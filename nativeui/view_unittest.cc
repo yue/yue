@@ -4,6 +4,7 @@
 
 #include "nativeui/init.h"
 #include "nativeui/label.h"
+#include "nativeui/window.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 class ViewTest : public testing::Test {
@@ -20,4 +21,15 @@ TEST_F(ViewTest, Bounds) {
   gfx::Rect bounds(100, 100, 200, 200);
   view_->SetBounds(bounds);
   EXPECT_EQ(view_->GetBounds(), bounds);
+  EXPECT_EQ(view_->GetWindowPixelOrigin(), gfx::Point(100, 100));
+}
+
+TEST_F(ViewTest, AddToChildView) {
+  scoped_refptr<nu::Window> window(new nu::Window(nu::Window::Options()));
+  window->GetContentView()->AddChildView(view_.get());
+
+  gfx::Rect bounds(100, 100, 200, 200);
+  window->SetContentBounds(bounds);
+  EXPECT_EQ(view_->GetBounds(), gfx::Rect(0, 0, 200, 200));
+  EXPECT_EQ(view_->GetWindowPixelOrigin(), gfx::Point(0, 0));
 }
