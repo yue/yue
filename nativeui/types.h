@@ -11,6 +11,12 @@
 #include <gtk/gtk.h>  // NOLINT
 #endif
 
+#if defined(OS_WIN)
+#include "base/strings/string16.h"
+#else
+#include <string>
+#endif
+
 #if defined(OS_MACOSX)
 #ifdef __OBJC__
 @class NSView;
@@ -26,6 +32,12 @@ namespace nu {
 #if defined(OS_WIN)
 class BaseView;
 class WindowImpl;
+#endif
+
+#if defined(OS_WIN)
+typedef base::string16 String;
+#else
+typedef std::string String;
 #endif
 
 #if defined(OS_MACOSX)

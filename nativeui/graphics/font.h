@@ -5,15 +5,15 @@
 #ifndef NATIVEUI_GRAPHICS_FONT_H_
 #define NATIVEUI_GRAPHICS_FONT_H_
 
-#include <string>
+#include "nativeui/types.h"
 
 namespace nu {
 
 struct Font {
   Font();
-  Font(const std::string& family, int size) : family(family), size(size) {}
+  Font(const String& family, int size) : family(family), size(size) {}
 
-  std::string family;
+  String family;
   int size;
 };
 

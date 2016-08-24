@@ -4,14 +4,13 @@
 
 #include "nativeui/graphics/font.h"
 
-#include "base/strings/utf_string_conversions.h"
 #include "base/win/scoped_gdi_object.h"
 #include "base/win/scoped_hdc.h"
 #include "nativeui/win/gdiplus.h"
 
 namespace nu {
 
-Font::Font() : family("Tahoma"), size(24) {
+Font::Font() : family(L"Tahoma"), size(24) {
 }
 
 Font GetDefaultFont() {
@@ -26,7 +25,7 @@ Font GetDefaultFont() {
 
   wchar_t buffer[LF_FACESIZE] = {0};
   family.GetFamilyName(buffer);
-  return Font(base::UTF16ToUTF8(buffer), font.GetSize());
+  return Font(buffer, font.GetSize());
 }
 
 }  // namespace nu

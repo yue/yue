@@ -7,8 +7,9 @@
 #include "base/strings/string_util.h"
 #include "base/strings/utf_string_conversions.h"
 #include "nativeui/graphics/color.h"
-#include "nativeui/graphics/font.h"
+#include "nativeui/graphics/text.h"
 #include "nativeui/win/subwin_view.h"
+#include "ui/gfx/geometry/size_conversions.h"
 
 namespace nu {
 
@@ -19,7 +20,7 @@ class LabelView : public BaseView {
   LabelView() : BaseView(true),
                 color_(GetThemeColor(ThemeColor::Text)),
                 font_(GetDefaultFont()),
-                gdi_font_family_(base::UTF8ToUTF16(font_.family).c_str()),
+                gdi_font_family_(font_.family.c_str()),
                 gdi_font_(&gdi_font_family_, font_.size,
                           Gdiplus::FontStyleRegular, Gdiplus::UnitPixel) {
   }
@@ -36,7 +37,12 @@ class LabelView : public BaseView {
     if (!window())
       return;
 
+    // Pring the text in middle of rect.
     gfx::Point origin(GetWindowPixelOrigin());
+    gfx::Size text_size = ToFlooredSize(MeasureText(font_, text_));
+    gfx::Size ctrl_size = GetPixelBounds().size();
+    origin.set_x(origin.x() + (ctrl_size.width() - text_size.width()) / 2);
+    origin.set_y(origin.y() + (ctrl_size.height() - text_size.height()) / 2);
 
     Gdiplus::PointF point(origin.x(), origin.y());
     Gdiplus::SolidBrush brush(
