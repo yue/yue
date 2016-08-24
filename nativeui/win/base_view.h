@@ -5,8 +5,6 @@
 #ifndef NATIVEUI_WIN_BASE_VIEW_H_
 #define NATIVEUI_WIN_BASE_VIEW_H_
 
-#include <windows.h>
-
 #include "nativeui/win/window_impl.h"
 
 namespace nu {

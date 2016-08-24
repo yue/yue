@@ -38,6 +38,7 @@ source_set("nativeui") {
     "mac/window_mac.mm",
     "win/base_view.cc",
     "win/base_view.h",
+    "win/gdiplus.h",
     "win/subwin_holder.cc",
     "win/subwin_holder.h",
     "win/subwin_view.cc",
@@ -67,7 +68,9 @@ source_set("nativeui") {
   } else if (is_win) {
     libs = [
       "gdi32.lib",
+      "gdiplus.lib",
     ]
+    configs -= [ "//build/config/win:lean_and_mean" ]
   }
 }
 

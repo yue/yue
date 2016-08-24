@@ -8,6 +8,7 @@
 #include "base/win/scoped_hdc.h"
 #include "base/win/scoped_select_object.h"
 #include "nativeui/win/base_view.h"
+#include "nativeui/win/gdiplus.h"
 #include "nativeui/win/window_impl.h"
 
 namespace nu {
