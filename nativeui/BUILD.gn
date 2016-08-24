@@ -17,6 +17,8 @@ source_set("nativeui") {
     "types.h",
     "view.h",
     "label.h",
+    "group.cc",
+    "group.h",
     "window.cc",
     "window.h",
     "graphics/color.h",
@@ -36,6 +38,7 @@ source_set("nativeui") {
     "gtk/window_gtk.cc",
     "mac/container_mac.mm",
     "mac/init_mac.mm",
+    "mac/group_mac.mm",
     "mac/label_mac.mm",
     "mac/view_mac.mm",
     "mac/window_mac.mm",
@@ -83,6 +86,7 @@ source_set("nativeui") {
 test("nativeui_unittests") {
   sources = [
     "container_unittest.cc",
+    "group_unittest.cc",
     "label_unittest.cc",
     "view_unittest.cc",
     "window_unittest.cc",

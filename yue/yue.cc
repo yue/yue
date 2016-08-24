@@ -8,8 +8,8 @@
 #include "base/message_loop/message_loop.h"
 #include "base/run_loop.h"
 #include "lua/callback.h"
-#include "nativeui/container.h"
 #include "nativeui/init.h"
+#include "nativeui/group.h"
 #include "nativeui/label.h"
 #include "nativeui/layout/box_layout.h"
 #include "nativeui/window.h"
@@ -58,7 +58,10 @@ int main(int argc, const char *argv[]) {
   sub->SetLayoutManager(new nu::BoxLayout(nu::BoxLayout::Vertical));
   sub->AddChildView(new nu::Label("line1"));
   sub->AddChildView(new nu::Label("line2"));
-  container->AddChildView(sub);
+  nu::Group* group = new nu::Group;
+  group->SetTitle("Button Group");
+  group->SetContentView(sub);
+  container->AddChildView(group);
   window->SetContentView(container);
   window->SetVisible(true);
 
