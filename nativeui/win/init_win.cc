@@ -8,6 +8,7 @@
 
 #include "base/logging.h"
 #include "base/win/windows_version.h"
+#include "nativeui/win/gdiplus.h"
 
 namespace nu {
 
@@ -62,6 +63,10 @@ void EnableHighDPISupport() {
 
 void Initialize() {
   EnableHighDPISupport();
+
+  ULONG_PTR token;
+  Gdiplus::GdiplusStartupInput input;
+  Gdiplus::GdiplusStartup(&token, &input, nullptr);
 }
 
 }  // namespace nu

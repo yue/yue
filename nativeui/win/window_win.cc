@@ -80,6 +80,11 @@ void TopLevelWindow::OnPaint(HDC) {
       CreateCompatibleBitmap(dc, bounds.width(), bounds.height()));
   base::win::ScopedSelectObject select_bitmap(mem_dc.Get(), mem_bitmap.get());
 
+  // Background.
+  Gdiplus::Graphics graphics(mem_dc.Get());
+  Gdiplus::SolidBrush solid_brush(Gdiplus::Color(255, 255, 255, 255));
+  graphics.FillRectangle(&solid_brush, 0, 0, bounds.width(), bounds.height());
+
   // Draw.
   gfx::Rect dirty(ps.rcPaint);
   delegate_->GetContentView()->view()->Draw(mem_dc.Get(), dirty);
