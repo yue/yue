@@ -21,6 +21,20 @@ class ContainerView : public BaseView {
     container_->Layout();
   }
 
+  void Draw(HDC dc, const gfx::Rect& dirty) override {
+    // Calculate the dirty rect for each child.
+    for (int i = 0; i < container_->child_count(); ++i) {
+      View* child = container_->child_at(i);
+      gfx::Rect child_bounds = child->GetPixelBounds();
+      if (child_bounds.Intersects(dirty)) {
+        gfx::Rect child_dirty(dirty);
+        child_dirty.Intersect(child_bounds);
+        child_dirty -= child_bounds.OffsetFromOrigin();
+        child->view()->Draw(dc, child_dirty);
+      }
+    }
+  }
+
   void SetParent(BaseView* parent) override {
     BaseView::SetParent(parent);
     RefreshParentTree();

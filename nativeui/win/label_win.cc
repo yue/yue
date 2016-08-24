@@ -10,10 +10,37 @@
 
 namespace nu {
 
+namespace {
+
+class LabelView : public BaseView {
+ public:
+  LabelView() : BaseView(true) {}
+
+  void SetText(const base::string16& text) {
+    text_ = text;
+  }
+
+  base::string16 GetText() const {
+    return text_;
+  }
+
+  void Draw(HDC dc, const gfx::Rect& dirty) override {
+    if (!window())
+      return;
+
+    gfx::Point origin(GetWindowPixelOrigin());
+    TextOutW(dc, origin.x(), origin.y(),
+             text_.c_str(), static_cast<int>(text_.length()));
+  }
+
+ private:
+  base::string16 text_;
+};
+
+}  // namespace
+
 Label::Label(const std::string& text) {
-  set_view(new SubwinView(
-      base::StringPiece16(L"static"),
-      WS_CHILD | WS_VISIBLE | SS_CENTER | SS_CENTERIMAGE));
+  set_view(new LabelView());
   SetText(text);
 }
 
@@ -21,16 +48,13 @@ Label::~Label() {
 }
 
 void Label::SetText(const std::string& text) {
-  HWND hwnd = static_cast<SubwinView*>(view())->hwnd();
-  SetWindowTextW(hwnd, base::UTF8ToUTF16(text).c_str());
+  LabelView* label = static_cast<LabelView*>(view());
+  label->SetText(base::UTF8ToUTF16(text));
 }
 
 std::string Label::GetText() {
-  HWND hwnd = static_cast<SubwinView*>(view())->hwnd();
-  base::string16 title;
-  int length = GetWindowTextLengthW(hwnd) + 1;
-  GetWindowTextW(hwnd, base::WriteInto(&title, length), length);
-  return base::UTF16ToUTF8(title);
+  LabelView* label = static_cast<LabelView*>(view());
+  return base::UTF16ToUTF8(label->GetText());
 }
 
 }  // namespace nu

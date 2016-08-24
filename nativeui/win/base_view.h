@@ -22,6 +22,9 @@ class BaseView {
   virtual void SetPixelBounds(const gfx::Rect& pixel_bounds);
   virtual gfx::Rect GetPixelBounds();
 
+  // Draw the content.
+  virtual void Draw(HDC dc, const gfx::Rect& dirty) {}
+
   // Set the parent view.
   virtual void SetParent(BaseView* parent);
   virtual void BecomeContentView(WindowImpl* parent);

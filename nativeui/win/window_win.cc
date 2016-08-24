@@ -4,6 +4,9 @@
 
 #include "nativeui/window.h"
 
+#include "base/win/scoped_gdi_object.h"
+#include "base/win/scoped_hdc.h"
+#include "base/win/scoped_select_object.h"
 #include "nativeui/win/base_view.h"
 #include "nativeui/win/window_impl.h"
 
@@ -16,52 +19,80 @@ class TopLevelWindow : public WindowImpl {
   explicit TopLevelWindow(Window* delegate)
     : WindowImpl(), delegate_(delegate) {}
 
-  void SetPixelBounds(const gfx::Rect& bounds) {
-    SetWindowPos(hwnd(), NULL,
-                 bounds.x(), bounds.y(), bounds.width(), bounds.height(),
-                 SWP_NOACTIVATE | SWP_NOZORDER);
-    RedrawWindow(hwnd(), NULL, NULL, RDW_INVALIDATE | RDW_ALLCHILDREN);
-  }
-
-  gfx::Rect GetPixelBounds() {
-    RECT r;
-    GetWindowRect(hwnd(), &r);
-    return gfx::Rect(r);
-  }
-
-  gfx::Rect GetContentPixelBounds() {
-    RECT r;
-    GetClientRect(hwnd(), &r);
-    POINT point = { r.left, r.top };
-    ClientToScreen(hwnd(), &point);
-    return gfx::Rect(point.x, point.y, r.right - r.left, r.bottom - r.top);
-  }
+  void SetPixelBounds(const gfx::Rect& bounds);
+  gfx::Rect GetPixelBounds();
+  gfx::Rect GetContentPixelBounds();
 
  protected:
   CR_BEGIN_MSG_MAP_EX(TopLevelWindow, WindowImpl)
     CR_MSG_WM_SIZE(OnSize)
     CR_MSG_WM_PAINT(OnPaint)
+    CR_MSG_WM_ERASEBKGND(OnEraseBkgnd)
     CR_MESSAGE_HANDLER_EX(WM_SETCURSOR, OnSetCursor);
   CR_END_MSG_MAP()
 
  private:
   void OnSize(UINT param, const gfx::Size& size);
   void OnPaint(HDC dc);
+  LRESULT OnEraseBkgnd(HDC dc);
   LRESULT OnSetCursor(UINT message, WPARAM w_param, LPARAM l_param);
 
   Window* delegate_;
 };
 
+void TopLevelWindow::SetPixelBounds(const gfx::Rect& bounds) {
+  SetWindowPos(hwnd(), NULL,
+               bounds.x(), bounds.y(), bounds.width(), bounds.height(),
+               SWP_NOACTIVATE | SWP_NOZORDER);
+}
+
+gfx::Rect TopLevelWindow::GetPixelBounds() {
+  RECT r;
+  GetWindowRect(hwnd(), &r);
+  return gfx::Rect(r);
+}
+
+gfx::Rect TopLevelWindow::GetContentPixelBounds() {
+  RECT r;
+  GetClientRect(hwnd(), &r);
+  POINT point = { r.left, r.top };
+  ClientToScreen(hwnd(), &point);
+  return gfx::Rect(point.x, point.y, r.right - r.left, r.bottom - r.top);
+}
+
 void TopLevelWindow::OnSize(UINT param, const gfx::Size& size) {
   if (delegate_->GetContentView())
     delegate_->GetContentView()->view()->SetPixelBounds(
         gfx::Rect(gfx::Point(), size));
+  RedrawWindow(hwnd(), NULL, NULL, RDW_INVALIDATE | RDW_ALLCHILDREN);
 }
 
-void TopLevelWindow::OnPaint(HDC dc) {
+void TopLevelWindow::OnPaint(HDC) {
   PAINTSTRUCT ps;
   BeginPaint(hwnd(), &ps);
+
+  // Prepare double buffering.
+  gfx::Rect bounds(GetContentPixelBounds());
+  base::win::ScopedGetDC dc(hwnd());
+  base::win::ScopedCreateDC mem_dc(CreateCompatibleDC(dc));
+  base::win::ScopedBitmap mem_bitmap(
+      CreateCompatibleBitmap(dc, bounds.width(), bounds.height()));
+  base::win::ScopedSelectObject select_bitmap(mem_dc.Get(), mem_bitmap.get());
+
+  // Draw.
+  gfx::Rect dirty(ps.rcPaint);
+  delegate_->GetContentView()->view()->Draw(mem_dc.Get(), dirty);
+
+  // Transfer the off-screen DC to the screen.
+  BitBlt(dc, 0, 0, bounds.width(), bounds.height(),
+         mem_dc.Get(), 0, 0, SRCCOPY);
+
   EndPaint(hwnd(), &ps);
+}
+
+LRESULT TopLevelWindow::OnEraseBkgnd(HDC dc) {
+  // Needed to prevent resize flicker.
+  return 1;
 }
 
 LRESULT TopLevelWindow::OnSetCursor(UINT message,
