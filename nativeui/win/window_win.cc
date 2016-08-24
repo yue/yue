@@ -87,7 +87,7 @@ void TopLevelWindow::OnPaint(HDC) {
 
   // Draw.
   gfx::Rect dirty(ps.rcPaint);
-  delegate_->GetContentView()->view()->Draw(mem_dc.Get(), dirty);
+  delegate_->GetContentView()->view()->Draw(&graphics, dirty);
 
   // Transfer the off-screen DC to the screen.
   BitBlt(dc, 0, 0, bounds.width(), bounds.height(),

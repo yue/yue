@@ -21,7 +21,7 @@ class ContainerView : public BaseView {
     container_->Layout();
   }
 
-  void Draw(HDC dc, const gfx::Rect& dirty) override {
+  void Draw(Gdiplus::Graphics* context, const gfx::Rect& dirty) override {
     // Calculate the dirty rect for each child.
     for (int i = 0; i < container_->child_count(); ++i) {
       View* child = container_->child_at(i);
@@ -30,7 +30,7 @@ class ContainerView : public BaseView {
         gfx::Rect child_dirty(dirty);
         child_dirty.Intersect(child_bounds);
         child_dirty -= child_bounds.OffsetFromOrigin();
-        child->view()->Draw(dc, child_dirty);
+        child->view()->Draw(context, child_dirty);
       }
     }
   }

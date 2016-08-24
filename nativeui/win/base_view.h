@@ -5,6 +5,7 @@
 #ifndef NATIVEUI_WIN_BASE_VIEW_H_
 #define NATIVEUI_WIN_BASE_VIEW_H_
 
+#include "nativeui/win/gdiplus.h"
 #include "nativeui/win/window_impl.h"
 
 namespace nu {
@@ -21,7 +22,7 @@ class BaseView {
   virtual gfx::Rect GetPixelBounds();
 
   // Draw the content.
-  virtual void Draw(HDC dc, const gfx::Rect& dirty) {}
+  virtual void Draw(Gdiplus::Graphics* context, const gfx::Rect& dirty) {}
 
   // Set the parent view.
   virtual void SetParent(BaseView* parent);

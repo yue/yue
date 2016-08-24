@@ -24,13 +24,20 @@ class LabelView : public BaseView {
     return text_;
   }
 
-  void Draw(HDC dc, const gfx::Rect& dirty) override {
+  void Draw(Gdiplus::Graphics* context, const gfx::Rect& dirty) override {
     if (!window())
       return;
 
     gfx::Point origin(GetWindowPixelOrigin());
-    TextOutW(dc, origin.x(), origin.y(),
-             text_.c_str(), static_cast<int>(text_.length()));
+
+    Gdiplus::FontFamily family(L"Times New Roman");
+    Gdiplus::Font font(&family, 24, Gdiplus::FontStyleRegular,
+                       Gdiplus::UnitPixel);
+    Gdiplus::PointF point(origin.x(), origin.y());
+    Gdiplus::SolidBrush brush(Gdiplus::Color(255, 0, 0, 255));
+
+    context->DrawString(text_.c_str(), static_cast<int>(text_.size()),
+                        &font, point, &brush);
   }
 
  private:
