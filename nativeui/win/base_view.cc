@@ -14,12 +14,8 @@ void BaseView::SetPixelBounds(const gfx::Rect& bounds) {
     gfx::Point po = parent()->GetWindowPixelOrigin();
     window_origin_.set_x(bounds.x() + po.x());
     window_origin_.set_y(bounds.y() + po.y());
-  } else if (window_) {
-    DCHECK(is_content_view_);
-    window_origin_ = bounds.origin();
   } else {
-    DCHECK(!is_content_view_);
-    window_origin_ = gfx::Point();
+    window_origin_ = bounds.origin();
   }
 }
 

@@ -124,6 +124,7 @@ void Window::PlatformInit(const Options& options) {
 
 void Window::PlatformSetContentView(Container* container) {
   container->view()->BecomeContentView(window_);
+  container->Layout();
 }
 
 void Window::SetContentBounds(const gfx::Rect& bounds) {
