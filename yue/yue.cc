@@ -50,7 +50,7 @@ int main(int argc, const char *argv[]) {
   nu::Initialize();
   nu::Window::Options options = { gfx::Rect(100, 100, 400, 400) };
   scoped_refptr<nu::Window> window(new nu::Window(options));
-  nu::Container* container = new nu::Container;
+  nu::Container* container = window->GetContentView();
   container->SetLayoutManager(new nu::BoxLayout(nu::BoxLayout::Horizontal));
   container->AddChildView(new nu::Label("col1"));
   container->AddChildView(new nu::Label("col2"));
@@ -62,7 +62,6 @@ int main(int argc, const char *argv[]) {
   group->SetTitle("Button Group");
   group->SetContentView(sub);
   container->AddChildView(group);
-  window->SetContentView(container);
   window->SetVisible(true);
 
   base::RunLoop().Run();
