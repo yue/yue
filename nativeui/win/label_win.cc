@@ -6,6 +6,8 @@
 
 #include "base/strings/string_util.h"
 #include "base/strings/utf_string_conversions.h"
+#include "nativeui/graphics/color.h"
+#include "nativeui/graphics/font.h"
 #include "nativeui/win/subwin_view.h"
 
 namespace nu {
@@ -14,7 +16,13 @@ namespace {
 
 class LabelView : public BaseView {
  public:
-  LabelView() : BaseView(true) {}
+  LabelView() : BaseView(true),
+                color_(GetThemeColor(ThemeColor::Text)),
+                font_(GetDefaultFont()),
+                gdi_font_family_(base::UTF8ToUTF16(font_.family).c_str()),
+                gdi_font_(&gdi_font_family_, font_.size,
+                          Gdiplus::FontStyleRegular, Gdiplus::UnitPixel) {
+  }
 
   void SetText(const base::string16& text) {
     text_ = text;
@@ -30,17 +38,19 @@ class LabelView : public BaseView {
 
     gfx::Point origin(GetWindowPixelOrigin());
 
-    Gdiplus::FontFamily family(L"Times New Roman");
-    Gdiplus::Font font(&family, 24, Gdiplus::FontStyleRegular,
-                       Gdiplus::UnitPixel);
     Gdiplus::PointF point(origin.x(), origin.y());
-    Gdiplus::SolidBrush brush(Gdiplus::Color(255, 0, 0, 255));
-
+    Gdiplus::SolidBrush brush(
+        Gdiplus::Color(color_.a(), color_.r(), color_.g(), color_.b()));
     context->DrawString(text_.c_str(), static_cast<int>(text_.size()),
-                        &font, point, &brush);
+                        &gdi_font_, point, &brush);
   }
 
  private:
+  Color color_;
+  Font font_;
+  Gdiplus::FontFamily gdi_font_family_;
+  Gdiplus::Font gdi_font_;
+
   base::string16 text_;
 };
 
