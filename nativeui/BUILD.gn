@@ -33,6 +33,7 @@ source_set("nativeui") {
     "gtk/gtk_event_loop.h",
     "gtk/container_gtk.cc",
     "gtk/init_gtk.cc",
+    "gtk/group_gtk.cc",
     "gtk/label_gtk.cc",
     "gtk/view_gtk.cc",
     "gtk/window_gtk.cc",
