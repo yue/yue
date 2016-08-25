@@ -43,11 +43,9 @@ class LabelView : public BaseView {
                       (ctrl_size.height() - text_size.height()) / 2);
     origin += GetWindowPixelOrigin().OffsetFromOrigin();
 
-    Gdiplus::PointF point(origin.x(), origin.y());
-    Gdiplus::SolidBrush brush(
-        Gdiplus::Color(color_.a(), color_.r(), color_.g(), color_.b()));
+    Gdiplus::SolidBrush brush(ToGdi(color_));
     context->DrawString(text_.c_str(), static_cast<int>(text_.size()),
-                        &gdi_font_, point, &brush);
+                        &gdi_font_, ToGdi(origin), &brush);
   }
 
  private:

@@ -30,6 +30,7 @@ class BaseView {
 
   // Get the offset to parent HWND.
   gfx::Point GetWindowPixelOrigin();
+  gfx::Rect GetWindowPixelBounds();
 
   // Returns DIP bounds according to window's scale factor.
   void SetBounds(const gfx::Rect& bounds);

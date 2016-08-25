@@ -31,6 +31,10 @@ gfx::Point BaseView::GetWindowPixelOrigin() {
   return window_origin_;
 }
 
+gfx::Rect BaseView::GetWindowPixelBounds() {
+  return gfx::Rect(window_origin_, bounds_.size());
+}
+
 void BaseView::SetParent(BaseView* parent) {
   float old_scale_factor = scale_factor();
 
