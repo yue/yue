@@ -4,7 +4,6 @@
 
 #include "nativeui/label.h"
 
-#include "base/strings/string_util.h"
 #include "base/strings/utf_string_conversions.h"
 #include "nativeui/graphics/color.h"
 #include "nativeui/graphics/text.h"

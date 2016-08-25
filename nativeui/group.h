@@ -5,6 +5,8 @@
 #ifndef NATIVEUI_GROUP_H_
 #define NATIVEUI_GROUP_H_
 
+#include <string>
+
 #include "nativeui/container.h"
 
 namespace nu {

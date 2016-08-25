@@ -57,6 +57,7 @@ source_set("nativeui") {
     "win/text_win.cc",
     "win/container_win.cc",
     "win/init_win.cc",
+    "win/group_win.cc",
     "win/label_win.cc",
     "win/view_win.cc",
     "win/screen.cc",
