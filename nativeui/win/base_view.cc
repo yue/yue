@@ -10,13 +10,9 @@ void BaseView::SetPixelBounds(const gfx::Rect& bounds) {
   bounds_ = bounds;
 
   // Refresh the origin to parent HWND.
-  if (parent()) {
-    gfx::Point po = parent()->GetWindowPixelOrigin();
-    window_origin_.set_x(bounds.x() + po.x());
-    window_origin_.set_y(bounds.y() + po.y());
-  } else {
-    window_origin_ = bounds.origin();
-  }
+  window_origin_ = bounds.origin();
+  if (parent())
+    window_origin_ += parent()->GetWindowPixelOrigin().OffsetFromOrigin();
 }
 
 gfx::Rect BaseView::GetPixelBounds() {

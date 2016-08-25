@@ -37,11 +37,11 @@ class LabelView : public BaseView {
       return;
 
     // Pring the text in middle of rect.
-    gfx::Point origin(GetWindowPixelOrigin());
     gfx::Size text_size = ToFlooredSize(MeasureText(font_, text_));
     gfx::Size ctrl_size = GetPixelBounds().size();
-    origin.set_x(origin.x() + (ctrl_size.width() - text_size.width()) / 2);
-    origin.set_y(origin.y() + (ctrl_size.height() - text_size.height()) / 2);
+    gfx::Point origin((ctrl_size.width() - text_size.width()) / 2,
+                      (ctrl_size.height() - text_size.height()) / 2);
+    origin += GetWindowPixelOrigin().OffsetFromOrigin();
 
     Gdiplus::PointF point(origin.x(), origin.y());
     Gdiplus::SolidBrush brush(
