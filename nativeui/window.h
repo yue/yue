@@ -5,6 +5,7 @@
 #ifndef NATIVEUI_WINDOW_H_
 #define NATIVEUI_WINDOW_H_
 
+#include "base/callback_list.h"
 #include "nativeui/container.h"
 #include "nativeui/gfx/geometry/rect.h"
 
@@ -19,6 +20,8 @@ NATIVEUI_EXPORT class Window : public base::RefCounted<Window> {
 
   explicit Window(const Options& options);
 
+  void Close();
+
   void SetContentView(Container* view);
   Container* GetContentView() const;
 
@@ -30,6 +33,11 @@ NATIVEUI_EXPORT class Window : public base::RefCounted<Window> {
 
   void SetVisible(bool visible);
   bool IsVisible() const;
+
+  NativeWindow window() const { return window_; }
+
+  // Events.
+  base::CallbackList<void()> on_close;
 
  protected:
   virtual ~Window();

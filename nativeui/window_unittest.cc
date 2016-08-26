@@ -2,6 +2,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
+#include "base/bind.h"
 #include "nativeui/init.h"
 #include "nativeui/window.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -38,4 +39,15 @@ TEST_F(WindowTest, Visible) {
   ASSERT_TRUE(window_->IsVisible());
   window_->SetVisible(false);
   ASSERT_FALSE(window_->IsVisible());
+}
+
+void OnClose(bool* ptr) {
+  *ptr = true;
+}
+
+TEST_F(WindowTest, OnClose) {
+  bool closed = false;
+  auto sub = window_->on_close.Add(base::Bind(&OnClose, &closed));
+  window_->Close();
+  EXPECT_EQ(closed, true);
 }

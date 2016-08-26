@@ -47,9 +47,13 @@ int main(int argc, const char *argv[]) {
   }
 #endif
 
+  base::RunLoop run_loop;
   nu::Initialize();
+
   nu::Window::Options options = { nu::Rect(100, 100, 400, 400) };
   scoped_refptr<nu::Window> window(new nu::Window(options));
+  auto sub_close = window->on_close.Add(run_loop.QuitClosure());
+
   nu::Container* container = window->GetContentView();
   container->SetLayoutManager(new nu::BoxLayout(nu::BoxLayout::Horizontal));
   container->AddChildView(new nu::Label("col1"));
@@ -64,7 +68,7 @@ int main(int argc, const char *argv[]) {
   container->AddChildView(group);
   window->SetVisible(true);
 
-  base::RunLoop().Run();
+  run_loop.Run();
 
   return 0;
 }

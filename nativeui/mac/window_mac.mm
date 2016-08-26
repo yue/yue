@@ -8,10 +8,36 @@
 
 #include "nativeui/gfx/mac/coordinate_conversion.h"
 
+@interface NUWindowDelegate : NSObject<NSWindowDelegate> {
+ @private
+  nu::Window* shell_;
+}
+- (id)initWithShell:(nu::Window*)shell;
+@end
+
+@implementation NUWindowDelegate
+
+- (id)initWithShell:(nu::Window*)shell {
+  if ((self = [super init]))
+    shell_ = shell;
+  return self;
+}
+
+- (void)windowWillClose:(NSNotification*)notification {
+  shell_->on_close.Notify();
+
+  // Clear the delegate class.
+  [shell_->window() setDelegate:nil];
+  [self release];
+}
+
+@end
+
 namespace nu {
 
 namespace {
 
+// Converting between window and content bounds.
 Rect ContentToWindowBounds(NSWindow* window, const Rect& bounds) {
   Rect window_bounds([window frameRectForContentRect:bounds.ToCGRect()]);
   int frame_height = window_bounds.height() - bounds.height();
@@ -41,6 +67,13 @@ void Window::PlatformInit(const Options& options) {
                 styleMask:styleMask
                   backing:NSBackingStoreBuffered
                     defer:YES];
+
+  [window_ setDelegate:[[NUWindowDelegate alloc] initWithShell:this]];
+  [window_ setReleasedWhenClosed:NO];
+}
+
+void Window::Close() {
+  [window_ performClose:nil];
 }
 
 void Window::PlatformSetContentView(Container* container) {
