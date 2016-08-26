@@ -15,45 +15,45 @@ View::~View() {
   gtk_widget_destroy(view_);
 }
 
-void View::SetBounds(const gfx::Rect& bounds) {
+void View::SetBounds(const Rect& bounds) {
   GdkRectangle rect = { bounds.x(), bounds.y(),
                         bounds.width(), bounds.height() };
   if (parent()) {
     // The size allocation is relative to the window instead of parent.
-    gfx::Point pb = parent()->GetWindowOrigin();
+    Point pb = parent()->GetWindowOrigin();
     rect.x += pb.x();
     rect.y += pb.y();
   }
   gtk_widget_size_allocate(view_, &rect);
 }
 
-gfx::Rect View::GetBounds() const {
+Rect View::GetBounds() const {
   GdkRectangle rect;
   gtk_widget_get_allocation(view_, &rect);
   if (parent()) {
     // The size allocation is relative to the window instead of parent.
-    gfx::Point pb = parent()->GetWindowOrigin();
+    Point pb = parent()->GetWindowOrigin();
     rect.x -= pb.x();
     rect.y -= pb.y();
   }
-  return gfx::Rect(rect.x, rect.y, rect.width, rect.height);
+  return Rect(rect.x, rect.y, rect.width, rect.height);
 }
 
-void View::SetPixelBounds(const gfx::Rect& bounds) {
+void View::SetPixelBounds(const Rect& bounds) {
   SetBounds(bounds);
 }
 
-gfx::Rect View::GetPixelBounds() const {
+Rect View::GetPixelBounds() const {
   return GetBounds();
 }
 
-gfx::Point View::GetWindowOrigin() const {
+Point View::GetWindowOrigin() const {
   GdkRectangle rect;
   gtk_widget_get_allocation(view_, &rect);
-  return gfx::Point(rect.x, rect.y);
+  return Point(rect.x, rect.y);
 }
 
-gfx::Point View::GetWindowPixelOrigin() const {
+Point View::GetWindowPixelOrigin() const {
   return GetWindowOrigin();
 }
 

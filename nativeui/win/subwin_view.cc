@@ -18,13 +18,13 @@ SubwinView::SubwinView(base::StringPiece16 class_name,
 SubwinView::~SubwinView() {
 }
 
-void SubwinView::SetPixelBounds(const gfx::Rect& bounds) {
+void SubwinView::SetPixelBounds(const Rect& bounds) {
   BaseView::SetPixelBounds(bounds);
 
   // Calculate the bounds relative to parent HWND.
-  gfx::Point pos(bounds.origin());
+  Point pos(bounds.origin());
   if (parent()) {
-    gfx::Point offset = parent()->GetWindowPixelOrigin();
+    Point offset = parent()->GetWindowPixelOrigin();
     pos.set_x(pos.x() + offset.x());
     pos.set_y(pos.y() + offset.y());
   }

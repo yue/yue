@@ -8,7 +8,7 @@
 #include "base/win/scoped_hdc.h"
 #include "base/win/scoped_select_object.h"
 #include "nativeui/win/base_view.h"
-#include "nativeui/win/gdiplus.h"
+#include "nativeui/gfx/win/gdiplus.h"
 #include "nativeui/win/window_impl.h"
 
 namespace nu {
@@ -20,9 +20,9 @@ class TopLevelWindow : public WindowImpl {
   explicit TopLevelWindow(Window* delegate)
     : WindowImpl(), delegate_(delegate) {}
 
-  void SetPixelBounds(const gfx::Rect& bounds);
-  gfx::Rect GetPixelBounds();
-  gfx::Rect GetContentPixelBounds();
+  void SetPixelBounds(const Rect& bounds);
+  Rect GetPixelBounds();
+  Rect GetContentPixelBounds();
 
  protected:
   CR_BEGIN_MSG_MAP_EX(TopLevelWindow, WindowImpl)
@@ -33,7 +33,7 @@ class TopLevelWindow : public WindowImpl {
   CR_END_MSG_MAP()
 
  private:
-  void OnSize(UINT param, const gfx::Size& size);
+  void OnSize(UINT param, const Size& size);
   void OnPaint(HDC dc);
   LRESULT OnEraseBkgnd(HDC dc);
   LRESULT OnSetCursor(UINT message, WPARAM w_param, LPARAM l_param);
@@ -41,30 +41,30 @@ class TopLevelWindow : public WindowImpl {
   Window* delegate_;
 };
 
-void TopLevelWindow::SetPixelBounds(const gfx::Rect& bounds) {
+void TopLevelWindow::SetPixelBounds(const Rect& bounds) {
   SetWindowPos(hwnd(), NULL,
                bounds.x(), bounds.y(), bounds.width(), bounds.height(),
                SWP_NOACTIVATE | SWP_NOZORDER);
 }
 
-gfx::Rect TopLevelWindow::GetPixelBounds() {
+Rect TopLevelWindow::GetPixelBounds() {
   RECT r;
   GetWindowRect(hwnd(), &r);
-  return gfx::Rect(r);
+  return Rect(r);
 }
 
-gfx::Rect TopLevelWindow::GetContentPixelBounds() {
+Rect TopLevelWindow::GetContentPixelBounds() {
   RECT r;
   GetClientRect(hwnd(), &r);
   POINT point = { r.left, r.top };
   ClientToScreen(hwnd(), &point);
-  return gfx::Rect(point.x, point.y, r.right - r.left, r.bottom - r.top);
+  return Rect(point.x, point.y, r.right - r.left, r.bottom - r.top);
 }
 
-void TopLevelWindow::OnSize(UINT param, const gfx::Size& size) {
+void TopLevelWindow::OnSize(UINT param, const Size& size) {
   if (delegate_->GetContentView())
     delegate_->GetContentView()->view()->SetPixelBounds(
-        gfx::Rect(gfx::Point(), size));
+        Rect(Point(), size));
   RedrawWindow(hwnd(), NULL, NULL, RDW_INVALIDATE | RDW_ALLCHILDREN);
 }
 
@@ -73,7 +73,7 @@ void TopLevelWindow::OnPaint(HDC) {
   BeginPaint(hwnd(), &ps);
 
   // Prepare double buffering.
-  gfx::Rect bounds(GetContentPixelBounds());
+  Rect bounds(GetContentPixelBounds());
   base::win::ScopedGetDC dc(hwnd());
   base::win::ScopedCreateDC mem_dc(CreateCompatibleDC(dc));
   base::win::ScopedBitmap mem_bitmap(
@@ -86,7 +86,7 @@ void TopLevelWindow::OnPaint(HDC) {
   graphics.FillRectangle(&solid_brush, 0, 0, bounds.width(), bounds.height());
 
   // Draw.
-  gfx::Rect dirty(ps.rcPaint);
+  Rect dirty(ps.rcPaint);
   delegate_->GetContentView()->view()->Draw(&graphics, dirty);
 
   // Transfer the off-screen DC to the screen.
@@ -138,11 +138,11 @@ LRESULT TopLevelWindow::OnSetCursor(UINT message,
 }
 
 // Convert between window and client areas.
-gfx::Rect ContentToWindowBounds(WindowImpl* window, const gfx::Rect& bounds) {
+Rect ContentToWindowBounds(WindowImpl* window, const Rect& bounds) {
   RECT rect = bounds.ToRECT();
   AdjustWindowRectEx(&rect, window->window_style(),
                      FALSE, window->window_ex_style());
-  return gfx::Rect(rect);
+  return Rect(rect);
 }
 
 }  // namespace
@@ -164,24 +164,24 @@ void Window::PlatformSetContentView(Container* container) {
   container->Layout();
 }
 
-void Window::SetContentBounds(const gfx::Rect& bounds) {
+void Window::SetContentBounds(const Rect& bounds) {
   TopLevelWindow* win = static_cast<TopLevelWindow*>(window_);
-  gfx::Rect pixel_bounds(ScaleToEnclosingRect(bounds, win->scale_factor()));
+  Rect pixel_bounds(ScaleToEnclosingRect(bounds, win->scale_factor()));
   win->SetPixelBounds(ContentToWindowBounds(win, pixel_bounds));
 }
 
-gfx::Rect Window::GetContentBounds() const {
+Rect Window::GetContentBounds() const {
   TopLevelWindow* win = static_cast<TopLevelWindow*>(window_);
   return ScaleToEnclosingRect(win->GetContentPixelBounds(),
                               1.0f / win->scale_factor());
 }
 
-void Window::SetBounds(const gfx::Rect& bounds) {
+void Window::SetBounds(const Rect& bounds) {
   TopLevelWindow* win = static_cast<TopLevelWindow*>(window_);
   win->SetPixelBounds(ScaleToEnclosingRect(bounds, win->scale_factor()));
 }
 
-gfx::Rect Window::GetBounds() const {
+Rect Window::GetBounds() const {
   TopLevelWindow* win = static_cast<TopLevelWindow*>(window_);
   return ScaleToEnclosingRect(win->GetPixelBounds(),
                               1.0f / win->scale_factor());

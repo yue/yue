@@ -9,7 +9,7 @@
 
 #include "base/win/scoped_hdc.h"
 #include "base/win/win_util.h"
-#include "ui/gfx/geometry/rect.h"
+#include "nativeui/gfx/geometry/rect.h"
 
 namespace nu {
 
@@ -17,7 +17,7 @@ namespace {
 
 const float kDefaultDPI = 96.f;
 
-gfx::Size GetDPI() {
+Size GetDPI() {
   static int dpi_x = 0;
   static int dpi_y = 0;
   static bool should_initialize = true;
@@ -31,7 +31,7 @@ gfx::Size GetDPI() {
     dpi_x = GetDeviceCaps(screen_dc, LOGPIXELSX);
     dpi_y = GetDeviceCaps(screen_dc, LOGPIXELSY);
   }
-  return gfx::Size(dpi_x, dpi_y);
+  return Size(dpi_x, dpi_y);
 }
 
 float GetScalingFactorFromDPI(int dpi) {

@@ -16,17 +16,17 @@ namespace Gdiplus {
 
 #include <gdiplus.h>  // NOLINT
 
-#include "nativeui/graphics/color.h"
-#include "ui/gfx/geometry/rect.h"
+#include "nativeui/gfx/color.h"
+#include "nativeui/gfx/geometry/rect.h"
 
 namespace nu {
 
 // Convert from gfx types to gdiplus types.
-inline Gdiplus::RectF ToGdi(const gfx::Rect& rect) {
+inline Gdiplus::RectF ToGdi(const Rect& rect) {
   return Gdiplus::RectF(rect.x(), rect.y(), rect.width(), rect.height());
 }
 
-inline Gdiplus::PointF ToGdi(const gfx::Point& point) {
+inline Gdiplus::PointF ToGdi(const Point& point) {
   return Gdiplus::PointF(point.x(), point.y());
 }
 

@@ -8,7 +8,7 @@
 #include "base/memory/ref_counted.h"
 #include "nativeui/nativeui_export.h"
 #include "nativeui/types.h"
-#include "ui/gfx/geometry/rect.h"
+#include "nativeui/gfx/geometry/rect.h"
 
 namespace nu {
 
@@ -20,16 +20,16 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
   NativeView view() const { return view_; }
 
   // Change/Get position and size.
-  void SetBounds(const gfx::Rect& bounds);
-  gfx::Rect GetBounds() const;
+  void SetBounds(const Rect& bounds);
+  Rect GetBounds() const;
 
   // The real pixel bounds that depends on the scale factor.
-  void SetPixelBounds(const gfx::Rect& bounds);
-  gfx::Rect GetPixelBounds() const;
+  void SetPixelBounds(const Rect& bounds);
+  Rect GetPixelBounds() const;
 
   // Gets the offset to the parent window.
-  gfx::Point GetWindowOrigin() const;
-  gfx::Point GetWindowPixelOrigin() const;
+  Point GetWindowOrigin() const;
+  Point GetWindowPixelOrigin() const;
 
   // Get parent.
   const Container* parent() const { return parent_; }

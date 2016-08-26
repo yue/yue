@@ -6,7 +6,7 @@
 
 namespace nu {
 
-void BaseView::SetPixelBounds(const gfx::Rect& bounds) {
+void BaseView::SetPixelBounds(const Rect& bounds) {
   bounds_ = bounds;
 
   // Refresh the origin to parent HWND.
@@ -15,24 +15,24 @@ void BaseView::SetPixelBounds(const gfx::Rect& bounds) {
     window_origin_ += parent()->GetWindowPixelOrigin().OffsetFromOrigin();
 }
 
-gfx::Rect BaseView::GetPixelBounds() {
+Rect BaseView::GetPixelBounds() {
   return bounds_;
 }
 
-void BaseView::SetBounds(const gfx::Rect& bounds) {
+void BaseView::SetBounds(const Rect& bounds) {
   SetPixelBounds(ScaleToEnclosingRect(bounds, scale_factor()));
 }
 
-gfx::Rect BaseView::GetBounds() {
+Rect BaseView::GetBounds() {
   return ScaleToEnclosingRect(GetPixelBounds(), 1.0f / scale_factor());
 }
 
-gfx::Point BaseView::GetWindowPixelOrigin() {
+Point BaseView::GetWindowPixelOrigin() {
   return window_origin_;
 }
 
-gfx::Rect BaseView::GetWindowPixelBounds() {
-  return gfx::Rect(window_origin_, bounds_.size());
+Rect BaseView::GetWindowPixelBounds() {
+  return Rect(window_origin_, bounds_.size());
 }
 
 void BaseView::SetParent(BaseView* parent) {

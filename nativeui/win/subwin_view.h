@@ -18,7 +18,7 @@ class SubwinView : public WindowImpl, public BaseView {
              DWORD window_ex_style = 0);
   ~SubwinView() override;
 
-  void SetPixelBounds(const gfx::Rect& pixel_bounds) override;
+  void SetPixelBounds(const Rect& pixel_bounds) override;
   void SetParent(BaseView* parent) override;
   void BecomeContentView(WindowImpl* parent) override;
 };

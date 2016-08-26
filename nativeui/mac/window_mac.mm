@@ -6,21 +6,21 @@
 
 #import <Cocoa/Cocoa.h>
 
-#include "ui/gfx/mac/coordinate_conversion.h"
+#include "nativeui/gfx/mac/coordinate_conversion.h"
 
 namespace nu {
 
 namespace {
 
-gfx::Rect ContentToWindowBounds(NSWindow* window, const gfx::Rect& bounds) {
-  gfx::Rect window_bounds([window frameRectForContentRect:bounds.ToCGRect()]);
+Rect ContentToWindowBounds(NSWindow* window, const Rect& bounds) {
+  Rect window_bounds([window frameRectForContentRect:bounds.ToCGRect()]);
   int frame_height = window_bounds.height() - bounds.height();
   window_bounds.set_y(window_bounds.y() - frame_height);
   return window_bounds;
 }
 
-gfx::Rect WindowToContentBounds(NSWindow* window, const gfx::Rect& bounds) {
-  gfx::Rect content_bounds([window contentRectForFrameRect:bounds.ToCGRect()]);
+Rect WindowToContentBounds(NSWindow* window, const Rect& bounds) {
+  Rect content_bounds([window contentRectForFrameRect:bounds.ToCGRect()]);
   int frame_height = bounds.height() - content_bounds.height();
   content_bounds.set_y(content_bounds.y() + frame_height);
   return content_bounds;
@@ -37,7 +37,7 @@ void Window::PlatformInit(const Options& options) {
                          NSClosableWindowMask | NSResizableWindowMask |
                          NSTexturedBackgroundWindowMask;
   window_ = [[NSWindow alloc]
-      initWithContentRect:gfx::ScreenRectToNSRect(options.bounds)
+      initWithContentRect:ScreenRectToNSRect(options.bounds)
                 styleMask:styleMask
                   backing:NSBackingStoreBuffered
                     defer:YES];
@@ -48,20 +48,20 @@ void Window::PlatformSetContentView(Container* container) {
   container->Layout();
 }
 
-void Window::SetContentBounds(const gfx::Rect& bounds) {
+void Window::SetContentBounds(const Rect& bounds) {
   SetBounds(ContentToWindowBounds(window_, bounds));
 }
 
-gfx::Rect Window::GetContentBounds() const {
+Rect Window::GetContentBounds() const {
   return WindowToContentBounds(window_, GetBounds());
 }
 
-void Window::SetBounds(const gfx::Rect& bounds) {
-  [window_ setFrame:gfx::ScreenRectToNSRect(bounds) display:YES animate:NO];
+void Window::SetBounds(const Rect& bounds) {
+  [window_ setFrame:ScreenRectToNSRect(bounds) display:YES animate:NO];
 }
 
-gfx::Rect Window::GetBounds() const {
-  return gfx::ScreenRectFromNSRect(NSRectToCGRect([window_ frame]));
+Rect Window::GetBounds() const {
+  return ScreenRectFromNSRect(NSRectToCGRect([window_ frame]));
 }
 
 void Window::SetVisible(bool visible) {

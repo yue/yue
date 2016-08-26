@@ -6,11 +6,11 @@
 
 #include "base/strings/utf_string_conversions.h"
 #include "base/strings/string_util.h"
-#include "nativeui/graphics/color.h"
-#include "nativeui/graphics/text.h"
+#include "nativeui/gfx/color.h"
+#include "nativeui/gfx/text.h"
 #include "nativeui/win/base_view.h"
-#include "ui/gfx/geometry/insets.h"
-#include "ui/gfx/geometry/size_conversions.h"
+#include "nativeui/gfx/geometry/insets.h"
+#include "nativeui/gfx/geometry/size_conversions.h"
 
 namespace nu {
 
@@ -35,9 +35,9 @@ class GroupView : public BaseView {
     title_ = title;
 
     // Update the rect of the title.
-    title_bounds_ = gfx::Rect(gfx::Point(kTitleLeftMargin * scale_factor(), 0),
+    title_bounds_ = Rect(Point(kTitleLeftMargin * scale_factor(), 0),
                               ToFlooredSize(MeasureText(font_, title_)));
-    border_insets_ = gfx::Insets(title_bounds_.height());
+    border_insets_ = Insets(title_bounds_.height());
   }
 
   base::string16 GetTitle() const {
@@ -45,19 +45,19 @@ class GroupView : public BaseView {
   }
 
   void Layout() {
-    gfx::Rect child_bounds(gfx::Rect(GetPixelBounds().size()));
+    Rect child_bounds(Rect(GetPixelBounds().size()));
     child_bounds.Inset(border_insets_);
     delegate_->GetContentView()->view()->SetPixelBounds(child_bounds);
   }
 
-  void SetPixelBounds(const gfx::Rect& pixel_bounds) override {
+  void SetPixelBounds(const Rect& pixel_bounds) override {
     BaseView::SetPixelBounds(pixel_bounds);
     Layout();
   }
 
-  void Draw(Gdiplus::Graphics* context, const gfx::Rect& dirty) override {
+  void Draw(Gdiplus::Graphics* context, const Rect& dirty) override {
     // Draw title.
-    gfx::Rect title_bounds = title_bounds_ +
+    Rect title_bounds = title_bounds_ +
                              GetWindowPixelOrigin().OffsetFromOrigin();
     Gdiplus::SolidBrush brush(ToGdi(color_));
     context->DrawString(title_.c_str(), static_cast<int>(title_.size()),
@@ -65,7 +65,7 @@ class GroupView : public BaseView {
 
     // Calculate the border bounds.
     int text_height = title_bounds.height();
-    gfx::Rect border_bounds(text_height / 2, text_height / 2,
+    Rect border_bounds(text_height / 2, text_height / 2,
                             GetPixelBounds().width() - text_height,
                             GetPixelBounds().height() - text_height);
     border_bounds += GetWindowPixelOrigin().OffsetFromOrigin();
@@ -80,7 +80,7 @@ class GroupView : public BaseView {
     context->EndContainer(container);
 
     // Draw child.
-    gfx::Rect child_dirty(GetPixelBounds().size());
+    Rect child_dirty(GetPixelBounds().size());
     child_dirty.Inset(border_insets_);
     delegate_->GetContentView()->view()->Draw(context, dirty);
   }
@@ -97,9 +97,9 @@ class GroupView : public BaseView {
   Font font_;
   Gdiplus::FontFamily gdi_font_family_;
   Gdiplus::Font gdi_font_;
-  gfx::Rect title_bounds_;
+  Rect title_bounds_;
 
-  gfx::Insets border_insets_;
+  Insets border_insets_;
   base::string16 title_;
 };
 

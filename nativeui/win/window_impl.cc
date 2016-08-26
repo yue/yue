@@ -14,7 +14,7 @@
 #include "base/win/win_util.h"
 #include "base/win/wrapped_window_proc.h"
 #include "nativeui/win/screen.h"
-#include "ui/gfx/win/hwnd_util.h"
+#include "nativeui/gfx/win/hwnd_util.h"
 
 namespace nu {
 
@@ -171,10 +171,10 @@ WindowImpl::WindowImpl(base::StringPiece16 class_name, HWND parent,
   if (parent == HWND_DESKTOP) {
     // Only non-child windows can have HWND_DESKTOP (0) as their parent.
     CHECK_EQ(static_cast<int>(window_style & WS_CHILD), 0);
-    parent = gfx::GetWindowToParentTo(false);
+    parent = GetWindowToParentTo(false);
   } else if (parent == ::GetDesktopWindow()) {
     // Any type of window can have the "Desktop Window" as their parent.
-    parent = gfx::GetWindowToParentTo(true);
+    parent = GetWindowToParentTo(true);
   } else if (parent != HWND_MESSAGE) {
     CHECK(::IsWindow(parent));
   }
@@ -196,11 +196,11 @@ WindowImpl::WindowImpl(base::StringPiece16 class_name, HWND parent,
   // For custom window we the hwnd_ is assigned in WM_NCCREATE.
   if (class_name.empty()) {
     // The window procedure should have set the data for us.
-    gfx::CheckWindowCreated(hwnd_);
-    CHECK_EQ(this, gfx::GetWindowUserData(hwnd));
+    CheckWindowCreated(hwnd_);
+    CHECK_EQ(this, GetWindowUserData(hwnd));
   } else {
     hwnd_ = hwnd;
-    gfx::SetWindowUserData(hwnd, this);
+    SetWindowUserData(hwnd, this);
   }
 
   scale_factor_ = GetScaleFactorForHWND(hwnd_);
@@ -213,7 +213,7 @@ WindowImpl::~WindowImpl() {
   if (::GetParent(hwnd_) == NULL)  // removing a child window.
     ::SetParent(hwnd_, NULL);
 
-  gfx::SetWindowUserData(hwnd_, NULL);
+  SetWindowUserData(hwnd_, NULL);
   ::DestroyWindow(hwnd_);
 }
 
@@ -254,13 +254,13 @@ LRESULT CALLBACK WindowImpl::WndProc(HWND hwnd,
     CREATESTRUCT* cs = reinterpret_cast<CREATESTRUCT*>(l_param);
     WindowImpl* window = reinterpret_cast<WindowImpl*>(cs->lpCreateParams);
     DCHECK(window);
-    gfx::SetWindowUserData(hwnd, window);
+    SetWindowUserData(hwnd, window);
     window->hwnd_ = hwnd;
     return TRUE;
   }
 
   WindowImpl* window =
-      reinterpret_cast<WindowImpl*>(gfx::GetWindowUserData(hwnd));
+      reinterpret_cast<WindowImpl*>(GetWindowUserData(hwnd));
   if (!window)
     return 0;
 

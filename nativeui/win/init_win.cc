@@ -8,7 +8,7 @@
 
 #include "base/logging.h"
 #include "base/win/windows_version.h"
-#include "nativeui/win/gdiplus.h"
+#include "nativeui/gfx/win/gdiplus.h"
 
 namespace nu {
 

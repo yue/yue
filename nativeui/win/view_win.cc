@@ -15,28 +15,28 @@ View::~View() {
   delete view_;
 }
 
-void View::SetBounds(const gfx::Rect& bounds) {
+void View::SetBounds(const Rect& bounds) {
   view_->SetBounds(bounds);
 }
 
-gfx::Rect View::GetBounds() const {
+Rect View::GetBounds() const {
   return view_->GetBounds();
 }
 
-void View::SetPixelBounds(const gfx::Rect& bounds) {
+void View::SetPixelBounds(const Rect& bounds) {
   view_->SetPixelBounds(bounds);
 }
 
-gfx::Rect View::GetPixelBounds() const {
+Rect View::GetPixelBounds() const {
   return view_->GetPixelBounds();
 }
 
-gfx::Point View::GetWindowOrigin() const {
+Point View::GetWindowOrigin() const {
   return ScaleToFlooredPoint(GetWindowPixelOrigin(),
                              1.0f / view_->scale_factor());
 }
 
-gfx::Point View::GetWindowPixelOrigin() const {
+Point View::GetWindowPixelOrigin() const {
   return view_->GetWindowPixelOrigin();
 }
 

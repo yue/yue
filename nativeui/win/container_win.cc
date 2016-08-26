@@ -16,18 +16,18 @@ class ContainerView : public BaseView {
       : BaseView(true), container_(container) {}
   ~ContainerView() override {}
 
-  void SetPixelBounds(const gfx::Rect& pixel_bounds) override {
+  void SetPixelBounds(const Rect& pixel_bounds) override {
     BaseView::SetPixelBounds(pixel_bounds);
     container_->Layout();
   }
 
-  void Draw(Gdiplus::Graphics* context, const gfx::Rect& dirty) override {
+  void Draw(Gdiplus::Graphics* context, const Rect& dirty) override {
     // Calculate the dirty rect for each child.
     for (int i = 0; i < container_->child_count(); ++i) {
       View* child = container_->child_at(i);
-      gfx::Rect child_bounds = child->GetPixelBounds();
+      Rect child_bounds = child->GetPixelBounds();
       if (child_bounds.Intersects(dirty)) {
-        gfx::Rect child_dirty(dirty);
+        Rect child_dirty(dirty);
         child_dirty.Intersect(child_bounds);
         child_dirty -= child_bounds.OffsetFromOrigin();
         child->view()->Draw(context, child_dirty);

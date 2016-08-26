@@ -5,10 +5,10 @@
 #include "nativeui/label.h"
 
 #include "base/strings/utf_string_conversions.h"
-#include "nativeui/graphics/color.h"
-#include "nativeui/graphics/text.h"
+#include "nativeui/gfx/color.h"
+#include "nativeui/gfx/text.h"
 #include "nativeui/win/subwin_view.h"
-#include "ui/gfx/geometry/size_conversions.h"
+#include "nativeui/gfx/geometry/size_conversions.h"
 
 namespace nu {
 
@@ -32,14 +32,14 @@ class LabelView : public BaseView {
     return text_;
   }
 
-  void Draw(Gdiplus::Graphics* context, const gfx::Rect& dirty) override {
+  void Draw(Gdiplus::Graphics* context, const Rect& dirty) override {
     if (!window())
       return;
 
     // Pring the text in middle of rect.
-    gfx::Size text_size = ToFlooredSize(MeasureText(font_, text_));
-    gfx::Size ctrl_size = GetPixelBounds().size();
-    gfx::Point origin((ctrl_size.width() - text_size.width()) / 2,
+    Size text_size = ToFlooredSize(MeasureText(font_, text_));
+    Size ctrl_size = GetPixelBounds().size();
+    Point origin((ctrl_size.width() - text_size.width()) / 2,
                       (ctrl_size.height() - text_size.height()) / 2);
     origin += GetWindowPixelOrigin().OffsetFromOrigin();
 

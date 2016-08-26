@@ -70,7 +70,7 @@ TEST_F(ContainerTest, Layout) {
   EXPECT_EQ(container_->layout_count(), 1);
   container_->AddChildView(new nu::Container);
   EXPECT_EQ(container_->layout_count(), 2);
-  window_->SetBounds(gfx::Rect(0, 0, 100, 200));
+  window_->SetBounds(nu::Rect(0, 0, 100, 200));
   EXPECT_EQ(container_->layout_count(), 3);
 }
 
@@ -79,7 +79,7 @@ TEST_F(ContainerTest, VisibleLayout) {
   EXPECT_GE(container_->layout_count(), 1);
   container_->AddChildView(new nu::Container);
   EXPECT_GE(container_->layout_count(), 2);
-  window_->SetBounds(gfx::Rect(0, 0, 100, 200));
+  window_->SetBounds(nu::Rect(0, 0, 100, 200));
   EXPECT_GE(container_->layout_count(), 3);
 }
 
@@ -111,19 +111,19 @@ TEST_F(ContainerTest, MoveBetweenContainers) {
   c1->AddChildView(v2.get());
   container_->AddChildView(c1);
   container_->AddChildView(c2);
-  window_->SetContentBounds(gfx::Rect(0, 0, 200, 400));
-  EXPECT_EQ(container_->GetBounds(), gfx::Rect(0, 0, 200, 400));
-  EXPECT_EQ(v1->GetBounds(), gfx::Rect(0, 0, 100, 200));
-  EXPECT_EQ(v2->GetBounds(), gfx::Rect(0, 200, 100, 200));
-  EXPECT_EQ(v1->GetWindowOrigin(), gfx::Point(0, 0));
-  EXPECT_EQ(v2->GetWindowOrigin(), gfx::Point(0, 200));
+  window_->SetContentBounds(nu::Rect(0, 0, 200, 400));
+  EXPECT_EQ(container_->GetBounds(), nu::Rect(0, 0, 200, 400));
+  EXPECT_EQ(v1->GetBounds(), nu::Rect(0, 0, 100, 200));
+  EXPECT_EQ(v2->GetBounds(), nu::Rect(0, 200, 100, 200));
+  EXPECT_EQ(v1->GetWindowOrigin(), nu::Point(0, 0));
+  EXPECT_EQ(v2->GetWindowOrigin(), nu::Point(0, 200));
 
   c1->RemoveChildView(v1.get());
   c1->RemoveChildView(v2.get());
   c2->AddChildView(v1.get());
   c2->AddChildView(v2.get());
-  EXPECT_EQ(v1->GetBounds(), gfx::Rect(0, 0, 50, 400));
-  EXPECT_EQ(v2->GetBounds(), gfx::Rect(50, 0, 50, 400));
-  EXPECT_EQ(v1->GetWindowOrigin(), gfx::Point(100, 0));
-  EXPECT_EQ(v2->GetWindowOrigin(), gfx::Point(150, 0));
+  EXPECT_EQ(v1->GetBounds(), nu::Rect(0, 0, 50, 400));
+  EXPECT_EQ(v2->GetBounds(), nu::Rect(50, 0, 50, 400));
+  EXPECT_EQ(v1->GetWindowOrigin(), nu::Point(100, 0));
+  EXPECT_EQ(v2->GetWindowOrigin(), nu::Point(150, 0));
 }

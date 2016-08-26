@@ -11,8 +11,8 @@
 
 #include "base/logging.h"
 #include "base/strings/string_piece.h"
-#include "ui/gfx/geometry/rect.h"
-#include "ui/gfx/win/msg_util.h"
+#include "nativeui/gfx/geometry/rect.h"
+#include "nativeui/gfx/win/msg_util.h"
 
 namespace nu {
 

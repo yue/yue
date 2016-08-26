@@ -17,9 +17,9 @@ class WindowTest : public testing::Test {
 };
 
 TEST_F(WindowTest, Bounds) {
-  gfx::Rect bounds(123, 456, 789, 10);
+  nu::Rect bounds(123, 456, 789, 10);
   window_->SetContentBounds(bounds);
-  gfx::Rect window_bounds = window_->GetBounds();
+  nu::Rect window_bounds = window_->GetBounds();
   EXPECT_EQ(window_->GetContentBounds(), bounds);
   window_->SetBounds(window_bounds);
   EXPECT_EQ(window_->GetBounds(), window_bounds);
@@ -30,7 +30,7 @@ TEST_F(WindowTest, ContentView) {
   scoped_refptr<nu::Container> view(new nu::Container);
   window_->SetContentView(view.get());
   EXPECT_EQ(window_->GetContentView(), view.get());
-  EXPECT_EQ(view->GetWindowPixelOrigin(), gfx::Point(0, 0));
+  EXPECT_EQ(view->GetWindowPixelOrigin(), nu::Point(0, 0));
 }
 
 TEST_F(WindowTest, Visible) {

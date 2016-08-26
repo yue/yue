@@ -22,34 +22,34 @@ class BoxLayoutTest : public testing::Test {
 };
 
 TEST_F(BoxLayoutTest, ListChild) {
-  gfx::Rect bounds(1, 2, 300, 400);
+  nu::Rect bounds(1, 2, 300, 400);
   nu::Container* c1 = new nu::Container;
   nu::Container* c2 = new nu::Container;
   window_->GetContentView()->AddChildView(c1);
   window_->GetContentView()->AddChildView(c2);
   window_->SetContentBounds(bounds);
-  EXPECT_EQ(c1->GetBounds(), gfx::Rect(0, 0, 300, 200));
-  EXPECT_EQ(c2->GetBounds(), gfx::Rect(0, 200, 300, 200));
-  EXPECT_EQ(c1->GetWindowOrigin(), gfx::Point(0, 0));
-  EXPECT_EQ(c2->GetWindowOrigin(), gfx::Point(0, 200));
+  EXPECT_EQ(c1->GetBounds(), nu::Rect(0, 0, 300, 200));
+  EXPECT_EQ(c2->GetBounds(), nu::Rect(0, 200, 300, 200));
+  EXPECT_EQ(c1->GetWindowOrigin(), nu::Point(0, 0));
+  EXPECT_EQ(c2->GetWindowOrigin(), nu::Point(0, 200));
 }
 
 TEST_F(BoxLayoutTest, ListChildChild) {
-  gfx::Rect bounds(1, 2, 300, 400);
+  nu::Rect bounds(1, 2, 300, 400);
   nu::Container* c1 = new nu::Container;
   nu::Container* c2 = new nu::Container;
   c1->SetLayoutManager(new nu::BoxLayout(nu::BoxLayout::Vertical));
   c1->AddChildView(c2);
   window_->GetContentView()->AddChildView(c1);
   window_->SetContentBounds(bounds);
-  EXPECT_EQ(c1->GetBounds(), gfx::Rect(0, 0, 300, 400));
-  EXPECT_EQ(c2->GetBounds(), gfx::Rect(0, 0, 300, 400));
-  EXPECT_EQ(c1->GetWindowOrigin(), gfx::Point(0, 0));
-  EXPECT_EQ(c2->GetWindowOrigin(), gfx::Point(0, 0));
+  EXPECT_EQ(c1->GetBounds(), nu::Rect(0, 0, 300, 400));
+  EXPECT_EQ(c2->GetBounds(), nu::Rect(0, 0, 300, 400));
+  EXPECT_EQ(c1->GetWindowOrigin(), nu::Point(0, 0));
+  EXPECT_EQ(c2->GetWindowOrigin(), nu::Point(0, 0));
 }
 
 TEST_F(BoxLayoutTest, ListChildHorizontal) {
-  gfx::Rect bounds(1, 2, 300, 400);
+  nu::Rect bounds(1, 2, 300, 400);
   window_->GetContentView()->SetLayoutManager(
       new nu::BoxLayout(nu::BoxLayout::Horizontal));
   nu::Container* c1 = new nu::Container;
@@ -57,8 +57,8 @@ TEST_F(BoxLayoutTest, ListChildHorizontal) {
   window_->GetContentView()->AddChildView(c1);
   window_->GetContentView()->AddChildView(c2);
   window_->SetContentBounds(bounds);
-  EXPECT_EQ(c1->GetBounds(), gfx::Rect(0, 0, 150, 400));
-  EXPECT_EQ(c2->GetBounds(), gfx::Rect(150, 0, 150, 400));
-  EXPECT_EQ(c1->GetWindowOrigin(), gfx::Point(0, 0));
-  EXPECT_EQ(c2->GetWindowOrigin(), gfx::Point(150, 0));
+  EXPECT_EQ(c1->GetBounds(), nu::Rect(0, 0, 150, 400));
+  EXPECT_EQ(c2->GetBounds(), nu::Rect(150, 0, 150, 400));
+  EXPECT_EQ(c1->GetWindowOrigin(), nu::Point(0, 0));
+  EXPECT_EQ(c2->GetWindowOrigin(), nu::Point(150, 0));
 }

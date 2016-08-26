@@ -18,18 +18,18 @@ class ViewTest : public testing::Test {
 };
 
 TEST_F(ViewTest, Bounds) {
-  gfx::Rect bounds(100, 100, 200, 200);
+  nu::Rect bounds(100, 100, 200, 200);
   view_->SetBounds(bounds);
   EXPECT_EQ(view_->GetBounds(), bounds);
-  EXPECT_EQ(view_->GetWindowPixelOrigin(), gfx::Point(100, 100));
+  EXPECT_EQ(view_->GetWindowPixelOrigin(), nu::Point(100, 100));
 }
 
 TEST_F(ViewTest, AddToChildView) {
   scoped_refptr<nu::Window> window(new nu::Window(nu::Window::Options()));
   window->GetContentView()->AddChildView(view_.get());
 
-  gfx::Rect bounds(100, 100, 200, 200);
+  nu::Rect bounds(100, 100, 200, 200);
   window->SetContentBounds(bounds);
-  EXPECT_EQ(view_->GetBounds(), gfx::Rect(0, 0, 200, 200));
-  EXPECT_EQ(view_->GetWindowPixelOrigin(), gfx::Point(0, 0));
+  EXPECT_EQ(view_->GetBounds(), nu::Rect(0, 0, 200, 200));
+  EXPECT_EQ(view_->GetWindowPixelOrigin(), nu::Point(0, 0));
 }

@@ -21,14 +21,14 @@ void BoxLayout::Layout(Container* host) {
     int height = host->GetPixelBounds().height();
     for (int i = 0; i < host->child_count(); ++i) {
       host->child_at(i)->SetPixelBounds(
-          gfx::Rect(per_width * i, 0, per_width, height));
+          Rect(per_width * i, 0, per_width, height));
     }
   } else {
     int per_height = host->GetPixelBounds().height() / host->child_count();
     int width = host->GetPixelBounds().width();
     for (int i = 0; i < host->child_count(); ++i) {
       host->child_at(i)->SetPixelBounds(
-          gfx::Rect(0, per_height * i, width, per_height));
+          Rect(0, per_height * i, width, per_height));
     }
   }
 }

@@ -7,7 +7,7 @@
 #import <Cocoa/Cocoa.h>
 
 #include "nativeui/container.h"
-#include "ui/gfx/mac/coordinate_conversion.h"
+#include "nativeui/gfx/mac/coordinate_conversion.h"
 
 namespace nu {
 
@@ -18,7 +18,7 @@ View::~View() {
   [view_ release];
 }
 
-void View::SetBounds(const gfx::Rect& bounds) {
+void View::SetBounds(const Rect& bounds) {
   CGRect frame = bounds.ToCGRect();
   if (parent_) {
     frame.origin.y = parent_->GetBounds().height() -
@@ -27,8 +27,8 @@ void View::SetBounds(const gfx::Rect& bounds) {
   [view_ setFrame:frame];
 }
 
-gfx::Rect View::GetBounds() const {
-  gfx::Rect bounds(NSRectToCGRect([view_ frame]));
+Rect View::GetBounds() const {
+  Rect bounds(NSRectToCGRect([view_ frame]));
   if (parent_) {
     bounds.set_y(parent_->GetBounds().height() -
                  (bounds.y() + bounds.height()));
@@ -36,25 +36,25 @@ gfx::Rect View::GetBounds() const {
   return bounds;
 }
 
-void View::SetPixelBounds(const gfx::Rect& bounds) {
+void View::SetPixelBounds(const Rect& bounds) {
   SetBounds(bounds);
 }
 
-gfx::Rect View::GetPixelBounds() const {
+Rect View::GetPixelBounds() const {
   return GetBounds();
 }
 
-gfx::Point View::GetWindowOrigin() const {
+Point View::GetWindowOrigin() const {
   if (!view_.window || !view_.window.contentView)
     return GetBounds().origin();
   NSRect contentFrame = view_.window.contentView.frame;
-  gfx::Rect bounds([view_ convertRect:view_.bounds
+  Rect bounds([view_ convertRect:view_.bounds
                                toView:view_.window.contentView]);
-  return gfx::Point(bounds.x(),
+  return Point(bounds.x(),
                     NSHeight(contentFrame) - (bounds.y() + bounds.height()));
 }
 
-gfx::Point View::GetWindowPixelOrigin() const {
+Point View::GetWindowPixelOrigin() const {
   return GetWindowOrigin();
 }
 

@@ -5,7 +5,7 @@
 #ifndef NATIVEUI_WIN_BASE_VIEW_H_
 #define NATIVEUI_WIN_BASE_VIEW_H_
 
-#include "nativeui/win/gdiplus.h"
+#include "nativeui/gfx/win/gdiplus.h"
 #include "nativeui/win/window_impl.h"
 
 namespace nu {
@@ -18,23 +18,23 @@ class BaseView {
   virtual ~BaseView() {}
 
   // Subclass should override this.
-  virtual void SetPixelBounds(const gfx::Rect& pixel_bounds);
-  virtual gfx::Rect GetPixelBounds();
+  virtual void SetPixelBounds(const Rect& pixel_bounds);
+  virtual Rect GetPixelBounds();
 
   // Draw the content.
-  virtual void Draw(Gdiplus::Graphics* context, const gfx::Rect& dirty) {}
+  virtual void Draw(Gdiplus::Graphics* context, const Rect& dirty) {}
 
   // Set the parent view.
   virtual void SetParent(BaseView* parent);
   virtual void BecomeContentView(WindowImpl* parent);
 
   // Get the offset to parent HWND.
-  gfx::Point GetWindowPixelOrigin();
-  gfx::Rect GetWindowPixelBounds();
+  Point GetWindowPixelOrigin();
+  Rect GetWindowPixelBounds();
 
   // Returns DIP bounds according to window's scale factor.
-  void SetBounds(const gfx::Rect& bounds);
-  gfx::Rect GetBounds();
+  void SetBounds(const Rect& bounds);
+  Rect GetBounds();
 
   // Parent view and host window.
   WindowImpl* window() const { return window_; }
@@ -60,10 +60,10 @@ class BaseView {
   BaseView* parent_ = nullptr;
 
   // The bounds relative to parent view.
-  gfx::Rect bounds_;
+  Rect bounds_;
 
   // The offset relative the parent HWND.
-  gfx::Point window_origin_;
+  Point window_origin_;
 
   DISALLOW_COPY_AND_ASSIGN(BaseView);
 };
