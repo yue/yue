@@ -2,12 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef UI_GFX_WIN_MSG_UTIL_H_
-#define UI_GFX_WIN_MSG_UTIL_H_
+#ifndef NATIVEUI_WIN_UTIL_MSG_UTIL_H_
+#define NATIVEUI_WIN_UTIL_MSG_UTIL_H_
 
 #include "base/logging.h"
-#include "ui/gfx/geometry/point.h"
-#include "ui/gfx/geometry/size.h"
+#include "nativeui/gfx/geometry/point.h"
+#include "nativeui/gfx/geometry/size.h"
 
 // Based on WTL version 8.0 atlcrack.h
 
@@ -119,18 +119,18 @@
 #define CR_MSG_WM_MOVE(func)                                            \
   if (uMsg == WM_MOVE) {                                                \
     SetMsgHandled(TRUE);                                                \
-    func(gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+    func(nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                        \
     if (IsMsgHandled())                                                 \
       return TRUE;                                                      \
   }
 
-// void OnSize(UINT nType, gfx::Size size)
+// void OnSize(UINT nType, nu::Size size)
 #define CR_MSG_WM_SIZE(func)                                           \
   if (uMsg == WM_SIZE) {                                               \
     SetMsgHandled(TRUE);                                               \
     func((UINT)wParam,                                                 \
-         gfx::Size(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Size(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                       \
     if (IsMsgHandled())                                                \
       return TRUE;                                                     \
@@ -533,12 +533,12 @@
       return TRUE;                        \
   }
 
-// UINT OnNcHitTest(gfx::Point point)
+// UINT OnNcHitTest(nu::Point point)
 #define CR_MSG_WM_NCHITTEST(func)                                      \
   if (uMsg == WM_NCHITTEST) {                                          \
     SetMsgHandled(TRUE);                                               \
     lResult = (LRESULT)func(                                           \
-        gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+        nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     if (IsMsgHandled())                                                \
       return TRUE;                                                     \
   }
@@ -571,67 +571,67 @@
       return TRUE;                          \
   }
 
-// void OnNcMouseMove(UINT nHitTest, gfx::Point point)
+// void OnNcMouseMove(UINT nHitTest, nu::Point point)
 #define CR_MSG_WM_NCMOUSEMOVE(func)                                     \
   if (uMsg == WM_NCMOUSEMOVE) {                                         \
     SetMsgHandled(TRUE);                                                \
     func((UINT)wParam,                                                  \
-         gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                        \
     if (IsMsgHandled())                                                 \
       return TRUE;                                                      \
   }
 
-// void OnNcLButtonDown(UINT nHitTest, gfx::Point point)
+// void OnNcLButtonDown(UINT nHitTest, nu::Point point)
 #define CR_MSG_WM_NCLBUTTONDOWN(func)                                   \
   if (uMsg == WM_NCLBUTTONDOWN) {                                       \
     SetMsgHandled(TRUE);                                                \
     func((UINT)wParam,                                                  \
-         gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                        \
     if (IsMsgHandled())                                                 \
       return TRUE;                                                      \
   }
 
-// void OnNcLButtonUp(UINT nHitTest, gfx::Point point)
+// void OnNcLButtonUp(UINT nHitTest, nu::Point point)
 #define CR_MSG_WM_NCLBUTTONUP(func)                                     \
   if (uMsg == WM_NCLBUTTONUP) {                                         \
     SetMsgHandled(TRUE);                                                \
     func((UINT)wParam,                                                  \
-         gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                        \
     if (IsMsgHandled())                                                 \
       return TRUE;                                                      \
   }
 
-// void OnNcLButtonDblClk(UINT nHitTest, gfx::Point point)
+// void OnNcLButtonDblClk(UINT nHitTest, nu::Point point)
 #define CR_MSG_WM_NCLBUTTONDBLCLK(func)                                 \
   if (uMsg == WM_NCLBUTTONDBLCLK) {                                     \
     SetMsgHandled(TRUE);                                                \
     func((UINT)wParam,                                                  \
-         gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                        \
     if (IsMsgHandled())                                                 \
       return TRUE;                                                      \
   }
 
-// void OnNcRButtonDown(UINT nHitTest, gfx::Point point)
+// void OnNcRButtonDown(UINT nHitTest, nu::Point point)
 #define CR_MSG_WM_NCRBUTTONDOWN(func)                                   \
   if (uMsg == WM_NCRBUTTONDOWN) {                                       \
     SetMsgHandled(TRUE);                                                \
     func((UINT)wParam,                                                  \
-         gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                        \
     if (IsMsgHandled())                                                 \
       return TRUE;                                                      \
   }
 
-// void OnNcRButtonUp(UINT nHitTest, gfx::Point point)
+// void OnNcRButtonUp(UINT nHitTest, nu::Point point)
 #define CR_MSG_WM_NCRBUTTONUP(func)                                     \
   if (uMsg == WM_NCRBUTTONUP) {                                         \
     SetMsgHandled(TRUE);                                                \
     func((UINT)wParam,                                                  \
-         gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                        \
     if (IsMsgHandled())                                                 \
       return TRUE;                                                      \
@@ -642,7 +642,7 @@
   if (uMsg == WM_NCRBUTTONDBLCLK) {                                     \
     SetMsgHandled(TRUE);                                                \
     func((UINT)wParam,                                                  \
-         gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                        \
     if (IsMsgHandled())                                                 \
       return TRUE;                                                      \
@@ -653,7 +653,7 @@
   if (uMsg == WM_NCMBUTTONDOWN) {                                       \
     SetMsgHandled(TRUE);                                                \
     func((UINT)wParam,                                                  \
-         gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                        \
     if (IsMsgHandled())                                                 \
       return TRUE;                                                      \
@@ -664,7 +664,7 @@
   if (uMsg == WM_NCMBUTTONUP) {                                         \
     SetMsgHandled(TRUE);                                                \
     func((UINT)wParam,                                                  \
-         gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                        \
     if (IsMsgHandled())                                                 \
       return TRUE;                                                      \
@@ -675,7 +675,7 @@
   if (uMsg == WM_NCMBUTTONDBLCLK) {                                     \
     SetMsgHandled(TRUE);                                                \
     func((UINT)wParam,                                                  \
-         gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                        \
     if (IsMsgHandled())                                                 \
       return TRUE;                                                      \
@@ -782,7 +782,7 @@
   if (uMsg == WM_SYSCOMMAND) {                                          \
     SetMsgHandled(TRUE);                                                \
     func((UINT)wParam,                                                  \
-         gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                        \
     if (IsMsgHandled())                                                 \
       return TRUE;                                                      \
@@ -892,7 +892,7 @@
   if (uMsg == WM_MOUSEMOVE) {                                           \
     SetMsgHandled(TRUE);                                                \
     func((UINT)wParam,                                                  \
-         gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                        \
     if (IsMsgHandled())                                                 \
       return TRUE;                                                      \
@@ -905,7 +905,7 @@
     lResult = (LRESULT)func(                                           \
         (UINT)LOWORD(wParam),                                          \
         (short)HIWORD(wParam),                                         \
-        gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+        nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     if (IsMsgHandled())                                                \
       return TRUE;                                                     \
   }
@@ -915,7 +915,7 @@
   if (uMsg == WM_LBUTTONDOWN) {                                         \
     SetMsgHandled(TRUE);                                                \
     func((UINT)wParam,                                                  \
-         gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                        \
     if (IsMsgHandled())                                                 \
       return TRUE;                                                      \
@@ -926,7 +926,7 @@
   if (uMsg == WM_LBUTTONUP) {                                           \
     SetMsgHandled(TRUE);                                                \
     func((UINT)wParam,                                                  \
-         gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                        \
     if (IsMsgHandled())                                                 \
       return TRUE;                                                      \
@@ -937,7 +937,7 @@
   if (uMsg == WM_LBUTTONDBLCLK) {                                       \
     SetMsgHandled(TRUE);                                                \
     func((UINT)wParam,                                                  \
-         gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                        \
     if (IsMsgHandled())                                                 \
       return TRUE;                                                      \
@@ -948,7 +948,7 @@
   if (uMsg == WM_RBUTTONDOWN) {                                         \
     SetMsgHandled(TRUE);                                                \
     func((UINT)wParam,                                                  \
-         gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                        \
     if (IsMsgHandled())                                                 \
       return TRUE;                                                      \
@@ -959,7 +959,7 @@
   if (uMsg == WM_RBUTTONUP) {                                           \
     SetMsgHandled(TRUE);                                                \
     func((UINT)wParam,                                                  \
-         gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                        \
     if (IsMsgHandled())                                                 \
       return TRUE;                                                      \
@@ -970,7 +970,7 @@
   if (uMsg == WM_RBUTTONDBLCLK) {                                       \
     SetMsgHandled(TRUE);                                                \
     func((UINT)wParam,                                                  \
-         gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                        \
     if (IsMsgHandled())                                                 \
       return TRUE;                                                      \
@@ -981,7 +981,7 @@
   if (uMsg == WM_MBUTTONDOWN) {                                         \
     SetMsgHandled(TRUE);                                                \
     func((UINT)wParam,                                                  \
-         gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                        \
     if (IsMsgHandled())                                                 \
       return TRUE;                                                      \
@@ -992,7 +992,7 @@
   if (uMsg == WM_MBUTTONUP) {                                           \
     SetMsgHandled(TRUE);                                                \
     func((UINT)wParam,                                                  \
-         gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                        \
     if (IsMsgHandled())                                                 \
       return TRUE;                                                      \
@@ -1003,7 +1003,7 @@
   if (uMsg == WM_MBUTTONDBLCLK) {                                       \
     SetMsgHandled(TRUE);                                                \
     func((UINT)wParam,                                                  \
-         gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                        \
     if (IsMsgHandled())                                                 \
       return TRUE;                                                      \
@@ -1095,7 +1095,7 @@
   if (uMsg == WM_CONTEXTMENU) {                                         \
     SetMsgHandled(TRUE);                                                \
     func((HWND)wParam,                                                  \
-         gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                        \
     if (IsMsgHandled())                                                 \
       return TRUE;                                                      \
@@ -1290,12 +1290,12 @@
       return TRUE;                                                 \
   }
 
-// void OnDisplayChange(UINT uBitsPerPixel, gfx::Size sizeScreen)
+// void OnDisplayChange(UINT uBitsPerPixel, nu::Size sizeScreen)
 #define CR_MSG_WM_DISPLAYCHANGE(func)                                  \
   if (uMsg == WM_DISPLAYCHANGE) {                                      \
     SetMsgHandled(TRUE);                                               \
     func((UINT)wParam,                                                 \
-         gfx::Size(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Size(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                       \
     if (IsMsgHandled())                                                \
       return TRUE;                                                     \
@@ -1542,7 +1542,7 @@
   if (uMsg == WM_MOUSEHOVER) {                                          \
     SetMsgHandled(TRUE);                                                \
     func(wParam,                                                        \
-         gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                        \
     if (IsMsgHandled())                                                 \
       return TRUE;                                                      \
@@ -1632,7 +1632,7 @@
     SetMsgHandled(TRUE);                                                \
     func(GET_XBUTTON_WPARAM(wParam),                                    \
          GET_NCHITTEST_WPARAM(wParam),                                  \
-         gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                        \
     if (IsMsgHandled())                                                 \
       return TRUE;                                                      \
@@ -1644,7 +1644,7 @@
     SetMsgHandled(TRUE);                                                \
     func(GET_XBUTTON_WPARAM(wParam),                                    \
          GET_NCHITTEST_WPARAM(wParam),                                  \
-         gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                        \
     if (IsMsgHandled())                                                 \
       return TRUE;                                                      \
@@ -1656,7 +1656,7 @@
     SetMsgHandled(TRUE);                                                \
     func(GET_XBUTTON_WPARAM(wParam),                                    \
          GET_NCHITTEST_WPARAM(wParam),                                  \
-         gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                        \
     if (IsMsgHandled())                                                 \
       return TRUE;                                                      \
@@ -1668,7 +1668,7 @@
     SetMsgHandled(TRUE);                                                \
     func(GET_XBUTTON_WPARAM(wParam),                                    \
          GET_KEYSTATE_WPARAM(wParam),                                   \
-         gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                        \
     if (IsMsgHandled())                                                 \
       return TRUE;                                                      \
@@ -1680,7 +1680,7 @@
     SetMsgHandled(TRUE);                                                \
     func(GET_XBUTTON_WPARAM(wParam),                                    \
          GET_KEYSTATE_WPARAM(wParam),                                   \
-         gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                        \
     if (IsMsgHandled())                                                 \
       return TRUE;                                                      \
@@ -1692,7 +1692,7 @@
     SetMsgHandled(TRUE);                                                \
     func(GET_XBUTTON_WPARAM(wParam),                                    \
          GET_KEYSTATE_WPARAM(wParam),                                   \
-         gfx::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam))); \
+         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     lResult = 0;                                                        \
     if (IsMsgHandled())                                                 \
       return TRUE;                                                      \
@@ -2273,4 +2273,4 @@
 #define CR_POINT_INITIALIZER_FROM_LPARAM(lparam) \
   { LOWORD(lparam), HIWORD(lparam) }
 
-#endif  // UI_GFX_WIN_MSG_UTIL_H_
+#endif  // NATIVEUI_WIN_UTIL_MSG_UTIL_H_

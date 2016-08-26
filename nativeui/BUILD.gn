@@ -92,6 +92,9 @@ source_set("nativeui") {
     "win/screen.cc",
     "win/screen.h",
     "win/window_win.cc",
+    "win/util/hwnd_util.cc",
+    "win/util/hwnd_util.h",
+    "win/util/msg.h",
   ]
 
   deps = [
@@ -131,6 +134,5 @@ test("nativeui_unittests") {
     ":nativeui",
     "//base/test:test_support",
     "//testing/gtest",
-    "//ui/gfx:test_support",
   ]
 }

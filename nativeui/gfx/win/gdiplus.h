@@ -2,8 +2,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef NATIVEUI_WIN_GDIPLUS_H_
-#define NATIVEUI_WIN_GDIPLUS_H_
+#ifndef NATIVEUI_GFX_WIN_GDIPLUS_H_
+#define NATIVEUI_GFX_WIN_GDIPLUS_H_
 
 #include <windows.h>
 
@@ -36,4 +36,4 @@ inline Gdiplus::Color ToGdi(const Color& color) {
 
 }  // namespace nu
 
-#endif  // NATIVEUI_WIN_GDIPLUS_H_
+#endif  // NATIVEUI_GFX_WIN_GDIPLUS_H_

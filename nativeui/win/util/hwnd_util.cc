@@ -2,16 +2,16 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "ui/gfx/win/hwnd_util.h"
+#include "nativeui/win/util/hwnd_util.h"
 
 #include "base/i18n/rtl.h"
 #include "base/strings/string_util.h"
 #include "base/win/win_util.h"
-#include "ui/gfx/geometry/point.h"
-#include "ui/gfx/geometry/rect.h"
-#include "ui/gfx/geometry/size.h"
+#include "nativeui/gfx/geometry/point.h"
+#include "nativeui/gfx/geometry/rect.h"
+#include "nativeui/gfx/geometry/size.h"
 
-namespace gfx {
+namespace nu {
 
 namespace {
 
@@ -211,4 +211,4 @@ HWND GetWindowToParentTo(bool get_real_hwnd) {
   return get_real_hwnd ? ::GetDesktopWindow() : HWND_DESKTOP;
 }
 
-}  // namespace gfx
+}  // namespace nu

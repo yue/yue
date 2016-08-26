@@ -14,7 +14,7 @@
 #include "base/win/win_util.h"
 #include "base/win/wrapped_window_proc.h"
 #include "nativeui/win/screen.h"
-#include "nativeui/gfx/win/hwnd_util.h"
+#include "nativeui/win/util/hwnd_util.h"
 
 namespace nu {
 
