@@ -7,8 +7,15 @@
 #include "base/logging.h"
 #include "base/message_loop/message_loop.h"
 #include "base/run_loop.h"
+#include "base/strings/stringprintf.h"
 #include "lua/callback.h"
 #include "nativeui/nativeui.h"
+
+void AddNewChild(nu::Container* container) {
+  static int counter = 0;
+  container->AddChildViewAt(
+      new nu::Label(base::StringPrintf("new child %d", ++counter)), 0);
+}
 
 int main(int argc, const char *argv[]) {
   base::AtExitManager exit_manager;
@@ -60,7 +67,7 @@ int main(int argc, const char *argv[]) {
   sub->AddChildView(label);
   nu::Button* button = new nu::Button("button2");
   auto sub_click = button->on_click.Add(
-      base::Bind(&nu::Label::SetText, label, "clicked"));
+      base::Bind(&AddNewChild, sub));
   sub->AddChildView(button);
   nu::Group* group = new nu::Group;
   auto sub_click2 = button->on_click.Add(
