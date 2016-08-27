@@ -48,7 +48,9 @@ Label::~Label() {
 }
 
 void Label::SetText(const std::string& text) {
-  static_cast<LabelView*>(view()).text = base::SysUTF8ToNSString(text);
+  LabelView* label = static_cast<LabelView*>(view());
+  label.text = base::SysUTF8ToNSString(text);
+  label.needsDisplay = YES;
 }
 
 std::string Label::GetText() {

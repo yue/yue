@@ -63,6 +63,8 @@ int main(int argc, const char *argv[]) {
       base::Bind(&nu::Label::SetText, label, "clicked"));
   sub->AddChildView(button);
   nu::Group* group = new nu::Group;
+  auto sub_click2 = button->on_click.Add(
+      base::Bind(&nu::Group::SetTitle, group, "clicked"));
   group->SetTitle("Button Group");
   group->SetContentView(sub);
   container->AddChildView(group);
