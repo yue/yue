@@ -123,6 +123,9 @@ source_set("nativeui") {
     } else {
       public_configs = [ "//build/config/linux/gtk2" ]
     }
+
+    # Do not warn on using deprecated GTK APIs.
+    cflags_cc = [ "-Wno-deprecated-declarations" ]
   } else if (is_win) {
     libs = [
       "gdi32.lib",

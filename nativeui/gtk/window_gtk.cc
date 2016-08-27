@@ -8,9 +8,11 @@ namespace nu {
 
 namespace {
 
-// Window is going to be closed.
+// User clicks the close button.
 gboolean OnClose(GtkWidget *widget, GdkEvent *event, Window* window) {
-  window->on_close.Notify();
+  window->Close();
+
+  // We are destroying the window ourselves, so prevent the default behavior.
   return TRUE;
 }
 
@@ -24,7 +26,8 @@ void ForceSizeAllocation(GtkWindow* window, GtkWidget* view) {
 }  // namespace
 
 Window::~Window() {
-  gtk_widget_destroy(GTK_WIDGET(window_));
+  if (window_)
+    gtk_widget_destroy(GTK_WIDGET(window_));
 }
 
 void Window::PlatformInit(const Options& options) {
@@ -41,17 +44,10 @@ void Window::PlatformInit(const Options& options) {
 }
 
 void Window::Close() {
-  if (!gtk_widget_get_realized(GTK_WIDGET(window_)))
-    return;
+  on_close.Notify();
+  gtk_widget_destroy(GTK_WIDGET(window_));
 
-  // Send delete-event to the window.
-  auto* event = gdk_event_new(GDK_DELETE);
-  auto* window = gtk_widget_get_window(GTK_WIDGET(window_));
-  g_object_ref(window);
-  event->any.window = window;
-  event->any.send_event = TRUE;
-  gtk_main_do_event(event);
-  gdk_event_free(event);
+  window_ = nullptr;
 }
 
 void Window::PlatformSetContentView(Container* container) {
