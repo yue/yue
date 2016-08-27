@@ -8,6 +8,12 @@ namespace nu {
 
 namespace {
 
+// Window is going to be closed.
+gboolean OnClose(GtkWidget *widget, GdkEvent *event, Window* window) {
+  window->on_close.Notify();
+  return TRUE;
+}
+
 // Force window to allocate size for content view.
 void ForceSizeAllocation(GtkWindow* window, GtkWidget* view) {
   GdkRectangle rect = { 0, 0 };
@@ -30,6 +36,22 @@ void Window::PlatformInit(const Options& options) {
                                          options.bounds.height());
     gtk_window_move(window_, options.bounds.x(), options.bounds.y());
   }
+
+  g_signal_connect(window_, "delete-event", G_CALLBACK(OnClose), this);
+}
+
+void Window::Close() {
+  if (!gtk_widget_get_realized(GTK_WIDGET(window_)))
+    return;
+
+  // Send delete-event to the window.
+  auto* event = gdk_event_new(GDK_DELETE);
+  auto* window = gtk_widget_get_window(GTK_WIDGET(window_));
+  g_object_ref(window);
+  event->any.window = window;
+  event->any.send_event = TRUE;
+  gtk_main_do_event(event);
+  gdk_event_free(event);
 }
 
 void Window::PlatformSetContentView(Container* container) {
