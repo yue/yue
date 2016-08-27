@@ -5,6 +5,7 @@
 #ifndef NATIVEUI_WIN_SUBWIN_VIEW_H_
 #define NATIVEUI_WIN_SUBWIN_VIEW_H_
 
+#include "base/win/scoped_gdi_object.h"
 #include "nativeui/win/base_view.h"
 #include "nativeui/win/window_impl.h"
 
@@ -21,6 +22,9 @@ class SubwinView : public WindowImpl, public BaseView {
   void SetPixelBounds(const Rect& pixel_bounds) override;
   void SetParent(BaseView* parent) override;
   void BecomeContentView(WindowImpl* parent) override;
+
+ private:
+  base::win::ScopedHFONT font_;
 };
 
 }  // namespace nu

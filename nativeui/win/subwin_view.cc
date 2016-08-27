@@ -4,6 +4,9 @@
 
 #include "nativeui/win/subwin_view.h"
 
+#include "base/win/scoped_hdc.h"
+#include "nativeui/gfx/font.h"
+#include "nativeui/state.h"
 #include "nativeui/win/subwin_holder.h"
 
 namespace nu {
@@ -13,6 +16,14 @@ SubwinView::SubwinView(base::StringPiece16 class_name,
     : WindowImpl(class_name, SubwinHolder::GetInstance()->hwnd(),
                  window_style, window_ex_style),
       BaseView(false) {
+  // Create HFONT from default system font.
+  base::win::ScopedCreateDC mem_dc(CreateCompatibleDC(NULL));
+  Gdiplus::Graphics context(mem_dc.Get());
+  LOGFONTW logfont;
+  Font().GetNativeFont()->GetLogFontW(&context, &logfont);
+  font_.reset(CreateFontIndirect(&logfont));
+  // Use it as control's default font.
+  SendMessage(hwnd(), WM_SETFONT, reinterpret_cast<WPARAM>(font_.get()), TRUE);
 }
 
 SubwinView::~SubwinView() {
