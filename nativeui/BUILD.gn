@@ -117,6 +117,9 @@ source_set("nativeui") {
       "gdi32.lib",
       "gdiplus.lib",
     ]
+    deps += [
+      "//build/win:default_exe_manifest",
+    ]
     configs -= [ "//build/config/win:lean_and_mean" ]
   }
 }
