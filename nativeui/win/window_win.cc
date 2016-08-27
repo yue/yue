@@ -8,8 +8,8 @@
 #include "base/win/scoped_hdc.h"
 #include "base/win/scoped_select_object.h"
 #include "nativeui/gfx/win/gdiplus.h"
-#include "nativeui/win/base_view.h"
-#include "nativeui/win/window_impl.h"
+#include "nativeui/win/subwin_view.h"
+#include "nativeui/win/util/hwnd_util.h"
 
 namespace nu {
 
@@ -26,6 +26,8 @@ class TopLevelWindow : public WindowImpl {
 
  protected:
   CR_BEGIN_MSG_MAP_EX(TopLevelWindow, WindowImpl)
+    CR_MSG_WM_CLOSE(OnClose)
+    CR_MSG_WM_COMMAND(OnCommand)
     CR_MSG_WM_SIZE(OnSize)
     CR_MSG_WM_PAINT(OnPaint)
     CR_MSG_WM_ERASEBKGND(OnEraseBkgnd)
@@ -33,6 +35,8 @@ class TopLevelWindow : public WindowImpl {
   CR_END_MSG_MAP()
 
  private:
+  void OnClose();
+  void OnCommand(UINT code, int command, HWND window);
   void OnSize(UINT param, const Size& size);
   void OnPaint(HDC dc);
   LRESULT OnEraseBkgnd(HDC dc);
@@ -59,6 +63,21 @@ Rect TopLevelWindow::GetContentPixelBounds() {
   POINT point = { r.left, r.top };
   ClientToScreen(hwnd(), &point);
   return Rect(point.x, point.y, r.right - r.left, r.bottom - r.top);
+}
+
+void TopLevelWindow::OnClose() {
+  delegate_->on_close.Notify();
+}
+
+void TopLevelWindow::OnCommand(UINT code, int command, HWND window) {
+  if (::GetParent(window) != hwnd()) {
+    LOG(ERROR) << "Received notification " << code << " " << command
+               << "from a non-child window";
+    return;
+  }
+
+  auto* control = reinterpret_cast<SubwinView*>(GetWindowUserData(window));
+  control->OnCommand(code, command);
 }
 
 void TopLevelWindow::OnSize(UINT param, const Size& size) {

@@ -23,6 +23,9 @@ class SubwinView : public WindowImpl, public BaseView {
   void SetParent(BaseView* parent) override;
   void BecomeContentView(WindowImpl* parent) override;
 
+  // Rerouted from parent window
+  virtual void OnCommand(UINT code, int command) {}
+
  private:
   base::win::ScopedHFONT font_;
 };

@@ -10,8 +10,27 @@
 
 namespace nu {
 
+namespace {
+
+class ButtonView : public SubwinView {
+ public:
+  explicit ButtonView(Button* delegate)
+      : SubwinView(L"button", BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE),
+        delegate_(delegate) {
+  }
+
+  void OnCommand(UINT code, int command) override {
+    delegate_->on_click.Notify();
+  }
+
+ private:
+  Button* delegate_;
+};
+
+}  // namespace
+
 Button::Button(const std::string& title) {
-  set_view(new SubwinView(L"button", BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE));
+  set_view(new ButtonView(this));
   SetTitle(title);
 }
 
@@ -31,7 +50,5 @@ std::string Button::GetTitle() const {
     ::GetWindowTextW(button->hwnd(), base::WriteInto(&title, len), len);
   return base::UTF16ToUTF8(title);
 }
-
-
 
 }  // namespace nu
