@@ -23,10 +23,6 @@ class GroupView : public BaseView {
   explicit GroupView(Group* delegate)
       : BaseView(true), delegate_(delegate),
         color_(GetThemeColor(ThemeColor::Text)),
-        font_(GetDefaultFont()),
-        gdi_font_family_(font_.family.c_str()),
-        gdi_font_(&gdi_font_family_, font_.size,
-                  Gdiplus::FontStyleRegular, Gdiplus::UnitPixel),
         border_insets_(kTitleLeftMargin) {}
 
 
@@ -60,7 +56,8 @@ class GroupView : public BaseView {
                              GetWindowPixelOrigin().OffsetFromOrigin();
     Gdiplus::SolidBrush brush(ToGdi(color_));
     context->DrawString(title_.c_str(), static_cast<int>(title_.size()),
-                        &gdi_font_, ToGdi(title_bounds.origin()), &brush);
+                        font_.GetNativeFont(), ToGdi(title_bounds.origin()),
+                        &brush);
 
     // Calculate the border bounds.
     int text_height = title_bounds.height();
@@ -94,8 +91,6 @@ class GroupView : public BaseView {
 
   Color color_;
   Font font_;
-  Gdiplus::FontFamily gdi_font_family_;
-  Gdiplus::Font gdi_font_;
   Rect title_bounds_;
 
   Insets border_insets_;

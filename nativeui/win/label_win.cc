@@ -17,11 +17,7 @@ namespace {
 class LabelView : public BaseView {
  public:
   LabelView() : BaseView(true),
-                color_(GetThemeColor(ThemeColor::Text)),
-                font_(GetDefaultFont()),
-                gdi_font_family_(font_.family.c_str()),
-                gdi_font_(&gdi_font_family_, font_.size,
-                          Gdiplus::FontStyleRegular, Gdiplus::UnitPixel) {
+                color_(GetThemeColor(ThemeColor::Text)) {
   }
 
   void SetText(const base::string16& text) {
@@ -45,14 +41,12 @@ class LabelView : public BaseView {
 
     Gdiplus::SolidBrush brush(ToGdi(color_));
     context->DrawString(text_.c_str(), static_cast<int>(text_.size()),
-                        &gdi_font_, ToGdi(origin), &brush);
+                        font_.GetNativeFont(), ToGdi(origin), &brush);
   }
 
  private:
   Color color_;
   Font font_;
-  Gdiplus::FontFamily gdi_font_family_;
-  Gdiplus::Font gdi_font_;
 
   base::string16 text_;
 };

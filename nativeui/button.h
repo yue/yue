@@ -5,6 +5,8 @@
 #ifndef NATIVEUI_BUTTON_H_
 #define NATIVEUI_BUTTON_H_
 
+#include <string>
+
 #include "nativeui/view.h"
 
 namespace nu {

@@ -12,16 +12,12 @@ namespace nu {
 
 SizeF MeasureText(const Font& font, const String& text) {
   base::win::ScopedCreateDC dc(CreateCompatibleDC(NULL));
-
   Gdiplus::Graphics graphics(dc.Get());
-  Gdiplus::FontFamily gdi_family(font.family.c_str());
-  Gdiplus::Font gdi_font(&gdi_family, font.size,
-                         Gdiplus::FontStyleRegular, Gdiplus::UnitPixel);
-
   Gdiplus::RectF rect;
   Gdiplus::StringFormat fomart(Gdiplus::StringFormat::GenericDefault());
   graphics.MeasureString(text.c_str(), static_cast<int>(text.length()),
-                         &gdi_font, Gdiplus::PointF(0., 0.), &fomart, &rect);
+                         font.GetNativeFont(), Gdiplus::PointF(0., 0.),
+                         &fomart, &rect);
   return SizeF(rect.Width, rect.Height);
 }
 

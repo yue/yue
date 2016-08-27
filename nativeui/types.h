@@ -25,6 +25,22 @@
 struct NSView;
 class NSWindow;
 #endif  // __OBJC__
+#elif defined(OS_IOS)
+#ifdef __OBJC__
+@class UIFont;
+@class UIView;
+@class UIWindow;
+#else
+class UIFont;
+class UIView;
+class UIWindow;
+#endif  // __OBJC__
+#endif
+
+#if defined(OS_WIN)
+namespace Gdiplus {
+class Font;
+}
 #endif
 
 namespace nu {
@@ -43,12 +59,18 @@ typedef std::string String;
 #if defined(OS_MACOSX)
 typedef NSView* NativeView;
 typedef NSWindow* NativeWindow;
+typedef NSFont* NativeFont;
 #elif defined(OS_LINUX)
 typedef GtkWidget* NativeView;
 typedef GtkWindow* NativeWindow;
 #elif defined(OS_WIN)
 typedef BaseView* NativeView;
 typedef WindowImpl* NativeWindow;
+typedef Gdiplus::Font* NativeFont;
+#elif defined(OS_IOS)
+typedef UIView* NativeView;
+typedef UIWindow* NativeWindow;
+typedef UIFont* NativeFont;
 #endif
 
 }  // namespace nu
