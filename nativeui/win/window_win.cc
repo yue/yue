@@ -159,6 +159,10 @@ void Window::PlatformInit(const Options& options) {
     SetBounds(options.bounds);
 }
 
+void Window::Close() {
+  ::SendMessage(window_->hwnd(), WM_CLOSE, 0, 0);
+}
+
 void Window::PlatformSetContentView(Container* container) {
   container->view()->BecomeContentView(window_);
   container->Layout();

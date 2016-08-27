@@ -5,7 +5,6 @@
 #include "nativeui/group.h"
 
 #include "base/strings/utf_string_conversions.h"
-#include "base/strings/string_util.h"
 #include "nativeui/gfx/color.h"
 #include "nativeui/gfx/text.h"
 #include "nativeui/win/base_view.h"

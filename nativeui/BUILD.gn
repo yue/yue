@@ -88,6 +88,7 @@ source_set("nativeui") {
     "win/subwin_view.h",
     "win/window_impl.cc",
     "win/window_impl.h",
+    "win/button_win.cc",
     "win/container_win.cc",
     "win/init_win.cc",
     "win/group_win.cc",
