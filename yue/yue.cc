@@ -8,11 +8,7 @@
 #include "base/message_loop/message_loop.h"
 #include "base/run_loop.h"
 #include "lua/callback.h"
-#include "nativeui/init.h"
-#include "nativeui/group.h"
-#include "nativeui/label.h"
-#include "nativeui/layout/box_layout.h"
-#include "nativeui/window.h"
+#include "nativeui/nativeui.h"
 
 int main(int argc, const char *argv[]) {
   base::AtExitManager exit_manager;
@@ -60,8 +56,12 @@ int main(int argc, const char *argv[]) {
   container->AddChildView(new nu::Label("col2"));
   nu::Container* sub = new nu::Container;
   sub->SetLayoutManager(new nu::BoxLayout(nu::BoxLayout::Vertical));
-  sub->AddChildView(new nu::Label("line1"));
-  sub->AddChildView(new nu::Label("line2"));
+  nu::Label* label = new nu::Label("line1");
+  sub->AddChildView(label);
+  nu::Button* button = new nu::Button("button2");
+  auto sub_click = button->on_click.Add(
+      base::Bind(&nu::Label::SetText, label, "clicked"));
+  sub->AddChildView(button);
   nu::Group* group = new nu::Group;
   group->SetTitle("Button Group");
   group->SetContentView(sub);

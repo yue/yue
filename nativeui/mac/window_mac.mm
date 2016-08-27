@@ -25,10 +25,6 @@
 
 - (void)windowWillClose:(NSNotification*)notification {
   shell_->on_close.Notify();
-
-  // Clear the delegate class.
-  [shell_->window() setDelegate:nil];
-  [self release];
 }
 
 @end
@@ -55,6 +51,10 @@ Rect WindowToContentBounds(NSWindow* window, const Rect& bounds) {
 }  // namespace
 
 Window::~Window() {
+  // Clear the delegate class.
+  [[window_ delegate] release];
+  [window_ setDelegate:nil];
+
   [window_ release];
 }
 
