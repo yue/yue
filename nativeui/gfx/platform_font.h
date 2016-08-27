@@ -16,9 +16,6 @@ NATIVEUI_EXPORT class PlatformFont : public base::RefCounted<PlatformFont> {
  public:
   // Creates an appropriate PlatformFont implementation.
   static PlatformFont* CreateDefault();
-#if defined(OS_WIN) || defined(OS_MACOSX) || defined(OS_IOS)
-  static PlatformFont* CreateFromNativeFont(NativeFont native_font);
-#endif
   // Creates a PlatformFont implementation with the specified |font_name|
   // (encoded in UTF-8) and |font_size| in pixels.
   static PlatformFont* CreateFromNameAndSize(const std::string& font_name,
