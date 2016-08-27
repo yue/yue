@@ -98,7 +98,9 @@ void TopLevelWindow::OnPaint(HDC) {
     // Background.
     Gdiplus::Graphics graphics(buffer.dc());
     Gdiplus::SolidBrush solid_brush(Gdiplus::Color(255, 255, 255, 255));
-    graphics.FillRectangle(&solid_brush, 0, 0, bounds.width(), bounds.height());
+    graphics.FillRectangle(&solid_brush,
+                           dirty.x(), dirty.y(),
+                           dirty.width(), dirty.height());
 
     // Draw.
     delegate_->GetContentView()->view()->Draw(&graphics, dirty);
