@@ -31,6 +31,7 @@ source_set("nativeui") {
     "gfx/platform_font.h",
     "gfx/text.h",
     "gfx/win/color_win.cc",
+    "gfx/win/double_buffer.h",
     "gfx/win/platform_font_win.cc",
     "gfx/win/platform_font_win.h",
     "gfx/win/scoped_set_map_mode.h",

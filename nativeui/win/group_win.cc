@@ -110,6 +110,7 @@ void Group::PlatformSetContentView(Container* container) {
 
 void Group::SetTitle(const std::string& title) {
   static_cast<GroupView*>(view())->SetTitle(base::UTF8ToUTF16(title));
+  view()->Invalidate();
 }
 
 std::string Group::GetTitle() const {

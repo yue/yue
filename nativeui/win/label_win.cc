@@ -64,6 +64,7 @@ Label::~Label() {
 void Label::SetText(const std::string& text) {
   LabelView* label = static_cast<LabelView*>(view());
   label->SetText(base::UTF8ToUTF16(text));
+  label->Invalidate();
 }
 
 std::string Label::GetText() {

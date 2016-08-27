@@ -36,6 +36,9 @@ class BaseView {
   void SetBounds(const Rect& bounds);
   Rect GetBounds();
 
+  // Invalidate the view and trigger a redraw.
+  void Invalidate(const Rect& dirty = Rect());
+
   // Parent view and host window.
   WindowImpl* window() const { return window_; }
   BaseView* parent() const { return parent_; }

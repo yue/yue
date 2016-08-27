@@ -59,4 +59,19 @@ void BaseView::BecomeContentView(WindowImpl* parent) {
     bounds_ = ScaleToEnclosingRect(bounds_, scale_factor() / old_scale_factor);
 }
 
+void BaseView::Invalidate(const Rect& dirty) {
+  // Nothing to draw?
+  if (!window_ || bounds_.size().IsEmpty())
+    return;
+
+  // Default to redraw whole view.
+  if (dirty.IsEmpty()) {
+    Invalidate(Rect(bounds_.size()));
+    return;
+  }
+
+  RECT rect = (dirty + GetWindowPixelOrigin().OffsetFromOrigin()).ToRECT();
+  RedrawWindow(window_->hwnd(), &rect, NULL, RDW_INVALIDATE);
+}
+
 }  // namespace nu

@@ -4,10 +4,7 @@
 
 #include "nativeui/window.h"
 
-#include "base/win/scoped_gdi_object.h"
-#include "base/win/scoped_hdc.h"
-#include "base/win/scoped_select_object.h"
-#include "nativeui/gfx/win/gdiplus.h"
+#include "nativeui/gfx/win/double_buffer.h"
 #include "nativeui/win/subwin_view.h"
 #include "nativeui/win/util/hwnd_util.h"
 
@@ -91,26 +88,21 @@ void TopLevelWindow::OnPaint(HDC) {
   PAINTSTRUCT ps;
   BeginPaint(hwnd(), &ps);
 
-  // Prepare double buffering.
   Rect bounds(GetContentPixelBounds());
-  base::win::ScopedGetDC dc(hwnd());
-  base::win::ScopedCreateDC mem_dc(CreateCompatibleDC(dc));
-  base::win::ScopedBitmap mem_bitmap(
-      CreateCompatibleBitmap(dc, bounds.width(), bounds.height()));
-  base::win::ScopedSelectObject select_bitmap(mem_dc.Get(), mem_bitmap.get());
-
-  // Background.
-  Gdiplus::Graphics graphics(mem_dc.Get());
-  Gdiplus::SolidBrush solid_brush(Gdiplus::Color(255, 255, 255, 255));
-  graphics.FillRectangle(&solid_brush, 0, 0, bounds.width(), bounds.height());
-
-  // Draw.
   Rect dirty(ps.rcPaint);
-  delegate_->GetContentView()->view()->Draw(&graphics, dirty);
+  base::win::ScopedGetDC dc(hwnd());
+  {
+    // Double buffering the drawing.
+    DoubleBuffer buffer(dc, bounds.size(), dirty, dirty.origin());
 
-  // Transfer the off-screen DC to the screen.
-  BitBlt(dc, dirty.x(), dirty.y(), dirty.width(), dirty.height(),
-         mem_dc.Get(), dirty.x(), dirty.y(), SRCCOPY);
+    // Background.
+    Gdiplus::Graphics graphics(buffer.dc());
+    Gdiplus::SolidBrush solid_brush(Gdiplus::Color(255, 255, 255, 255));
+    graphics.FillRectangle(&solid_brush, 0, 0, bounds.width(), bounds.height());
+
+    // Draw.
+    delegate_->GetContentView()->view()->Draw(&graphics, dirty);
+  }
 
   EndPaint(hwnd(), &ps);
 }
