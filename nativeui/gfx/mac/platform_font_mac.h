@@ -2,19 +2,20 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef NATIVEUI_GFX_WIN_PLATFORM_FONT_WIN_H_
-#define NATIVEUI_GFX_WIN_PLATFORM_FONT_WIN_H_
+#ifndef NATIVEUI_GFX_MAC_PLATFORM_FONT_MAC_H_
+#define NATIVEUI_GFX_MAC_PLATFORM_FONT_MAC_H_
 
 #include <string>
 
+#include "base/mac/scoped_nsobject.h"
 #include "nativeui/gfx/platform_font.h"
-#include "nativeui/gfx/win/gdiplus.h"
 
 namespace nu {
 
-NATIVEUI_EXPORT class PlatformFontWin : public PlatformFont {
+NATIVEUI_EXPORT class PlatformFontMac : public PlatformFont {
  public:
-  PlatformFontWin(const base::string16& font_name, int font_size);
+  PlatformFontMac();
+  PlatformFontMac(const std::string& font_name, int font_size);
 
   // PlatformFont:
   std::string GetFontName() const override;
@@ -22,12 +23,11 @@ NATIVEUI_EXPORT class PlatformFontWin : public PlatformFont {
   NativeFont GetNativeFont() const override;
 
  private:
-  ~PlatformFontWin() override;
+  ~PlatformFontMac() override;
 
-  Gdiplus::FontFamily font_family_;
-  Gdiplus::Font font_;
+  base::scoped_nsobject<NSFont> font_;
 };
 
 }  // namespace nu
 
-#endif  // NATIVEUI_GFX_WIN_PLATFORM_FONT_WIN_H_
+#endif  // NATIVEUI_GFX_MAC_PLATFORM_FONT_MAC_H_

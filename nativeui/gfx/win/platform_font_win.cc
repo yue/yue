@@ -21,6 +21,9 @@ PlatformFontWin::PlatformFontWin(const base::string16& font_name,
             Gdiplus::FontStyleRegular, Gdiplus::UnitPixel) {
 }
 
+PlatformFontWin::~PlatformFontWin() {
+}
+
 std::string PlatformFontWin::GetFontName() const {
   WCHAR buffer[LF_FACESIZE] = {0};
   font_family_.GetFamilyName(buffer);

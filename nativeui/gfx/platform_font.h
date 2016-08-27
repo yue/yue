@@ -36,10 +36,13 @@ NATIVEUI_EXPORT class PlatformFont : public base::RefCounted<PlatformFont> {
 #endif
 
  protected:
+  PlatformFont() {}
   virtual ~PlatformFont() {}
 
  private:
   friend class base::RefCounted<PlatformFont>;
+
+  DISALLOW_COPY_AND_ASSIGN(PlatformFont);
 };
 
 }  // namespace nu

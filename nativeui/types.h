@@ -19,9 +19,11 @@
 
 #if defined(OS_MACOSX)
 #ifdef __OBJC__
+@class NSFont;
 @class NSView;
 @class NSWindow;
 #else
+class NSFont;
 struct NSView;
 class NSWindow;
 #endif  // __OBJC__
