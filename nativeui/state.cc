@@ -6,6 +6,7 @@
 
 #include "base/lazy_instance.h"
 #include "base/threading/thread_local.h"
+#include "nativeui/gfx/platform_font.h"
 
 namespace nu {
 
@@ -25,6 +26,9 @@ State::State() {
 }
 
 State::~State() {
+  // The GUI members must be destroyed before we shutdone GUI engine.
+  default_font_ = nullptr;
+
   PlatformDestroy();
   DCHECK_EQ(current(), this);
   lazy_tls_ptr.Pointer()->Set(nullptr);
@@ -35,8 +39,10 @@ State* State::current() {
   return lazy_tls_ptr.Pointer()->Get();
 }
 
-Font State::GetDefaultFont() const {
-  return default_font_;
+PlatformFont* State::GetDefaultFont() {
+  if (!default_font_)
+    default_font_ = PlatformFont::CreateDefault();
+  return default_font_.get();
 }
 
 }  // namespace nu

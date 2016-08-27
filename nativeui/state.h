@@ -5,9 +5,12 @@
 #ifndef NATIVEUI_STATE_H_
 #define NATIVEUI_STATE_H_
 
-#include "nativeui/gfx/font.h"
+#include "base/memory/ref_counted.h"
+#include "nativeui/nativeui_export.h"
 
 namespace nu {
+
+class PlatformFont;
 
 NATIVEUI_EXPORT class State {
  public:
@@ -17,13 +20,13 @@ NATIVEUI_EXPORT class State {
   static State* current();
 
   // Returns the default GUI font.
-  Font GetDefaultFont() const;
+  PlatformFont* GetDefaultFont();
 
  private:
   void PlatformInit();
   void PlatformDestroy();
 
-  Font default_font_;
+  scoped_refptr<PlatformFont> default_font_;
 
 #if defined(OS_WIN)
   ULONG_PTR token_;

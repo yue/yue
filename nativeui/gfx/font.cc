@@ -5,10 +5,11 @@
 #include "nativeui/gfx/font.h"
 
 #include "nativeui/gfx/platform_font.h"
+#include "nativeui/state.h"
 
 namespace nu {
 
-Font::Font() : platform_font_(PlatformFont::CreateDefault()) {
+Font::Font() : platform_font_(State::current()->GetDefaultFont()) {
 }
 
 Font::Font(const std::string& font_name, int font_size)
