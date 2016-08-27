@@ -44,7 +44,7 @@ int main(int argc, const char *argv[]) {
 #endif
 
   base::RunLoop run_loop;
-  nu::Initialize();
+  nu::State nu_state;
 
   nu::Window::Options options = { nu::Rect(100, 100, 400, 400) };
   scoped_refptr<nu::Window> window(new nu::Window(options));

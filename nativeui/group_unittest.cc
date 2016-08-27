@@ -2,18 +2,12 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/init.h"
-#include "nativeui/group.h"
-#include "nativeui/label.h"
-#include "nativeui/layout/box_layout.h"
-#include "nativeui/window.h"
+#include "nativeui/nativeui.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 class GroupTest : public testing::Test {
  protected:
-  void SetUp() override {
-    nu::Initialize();
-  }
+  nu::State state_;
 };
 
 TEST_F(GroupTest, ContentView) {

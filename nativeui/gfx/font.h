@@ -25,6 +25,10 @@ NATIVEUI_EXPORT class Font {
   // Creates a font with the specified name in UTF-8 and size.
   Font(const std::string& family, int size);
 
+  // Creates a font that is a clone of another font object.
+  Font(const Font& other);
+  Font& operator=(const Font& other);
+
   ~Font();
 
   // Returns the specified font name in UTF-8.

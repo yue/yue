@@ -3,17 +3,16 @@
 // LICENSE file.
 
 #include "base/bind.h"
-#include "nativeui/init.h"
-#include "nativeui/window.h"
+#include "nativeui/nativeui.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 class WindowTest : public testing::Test {
  protected:
   void SetUp() override {
-    nu::Initialize();
     window_ = new nu::Window(nu::Window::Options());
   }
 
+  nu::State state_;
   scoped_refptr<nu::Window> window_;
 };
 

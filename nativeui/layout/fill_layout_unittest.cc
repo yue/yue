@@ -2,22 +2,19 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/init.h"
-#include "nativeui/container.h"
-#include "nativeui/layout/fill_layout.h"
-#include "nativeui/window.h"
+#include "nativeui/nativeui.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 class FillLayoutTest : public testing::Test {
  protected:
   void SetUp() override {
-    nu::Initialize();
     window_ = new nu::Window(nu::Window::Options());
     nu::Container* container = new nu::Container;
     container->SetLayoutManager(new nu::FillLayout);
     window_->SetContentView(container);
   }
 
+  nu::State state_;
   scoped_refptr<nu::Window> window_;
 };
 

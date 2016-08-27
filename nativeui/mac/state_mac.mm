@@ -2,15 +2,18 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/init.h"
+#include "nativeui/state.h"
 
 #import <Cocoa/Cocoa.h>
 
 namespace nu {
 
-void Initialize() {
+void State::PlatformInit() {
   [NSApplication sharedApplication];
   [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+}
+
+void State::PlatformDestroy() {
 }
 
 }  // namespace nu

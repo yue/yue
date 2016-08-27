@@ -7,8 +7,8 @@
 
 #include "nativeui/button.h"
 #include "nativeui/group.h"
-#include "nativeui/init.h"
 #include "nativeui/label.h"
+#include "nativeui/state.h"
 #include "nativeui/window.h"
 #include "nativeui/layout/fill_layout.h"
 #include "nativeui/layout/box_layout.h"

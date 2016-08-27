@@ -16,6 +16,14 @@ Font::Font(const std::string& font_name, int font_size)
                                                          font_size)) {
 }
 
+Font::Font(const Font& other) : platform_font_(other.platform_font_) {
+}
+
+Font& Font::operator=(const Font& other) {
+  platform_font_ = other.platform_font_;
+  return *this;
+}
+
 Font::~Font() {
 }
 

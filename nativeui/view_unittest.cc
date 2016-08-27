@@ -2,18 +2,16 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/init.h"
-#include "nativeui/label.h"
-#include "nativeui/window.h"
+#include "nativeui/nativeui.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 class ViewTest : public testing::Test {
  protected:
   void SetUp() override {
-    nu::Initialize();
     view_ = new nu::Label;
   }
 
+  nu::State state_;
   scoped_refptr<nu::View> view_;
 };
 

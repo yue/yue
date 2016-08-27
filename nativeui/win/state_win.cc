@@ -2,7 +2,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/init.h"
+#include "nativeui/state.h"
 
 #include <shellscalingapi.h>
 
@@ -61,12 +61,15 @@ void EnableHighDPISupport() {
 
 }  // namespace
 
-void Initialize() {
+void State::PlatformInit() {
   EnableHighDPISupport();
 
-  ULONG_PTR token;
   Gdiplus::GdiplusStartupInput input;
-  Gdiplus::GdiplusStartup(&token, &input, nullptr);
+  Gdiplus::GdiplusStartup(&token_, &input, nullptr);
+}
+
+void State::PlatformDestroy() {
+  Gdiplus::GdiplusShutdown(token_);
 }
 
 }  // namespace nu
