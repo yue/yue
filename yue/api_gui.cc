@@ -85,6 +85,8 @@ struct Type<nu::Container> {
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
            "new", &MetaTable<nu::Container>::NewInstance<>,
+           "setlayout", &nu::Container::SetLayoutManager,
+           "getlayout", &nu::Container::GetLayoutManager,
            "addchildview", &nu::Container::AddChildView,
            "addchildviewat", &nu::Container::AddChildViewAt,
            "removechildview", &nu::Container::RemoveChildView,
@@ -121,6 +123,53 @@ struct Type<nu::Window> {
   }
 };
 
+template<>
+struct Type<nu::LayoutManager> {
+  static constexpr const char* name = "yue.LayoutManager";
+  static void BuildMetaTable(State* state, int index) {
+  }
+};
+
+template<>
+struct Type<nu::FillLayout> {
+  using base = nu::LayoutManager;
+  static constexpr const char* name = "yue.FillLayout";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index, "new", &MetaTable<nu::FillLayout>::NewInstance<>);
+  }
+};
+
+template<>
+struct Type<nu::BoxLayout::Orientation> {
+  static constexpr const char* name = "yue.BoxLayout.Orientation";
+  static inline bool To(State* state, int index,
+                        nu::BoxLayout::Orientation* out) {
+    std::string orientation;
+    if (!lua::To(state, index, &orientation))
+      return false;
+    if (orientation == "vertical") {
+      *out = nu::BoxLayout::Vertical;
+      return true;
+    } else if (orientation == "horizontal") {
+      *out = nu::BoxLayout::Horizontal;
+      return true;
+    } else {
+      return false;
+    }
+  }
+};
+
+template<>
+struct Type<nu::BoxLayout> {
+  using base = nu::LayoutManager;
+  static constexpr const char* name = "yue.BoxLayout";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "new",
+           &MetaTable<nu::BoxLayout>::NewInstance<nu::BoxLayout::Orientation>);
+  }
+};
+
 }  // namespace lua
 
 extern "C" int luaopen_yue_gui(lua::State* state) {
@@ -145,6 +194,12 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   lua_rawset(state, -3);
   lua::Push(state, "Group");
   lua::MetaTable<nu::Group>::Push(state);
+  lua_rawset(state, -3);
+  lua::Push(state, "FillLayout");
+  lua::MetaTable<nu::FillLayout>::Push(state);
+  lua_rawset(state, -3);
+  lua::Push(state, "BoxLayout");
+  lua::MetaTable<nu::BoxLayout>::Push(state);
   lua_rawset(state, -3);
   return 1;
 }

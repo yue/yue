@@ -14,7 +14,7 @@ FillLayout::~FillLayout() {
 
 void FillLayout::Layout(Container* host) {
   if (host->child_count() > 0)
-    host->child_at(0)->SetPixelBounds(host->GetPixelBounds());
+    host->child_at(0)->SetPixelBounds(Rect(host->GetPixelBounds().size()));
 }
 
 }  // namespace nu
