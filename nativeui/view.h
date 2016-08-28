@@ -33,8 +33,7 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
   Point GetWindowPixelOrigin() const;
 
   // Get parent.
-  const Container* parent() const { return parent_; }
-  Container* parent() { return parent_; }
+  Container* parent() const { return parent_; }
 
   // Set parent, can only be used internally for now.
   void set_parent(Container* parent) { parent_ = parent; }

@@ -6,9 +6,10 @@
 
 namespace nu {
 
-Group::Group() {
+Group::Group(const std::string& title) {
   PlatformInit();
   SetContentView(new Container);
+  SetTitle(title);
 }
 
 Group::~Group() {

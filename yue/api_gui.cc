@@ -30,6 +30,70 @@ struct Type<nu::Rect> {
 };
 
 template<>
+struct Type<nu::View> {
+  static constexpr const char* name = "yue.View";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "setbounds", &nu::View::SetBounds,
+           "getbounds", &nu::View::GetBounds,
+           "getparent", &nu::View::parent);
+  }
+};
+
+template<>
+struct Type<nu::Button> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Button";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "new", &MetaTable<nu::Button>::NewInstance<const std::string&>,
+           "settitle", &nu::Button::SetTitle,
+           "gettitle", &nu::Button::GetTitle);
+  }
+};
+
+template<>
+struct Type<nu::Label> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Label";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "new", &MetaTable<nu::Label>::NewInstance<const std::string&>,
+           "settext", &nu::Label::SetText,
+           "gettext", &nu::Label::GetText);
+  }
+};
+
+template<>
+struct Type<nu::Group> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Group";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "new", &MetaTable<nu::Group>::NewInstance<const std::string&>,
+           "setcontentview", &nu::Group::SetContentView,
+           "getcontentview", &nu::Group::GetContentView,
+           "settitle", &nu::Group::SetTitle,
+           "gettitle", &nu::Group::GetTitle);
+  }
+};
+
+template<>
+struct Type<nu::Container> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Container";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "new", &MetaTable<nu::Container>::NewInstance<>,
+           "addchildview", &nu::Container::AddChildView,
+           "addchildviewat", &nu::Container::AddChildViewAt,
+           "removechildview", &nu::Container::RemoveChildView,
+           "childcount", &nu::Container::child_count,
+           "childat", &nu::Container::child_at);
+  }
+};
+
+template<>
 struct Type<nu::Window::Options> {
   static constexpr const char* name = "yue.Window.Options";
   static inline bool To(State* state, int index, nu::Window::Options* out) {
@@ -50,6 +114,8 @@ struct Type<nu::Window> {
            "getcontentbounds", &nu::Window::GetContentBounds,
            "setbounds", &nu::Window::SetBounds,
            "getbounds", &nu::Window::GetBounds,
+           "setcontentview", &nu::Window::SetContentView,
+           "getcontentview", &nu::Window::GetContentView,
            "setvisible", &nu::Window::SetVisible,
            "isvisible", &nu::Window::IsVisible);
   }
@@ -67,6 +133,18 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   lua::PushNewTable(state);
   lua::Push(state, "Window");
   lua::MetaTable<nu::Window>::Push(state);
+  lua_rawset(state, -3);
+  lua::Push(state, "Container");
+  lua::MetaTable<nu::Container>::Push(state);
+  lua_rawset(state, -3);
+  lua::Push(state, "Button");
+  lua::MetaTable<nu::Button>::Push(state);
+  lua_rawset(state, -3);
+  lua::Push(state, "Label");
+  lua::MetaTable<nu::Label>::Push(state);
+  lua_rawset(state, -3);
+  lua::Push(state, "Group");
+  lua::MetaTable<nu::Group>::Push(state);
   lua_rawset(state, -3);
   return 1;
 }

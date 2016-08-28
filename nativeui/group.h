@@ -13,7 +13,7 @@ namespace nu {
 
 NATIVEUI_EXPORT class Group : public View {
  public:
-  Group();
+  explicit Group(const std::string& title = "");
 
   void SetContentView(Container* view);
   Container* GetContentView() const;
