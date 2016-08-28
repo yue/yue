@@ -6,6 +6,10 @@ import("//testing/test.gni")
 
 executable("yue") {
   sources = [
+    "api_message_loop.cc",
+    "api_message_loop.h",
+    "builtin_loader.cc",
+    "builtin_loader.h",
     "yue.cc",
   ]
 

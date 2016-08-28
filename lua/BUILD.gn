@@ -6,6 +6,7 @@ import("//testing/test.gni")
 
 source_set("lua") {
   sources = [
+    "lua.h",
     "call_context.h",
     "callback.cc",
     "callback.h",

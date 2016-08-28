@@ -5,17 +5,7 @@
 #include "base/at_exit.h"
 #include "base/command_line.h"
 #include "base/logging.h"
-#include "base/message_loop/message_loop.h"
-#include "base/run_loop.h"
-#include "base/strings/stringprintf.h"
-#include "lua/callback.h"
-#include "nativeui/nativeui.h"
-
-void AddNewChild(nu::Container* container) {
-  static int counter = 0;
-  container->AddChildViewAt(
-      new nu::Label(base::StringPrintf("new child %d", ++counter)), 0);
-}
+#include "yue/builtin_loader.h"
 
 int main(int argc, const char *argv[]) {
   base::AtExitManager exit_manager;
@@ -27,57 +17,26 @@ int main(int argc, const char *argv[]) {
 
   auto* cmd = base::CommandLine::ForCurrentProcess();
   if (cmd->GetArgs().size() != 1) {
-    LOG(ERROR) << "Script expected";
+    fprintf(stderr, "Usage: yue <path-to-script>\n");
     return 1;
   }
 
-  base::MessageLoop message_loop(base::MessageLoop::TYPE_UI);
-
   lua::ManagedState state;
   if (!state) {
-    LOG(ERROR) << "Failed to create state.";
+    fprintf(stderr, "Unable to create lua state\n");
     return 1;
   }
   luaL_openlibs(state);
 
-#if 0
+  yue::InsertBuiltinModuleLoader(state);
+
   if (luaL_loadfile(state, cmd->GetArgs()[0].c_str()) != LUA_OK ||
       !lua::PCall(state, nullptr)) {
     std::string error;
     lua::Pop(state, &error);
-    LOG(ERROR) << "Error run script: " << error;
+    fprintf(stderr, "Error when running script: %s\n", error.c_str());
     return 1;
   }
-#endif
-
-  base::RunLoop run_loop;
-  nu::State nu_state;
-
-  nu::Window::Options options = { nu::Rect(100, 100, 400, 400) };
-  scoped_refptr<nu::Window> window(new nu::Window(options));
-  auto sub_close = window->on_close.Add(run_loop.QuitClosure());
-
-  nu::Container* container = window->GetContentView();
-  container->SetLayoutManager(new nu::BoxLayout(nu::BoxLayout::Horizontal));
-  container->AddChildView(new nu::Label("col1"));
-  container->AddChildView(new nu::Label("col2"));
-  nu::Container* sub = new nu::Container;
-  sub->SetLayoutManager(new nu::BoxLayout(nu::BoxLayout::Vertical));
-  nu::Label* label = new nu::Label("line1");
-  sub->AddChildView(label);
-  nu::Button* button = new nu::Button("button2");
-  auto sub_click = button->on_click.Add(
-      base::Bind(&AddNewChild, sub));
-  sub->AddChildView(button);
-  nu::Group* group = new nu::Group;
-  auto sub_click2 = button->on_click.Add(
-      base::Bind(&nu::Group::SetTitle, group, "clicked"));
-  group->SetTitle("Button Group");
-  group->SetContentView(sub);
-  container->AddChildView(group);
-  window->SetVisible(true);
-
-  run_loop.Run();
 
   return 0;
 }

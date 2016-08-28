@@ -5,6 +5,8 @@
 #ifndef NATIVEUI_GFX_GTK_PLATFORM_FONT_GTK_H_
 #define NATIVEUI_GFX_GTK_PLATFORM_FONT_GTK_H_
 
+#include <string>
+
 #include "nativeui/gfx/platform_font.h"
 
 namespace nu {
