@@ -123,8 +123,10 @@ class Invoker<IndicesHolder<indices...>, ArgTypes...>
   template<typename ReturnType>
   void DispatchToCallback(
       const base::Callback<ReturnType(ArgTypes...)>& callback) {
-    Push(context_->state,
-         callback.Run(ArgumentHolder<indices, ArgTypes>::value...));
+    ReturnType&& r = callback.Run(ArgumentHolder<indices, ArgTypes>::value...);
+    // Convert result to lua if there is no error happened.
+    if (!context_->has_error)
+      Push(context_->state, r);
   }
 
   // In C++, you can declare the function foo(void), but you can't pass a void
@@ -158,6 +160,8 @@ struct Dispatcher<ReturnType(ArgTypes...)> {
         lua_touserdata(state, lua_upvalueindex(1)));
 
     CallContext context(state);
+    static_assert(std::is_standard_layout<CallContext>::value,
+                  "The CallContext must not invole C++ stack");
     {  // Make sure C++ stack is destroyed before calling lua_error.
       using Indices = typename IndicesGenerator<sizeof...(ArgTypes)>::type;
       Invoker<Indices, ArgTypes...> invoker(&context);

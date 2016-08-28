@@ -29,10 +29,7 @@ class MessageLoop : public base::RefCounted<MessageLoop> {
       return nullptr;
     }
 
-    lua::StackAutoReset reset(context->state);
-    MessageLoop* instance = new MessageLoop(base::MessageLoop::TYPE_UI);
-    lua::MetaTable<MessageLoop>::PushNewWrapper(context->state, instance);
-    return instance;
+    return new MessageLoop(base::MessageLoop::TYPE_UI);
   }
 
   void Run() {

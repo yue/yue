@@ -6,11 +6,18 @@ import("//testing/test.gni")
 
 executable("yue") {
   sources = [
+    "yue.cc",
+  ]
+
+  deps = [ ":libyue" ]
+}
+
+source_set("libyue") {
+  sources = [
     "api_message_loop.cc",
     "api_message_loop.h",
     "builtin_loader.cc",
     "builtin_loader.h",
-    "yue.cc",
   ]
 
   deps = [
@@ -22,11 +29,12 @@ executable("yue") {
 
 test("yue_unittests") {
   sources = [
+    "api_message_loop_unittest.cc",
     "test/run_all_unittests.cc",
   ]
 
   deps = [
-    ":yue",
+    ":libyue",
     "//base/test:test_support",
     "//testing/gtest",
   ]
