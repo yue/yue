@@ -7,6 +7,7 @@
 #include <string>
 #include <unordered_map>
 
+#include "yue/api_gui.h"
 #include "yue/api_message_loop.h"
 
 namespace yue {
@@ -16,6 +17,7 @@ namespace {
 // The search table.
 std::unordered_map<std::string, lua_CFunction> loaders_map = {
   { "yue.MessageLoop", luaopen_yue_message_loop },
+  { "yue.GUI", luaopen_yue_gui },
 };
 
 int SearchBuiltin(lua::State* state) {

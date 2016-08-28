@@ -26,8 +26,8 @@ int main(int argc, const char *argv[]) {
     fprintf(stderr, "Unable to create lua state\n");
     return 1;
   }
-  luaL_openlibs(state);
 
+  luaL_openlibs(state);
   yue::InsertBuiltinModuleLoader(state);
 
   if (luaL_loadfile(state, cmd->GetArgs()[0].c_str()) != LUA_OK ||

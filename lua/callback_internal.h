@@ -210,7 +210,11 @@ struct PCallHelper {
     ReturnType result = ReturnType();
     int top = GetTop(state);
     handle->Push(state);
-    PCall(state, &result, args...);
+    if (!PCall(state, &result, args...)) {
+      std::string error;
+      lua::Pop(state, &error);
+      LOG(ERROR) << "Error when calling lua function: " << error;
+    }
     SetTop(state, top);  // reset everything on stack
     return result;
   }
@@ -223,7 +227,11 @@ struct PCallHelper<void, ArgTypes...> {
                   ArgTypes... args) {
     int top = GetTop(state);
     handle->Push(state);
-    PCall(state, nullptr, args...);
+    if (!PCall(state, nullptr, args...)) {
+      std::string error;
+      lua::Pop(state, &error);
+      LOG(ERROR) << "Error when calling lua function: " << error;
+    }
     SetTop(state, top);  // reset everything on stack
   }
 };
