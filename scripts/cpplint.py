@@ -30,8 +30,14 @@ def list_files(directories, filters):
 
 def call_cpplint(files):
   cpplint = os.path.join(SOURCE_ROOT, 'tools', 'cpplint.py')
-  subprocess.check_call([sys.executable, cpplint] + files)
-
+  try:
+    output = subprocess.check_output([sys.executable, cpplint] + files,
+                                     stderr=subprocess.STDOUT)
+  except Exception as e:
+    output = e.output
+  for line in output.split('\n'):
+    if line != '' and not line.startswith('Done processing'):
+      print line
 
 if __name__ == '__main__':
   sys.exit(main())
