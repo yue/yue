@@ -9,6 +9,7 @@
 #include "lua/call_context.h"
 #include "lua/handle.h"
 #include "lua/pcall.h"
+#include "lua/table.h"
 
 namespace lua {
 
@@ -171,10 +172,20 @@ struct Dispatcher<ReturnType(ArgTypes...)> {
           PushFormatedString(state, "insufficient args, only %d supplied",
                              context.invalid_arg -1);
         } else {
+          // Get name of custom type.
+          std::string name;
+          if (GetType(state, context.invalid_arg) == LuaType::UserData &&
+              GetMetaTable(state, context.invalid_arg)) {
+            RawGetAndPop(state, -1, "__name", &name);
+            PopAndIgnore(state, 1);
+          }
+
           PushFormatedString(
               state, "error converting arg at index %d from %s to %s",
               context.invalid_arg,
-              lua_typename(state, lua_type(state, context.invalid_arg)),
+              name.empty() ?
+                  lua_typename(state, lua_type(state, context.invalid_arg)) :
+                  name.data(),
               context.invalid_arg_name);
         }
       } else {

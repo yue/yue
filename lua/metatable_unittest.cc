@@ -296,7 +296,7 @@ TEST_F(MetaTableTest, BaseCallDerivedClassMethods) {
   std::string error;
   ASSERT_TRUE(lua::Pop(state_, &error));
   ASSERT_EQ(error, "error converting arg at index 1 "
-                   "from userdata to DerivedClass");
+                   "from TestClass to DerivedClass");
 }
 
 TEST_F(MetaTableTest, BaseConvertToDerivedClass) {
