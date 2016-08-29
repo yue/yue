@@ -4,6 +4,8 @@
 
 #include "yue/api_gui.h"
 
+#include <string>
+
 #include "nativeui/nativeui.h"
 
 namespace lua {

@@ -18,7 +18,7 @@ NATIVEUI_EXPORT class Button : public View {
   void SetTitle(const std::string& title);
   std::string GetTitle() const;
 
-  base::CallbackList<void()> on_click;
+  Signal<void()> on_click;
 
  protected:
   ~Button() override;

@@ -20,7 +20,7 @@ class ButtonView : public SubwinView {
   }
 
   void OnCommand(UINT code, int command) override {
-    delegate_->on_click.Notify();
+    delegate_->on_click.Emit();
   }
 
  private:

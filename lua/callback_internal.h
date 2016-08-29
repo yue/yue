@@ -5,6 +5,10 @@
 #ifndef LUA_CALLBACK_INTERNAL_H_
 #define LUA_CALLBACK_INTERNAL_H_
 
+#include <memory>
+#include <string>
+#include <utility>
+
 #include "base/callback.h"
 #include "lua/call_context.h"
 #include "lua/handle.h"
@@ -127,7 +131,7 @@ class Invoker<IndicesHolder<indices...>, ArgTypes...>
     ReturnType&& r = callback.Run(ArgumentHolder<indices, ArgTypes>::value...);
     // Convert result to lua if there is no error happened.
     if (!context_->has_error)
-      Push(context_->state, r);
+      Push(context_->state, std::forward(r));
   }
 
   // In C++, you can declare the function foo(void), but you can't pass a void

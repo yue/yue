@@ -5,11 +5,10 @@
 #ifndef NATIVEUI_VIEW_H_
 #define NATIVEUI_VIEW_H_
 
-#include "base/callback_list.h"
 #include "base/memory/ref_counted.h"
-#include "nativeui/nativeui_export.h"
-#include "nativeui/types.h"
 #include "nativeui/gfx/geometry/rect.h"
+#include "nativeui/types.h"
+#include "nativeui/signal.h"
 
 namespace nu {
 

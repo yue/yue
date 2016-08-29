@@ -25,7 +25,7 @@
 }
 
 - (IBAction)onClick:(id)sender {
-  shell_->on_click.Notify();
+  shell_->on_click.Emit();
 }
 
 @end

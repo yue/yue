@@ -24,7 +24,7 @@
 }
 
 - (void)windowWillClose:(NSNotification*)notification {
-  shell_->on_close.Notify();
+  shell_->on_close.Emit();
 }
 
 @end

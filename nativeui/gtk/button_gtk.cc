@@ -9,7 +9,7 @@ namespace nu {
 namespace {
 
 void OnClick(GtkButton* width, Button* button) {
-  button->on_click.Notify();
+  button->on_click.Emit();
 }
 
 }  // namespace

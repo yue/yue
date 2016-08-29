@@ -44,7 +44,7 @@ void Window::PlatformInit(const Options& options) {
 }
 
 void Window::Close() {
-  on_close.Notify();
+  on_close.Emit();
   gtk_widget_destroy(GTK_WIDGET(window_));
 
   window_ = nullptr;

@@ -5,6 +5,8 @@
 #ifndef LUA_METATABLE_INTERNAL_H_
 #define LUA_METATABLE_INTERNAL_H_
 
+#include <string>
+
 #include "base/memory/ref_counted.h"
 #include "lua/table.h"
 

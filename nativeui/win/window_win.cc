@@ -63,7 +63,7 @@ Rect TopLevelWindow::GetContentPixelBounds() {
 }
 
 void TopLevelWindow::OnClose() {
-  delegate_->on_close.Notify();
+  delegate_->on_close.Emit();
 }
 
 void TopLevelWindow::OnCommand(UINT code, int command, HWND window) {

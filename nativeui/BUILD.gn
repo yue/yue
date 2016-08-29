@@ -23,6 +23,7 @@ source_set("nativeui") {
     "group.h",
     "state.cc",
     "state.h",
+    "signal.h",
     "window.cc",
     "window.h",
     "gfx/color.h",

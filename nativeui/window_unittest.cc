@@ -46,7 +46,7 @@ void OnClose(bool* ptr) {
 
 TEST_F(WindowTest, OnClose) {
   bool closed = false;
-  auto sub = window_->on_close.Add(base::Bind(&OnClose, &closed));
+  window_->on_close.Connect(base::Bind(&OnClose, &closed));
   window_->Close();
   EXPECT_EQ(closed, true);
 }
