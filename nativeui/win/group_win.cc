@@ -6,10 +6,10 @@
 
 #include "base/strings/utf_string_conversions.h"
 #include "nativeui/gfx/color.h"
-#include "nativeui/gfx/text.h"
-#include "nativeui/win/base_view.h"
 #include "nativeui/gfx/geometry/insets.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
+#include "nativeui/gfx/text.h"
+#include "nativeui/win/base_view.h"
 
 namespace nu {
 

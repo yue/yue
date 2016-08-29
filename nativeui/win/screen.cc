@@ -4,8 +4,8 @@
 
 #include "nativeui/win/screen.h"
 
-#include <windows.h>
 #include <shellscalingapi.h>
+#include <windows.h>
 
 #include "base/win/scoped_hdc.h"
 #include "base/win/win_util.h"

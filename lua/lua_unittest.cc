@@ -2,8 +2,10 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "lua/callback.h"
-#include "lua/table.h"
+#include <string>
+#include <tuple>
+
+#include "lua/lua.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 class LuaTest : public testing::Test {

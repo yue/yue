@@ -5,9 +5,7 @@
 #include <memory>
 
 #include "base/bind.h"
-#include "lua/handle.h"
-#include "lua/callback.h"
-#include "lua/table.h"
+#include "lua/lua.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 class HandleTest : public testing::Test {

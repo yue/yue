@@ -6,9 +6,9 @@
 
 #include "base/strings/utf_string_conversions.h"
 #include "nativeui/gfx/color.h"
+#include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/text.h"
 #include "nativeui/win/subwin_view.h"
-#include "nativeui/gfx/geometry/size_conversions.h"
 
 namespace nu {
 

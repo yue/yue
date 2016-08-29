@@ -10,7 +10,6 @@
 #include <tuple>
 
 #include "lua/table_internal.h"
-#include "lua/stack.h"
 
 namespace lua {
 

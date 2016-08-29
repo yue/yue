@@ -131,7 +131,7 @@ class Invoker<IndicesHolder<indices...>, ArgTypes...>
     ReturnType&& r = callback.Run(ArgumentHolder<indices, ArgTypes>::value...);
     // Convert result to lua if there is no error happened.
     if (!context_->has_error)
-      Push(context_->state, std::forward(r));
+      Push(context_->state, r);
   }
 
   // In C++, you can declare the function foo(void), but you can't pass a void

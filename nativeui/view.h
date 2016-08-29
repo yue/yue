@@ -7,8 +7,8 @@
 
 #include "base/memory/ref_counted.h"
 #include "nativeui/gfx/geometry/rect.h"
-#include "nativeui/types.h"
 #include "nativeui/signal.h"
+#include "nativeui/types.h"
 
 namespace nu {
 

@@ -8,8 +8,8 @@
 #include <iosfwd>
 #include <string>
 
-#include "testing/gtest/include/gtest/gtest.h"
 #include "nativeui/gfx/geometry/rect_f.h"
+#include "testing/gtest/include/gtest/gtest.h"
 
 namespace nu {
 

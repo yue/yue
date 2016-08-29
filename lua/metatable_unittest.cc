@@ -4,8 +4,7 @@
 
 #include <string>
 
-#include "lua/callback.h"
-#include "lua/metatable.h"
+#include "lua/lua.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 class MetaTableTest : public testing::Test {
