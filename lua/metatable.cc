@@ -42,6 +42,15 @@ PointerWrapperBase::PointerWrapperBase(State* state, void* ptr) {
   RawSet(state, -1, LightUserData(ptr), ValueOnStack(state, -2));
 }
 
+int DefaultPropertyLookup(State* state) {
+  DCHECK_EQ(GetType(state, 1), LuaType::UserData);
+  lua_getmetatable(state, 1);
+  DCHECK_EQ(GetType(state, 3), LuaType::Table);
+  lua_pushvalue(state, 2);
+  lua_gettable(state, 3);
+  return 1;
+}
+
 }  // namespace internal
 
 }  // namespace lua

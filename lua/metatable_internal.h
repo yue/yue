@@ -52,6 +52,34 @@ class PointerWrapper : public PointerWrapperBase {
   T* ptr_;
 };
 
+// The default __index handler which looks up in the metatable.
+int DefaultPropertyLookup(State* state);
+
+// Check whether T has an Index handler, if not use the default property lookup
+// that searches in metatable.
+template<typename T, typename Enable = void>
+struct PropertyLookuper {
+  static int Index(State* state) {
+    return DefaultPropertyLookup(state);
+  }
+};
+
+template<typename T>
+struct PropertyLookuper<T, typename std::enable_if<std::is_function<
+                               decltype(Type<T>::Index)>::value>::type> {
+  static int Index(State* state) {
+    // The DefaultPropertyLookup may throw error, so wrap the C++ stack.
+    {
+      T* self;
+      std::string name;
+      if (To(state, -2, &self, &name) && Type<T>::Index(state, self, name))
+        return 1;
+    }
+    // Go to the default routine.
+    return DefaultPropertyLookup(state);
+  }
+};
+
 // Create metatable for T, returns true if the metattable has already been
 // created.
 template<typename T>
@@ -59,7 +87,7 @@ bool PushSingleTypeMetaTable(State* state) {
   if (luaL_newmetatable(state, Type<T>::name) == 0)
     return true;
 
-  RawSet(state, -1, "__index", ValueOnStack(state, -1),
+  RawSet(state, -1, "__index", CFunction(PropertyLookuper<T>::Index),
                     "__gc", CFunction(PointerWrapper<T>::OnGC));
   Type<T>::BuildMetaTable(state, -1);
   return false;

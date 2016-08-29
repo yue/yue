@@ -128,6 +128,7 @@ inline bool RawGetAndPop(State* state, int index, const Key& key, Value* out,
 // When failed, false is returned and the error is left on stack.
 template<typename... ArgTypes>
 inline bool PSet(State* state, int index, const ArgTypes&... args) {
+  index = AbsIndex(state, index);
   std::tuple<const ArgTypes&...> args_refs(args...);
   lua_pushcfunction(state, &internal::UnsafeSetWrapper<const ArgTypes&...>);
   lua_pushlightuserdata(state, &args_refs);
@@ -139,6 +140,7 @@ inline bool PSet(State* state, int index, const ArgTypes&... args) {
 // When failed, false is returned and the error is left on stack.
 template<typename... ArgTypes>
 inline bool PGet(State* state, int index, const ArgTypes&... args) {
+  index = AbsIndex(state, index);
   std::tuple<const ArgTypes&...> args_refs(args...);
   lua_pushcfunction(state, &internal::UnsafeGetWrapper<const ArgTypes&...>);
   lua_pushlightuserdata(state, &args_refs);
@@ -150,6 +152,7 @@ inline bool PGet(State* state, int index, const ArgTypes&... args) {
 // When failed, false is returned and the error is left on stack.
 template<typename... ArgTypes>
 inline bool PGetAndPop(State* state, int index, const ArgTypes&... args) {
+  index = AbsIndex(state, index);
   std::tuple<const ArgTypes&...> args_refs(args...);
   int current_top = GetTop(state);
   lua_pushcfunction(state,

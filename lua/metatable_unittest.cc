@@ -66,8 +66,7 @@ TEST_F(MetaTableTest, PushNewClass) {
   EXPECT_EQ(lua::GetTop(state_), 1);
   EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Table);
   lua::RawGet(state_, -1, "method1", "method2", "__gc", "__index");
-  EXPECT_TRUE(lua::Compare(state_, 1, -1, lua::CompareOp::EQ));
-  EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Table);
+  EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Function);
   EXPECT_EQ(lua::GetType(state_, -2), lua::LuaType::Function);
   EXPECT_EQ(lua::GetType(state_, -3), lua::LuaType::Function);
   EXPECT_EQ(lua::GetType(state_, -4), lua::LuaType::Function);
@@ -387,7 +386,7 @@ TEST_F(MetaTableTest, ConvertedBaseWithoutParentMethods) {
   lua::MetaTable<DerivedClass2>::Push(state_);
   lua::Push(state_, new DerivedClass2);
 
-  ASSERT_TRUE(lua::PGet(state_, 1, "a", "b", "c"));
+  ASSERT_TRUE(lua::PGet(state_, 2, "a", "b", "c"));
   EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Function);
   EXPECT_EQ(lua::GetType(state_, -2), lua::LuaType::Function);
   EXPECT_EQ(lua::GetType(state_, -3), lua::LuaType::Function);
@@ -404,3 +403,46 @@ TEST_F(MetaTableTest, ConvertedBaseWithoutParentMethods) {
   EXPECT_EQ(lua::GetType(state_, -2), lua::LuaType::Function);
   EXPECT_EQ(lua::GetType(state_, -3), lua::LuaType::Function);
 }
+
+class PropertiesClass : public base::RefCounted<PropertiesClass> {
+ public:
+  PropertiesClass() {}
+
+  int property = 0;
+
+ private:
+  friend class base::RefCounted<PropertiesClass>;
+
+  ~PropertiesClass() {}
+};
+
+namespace lua {
+
+template<>
+struct Type<PropertiesClass> {
+  static constexpr const char* name = "PropertiesClass";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "new", &MetaTable<PropertiesClass>::NewInstance<>);
+  }
+  static bool Index(State* state, PropertiesClass* self,
+                    const std::string& name) {
+    if (name == "property") {
+      Push(state, self->property);
+      return true;
+    } else {
+      return false;
+    }
+  }
+};
+
+TEST_F(MetaTableTest, Properties) {
+  lua::MetaTable<PropertiesClass>::Push(state_);
+  lua::Push(state_, new PropertiesClass);
+
+  int property = -1;
+  ASSERT_TRUE(lua::PGetAndPop(state_, -1, "property", &property));
+  EXPECT_EQ(property, 0);
+}
+
+}  // namespace lua
