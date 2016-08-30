@@ -25,6 +25,7 @@ struct ExtractMemberPointer<TMember(TType::*)> {
 class SignalBase {
  public:
   virtual void Connect(lua::CallContext* context) = 0;
+  virtual void Disconnect(lua::CallContext* context) = 0;
 };
 
 template<typename T>
@@ -34,33 +35,64 @@ class Signal : SignalBase {
   using Slot = typename ExtractMemberPointer<T>::Member::Slot;
   using Ref = typename ExtractMemberPointer<T>::Member::Ref;
 
+  // The singal doesn't store the object or the member directly, instead it only
+  // keeps a weak reference to the object and stores the pointer to member, so
+  // it can still work when user copies the signal and uses it after the object
+  // gets deleted.
   Signal(lua::State* state, int index, T member)
       : object_ref_(lua::CreateWeakReference(state, index)),
         member_(member) {}
 
   void Connect(lua::CallContext* context) override {
     Slot slot;
-    if (!lua::To(context->state, -1, &slot)) {
+    if (!lua::Pop(context->state, &slot)) {
       context->has_error = true;
       lua::Push(context->state, "first arg must be function");
       return;
     }
 
-    lua::PushWeakReference(context->state, object_ref_);
     Type* object;
-    if (!lua::To(context->state, -1, &object)) {
-      context->has_error = true;
-      lua::Push(context->state, "owner of signal is gone");
+    if (!GetObject(context, &object))
       return;
-    }
 
-    (object->*member_).Connect(slot);
+    Ref ref = (object->*member_).Connect(slot);
     static_assert(std::is_trivially_destructible<Ref>::value &&
                   std::is_trivially_copyable<Ref>::value,
                   "implementation rely on Ref being trival");
+
+    // Return the ref in lua.
+    context->return_values_count = 1;
+    void* memory = lua_newuserdata(context->state, sizeof(Ref));
+    *reinterpret_cast<Ref*>(memory) = ref;
+  }
+
+  void Disconnect(lua::CallContext* context) override {
+    if (lua::GetType(context->state, -1) != lua::LuaType::UserData ||
+        lua::RawLen(context->state, -1) != sizeof(Ref)) {
+      context->has_error = true;
+      lua::Push(context->state, "can only disconnect a ref to signal");
+      return;
+    }
+
+    Type* object;
+    if (!GetObject(context, &object))
+      return;
+
+    Ref ref = *reinterpret_cast<Ref*>(lua_touserdata(context->state, -1));
+    (object->*member_).Disconnect(ref);
   }
 
  private:
+  bool GetObject(lua::CallContext* context, Type** object) {
+    lua::PushWeakReference(context->state, object_ref_);
+    if (!lua::Pop(context->state, object)) {
+      context->has_error = true;
+      lua::Push(context->state, "owner of signal is gone");
+      return false;
+    }
+    return true;
+  }
+
   int object_ref_;
   T member_;
 };
@@ -82,8 +114,9 @@ void PushSignal(lua::State* state, int index, const char* name, T member) {
     if (luaL_newmetatable(state, "yue.Signal")) {
       // The signal class doesn't have a destructor, so there is no need to add
       // hook to __gc.
-      lua::RawSet(state, -1, "__index", lua::ValueOnStack(state, -1));
-      lua::RawSet(state, -1, "connect", &SignalBase::Connect);
+      lua::RawSet(state, -1, "__index", lua::ValueOnStack(state, -1),
+                             "connect", &SignalBase::Connect,
+                             "disconnect", &SignalBase::Disconnect);
     }
     lua::SetMetaTable(state, -2);
     lua::RawSet(state, top + 1, name, lua::ValueOnStack(state, -1));

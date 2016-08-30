@@ -26,13 +26,16 @@ class Signal<void(Args...)> {
     return --slots_.end();
   }
 
-  void Remove(Ref ref) {
+  void Disconnect(Ref ref) {
     slots_.erase(ref);
   }
 
   template<typename... RunArgs>
   void Emit(RunArgs&&... args) {
-    for (Slot& slot : slots_)
+    // Copy the list before iterating, since it is possible that user removes
+    // elements from the list when iterating.
+    std::list<Slot> slots(slots_);
+    for (Slot& slot : slots)
       slot.Run(std::forward(args)...);
   }
 

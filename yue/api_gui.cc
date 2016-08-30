@@ -53,6 +53,13 @@ struct Type<nu::Button> {
            "settitle", &nu::Button::SetTitle,
            "gettitle", &nu::Button::GetTitle);
   }
+  static bool Index(State* state, const std::string& name) {
+    if (name == "onclick") {
+      yue::PushSignal(state, 1, "onclick", &nu::Button::on_click);
+      return true;
+    }
+    return false;
+  }
 };
 
 template<>
@@ -124,7 +131,7 @@ struct Type<nu::Window> {
            "setvisible", &nu::Window::SetVisible,
            "isvisible", &nu::Window::IsVisible);
   }
-  static bool Index(State* state, nu::Window* self, const std::string& name) {
+  static bool Index(State* state, const std::string& name) {
     if (name == "onclose") {
       yue::PushSignal(state, 1, "onclose", &nu::Window::on_close);
       return true;
