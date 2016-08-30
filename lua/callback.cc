@@ -12,15 +12,8 @@ namespace internal {
 
 CallbackHolderBase::CallbackHolderBase(State* state) {
   PushNewTable(state);
-  RawSet(state, -1, "__gc", CFunction(&OnGC));
+  RawSet(state, -1, "__gc", CFunction(&OnGC<CallbackHolderBase>));
   SetMetaTable(state, -2);
-}
-
-// static
-int CallbackHolderBase::OnGC(State* state) {
-  auto* self = static_cast<CallbackHolderBase*>(lua_touserdata(state, 1));
-  self->~CallbackHolderBase();
-  return 0;
 }
 
 }  // namespace internal

@@ -49,11 +49,6 @@ struct CallbackParamTraits<const char*> {
 class CallbackHolderBase {
  protected:
   explicit CallbackHolderBase(State* state);
-
- private:
-  static int OnGC(State* state);
-
-  DISALLOW_COPY_AND_ASSIGN(CallbackHolderBase);
 };
 
 template<typename Sig>

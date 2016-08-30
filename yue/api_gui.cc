@@ -190,9 +190,14 @@ struct Type<nu::BoxLayout> {
 }  // namespace lua
 
 extern "C" int luaopen_yue_gui(lua::State* state) {
-  // Put the gui state into registry, so it is alive through whole lua state.
+  // Manage the gui state in lua.
   void* memory = lua_newuserdata(state, sizeof(nu::State));
   new(memory) nu::State;
+  lua::PushNewTable(state);
+  lua::RawSet(state, -1, "__gc", lua::CFunction(lua::OnGC<nu::State>));
+  lua::SetMetaTable(state, -2);
+
+  // Put the gui state into registry, so it is alive through whole lua state.
   luaL_ref(state, LUA_REGISTRYINDEX);
 
   // Populate the table with GUI elements.

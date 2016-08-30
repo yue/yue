@@ -33,24 +33,17 @@ class PointerWrapperBase {
 template<typename T>
 class PointerWrapper : public PointerWrapperBase {
  public:
-  // Call destructors on garbage collection.
-  static int OnGC(State* state) {
-    auto* self = static_cast<PointerWrapper*>(lua_touserdata(state, 1));
-    self->~PointerWrapper();
-    return 0;
-  }
-
   PointerWrapper(State* state, T* t) : PointerWrapperBase(state, t), ptr_(t) {
     ptr_->AddRef();
+  }
+
+  ~PointerWrapper() {
+    ptr_->Release();
   }
 
   T* get() const { return ptr_; }
 
  private:
-  ~PointerWrapper() {
-    ptr_->Release();
-  }
-
   T* ptr_;
 };
 
@@ -89,7 +82,7 @@ bool PushSingleTypeMetaTable(State* state) {
     return true;
 
   RawSet(state, -1, "__index", CFunction(PropertyLookuper<T>::Index),
-                    "__gc", CFunction(PointerWrapper<T>::OnGC));
+                    "__gc", CFunction(&OnGC<PointerWrapper<T>>));
   Type<T>::BuildMetaTable(state, -1);
   return false;
 }

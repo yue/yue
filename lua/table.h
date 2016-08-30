@@ -185,6 +185,14 @@ inline void PushWeakTable(State* state, const char* name, const char* mode) {
   }
 }
 
+// Generic callback for __gc.
+template<typename T>
+int OnGC(lua::State* state) {
+  auto* self = static_cast<T*>(lua_touserdata(state, 1));
+  self->~T();
+  return 0;
+}
+
 }  // namespace lua
 
 #endif  // LUA_TABLE_H_
