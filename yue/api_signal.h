@@ -26,6 +26,7 @@ class SignalBase {
  public:
   virtual int Connect(lua::CallContext* context) = 0;
   virtual void Disconnect(lua::CallContext* context, int id) = 0;
+  virtual void DisconnectAll(lua::CallContext* context) = 0;
 };
 
 template<typename T>
@@ -65,6 +66,14 @@ class Signal : SignalBase {
     (object->*member_).Disconnect(id);
   }
 
+  void DisconnectAll(lua::CallContext* context) override {
+    Type* object;
+    if (!GetObject(context, &object))
+      return;
+
+    (object->*member_).DisconnectAll();
+  }
+
  private:
   bool GetObject(lua::CallContext* context, Type** object) {
     lua::PushWeakReference(context->state, object_ref_);
@@ -99,7 +108,8 @@ void PushSignal(lua::State* state, int index, const char* name, T member) {
       // hook to __gc.
       lua::RawSet(state, -1, "__index", lua::ValueOnStack(state, -1),
                              "connect", &SignalBase::Connect,
-                             "disconnect", &SignalBase::Disconnect);
+                             "disconnect", &SignalBase::Disconnect,
+                             "disconnectall", &SignalBase::DisconnectAll);
     }
     lua::SetMetaTable(state, -2);
     lua::RawSet(state, top + 1, name, lua::ValueOnStack(state, -1));

@@ -33,6 +33,10 @@ class Signal<void(Args...)> {
       slots_.erase(iter);
   }
 
+  void DisconnectAll() {
+    slots_.clear();
+  }
+
   template<typename... RunArgs>
   void Emit(RunArgs&&... args) {
     // Copy the list before iterating, since it is possible that user removes
