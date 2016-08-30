@@ -30,4 +30,36 @@ void PushObjectMembersTable(lua::State* state, int index) {
   DCHECK_EQ(lua::GetType(state, -1), lua::LuaType::Table);
 }
 
+void SetSignalMetaTable(lua::State* state, int index) {
+  index = lua::AbsIndex(state, index);
+  if (luaL_newmetatable(state, "yue.Signal")) {
+    // The signal class doesn't have a destructor, so there is no need to add
+    // hook to __gc.
+    lua::RawSet(state, -1, "__index", lua::ValueOnStack(state, -1),
+                           "connect", &SignalBase::Connect,
+                           "disconnect", &SignalBase::Disconnect,
+                           "disconnectall", &SignalBase::DisconnectAll);
+  }
+  lua::SetMetaTable(state, index);
+}
+
 }  // namespace yue
+
+namespace lua {
+
+bool Type<yue::SignalBase*>::To(State* state, int index,
+                                yue::SignalBase** out) {
+  index = AbsIndex(state, index);
+  StackAutoReset reset(state);
+  if (GetType(state, index) != lua::LuaType::UserData ||
+      !GetMetaTable(state, index))
+    return false;
+  base::StringPiece iname;
+  if (!RawGetAndPop(state, -1, "__name", &iname) || iname != name)
+    return false;
+  // Signal inherites SignalBase singlely, so it is safe to cast.
+  *out = reinterpret_cast<yue::SignalBase*>(lua_touserdata(state, index));
+  return true;
+}
+
+}  // namespace lu

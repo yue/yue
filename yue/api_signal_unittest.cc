@@ -65,7 +65,7 @@ TEST_F(YueSignalTest, Cached) {
   EXPECT_TRUE(lua::Compare(state_, 1, 2, lua::CompareOp::EQ));
 }
 
-TEST_F(YueSignalTest, GarbageCollected) {
+TEST_F(YueSignalTest, OwnerGarbageCollected) {
   ASSERT_FALSE(luaL_dostring(state_,
       "signal = win.onclose\n"
       "win = nil"));
@@ -77,4 +77,26 @@ TEST_F(YueSignalTest, GarbageCollected) {
   ASSERT_TRUE(luaL_dostring(state_, "signal:connect(function() end)\n"));
   ASSERT_TRUE(lua::Pop(state_, &error));
   EXPECT_EQ(error, "owner of signal is gone");
+}
+
+int CountTable(lua::State* state, int index) {
+  lua::StackAutoReset reset(state);
+  index = lua::AbsIndex(state, index);
+  int count = 0;
+  lua::Push(state, nullptr);
+  while (lua_next(state, index)) {
+    ++count;
+    lua::PopAndIgnore(state, 1);
+  }
+  return count;
+}
+
+TEST_F(YueSignalTest, WeakTableCleared) {
+  ASSERT_FALSE(luaL_dostring(state_, "win.onclose:disconnectall()"));
+  ASSERT_FALSE(luaL_newmetatable(state_, "yue.internal.membersmap"));
+  EXPECT_EQ(CountTable(state_, 1), 2);
+  ASSERT_FALSE(luaL_dostring(state_, "win = nil"));
+  lua::CollectGarbage(state_);
+  lua::CollectGarbage(state_);
+  EXPECT_EQ(CountTable(state_, 1), 1);
 }

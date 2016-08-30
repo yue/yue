@@ -10,9 +10,6 @@
 
 namespace yue {
 
-// Push a weak table which records the object's members.
-void PushObjectMembersTable(lua::State* state, int index);
-
 // Get type from member pointer.
 template<typename T> struct ExtractMemberPointer;
 template<typename TType, typename TMember>
@@ -89,6 +86,12 @@ class Signal : SignalBase {
   T member_;
 };
 
+// Push a weak table which records the object's members.
+void PushObjectMembersTable(lua::State* state, int index);
+
+// Set metatable for signal.
+void SetSignalMetaTable(lua::State* state, int index);
+
 // Helper to create signal and push it to stack.
 template<typename T>
 void PushSignal(lua::State* state, int index, const char* name, T member) {
@@ -103,15 +106,7 @@ void PushSignal(lua::State* state, int index, const char* name, T member) {
     new(memory) Signal<T>(state, index, member);
     static_assert(std::is_trivially_destructible<Signal<T>>::value,
                   "we are not providing __gc so Signal<T> must be trivial");
-    if (luaL_newmetatable(state, "yue.Signal")) {
-      // The signal class doesn't have a destructor, so there is no need to add
-      // hook to __gc.
-      lua::RawSet(state, -1, "__index", lua::ValueOnStack(state, -1),
-                             "connect", &SignalBase::Connect,
-                             "disconnect", &SignalBase::Disconnect,
-                             "disconnectall", &SignalBase::DisconnectAll);
-    }
-    lua::SetMetaTable(state, -2);
+    SetSignalMetaTable(state, -1);
     lua::RawSet(state, top + 1, name, lua::ValueOnStack(state, -1));
   }
   // Pop the table and keep the signal.
@@ -127,19 +122,7 @@ namespace lua {
 template<>
 struct Type<yue::SignalBase*> {
   static constexpr const char* name = "yue.Signal";
-  static inline bool To(State* state, int index, yue::SignalBase** out) {
-    index = AbsIndex(state, index);
-    StackAutoReset reset(state);
-    if (GetType(state, index) != lua::LuaType::UserData ||
-        !GetMetaTable(state, index))
-      return false;
-    base::StringPiece iname;
-    if (!RawGetAndPop(state, -1, "__name", &iname) || iname != name)
-      return false;
-    // Signal inherites SignalBase singlely, so it is safe to cast.
-    *out = reinterpret_cast<yue::SignalBase*>(lua_touserdata(state, index));
-    return true;
-  }
+  static bool To(State* state, int index, yue::SignalBase** out);
 };
 
 }  // namespace lua
