@@ -45,7 +45,8 @@ void InsertBuiltinModuleLoader(lua::State* state) {
       << "package.searchers should be a table";
 
   // table.insert(pacakge.searchers, 2, search_builtin)
-  int len = lua::RawLen(state, -1);
+  int len = static_cast<int>(lua::RawLen(state, -1));
+  DCHECK_EQ(len, 4);
   for (int i = len; i >= 2; --i) {
     lua::RawGet(state, -1, i);
     lua_rawseti(state, -2, i + 1);

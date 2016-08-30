@@ -5,6 +5,7 @@
 #include "base/at_exit.h"
 #include "base/command_line.h"
 #include "base/logging.h"
+#include "base/strings/utf_string_conversions.h"
 #include "yue/builtin_loader.h"
 
 int main(int argc, const char *argv[]) {
@@ -30,7 +31,13 @@ int main(int argc, const char *argv[]) {
   luaL_openlibs(state);
   yue::InsertBuiltinModuleLoader(state);
 
-  if (luaL_loadfile(state, cmd->GetArgs()[0].c_str()) != LUA_OK ||
+#if defined(OS_WIN)
+  std::string filename = base::UTF16ToUTF8(cmd->GetArgs()[0]);
+#else
+  std::string filename = cmd->GetArgs()[0];
+#endif
+
+  if (luaL_loadfile(state, filename.c_str()) != LUA_OK ||
       !lua::PCall(state, nullptr)) {
     std::string error;
     lua::Pop(state, &error);

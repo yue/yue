@@ -56,9 +56,13 @@ class Signal : SignalBase {
       return;
 
     Ref ref = (object->*member_).Connect(slot);
+#if !defined(OS_WIN) || defined(NDEBUG)
+    // The debug version on Windows is doing some check in iterator's
+    // destructor, so ignore this assert there.
     static_assert(std::is_trivially_destructible<Ref>::value &&
                   std::is_trivially_copyable<Ref>::value,
                   "implementation rely on Ref being trival");
+#endif
 
     // Return the ref in lua.
     context->return_values_count = 1;
