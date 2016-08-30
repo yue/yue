@@ -7,6 +7,7 @@
 #include <string>
 
 #include "nativeui/nativeui.h"
+#include "yue/api_signal.h"
 
 namespace lua {
 
@@ -122,6 +123,13 @@ struct Type<nu::Window> {
            "getcontentview", &nu::Window::GetContentView,
            "setvisible", &nu::Window::SetVisible,
            "isvisible", &nu::Window::IsVisible);
+  }
+  static bool Index(State* state, nu::Window* self, const std::string& name) {
+    if (name == "onclose") {
+      yue::PushSignal(state, 1, "onclose", &nu::Window::on_close);
+      return true;
+    }
+    return false;
   }
 };
 

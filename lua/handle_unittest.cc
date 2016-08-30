@@ -58,10 +58,10 @@ TEST_F(HandleTest, Weak) {
   lua::RawSet(state_, 2, "__gc", base::Bind(&OnGC, &changed));
   lua::SetMetaTable(state_, 1);
   ASSERT_EQ(lua::GetTop(state_), 1);
-  lua::Weak handle(state_, -1);
+  int ref = lua::CreateWeakReference(state_, -1);
   ASSERT_EQ(lua::GetTop(state_), 1);
 
-  handle.Push(state_);
+  lua::PushWeakReference(state_, ref);
   EXPECT_EQ(lua::GetTop(state_), 2);
   EXPECT_TRUE(lua::Compare(state_, 1, 2, lua::CompareOp::EQ));
   lua::SetTop(state_, 0);

@@ -16,6 +16,7 @@ source_set("libyue") {
   sources = [
     "api_gui.cc",
     "api_gui.h",
+    "api_signal.h",
     "api_message_loop.cc",
     "api_message_loop.h",
     "builtin_loader.cc",

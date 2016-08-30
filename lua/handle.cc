@@ -14,7 +14,7 @@ const char* kWeakTableName = "yue.internal.weaktable";
 
 }  // namespace
 
-Weak::Weak(State* state, int index) : state_(state) {
+int CreateWeakReference(State* state, int index) {
   index = AbsIndex(state, index);
   StackAutoReset reset(state);
   if (luaL_newmetatable(state, kWeakTableName) == 1) {
@@ -23,15 +23,13 @@ Weak::Weak(State* state, int index) : state_(state) {
     SetMetaTable(state, -2);
   }
   lua::Push(state, ValueOnStack(state, index));
-  ref_ = luaL_ref(state, -2);
-  DCHECK_NE(ref_, LUA_REFNIL);
+  return luaL_ref(state, -2);
 }
 
-void Weak::Push(State* state) const {
-  DCHECK_EQ(state, state_) << "Pushing a handle on wrong thread";
+void PushWeakReference(State* state, int ref) {
   luaL_getmetatable(state, kWeakTableName);
   DCHECK_EQ(GetType(state, -1), LuaType::Table);
-  lua_rawgeti(state, -1, ref_);
+  lua_rawgeti(state, -1, ref);
   lua_remove(state, -2);
 }
 

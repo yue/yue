@@ -157,6 +157,8 @@ class StackAutoReset {
   explicit StackAutoReset(State* state) : state_(state), top_(GetTop(state)) {}
   ~StackAutoReset() { SetTop(state_, top_); }
 
+  int top() const { return top_; }
+
  private:
   State* state_;
   int top_;
@@ -172,6 +174,12 @@ enum class CompareOp {
 };
 inline bool Compare(State* state, int index1, int index2, CompareOp op) {
   return lua_compare(state, index1, index2, static_cast<int>(op)) == 1;
+}
+
+// Thin wrapper of lua_insert.
+inline void Insert(State* state, int index) {
+  DCHECK_GE(index, 0) << "lua_insert does not accept pseudo-index";
+  lua_insert(state, index);
 }
 
 }  // namespace lua

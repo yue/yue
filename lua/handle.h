@@ -59,21 +59,8 @@ class Persistent {
 };
 
 // The weak reference.
-// This class does not track the GC, so the user is responsible for not using
-// this class after the table gets GCed.
-class Weak {
- public:
-  explicit Weak(State* state, int index);
-
-  // Puts the value back to stack.
-  void Push(State* state) const;
-
- private:
-  State* state_;
-  int ref_;
-
-  DISALLOW_COPY_AND_ASSIGN(Weak);
-};
+int CreateWeakReference(State* state, int index);
+void PushWeakReference(State* state, int ref);
 
 }  // namespace lua
 
