@@ -5,6 +5,7 @@
 #ifndef NATIVEUI_SIGNAL_H_
 #define NATIVEUI_SIGNAL_H_
 
+#include <algorithm>
 #include <tuple>
 #include <utility>
 #include <vector>

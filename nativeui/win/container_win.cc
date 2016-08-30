@@ -62,10 +62,12 @@ void Container::PlatformInit() {
 
 void Container::PlatformAddChildView(View* child) {
   child->view()->SetParent(view());
+  view()->Invalidate();
 }
 
 void Container::PlatformRemoveChildView(View* child) {
   child->view()->SetParent(nullptr);
+  view()->Invalidate();
 }
 
 }  // namespace nu
