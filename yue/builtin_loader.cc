@@ -4,8 +4,9 @@
 
 #include "yue/builtin_loader.h"
 
+#include <algorithm>
 #include <string>
-#include <unordered_map>
+#include <tuple>
 
 #include "yue/api_gui.h"
 #include "yue/api_message_loop.h"
@@ -14,21 +15,30 @@ namespace yue {
 
 namespace {
 
-// The search table.
-std::unordered_map<std::string, lua_CFunction> loaders_map = {
-  { "yue.MessageLoop", luaopen_yue_message_loop },
+// The search table, it must be manually kept in sorted order.
+std::tuple<std::string, lua_CFunction> loaders_map[] = {
   { "yue.GUI", luaopen_yue_gui },
+  { "yue.MessageLoop", luaopen_yue_message_loop },
 };
 
+// Use the first element of tuple as comparing key.
+bool TupleCompare(const std::tuple<std::string, lua_CFunction>& element,
+                  const std::string& key) {
+  return std::get<0>(element) < key;
+}
+
 int SearchBuiltin(lua::State* state) {
+  DCHECK(std::is_sorted(std::begin(loaders_map), std::end(loaders_map)))
+      << "The builtin loaders map must be in sorted order";
   std::string name;
   lua::To(state, 1, &name);
-  auto iter = loaders_map.find(name);
-  if (iter == loaders_map.end()) {
+  auto iter = std::lower_bound(std::begin(loaders_map), std::end(loaders_map),
+                               name, TupleCompare);
+  if (iter == std::end(loaders_map)) {
     lua::PushFormatedString(state, "\n\tno builtin '%s'", name.c_str());
     return 1;
   } else {
-    lua::Push(state, lua::CFunction(iter->second));
+    lua::Push(state, lua::CFunction(std::get<1>(*iter)));
     return 1;
   }
 }
