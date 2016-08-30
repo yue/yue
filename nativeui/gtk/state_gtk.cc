@@ -4,13 +4,10 @@
 
 #include "nativeui/state.h"
 
-#include "nativeui/gtk/gtk_event_loop.h"
-
 namespace nu {
 
 void State::PlatformInit() {
   gtk_init(nullptr, nullptr);
-  GtkEventLoop::GetInstance();
 }
 
 void State::PlatformDestroy() {

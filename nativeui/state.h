@@ -8,6 +8,10 @@
 #include "base/memory/ref_counted.h"
 #include "nativeui/nativeui_export.h"
 
+#if defined(OS_LINUX)
+#include "nativeui/gtk/gtk_event_loop.h"
+#endif
+
 namespace nu {
 
 class PlatformFont;
@@ -27,6 +31,10 @@ NATIVEUI_EXPORT class State {
   void PlatformDestroy();
 
   scoped_refptr<PlatformFont> default_font_;
+
+#if defined(OS_LINUX)
+  GtkEventLoop gtk_event_loop_;
+#endif
 
 #if defined(OS_WIN)
   ULONG_PTR token_;

@@ -6,14 +6,7 @@
 
 #include <gdk/gdk.h>
 
-#include "base/memory/singleton.h"
-
 namespace nu {
-
-// static
-GtkEventLoop* GtkEventLoop::GetInstance() {
-  return base::Singleton<GtkEventLoop>::get();
-}
 
 GtkEventLoop::GtkEventLoop() {
   gdk_event_handler_set(DispatchGdkEvent, NULL, NULL);
