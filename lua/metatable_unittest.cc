@@ -60,6 +60,13 @@ struct Type<TestClass> {
 
 }  // namespace lua
 
+TEST_F(MetaTableTest, PushNull) {
+  lua::MetaTable<TestClass>::Push(state_);
+  TestClass* instance = nullptr;
+  lua::Push(state_, instance);
+  EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Nil);
+}
+
 TEST_F(MetaTableTest, PushNewClass) {
   lua::MetaTable<TestClass>::Push(state_);
   EXPECT_EQ(lua::GetTop(state_), 1);
@@ -424,8 +431,10 @@ struct Type<PropertiesClass> {
     RawSet(state, index,
            "new", &MetaTable<PropertiesClass>::NewInstance<>);
   }
-  static bool Index(State* state, PropertiesClass* self,
-                    const std::string& name) {
+  static bool Index(State* state, const std::string& name) {
+    PropertiesClass* self;
+    if (!To(state, 1, &self))
+      return false;
     if (name == "property") {
       Push(state, self->property);
       return true;

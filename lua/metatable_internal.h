@@ -72,9 +72,8 @@ struct PropertyLookuper<T, typename std::enable_if<std::is_function<
   static int Index(State* state) {
     // The DefaultPropertyLookup may throw error, so wrap the C++ stack.
     {
-      T* self;
       std::string name;
-      if (To(state, -2, &self, &name) && Type<T>::Index(state, self, name))
+      if (To(state, -1, &name) && Type<T>::Index(state, name))
         return 1;
     }
     // Go to the default routine.

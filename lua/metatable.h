@@ -75,7 +75,9 @@ struct Type<T*, typename std::enable_if<std::is_convertible<
     return true;
   }
   static inline void Push(State* state, T* ptr) {
-    if (!internal::PointerWrapperBase::Push(state, ptr))
+    if (!ptr)
+      lua::Push(state, nullptr);
+    else if (!internal::PointerWrapperBase::Push(state, ptr))
       MetaTable<T>::PushNewWrapper(state, ptr);
   }
 };
