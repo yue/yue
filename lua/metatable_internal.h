@@ -53,15 +53,18 @@ int DefaultPropertyLookup(State* state);
 // Check whether T has an Index handler, if not use the default property lookup
 // that searches in metatable.
 template<typename T, typename Enable = void>
-struct PropertyLookuper {
-  static int Index(State* state) {
-    return DefaultPropertyLookup(state);
+struct Indexer {
+  static inline void Set(State* state, int index) {
+    RawSet(state, index, "__index", ValueOnStack(state, index));
   }
 };
 
 template<typename T>
-struct PropertyLookuper<T, typename std::enable_if<std::is_function<
-                               decltype(Type<T>::Index)>::value>::type> {
+struct Indexer<T, typename std::enable_if<std::is_function<
+                      decltype(Type<T>::Index)>::value>::type> {
+  static inline void Set(State* state, int index) {
+    RawSet(state, index, "__index", CFunction(&Index));
+  }
   static int Index(State* state) {
     // The DefaultPropertyLookup may throw error, so wrap the C++ stack.
     {
@@ -81,8 +84,8 @@ bool PushSingleTypeMetaTable(State* state) {
   if (luaL_newmetatable(state, Type<T>::name) == 0)
     return true;
 
-  RawSet(state, -1, "__index", CFunction(PropertyLookuper<T>::Index),
-                    "__gc", CFunction(&OnGC<PointerWrapper<T>>));
+  RawSet(state, -1, "__gc", CFunction(&OnGC<PointerWrapper<T>>));
+  Indexer<T>::Set(state, -1);
   Type<T>::BuildMetaTable(state, -1);
   return false;
 }

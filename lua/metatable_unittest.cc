@@ -72,7 +72,7 @@ TEST_F(MetaTableTest, PushNewClass) {
   EXPECT_EQ(lua::GetTop(state_), 1);
   EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Table);
   lua::RawGet(state_, -1, "method1", "method2", "__gc", "__index");
-  EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Function);
+  EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Table);
   EXPECT_EQ(lua::GetType(state_, -2), lua::LuaType::Function);
   EXPECT_EQ(lua::GetType(state_, -3), lua::LuaType::Function);
   EXPECT_EQ(lua::GetType(state_, -4), lua::LuaType::Function);
@@ -446,8 +446,10 @@ struct Type<PropertiesClass> {
 
 TEST_F(MetaTableTest, Properties) {
   lua::MetaTable<PropertiesClass>::Push(state_);
-  lua::Push(state_, new PropertiesClass);
+  lua::RawGet(state_, -1, "__index");
+  EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Function);
 
+  lua::Push(state_, new PropertiesClass);
   int property = -1;
   ASSERT_TRUE(lua::PGetAndPop(state_, -1, "property", &property));
   EXPECT_EQ(property, 0);
