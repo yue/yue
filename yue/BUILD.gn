@@ -33,6 +33,7 @@ source_set("libyue") {
 
 test("yue_unittests") {
   sources = [
+    "api_signal_unittest.cc",
     "api_message_loop_unittest.cc",
     "test/run_all_unittests.cc",
   ]
