@@ -176,6 +176,15 @@ inline bool PGetAndPop(State* state, int index, const ArgTypes&... args) {
   return success;
 }
 
+// Helper to create weak tables.
+inline void PushWeakTable(State* state, const char* name, const char* mode) {
+  if (luaL_newmetatable(state, name)) {
+    lua::PushNewTable(state);
+    lua::RawSet(state, -1, "__mode", mode);
+    lua::SetMetaTable(state, -2);
+  }
+}
+
 }  // namespace lua
 
 #endif  // LUA_TABLE_H_

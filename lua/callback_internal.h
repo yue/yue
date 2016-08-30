@@ -165,7 +165,7 @@ struct Dispatcher<ReturnType(ArgTypes...)> {
         lua_touserdata(state, lua_upvalueindex(1)));
 
     CallContext context(state, Values<ReturnType>::count);
-    static_assert(std::is_standard_layout<CallContext>::value,
+    static_assert(std::is_trivially_destructible<CallContext>::value,
                   "The CallContext must not invole C++ stack");
     {  // Make sure C++ stack is destroyed before calling lua_error.
       using Indices = typename IndicesGenerator<sizeof...(ArgTypes)>::type;

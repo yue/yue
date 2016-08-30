@@ -34,11 +34,7 @@ bool PointerWrapperBase::Push(State* state, void* ptr) {
 PointerWrapperBase::PointerWrapperBase(State* state, void* ptr) {
   DCHECK_EQ(GetType(state, -1), LuaType::UserData);
   StackAutoReset reset(state);
-  if (luaL_newmetatable(state, kPointerWrapperTableName) == 1) {
-    PushNewTable(state, 0, 1);
-    RawSet(state, -1, "__mode", "v");
-    SetMetaTable(state, -2);
-  }
+  PushWeakTable(state, kPointerWrapperTableName, "v");
   RawSet(state, -1, LightUserData(ptr), ValueOnStack(state, -2));
 }
 

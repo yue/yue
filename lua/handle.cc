@@ -17,11 +17,7 @@ const char* kWeakTableName = "yue.internal.weaktable";
 int CreateWeakReference(State* state, int index) {
   index = AbsIndex(state, index);
   StackAutoReset reset(state);
-  if (luaL_newmetatable(state, kWeakTableName) == 1) {
-    PushNewTable(state, 0, 1);
-    RawSet(state, -1, "__mode", "v");
-    SetMetaTable(state, -2);
-  }
+  PushWeakTable(state, kWeakTableName, "v");
   lua::Push(state, ValueOnStack(state, index));
   return luaL_ref(state, -2);
 }

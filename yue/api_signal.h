@@ -5,11 +5,13 @@
 #ifndef YUE_API_SIGNAL_H_
 #define YUE_API_SIGNAL_H_
 
-#include "base/memory/ref_counted.h"
-#include "lua/handle.h"
+#include "lua/lua.h"
 #include "nativeui/signal.h"
 
 namespace yue {
+
+// Push a weak table which records the object's members.
+void PushObjectMembersTable(lua::State* state, int index);
 
 // Get type from member pointer.
 template<typename T> struct ExtractMemberPointer;
@@ -53,6 +55,9 @@ class Signal : SignalBase {
     }
 
     (object->*member_).Connect(slot);
+    static_assert(std::is_trivially_destructible<Ref>::value &&
+                  std::is_trivially_copyable<Ref>::value,
+                  "implementation rely on Ref being trival");
   }
 
  private:
@@ -60,40 +65,20 @@ class Signal : SignalBase {
   T member_;
 };
 
-// Push a weak table which records the object's signals.
-void PushObjectSignalsTable(lua::State* state, int index) {
-  int top = lua::GetTop(state);
-  // Get the table for recording objects.
-  if (luaL_newmetatable(state, "yue.SignalMap")) {
-    lua::PushNewTable(state);
-    lua::RawSet(state, -1, "__mode", "k");
-    lua::SetMetaTable(state, -2);
-  }
-  lua::RawGet(state, -1, lua::ValueOnStack(state, index));
-  if (lua::GetType(state, -1) != lua::LuaType::Table) {
-    // This is the first record.
-    lua::PushNewTable(state);
-    lua::RawSet(state, -3, lua::ValueOnStack(state, index),
-                           lua::ValueOnStack(state, -1));
-  }
-  // Pop the metatable and keep the signal table.
-  lua::Insert(state, top + 1);
-  lua::SetTop(state, top + 1);
-  DCHECK_EQ(lua::GetType(state, -1), lua::LuaType::Table);
-}
-
 // Helper to create signal and push it to stack.
 template<typename T>
 void PushSignal(lua::State* state, int index, const char* name, T member) {
   int top = lua::GetTop(state);
   index = lua::AbsIndex(state, index);
   // Check if the member has already been converted.
-  PushObjectSignalsTable(state, index);
+  PushObjectMembersTable(state, index);
   lua::RawGet(state, -1, name);
   if (lua::GetType(state, -1) != lua::LuaType::UserData) {
     // Create the wrapper for signal class.
     void* memory = lua_newuserdata(state, sizeof(Signal<T>));
     new(memory) Signal<T>(state, index, member);
+    static_assert(std::is_trivially_destructible<Signal<T>>::value,
+                  "we are not providing __gc so Signal<T> must be trivial");
     if (luaL_newmetatable(state, "yue.Signal")) {
       // The signal class doesn't have a destructor, so there is no need to add
       // hook to __gc.
