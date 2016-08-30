@@ -24,8 +24,8 @@ struct ExtractMemberPointer<TMember(TType::*)> {
 // The wrapper for nu::Signal.
 class SignalBase {
  public:
-  virtual void Connect(lua::CallContext* context) = 0;
-  virtual void Disconnect(lua::CallContext* context) = 0;
+  virtual int Connect(lua::CallContext* context) = 0;
+  virtual void Disconnect(lua::CallContext* context, int id) = 0;
 };
 
 template<typename T>
@@ -33,7 +33,6 @@ class Signal : SignalBase {
  public:
   using Type = typename ExtractMemberPointer<T>::Type;
   using Slot = typename ExtractMemberPointer<T>::Member::Slot;
-  using Ref = typename ExtractMemberPointer<T>::Member::Ref;
 
   // The singal doesn't store the object or the member directly, instead it only
   // keeps a weak reference to the object and stores the pointer to member, so
@@ -43,47 +42,27 @@ class Signal : SignalBase {
       : object_ref_(lua::CreateWeakReference(state, index)),
         member_(member) {}
 
-  void Connect(lua::CallContext* context) override {
+  int Connect(lua::CallContext* context) override {
     Slot slot;
     if (!lua::Pop(context->state, &slot)) {
       context->has_error = true;
       lua::Push(context->state, "first arg must be function");
-      return;
+      return -1;
     }
 
     Type* object;
     if (!GetObject(context, &object))
-      return;
+      return -1;
 
-    Ref ref = (object->*member_).Connect(slot);
-#if !defined(OS_WIN) || defined(NDEBUG)
-    // The debug version on Windows is doing some check in iterator's
-    // destructor, so ignore this assert there.
-    static_assert(std::is_trivially_destructible<Ref>::value &&
-                  std::is_trivially_copyable<Ref>::value,
-                  "implementation rely on Ref being trival");
-#endif
-
-    // Return the ref in lua.
-    context->return_values_count = 1;
-    void* memory = lua_newuserdata(context->state, sizeof(Ref));
-    *reinterpret_cast<Ref*>(memory) = ref;
+    return (object->*member_).Connect(slot);
   }
 
-  void Disconnect(lua::CallContext* context) override {
-    if (lua::GetType(context->state, -1) != lua::LuaType::UserData ||
-        lua::RawLen(context->state, -1) != sizeof(Ref)) {
-      context->has_error = true;
-      lua::Push(context->state, "can only disconnect a ref to signal");
-      return;
-    }
-
+  void Disconnect(lua::CallContext* context, int id) override {
     Type* object;
     if (!GetObject(context, &object))
       return;
 
-    Ref ref = *reinterpret_cast<Ref*>(lua_touserdata(context->state, -1));
-    (object->*member_).Disconnect(ref);
+    (object->*member_).Disconnect(id);
   }
 
  private:
