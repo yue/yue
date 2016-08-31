@@ -57,7 +57,7 @@ struct Type<nu::Button> {
     return yue::SignalIndex(state, name, "onclick", &nu::Button::on_click);
   }
   static bool NewIndex(State* state, const std::string& name) {
-    return yue::SignalNewIndex(state, name, "onclick", &nu::Button::on_click);
+    return yue::MemberNewIndex(state, name, "onclick", &nu::Button::on_click);
   }
 };
 
@@ -134,7 +134,9 @@ struct Type<nu::Window> {
     return yue::SignalIndex(state, name, "onclose", &nu::Window::on_close);
   }
   static bool NewIndex(State* state, const std::string& name) {
-    return yue::SignalNewIndex(state, name, "onclose", &nu::Window::on_close);
+    return yue::MemberNewIndex(state, name,
+                               "onclose", &nu::Window::on_close,
+                               "shouldclose", &nu::Window::should_close);
   }
 };
 

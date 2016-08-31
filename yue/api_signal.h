@@ -136,37 +136,66 @@ inline bool SignalIndex(lua::State* state, const std::string& name,
   return true;
 }
 
-// Helper to compare name and key and set the signals.
+// Defines how a member is assigned.
+template<typename T, typename Enable = void>
+struct MemberAssignment {};
+
+// Assignment for signals.
 template<typename T>
-inline bool SignalNewIndexHelper(
+struct MemberAssignment<T, typename std::enable_if<std::is_class<
+    typename ExtractMemberPointer<T>::Member::Slot>::value>::type> {
+  static void Do(lua::State* state,
+                 typename ExtractMemberPointer<T>::Type* object, T member) {
+    (object->*member).DisconnectAll();
+    typename ExtractMemberPointer<T>::Member::Slot slot;
+    if (lua::To(state, 3, &slot))
+      (object->*member).Connect(slot);
+  }
+};
+
+// Assignment for delegates.
+template<typename T>
+struct MemberAssignment<T, typename std::enable_if<
+    std::is_member_function_pointer<
+        decltype(&ExtractMemberPointer<T>::Member::Reset)>::value>::type> {
+  static void Do(lua::State* state,
+                 typename ExtractMemberPointer<T>::Type* object, T member) {
+    typename ExtractMemberPointer<T>::Member slot;
+    if (lua::To(state, 3, &slot))
+      (object->*member) = slot;
+    else
+      (object->*member).Reset();
+  }
+};
+
+// Helper to compare name and key and set the members.
+template<typename T>
+inline bool MemberNewIndexHelper(
     lua::State* state, T object, const std::string& name) {
   return false;
 }
 
 template<typename T, typename Member, typename... Rest>
-inline bool SignalNewIndexHelper(
+inline bool MemberNewIndexHelper(
     lua::State* state, T object, const std::string& name,
     const char* key, Member member, Rest... rest) {
   if (name == key) {
-    (object->*member).DisconnectAll();
-    typename ExtractMemberPointer<Member>::Member::Slot slot;
-    if (lua::To(state, 3, &slot))
-      (object->*member).Connect(slot);
+    MemberAssignment<Member>::Do(state, object, member);
     return true;
   } else {
-    return SignalNewIndexHelper(state, object, name, rest...);
+    return MemberNewIndexHelper(state, object, name, rest...);
   }
 }
 
-// Define the __newindex handler for signals.
+// Define the __newindex handler for members.
 template<typename Member, typename... Rest>
-inline bool SignalNewIndex(
+inline bool MemberNewIndex(
     lua::State* state, const std::string& name, const char* key, Member member,
     Rest... rest) {
   typename ExtractMemberPointer<Member>::Type* object;
   if (!lua::To(state, 1, &object))
     return false;
-  return SignalNewIndexHelper(state, object, name, key, member, rest...);
+  return MemberNewIndexHelper(state, object, name, key, member, rest...);
 }
 
 }  // namespace yue
