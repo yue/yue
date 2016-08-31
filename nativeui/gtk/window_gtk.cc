@@ -10,7 +10,8 @@ namespace {
 
 // User clicks the close button.
 gboolean OnClose(GtkWidget *widget, GdkEvent *event, Window* window) {
-  window->Close();
+  if (window->should_close.is_null() || window->should_close.Run())
+    window->Close();
 
   // We are destroying the window ourselves, so prevent the default behavior.
   return TRUE;
@@ -44,6 +45,9 @@ void Window::PlatformInit(const Options& options) {
 }
 
 void Window::Close() {
+  if (!should_close.is_null() && !should_close.Run())
+    return;
+
   on_close.Emit();
   gtk_widget_destroy(GTK_WIDGET(window_));
 
