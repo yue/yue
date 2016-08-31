@@ -137,13 +137,13 @@ inline bool SignalIndex(lua::State* state, const std::string& name,
 }
 
 // Defines how a member is assigned.
-template<typename T, typename Enable = void>
+template<typename T, typename Type, typename Enable = void>
 struct MemberAssignment {};
 
 // Assignment for signals.
-template<typename T>
-struct MemberAssignment<T, typename std::enable_if<std::is_class<
-    typename ExtractMemberPointer<T>::Member::Slot>::value>::type> {
+template<typename T, typename SignalType>
+struct MemberAssignment<T, SignalType, typename std::enable_if<std::is_class<
+    typename SignalType::Slot>::value>::type> {
   static void Do(lua::State* state,
                  typename ExtractMemberPointer<T>::Type* object, T member) {
     (object->*member).DisconnectAll();
@@ -154,10 +154,10 @@ struct MemberAssignment<T, typename std::enable_if<std::is_class<
 };
 
 // Assignment for delegates.
-template<typename T>
-struct MemberAssignment<T, typename std::enable_if<
+template<typename T, typename DelegateType>
+struct MemberAssignment<T, DelegateType, typename std::enable_if<
     std::is_member_function_pointer<
-        decltype(&ExtractMemberPointer<T>::Member::Reset)>::value>::type> {
+        decltype(&DelegateType::Reset)>::value>::type> {
   static void Do(lua::State* state,
                  typename ExtractMemberPointer<T>::Type* object, T member) {
     typename ExtractMemberPointer<T>::Member slot;
@@ -180,7 +180,9 @@ inline bool MemberNewIndexHelper(
     lua::State* state, T object, const std::string& name,
     const char* key, Member member, Rest... rest) {
   if (name == key) {
-    MemberAssignment<Member>::Do(state, object, member);
+    MemberAssignment<Member,
+                     typename ExtractMemberPointer<Member>::Member>::Do(
+        state, object, member);
     return true;
   } else {
     return MemberNewIndexHelper(state, object, name, rest...);

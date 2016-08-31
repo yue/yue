@@ -60,8 +60,8 @@ struct Indexer {
 };
 
 template<typename T>
-struct Indexer<T, typename std::enable_if<std::is_function<
-                      decltype(Type<T>::Index)>::value>::type> {
+struct Indexer<T, typename std::enable_if<std::is_pointer<
+                      decltype(&Type<T>::Index)>::value>::type> {
   static inline void Set(State* state, int index) {
     RawSet(state, index, "__index", CFunction(&Index));
   }
