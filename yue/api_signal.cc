@@ -62,4 +62,4 @@ bool Type<yue::SignalBase*>::To(State* state, int index,
   return true;
 }
 
-}  // namespace lu
+}  // namespace lua

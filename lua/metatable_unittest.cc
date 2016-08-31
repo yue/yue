@@ -444,10 +444,14 @@ struct Type<PropertiesClass> {
   }
 };
 
-TEST_F(MetaTableTest, Properties) {
+}  // namespace lua
+
+TEST_F(MetaTableTest, Index) {
   lua::MetaTable<PropertiesClass>::Push(state_);
-  lua::RawGet(state_, -1, "__index");
+  lua::RawGet(state_, 1, "__index");
   EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Function);
+  lua::RawGet(state_, 1, "__newindex");
+  EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Nil);
 
   lua::Push(state_, new PropertiesClass);
   int property = -1;
@@ -455,4 +459,62 @@ TEST_F(MetaTableTest, Properties) {
   EXPECT_EQ(property, 0);
 }
 
+class NewIndexClass : public base::RefCounted<NewIndexClass> {
+ public:
+  NewIndexClass() {}
+
+  int property = 0;
+
+ private:
+  friend class base::RefCounted<NewIndexClass>;
+
+  ~NewIndexClass() {}
+};
+
+namespace lua {
+
+template<>
+struct Type<NewIndexClass> {
+  static constexpr const char* name = "NewIndexClass";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "new", &MetaTable<NewIndexClass>::NewInstance<>);
+  }
+  static bool Index(State* state, const std::string& name) {
+    NewIndexClass* self;
+    if (!To(state, 1, &self))
+      return false;
+    if (name == "property") {
+      Push(state, self->property);
+      return true;
+    }
+    return false;
+  }
+  static bool NewIndex(State* state, const std::string& name) {
+    NewIndexClass* self;
+    int value;
+    if (!To(state, 1, &self) || !To(state, 3, &value))
+      return false;
+    if (name == "property") {
+      self->property = value;
+      return true;
+    }
+    return false;
+  }
+};
+
 }  // namespace lua
+
+TEST_F(MetaTableTest, NewIndex) {
+  lua::MetaTable<NewIndexClass>::Push(state_);
+  lua::RawGet(state_, 1, "__index");
+  EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Function);
+  lua::RawGet(state_, 1, "__newindex");
+  EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Function);
+
+  lua::Push(state_, new NewIndexClass);
+  ASSERT_TRUE(lua::PSet(state_, -1, "property", 123));
+  int property;
+  ASSERT_TRUE(lua::PGetAndPop(state_, -1, "property", &property));
+  EXPECT_EQ(property, 123);
+}

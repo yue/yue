@@ -77,6 +77,32 @@ struct Indexer<T, typename std::enable_if<std::is_function<
   }
 };
 
+// Check whether T has an NewIndex handler, if it does then set __newindex.
+template<typename T, typename Enable = void>
+struct NewIndexer {
+  static inline void Set(State* state, int index) {
+  }
+};
+
+template<typename T>
+struct NewIndexer<T, typename std::enable_if<std::is_function<
+                         decltype(Type<T>::NewIndex)>::value>::type> {
+  static inline void Set(State* state, int index) {
+    RawSet(state, index, "__newindex", CFunction(&NewIndex));
+  }
+  static int NewIndex(State* state) {
+    // Wrap the C++ stack.
+    {
+      std::string name;
+      if (To(state, 2, &name) && Type<T>::NewIndex(state, name))
+        return 0;
+    }
+    lua::Push(state, "unaccepted assignment");
+    lua_error(state);
+    return 0;
+  }
+};
+
 // Create metatable for T, returns true if the metattable has already been
 // created.
 template<typename T>
@@ -86,6 +112,7 @@ bool PushSingleTypeMetaTable(State* state) {
 
   RawSet(state, -1, "__gc", CFunction(&OnGC<PointerWrapper<T>>));
   Indexer<T>::Set(state, -1);
+  NewIndexer<T>::Set(state, -1);
   Type<T>::BuildMetaTable(state, -1);
   return false;
 }
