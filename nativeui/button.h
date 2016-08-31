@@ -13,7 +13,7 @@ namespace nu {
 
 NATIVEUI_EXPORT class Button : public View {
  public:
-  explicit Button(const std::string& title = "");
+  explicit Button(const std::string& title);
 
   void SetTitle(const std::string& title);
   std::string GetTitle() const;

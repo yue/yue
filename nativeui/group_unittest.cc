@@ -11,7 +11,7 @@ class GroupTest : public testing::Test {
 };
 
 TEST_F(GroupTest, ContentView) {
-  scoped_refptr<nu::Group> group(new nu::Group);
+  scoped_refptr<nu::Group> group(new nu::Group("title"));
   nu::Container* view = new nu::Container;
   group->SetContentView(view);
   EXPECT_EQ(group->GetContentView(), view);
@@ -27,7 +27,7 @@ TEST_F(GroupTest, ContentView) {
 }
 
 TEST_F(GroupTest, Title) {
-  scoped_refptr<nu::Group> group(new nu::Group);
+  scoped_refptr<nu::Group> group(new nu::Group("title"));
   group->SetTitle("test");
   ASSERT_EQ(group->GetTitle(), "test");
 }

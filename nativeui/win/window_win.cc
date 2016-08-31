@@ -63,7 +63,10 @@ Rect TopLevelWindow::GetContentPixelBounds() {
 }
 
 void TopLevelWindow::OnClose() {
-  delegate_->on_close.Emit();
+  if (delegate_->should_close.is_null() || delegate_->should_close.Run()) {
+    delegate_->on_close.Emit();
+    SetMsgHandled(FALSE);
+  }
 }
 
 void TopLevelWindow::OnCommand(UINT code, int command, HWND window) {
