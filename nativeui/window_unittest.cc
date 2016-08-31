@@ -50,3 +50,18 @@ TEST_F(WindowTest, OnClose) {
   window_->Close();
   EXPECT_EQ(closed, true);
 }
+
+bool ShouldClose() {
+  return false;
+}
+
+TEST_F(WindowTest, ShouldClose) {
+  bool closed = false;
+  window_->on_close.Connect(base::Bind(&OnClose, &closed));
+  window_->should_close = base::Bind(&ShouldClose);
+  window_->Close();
+  EXPECT_EQ(closed, false);
+  window_->should_close.Reset();
+  window_->Close();
+  EXPECT_EQ(closed, true);
+}

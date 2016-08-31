@@ -38,6 +38,9 @@ NATIVEUI_EXPORT class Window : public base::RefCounted<Window> {
   // Events.
   Signal<void()> on_close;
 
+  // Delegate methods.
+  base::Callback<bool()> should_close;
+
  protected:
   virtual ~Window();
 

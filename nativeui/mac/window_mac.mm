@@ -23,6 +23,10 @@
   return self;
 }
 
+- (BOOL)windowShouldClose:(id)sender {
+  return shell_->should_close.is_null() ? true : shell_->should_close.Run();
+}
+
 - (void)windowWillClose:(NSNotification*)notification {
   shell_->on_close.Emit();
 }
