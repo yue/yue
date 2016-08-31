@@ -54,11 +54,10 @@ struct Type<nu::Button> {
            "gettitle", &nu::Button::GetTitle);
   }
   static bool Index(State* state, const std::string& name) {
-    if (name == "onclick") {
-      yue::PushSignal(state, 1, "onclick", &nu::Button::on_click);
-      return true;
-    }
-    return false;
+    return yue::SignalIndex(state, name, "onclick", &nu::Button::on_click);
+  }
+  static bool NewIndex(State* state, const std::string& name) {
+    return yue::SignalNewIndex(state, name, "onclick", &nu::Button::on_click);
   }
 };
 
@@ -132,11 +131,10 @@ struct Type<nu::Window> {
            "isvisible", &nu::Window::IsVisible);
   }
   static bool Index(State* state, const std::string& name) {
-    if (name == "onclose") {
-      yue::PushSignal(state, 1, "onclose", &nu::Window::on_close);
-      return true;
-    }
-    return false;
+    return yue::SignalIndex(state, name, "onclose", &nu::Window::on_close);
+  }
+  static bool NewIndex(State* state, const std::string& name) {
+    return yue::SignalNewIndex(state, name, "onclose", &nu::Window::on_close);
   }
 };
 

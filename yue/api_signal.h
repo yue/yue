@@ -92,20 +92,38 @@ void PushObjectMembersTable(lua::State* state, int index);
 // Set metatable for signal.
 void SetSignalMetaTable(lua::State* state, int index);
 
-// Helper to create signal and push it to stack.
-template<typename T>
-void PushSignal(lua::State* state, int index, const char* name, T member) {
-  int top = lua::GetTop(state);
-  index = lua::AbsIndex(state, index);
-  // Check if the member has already been converted.
-  PushObjectMembersTable(state, index);
-  lua::RawGet(state, -1, name);
-  if (lua::GetType(state, -1) != lua::LuaType::UserData) {
+// Helper to compare name and key and create the signal wrapepr.
+inline bool PushSignal(lua::State* state, const std::string& name) {
+  return false;
+}
+
+template<typename T, typename... Rest>
+inline bool PushSignal(lua::State* state, const std::string& name,
+                       const char* key, T member, Rest... rest) {
+  if (name == key) {
     // Create the wrapper for signal class.
     void* memory = lua_newuserdata(state, sizeof(Signal<T>));
-    new(memory) Signal<T>(state, index, member);
+    new(memory) Signal<T>(state, 1, member);
     static_assert(std::is_trivially_destructible<Signal<T>>::value,
                   "we are not providing __gc so Signal<T> must be trivial");
+    return true;
+  }
+  return PushSignal(state, name, rest...);
+}
+
+// Define the __index handler for signals.
+template<typename T, typename... Rest>
+inline bool SignalIndex(lua::State* state, const std::string& name,
+                        const char* key, T member, Rest... rest) {
+  int top = lua::GetTop(state);
+  // Check if the member has already been converted.
+  PushObjectMembersTable(state, 1);
+  lua::RawGet(state, -1, name);
+  if (lua::GetType(state, -1) != lua::LuaType::UserData) {
+    if (!PushSignal(state, name, key, member, rest...)) {
+      lua::SetTop(state, top);
+      return false;
+    }
     SetSignalMetaTable(state, -1);
     lua::RawSet(state, top + 1, name, lua::ValueOnStack(state, -1));
   }
@@ -113,6 +131,40 @@ void PushSignal(lua::State* state, int index, const char* name, T member) {
   lua::Insert(state, top + 1);
   lua::SetTop(state, top + 1);
   DCHECK_EQ(lua::GetType(state, -1), lua::LuaType::UserData);
+  return true;
+}
+
+// Helper to compare name and key and set the signals.
+template<typename T>
+inline bool SignalNewIndexHelper(
+    lua::State* state, T object, const std::string& name) {
+  return false;
+}
+
+template<typename T, typename Member, typename... Rest>
+inline bool SignalNewIndexHelper(
+    lua::State* state, T object, const std::string& name,
+    const char* key, Member member, Rest... rest) {
+  if (name == key) {
+    (object->*member).DisconnectAll();
+    typename ExtractMemberPointer<Member>::Member::Slot slot;
+    if (lua::To(state, 3, &slot))
+      (object->*member).Connect(slot);
+    return true;
+  } else {
+    return SignalNewIndexHelper(state, object, name, rest...);
+  }
+}
+
+// Define the __newindex handler for signals.
+template<typename Member, typename... Rest>
+inline bool SignalNewIndex(
+    lua::State* state, const std::string& name, const char* key, Member member,
+    Rest... rest) {
+  typename ExtractMemberPointer<Member>::Type* object;
+  if (!lua::To(state, 1, &object))
+    return false;
+  return SignalNewIndexHelper(state, object, name, key, member, rest...);
 }
 
 }  // namespace yue
