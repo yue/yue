@@ -6,7 +6,6 @@
 #define NATIVEUI_SIGNAL_H_
 
 #include <algorithm>
-#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -23,7 +22,7 @@ class Signal<void(Args...)> {
   using Slot = base::Callback<void(Args...)>;
 
   int Connect(const Slot& slot) {
-    slots_.push_back(std::make_tuple(++next_id_, slot));
+    slots_.push_back(std::make_pair(++next_id_, slot));
     return next_id_;
   }
 
@@ -44,17 +43,17 @@ class Signal<void(Args...)> {
     // elements from the list when iterating.
     auto slots = slots_;
     for (auto& slot : slots)
-      std::get<1>(slot).Run(std::forward(args)...);
+      slot.second.Run(std::forward(args)...);
   }
 
  private:
   // Use the first element of tuple as comparing key.
-  static bool TupleCompare(const std::tuple<int, Slot>& element, int key) {
-    return std::get<0>(element) < key;
+  static bool TupleCompare(const std::pair<int, Slot>& element, int key) {
+    return element.first < key;
   }
 
   int next_id_ = 0;
-  std::vector<std::tuple<int, Slot>> slots_;
+  std::vector<std::pair<int, Slot>> slots_;
 };
 
 }  // namespace nu

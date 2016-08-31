@@ -5,6 +5,8 @@
 #ifndef YUE_API_SIGNAL_H_
 #define YUE_API_SIGNAL_H_
 
+#include <string>
+
 #include "lua/lua.h"
 #include "nativeui/signal.h"
 

@@ -6,7 +6,7 @@
 
 #include <algorithm>
 #include <string>
-#include <tuple>
+#include <utility>
 
 #include "yue/api_gui.h"
 #include "yue/api_message_loop.h"
@@ -16,15 +16,15 @@ namespace yue {
 namespace {
 
 // The search table, it must be manually kept in sorted order.
-std::tuple<std::string, lua_CFunction> loaders_map[] = {
-  std::make_tuple("yue.GUI", luaopen_yue_gui),
-  std::make_tuple("yue.MessageLoop", luaopen_yue_message_loop),
+std::pair<std::string, lua_CFunction> loaders_map[] = {
+  std::make_pair("yue.GUI", luaopen_yue_gui),
+  std::make_pair("yue.MessageLoop", luaopen_yue_message_loop),
 };
 
 // Use the first element of tuple as comparing key.
-bool TupleCompare(const std::tuple<std::string, lua_CFunction>& element,
+bool TupleCompare(const std::pair<std::string, lua_CFunction>& element,
                   const std::string& key) {
-  return std::get<0>(element) < key;
+  return element.first < key;
 }
 
 int SearchBuiltin(lua::State* state) {
@@ -38,7 +38,7 @@ int SearchBuiltin(lua::State* state) {
     lua::PushFormatedString(state, "\n\tno builtin '%s'", name.c_str());
     return 1;
   } else {
-    lua::Push(state, lua::CFunction(std::get<1>(*iter)));
+    lua::Push(state, lua::CFunction(iter->second));
     return 1;
   }
 }
