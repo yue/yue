@@ -100,3 +100,46 @@ TEST_F(YueSignalTest, WeakTableCleared) {
   lua::CollectGarbage(state_);
   EXPECT_EQ(CountTable(state_, 1), 1);
 }
+
+TEST_F(YueSignalTest, EventAssignment) {
+  bool closed = false;
+  lua::Push(state_, base::Bind(&OnClose, &closed));
+  lua_setglobal(state_, "callback");
+  ASSERT_FALSE(luaL_dostring(state_,
+      "win.onclose = callback\n"
+      "win:close()"));
+  EXPECT_TRUE(closed);
+}
+
+TEST_F(YueSignalTest, NilAssignment) {
+  bool closed = false;
+  lua::Push(state_, base::Bind(&OnClose, &closed));
+  lua_setglobal(state_, "callback");
+  ASSERT_FALSE(luaL_dostring(state_,
+      "win.onclose = callback\n"
+      "win.onclose = 123\n"
+      "win:close()"));
+  EXPECT_FALSE(closed);
+}
+
+TEST_F(YueSignalTest, DelegateAssignment) {
+  bool closed = false;
+  lua::Push(state_, base::Bind(&OnClose, &closed));
+  lua_setglobal(state_, "callback");
+  ASSERT_FALSE(luaL_dostring(state_,
+      "win.onclose = callback\n"
+      "win.shouldclose = function() return false end\n"
+      "win:close()"));
+  EXPECT_FALSE(closed);
+  ASSERT_FALSE(luaL_dostring(state_,
+      "win.shouldclose = nil\n"
+      "win:close()"));
+  EXPECT_TRUE(closed);
+}
+
+TEST_F(YueSignalTest, InvalidAssignment) {
+  ASSERT_TRUE(luaL_dostring(state_, "win.onnothing = callback"));
+  std::string error;
+  lua::Pop(state_, &error);
+  EXPECT_EQ(error, "unaccepted assignment");
+}
