@@ -106,7 +106,7 @@ inline bool PushSignal(lua::State* state, const std::string& name,
     // Create the wrapper for signal class.
     void* memory = lua_newuserdata(state, sizeof(Signal<T>));
     new(memory) Signal<T>(state, 1, member);
-    static_assert(std::is_trivially_destructible<Signal<T>>::value,
+    static_assert(base::is_trivially_destructible<Signal<T>>::value,
                   "we are not providing __gc so Signal<T> must be trivial");
     return true;
   }

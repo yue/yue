@@ -10,6 +10,7 @@
 #include <utility>
 
 #include "base/callback.h"
+#include "base/template_util.h"
 #include "lua/call_context.h"
 #include "lua/handle.h"
 #include "lua/pcall.h"
@@ -160,7 +161,7 @@ struct Dispatcher<ReturnType(ArgTypes...)> {
         lua_touserdata(state, lua_upvalueindex(1)));
 
     CallContext context(state, Values<ReturnType>::count);
-    static_assert(std::is_trivially_destructible<CallContext>::value,
+    static_assert(base::is_trivially_destructible<CallContext>::value,
                   "The CallContext must not invole C++ stack");
     {  // Make sure C++ stack is destroyed before calling lua_error.
       using Indices = typename IndicesGenerator<sizeof...(ArgTypes)>::type;
