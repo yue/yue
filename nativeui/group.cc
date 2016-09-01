@@ -4,6 +4,8 @@
 
 #include "nativeui/group.h"
 
+#include "nativeui/gfx/geometry/insets.h"
+
 namespace nu {
 
 Group::Group(const std::string& title) {
@@ -13,6 +15,17 @@ Group::Group(const std::string& title) {
 }
 
 Group::~Group() {
+}
+
+bool Group::UpdatePreferredSize() {
+  Size outer = GetBounds().size();
+  Size inner = GetContentView()->GetBounds().size();
+  Size preferred_size = GetContentView()->preferred_size();
+  preferred_size.Enlarge(outer.width() - inner.width(),
+                         outer.height() - inner.height());
+  if (SetPreferredSize(preferred_size))
+    content_view_->Layout();
+  return false;
 }
 
 void Group::SetContentView(Container* container) {
