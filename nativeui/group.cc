@@ -10,6 +10,11 @@ namespace nu {
 
 Group::Group(const std::string& title) {
   PlatformInit();
+
+  // Give group a initialize size otherwise we will be unable to calculate the
+  // preferred size.
+  SetBounds(Rect(0, 0, 100, 100));
+
   SetContentView(new Container);
   SetTitle(title);
 }
@@ -30,7 +35,9 @@ bool Group::UpdatePreferredSize() {
 
 void Group::SetContentView(Container* container) {
   content_view_ = container;
+  content_view_->set_parent(this);
   PlatformSetContentView(container);
+  UpdatePreferredSize();
 }
 
 Container* Group::GetContentView() const {

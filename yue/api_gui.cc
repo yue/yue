@@ -12,6 +12,24 @@
 namespace lua {
 
 template<>
+struct Type<nu::Size> {
+  static constexpr const char* name = "yue.Size";
+  static inline void Push(State* state, const nu::Size& size) {
+    lua::PushNewTable(state);
+    lua::RawSet(state, -1, "width", size.width(), "height", size.height());
+  }
+  static inline bool To(State* state, int index, nu::Size* out) {
+    if (GetType(state, index) != LuaType::Table)
+      return false;
+    int width, height;
+    if (!RawGetAndPop(state, index, "width", &width, "height", &height))
+      return false;
+    *out = nu::Size(width, height);
+    return true;
+  }
+};
+
+template<>
 struct Type<nu::Rect> {
   static constexpr const char* name = "yue.Rect";
   static inline void Push(State* state, const nu::Rect& rect) {
@@ -37,6 +55,8 @@ struct Type<nu::View> {
   static constexpr const char* name = "yue.View";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
+           "getpreferredsize", &nu::View::preferred_size,
+           "setpreferredsize", &nu::View::SetPreferredSize,
            "setbounds", &nu::View::SetBounds,
            "getbounds", &nu::View::GetBounds,
            "getparent", &nu::View::parent);

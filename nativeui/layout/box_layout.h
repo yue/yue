@@ -5,6 +5,7 @@
 #ifndef NATIVEUI_LAYOUT_BOX_LAYOUT_H_
 #define NATIVEUI_LAYOUT_BOX_LAYOUT_H_
 
+#include "nativeui/gfx/geometry/insets.h"
 #include "nativeui/layout/layout_manager.h"
 
 namespace nu {
@@ -15,7 +16,9 @@ NATIVEUI_EXPORT class BoxLayout : public LayoutManager {
     Horizontal,
     Vertical,
   };
-  explicit BoxLayout(Orientation orientation);
+  BoxLayout(Orientation orientation,
+            Insets inner_padding = Insets(),
+            int child_spacing = 0);
 
   // LayoutManager:
   void Layout(Container* host) override;
@@ -26,6 +29,12 @@ NATIVEUI_EXPORT class BoxLayout : public LayoutManager {
 
  private:
   Orientation orientation_;
+
+  // The padding between the broder.
+  Insets inner_padding_;
+
+  // The space between children.
+  int child_spacing_;
 };
 
 }  // namespace nu

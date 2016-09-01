@@ -43,7 +43,9 @@ namespace nu {
 namespace {
 
 Size GetPreferredSizeFroText(const std::string& text) {
-  return ToFlooredSize(MeasureText(Font(), text));
+  Size size = ToCeiledSize(MeasureText(Font(), text));
+  size.Enlarge(1, 1);  // leave space for border
+  return size;
 }
 
 }  // namespace

@@ -12,8 +12,6 @@
 
 namespace nu {
 
-class Container;
-
 // The base class for all kinds of views.
 NATIVEUI_EXPORT class View : public base::RefCounted<View> {
  public:
@@ -43,10 +41,10 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
   Size preferred_size() const { return preferred_size_; }
 
   // Get parent.
-  Container* parent() const { return parent_; }
+  View* parent() const { return parent_; }
 
   // Set parent, can only be used internally for now.
-  void set_parent(Container* parent) { parent_ = parent; }
+  void set_parent(View* parent) { parent_ = parent; }
 
  protected:
   View();
@@ -58,7 +56,7 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
   friend class base::RefCounted<View>;
 
   // Relationships.
-  Container* parent_ = nullptr;
+  View* parent_ = nullptr;
 
   // The native implementation.
   NativeView view_;
