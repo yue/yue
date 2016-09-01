@@ -7,6 +7,8 @@
 #import <Cocoa/Cocoa.h>
 
 #include "base/strings/sys_string_conversions.h"
+#include "nativeui/gfx/geometry/size_conversions.h"
+#include "nativeui/gfx/text.h"
 
 @interface LabelView : NSView {
  @private
@@ -38,10 +40,17 @@
 
 namespace nu {
 
+namespace {
+
+Size GetPreferredSizeFroText(const std::string& text) {
+  return ToFlooredSize(MeasureText(Font(), text));
+}
+
+}  // namespace
+
 Label::Label(const std::string& text) {
-  LabelView* label = [[LabelView alloc] init];
-  label.text = base::SysUTF8ToNSString(text);
-  set_view(label);
+  set_view([[LabelView alloc] init]);
+  SetText(text);
 }
 
 Label::~Label() {
@@ -51,6 +60,7 @@ void Label::SetText(const std::string& text) {
   LabelView* label = static_cast<LabelView*>(view());
   label.text = base::SysUTF8ToNSString(text);
   label.needsDisplay = YES;
+  SetPreferredSize(GetPreferredSizeFroText(text));
 }
 
 std::string Label::GetText() {

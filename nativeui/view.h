@@ -31,6 +31,17 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
   Point GetWindowOrigin() const;
   Point GetWindowPixelOrigin() const;
 
+  // Set the preferred size of the view, returns whether current view should
+  // do a layout.
+  bool SetPreferredSize(const Size& size);
+
+  // A child changed its preferred size, returns true if the child should do a
+  // layout.
+  virtual bool UpdatePreferredSize();
+
+  // Get the size the view would like to be.
+  Size preferred_size() const { return preferred_size_; }
+
   // Get parent.
   Container* parent() const { return parent_; }
 
@@ -51,6 +62,9 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
 
   // The native implementation.
   NativeView view_;
+
+  // The preferred size of widget.
+  Size preferred_size_;
 };
 
 }  // namespace nu

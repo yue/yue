@@ -24,4 +24,3 @@ std::string Label::GetText() {
 }
 
 }  // namespace nu
-

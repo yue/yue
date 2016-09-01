@@ -62,12 +62,27 @@ TEST_F(ContainerTest, RemoveChildView) {
   EXPECT_EQ(container_->child_at(0), v2);
 }
 
+TEST_F(ContainerTest, SetBounds) {
+  TestContainer* c = new TestContainer;
+  EXPECT_EQ(c->layout_count(), 0);
+  c->SetBounds(nu::Rect(0, 0, 100, 100));
+  EXPECT_EQ(c->layout_count(), 1);
+}
+
 TEST_F(ContainerTest, Layout) {
   EXPECT_EQ(container_->layout_count(), 1);
   container_->AddChildView(new nu::Container);
   EXPECT_EQ(container_->layout_count(), 2);
   window_->SetBounds(nu::Rect(0, 0, 100, 200));
   EXPECT_EQ(container_->layout_count(), 3);
+}
+
+TEST_F(ContainerTest, NestedLayout) {
+  TestContainer* c1 = new TestContainer;
+  EXPECT_EQ(container_->layout_count(), 1);
+  container_->AddChildView(c1);
+  EXPECT_EQ(container_->layout_count(), 2);
+  EXPECT_EQ(c1->layout_count(), 1);
 }
 
 TEST_F(ContainerTest, VisibleLayout) {

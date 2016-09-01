@@ -15,6 +15,7 @@ NATIVEUI_EXPORT class FillLayout : public LayoutManager {
 
   // LayoutManager:
   void Layout(Container* host) override;
+  Size GetPreferredSize(Container* host) override;
 
  protected:
   ~FillLayout() override;

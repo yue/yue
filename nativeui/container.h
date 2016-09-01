@@ -17,6 +17,9 @@ NATIVEUI_EXPORT class Container : public View {
  public:
   Container();
 
+  // View:
+  bool UpdatePreferredSize() override;
+
   // Layouts.
   void SetLayoutManager(LayoutManager* layout_manager);
   LayoutManager* GetLayoutManager() const;

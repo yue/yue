@@ -25,6 +25,8 @@ void View::SetBounds(const Rect& bounds) {
                      (frame.origin.y + frame.size.height);
   }
   [view_ setFrame:frame];
+  // Calling setFrame manually does not trigger adjustSubviews.
+  [view_ resizeSubviewsWithOldSize:frame.size];
 }
 
 Rect View::GetBounds() const {

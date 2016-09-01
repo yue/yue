@@ -19,6 +19,7 @@ NATIVEUI_EXPORT class BoxLayout : public LayoutManager {
 
   // LayoutManager:
   void Layout(Container* host) override;
+  Size GetPreferredSize(Container* host) override;
 
  protected:
   ~BoxLayout() override;

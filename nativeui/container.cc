@@ -18,9 +18,17 @@ Container::Container() : layout_manager_(new FillLayout) {
 Container::~Container() {
 }
 
+bool Container::UpdatePreferredSize() {
+  if (SetPreferredSize(layout_manager_->GetPreferredSize(this)))
+    Layout();
+
+  // The layout of children is managed by Container.
+  return false;
+}
+
 void Container::SetLayoutManager(LayoutManager* layout_manager) {
   layout_manager_ = layout_manager;
-  Layout();
+  UpdatePreferredSize();
 }
 
 LayoutManager* Container::GetLayoutManager() const {
@@ -52,7 +60,7 @@ void Container::AddChildViewAt(View* view, int index) {
   view->set_parent(this);
   PlatformAddChildView(view);
 
-  Layout();
+  UpdatePreferredSize();
 }
 
 void Container::RemoveChildView(View* view) {
@@ -64,7 +72,7 @@ void Container::RemoveChildView(View* view) {
   PlatformRemoveChildView(view);
   children_.erase(i);
 
-  Layout();
+  UpdatePreferredSize();
 }
 
 }  // namespace nu

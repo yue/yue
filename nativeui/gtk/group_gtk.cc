@@ -30,4 +30,3 @@ std::string Group::GetTitle() const {
 }
 
 }  // namespace nu
-

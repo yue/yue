@@ -17,4 +17,11 @@ void FillLayout::Layout(Container* host) {
     host->child_at(0)->SetPixelBounds(Rect(host->GetPixelBounds().size()));
 }
 
+Size FillLayout::GetPreferredSize(Container* host) {
+  if (host->child_count() > 0)
+    return host->child_at(0)->preferred_size();
+  else
+    return Size();
+}
+
 }  // namespace nu

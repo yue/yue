@@ -42,7 +42,7 @@ NSFont* NSFontWithSpec(const std::string& font_name, int font_size) {
 }  // namespace
 
 PlatformFontMac::PlatformFontMac()
-    : font_([NSFont systemFontOfSize:[NSFont systemFontSize]]) {
+    : font_([[NSFont systemFontOfSize:[NSFont systemFontSize]] retain]) {
 }
 
 PlatformFontMac::PlatformFontMac(const std::string& font_name, int font_size)

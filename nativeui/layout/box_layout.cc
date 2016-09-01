@@ -33,4 +33,25 @@ void BoxLayout::Layout(Container* host) {
   }
 }
 
+Size BoxLayout::GetPreferredSize(Container* host) {
+  if (host->child_count() == 0)
+    return Size();
+
+  Size size;
+  if (orientation_ == Horizontal) {
+    for (int i = 0; i < host->child_count(); ++i) {
+      Size child_size = host->child_at(i)->preferred_size();
+      size.set_height(std::max(size.height(), child_size.height()));
+      size.set_width(size.width() + child_size.width());
+    }
+  } else {
+    for (int i = 0; i < host->child_count(); ++i) {
+      Size child_size = host->child_at(i)->preferred_size();
+      size.set_width(std::max(size.width(), child_size.width()));
+      size.set_height(size.height() + child_size.height());
+    }
+  }
+  return size;
+}
+
 }  // namespace nu

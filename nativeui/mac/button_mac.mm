@@ -6,6 +6,7 @@
 
 #import <Cocoa/Cocoa.h>
 
+#include "base/mac/scoped_nsobject.h"
 #include "base/strings/sys_string_conversions.h"
 
 @interface NUButtonDelegate : NSObject {
@@ -49,7 +50,15 @@ Button::~Button() {
 }
 
 void Button::SetTitle(const std::string& title) {
-  static_cast<NSButton*>(view()).title = base::SysUTF8ToNSString(title);
+  NSButton* button = static_cast<NSButton*>(view());
+  button.title = base::SysUTF8ToNSString(title);
+
+  // Calculate the preferred size by creating a new button.
+  base::scoped_nsobject<NSButton> tmp([[NSButton alloc] init]);
+  [tmp setBezelStyle:button.bezelStyle];
+  [tmp setTitle:button.title];
+  [tmp sizeToFit];
+  SetPreferredSize(Size([tmp frame].size));
 }
 
 std::string Button::GetTitle() const {
