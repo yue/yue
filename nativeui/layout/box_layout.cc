@@ -6,40 +6,82 @@
 
 namespace nu {
 
-BoxLayout::BoxLayout(Orientation orientation)
-    : orientation_(orientation) {
+BoxLayout::BoxLayout(Orientation orientation) : orientation_(orientation) {
 }
 
 BoxLayout::~BoxLayout() {
 }
 
 void BoxLayout::Layout(Container* host) {
+  Rect child_area(host->GetPixelBounds().size());
+  if (child_area.IsEmpty())
+    return;
+
+  // TODO(zcbenz): Detect hidden children.
+  int child_count = host->child_count();
   if (host->child_count() == 0)
     return;
 
-  Rect bounds(host->GetPixelBounds().size());
-  if (bounds.IsEmpty())
-    return;
-
   // Calculate from where to place the views.
-  Size preferred_size(host->preferred_size());
-  bounds.Inset(inner_padding_);
-  Point origin(bounds.x() + (bounds.width() - preferred_size.width()) / 2,
-               bounds.y() + (bounds.height() - preferred_size.height()) / 2);
-
-  if (host->child_count() == 1) {
-    // No spacing for single child.
-    host->child_at(0)->SetPixelBounds(Rect(origin, preferred_size));
-    return;
+  Size host_size(host->preferred_size());
+  child_area.Inset(inner_padding_);
+  // Start and Stretch alignments start from child area origin.
+  Point origin(child_area.x(), child_area.y());
+  if (orientation_ == Horizontal) {
+    if (main_axis_alignment_ == Center)
+      origin.Offset((child_area.width() - host_size.width()) / 2, 0);
+    else if (main_axis_alignment_ == End)
+      origin.Offset(child_area.width() - host_size.width(), 0);
+  } else {
+    if (main_axis_alignment_ == Center)
+      origin.Offset(0, (child_area.height() - host_size.height()) / 2);
+    else if (main_axis_alignment_ == End)
+      origin.Offset(0, child_area.height() - host_size.height());
   }
 
+  // For stretch main axis alignment, all children are streched to fill the
+  // child area of the view.
+  int main_axis_size;
+  if (main_axis_alignment_ == Stretch) {
+    main_axis_size = orientation_ ==
+        Horizontal ? child_area.width() : child_area.height();
+    main_axis_size = (main_axis_size - child_spacing_ * (child_count - 1)) /
+                     child_count;
+  }
+
+  // Start layout.
   for (int i = 0; i < host->child_count(); ++i) {
     View* child = host->child_at(i);
-    child->SetPixelBounds(Rect(origin, child->preferred_size()));
-    if (orientation_ == Horizontal)
-      origin.Offset(child->preferred_size().width() + child_spacing_, 0);
-    else
-      origin.Offset(0, child->preferred_size().height() + child_spacing_);
+    Point child_origin(origin);
+    Size child_size(child->preferred_size());
+    if (orientation_ == Horizontal) {
+      if (main_axis_alignment_ == Stretch)
+        child_size.set_width(main_axis_size);
+      if (cross_axis_alignment_ == Start)
+        child_origin.Offset(0, (child_area.height() - host_size.height()) / 2);
+      else if (cross_axis_alignment_ == Center)
+        child_origin.Offset(0, (child_area.height() - child_size.height()) / 2);
+      else if (cross_axis_alignment_ == End)
+        child_origin.Offset(0, (child_area.height() - host_size.height()) / 2 +
+                               host_size.height() - child_size.height());
+      else if (cross_axis_alignment_ == Stretch)
+        child_size.set_height(child_area.height());
+      origin.Offset(child_size.width() + child_spacing_, 0);
+    } else {
+      if (main_axis_alignment_ == Stretch)
+        child_size.set_height(main_axis_size);
+      if (cross_axis_alignment_ == Start)
+        child_origin.Offset((child_area.width() - host_size.width()) / 2, 0);
+      else if (cross_axis_alignment_ == Center)
+        child_origin.Offset((child_area.width() - child_size.width()) / 2, 0);
+      else if (cross_axis_alignment_ == End)
+        child_origin.Offset((child_area.width() - host_size.width()) / 2 +
+                            host_size.width() - child_size.width(), 0);
+      else if (cross_axis_alignment_ == Stretch)
+        child_size.set_width(child_area.width());
+      origin.Offset(0, child_size.height() + child_spacing_);
+    }
+    child->SetPixelBounds(Rect(child_origin, child_size));
   }
 }
 

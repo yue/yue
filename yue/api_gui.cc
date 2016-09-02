@@ -199,8 +199,7 @@ struct Type<nu::FillLayout> {
 template<>
 struct Type<nu::BoxLayout::Orientation> {
   static constexpr const char* name = "yue.BoxLayout.Orientation";
-  static inline bool To(State* state, int index,
-                        nu::BoxLayout::Orientation* out) {
+  static bool To(State* state, int index, nu::BoxLayout::Orientation* out) {
     std::string orientation;
     if (!lua::To(state, index, &orientation))
       return false;
@@ -209,6 +208,31 @@ struct Type<nu::BoxLayout::Orientation> {
       return true;
     } else if (orientation == "horizontal") {
       *out = nu::BoxLayout::Horizontal;
+      return true;
+    } else {
+      return false;
+    }
+  }
+};
+
+template<>
+struct Type<nu::BoxLayout::AxisAlignment> {
+  static constexpr const char* name = "yue.BoxLayout.AxisAlignment";
+  static bool To(State* state, int index, nu::BoxLayout::AxisAlignment* out) {
+    std::string alignment;
+    if (!lua::To(state, index, &alignment))
+      return false;
+    if (alignment == "start") {
+      *out = nu::BoxLayout::Start;
+      return true;
+    } else if (alignment == "center") {
+      *out = nu::BoxLayout::Center;
+      return true;
+    } else if (alignment == "end") {
+      *out = nu::BoxLayout::End;
+      return true;
+    } else if (alignment == "stretch") {
+      *out = nu::BoxLayout::Stretch;
       return true;
     } else {
       return false;
@@ -236,6 +260,11 @@ struct Type<nu::BoxLayout> {
       nu::Insets insets;
       if (RawGetAndPop(context->state, 1, "innerpadding", &insets))
         box->set_inner_padding(insets);
+      nu::BoxLayout::AxisAlignment alignment;
+      if (RawGetAndPop(context->state, 1, "mainaxisalignment", &alignment))
+        box->set_main_axis_alignment(alignment);
+      if (RawGetAndPop(context->state, 1, "crossaxisalignment", &alignment))
+        box->set_cross_axis_alignment(alignment);
       return box;
     } else {
       context->has_error = true;

@@ -35,7 +35,7 @@ namespace nu {
 
 Button::Button(const std::string& title) {
   NSButton* button = [[NSButton alloc] init];
-  button.bezelStyle = NSRegularSquareBezelStyle;
+  button.bezelStyle = NSRoundedBezelStyle;
   button.target = [[NUButtonDelegate alloc] initWithShell:this];
   button.action = @selector(onClick:);
   set_view(button);
