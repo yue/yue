@@ -28,6 +28,7 @@ NATIVEUI_EXPORT class BoxLayout : public LayoutManager {
   void Layout(Container* host) override;
   Size GetPreferredSize(Container* host) override;
 
+  void set_orientation(Orientation orientation) { orientation_ = orientation; }
   void set_inner_padding(const Insets& padding) { inner_padding_ = padding; }
   void set_child_spacing(int spacing) { child_spacing_ = spacing; }
   void set_main_axis_alignment(AxisAlignment a) { main_axis_alignment_ = a; }

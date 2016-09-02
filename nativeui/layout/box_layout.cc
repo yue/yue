@@ -4,6 +4,8 @@
 
 #include "nativeui/layout/box_layout.h"
 
+#include <algorithm>
+
 namespace nu {
 
 BoxLayout::BoxLayout(Orientation orientation) : orientation_(orientation) {
@@ -24,9 +26,10 @@ void BoxLayout::Layout(Container* host) {
 
   // Calculate from where to place the views.
   Size host_size(host->preferred_size());
+  host_size.Enlarge(-inner_padding_.left() - inner_padding_.right(),
+                    -inner_padding_.top() - inner_padding_.bottom());
   child_area.Inset(inner_padding_);
-  // Start and Stretch alignments start from child area origin.
-  Point origin(child_area.x(), child_area.y());
+  Point origin(inner_padding_.left(), inner_padding_.top());
   if (orientation_ == Horizontal) {
     if (main_axis_alignment_ == Center)
       origin.Offset((child_area.width() - host_size.width()) / 2, 0);

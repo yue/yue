@@ -9,53 +9,165 @@ class BoxLayoutTest : public testing::Test {
  protected:
   void SetUp() override {
     window_ = new nu::Window(nu::Window::Options());
-    nu::Container* container = new nu::Container;
-    container->SetLayoutManager(new nu::BoxLayout(nu::BoxLayout::Vertical));
-    window_->SetContentView(container);
+    layout_ = new nu::BoxLayout(nu::BoxLayout::Vertical);
+    content_ = window_->GetContentView();
+    content_->SetLayoutManager(layout_.get());
   }
 
   nu::State state_;
+  scoped_refptr<nu::BoxLayout> layout_;
   scoped_refptr<nu::Window> window_;
+  nu::Container* content_;
 };
 
-TEST_F(BoxLayoutTest, ListChild) {
-  nu::Rect bounds(1, 2, 300, 400);
-  nu::Container* c1 = new nu::Container;
-  nu::Container* c2 = new nu::Container;
-  window_->GetContentView()->AddChildView(c1);
-  window_->GetContentView()->AddChildView(c2);
-  window_->SetContentBounds(bounds);
-  EXPECT_EQ(c1->GetBounds(), nu::Rect(0, 0, 300, 200));
-  EXPECT_EQ(c2->GetBounds(), nu::Rect(0, 200, 300, 200));
-  EXPECT_EQ(c1->GetWindowOrigin(), nu::Point(0, 0));
-  EXPECT_EQ(c2->GetWindowOrigin(), nu::Point(0, 200));
+nu::View* CreateFixedSizeView(int width, int height) {
+  nu::Container* container = new nu::Container;
+  container->SetPreferredSize(nu::Size(width, height));
+  return container;
 }
 
-TEST_F(BoxLayoutTest, ListChildChild) {
-  nu::Rect bounds(1, 2, 300, 400);
-  nu::Container* c1 = new nu::Container;
-  nu::Container* c2 = new nu::Container;
-  c1->SetLayoutManager(new nu::BoxLayout(nu::BoxLayout::Vertical));
-  c1->AddChildView(c2);
-  window_->GetContentView()->AddChildView(c1);
-  window_->SetContentBounds(bounds);
-  EXPECT_EQ(c1->GetBounds(), nu::Rect(0, 0, 300, 400));
-  EXPECT_EQ(c2->GetBounds(), nu::Rect(0, 0, 300, 400));
-  EXPECT_EQ(c1->GetWindowOrigin(), nu::Point(0, 0));
-  EXPECT_EQ(c2->GetWindowOrigin(), nu::Point(0, 0));
+TEST_F(BoxLayoutTest, MainStartCrossStart) {
+  layout_->set_main_axis_alignment(nu::BoxLayout::Start);
+  layout_->set_cross_axis_alignment(nu::BoxLayout::Start);
+  content_->AddChildView(CreateFixedSizeView(100, 100));
+  content_->AddChildView(CreateFixedSizeView(50, 50));
+  window_->SetContentBounds(nu::Rect(0, 0, 200, 200));
+  EXPECT_EQ(content_->preferred_size(), nu::Size(100, 150));
+  EXPECT_EQ(content_->child_at(0)->GetBounds(), nu::Rect(50, 0, 100, 100));
+  EXPECT_EQ(content_->child_at(1)->GetBounds(), nu::Rect(50, 100, 50, 50));
 }
 
-TEST_F(BoxLayoutTest, ListChildHorizontal) {
-  nu::Rect bounds(1, 2, 300, 400);
-  window_->GetContentView()->SetLayoutManager(
-      new nu::BoxLayout(nu::BoxLayout::Horizontal));
-  nu::Container* c1 = new nu::Container;
-  nu::Container* c2 = new nu::Container;
-  window_->GetContentView()->AddChildView(c1);
-  window_->GetContentView()->AddChildView(c2);
-  window_->SetContentBounds(bounds);
-  EXPECT_EQ(c1->GetBounds(), nu::Rect(0, 0, 150, 400));
-  EXPECT_EQ(c2->GetBounds(), nu::Rect(150, 0, 150, 400));
-  EXPECT_EQ(c1->GetWindowOrigin(), nu::Point(0, 0));
-  EXPECT_EQ(c2->GetWindowOrigin(), nu::Point(150, 0));
+TEST_F(BoxLayoutTest, MainStartCrossCenter) {
+  layout_->set_main_axis_alignment(nu::BoxLayout::Start);
+  layout_->set_cross_axis_alignment(nu::BoxLayout::Center);
+  content_->AddChildView(CreateFixedSizeView(100, 100));
+  content_->AddChildView(CreateFixedSizeView(50, 50));
+  window_->SetContentBounds(nu::Rect(0, 0, 200, 200));
+  EXPECT_EQ(content_->preferred_size(), nu::Size(100, 150));
+  EXPECT_EQ(content_->child_at(0)->GetBounds(), nu::Rect(50, 0, 100, 100));
+  EXPECT_EQ(content_->child_at(1)->GetBounds(), nu::Rect(75, 100, 50, 50));
+}
+
+TEST_F(BoxLayoutTest, MainStartCrossEnd) {
+  layout_->set_main_axis_alignment(nu::BoxLayout::Start);
+  layout_->set_cross_axis_alignment(nu::BoxLayout::End);
+  content_->AddChildView(CreateFixedSizeView(100, 100));
+  content_->AddChildView(CreateFixedSizeView(50, 50));
+  window_->SetContentBounds(nu::Rect(0, 0, 200, 200));
+  EXPECT_EQ(content_->preferred_size(), nu::Size(100, 150));
+  EXPECT_EQ(content_->child_at(0)->GetBounds(), nu::Rect(50, 0, 100, 100));
+  EXPECT_EQ(content_->child_at(1)->GetBounds(), nu::Rect(100, 100, 50, 50));
+}
+
+TEST_F(BoxLayoutTest, MainStartCrossStretch) {
+  layout_->set_main_axis_alignment(nu::BoxLayout::Start);
+  layout_->set_cross_axis_alignment(nu::BoxLayout::Stretch);
+  content_->AddChildView(CreateFixedSizeView(100, 100));
+  content_->AddChildView(CreateFixedSizeView(50, 50));
+  window_->SetContentBounds(nu::Rect(0, 0, 200, 200));
+  EXPECT_EQ(content_->preferred_size(), nu::Size(100, 150));
+  EXPECT_EQ(content_->child_at(0)->GetBounds(), nu::Rect(0, 0, 200, 100));
+  EXPECT_EQ(content_->child_at(1)->GetBounds(), nu::Rect(0, 100, 200, 50));
+}
+
+TEST_F(BoxLayoutTest, MainCenterCrossStart) {
+  layout_->set_main_axis_alignment(nu::BoxLayout::Center);
+  layout_->set_cross_axis_alignment(nu::BoxLayout::Start);
+  content_->AddChildView(CreateFixedSizeView(100, 100));
+  content_->AddChildView(CreateFixedSizeView(50, 50));
+  window_->SetContentBounds(nu::Rect(0, 0, 200, 200));
+  EXPECT_EQ(content_->preferred_size(), nu::Size(100, 150));
+  EXPECT_EQ(content_->child_at(0)->GetBounds(), nu::Rect(50, 25, 100, 100));
+  EXPECT_EQ(content_->child_at(1)->GetBounds(), nu::Rect(50, 125, 50, 50));
+}
+
+TEST_F(BoxLayoutTest, MainEndCrossStart) {
+  layout_->set_main_axis_alignment(nu::BoxLayout::End);
+  layout_->set_cross_axis_alignment(nu::BoxLayout::Start);
+  content_->AddChildView(CreateFixedSizeView(100, 100));
+  content_->AddChildView(CreateFixedSizeView(50, 50));
+  window_->SetContentBounds(nu::Rect(0, 0, 200, 200));
+  EXPECT_EQ(content_->preferred_size(), nu::Size(100, 150));
+  EXPECT_EQ(content_->child_at(0)->GetBounds(), nu::Rect(50, 50, 100, 100));
+  EXPECT_EQ(content_->child_at(1)->GetBounds(), nu::Rect(50, 150, 50, 50));
+}
+
+TEST_F(BoxLayoutTest, MainStretchCrossStart) {
+  layout_->set_main_axis_alignment(nu::BoxLayout::Stretch);
+  layout_->set_cross_axis_alignment(nu::BoxLayout::Start);
+  content_->AddChildView(CreateFixedSizeView(100, 100));
+  content_->AddChildView(CreateFixedSizeView(50, 50));
+  window_->SetContentBounds(nu::Rect(0, 0, 200, 200));
+  EXPECT_EQ(content_->preferred_size(), nu::Size(100, 150));
+  EXPECT_EQ(content_->child_at(0)->GetBounds(), nu::Rect(50, 0, 100, 100));
+  EXPECT_EQ(content_->child_at(1)->GetBounds(), nu::Rect(50, 100, 50, 100));
+}
+
+TEST_F(BoxLayoutTest, MainStretchCrossStretch) {
+  layout_->set_main_axis_alignment(nu::BoxLayout::Stretch);
+  layout_->set_cross_axis_alignment(nu::BoxLayout::Stretch);
+  content_->AddChildView(CreateFixedSizeView(100, 100));
+  content_->AddChildView(CreateFixedSizeView(50, 50));
+  window_->SetContentBounds(nu::Rect(0, 0, 200, 200));
+  EXPECT_EQ(content_->preferred_size(), nu::Size(100, 150));
+  EXPECT_EQ(content_->child_at(0)->GetBounds(), nu::Rect(0, 0, 200, 100));
+  EXPECT_EQ(content_->child_at(1)->GetBounds(), nu::Rect(0, 100, 200, 100));
+}
+
+TEST_F(BoxLayoutTest, HorizontalMainStartCrossStart) {
+  layout_->set_orientation(nu::BoxLayout::Horizontal);
+  layout_->set_main_axis_alignment(nu::BoxLayout::Start);
+  layout_->set_cross_axis_alignment(nu::BoxLayout::Start);
+  content_->AddChildView(CreateFixedSizeView(100, 100));
+  content_->AddChildView(CreateFixedSizeView(50, 50));
+  window_->SetContentBounds(nu::Rect(0, 0, 200, 200));
+  EXPECT_EQ(content_->preferred_size(), nu::Size(150, 100));
+  EXPECT_EQ(content_->child_at(0)->GetBounds(), nu::Rect(0, 50, 100, 100));
+  EXPECT_EQ(content_->child_at(1)->GetBounds(), nu::Rect(100, 50, 50, 50));
+}
+
+TEST_F(BoxLayoutTest, ChildSpacing) {
+  layout_->set_child_spacing(10);
+  layout_->set_main_axis_alignment(nu::BoxLayout::Center);
+  layout_->set_cross_axis_alignment(nu::BoxLayout::Center);
+  content_->AddChildView(CreateFixedSizeView(100, 100));
+  content_->AddChildView(CreateFixedSizeView(50, 50));
+  window_->SetContentBounds(nu::Rect(0, 0, 200, 200));
+  EXPECT_EQ(content_->preferred_size(), nu::Size(100, 160));
+  EXPECT_EQ(content_->child_at(0)->GetBounds(), nu::Rect(50, 20, 100, 100));
+  EXPECT_EQ(content_->child_at(1)->GetBounds(), nu::Rect(75, 130, 50, 50));
+}
+
+TEST_F(BoxLayoutTest, ChildSpacingSingle) {
+  layout_->set_child_spacing(10);
+  layout_->set_main_axis_alignment(nu::BoxLayout::Center);
+  layout_->set_cross_axis_alignment(nu::BoxLayout::Center);
+  content_->AddChildView(CreateFixedSizeView(50, 50));
+  window_->SetContentBounds(nu::Rect(0, 0, 200, 200));
+  EXPECT_EQ(content_->preferred_size(), nu::Size(50, 50));
+  EXPECT_EQ(content_->child_at(0)->GetBounds(), nu::Rect(75, 75, 50, 50));
+}
+
+TEST_F(BoxLayoutTest, InnerPaddingMainCenterCrossCenter) {
+  layout_->set_inner_padding(nu::Insets(1, 2, 3, 4));
+  layout_->set_main_axis_alignment(nu::BoxLayout::Center);
+  layout_->set_cross_axis_alignment(nu::BoxLayout::Center);
+  content_->AddChildView(CreateFixedSizeView(100, 100));
+  content_->AddChildView(CreateFixedSizeView(50, 50));
+  window_->SetContentBounds(nu::Rect(0, 0, 200, 200));
+  EXPECT_EQ(content_->preferred_size(), nu::Size(106, 154));
+  EXPECT_EQ(content_->child_at(0)->GetBounds(), nu::Rect(49, 24, 100, 100));
+  EXPECT_EQ(content_->child_at(1)->GetBounds(), nu::Rect(74, 124, 50, 50));
+}
+
+TEST_F(BoxLayoutTest, InnerPaddingMainEndCrossEnd) {
+  layout_->set_inner_padding(nu::Insets(1, 2, 3, 4));
+  layout_->set_main_axis_alignment(nu::BoxLayout::End);
+  layout_->set_cross_axis_alignment(nu::BoxLayout::End);
+  content_->AddChildView(CreateFixedSizeView(100, 100));
+  content_->AddChildView(CreateFixedSizeView(50, 50));
+  window_->SetContentBounds(nu::Rect(0, 0, 200, 200));
+  EXPECT_EQ(content_->preferred_size(), nu::Size(106, 154));
+  EXPECT_EQ(content_->child_at(0)->GetBounds(), nu::Rect(49, 47, 100, 100));
+  EXPECT_EQ(content_->child_at(1)->GetBounds(), nu::Rect(99, 147, 50, 50));
 }
