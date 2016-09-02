@@ -6,12 +6,8 @@
 
 namespace nu {
 
-BoxLayout::BoxLayout(Orientation orientation,
-                     Insets inner_padding,
-                     int child_spacing)
-    : orientation_(orientation),
-      inner_padding_(inner_padding),
-      child_spacing_(child_spacing) {
+BoxLayout::BoxLayout(Orientation orientation)
+    : orientation_(orientation) {
 }
 
 BoxLayout::~BoxLayout() {

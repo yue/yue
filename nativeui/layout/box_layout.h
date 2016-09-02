@@ -16,13 +16,14 @@ NATIVEUI_EXPORT class BoxLayout : public LayoutManager {
     Horizontal,
     Vertical,
   };
-  BoxLayout(Orientation orientation,
-            Insets inner_padding = Insets(),
-            int child_spacing = 0);
+  explicit BoxLayout(Orientation orientation);
 
   // LayoutManager:
   void Layout(Container* host) override;
   Size GetPreferredSize(Container* host) override;
+
+  void set_inner_padding(const Insets& padding) { inner_padding_ = padding; }
+  void set_child_spacing(int spacing) { child_spacing_ = spacing; }
 
  protected:
   ~BoxLayout() override;

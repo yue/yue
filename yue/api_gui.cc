@@ -51,6 +51,26 @@ struct Type<nu::Rect> {
 };
 
 template<>
+struct Type<nu::Insets> {
+  static constexpr const char* name = "yue.Insets";
+  static inline void Push(State* state, const nu::Insets& insets) {
+    lua::PushNewTable(state);
+    lua::RawSet(state, -1, "top", insets.top(), "left", insets.left(),
+                           "bottom", insets.bottom(), "right", insets.right());
+  }
+  static inline bool To(State* state, int index, nu::Insets* out) {
+    if (GetType(state, index) != LuaType::Table)
+      return false;
+    int top, left, bottom, right;;
+    if (!RawGetAndPop(state, index, "top", &top, "left", &left,
+                                    "bottom", &bottom, "right", &right))
+      return false;
+    *out = nu::Insets(top, left, bottom, right);
+    return true;
+  }
+};
+
+template<>
 struct Type<nu::View> {
   static constexpr const char* name = "yue.View";
   static void BuildMetaTable(State* state, int index) {
@@ -201,9 +221,27 @@ struct Type<nu::BoxLayout> {
   using base = nu::LayoutManager;
   static constexpr const char* name = "yue.BoxLayout";
   static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index,
-           "new",
-           &MetaTable<nu::BoxLayout>::NewInstance<nu::BoxLayout::Orientation>);
+    RawSet(state, index, "new", &New);
+  }
+  static nu::BoxLayout* New(CallContext* context) {
+    nu::BoxLayout::Orientation orientation = nu::BoxLayout::Vertical;
+    if (To(context->state, 1, &orientation)) {
+      return new nu::BoxLayout(orientation);
+    } else if (GetType(context->state, 1) == LuaType::Table) {
+      RawGetAndPop(context->state, 1, "orientation", &orientation);
+      auto* box = new nu::BoxLayout(orientation);
+      int n;
+      if (RawGetAndPop(context->state, 1, "childspacing", &n))
+        box->set_child_spacing(n);
+      nu::Insets insets;
+      if (RawGetAndPop(context->state, 1, "innerpadding", &insets))
+        box->set_inner_padding(insets);
+      return box;
+    } else {
+      context->has_error = true;
+      Push(context->state, "BoxLayout must be created with string or table");
+      return nullptr;
+    }
   }
 };
 
