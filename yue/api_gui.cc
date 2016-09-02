@@ -245,7 +245,8 @@ struct Type<nu::BoxLayout> {
   using base = nu::LayoutManager;
   static constexpr const char* name = "yue.BoxLayout";
   static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index, "new", &New);
+    RawSet(state, index, "new", &New,
+                         "setflexat", &nu::BoxLayout::SetFlexAt);
   }
   static nu::BoxLayout* New(CallContext* context) {
     nu::BoxLayout::Orientation orientation = nu::BoxLayout::Vertical;
