@@ -29,5 +29,17 @@ TEST_F(GroupTest, ContentView) {
 TEST_F(GroupTest, Title) {
   scoped_refptr<nu::Group> group(new nu::Group("title"));
   group->SetTitle("test");
-  ASSERT_EQ(group->GetTitle(), "test");
+  EXPECT_EQ(group->GetTitle(), "test");
+}
+
+TEST_F(GroupTest, PreferredSize) {
+  nu::Size preferred_size(300, 300);
+  scoped_refptr<nu::Group> group(new nu::Group("title"));
+  nu::Container* view = new nu::Container;
+  group->SetContentView(view);
+  EXPECT_LT(group->preferred_size().width(), preferred_size.width());
+  EXPECT_LT(group->preferred_size().height(), preferred_size.height());
+  view->SetPreferredSize(preferred_size);
+  EXPECT_GT(group->preferred_size().width(), preferred_size.width());
+  EXPECT_GT(group->preferred_size().height(), preferred_size.height());
 }

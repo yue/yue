@@ -17,5 +17,14 @@ class LabelTest : public testing::Test {
 
 TEST_F(LabelTest, SetText) {
   label_->SetText("test");
-  ASSERT_EQ(label_->GetText(), "test");
+  EXPECT_EQ(label_->GetText(), "test");
+}
+
+TEST_F(LabelTest, PreferredSize) {
+  nu::Size preferred_size = label_->preferred_size();
+  label_->SetText("test");
+  EXPECT_NE(preferred_size, label_->preferred_size());
+  preferred_size = label_->preferred_size();
+  label_->SetText("longlongtest");
+  EXPECT_NE(preferred_size, label_->preferred_size());
 }
