@@ -63,7 +63,7 @@ TEST_F(ContainerTest, RemoveChildView) {
 }
 
 TEST_F(ContainerTest, SetBounds) {
-  TestContainer* c = new TestContainer;
+  scoped_refptr<TestContainer> c = new TestContainer;
   EXPECT_EQ(c->layout_count(), 0);
   c->SetBounds(nu::Rect(0, 0, 100, 100));
   EXPECT_EQ(c->layout_count(), 1);
@@ -114,10 +114,20 @@ TEST_F(ContainerTest, MoveBetweenContainers) {
   scoped_refptr<nu::Label> v1 = new nu::Label;
   scoped_refptr<nu::Label> v2 = new nu::Label;
   nu::Container* c1 = new nu::Container;
-  c1->SetLayoutManager(new nu::BoxLayout(nu::BoxLayout::Vertical));
+  nu::BoxLayout* l1 = new nu::BoxLayout(nu::BoxLayout::Vertical);
+  l1->set_main_axis_alignment(nu::BoxLayout::Stretch);
+  l1->set_cross_axis_alignment(nu::BoxLayout::Stretch);
+  c1->SetLayoutManager(l1);
   nu::Container* c2 = new nu::Container;
-  c2->SetLayoutManager(new nu::BoxLayout(nu::BoxLayout::Horizontal));
-  container_->SetLayoutManager(new nu::BoxLayout(nu::BoxLayout::Horizontal));
+  nu::BoxLayout* l2 = new nu::BoxLayout(nu::BoxLayout::Horizontal);
+  l2->set_main_axis_alignment(nu::BoxLayout::Stretch);
+  l2->set_cross_axis_alignment(nu::BoxLayout::Stretch);
+  c2->SetLayoutManager(l2);
+  nu::BoxLayout* l3 = new nu::BoxLayout(nu::BoxLayout::Horizontal);
+  l3->set_main_axis_alignment(nu::BoxLayout::Stretch);
+  l3->set_cross_axis_alignment(nu::BoxLayout::Stretch);
+  container_->SetLayoutManager(l3);
+
   c1->AddChildView(v1.get());
   c1->AddChildView(v2.get());
   container_->AddChildView(c1);
@@ -137,4 +147,15 @@ TEST_F(ContainerTest, MoveBetweenContainers) {
   EXPECT_EQ(v2->GetBounds(), nu::Rect(50, 0, 50, 400));
   EXPECT_EQ(v1->GetWindowOrigin(), nu::Point(100, 0));
   EXPECT_EQ(v2->GetWindowOrigin(), nu::Point(150, 0));
+}
+
+TEST_F(ContainerTest, ChildSetPreferredSize) {
+  nu::Container* child = new nu::Container;
+  EXPECT_EQ(container_->layout_count(), 1);
+  container_->AddChildView(child);
+  EXPECT_EQ(container_->layout_count(), 2);
+  nu::Size preferred_size(100, 100);
+  child->SetPreferredSize(preferred_size);
+  EXPECT_EQ(container_->layout_count(), 3);
+  EXPECT_EQ(container_->preferred_size(), preferred_size);
 }
