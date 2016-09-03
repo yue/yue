@@ -29,4 +29,13 @@ std::string Group::GetTitle() const {
   return gtk_frame_get_label(GTK_FRAME(view()));
 }
 
+Size Group::GetBorderSize() const {
+  GdkRectangle outer;
+  gtk_widget_get_allocation(view(), &outer);
+  GdkRectangle inner;
+  GTK_FRAME_GET_CLASS(view())->compute_child_allocation(
+      GTK_FRAME(view()), &inner);
+  return Size(outer.width - inner.width, outer.height - inner.height);
+}
+
 }  // namespace nu

@@ -23,11 +23,9 @@ Group::~Group() {
 }
 
 bool Group::UpdatePreferredSize() {
-  Size outer = GetBounds().size();
-  Size inner = GetContentView()->GetBounds().size();
+  Size border = GetBorderSize();
   Size preferred_size = GetContentView()->preferred_size();
-  preferred_size.Enlarge(outer.width() - inner.width(),
-                         outer.height() - inner.height());
+  preferred_size.Enlarge(border.width(), border.height());
   if (SetPreferredSize(preferred_size))
     content_view_->Layout();
   return false;

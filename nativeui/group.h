@@ -27,6 +27,9 @@ NATIVEUI_EXPORT class Group : public View {
  protected:
   ~Group() override;
 
+  // Get the spaces taken by the border of group.
+  Size GetBorderSize() const;
+
   // Following platform implementations should only be called by wrappers.
   void PlatformInit();
   void PlatformSetContentView(Container* container);
