@@ -64,11 +64,13 @@ void BoxLayout::Layout(Container* host) {
     }
   } else {
     // For flex layout, all spaces on main axis will be taken.
-    free_space = child_area.width() - host_size.width();
-    if (orientation_ == Horizontal)
+    if (orientation_ == Horizontal) {
+      free_space = child_area.width() - host_size.width();
       host_size.set_width(child_area.width());
-    else
+    } else {
+      free_space = child_area.height() - host_size.height();
       host_size.set_height(child_area.height());
+    }
   }
 
   // Start layout.

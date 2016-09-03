@@ -171,3 +171,15 @@ TEST_F(BoxLayoutTest, InnerPaddingMainEndCrossEnd) {
   EXPECT_EQ(content_->child_at(0)->GetBounds(), nu::Rect(49, 47, 100, 100));
   EXPECT_EQ(content_->child_at(1)->GetBounds(), nu::Rect(99, 147, 50, 50));
 }
+
+TEST_F(BoxLayoutTest, Flex) {
+  layout_->set_main_axis_alignment(nu::BoxLayout::Start);
+  layout_->set_cross_axis_alignment(nu::BoxLayout::Start);
+  layout_->SetFlexAt(1, 1);
+  content_->AddChildView(CreateFixedSizeView(100, 100));
+  content_->AddChildView(CreateFixedSizeView(50, 50));
+  window_->SetContentBounds(nu::Rect(0, 0, 200, 200));
+  EXPECT_EQ(content_->preferred_size(), nu::Size(100, 150));
+  EXPECT_EQ(content_->child_at(0)->GetBounds(), nu::Rect(50, 0, 100, 100));
+  EXPECT_EQ(content_->child_at(1)->GetBounds(), nu::Rect(50, 100, 50, 100));
+}
