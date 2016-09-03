@@ -12,14 +12,14 @@ FillLayout::FillLayout() {
 FillLayout::~FillLayout() {
 }
 
-void FillLayout::Layout(Container* host) {
+void FillLayout::Layout(Container* host) const {
   if (host->child_count() > 0)
     host->child_at(0)->SetPixelBounds(Rect(host->GetPixelBounds().size()));
 }
 
-Size FillLayout::GetPreferredSize(Container* host) {
+Size FillLayout::GetPixelPreferredSize(Container* host) const {
   if (host->child_count() > 0)
-    return host->child_at(0)->preferred_size();
+    return host->child_at(0)->GetPixelPreferredSize();
   else
     return Size();
 }

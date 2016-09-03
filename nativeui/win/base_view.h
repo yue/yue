@@ -39,6 +39,10 @@ class BaseView {
   // Invalidate the view and trigger a redraw.
   void Invalidate(const Rect& dirty = Rect());
 
+  // Set the preferred size.
+  void set_pixel_preferred_size(Size size) { preferred_size_ = size; }
+  Size pixel_preferred_size() const { return preferred_size_; }
+
   // Whether the view is visible.
   void set_visible(bool visible) { is_visible_ = visible; }
   bool is_visible() const { return is_visible_; }
@@ -71,6 +75,9 @@ class BaseView {
 
   // The bounds relative to parent view.
   Rect bounds_;
+
+  // The preferred size of the view.
+  Size preferred_size_;
 
   // The offset relative the parent HWND.
   Point window_origin_;

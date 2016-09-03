@@ -11,8 +11,8 @@ namespace nu {
 
 NATIVEUI_EXPORT class LayoutManager : public base::RefCounted<LayoutManager> {
  public:
-  virtual void Layout(Container* host) = 0;
-  virtual Size GetPreferredSize(Container* host) = 0;
+  virtual void Layout(Container* host) const = 0;
+  virtual Size GetPixelPreferredSize(Container* host) const = 0;
 
  protected:
   LayoutManager() {}

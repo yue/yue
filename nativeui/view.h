@@ -36,10 +36,15 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
   // Set the preferred size of the view, returns whether current view should
   // do a layout.
   bool SetPreferredSize(const Size& size);
+  bool SetPixelPreferredSize(const Size& size);
+  Size GetPixelPreferredSize() const;
 
   // A child changed its preferred size, returns true if the child should do a
   // layout.
   virtual bool UpdatePreferredSize();
+
+  // Convert the DIP geometry to pixel geometry.
+  int DIPToPixel(int length) const;
 
   // Get the size the view would like to be.
   Size preferred_size() const { return preferred_size_; }
@@ -56,6 +61,9 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
 
   // Called by subclasses to take the ownership of |view|.
   void TakeOverView(NativeView view);
+
+  // Called by sublcasses for setting preferred size.
+  bool DoSetPreferredSize(const Size& size);
 
  private:
   friend class base::RefCounted<View>;

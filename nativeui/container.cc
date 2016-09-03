@@ -19,7 +19,7 @@ Container::~Container() {
 }
 
 bool Container::UpdatePreferredSize() {
-  if (SetPreferredSize(layout_manager_->GetPreferredSize(this)))
+  if (SetPixelPreferredSize(layout_manager_->GetPixelPreferredSize(this)))
     Layout();
 
   // The layout of children is managed by Container.

@@ -44,6 +44,26 @@ Point View::GetWindowPixelOrigin() const {
   return view_->GetWindowPixelOrigin();
 }
 
+bool View::SetPreferredSize(const Size& size) {
+  view_->set_pixel_preferred_size(
+      ScaleToCeiledSize(size, view_->scale_factor()));
+  return DoSetPreferredSize(size);
+}
+
+bool View::SetPixelPreferredSize(const Size& size) {
+  view_->set_pixel_preferred_size(size);
+  return DoSetPreferredSize(
+      ScaleToCeiledSize(size, 1.0f / view_->scale_factor()));
+}
+
+Size View::GetPixelPreferredSize() const {
+  return view_->pixel_preferred_size();
+}
+
+int View::DIPToPixel(int length) const {
+  return static_cast<int>(std::ceil(length * view_->scale_factor()));
+}
+
 void View::PlatformSetVisible(bool visible) {
   view_->set_visible(visible);
 }

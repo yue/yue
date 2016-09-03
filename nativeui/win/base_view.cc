@@ -43,8 +43,11 @@ void BaseView::SetParent(BaseView* parent) {
   window_ = parent ? parent->window_ : nullptr;
 
   // Scale the bounds after moving to a new parent.
-  if (old_scale_factor != scale_factor())
+  if (old_scale_factor != scale_factor()) {
     bounds_ = ScaleToEnclosingRect(bounds_, scale_factor() / old_scale_factor);
+    preferred_size_ = ScaleToCeiledSize(preferred_size_,
+                                        scale_factor() / old_scale_factor);
+  }
 }
 
 void BaseView::BecomeContentView(WindowImpl* parent) {
@@ -55,8 +58,11 @@ void BaseView::BecomeContentView(WindowImpl* parent) {
   window_ = parent;
 
   // Scale the bounds after moving to a new parent.
-  if (old_scale_factor != scale_factor())
+  if (old_scale_factor != scale_factor()) {
     bounds_ = ScaleToEnclosingRect(bounds_, scale_factor() / old_scale_factor);
+    preferred_size_ = ScaleToCeiledSize(preferred_size_,
+                                        scale_factor() / old_scale_factor);
+  }
 }
 
 void BaseView::Invalidate(const Rect& dirty) {

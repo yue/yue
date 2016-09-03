@@ -14,7 +14,7 @@ Group::Group(const std::string& title) {
 
   // Give group a initialize size otherwise we will be unable to calculate the
   // preferred size.
-  SetBounds(Rect(0, 0, 100, 100));
+  SetPixelBounds(Rect(0, 0, 100, 100));
 
   SetTitle(title);
 }
@@ -24,9 +24,9 @@ Group::~Group() {
 
 bool Group::UpdatePreferredSize() {
   Size border = GetBorderSize();
-  Size preferred_size = GetContentView()->preferred_size();
+  Size preferred_size = GetContentView()->GetPixelPreferredSize();
   preferred_size.Enlarge(border.width(), border.height());
-  if (SetPreferredSize(preferred_size))
+  if (SetPixelPreferredSize(preferred_size))
     content_view_->Layout();
   return false;
 }

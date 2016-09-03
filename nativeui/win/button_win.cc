@@ -14,7 +14,7 @@ namespace nu {
 
 namespace {
 
-const int kButtonPadding = 15;
+const int kButtonPadding = 7;
 
 class ButtonView : public SubwinView {
  public:
@@ -49,7 +49,7 @@ void Button::SetTitle(const std::string& title) {
   // Windows doesn't preferred size for buttons, so just add some padding.
   Size text_size = ToCeiledSize(MeasureText(Font(), wtitle));
   text_size.Enlarge(kButtonPadding, kButtonPadding);
-  SetPreferredSize(text_size);
+  SetPixelPreferredSize(text_size);
 }
 
 std::string Button::GetTitle() const {

@@ -64,6 +64,22 @@ Point View::GetWindowPixelOrigin() const {
   return GetWindowOrigin();
 }
 
+bool View::SetPreferredSize(const Size& size) {
+  return DoSetPreferredSize(size);
+}
+
+bool View::SetPixelPreferredSize(const Size& size) {
+  return DoSetPreferredSize(size);
+}
+
+Size View::GetPixelPreferredSize() const {
+  return preferred_size();
+}
+
+int View::DIPToPixel(int length) const {
+  return length;
+}
+
 void View::PlatformSetVisible(bool visible) {
   [view_ setHidden:!visible];
 }

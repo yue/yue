@@ -14,8 +14,8 @@ NATIVEUI_EXPORT class FillLayout : public LayoutManager {
   FillLayout();
 
   // LayoutManager:
-  void Layout(Container* host) override;
-  Size GetPreferredSize(Container* host) override;
+  void Layout(Container* host) const override;
+  Size GetPixelPreferredSize(Container* host) const override;
 
  protected:
   ~FillLayout() override;

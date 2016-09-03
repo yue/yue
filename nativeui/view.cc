@@ -10,20 +10,20 @@ namespace nu {
 
 void View::SetVisible(bool visible) {
   PlatformSetVisible(visible);
-  SetPreferredSize(Size());
+  SetPixelPreferredSize(Size());
 }
 
-bool View::SetPreferredSize(const Size& size) {
+bool View::UpdatePreferredSize() {
+  return false;
+}
+
+bool View::DoSetPreferredSize(const Size& size) {
   preferred_size_ = size;
 
   if (parent_)
     return parent_->UpdatePreferredSize();
   else
     return true;
-}
-
-bool View::UpdatePreferredSize() {
-  return false;
 }
 
 }  // namespace nu
