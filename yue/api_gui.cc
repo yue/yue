@@ -137,10 +137,17 @@ struct Type<nu::Container> {
            "setlayout", &nu::Container::SetLayoutManager,
            "getlayout", &nu::Container::GetLayoutManager,
            "addchildview", &nu::Container::AddChildView,
-           "addchildviewat", &nu::Container::AddChildViewAt,
+           "addchildviewat", &AddChildViewAt,
            "removechildview", &nu::Container::RemoveChildView,
            "childcount", &nu::Container::child_count,
-           "childat", &nu::Container::child_at);
+           "childat", &ChildAt);
+  }
+  // Transalte 1-based index to 0-based.
+  static inline void AddChildViewAt(nu::Container* c, nu::View* view, int i) {
+    c->AddChildViewAt(view, i - 1);
+  }
+  static inline nu::View* ChildAt(nu::Container* container, int i) {
+    return container->child_at(i - 1);
   }
 };
 
@@ -246,7 +253,7 @@ struct Type<nu::BoxLayout> {
   static constexpr const char* name = "yue.BoxLayout";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index, "new", &New,
-                         "setflexat", &nu::BoxLayout::SetFlexAt,
+                         "setflexat", &SetFlexAt,
                          "setorientation", &nu::BoxLayout::set_orientation);
   }
   static nu::BoxLayout* New(CallContext* context) {
@@ -273,6 +280,10 @@ struct Type<nu::BoxLayout> {
       Push(context->state, "BoxLayout must be created with string or table");
       return nullptr;
     }
+  }
+  // Transalte 1-based index to 0-based.
+  static inline void SetFlexAt(nu::BoxLayout* layout, int flex, int i) {
+    layout->SetFlexAt(flex, i - 1);
   }
 };
 

@@ -156,7 +156,7 @@ Size BoxLayout::GetPreferredSize(Container* host) {
   return size;
 }
 
-void BoxLayout::SetFlexAt(int index, int flex) {
+void BoxLayout::SetFlexAt(int flex, int index) {
   if (static_cast<size_t>(index) >= flex_.size())
     flex_.resize(index + 1, 0);
   flex_[index] = flex;

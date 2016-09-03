@@ -37,7 +37,7 @@ NATIVEUI_EXPORT class BoxLayout : public LayoutManager {
   //
   // A flex of 0 means this view is not resized. Flex values must not be
   // negative.
-  void SetFlexAt(int index, int flex);
+  void SetFlexAt(int flex, int index);
 
   void set_orientation(Orientation orientation) { orientation_ = orientation; }
   void set_inner_padding(const Insets& padding) { inner_padding_ = padding; }
