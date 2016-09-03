@@ -4,11 +4,6 @@
 
 import("//testing/test.gni")
 
-declare_args() {
-  # Whether to build for GTK+3.
-  use_gtk3 = false
-}
-
 source_set("nativeui") {
   sources = [
     "nativeui.h",
@@ -80,6 +75,8 @@ source_set("nativeui") {
     "layout/layout_manager.h",
     "gtk/gtk_event_loop.cc",
     "gtk/gtk_event_loop.h",
+    "gtk/widget_util.cc",
+    "gtk/widget_util.h",
     "gtk/button_gtk.cc",
     "gtk/container_gtk.cc",
     "gtk/group_gtk.cc",
@@ -121,11 +118,7 @@ source_set("nativeui") {
   ]
 
   if (is_linux) {
-    if (use_gtk3) {
-      public_configs = [ "//build/config/linux/gtk3" ]
-    } else {
-      public_configs = [ "//build/config/linux/gtk2" ]
-    }
+    public_configs = [ "//build/config/linux/gtk3" ]
 
     # Do not warn on using deprecated GTK APIs.
     cflags_cc = [ "-Wno-deprecated-declarations" ]

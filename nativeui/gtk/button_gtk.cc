@@ -4,6 +4,8 @@
 
 #include "nativeui/button.h"
 
+#include "nativeui/gtk/widget_util.h"
+
 namespace nu {
 
 namespace {
@@ -20,6 +22,8 @@ Button::Button(const std::string& title) {
   gtk_widget_show(view());
 
   g_signal_connect(view(), "clicked", G_CALLBACK(OnClick), this);
+
+  SetPreferredSize(GetPreferredSizeForWidget(view()));
 }
 
 Button::~Button() {
@@ -27,6 +31,7 @@ Button::~Button() {
 
 void Button::SetTitle(const std::string& title) {
   gtk_button_set_label(GTK_BUTTON(view()), title.c_str());
+  SetPreferredSize(GetPreferredSizeForWidget(view()));
 }
 
 std::string Button::GetTitle() const {

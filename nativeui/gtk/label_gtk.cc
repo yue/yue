@@ -4,12 +4,16 @@
 
 #include "nativeui/label.h"
 
+#include "nativeui/gtk/widget_util.h"
+
 namespace nu {
 
 Label::Label(const std::string& text) {
   set_view(gtk_label_new(text.c_str()));
   g_object_ref_sink(view());
   gtk_widget_show(view());
+
+  SetPreferredSize(GetPreferredSizeForWidget(view()));
 }
 
 Label::~Label() {
@@ -17,6 +21,7 @@ Label::~Label() {
 
 void Label::SetText(const std::string& text) {
   gtk_label_set_text(GTK_LABEL(view()), text.c_str());
+  SetPreferredSize(GetPreferredSizeForWidget(view()));
 }
 
 std::string Label::GetText() {

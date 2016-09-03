@@ -57,4 +57,12 @@ Point View::GetWindowPixelOrigin() const {
   return GetWindowOrigin();
 }
 
+void View::PlatformSetVisible(bool visible) {
+  gtk_widget_set_visible(view_, visible);
+}
+
+bool View::IsVisible() const {
+  return gtk_widget_get_visible(view_);
+}
+
 }  // namespace nu
