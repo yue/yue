@@ -25,6 +25,10 @@ void Container::PlatformInit() {
   g_object_ref_sink(view());
   gtk_widget_show(view());
 
+  // Give the container a small initial size, otherwise GTK might give warnings.
+  GdkRectangle rect = { 0, 0, 10, 10 };
+  gtk_widget_size_allocate(view(), &rect);
+
   g_signal_connect_after(
       view(), "size-allocate", G_CALLBACK(OnSizeAllocate), this);
 }
