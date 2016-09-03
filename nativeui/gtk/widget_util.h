@@ -5,8 +5,8 @@
 #ifndef NATIVEUI_GTK_WIDGET_UTIL_H_
 #define NATIVEUI_GTK_WIDGET_UTIL_H_
 
-#include "nativeui/types.h"
 #include "nativeui/gfx/geometry/size.h"
+#include "nativeui/types.h"
 
 namespace nu {
 

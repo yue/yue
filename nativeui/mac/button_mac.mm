@@ -38,7 +38,7 @@ Button::Button(const std::string& title) {
   button.bezelStyle = NSRoundedBezelStyle;
   button.target = [[NUButtonDelegate alloc] initWithShell:this];
   button.action = @selector(onClick:);
-  set_view(button);
+  TakeOverView(button);
 
   SetTitle(title);
 }

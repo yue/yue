@@ -54,7 +54,8 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
   View();
   virtual ~View();
 
-  void set_view(NativeView view) { view_ = view; }
+  // Called by subclasses to take the ownership of |view|.
+  void TakeOverView(NativeView view);
 
  private:
   friend class base::RefCounted<View>;

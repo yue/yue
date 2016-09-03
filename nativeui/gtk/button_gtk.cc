@@ -17,13 +17,10 @@ void OnClick(GtkButton* width, Button* button) {
 }  // namespace
 
 Button::Button(const std::string& title) {
-  set_view(gtk_button_new_with_label(title.c_str()));
-  g_object_ref_sink(view());
-  gtk_widget_show(view());
+  TakeOverView(gtk_button_new_with_label(title.c_str()));
+  SetPreferredSize(GetPreferredSizeForWidget(view()));
 
   g_signal_connect(view(), "clicked", G_CALLBACK(OnClick), this);
-
-  SetPreferredSize(GetPreferredSizeForWidget(view()));
 }
 
 Button::~Button() {

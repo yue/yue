@@ -15,6 +15,10 @@ View::~View() {
   delete view_;
 }
 
+void View::TakeOverView(NativeView view) {
+  view_ = view;
+}
+
 void View::SetBounds(const Rect& bounds) {
   view_->SetBounds(bounds);
 }

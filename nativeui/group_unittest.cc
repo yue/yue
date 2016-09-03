@@ -15,7 +15,6 @@ TEST_F(GroupTest, ContentView) {
   nu::Container* view = new nu::Container;
   group->SetContentView(view);
   EXPECT_EQ(group->GetContentView(), view);
-  EXPECT_NE(view->GetWindowPixelOrigin(), nu::Point(0, 0));
 
   scoped_refptr<nu::Window> window(new nu::Window(nu::Window::Options()));
   window->SetBounds(nu::Rect(0, 0, 100, 100));

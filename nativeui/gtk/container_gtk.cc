@@ -21,9 +21,7 @@ void OnSizeAllocate(GtkWidget* view, GtkAllocation* alloc,
 }  // namespace
 
 void Container::PlatformInit() {
-  set_view(gtk_fixed_new());
-  g_object_ref_sink(view());
-  gtk_widget_show(view());
+  TakeOverView(gtk_fixed_new());
 
   // Give the container a small initial size, otherwise GTK might give warnings.
   GdkRectangle rect = { 0, 0, 10, 10 };

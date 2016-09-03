@@ -18,6 +18,10 @@ View::~View() {
   [view_ release];
 }
 
+void View::TakeOverView(NativeView view) {
+  view_ = view;
+}
+
 void View::SetBounds(const Rect& bounds) {
   CGRect frame = bounds.ToCGRect();
   if (parent_) {

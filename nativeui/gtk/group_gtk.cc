@@ -7,9 +7,7 @@
 namespace nu {
 
 void Group::PlatformInit() {
-  set_view(gtk_frame_new(""));
-  g_object_ref_sink(view());
-  gtk_widget_show(view());
+  TakeOverView(gtk_frame_new(""));
 }
 
 void Group::PlatformSetContentView(Container* container) {

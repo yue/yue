@@ -11,7 +11,7 @@
 namespace nu {
 
 void Group::PlatformInit() {
-  set_view([[NSBox alloc] init]);
+  TakeOverView([[NSBox alloc] init]);
 }
 
 void Group::PlatformSetContentView(Container* container) {

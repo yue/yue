@@ -51,7 +51,7 @@ Size GetPreferredSizeFroText(const std::string& text) {
 }  // namespace
 
 Label::Label(const std::string& text) {
-  set_view([[LabelView alloc] init]);
+  TakeOverView([[LabelView alloc] init]);
   SetText(text);
 }
 

@@ -100,7 +100,7 @@ class GroupView : public BaseView {
 }  // namespace
 
 void Group::PlatformInit() {
-  set_view(new GroupView(this));
+  TakeOverView(new GroupView(this));
 }
 
 void Group::PlatformSetContentView(Container* container) {

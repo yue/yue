@@ -57,7 +57,7 @@ class ContainerView : public BaseView {
 }  // namespace
 
 void Container::PlatformInit() {
-  set_view(new ContainerView(this));
+  TakeOverView(new ContainerView(this));
 }
 
 void Container::PlatformAddChildView(View* child) {

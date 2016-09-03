@@ -54,7 +54,7 @@ class LabelView : public BaseView {
 }  // namespace
 
 Label::Label(const std::string& text) {
-  set_view(new LabelView());
+  TakeOverView(new LabelView());
   SetText(text);
 }
 

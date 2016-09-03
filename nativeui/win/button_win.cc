@@ -30,7 +30,7 @@ class ButtonView : public SubwinView {
 }  // namespace
 
 Button::Button(const std::string& title) {
-  set_view(new ButtonView(this));
+  TakeOverView(new ButtonView(this));
   SetTitle(title);
 }
 

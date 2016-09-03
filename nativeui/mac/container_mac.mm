@@ -42,7 +42,7 @@
 namespace nu {
 
 void Container::PlatformInit() {
-  set_view([[ContainerView alloc] initWithWrapper:this]);
+  TakeOverView([[ContainerView alloc] initWithWrapper:this]);
 }
 
 void Container::PlatformAddChildView(View* child) {
