@@ -15,7 +15,7 @@ void BaseView::SetPixelBounds(const Rect& bounds) {
     window_origin_ += parent()->GetWindowPixelOrigin().OffsetFromOrigin();
 }
 
-Rect BaseView::GetPixelBounds() {
+Rect BaseView::GetPixelBounds() const {
   return bounds_;
 }
 

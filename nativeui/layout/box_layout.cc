@@ -40,7 +40,7 @@ void BoxLayout::Layout(Container* host) {
 
   // For stretch main axis alignment, all children are streched to fill the
   // child area of the view.
-  int main_axis_size;
+  int main_axis_size = 0;
   if (flex_sum == 0 && main_axis_alignment_ == Stretch) {
     main_axis_size = orientation_ ==
         Horizontal ? child_area.width() : child_area.height();

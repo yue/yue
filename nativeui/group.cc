@@ -10,12 +10,12 @@ namespace nu {
 
 Group::Group(const std::string& title) {
   PlatformInit();
+  SetContentView(new Container);
 
   // Give group a initialize size otherwise we will be unable to calculate the
   // preferred size.
   SetBounds(Rect(0, 0, 100, 100));
 
-  SetContentView(new Container);
   SetTitle(title);
 }
 

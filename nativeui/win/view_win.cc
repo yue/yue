@@ -44,4 +44,12 @@ Point View::GetWindowPixelOrigin() const {
   return view_->GetWindowPixelOrigin();
 }
 
+void View::PlatformSetVisible(bool visible) {
+  view_->set_visible(visible);
+}
+
+bool View::IsVisible() const {
+  return view_->is_visible();
+}
+
 }  // namespace nu

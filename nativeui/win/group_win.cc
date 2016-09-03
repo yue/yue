@@ -31,7 +31,7 @@ class GroupView : public BaseView {
 
     // Update the rect of the title.
     title_bounds_ = Rect(Point(kTitleLeftMargin * scale_factor(), 0),
-                              ToFlooredSize(MeasureText(font_, title_)));
+                              ToCeiledSize(MeasureText(font_, title_)));
     border_insets_ = Insets(title_bounds_.height());
   }
 
@@ -43,6 +43,13 @@ class GroupView : public BaseView {
     Rect child_bounds(Rect(GetPixelBounds().size()));
     child_bounds.Inset(border_insets_);
     delegate_->GetContentView()->view()->SetPixelBounds(child_bounds);
+  }
+
+  Rect GetBorder() const {
+    Rect bounds = GetPixelBounds();
+    int text_height = title_bounds_.height();
+    return Rect(text_height / 2, text_height / 2,
+                bounds.width() - text_height, bounds.height() - text_height);
   }
 
   void SetPixelBounds(const Rect& pixel_bounds) override {
@@ -60,10 +67,7 @@ class GroupView : public BaseView {
                         &brush);
 
     // Calculate the border bounds.
-    int text_height = title_bounds.height();
-    Rect border_bounds(text_height / 2, text_height / 2,
-                            GetPixelBounds().width() - text_height,
-                            GetPixelBounds().height() - text_height);
+    Rect border_bounds = GetBorder();
     border_bounds += GetWindowPixelOrigin().OffsetFromOrigin();
 
     // Draw border.
@@ -115,6 +119,10 @@ void Group::SetTitle(const std::string& title) {
 
 std::string Group::GetTitle() const {
   return base::UTF16ToUTF8(static_cast<GroupView*>(view())->GetTitle());
+}
+
+Size Group::GetBorderSize() const {
+  return static_cast<GroupView*>(view())->GetBorder().size();
 }
 
 }  // namespace nu

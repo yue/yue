@@ -33,7 +33,7 @@ class LabelView : public BaseView {
       return;
 
     // Pring the text in middle of rect.
-    Size text_size = ToFlooredSize(MeasureText(font_, text_));
+    Size text_size = ToCeiledSize(MeasureText(font_, text_));
     Size ctrl_size = GetPixelBounds().size();
     Point origin((ctrl_size.width() - text_size.width()) / 2,
                       (ctrl_size.height() - text_size.height()) / 2);
@@ -63,8 +63,11 @@ Label::~Label() {
 
 void Label::SetText(const std::string& text) {
   LabelView* label = static_cast<LabelView*>(view());
-  label->SetText(base::UTF8ToUTF16(text));
-  label->Invalidate();
+  base::string16 wtext = base::UTF8ToUTF16(text);
+  label->SetText(wtext);
+
+  if (SetPreferredSize(ToCeiledSize(MeasureText(Font(), wtext))))
+    label->Invalidate();
 }
 
 std::string Label::GetText() {

@@ -6,11 +6,15 @@
 
 #include "base/strings/string_util.h"
 #include "base/strings/utf_string_conversions.h"
+#include "nativeui/gfx/geometry/size_conversions.h"
+#include "nativeui/gfx/text.h"
 #include "nativeui/win/subwin_view.h"
 
 namespace nu {
 
 namespace {
+
+const int kButtonPadding = 15;
 
 class ButtonView : public SubwinView {
  public:
@@ -39,7 +43,13 @@ Button::~Button() {
 
 void Button::SetTitle(const std::string& title) {
   SubwinView* button = static_cast<SubwinView*>(view());
-  ::SetWindowTextW(button->hwnd(), base::UTF8ToUTF16(title).c_str());
+  base::string16 wtitle = base::UTF8ToUTF16(title);
+  ::SetWindowTextW(button->hwnd(), wtitle.c_str());
+
+  // Windows doesn't preferred size for buttons, so just add some padding.
+  Size text_size = ToCeiledSize(MeasureText(Font(), wtitle));
+  text_size.Enlarge(kButtonPadding, kButtonPadding);
+  SetPreferredSize(text_size);
 }
 
 std::string Button::GetTitle() const {

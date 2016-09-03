@@ -19,7 +19,7 @@ class BaseView {
 
   // Subclass should override this.
   virtual void SetPixelBounds(const Rect& pixel_bounds);
-  virtual Rect GetPixelBounds();
+  virtual Rect GetPixelBounds() const;
 
   // Draw the content.
   virtual void Draw(Gdiplus::Graphics* context, const Rect& dirty) {}
@@ -39,6 +39,10 @@ class BaseView {
   // Invalidate the view and trigger a redraw.
   void Invalidate(const Rect& dirty = Rect());
 
+  // Whether the view is visible.
+  void set_visible(bool visible) { is_visible_ = visible; }
+  bool is_visible() const { return is_visible_; }
+
   // Parent view and host window.
   WindowImpl* window() const { return window_; }
   BaseView* parent() const { return parent_; }
@@ -57,6 +61,9 @@ class BaseView {
 
  private:
   bool is_virtual_;
+
+  // The visible state.
+  bool is_visible_ = true;
 
   bool is_content_view_ = false;
   WindowImpl* window_ = nullptr;

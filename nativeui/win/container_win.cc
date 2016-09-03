@@ -19,12 +19,15 @@ class ContainerView : public BaseView {
   void SetPixelBounds(const Rect& pixel_bounds) override {
     BaseView::SetPixelBounds(pixel_bounds);
     container_->Layout();
+    BaseView::Invalidate();
   }
 
   void Draw(Gdiplus::Graphics* context, const Rect& dirty) override {
     // Calculate the dirty rect for each child.
     for (int i = 0; i < container_->child_count(); ++i) {
       View* child = container_->child_at(i);
+      if (!child->IsVisible())
+        continue;
       Rect child_bounds = child->GetPixelBounds();
       if (child_bounds.Intersects(dirty)) {
         Rect child_dirty(dirty);
@@ -62,12 +65,10 @@ void Container::PlatformInit() {
 
 void Container::PlatformAddChildView(View* child) {
   child->view()->SetParent(view());
-  view()->Invalidate();
 }
 
 void Container::PlatformRemoveChildView(View* child) {
   child->view()->SetParent(nullptr);
-  view()->Invalidate();
 }
 
 }  // namespace nu
