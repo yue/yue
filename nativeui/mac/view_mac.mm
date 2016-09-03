@@ -60,4 +60,12 @@ Point View::GetWindowPixelOrigin() const {
   return GetWindowOrigin();
 }
 
+void View::PlatformSetVisible(bool visible) {
+  [view_ setHidden:!visible];
+}
+
+bool View::IsVisible() const {
+  return ![view_ isHidden];
+}
+
 }  // namespace nu

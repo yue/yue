@@ -31,3 +31,10 @@ TEST_F(ViewTest, AddToChildView) {
   EXPECT_EQ(view_->GetBounds(), nu::Rect(0, 0, 200, 200));
   EXPECT_EQ(view_->GetWindowPixelOrigin(), nu::Point(0, 0));
 }
+
+TEST_F(ViewTest, Visible) {
+  EXPECT_EQ(view_->IsVisible(), true);
+  view_->SetVisible(false);
+  EXPECT_EQ(view_->preferred_size(), nu::Size());
+  EXPECT_EQ(view_->IsVisible(), false);
+}

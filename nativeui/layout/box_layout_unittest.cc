@@ -183,3 +183,14 @@ TEST_F(BoxLayoutTest, Flex) {
   EXPECT_EQ(content_->child_at(0)->GetBounds(), nu::Rect(50, 0, 100, 100));
   EXPECT_EQ(content_->child_at(1)->GetBounds(), nu::Rect(50, 100, 50, 100));
 }
+
+TEST_F(BoxLayoutTest, IgnoreHiddenChild) {
+  layout_->set_main_axis_alignment(nu::BoxLayout::Center);
+  layout_->set_cross_axis_alignment(nu::BoxLayout::Center);
+  content_->AddChildView(CreateFixedSizeView(100, 100));
+  content_->AddChildView(CreateFixedSizeView(50, 50));
+  content_->child_at(1)->SetVisible(false);
+  window_->SetContentBounds(nu::Rect(0, 0, 200, 200));
+  EXPECT_EQ(content_->preferred_size(), nu::Size(100, 100));
+  EXPECT_EQ(content_->child_at(0)->GetBounds(), nu::Rect(50, 50, 100, 100));
+}

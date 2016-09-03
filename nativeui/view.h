@@ -25,9 +25,13 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
   void SetPixelBounds(const Rect& bounds);
   Rect GetPixelBounds() const;
 
-  // Gets the offset to the parent window.
+  // Get the offset to the parent window.
   Point GetWindowOrigin() const;
   Point GetWindowPixelOrigin() const;
+
+  // Show/Hide the view.
+  void SetVisible(bool visible);
+  bool IsVisible() const;
 
   // Set the preferred size of the view, returns whether current view should
   // do a layout.
@@ -54,6 +58,8 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
 
  private:
   friend class base::RefCounted<View>;
+
+  void PlatformSetVisible(bool visible);
 
   // Relationships.
   View* parent_ = nullptr;

@@ -79,6 +79,8 @@ struct Type<nu::View> {
            "setpreferredsize", &nu::View::SetPreferredSize,
            "setbounds", &nu::View::SetBounds,
            "getbounds", &nu::View::GetBounds,
+           "setvisible", &nu::View::SetVisible,
+           "isvisible", &nu::View::IsVisible,
            "getparent", &nu::View::parent);
   }
 };

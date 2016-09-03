@@ -8,6 +8,11 @@
 
 namespace nu {
 
+void View::SetVisible(bool visible) {
+  PlatformSetVisible(visible);
+  SetPreferredSize(Size());
+}
+
 bool View::SetPreferredSize(const Size& size) {
   preferred_size_ = size;
 

@@ -20,17 +20,17 @@ void BoxLayout::Layout(Container* host) {
   if (child_area.IsEmpty())
     return;
 
-  // TODO(zcbenz): Detect hidden children.
-  int child_count = host->child_count();
-  if (host->child_count() == 0)
-    return;
+  int child_count = 0;
+  int flex_sum = 0;
+  for (int i = 0; i < host->child_count(); ++i) {
+    if (!host->child_at(i)->IsVisible())
+      continue;
+    child_count++;
+    flex_sum += GetFlexAt(i);
+  }
 
-  // The sum of flex value.
-  int flex_sum = std::accumulate(
-      flex_.begin(),
-      flex_.begin() + std::min(static_cast<int>(flex_.size()), child_count),
-      0);
-  int free_space = 0;
+  if (child_count == 0)
+    return;
 
   // Determine the sizes of host area and the preferred size of host.
   Size host_size(host->preferred_size());
@@ -50,6 +50,7 @@ void BoxLayout::Layout(Container* host) {
 
   // Calculate the sizes of origins of views.
   Point origin(inner_padding_.left(), inner_padding_.top());
+  int free_space = 0;
   if (flex_sum == 0) {
     if (orientation_ == Horizontal) {
       if (main_axis_alignment_ == Center)
@@ -78,6 +79,8 @@ void BoxLayout::Layout(Container* host) {
   int current_flex = 0;
   for (int i = 0; i < host->child_count(); ++i) {
     View* child = host->child_at(i);
+    if (!child->IsVisible())
+      continue;
     Point child_origin(origin);
     Size child_size(child->preferred_size());
     if (orientation_ == Horizontal) {
@@ -135,6 +138,8 @@ Size BoxLayout::GetPreferredSize(Container* host) {
   } else {
     if (orientation_ == Horizontal) {
       for (int i = 0; i < host->child_count(); ++i) {
+        if (!host->child_at(i)->IsVisible())
+          continue;
         Size child_size = host->child_at(i)->preferred_size();
         size.set_height(std::max(size.height(), child_size.height()));
         size.set_width(size.width() + child_size.width());
@@ -143,6 +148,8 @@ Size BoxLayout::GetPreferredSize(Container* host) {
       }
     } else {
       for (int i = 0; i < host->child_count(); ++i) {
+        if (!host->child_at(i)->IsVisible())
+          continue;
         Size child_size = host->child_at(i)->preferred_size();
         size.set_width(std::max(size.width(), child_size.width()));
         size.set_height(size.height() + child_size.height());
