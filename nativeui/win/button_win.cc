@@ -7,7 +7,7 @@
 #include "base/strings/string_util.h"
 #include "base/strings/utf_string_conversions.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
-#include "nativeui/gfx/text.h"
+#include "nativeui/gfx/win/text_win.h"
 #include "nativeui/win/subwin_view.h"
 
 namespace nu {
@@ -47,7 +47,7 @@ void Button::SetTitle(const std::string& title) {
   ::SetWindowTextW(button->hwnd(), wtitle.c_str());
 
   // Windows doesn't preferred size for buttons, so just add some padding.
-  Size text_size = ToCeiledSize(MeasureText(Font(), wtitle));
+  Size text_size = ToCeiledSize(MeasureText(view(), Font(), wtitle));
   text_size.Enlarge(kButtonPadding, kButtonPadding);
   SetPixelPreferredSize(text_size);
 }

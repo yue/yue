@@ -38,13 +38,8 @@ float GetScalingFactorFromDPI(int dpi) {
   return static_cast<float>(dpi) / kDefaultDPI;
 }
 
-float GetDPIScale() {
-  return GetScalingFactorFromDPI(GetDPI().width());
-}
-
 }  // namespace
 
-// Returns |hwnd|'s scale factor.
 float GetScaleFactorForHWND(HWND hwnd) {
   HMONITOR monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
 
@@ -70,6 +65,10 @@ float GetScaleFactorForHWND(HWND hwnd) {
     }
   }
   return GetDPIScale();
+}
+
+float GetDPIScale() {
+  return GetScalingFactorFromDPI(GetDPI().width());
 }
 
 }  // namespace nu

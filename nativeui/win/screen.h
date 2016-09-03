@@ -12,6 +12,9 @@ namespace nu {
 // Returns |hwnd|'s scale factor.
 float GetScaleFactorForHWND(HWND hwnd);
 
+// Returns the default scale factor.
+float GetDPIScale();
+
 }  // namespace nu
 
 #endif  // NATIVEUI_WIN_SCREEN_H_

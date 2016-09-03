@@ -6,6 +6,7 @@
 #define NATIVEUI_WIN_BASE_VIEW_H_
 
 #include "nativeui/gfx/win/gdiplus.h"
+#include "nativeui/win/screen.h"
 #include "nativeui/win/window_impl.h"
 
 namespace nu {
@@ -58,7 +59,12 @@ class BaseView {
   bool is_virtual() const { return is_virtual_; }
 
   // Returns the DPI of current view.
-  float scale_factor() const { return window_ ? window_->scale_factor() : 1.f; }
+  float scale_factor() const {
+    if (window_)
+      return window_->scale_factor();
+    static float current_scale_factor = GetDPIScale();
+    return current_scale_factor;
+  }
 
  protected:
   explicit BaseView(bool is_virtual) : is_virtual_(is_virtual) {}

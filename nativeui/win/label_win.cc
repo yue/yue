@@ -7,7 +7,7 @@
 #include "base/strings/utf_string_conversions.h"
 #include "nativeui/gfx/color.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
-#include "nativeui/gfx/text.h"
+#include "nativeui/gfx/win/text_win.h"
 #include "nativeui/win/subwin_view.h"
 
 namespace nu {
@@ -33,7 +33,7 @@ class LabelView : public BaseView {
       return;
 
     // Pring the text in middle of rect.
-    Size text_size = ToCeiledSize(MeasureText(font_, text_));
+    Size text_size = ToCeiledSize(MeasureText(this, font_, text_));
     Size ctrl_size = GetPixelBounds().size();
     Point origin((ctrl_size.width() - text_size.width()) / 2,
                       (ctrl_size.height() - text_size.height()) / 2);
@@ -66,7 +66,7 @@ void Label::SetText(const std::string& text) {
   base::string16 wtext = base::UTF8ToUTF16(text);
   label->SetText(wtext);
 
-  if (SetPixelPreferredSize(ToCeiledSize(MeasureText(Font(), wtext))))
+  if (SetPixelPreferredSize(ToCeiledSize(MeasureText(view(), Font(), wtext))))
     label->Invalidate();
 }
 

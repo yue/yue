@@ -8,7 +8,7 @@
 #include "nativeui/gfx/color.h"
 #include "nativeui/gfx/geometry/insets.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
-#include "nativeui/gfx/text.h"
+#include "nativeui/gfx/win/text_win.h"
 #include "nativeui/win/base_view.h"
 
 namespace nu {
@@ -31,7 +31,7 @@ class GroupView : public BaseView {
 
     // Update the rect of the title.
     title_bounds_ = Rect(Point(kTitleLeftMargin * scale_factor(), 0),
-                              ToCeiledSize(MeasureText(font_, title_)));
+                               ToCeiledSize(MeasureText(this, font_, title_)));
     border_insets_ = Insets(title_bounds_.height());
   }
 
@@ -43,13 +43,6 @@ class GroupView : public BaseView {
     Rect child_bounds(Rect(GetPixelBounds().size()));
     child_bounds.Inset(border_insets_);
     delegate_->GetContentView()->view()->SetPixelBounds(child_bounds);
-  }
-
-  Rect GetBorder() const {
-    Rect bounds = GetPixelBounds();
-    int text_height = title_bounds_.height();
-    return Rect(text_height / 2, text_height / 2,
-                bounds.width() - text_height, bounds.height() - text_height);
   }
 
   void SetPixelBounds(const Rect& pixel_bounds) override {
@@ -67,7 +60,10 @@ class GroupView : public BaseView {
                         &brush);
 
     // Calculate the border bounds.
-    Rect border_bounds = GetBorder();
+    int text_height = title_bounds.height();
+    Rect border_bounds(text_height / 2, text_height / 2,
+                            GetPixelBounds().width() - text_height,
+                            GetPixelBounds().height() - text_height);
     border_bounds += GetWindowPixelOrigin().OffsetFromOrigin();
 
     // Draw border.
@@ -89,6 +85,8 @@ class GroupView : public BaseView {
     BaseView::SetParent(parent);
     delegate_->GetContentView()->view()->SetParent(this);
   }
+
+  int text_height() const { return title_bounds_.height(); }
 
  private:
   Group* delegate_;
@@ -121,8 +119,9 @@ std::string Group::GetTitle() const {
   return base::UTF16ToUTF8(static_cast<GroupView*>(view())->GetTitle());
 }
 
-Size Group::GetBorderSize() const {
-  return static_cast<GroupView*>(view())->GetBorder().size();
+Size Group::GetBorderPixelSize() const {
+  int text_height = static_cast<GroupView*>(view())->text_height();
+  return Size(text_height * 2, text_height * 2);
 }
 
 }  // namespace nu

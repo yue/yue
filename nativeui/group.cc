@@ -23,7 +23,7 @@ Group::~Group() {
 }
 
 bool Group::UpdatePreferredSize() {
-  Size border = GetBorderSize();
+  Size border = GetBorderPixelSize();
   Size preferred_size = GetContentView()->GetPixelPreferredSize();
   preferred_size.Enlarge(border.width(), border.height());
   if (SetPixelPreferredSize(preferred_size))
