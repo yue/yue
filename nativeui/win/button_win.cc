@@ -48,7 +48,8 @@ void Button::SetTitle(const std::string& title) {
 
   // Windows doesn't preferred size for buttons, so just add some padding.
   Size text_size = ToCeiledSize(MeasureText(view(), Font(), wtitle));
-  text_size.Enlarge(kButtonPadding, kButtonPadding);
+  text_size.Enlarge(kButtonPadding * view()->scale_factor(),
+                    kButtonPadding * view()->scale_factor());
   SetPixelPreferredSize(text_size);
 }
 

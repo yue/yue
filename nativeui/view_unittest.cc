@@ -19,7 +19,7 @@ TEST_F(ViewTest, Bounds) {
   nu::Rect bounds(100, 100, 200, 200);
   view_->SetBounds(bounds);
   EXPECT_EQ(view_->GetBounds(), bounds);
-  EXPECT_EQ(view_->GetWindowPixelOrigin(), nu::Point(100, 100));
+  EXPECT_EQ(view_->GetWindowOrigin(), nu::Point(100, 100));
 }
 
 TEST_F(ViewTest, AddToChildView) {
