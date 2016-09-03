@@ -27,4 +27,10 @@ std::string Group::GetTitle() const {
   return base::SysNSStringToUTF8(static_cast<NSBox*>(view()).title);
 }
 
+Size Group::GetBorderSize() const {
+  NSSize outer = [view() frame].size;
+  NSSize inner = [GetContentView()->view() frame].size;
+  return Size(outer.width - inner.width, outer.height - inner.height);
+}
+
 }  // namespace nu
