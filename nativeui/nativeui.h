@@ -6,6 +6,7 @@
 #define NATIVEUI_NATIVEUI_H_
 
 #include "nativeui/button.h"
+#include "nativeui/entry.h"
 #include "nativeui/group.h"
 #include "nativeui/label.h"
 #include "nativeui/layout/box_layout.h"

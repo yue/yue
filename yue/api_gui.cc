@@ -104,6 +104,17 @@ struct Type<nu::Button> {
 };
 
 template<>
+struct Type<nu::Entry> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Entry";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index, "new", &MetaTable<nu::Entry>::NewInstance<>,
+                         "settext", &nu::Entry::SetText,
+                         "gettext", &nu::Entry::GetText);
+  }
+};
+
+template<>
 struct Type<nu::Label> {
   using base = nu::View;
   static constexpr const char* name = "yue.Label";
@@ -312,6 +323,9 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   lua_rawset(state, -3);
   lua::Push(state, "Button");
   lua::MetaTable<nu::Button>::Push(state);
+  lua_rawset(state, -3);
+  lua::Push(state, "Entry");
+  lua::MetaTable<nu::Entry>::Push(state);
   lua_rawset(state, -3);
   lua::Push(state, "Label");
   lua::MetaTable<nu::Label>::Push(state);

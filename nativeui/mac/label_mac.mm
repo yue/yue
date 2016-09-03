@@ -42,7 +42,7 @@ namespace nu {
 
 namespace {
 
-Size GetPreferredSizeFroText(const std::string& text) {
+Size GetPreferredSizeForText(const std::string& text) {
   Size size = ToCeiledSize(MeasureText(Font(), text));
   size.Enlarge(1, 1);  // leave space for border
   return size;
@@ -62,7 +62,7 @@ void Label::SetText(const std::string& text) {
   LabelView* label = static_cast<LabelView*>(view());
   label.text = base::SysUTF8ToNSString(text);
   label.needsDisplay = YES;
-  SetPreferredSize(GetPreferredSizeFroText(text));
+  SetPreferredSize(GetPreferredSizeForText(text));
 }
 
 std::string Label::GetText() {
