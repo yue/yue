@@ -12,7 +12,6 @@ namespace nu {
 
 Entry::Entry() {
   NSTextField* entry = [[NSTextField alloc] init];
-  [entry setBordered:YES];
   [entry setBezelStyle:NSTextFieldSquareBezel];
   [entry setBezeled:YES];
   TakeOverView(entry);

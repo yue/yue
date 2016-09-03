@@ -6,7 +6,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-#include "base/mac/scoped_nsobject.h"
 #include "base/strings/sys_string_conversions.h"
 
 @interface NUButtonDelegate : NSObject {
@@ -35,7 +34,7 @@ namespace nu {
 
 Button::Button(const std::string& title) {
   NSButton* button = [[NSButton alloc] init];
-  button.bezelStyle = NSRoundedBezelStyle;
+  button.bezelStyle = NSSmallSquareBezelStyle;
   button.target = [[NUButtonDelegate alloc] initWithShell:this];
   button.action = @selector(onClick:);
   TakeOverView(button);
@@ -54,11 +53,7 @@ void Button::SetTitle(const std::string& title) {
   button.title = base::SysUTF8ToNSString(title);
 
   // Calculate the preferred size by creating a new button.
-  base::scoped_nsobject<NSButton> tmp([[NSButton alloc] init]);
-  [tmp setBezelStyle:button.bezelStyle];
-  [tmp setTitle:button.title];
-  [tmp sizeToFit];
-  SetPreferredSize(Size([tmp frame].size));
+  SetPreferredSize(Size([[button cell] cellSize]));
 }
 
 std::string Button::GetTitle() const {
