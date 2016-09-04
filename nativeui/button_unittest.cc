@@ -7,6 +7,9 @@
 
 class ButtonTest : public testing::Test {
  protected:
+  void SetUp() override {
+  }
+
   nu::State state_;
 };
 
@@ -33,6 +36,17 @@ TEST_F(ButtonTest, CheckBox) {
   EXPECT_TRUE(button->IsChecked());
 }
 
+// TODO(zcbenz): Fix the platform differences on radio buttons.
+#if !defined(OS_LINUX)
+TEST_F(ButtonTest, Radio) {
+  scoped_refptr<nu::Button> button =
+      new nu::Button("title", nu::Button::Radio);
+  EXPECT_FALSE(button->IsChecked());
+  button->SetChecked(true);
+  EXPECT_TRUE(button->IsChecked());
+}
+#endif
+
 TEST_F(ButtonTest, RadioGroup) {
   scoped_refptr<nu::Container> container = new nu::Container;
   container->SetBounds(nu::Rect(0, 0, 100, 100));
@@ -42,12 +56,19 @@ TEST_F(ButtonTest, RadioGroup) {
   container->AddChildView(r1);
   container->AddChildView(r2);
   container->AddChildView(r3);
+#if !defined(OS_MACOSX)
+  EXPECT_FALSE(r1->IsChecked());
+  EXPECT_FALSE(r2->IsChecked());
+  EXPECT_FALSE(r3->IsChecked());
+#endif
   r1->SetChecked(true);
   EXPECT_TRUE(r1->IsChecked());
   EXPECT_FALSE(r2->IsChecked());
   EXPECT_FALSE(r3->IsChecked());
+#if !defined(OS_WIN)
   r2->SetChecked(true);
   EXPECT_FALSE(r1->IsChecked());
   EXPECT_TRUE(r2->IsChecked());
   EXPECT_FALSE(r3->IsChecked());
+#endif
 }
