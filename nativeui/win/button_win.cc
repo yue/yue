@@ -4,6 +4,8 @@
 
 #include "nativeui/button.h"
 
+#include <windowsx.h>
+
 #include "base/strings/utf_string_conversions.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/win/text_win.h"
@@ -18,9 +20,8 @@ const int kButtonPadding = 6;
 
 class ButtonView : public SubwinView {
  public:
-  explicit ButtonView(Button* delegate)
-      : SubwinView(L"button",
-                   BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP),
+  ButtonView(DWORD style, Button* delegate)
+      : SubwinView(L"button", style | WS_CHILD | WS_VISIBLE | WS_TABSTOP),
         delegate_(delegate) {
   }
 
@@ -34,8 +35,13 @@ class ButtonView : public SubwinView {
 
 }  // namespace
 
-Button::Button(const std::string& title) {
-  TakeOverView(new ButtonView(this));
+Button::Button(const std::string& title, Type type) {
+  DWORD style = BS_PUSHBUTTON;
+  if (type == CheckBox)
+    style = BS_AUTOCHECKBOX;
+  else if (type == Radio)
+    style = BS_AUTORADIOBUTTON;
+  TakeOverView(new ButtonView(style, this));
   SetTitle(title);
 }
 
@@ -56,6 +62,16 @@ void Button::SetTitle(const std::string& title) {
 std::string Button::GetTitle() const {
   return base::UTF16ToUTF8(
       GetWindowString(static_cast<SubwinView*>(view())->hwnd()));
+}
+
+void Button::SetChecked(bool checked) {
+  auto* button = static_cast<SubwinView*>(view());
+  Button_SetCheck(button->hwnd(), checked ? BST_CHECKED : BST_UNCHECKED);
+}
+
+bool Button::IsChecked() const {
+  auto* button = static_cast<SubwinView*>(view());
+  return Button_GetCheck(button->hwnd()) == BST_CHECKED;
 }
 
 }  // namespace nu
