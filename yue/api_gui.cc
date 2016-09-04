@@ -86,14 +86,52 @@ struct Type<nu::View> {
 };
 
 template<>
+struct Type<nu::Button::Type> {
+  static constexpr const char* name = "yue.Button.Type";
+  static bool To(State* state, int index, nu::Button::Type* out) {
+    std::string type;
+    if (!lua::To(state, index, &type))
+      return false;
+    if (type.empty() || type == "normal") {
+      *out = nu::Button::Normal;
+      return true;
+    } else if (type == "checkbox") {
+      *out = nu::Button::CheckBox;
+      return true;
+    } else if (type == "radio") {
+      *out = nu::Button::Radio;
+      return true;
+    } else {
+      return false;
+    }
+  }
+};
+
+template<>
 struct Type<nu::Button> {
   using base = nu::View;
   static constexpr const char* name = "yue.Button";
   static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index,
-           "new", &MetaTable<nu::Button>::NewInstance<const std::string&>,
-           "settitle", &nu::Button::SetTitle,
-           "gettitle", &nu::Button::GetTitle);
+    RawSet(state, index, "new", &New,
+                         "settitle", &nu::Button::SetTitle,
+                         "gettitle", &nu::Button::GetTitle,
+                         "setchecked", &nu::Button::SetChecked,
+                         "ischecked", &nu::Button::IsChecked);
+  }
+  static nu::Button* New(CallContext* context) {
+    std::string title;
+    if (To(context->state, 1, &title)) {
+      return new nu::Button(title);
+    } else if (GetType(context->state, 1) == LuaType::Table) {
+      RawGetAndPop(context->state, 1, "title", &title);
+      nu::Button::Type type = nu::Button::Normal;
+      RawGetAndPop(context->state, 1, "type", &type);
+      return new nu::Button(title, type);
+    } else {
+      context->has_error = true;
+      Push(context->state, "Button must be created with string or table");
+      return nullptr;
+    }
   }
   static bool Index(State* state, const std::string& name) {
     return yue::SignalIndex(state, name, "onclick", &nu::Button::on_click);

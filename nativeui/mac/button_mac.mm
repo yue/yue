@@ -32,11 +32,17 @@
 
 namespace nu {
 
-Button::Button(const std::string& title) {
+Button::Button(const std::string& title, Type type) {
   NSButton* button = [[NSButton alloc] init];
-  button.bezelStyle = NSSmallSquareBezelStyle;
-  button.target = [[NUButtonDelegate alloc] initWithShell:this];
-  button.action = @selector(onClick:);
+  if (type == Normal)
+    [button setBezelStyle:NSSmallSquareBezelStyle];
+  else if (type == CheckBox)
+    [button setButtonType:NSSwitchButton];
+  else if (type == Radio)
+    [button setButtonType:NSRadioButton];
+
+  [button setTarget:[[NUButtonDelegate alloc] initWithShell:this]];
+  [button setAction:@selector(onClick:)];
   TakeOverView(button);
 
   SetTitle(title);
@@ -45,7 +51,7 @@ Button::Button(const std::string& title) {
 Button::~Button() {
   NSButton* button = static_cast<NSButton*>(view());
   [button.target release];
-  button.target = nil;
+  [button setTarget:nil];
 }
 
 void Button::SetTitle(const std::string& title) {
@@ -58,6 +64,14 @@ void Button::SetTitle(const std::string& title) {
 
 std::string Button::GetTitle() const {
   return base::SysNSStringToUTF8(static_cast<NSButton*>(view()).title);
+}
+
+void Button::SetChecked(bool checked) {
+  static_cast<NSButton*>(view()).state = checked ? NSOnState : NSOffState;
+}
+
+bool Button::IsChecked() const {
+  return static_cast<NSButton*>(view()).state == NSOnState;
 }
 
 }  // namespace nu

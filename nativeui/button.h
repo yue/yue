@@ -13,11 +13,19 @@ namespace nu {
 
 NATIVEUI_EXPORT class Button : public View {
  public:
-  explicit Button(const std::string& title);
+  enum Type {
+    Normal,
+    CheckBox,
+    Radio,
+  };
+  Button(const std::string& title, Type type = Normal);
 
   void SetTitle(const std::string& title);
   std::string GetTitle() const;
+  void SetChecked(bool checked);
+  bool IsChecked() const;
 
+  // Events.
   Signal<void()> on_click;
 
  protected:

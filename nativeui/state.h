@@ -5,6 +5,8 @@
 #ifndef NATIVEUI_STATE_H_
 #define NATIVEUI_STATE_H_
 
+#include <memory>
+
 #include "base/memory/ref_counted.h"
 #include "nativeui/nativeui_export.h"
 
