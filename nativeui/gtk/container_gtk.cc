@@ -32,6 +32,19 @@ void Container::PlatformInit() {
 }
 
 void Container::PlatformAddChildView(View* child) {
+  // If we are adding a radio button, we check whether there is already a radio
+  // button in the container, and join radio group if so.
+  if (GTK_IS_RADIO_BUTTON(child->view())) {
+    for (int i = 0; i < child_count(); ++i) {
+      GtkWidget* widget = child_at(i)->view();
+      if (GTK_IS_RADIO_BUTTON(widget)) {
+        gtk_radio_button_join_group(GTK_RADIO_BUTTON(child->view()),
+                                    GTK_RADIO_BUTTON(widget));
+        break;
+      }
+    }
+  }
+
   gtk_container_add(GTK_CONTAINER(view()), child->view());
 }
 

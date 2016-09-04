@@ -42,7 +42,8 @@ TEST_F(ButtonTest, Radio) {
 }
 
 TEST_F(ButtonTest, RadioGroup) {
-  scoped_refptr<nu::Container> container = new nu::Container;;
+  scoped_refptr<nu::Container> container = new nu::Container;
+  container->SetBounds(nu::Rect(0, 0, 100, 100));
   auto* r1 = new nu::Button("r1", nu::Button::Radio);
   auto* r2 = new nu::Button("r2", nu::Button::Radio);
   auto* r3 = new nu::Button("r3", nu::Button::Radio);
