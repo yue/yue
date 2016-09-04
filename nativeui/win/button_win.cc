@@ -4,11 +4,11 @@
 
 #include "nativeui/button.h"
 
-#include "base/strings/string_util.h"
 #include "base/strings/utf_string_conversions.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/win/text_win.h"
 #include "nativeui/win/subwin_view.h"
+#include "nativeui/win/util/hwnd_util.h"
 
 namespace nu {
 
@@ -19,7 +19,8 @@ const int kButtonPadding = 7;
 class ButtonView : public SubwinView {
  public:
   explicit ButtonView(Button* delegate)
-      : SubwinView(L"button", BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE),
+      : SubwinView(L"button",
+                   BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP),
         delegate_(delegate) {
   }
 
@@ -44,22 +45,17 @@ Button::~Button() {
 void Button::SetTitle(const std::string& title) {
   SubwinView* button = static_cast<SubwinView*>(view());
   base::string16 wtitle = base::UTF8ToUTF16(title);
-  ::SetWindowTextW(button->hwnd(), wtitle.c_str());
+  SetWindowTextW(button->hwnd(), wtitle.c_str());
 
-  // Windows doesn't preferred size for buttons, so just add some padding.
+  // Windows doesn't have preferred size for buttons, so just add some padding.
   Size text_size = ToCeiledSize(MeasureText(view(), Font(), wtitle));
-  text_size.Enlarge(kButtonPadding * view()->scale_factor(),
-                    kButtonPadding * view()->scale_factor());
+  text_size.Enlarge(DIPToPixel(kButtonPadding), DIPToPixel(kButtonPadding));
   SetPixelPreferredSize(text_size);
 }
 
 std::string Button::GetTitle() const {
-  SubwinView* button = static_cast<SubwinView*>(view());
-  base::string16 title;
-  int len = ::GetWindowTextLength(button->hwnd()) + 1;
-  if (len > 1)
-    ::GetWindowTextW(button->hwnd(), base::WriteInto(&title, len), len);
-  return base::UTF16ToUTF8(title);
+  return base::UTF16ToUTF8(
+      GetWindowString(static_cast<SubwinView*>(view())->hwnd()));
 }
 
 }  // namespace nu

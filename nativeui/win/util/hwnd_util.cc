@@ -203,12 +203,16 @@ void CheckWindowCreated(HWND hwnd) {
   }
 }
 
-extern "C" {
-  typedef HWND (*RootWindow)();
-}
-
 HWND GetWindowToParentTo(bool get_real_hwnd) {
   return get_real_hwnd ? ::GetDesktopWindow() : HWND_DESKTOP;
+}
+
+base::string16 GetWindowString(HWND hwnd) {
+  base::string16 title;
+  int len = ::GetWindowTextLength(hwnd) + 1;
+  if (len > 1)
+    ::GetWindowTextW(hwnd, base::WriteInto(&title, len), len);
+  return title;
 }
 
 }  // namespace nu
