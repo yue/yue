@@ -76,6 +76,9 @@ Size View::GetPixelPreferredSize() const {
   return preferred_size();
 }
 
+void View::Invalidate(const Rect& dirty) {
+}
+
 int View::DIPToPixel(int length) const {
   return length;
 }

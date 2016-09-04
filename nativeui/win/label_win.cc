@@ -29,9 +29,6 @@ class LabelView : public BaseView {
   }
 
   void Draw(Gdiplus::Graphics* context, const Rect& dirty) override {
-    if (!window())
-      return;
-
     // Pring the text in middle of rect.
     Size text_size = ToCeiledSize(MeasureText(this, font_, text_));
     Size ctrl_size = GetPixelBounds().size();
@@ -43,6 +40,8 @@ class LabelView : public BaseView {
     context->DrawString(text_.c_str(), static_cast<int>(text_.size()),
                         font_.GetNativeFont(), ToGdi(origin), &brush);
   }
+
+  Font font() const { return font_; }
 
  private:
   Color color_;
@@ -66,7 +65,8 @@ void Label::SetText(const std::string& text) {
   base::string16 wtext = base::UTF8ToUTF16(text);
   label->SetText(wtext);
 
-  if (SetPixelPreferredSize(ToCeiledSize(MeasureText(view(), Font(), wtext))))
+  if (SetPixelPreferredSize(
+          ToCeiledSize(MeasureText(label, label->font(), wtext))))
     label->Invalidate();
 }
 

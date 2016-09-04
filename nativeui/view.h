@@ -43,6 +43,9 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
   // layout.
   virtual bool UpdatePreferredSize();
 
+  // Invalidate the view and trigger a redraw.
+  void Invalidate(const Rect& dirty = Rect());
+
   // Convert the DIP geometry to pixel geometry.
   int DIPToPixel(int length) const;
 

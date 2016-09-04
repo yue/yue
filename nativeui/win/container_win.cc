@@ -19,7 +19,6 @@ class ContainerView : public BaseView {
   void SetPixelBounds(const Rect& pixel_bounds) override {
     BaseView::SetPixelBounds(pixel_bounds);
     container_->Layout();
-    BaseView::Invalidate();
   }
 
   void Draw(Gdiplus::Graphics* context, const Rect& dirty) override {

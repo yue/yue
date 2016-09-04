@@ -77,7 +77,7 @@ void BaseView::Invalidate(const Rect& dirty) {
   }
 
   RECT rect = (dirty + GetWindowPixelOrigin().OffsetFromOrigin()).ToRECT();
-  RedrawWindow(window_->hwnd(), &rect, NULL, RDW_INVALIDATE);
+  InvalidateRect(window_->hwnd(), &rect, TRUE);
 }
 
 }  // namespace nu
