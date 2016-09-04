@@ -20,14 +20,14 @@ const wchar_t* const kBaseClassName = L"Yue_";
 
 ClassRegistrar::ClassRegistrar() : registered_count_(0) {}
 
-ClassRegistrar::~ClassRegistrar() {}
+ClassRegistrar::~ClassRegistrar() {
+  UnregisterClasses();
+}
 
 void ClassRegistrar::UnregisterClasses() {
   for (RegisteredClasses::iterator i = registered_classes_.begin();
         i != registered_classes_.end(); ++i) {
-    if (UnregisterClass(MAKEINTATOM(i->atom), i->instance)) {
-      registered_classes_.erase(i);
-    } else {
+    if (!UnregisterClass(MAKEINTATOM(i->atom), i->instance)) {
       LOG(ERROR) << "Failed to unregister class " << i->name
                  << ". Error = " << GetLastError();
     }

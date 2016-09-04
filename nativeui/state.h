@@ -48,8 +48,8 @@ NATIVEUI_EXPORT class State {
 
 #if defined(OS_WIN)
   ULONG_PTR token_;
-  std::unique_ptr<SubwinHolder> subwin_holder_;
   std::unique_ptr<ClassRegistrar> class_registrar_;
+  std::unique_ptr<SubwinHolder> subwin_holder_;
 #endif
 
   DISALLOW_COPY_AND_ASSIGN(State);
