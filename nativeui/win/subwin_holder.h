@@ -20,6 +20,16 @@ class SubwinHolder : public WindowImpl {
  public:
   static SubwinHolder* GetInstance();
 
+ protected:
+  CR_BEGIN_MSG_MAP_EX(SubwinHolder, WindowImpl)
+    CR_MSG_WM_COMMAND(OnCommand)
+  CR_END_MSG_MAP()
+
+  // Some controls cache their parents, so after we reparent some controls to
+  // a new window, they would still send WM_COMMAND messages to this holder.
+  // We need to redirect the messages just like the toplevel window.
+  void OnCommand(UINT code, int command, HWND window);
+
  private:
   friend struct base::DefaultSingletonTraits<SubwinHolder>;
 

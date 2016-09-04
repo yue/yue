@@ -5,6 +5,8 @@
 #include "nativeui/win/subwin_holder.h"
 
 #include "base/memory/singleton.h"
+#include "nativeui/win/subwin_view.h"
+#include "nativeui/win/util/hwnd_util.h"
 
 namespace nu {
 
@@ -17,6 +19,11 @@ SubwinHolder::SubwinHolder() {
 }
 
 SubwinHolder::~SubwinHolder() {
+}
+
+void SubwinHolder::OnCommand(UINT code, int command, HWND window) {
+  auto* control = reinterpret_cast<SubwinView*>(GetWindowUserData(window));
+  control->OnCommand(code, command);
 }
 
 }  // namespace nu
