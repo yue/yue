@@ -129,7 +129,7 @@ ATOM ClassRegistrar::RetrieveClassAtom(const ClassInfo& class_info) {
   WNDCLASSEX window_class;
   base::win::InitializeWindowClass(
       name.c_str(), &base::win::WrappedWindowProc<WindowImpl::WndProc>,
-      class_info.style, 0, 0, NULL,
+      class_info.style, 0, 0, LoadCursorW(NULL, IDC_ARROW),
       reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1), NULL,
       class_info.icon, class_info.small_icon, &window_class);
   HMODULE instance = window_class.hInstance;

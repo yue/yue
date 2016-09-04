@@ -28,7 +28,6 @@ class TopLevelWindow : public WindowImpl {
     CR_MSG_WM_SIZE(OnSize)
     CR_MSG_WM_PAINT(OnPaint)
     CR_MSG_WM_ERASEBKGND(OnEraseBkgnd)
-    CR_MESSAGE_HANDLER_EX(WM_SETCURSOR, OnSetCursor);
   CR_END_MSG_MAP()
 
  private:
@@ -37,7 +36,6 @@ class TopLevelWindow : public WindowImpl {
   void OnSize(UINT param, const Size& size);
   void OnPaint(HDC dc);
   LRESULT OnEraseBkgnd(HDC dc);
-  LRESULT OnSetCursor(UINT message, WPARAM w_param, LPARAM l_param);
 
   Window* delegate_;
 };
@@ -114,42 +112,6 @@ void TopLevelWindow::OnPaint(HDC) {
 
 LRESULT TopLevelWindow::OnEraseBkgnd(HDC dc) {
   // Needed to prevent resize flicker.
-  return 1;
-}
-
-LRESULT TopLevelWindow::OnSetCursor(UINT message,
-                                    WPARAM w_param, LPARAM l_param) {
-  // Reimplement the necessary default behavior here. Calling DefWindowProc can
-  // trigger weird non-client painting for non-glass windows with custom frames.
-  wchar_t* cursor = IDC_ARROW;
-  switch (LOWORD(l_param)) {
-    case HTSIZE:
-      cursor = IDC_SIZENWSE;
-      break;
-    case HTLEFT:
-    case HTRIGHT:
-      cursor = IDC_SIZEWE;
-      break;
-    case HTTOP:
-    case HTBOTTOM:
-      cursor = IDC_SIZENS;
-      break;
-    case HTTOPLEFT:
-    case HTBOTTOMRIGHT:
-      cursor = IDC_SIZENWSE;
-      break;
-    case HTTOPRIGHT:
-    case HTBOTTOMLEFT:
-      cursor = IDC_SIZENESW;
-      break;
-    case LOWORD(HTERROR):  // Use HTERROR's LOWORD value for valid comparison.
-      SetMsgHandled(FALSE);
-      break;
-    default:
-      // Use the default value, IDC_ARROW.
-      break;
-  }
-  ::SetCursor(LoadCursor(NULL, cursor));
   return 1;
 }
 
