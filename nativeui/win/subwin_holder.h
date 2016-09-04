@@ -7,10 +7,6 @@
 
 #include "nativeui/win/window_impl.h"
 
-namespace base {
-template<typename T> struct DefaultSingletonTraits;
-}
-
 namespace nu {
 
 // Windows does not allow a child window to created without a parent, so this
@@ -18,7 +14,8 @@ namespace nu {
 // added to any parent yet.
 class SubwinHolder : public WindowImpl {
  public:
-  static SubwinHolder* GetInstance();
+  SubwinHolder();
+  ~SubwinHolder() override;
 
  protected:
   CR_BEGIN_MSG_MAP_EX(SubwinHolder, WindowImpl)
@@ -29,12 +26,6 @@ class SubwinHolder : public WindowImpl {
   // a new window, they would still send WM_COMMAND messages to this holder.
   // We need to redirect the messages just like the toplevel window.
   void OnCommand(UINT code, int command, HWND window);
-
- private:
-  friend struct base::DefaultSingletonTraits<SubwinHolder>;
-
-  SubwinHolder();
-  ~SubwinHolder() override;
 };
 
 }  // namespace nu

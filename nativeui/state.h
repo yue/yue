@@ -10,6 +10,9 @@
 
 #if defined(OS_LINUX)
 #include "nativeui/gtk/gtk_event_loop.h"
+#elif defined(OS_WIN)
+#include "nativeui/win/subwin_holder.h"
+#include "nativeui/win/util/class_registrar.h"
 #endif
 
 namespace nu {
@@ -26,6 +29,11 @@ NATIVEUI_EXPORT class State {
   // Returns the default GUI font.
   PlatformFont* GetDefaultFont();
 
+#if defined(OS_WIN)
+  HWND GetSubwinHolder();
+  ClassRegistrar* GetClassRegistrar();
+#endif
+
  private:
   void PlatformInit();
   void PlatformDestroy();
@@ -38,6 +46,8 @@ NATIVEUI_EXPORT class State {
 
 #if defined(OS_WIN)
   ULONG_PTR token_;
+  std::unique_ptr<SubwinHolder> subwin_holder_;
+  std::unique_ptr<ClassRegistrar> class_registrar_;
 #endif
 
   DISALLOW_COPY_AND_ASSIGN(State);

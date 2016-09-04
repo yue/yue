@@ -9,6 +9,7 @@
 #include "base/logging.h"
 #include "base/win/windows_version.h"
 #include "nativeui/gfx/win/gdiplus.h"
+#include "nativeui/win/subwin_holder.h"
 
 namespace nu {
 
@@ -70,6 +71,18 @@ void State::PlatformInit() {
 
 void State::PlatformDestroy() {
   Gdiplus::GdiplusShutdown(token_);
+}
+
+HWND State::GetSubwinHolder() {
+  if (!subwin_holder_)
+    subwin_holder_.reset(new SubwinHolder);
+  return subwin_holder_->hwnd();
+}
+
+ClassRegistrar* State::GetClassRegistrar() {
+  if (!class_registrar_)
+    class_registrar_.reset(new ClassRegistrar);
+  return class_registrar_.get();
 }
 
 }  // namespace nu

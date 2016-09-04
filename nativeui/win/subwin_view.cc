@@ -7,13 +7,12 @@
 #include "base/win/scoped_hdc.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/state.h"
-#include "nativeui/win/subwin_holder.h"
 
 namespace nu {
 
 SubwinView::SubwinView(base::StringPiece16 class_name,
                        DWORD window_style, DWORD window_ex_style)
-    : WindowImpl(class_name, SubwinHolder::GetInstance()->hwnd(),
+    : WindowImpl(class_name, State::current()->GetSubwinHolder(),
                  window_style, window_ex_style),
       BaseView(false) {
   // Create HFONT from default system font.
@@ -49,13 +48,13 @@ void SubwinView::SetParent(BaseView* parent) {
   BaseView::SetParent(parent);
   ::SetParent(hwnd(),
               parent && parent->window() ? parent->window()->hwnd()
-                                         : SubwinHolder::GetInstance()->hwnd());
+                                         : State::current()->GetSubwinHolder());
 }
 
 void SubwinView::BecomeContentView(WindowImpl* parent) {
   BaseView::BecomeContentView(parent);
   ::SetParent(hwnd(), parent ? parent->hwnd()
-                             : SubwinHolder::GetInstance()->hwnd());
+                             : State::current()->GetSubwinHolder());
 }
 
 }  // namespace nu

@@ -4,16 +4,10 @@
 
 #include "nativeui/win/subwin_holder.h"
 
-#include "base/memory/singleton.h"
 #include "nativeui/win/subwin_view.h"
 #include "nativeui/win/util/hwnd_util.h"
 
 namespace nu {
-
-// static
-SubwinHolder* SubwinHolder::GetInstance() {
-  return base::Singleton<SubwinHolder>::get();
-}
 
 SubwinHolder::SubwinHolder() {
 }
