@@ -33,7 +33,8 @@ bool Container::UpdatePreferredSize() {
 
 void Container::SetLayoutManager(LayoutManager* layout_manager) {
   layout_manager_ = layout_manager;
-  UpdatePreferredSize();
+  if (UpdatePreferredSize())
+    Layout();
 }
 
 LayoutManager* Container::GetLayoutManager() const {
@@ -66,7 +67,8 @@ void Container::AddChildViewAt(View* view, int index) {
   view->set_parent(this);
   PlatformAddChildView(view);
 
-  UpdatePreferredSize();
+  if (UpdatePreferredSize())
+    Layout();
 }
 
 void Container::RemoveChildView(View* view) {
@@ -78,7 +80,8 @@ void Container::RemoveChildView(View* view) {
   PlatformRemoveChildView(view);
   children_.erase(i);
 
-  UpdatePreferredSize();
+  if (UpdatePreferredSize())
+    Layout();
 }
 
 }  // namespace nu
