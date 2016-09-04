@@ -18,6 +18,10 @@ NATIVEUI_EXPORT class Entry : public View{
   void SetText(const std::string& text);
   std::string GetText() const;
 
+  // Events.
+  Signal<void()> on_text_change;
+  Signal<void()> on_activate;
+
  protected:
   ~Entry() override;
 };

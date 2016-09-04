@@ -112,6 +112,16 @@ struct Type<nu::Entry> {
                          "settext", &nu::Entry::SetText,
                          "gettext", &nu::Entry::GetText);
   }
+  static bool Index(State* state, const std::string& name) {
+    return yue::SignalIndex(state, name,
+                            "onactivate", &nu::Entry::on_activate,
+                            "ontextchange", &nu::Entry::on_text_change);
+  }
+  static bool NewIndex(State* state, const std::string& name) {
+    return yue::MemberNewIndex(state, name,
+                               "onactivate", &nu::Entry::on_activate,
+                               "ontextchange", &nu::Entry::on_text_change);
+  }
 };
 
 template<>

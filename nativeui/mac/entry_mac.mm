@@ -8,18 +8,51 @@
 
 #include "base/strings/sys_string_conversions.h"
 
+@interface NUEntryDelegate : NSObject<NSTextFieldDelegate> {
+ @private
+  nu::Entry* shell_;
+}
+- (id)initWithShell:(nu::Entry*)shell;
+- (IBAction)onActivate:(id)sender;
+@end
+
+@implementation NUEntryDelegate
+
+- (id)initWithShell:(nu::Entry*)shell {
+  if ((self = [super init]))
+    shell_ = shell;
+  return self;
+}
+
+- (IBAction)onActivate:(id)sender {
+  shell_->on_activate.Emit();
+}
+
+- (void)controlTextDidChange:(NSNotification*)notification {
+  shell_->on_text_change.Emit();
+}
+
+@end
+
 namespace nu {
 
 Entry::Entry() {
   NSTextField* entry = [[NSTextField alloc] init];
   [entry setBezelStyle:NSTextFieldSquareBezel];
   [entry setBezeled:YES];
+  [entry setTarget:[[NUEntryDelegate alloc] initWithShell:this]];
+  [entry setAction:@selector(onActivate:)];
+  [entry setDelegate:entry.target];
   TakeOverView(entry);
 
   SetPreferredSize(Size(100, [[entry cell] cellSize].height));
 }
 
 Entry::~Entry() {
+  NSTextField* entry = static_cast<NSTextField*>(view());
+  [entry.target release];
+  [entry setTarget:nil];
+  [entry setDelegate:nil];
 }
 
 void Entry::SetText(const std::string& text) {
