@@ -11,7 +11,8 @@
 namespace nu {
 
 void Group::PlatformInit() {
-  TakeOverView([[NSBox alloc] init]);
+  // Give the box an initial size to calculate border size.
+  TakeOverView([[NSBox alloc] initWithFrame:NSMakeRect(0, 0, 100, 100)]);
 }
 
 void Group::PlatformSetContentView(Container* container) {

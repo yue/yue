@@ -8,6 +8,9 @@ namespace nu {
 
 void Group::PlatformInit() {
   TakeOverView(gtk_frame_new(""));
+
+  // Give the frame an initial size to calculate border size.
+  SetBounds(Rect(0, 0, 100, 100));
 }
 
 void Group::PlatformSetContentView(Container* container) {

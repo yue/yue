@@ -80,6 +80,7 @@ source_set("nativeui") {
     "gtk/widget_util.h",
     "gtk/button_gtk.cc",
     "gtk/container_gtk.cc",
+    "gtk/entry_gtk.cc",
     "gtk/group_gtk.cc",
     "gtk/label_gtk.cc",
     "gtk/state_gtk.cc",

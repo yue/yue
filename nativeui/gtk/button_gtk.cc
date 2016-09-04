@@ -10,7 +10,7 @@ namespace nu {
 
 namespace {
 
-void OnClick(GtkButton* width, Button* button) {
+void OnClick(GtkButton*, Button* button) {
   button->on_click.Emit();
 }
 
