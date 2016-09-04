@@ -14,7 +14,7 @@ namespace nu {
 
 namespace {
 
-const int kButtonPadding = 7;
+const int kButtonPadding = 6;
 
 class ButtonView : public SubwinView {
  public:

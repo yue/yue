@@ -6,7 +6,6 @@
 
 #include "base/strings/utf_string_conversions.h"
 #include "nativeui/gfx/color.h"
-#include "nativeui/gfx/geometry/insets.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/win/text_win.h"
 #include "nativeui/win/base_view.h"
@@ -16,14 +15,13 @@ namespace nu {
 namespace {
 
 // The offset of title to left of rect.
-const int kTitleLeftMargin = 30;
+const int kTitleLeftMargin = 5;
 
 class GroupView : public BaseView {
  public:
   explicit GroupView(Group* delegate)
       : BaseView(true), delegate_(delegate),
-        color_(GetThemeColor(ThemeColor::Text)),
-        border_insets_(kTitleLeftMargin) {}
+        color_(GetThemeColor(ThemeColor::Text)) {}
 
 
   void SetTitle(const base::string16& title) {
@@ -32,7 +30,6 @@ class GroupView : public BaseView {
     // Update the rect of the title.
     title_bounds_ = Rect(Point(kTitleLeftMargin * scale_factor(), 0),
                                ToCeiledSize(MeasureText(this, font_, title_)));
-    border_insets_ = Insets(title_bounds_.height());
   }
 
   base::string16 GetTitle() const {
@@ -41,7 +38,9 @@ class GroupView : public BaseView {
 
   void Layout() {
     Rect child_bounds(Rect(GetPixelBounds().size()));
-    child_bounds.Inset(border_insets_);
+    int padding = CalculatePadding();
+    child_bounds.Inset(padding * 2, title_bounds_.height() + padding,
+                       padding * 2, padding * 2);
     delegate_->GetContentView()->view()->SetPixelBounds(child_bounds);
   }
 
@@ -52,8 +51,8 @@ class GroupView : public BaseView {
 
   void Draw(Gdiplus::Graphics* context, const Rect& dirty) override {
     // Draw title.
-    Rect title_bounds = title_bounds_ +
-                             GetWindowPixelOrigin().OffsetFromOrigin();
+    Rect title_bounds =
+        title_bounds_ + GetWindowPixelOrigin().OffsetFromOrigin();
     Gdiplus::SolidBrush brush(ToGdi(color_));
     context->DrawString(title_.c_str(), static_cast<int>(title_.size()),
                         font_.GetNativeFont(), ToGdi(title_bounds.origin()),
@@ -61,9 +60,10 @@ class GroupView : public BaseView {
 
     // Calculate the border bounds.
     int text_height = title_bounds.height();
-    Rect border_bounds(text_height / 2, text_height / 2,
-                            GetPixelBounds().width() - text_height,
-                            GetPixelBounds().height() - text_height);
+    int padding = CalculatePadding();
+    Rect border_bounds(padding, text_height / 2,
+                       GetPixelBounds().width() - 2 * padding,
+                       GetPixelBounds().height() - text_height / 2 - padding);
     border_bounds += GetWindowPixelOrigin().OffsetFromOrigin();
 
     // Draw border.
@@ -71,19 +71,23 @@ class GroupView : public BaseView {
     region.Exclude(ToGdi(title_bounds));
     Gdiplus::GraphicsContainer container = context->BeginContainer();
     context->SetClip(&region);
-    Gdiplus::Pen pen(ToGdi(color_));
+    Gdiplus::Pen pen(Gdiplus::Color(255, 170, 170, 170));
     context->DrawRectangle(&pen, ToGdi(border_bounds));
     context->EndContainer(container);
 
     // Draw child.
     Rect child_dirty(GetPixelBounds().size());
-    child_dirty.Inset(border_insets_);
+    child_dirty.Inset(title_bounds_.height() + 1, 3, 3, 3);
     delegate_->GetContentView()->view()->Draw(context, dirty);
   }
 
   void SetParent(BaseView* parent) override {
     BaseView::SetParent(parent);
     delegate_->GetContentView()->view()->SetParent(this);
+  }
+
+  int CalculatePadding() const {
+    return std::ceil(2 * scale_factor());
   }
 
   int text_height() const { return title_bounds_.height(); }
@@ -95,7 +99,6 @@ class GroupView : public BaseView {
   Font font_;
   Rect title_bounds_;
 
-  Insets border_insets_;
   base::string16 title_;
 };
 
@@ -120,8 +123,10 @@ std::string Group::GetTitle() const {
 }
 
 Size Group::GetBorderPixelSize() const {
-  int text_height = static_cast<GroupView*>(view())->text_height();
-  return Size(text_height * 2, text_height * 2);
+  GroupView* group = static_cast<GroupView*>(view());
+  int text_height = group->text_height();
+  int padding = group->CalculatePadding();
+  return Size(padding * 4, text_height + padding * 3);
 }
 
 }  // namespace nu
