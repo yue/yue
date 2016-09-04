@@ -24,7 +24,8 @@ class EntryView : public SubwinView {
                    ES_AUTOHSCROLL | ES_NOHIDESEL | WS_CHILD | WS_VISIBLE |
                    WS_TABSTOP,
                    WS_EX_CLIENTEDGE),
-        delegate_(delegate) {
+        delegate_(delegate),
+        proc_(SetWindowProc(hwnd(), &WndProc)) {
   }
 
   void OnCommand(UINT code, int command) override {
@@ -32,8 +33,19 @@ class EntryView : public SubwinView {
       delegate_->on_text_change.Emit();
   }
 
+ protected:
+  static LRESULT WndProc(HWND hwnd, UINT message, WPARAM w_param,
+                         LPARAM l_param) {
+    auto* self = reinterpret_cast<EntryView*>(GetWindowUserData(hwnd));
+    if (message == WM_KEYDOWN && w_param == VK_RETURN)
+      self->delegate_->on_activate.Emit();
+    return CallWindowProc(self->proc_, hwnd, message, w_param, l_param);
+  }
+
  private:
   Entry* delegate_;
+
+  WNDPROC proc_ = nullptr;
 };
 
 }  // namespace
