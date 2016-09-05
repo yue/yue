@@ -31,7 +31,8 @@ SizeF MeasureText(const Font& font, const String& text) {
   return MeasureText(dc.Get(), font, text);
 }
 
-SizeF MeasureText(nu::BaseView* view, const Font& font, const String& text) {
+SizeF MeasureText(const nu::BaseView* view, const Font& font,
+                  const String& text) {
   if (!view->window())
     return MeasureText(font, text);
 

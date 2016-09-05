@@ -25,47 +25,47 @@ int GetWindowsPart(NativeTheme::Part part) {
     return 0;
 }
 
-int GetWindowsState(NativeTheme::Part part, NativeTheme::State state) {
+int GetWindowsState(NativeTheme::Part part, ControlState state) {
   switch (part) {
     case NativeTheme::CheckBox:
       switch (state) {
-        case NativeTheme::Disabled:
+        case ControlState::Disabled:
           return CBS_UNCHECKEDDISABLED;
-        case NativeTheme::Hovered:
+        case ControlState::Hovered:
           return CBS_UNCHECKEDHOT;
-        case NativeTheme::Normal:
+        case ControlState::Normal:
           return CBS_UNCHECKEDNORMAL;
-        case NativeTheme::Pressed:
+        case ControlState::Pressed:
           return CBS_UNCHECKEDPRESSED;
-        case NativeTheme::NumStates:
+        case ControlState::Size:
           NOTREACHED();
           return 0;
       }
     case NativeTheme::Button:
       switch (state) {
-        case NativeTheme::Disabled:
+        case ControlState::Disabled:
           return PBS_DISABLED;
-        case NativeTheme::Hovered:
+        case ControlState::Hovered:
           return PBS_HOT;
-        case NativeTheme::Normal:
+        case ControlState::Normal:
           return PBS_NORMAL;
-        case NativeTheme::Pressed:
+        case ControlState::Pressed:
           return PBS_PRESSED;
-        case NativeTheme::NumStates:
+        case ControlState::Size:
           NOTREACHED();
           return 0;
       }
     case NativeTheme::Radio:
       switch (state) {
-        case NativeTheme::Disabled:
+        case ControlState::Disabled:
           return RBS_UNCHECKEDDISABLED;
-        case NativeTheme::Hovered:
+        case ControlState::Hovered:
           return RBS_UNCHECKEDHOT;
-        case NativeTheme::Normal:
+        case ControlState::Normal:
           return RBS_UNCHECKEDNORMAL;
-        case NativeTheme::Pressed:
+        case ControlState::Pressed:
           return RBS_UNCHECKEDPRESSED;
-        case NativeTheme::NumStates:
+        case ControlState::Size:
           NOTREACHED();
           return 0;
       }
@@ -120,7 +120,7 @@ NativeTheme::~NativeTheme() {
   }
 }
 
-Size NativeTheme::GetThemePartSize(Part part, State state) const {
+Size NativeTheme::GetThemePartSize(Part part, ControlState state) const {
   base::win::ScopedGetDC screen_dc(NULL);
   HANDLE handle = GetThemeHandle(part);
   if (handle && get_theme_part_size_) {
@@ -136,23 +136,23 @@ Size NativeTheme::GetThemePartSize(Part part, State state) const {
 }
 
 HRESULT NativeTheme::PaintPushButton(HDC hdc,
-                                     State state,
+                                     ControlState state,
                                      const Rect& rect,
                                      const ButtonExtraParams& extra) const {
   int state_id = extra.is_default ? PBS_DEFAULTED : PBS_NORMAL;
   switch (state) {
-    case Disabled:
+    case ControlState::Disabled:
       state_id = PBS_DISABLED;
       break;
-    case Hovered:
+    case ControlState::Hovered:
       state_id = PBS_HOT;
       break;
-    case Normal:
+    case ControlState::Normal:
       break;
-    case Pressed:
+    case ControlState::Pressed:
       state_id = PBS_PRESSED;
       break;
-    case NumStates:
+    case ControlState::Size:
       NOTREACHED();
       break;
   }
@@ -161,24 +161,24 @@ HRESULT NativeTheme::PaintPushButton(HDC hdc,
   return PaintButton(hdc, state, extra, BP_PUSHBUTTON, state_id, &rect_win);
 }
 
-HRESULT NativeTheme::PaintRadioButton(HDC hdc,
-                                      State state,
-                                      const Rect& rect,
-                                      const ButtonExtraParams& extra) const {
+HRESULT NativeTheme::PaintRadio(HDC hdc,
+                                ControlState state,
+                                const Rect& rect,
+                                const ButtonExtraParams& extra) const {
   int state_id = extra.checked ? RBS_CHECKEDNORMAL : RBS_UNCHECKEDNORMAL;
   switch (state) {
-    case Disabled:
+    case ControlState::Disabled:
       state_id = extra.checked ? RBS_CHECKEDDISABLED : RBS_UNCHECKEDDISABLED;
       break;
-    case Hovered:
+    case ControlState::Hovered:
       state_id = extra.checked ? RBS_CHECKEDHOT : RBS_UNCHECKEDHOT;
       break;
-    case Normal:
+    case ControlState::Normal:
       break;
-    case Pressed:
+    case ControlState::Pressed:
       state_id = extra.checked ? RBS_CHECKEDPRESSED : RBS_UNCHECKEDPRESSED;
       break;
-    case NumStates:
+    case ControlState::Size:
       NOTREACHED();
       break;
   }
@@ -187,32 +187,32 @@ HRESULT NativeTheme::PaintRadioButton(HDC hdc,
   return PaintButton(hdc, state, extra, BP_RADIOBUTTON, state_id, &rect_win);
 }
 
-HRESULT NativeTheme::PaintCheckbox(HDC hdc,
-                                   State state,
+HRESULT NativeTheme::PaintCheckBox(HDC hdc,
+                                   ControlState state,
                                    const Rect& rect,
                                    const ButtonExtraParams& extra) const {
   int state_id = extra.checked ?
       CBS_CHECKEDNORMAL :
       (extra.indeterminate ? CBS_MIXEDNORMAL : CBS_UNCHECKEDNORMAL);
   switch (state) {
-    case Disabled:
+    case ControlState::Disabled:
       state_id = extra.checked ?
           CBS_CHECKEDDISABLED :
           (extra.indeterminate ? CBS_MIXEDDISABLED : CBS_UNCHECKEDDISABLED);
       break;
-    case Hovered:
+    case ControlState::Hovered:
       state_id = extra.checked ?
           CBS_CHECKEDHOT :
           (extra.indeterminate ? CBS_MIXEDHOT : CBS_UNCHECKEDHOT);
       break;
-    case Normal:
+    case ControlState::Normal:
       break;
-    case Pressed:
+    case ControlState::Pressed:
       state_id = extra.checked ?
           CBS_CHECKEDPRESSED :
           (extra.indeterminate ? CBS_MIXEDPRESSED : CBS_UNCHECKEDPRESSED);
       break;
-    case NumStates:
+    case ControlState::Size:
       NOTREACHED();
       break;
   }
@@ -222,7 +222,7 @@ HRESULT NativeTheme::PaintCheckbox(HDC hdc,
 }
 
 HRESULT NativeTheme::PaintButton(HDC hdc,
-                                 State state,
+                                 ControlState state,
                                  const ButtonExtraParams& extra,
                                  int part_id,
                                  int state_id,
@@ -232,7 +232,7 @@ HRESULT NativeTheme::PaintButton(HDC hdc,
     return draw_theme_(handle, hdc, part_id, state_id, rect, NULL);
 
   // Adjust classic_state based on part, state, and extras.
-  int classic_state = extra.classic_state;
+  int classic_state = 0;
   switch (part_id) {
     case BP_CHECKBOX:
       classic_state |= DFCS_BUTTONCHECK;
@@ -249,16 +249,16 @@ HRESULT NativeTheme::PaintButton(HDC hdc,
   }
 
   switch (state) {
-    case Disabled:
+    case ControlState::Disabled:
       classic_state |= DFCS_INACTIVE;
       break;
-    case Hovered:
-    case Normal:
+    case ControlState::Hovered:
+    case ControlState::Normal:
       break;
-    case Pressed:
+    case ControlState::Pressed:
       classic_state |= DFCS_PUSHED;
       break;
-    case NumStates:
+    case ControlState::Size:
       NOTREACHED();
       break;
   }
@@ -302,7 +302,8 @@ HRESULT NativeTheme::PaintButton(HDC hdc,
     // "4 / 13" is same as IE10 in classic theme.
     int padding = (inner_rect.right - inner_rect.left) * 4 / 13;
     InflateRect(&inner_rect, -padding, -padding);
-    int color_index = state == Disabled ? COLOR_GRAYTEXT : COLOR_WINDOWTEXT;
+    int color_index = state == ControlState::Disabled ? COLOR_GRAYTEXT :
+                                                        COLOR_WINDOWTEXT;
     FillRect(hdc, &inner_rect, GetSysColorBrush(color_index));
   }
 

@@ -13,6 +13,16 @@ namespace nu {
 
 class WindowImpl;
 
+// The state of the control.
+enum class ControlState {
+  // IDs defined as specific values for use in arrays.
+  Disabled = 0,
+  Hovered  = 1,
+  Normal   = 2,
+  Pressed  = 3,
+  Size     = Pressed + 1,
+};
+
 // The common base for native window based view and directui view.
 class BaseView {
  public:
@@ -48,6 +58,8 @@ class BaseView {
   void set_visible(bool visible) { is_visible_ = visible; }
   bool is_visible() const { return is_visible_; }
 
+  ControlState state() const { return state_; }
+
   // Parent view and host window.
   WindowImpl* window() const { return window_; }
   BaseView* parent() const { return parent_; }
@@ -74,6 +86,9 @@ class BaseView {
 
   // The visible state.
   bool is_visible_ = true;
+
+  // The control state.
+  ControlState state_ = ControlState::Normal;
 
   bool is_content_view_ = false;
   WindowImpl* window_ = nullptr;

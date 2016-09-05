@@ -17,6 +17,7 @@
 
 #include "nativeui/gfx/geometry/size.h"
 #include "nativeui/gfx/geometry/rect.h"
+#include "nativeui/win/base_view.h"
 
 namespace nu {
 
@@ -33,16 +34,6 @@ class NativeTheme {
     NumParts,
   };
 
-  // The state of the part.
-  enum State {
-    // IDs defined as specific values for use in arrays.
-    Disabled = 0,
-    Hovered  = 1,
-    Normal   = 2,
-    Pressed  = 3,
-    NumStates = Pressed + 1,
-  };
-
   // Each structure below holds extra information needed when painting a given
   // part.
 
@@ -51,28 +42,26 @@ class NativeTheme {
     bool indeterminate;  // Whether the button state is indeterminate.
     bool is_default;  // Whether the button is default button.
     bool is_focused;
-    bool has_border;
-    int classic_state;  // Used on Windows when uxtheme is not available.
   };
 
-  Size GetThemePartSize(Part part, State state) const;
+  Size GetThemePartSize(Part part, ControlState state) const;
 
   HRESULT PaintPushButton(HDC hdc,
-                          State state,
+                          ControlState state,
                           const Rect& rect,
                           const ButtonExtraParams& extra) const;
-  HRESULT PaintRadioButton(HDC hdc,
-                           State state,
-                           const Rect& rect,
-                           const ButtonExtraParams& extra) const;
-  HRESULT PaintCheckbox(HDC hdc,
-                        State state,
+  HRESULT PaintRadio(HDC hdc,
+                     ControlState state,
+                     const Rect& rect,
+                     const ButtonExtraParams& extra) const;
+  HRESULT PaintCheckBox(HDC hdc,
+                        ControlState state,
                         const Rect& rect,
                         const ButtonExtraParams& extra) const;
 
  private:
   HRESULT PaintButton(HDC hdc,
-                      State state,
+                      ControlState state,
                       const ButtonExtraParams& extra,
                       int part_id,
                       int state_id,
