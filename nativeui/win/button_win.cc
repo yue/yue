@@ -29,9 +29,9 @@ class ButtonView : public BaseView {
         color_(GetThemeColor(ThemeColor::Text)),
         delegate_(delegate) {
     if (type == Button::CheckBox)
-      box_size_ = theme_->GetThemePartSize(NativeTheme::CheckBox, state_);
+      box_size_ = theme_->GetThemePartSize(NativeTheme::CheckBox, state());
     else if (type == Button::Radio)
-      box_size_ = theme_->GetThemePartSize(NativeTheme::Radio, state_);
+      box_size_ = theme_->GetThemePartSize(NativeTheme::Radio, state());
   }
 
   void SetTitle(const base::string16& title) {
@@ -50,12 +50,22 @@ class ButtonView : public BaseView {
     return size;
   }
 
+  void OnMouseEnter() override {
+    set_state(ControlState::Hovered);
+    Invalidate();
+  }
+
+  void OnMouseLeave() override {
+    set_state(ControlState::Normal);
+    Invalidate();
+  }
+
   void Draw(Gdiplus::Graphics* context, const Rect& dirty) override {
     HDC dc = context->GetHDC();
 
     // Draw the button background
     if (type_ == Button::Normal)
-      theme_->PaintPushButton(dc, state_, GetWindowPixelBounds(), params_);
+      theme_->PaintPushButton(dc, state(), GetWindowPixelBounds(), params_);
 
     // Place the content in the middle.
     Size preferred_size = delegate_->GetPixelPreferredSize();
@@ -68,9 +78,9 @@ class ButtonView : public BaseView {
     Point box_origin = origin;
     box_origin.Offset(0, (preferred_size.height() - box_size_.height()) / 2);
     if (type_ == Button::CheckBox)
-      theme_->PaintCheckBox(dc, state_, Rect(box_origin, box_size_), params_);
+      theme_->PaintCheckBox(dc, state(), Rect(box_origin, box_size_), params_);
     else if (type_ == Button::Radio)
-      theme_->PaintRadio(dc, state_, Rect(box_origin, box_size_), params_);
+      theme_->PaintRadio(dc, state(), Rect(box_origin, box_size_), params_);
 
     context->ReleaseHDC(dc);
 
@@ -92,7 +102,6 @@ class ButtonView : public BaseView {
   NativeTheme* theme_;
 
   NativeTheme::ButtonExtraParams params_ = {0};
-  ControlState state_ = ControlState::Normal;
 
   // The size of box for radio and checkbox.
   Size box_size_;

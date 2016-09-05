@@ -49,6 +49,28 @@ class GroupView : public BaseView {
     Layout();
   }
 
+  void OnMouseMove(const Point& point) override {
+    Rect child_bounds = delegate_->GetContentView()->GetPixelBounds();
+    if (child_bounds.Contains(point)) {
+      if (!content_view_hovered_) {
+        content_view_hovered_ = true;
+        delegate_->GetContentView()->view()->OnMouseEnter();
+      }
+      Point child_point = point;
+      child_point -= child_bounds.OffsetFromOrigin();
+      delegate_->GetContentView()->view()->OnMouseMove(child_point);
+    } else if (content_view_hovered_) {
+      OnMouseLeave();
+    }
+  }
+
+  void OnMouseLeave() override {
+    if (content_view_hovered_) {
+      content_view_hovered_ = false;
+      delegate_->GetContentView()->view()->OnMouseLeave();
+    }
+  }
+
   void Draw(Gdiplus::Graphics* context, const Rect& dirty) override {
     // Draw title.
     Rect title_bounds =
@@ -100,6 +122,9 @@ class GroupView : public BaseView {
   Rect title_bounds_;
 
   base::string16 title_;
+
+  // Whether the content view is hovered.
+  bool content_view_hovered_ = false;
 };
 
 }  // namespace

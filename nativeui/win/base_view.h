@@ -39,6 +39,11 @@ class BaseView {
   virtual void SetParent(BaseView* parent);
   virtual void BecomeContentView(WindowImpl* parent);
 
+  // The mouse events.
+  virtual void OnMouseEnter() {}
+  virtual void OnMouseMove(const Point& point) {}
+  virtual void OnMouseLeave() {}
+
   // Get the offset to parent HWND.
   Point GetWindowPixelOrigin();
   Rect GetWindowPixelBounds();
@@ -58,6 +63,7 @@ class BaseView {
   void set_visible(bool visible) { is_visible_ = visible; }
   bool is_visible() const { return is_visible_; }
 
+  void set_state(ControlState state) { state_ = state; }
   ControlState state() const { return state_; }
 
   // Parent view and host window.

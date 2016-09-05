@@ -14,8 +14,7 @@ namespace {
 
 class TopLevelWindow : public WindowImpl {
  public:
-  explicit TopLevelWindow(Window* delegate)
-    : WindowImpl(), delegate_(delegate) {}
+  explicit TopLevelWindow(Window* delegate) : delegate_(delegate) {}
 
   void SetPixelBounds(const Rect& bounds);
   Rect GetPixelBounds();
@@ -26,6 +25,8 @@ class TopLevelWindow : public WindowImpl {
     CR_MSG_WM_CLOSE(OnClose)
     CR_MSG_WM_COMMAND(OnCommand)
     CR_MSG_WM_SIZE(OnSize)
+    CR_MSG_WM_MOUSEMOVE(OnMouseMove)
+    CR_MSG_WM_MOUSELEAVE(OnMouseLeave)
     CR_MSG_WM_PAINT(OnPaint)
     CR_MSG_WM_ERASEBKGND(OnEraseBkgnd)
   CR_END_MSG_MAP()
@@ -34,9 +35,14 @@ class TopLevelWindow : public WindowImpl {
   void OnClose();
   void OnCommand(UINT code, int command, HWND window);
   void OnSize(UINT param, const Size& size);
+  void OnMouseMove(UINT param, const Point& point);
+  void OnMouseLeave();
   void OnPaint(HDC dc);
   LRESULT OnEraseBkgnd(HDC dc);
 
+  void TrackMouse(bool enable);
+
+  bool mouse_in_window_ = false;
   Window* delegate_;
 };
 
@@ -79,10 +85,25 @@ void TopLevelWindow::OnCommand(UINT code, int command, HWND window) {
 }
 
 void TopLevelWindow::OnSize(UINT param, const Size& size) {
-  if (delegate_->GetContentView())
-    delegate_->GetContentView()->view()->SetPixelBounds(
-        Rect(Point(), size));
+  if (!delegate_->GetContentView())
+    return;
+  delegate_->GetContentView()->view()->SetPixelBounds(Rect(size));
   RedrawWindow(hwnd(), NULL, NULL, RDW_INVALIDATE | RDW_ALLCHILDREN);
+}
+
+void TopLevelWindow::OnMouseMove(UINT param, const Point& point) {
+  if (!mouse_in_window_) {
+    mouse_in_window_ = true;
+    delegate_->GetContentView()->view()->OnMouseEnter();
+    TrackMouse(true);
+  }
+  delegate_->GetContentView()->view()->OnMouseMove(point);
+}
+
+void TopLevelWindow::OnMouseLeave() {
+  TrackMouse(false);
+  mouse_in_window_ = false;
+  delegate_->GetContentView()->view()->OnMouseLeave();
 }
 
 void TopLevelWindow::OnPaint(HDC) {
@@ -113,6 +134,15 @@ void TopLevelWindow::OnPaint(HDC) {
 LRESULT TopLevelWindow::OnEraseBkgnd(HDC dc) {
   // Needed to prevent resize flicker.
   return 1;
+}
+
+void TopLevelWindow::TrackMouse(bool enable) {
+  TRACKMOUSEEVENT event = {0};
+  event.cbSize = sizeof(event);
+  event.hwndTrack = hwnd();
+  event.dwFlags = (enable ? 0 : TME_CANCEL) | TME_LEAVE;
+  event.dwHoverTime = 0;
+  TrackMouseEvent(&event);
 }
 
 // Convert between window and client areas.
