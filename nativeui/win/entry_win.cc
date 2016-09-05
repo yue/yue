@@ -37,8 +37,10 @@ class EntryView : public SubwinView {
   static LRESULT WndProc(HWND hwnd, UINT message, WPARAM w_param,
                          LPARAM l_param) {
     auto* self = reinterpret_cast<EntryView*>(GetWindowUserData(hwnd));
-    if (message == WM_KEYDOWN && w_param == VK_RETURN)
+    if (message == WM_CHAR && w_param == VK_RETURN) {
       self->delegate_->on_activate.Emit();
+      return 0;
+    }
     return CallWindowProc(self->proc_, hwnd, message, w_param, l_param);
   }
 
