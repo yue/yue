@@ -10,6 +10,8 @@
 #include "base/win/windows_version.h"
 #include "nativeui/gfx/win/gdiplus.h"
 #include "nativeui/win/subwin_holder.h"
+#include "nativeui/win/util/class_registrar.h"
+#include "nativeui/win/util/native_theme.h"
 
 namespace nu {
 
@@ -83,6 +85,12 @@ ClassRegistrar* State::GetClassRegistrar() {
   if (!class_registrar_)
     class_registrar_.reset(new ClassRegistrar);
   return class_registrar_.get();
+}
+
+NativeTheme* State::GetNativeTheme() {
+  if (!native_theme_)
+    native_theme_.reset(new NativeTheme);
+  return native_theme_.get();
 }
 
 }  // namespace nu

@@ -6,6 +6,7 @@
 
 #include "nativeui/state.h"
 #include "nativeui/win/screen.h"
+#include "nativeui/win/util/class_registrar.h"
 #include "nativeui/win/util/hwnd_util.h"
 
 namespace nu {

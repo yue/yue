@@ -8,7 +8,7 @@
 #include "nativeui/gfx/color.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/win/text_win.h"
-#include "nativeui/win/subwin_view.h"
+#include "nativeui/win/base_view.h"
 
 namespace nu {
 
@@ -67,7 +67,7 @@ void Label::SetText(const std::string& text) {
 
   if (SetPixelPreferredSize(
           ToCeiledSize(MeasureText(label, label->font(), wtext))))
-    label->Invalidate();
+    Invalidate();
 }
 
 std::string Label::GetText() {

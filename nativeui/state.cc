@@ -8,6 +8,12 @@
 #include "base/threading/thread_local.h"
 #include "nativeui/gfx/platform_font.h"
 
+#if defined(OS_WIN)
+#include "nativeui/win/subwin_holder.h"
+#include "nativeui/win/util/class_registrar.h"
+#include "nativeui/win/util/native_theme.h"
+#endif
+
 namespace nu {
 
 namespace {

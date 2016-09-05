@@ -114,6 +114,8 @@ source_set("nativeui") {
     "win/window_win.cc",
     "win/util/class_registrar.cc",
     "win/util/class_registrar.h",
+    "win/util/native_theme.cc",
+    "win/util/native_theme.h",
     "win/util/hwnd_util.cc",
     "win/util/hwnd_util.h",
     "win/util/msg_util.h",
