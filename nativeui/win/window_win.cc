@@ -27,6 +27,7 @@ class TopLevelWindow : public WindowImpl {
     CR_MSG_WM_SIZE(OnSize)
     CR_MSG_WM_MOUSEMOVE(OnMouseMove)
     CR_MSG_WM_MOUSELEAVE(OnMouseLeave)
+    CR_MESSAGE_RANGE_HANDLER_EX(WM_LBUTTONDOWN, WM_MBUTTONDBLCLK, OnMouseClick)
     CR_MSG_WM_PAINT(OnPaint)
     CR_MSG_WM_ERASEBKGND(OnEraseBkgnd)
   CR_END_MSG_MAP()
@@ -35,8 +36,9 @@ class TopLevelWindow : public WindowImpl {
   void OnClose();
   void OnCommand(UINT code, int command, HWND window);
   void OnSize(UINT param, const Size& size);
-  void OnMouseMove(UINT param, const Point& point);
+  void OnMouseMove(UINT flags, const Point& point);
   void OnMouseLeave();
+  LRESULT OnMouseClick(UINT message, WPARAM w_param, LPARAM l_param);
   void OnPaint(HDC dc);
   LRESULT OnEraseBkgnd(HDC dc);
 
@@ -91,19 +93,27 @@ void TopLevelWindow::OnSize(UINT param, const Size& size) {
   RedrawWindow(hwnd(), NULL, NULL, RDW_INVALIDATE | RDW_ALLCHILDREN);
 }
 
-void TopLevelWindow::OnMouseMove(UINT param, const Point& point) {
+void TopLevelWindow::OnMouseMove(UINT flags, const Point& point) {
   if (!mouse_in_window_) {
     mouse_in_window_ = true;
     delegate_->GetContentView()->view()->OnMouseEnter();
     TrackMouse(true);
   }
-  delegate_->GetContentView()->view()->OnMouseMove(point);
+  delegate_->GetContentView()->view()->OnMouseMove(flags, point);
 }
 
 void TopLevelWindow::OnMouseLeave() {
   TrackMouse(false);
   mouse_in_window_ = false;
   delegate_->GetContentView()->view()->OnMouseLeave();
+}
+
+LRESULT TopLevelWindow::OnMouseClick(UINT message, WPARAM w_param,
+                                     LPARAM l_param) {
+  delegate_->GetContentView()->view()->OnMouseClick(
+      message, static_cast<UINT>(w_param),
+      nu::Point(CR_GET_X_LPARAM(l_param), CR_GET_Y_LPARAM(l_param)));
+  return 0;
 }
 
 void TopLevelWindow::OnPaint(HDC) {

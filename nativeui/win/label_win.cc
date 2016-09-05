@@ -16,7 +16,7 @@ namespace {
 
 class LabelView : public BaseView {
  public:
-  LabelView() : BaseView(true),
+  LabelView() : BaseView(ControlType::Label),
                 color_(GetThemeColor(ThemeColor::Text)) {
   }
 

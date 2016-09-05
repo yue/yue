@@ -7,6 +7,7 @@
 #include <windowsx.h>
 
 #include "base/strings/utf_string_conversions.h"
+#include "nativeui/container.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/win/text_win.h"
 #include "nativeui/state.h"
@@ -23,8 +24,9 @@ const int kCheckBoxPadding = 1;
 class ButtonView : public BaseView {
  public:
   ButtonView(Button::Type type, Button* delegate)
-      : BaseView(true),
-        type_(type),
+      : BaseView(type == Button::Normal ? ControlType::Button
+                    : (type == Button::CheckBox ? ControlType::CheckBox
+                                                : ControlType::Radio)),
         theme_(State::current()->GetNativeTheme()),
         color_(GetThemeColor(ThemeColor::Text)),
         delegate_(delegate) {
@@ -45,9 +47,40 @@ class ButtonView : public BaseView {
   Size GetPreferredSize() const {
     Size size = ToCeiledSize(MeasureText(this, font_, title_));
     int padding = delegate_->DIPToPixel(
-        type_ == Button::Normal ? kButtonPadding : kCheckBoxPadding);
+        type() == ControlType::Button ? kButtonPadding : kCheckBoxPadding);
     size.Enlarge(box_size_.width() + padding * 2, padding * 2);
     return size;
+  }
+
+  void OnClick() {
+    delegate_->on_click.Emit();
+    if (type() == ControlType::CheckBox)
+      SetChecked(!IsChecked());
+    else if (type() == ControlType::Radio && !IsChecked())
+      SetChecked(true);
+  }
+
+  void SetChecked(bool checked) {
+    if (IsChecked() == checked)
+      return;
+
+    params_.checked = checked;
+    Invalidate();
+
+    // And flip all other radio buttons' state.
+    if (checked && type() == ControlType::Radio && delegate_->parent() &&
+        delegate_->parent()->view()->type() == ControlType::Container) {
+      auto* container = static_cast<Container*>(delegate_->parent());
+      for (int i = 0; i < container->child_count(); ++i) {
+        View* child = container->child_at(i);
+        if (child != delegate_ && child->view()->type() == ControlType::Radio)
+          static_cast<Button*>(child)->SetChecked(false);
+      }
+    }
+  }
+
+  bool IsChecked() const {
+    return params_.checked;
   }
 
   void OnMouseEnter() override {
@@ -60,11 +93,22 @@ class ButtonView : public BaseView {
     Invalidate();
   }
 
+  void OnMouseClick(UINT message, UINT flags, const Point& point) override {
+    if (message == WM_LBUTTONDOWN) {
+      set_state(ControlState::Pressed);
+      Invalidate();
+    } else if (message == WM_LBUTTONUP) {
+      set_state(ControlState::Hovered);
+      Invalidate();
+      OnClick();
+    }
+  }
+
   void Draw(Gdiplus::Graphics* context, const Rect& dirty) override {
     HDC dc = context->GetHDC();
 
     // Draw the button background
-    if (type_ == Button::Normal)
+    if (type() == ControlType::Button)
       theme_->PaintPushButton(dc, state(), GetWindowPixelBounds(), params_);
 
     // Place the content in the middle.
@@ -77,16 +121,16 @@ class ButtonView : public BaseView {
     // Draw the box.
     Point box_origin = origin;
     box_origin.Offset(0, (preferred_size.height() - box_size_.height()) / 2);
-    if (type_ == Button::CheckBox)
+    if (type() == ControlType::CheckBox)
       theme_->PaintCheckBox(dc, state(), Rect(box_origin, box_size_), params_);
-    else if (type_ == Button::Radio)
+    else if (type() == ControlType::Radio)
       theme_->PaintRadio(dc, state(), Rect(box_origin, box_size_), params_);
 
     context->ReleaseHDC(dc);
 
     // The text.
     int padding = delegate_->DIPToPixel(
-        type_ == Button::Normal ? kButtonPadding : kCheckBoxPadding);
+        type() == ControlType::Button ? kButtonPadding : kCheckBoxPadding);
     Point text_origin = origin;
     text_origin.Offset(box_size_.width() + padding, padding);
     Gdiplus::SolidBrush brush(ToGdi(color_));
@@ -98,7 +142,6 @@ class ButtonView : public BaseView {
   Font font() const { return font_; }
 
  private:
-  Button::Type type_;
   NativeTheme* theme_;
 
   NativeTheme::ButtonExtraParams params_ = {0};
@@ -138,13 +181,11 @@ std::string Button::GetTitle() const {
 }
 
 void Button::SetChecked(bool checked) {
-  auto* button = static_cast<ButtonView*>(view());
-  button->params()->checked = checked;
+  static_cast<ButtonView*>(view())->SetChecked(checked);
 }
 
 bool Button::IsChecked() const {
-  auto* button = static_cast<ButtonView*>(view());
-  return button->params()->checked;
+  return static_cast<ButtonView*>(view())->IsChecked();
 }
 
 }  // namespace nu

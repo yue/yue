@@ -20,7 +20,7 @@ const int kTitleLeftMargin = 5;
 class GroupView : public BaseView {
  public:
   explicit GroupView(Group* delegate)
-      : BaseView(true), delegate_(delegate),
+      : BaseView(ControlType::Group), delegate_(delegate),
         color_(GetThemeColor(ThemeColor::Text)) {}
 
 
@@ -49,7 +49,7 @@ class GroupView : public BaseView {
     Layout();
   }
 
-  void OnMouseMove(const Point& point) override {
+  void OnMouseMove(UINT flags, const Point& point) override {
     Rect child_bounds = delegate_->GetContentView()->GetPixelBounds();
     if (child_bounds.Contains(point)) {
       if (!content_view_hovered_) {
@@ -58,7 +58,7 @@ class GroupView : public BaseView {
       }
       Point child_point = point;
       child_point -= child_bounds.OffsetFromOrigin();
-      delegate_->GetContentView()->view()->OnMouseMove(child_point);
+      delegate_->GetContentView()->view()->OnMouseMove(flags, child_point);
     } else if (content_view_hovered_) {
       OnMouseLeave();
     }
@@ -68,6 +68,16 @@ class GroupView : public BaseView {
     if (content_view_hovered_) {
       content_view_hovered_ = false;
       delegate_->GetContentView()->view()->OnMouseLeave();
+    }
+  }
+
+  void OnMouseClick(UINT message, UINT flags, const Point& point) override {
+    Rect child_bounds = delegate_->GetContentView()->GetPixelBounds();
+    if (child_bounds.Contains(point)) {
+      Point child_point = point;
+      child_point -= child_bounds.OffsetFromOrigin();
+      delegate_->GetContentView()->view()->OnMouseClick(
+          message, flags, child_point);
     }
   }
 

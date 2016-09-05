@@ -13,7 +13,7 @@ namespace {
 class ContainerView : public BaseView {
  public:
   explicit ContainerView(Container* delegate)
-      : BaseView(true), delegate_(delegate) {}
+      : BaseView(ControlType::Container), delegate_(delegate) {}
   ~ContainerView() override {}
 
   void SetPixelBounds(const Rect& pixel_bounds) override {
@@ -21,19 +21,9 @@ class ContainerView : public BaseView {
     delegate_->Layout();
   }
 
-  void OnMouseMove(const Point& point) override {
+  void OnMouseMove(UINT flags, const Point& point) override {
     // Find the view that has the mouse.
-    View* hover_view = nullptr;
-    for (int i = 0; i < delegate_->child_count(); ++i) {
-      View* child = delegate_->child_at(i);
-      if (!child->IsVisible())
-        continue;
-      Rect child_bounds = child->GetPixelBounds();
-      if (child_bounds.Contains(point)) {
-        hover_view = child;
-        break;
-      }
-    }
+    View* hover_view = FindChildFromPoint(point);
 
     // Emit mouse enter/leave events
     if (hover_view_ != hover_view) {
@@ -47,7 +37,7 @@ class ContainerView : public BaseView {
     if (hover_view_) {
       Point child_point = point;
       child_point -= hover_view_->GetPixelBounds().OffsetFromOrigin();
-      hover_view_->view()->OnMouseMove(child_point);
+      hover_view_->view()->OnMouseMove(flags, child_point);
     }
   }
 
@@ -55,6 +45,15 @@ class ContainerView : public BaseView {
     if (hover_view_) {
       hover_view_->view()->OnMouseLeave();
       hover_view_ = nullptr;
+    }
+  }
+
+  void OnMouseClick(UINT message, UINT flags, const Point& point) override {
+    View* child = FindChildFromPoint(point);
+    if (child) {
+      Point child_point = point;
+      child_point -= child->GetPixelBounds().OffsetFromOrigin();
+      child->view()->OnMouseClick(message, flags, child_point);
     }
   }
 
@@ -88,6 +87,18 @@ class ContainerView : public BaseView {
   void RefreshParentTree() {
     for (int i = 0; i < delegate_->child_count(); ++i)
       delegate_->child_at(i)->view()->SetParent(this);
+  }
+
+  View* FindChildFromPoint(const Point& point) {
+    for (int i = 0; i < delegate_->child_count(); ++i) {
+      View* child = delegate_->child_at(i);
+      if (!child->IsVisible())
+        continue;
+      Rect child_bounds = child->GetPixelBounds();
+      if (child_bounds.Contains(point))
+        return child;
+    }
+    return nullptr;
   }
 
   Container* delegate_;

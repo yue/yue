@@ -10,13 +10,13 @@
 // For more information on visual style parts and states, see:
 // http://msdn.microsoft.com/library/default.asp?url=/library/en-us/shellcc/platform/commctls/userex/topics/partsandstates.asp
 
+#include <windows.h>
+#include <uxtheme.h>  // NOLINT
+
 #include <map>
 
-#include <windows.h>
-#include <uxtheme.h>
-
-#include "nativeui/gfx/geometry/size.h"
 #include "nativeui/gfx/geometry/rect.h"
+#include "nativeui/gfx/geometry/size.h"
 #include "nativeui/win/base_view.h"
 
 namespace nu {

@@ -23,6 +23,17 @@ enum class ControlState {
   Size     = Pressed + 1,
 };
 
+// Possible control types.
+enum class ControlType {
+  Button,
+  CheckBox,
+  Radio,
+  Container,
+  Group,
+  Label,
+  Subwin,
+};
+
 // The common base for native window based view and directui view.
 class BaseView {
  public:
@@ -41,8 +52,9 @@ class BaseView {
 
   // The mouse events.
   virtual void OnMouseEnter() {}
-  virtual void OnMouseMove(const Point& point) {}
+  virtual void OnMouseMove(UINT flags, const Point& point) {}
   virtual void OnMouseLeave() {}
+  virtual void OnMouseClick(UINT message, UINT flags, const Point& point) {}
 
   // Get the offset to parent HWND.
   Point GetWindowPixelOrigin();
@@ -76,6 +88,9 @@ class BaseView {
   // Whether the view owns a HWND.
   bool is_virtual() const { return is_virtual_; }
 
+  // The control's type.
+  ControlType type() const { return type_; }
+
   // Returns the DPI of current view.
   float scale_factor() const {
     if (window_)
@@ -85,10 +100,12 @@ class BaseView {
   }
 
  protected:
-  explicit BaseView(bool is_virtual) : is_virtual_(is_virtual) {}
+  explicit BaseView(ControlType type)
+      : type_(type), is_virtual_(type != ControlType::Subwin) {}
 
  private:
   bool is_virtual_;
+  ControlType type_;
 
   // The visible state.
   bool is_visible_ = true;

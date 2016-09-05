@@ -14,7 +14,7 @@ SubwinView::SubwinView(base::StringPiece16 class_name,
                        DWORD window_style, DWORD window_ex_style)
     : WindowImpl(class_name, State::current()->GetSubwinHolder(),
                  window_style, window_ex_style),
-      BaseView(false) {
+      BaseView(ControlType::Subwin) {
   // Create HFONT from default system font.
   base::win::ScopedCreateDC mem_dc(CreateCompatibleDC(NULL));
   Gdiplus::Graphics context(mem_dc.Get());
