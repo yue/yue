@@ -20,6 +20,10 @@ Rect ContentToWindowBounds(WindowImpl* window, const Rect& bounds) {
   return Rect(rect);
 }
 
+bool IsShiftPressed() {
+  return (::GetKeyState(VK_SHIFT) & 0x8000) == 0x8000;
+}
+
 }  // namespace
 
 void TopLevelWindow::SetPixelBounds(const Rect& bounds) {
@@ -92,7 +96,7 @@ LRESULT TopLevelWindow::OnMouseClick(UINT message, WPARAM w_param,
 
 void TopLevelWindow::OnChar(UINT ch, UINT repeat, UINT flags) {
   if (ch == VK_TAB)
-    focus_manager_.AdvanceFocus(delegate_->GetContentView(), false);
+    focus_manager_.AdvanceFocus(delegate_->GetContentView(), IsShiftPressed());
 }
 
 void TopLevelWindow::OnPaint(HDC) {
@@ -133,6 +137,9 @@ void TopLevelWindow::TrackMouse(bool enable) {
   event.dwHoverTime = 0;
   TrackMouseEvent(&event);
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// Public Window API implementation.
 
 Window::~Window() {
   delete window_;

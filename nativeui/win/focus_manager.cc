@@ -31,7 +31,9 @@ void FocusManager::AdvanceFocus(Container* container, bool reverse) {
 bool FocusManager::DoAdvanceFocus(Container* container, bool reverse,
                                   bool* focus_on_next_view) {
   // Iterate views recusively.
-  for (int i = 0; i < container->child_count(); ++i) {
+  for (int i = reverse ? container->child_count() - 1 : 0;
+       reverse ? (i >= 0) : (i < container->child_count());
+       reverse ? --i : ++i) {
     View* child = container->child_at(i);
     if (child->view()->type() == ControlType::Container &&
         DoAdvanceFocus(static_cast<Container*>(child), reverse,
