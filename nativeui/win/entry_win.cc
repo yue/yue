@@ -22,8 +22,7 @@ class EntryView : public SubwinView {
  public:
   explicit EntryView(Entry* delegate)
       : SubwinView(L"edit",
-                   ES_AUTOHSCROLL | ES_NOHIDESEL | WS_CHILD | WS_VISIBLE |
-                   WS_TABSTOP,
+                   ES_AUTOHSCROLL | WS_CHILD | WS_VISIBLE,
                    WS_EX_CLIENTEDGE),
         delegate_(delegate),
         proc_(SetWindowProc(hwnd(), &WndProc)) {

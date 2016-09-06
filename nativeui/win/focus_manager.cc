@@ -25,7 +25,14 @@ void FocusManager::AdvanceFocus(Container* container, bool reverse) {
   // Should we focus on next view.
   bool focus_on_next_view = focused_view_ == nullptr;
 
-  DoAdvanceFocus(container, reverse, &focus_on_next_view);
+  bool found = DoAdvanceFocus(container, reverse, &focus_on_next_view);
+
+  // Search again from start.
+  if (!found && focus_on_next_view && focused_view_) {
+    focused_view_->view()->SetFocus(false);
+    focused_view_ = nullptr;
+    DoAdvanceFocus(container, reverse, &focus_on_next_view);
+  }
 }
 
 bool FocusManager::DoAdvanceFocus(Container* container, bool reverse,

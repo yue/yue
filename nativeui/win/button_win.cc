@@ -14,6 +14,7 @@
 #include "nativeui/state.h"
 #include "nativeui/win/base_view.h"
 #include "nativeui/win/util/native_theme.h"
+#include "nativeui/win/window_win.h"
 
 namespace nu {
 
@@ -103,6 +104,9 @@ class ButtonView : public BaseView {
       Invalidate();
       OnClick();
     }
+
+    // Clear focus when a button is clicked.
+    static_cast<TopLevelWindow*>(window())->focus_manager()->TakeFocus(nullptr);
   }
 
   bool CanHaveFocus() const override {
