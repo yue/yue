@@ -42,7 +42,12 @@ Rect View::GetBounds() const {
     rect.x -= pb.x();
     rect.y -= pb.y();
   }
-  return Rect(rect.x, rect.y, rect.width, rect.height);
+  Rect bounds = Rect(rect.x, rect.y, rect.width, rect.height);
+  // GTK uses (-1, -1, 1, 1) as empty bounds, we should match the behavior of
+  // other platforms by returning an empty rect.
+  if (bounds == Rect(-1, -1, 1, 1))
+    return Rect();
+  return bounds;
 }
 
 void View::SetPixelBounds(const Rect& bounds) {

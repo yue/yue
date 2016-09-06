@@ -22,11 +22,6 @@ void OnSizeAllocate(GtkWidget* view, GtkAllocation* alloc,
 
 void Container::PlatformInit() {
   TakeOverView(gtk_fixed_new());
-
-  // Give the container a small initial size, otherwise GTK might give warnings.
-  GdkRectangle rect = { 0, 0, 100, 100 };
-  gtk_widget_size_allocate(view(), &rect);
-
   g_signal_connect_after(
       view(), "size-allocate", G_CALLBACK(OnSizeAllocate), this);
 }

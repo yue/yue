@@ -42,6 +42,10 @@ LayoutManager* Container::GetLayoutManager() const {
 }
 
 void Container::Layout() {
+  // No need to layout when container is not initialized.
+  if (GetPixelBounds().IsEmpty())
+    return;
+
   DCHECK(layout_manager_.get());
   Invalidate();
   layout_manager_->Layout(this);
