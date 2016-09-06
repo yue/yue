@@ -22,6 +22,9 @@ class SubwinView : public WindowImpl, public BaseView {
   void SetPixelBounds(const Rect& pixel_bounds) override;
   void SetParent(BaseView* parent) override;
   void BecomeContentView(WindowImpl* parent) override;
+  void Invalidate(const Rect& dirty) override;
+  void SetFocus(bool focus) override;
+  bool IsFocused() const override;
 
   // Rerouted from parent window
   virtual void OnCommand(UINT code, int command) {}

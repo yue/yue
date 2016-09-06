@@ -8,6 +8,7 @@
 
 #include "base/strings/utf_string_conversions.h"
 #include "nativeui/container.h"
+#include "nativeui/gfx/geometry/insets.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/win/text_win.h"
 #include "nativeui/state.h"
@@ -104,6 +105,10 @@ class ButtonView : public BaseView {
     }
   }
 
+  bool CanHaveFocus() const override {
+    return true;
+  }
+
   void Draw(Gdiplus::Graphics* context, const Rect& dirty) override {
     HDC dc = context->GetHDC();
 
@@ -126,6 +131,25 @@ class ButtonView : public BaseView {
     else if (type() == ControlType::Radio)
       theme_->PaintRadio(dc, state(), Rect(box_origin, box_size_), params_);
 
+    // Draw focused ring.
+    if (IsFocused()) {
+      RECT rect;
+      if (type() == ControlType::Button) {
+        Rect bounds = GetWindowPixelBounds();
+        int padding = delegate_->DIPToPixel(1);
+        bounds.Inset(Insets(padding));
+        rect = bounds.ToRECT();
+      } else {
+        int padding = delegate_->DIPToPixel(kCheckBoxPadding);
+        Point box_origin = origin;
+        box_origin.Offset(box_size_.width() + padding, padding);
+        Size ring_size = preferred_size;
+        ring_size.Enlarge(-box_size_.width() - padding * 2, -padding * 2);
+        rect = Rect(box_origin, ring_size).ToRECT();
+      }
+      DrawFocusRect(dc, &rect);
+    }
+
     context->ReleaseHDC(dc);
 
     // The text.
@@ -143,7 +167,6 @@ class ButtonView : public BaseView {
 
  private:
   NativeTheme* theme_;
-
   NativeTheme::ButtonExtraParams params_ = {0};
 
   // The size of box for radio and checkbox.

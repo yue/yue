@@ -9,6 +9,7 @@
 #include "nativeui/gfx/win/text_win.h"
 #include "nativeui/win/subwin_view.h"
 #include "nativeui/win/util/hwnd_util.h"
+#include "nativeui/win/window_win.h"
 
 namespace nu {
 
@@ -28,6 +29,10 @@ class EntryView : public SubwinView {
         proc_(SetWindowProc(hwnd(), &WndProc)) {
   }
 
+  bool CanHaveFocus() const override {
+    return true;
+  }
+
   void OnCommand(UINT code, int command) override {
     if (code == EN_CHANGE)
       delegate_->on_text_change.Emit();
@@ -38,8 +43,19 @@ class EntryView : public SubwinView {
                          LPARAM l_param) {
     auto* self = reinterpret_cast<EntryView*>(GetWindowUserData(hwnd));
     if (message == WM_CHAR && w_param == VK_RETURN) {
+      // Pressing enter means activate.
       self->delegate_->on_activate.Emit();
       return 0;
+    } else if (message == WM_CHAR && w_param == VK_TAB) {
+      // Let the parent handle focus switching.
+      ::SendMessage(::GetParent(hwnd), WM_CHAR, w_param, l_param);
+      return 0;
+    } else if (message == WM_SETFOCUS) {
+      // Notify the window that focus has changed.
+      if (self->window()) {
+        static_cast<TopLevelWindow*>(self->window())->focus_manager()->
+          TakeFocus(self->delegate_);
+      }
     }
     return CallWindowProc(self->proc_, hwnd, message, w_param, l_param);
   }

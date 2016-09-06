@@ -56,7 +56,7 @@ TEST_F(ButtonTest, RadioGroup) {
   container->AddChildView(r1);
   container->AddChildView(r2);
   container->AddChildView(r3);
-#if !defined(OS_MACOSX)
+#if !defined(OS_LINUX)
   EXPECT_FALSE(r1->IsChecked());
   EXPECT_FALSE(r2->IsChecked());
   EXPECT_FALSE(r3->IsChecked());
@@ -65,10 +65,8 @@ TEST_F(ButtonTest, RadioGroup) {
   EXPECT_TRUE(r1->IsChecked());
   EXPECT_FALSE(r2->IsChecked());
   EXPECT_FALSE(r3->IsChecked());
-#if !defined(OS_WIN)
   r2->SetChecked(true);
   EXPECT_FALSE(r1->IsChecked());
   EXPECT_TRUE(r2->IsChecked());
   EXPECT_FALSE(r3->IsChecked());
-#endif
 }

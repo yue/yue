@@ -281,20 +281,6 @@ HRESULT NativeTheme::PaintButton(HDC hdc,
   }
   DrawFrameControl(hdc, rect, DFC_BUTTON, classic_state);
 
-  // Draw the focus rectangle (the dotted line box) only on buttons.  For radio
-  // and checkboxes, we let webkit draw the focus rectangle (orange glow).
-  if ((BP_PUSHBUTTON == part_id) && focused) {
-    // The focus rect is inside the button.  The exact number of pixels depends
-    // on whether we're in classic mode or using uxtheme.
-    if (handle && get_theme_content_rect_) {
-      get_theme_content_rect_(handle, hdc, part_id, state_id, rect, rect);
-    } else {
-      InflateRect(rect, -GetSystemMetrics(SM_CXEDGE),
-                  -GetSystemMetrics(SM_CYEDGE));
-    }
-    DrawFocusRect(hdc, rect);
-  }
-
   // Classic theme doesn't support indeterminate checkboxes.  We draw
   // a recangle inside a checkbox like IE10 does.
   if (part_id == BP_CHECKBOX && extra.indeterminate) {

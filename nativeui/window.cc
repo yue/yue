@@ -14,6 +14,10 @@ Window::Window(const Options& options) {
 }
 
 void Window::SetContentView(Container* container) {
+  if (!container) {
+    LOG(ERROR) << "Content view can not be null";
+    return;
+  }
   content_view_ = container;
   PlatformSetContentView(container);
 }

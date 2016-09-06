@@ -2,7 +2,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/window.h"
+#include "nativeui/win/window_win.h"
 
 #include "nativeui/gfx/win/double_buffer.h"
 #include "nativeui/win/subwin_view.h"
@@ -12,41 +12,15 @@ namespace nu {
 
 namespace {
 
-class TopLevelWindow : public WindowImpl {
- public:
-  explicit TopLevelWindow(Window* delegate) : delegate_(delegate) {}
+// Convert between window and client areas.
+Rect ContentToWindowBounds(WindowImpl* window, const Rect& bounds) {
+  RECT rect = bounds.ToRECT();
+  AdjustWindowRectEx(&rect, window->window_style(),
+                     FALSE, window->window_ex_style());
+  return Rect(rect);
+}
 
-  void SetPixelBounds(const Rect& bounds);
-  Rect GetPixelBounds();
-  Rect GetContentPixelBounds();
-
- protected:
-  CR_BEGIN_MSG_MAP_EX(TopLevelWindow, WindowImpl)
-    CR_MSG_WM_CLOSE(OnClose)
-    CR_MSG_WM_COMMAND(OnCommand)
-    CR_MSG_WM_SIZE(OnSize)
-    CR_MSG_WM_MOUSEMOVE(OnMouseMove)
-    CR_MSG_WM_MOUSELEAVE(OnMouseLeave)
-    CR_MESSAGE_RANGE_HANDLER_EX(WM_LBUTTONDOWN, WM_MBUTTONDBLCLK, OnMouseClick)
-    CR_MSG_WM_PAINT(OnPaint)
-    CR_MSG_WM_ERASEBKGND(OnEraseBkgnd)
-  CR_END_MSG_MAP()
-
- private:
-  void OnClose();
-  void OnCommand(UINT code, int command, HWND window);
-  void OnSize(UINT param, const Size& size);
-  void OnMouseMove(UINT flags, const Point& point);
-  void OnMouseLeave();
-  LRESULT OnMouseClick(UINT message, WPARAM w_param, LPARAM l_param);
-  void OnPaint(HDC dc);
-  LRESULT OnEraseBkgnd(HDC dc);
-
-  void TrackMouse(bool enable);
-
-  bool mouse_in_window_ = false;
-  Window* delegate_;
-};
+}  // namespace
 
 void TopLevelWindow::SetPixelBounds(const Rect& bounds) {
   SetWindowPos(hwnd(), NULL,
@@ -116,6 +90,11 @@ LRESULT TopLevelWindow::OnMouseClick(UINT message, WPARAM w_param,
   return 0;
 }
 
+void TopLevelWindow::OnChar(UINT ch, UINT repeat, UINT flags) {
+  if (ch == VK_TAB)
+    focus_manager_.AdvanceFocus(delegate_->GetContentView(), false);
+}
+
 void TopLevelWindow::OnPaint(HDC) {
   PAINTSTRUCT ps;
   BeginPaint(hwnd(), &ps);
@@ -154,16 +133,6 @@ void TopLevelWindow::TrackMouse(bool enable) {
   event.dwHoverTime = 0;
   TrackMouseEvent(&event);
 }
-
-// Convert between window and client areas.
-Rect ContentToWindowBounds(WindowImpl* window, const Rect& bounds) {
-  RECT rect = bounds.ToRECT();
-  AdjustWindowRectEx(&rect, window->window_style(),
-                     FALSE, window->window_ex_style());
-  return Rect(rect);
-}
-
-}  // namespace
 
 Window::~Window() {
   delete window_;

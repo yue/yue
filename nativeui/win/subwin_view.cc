@@ -57,4 +57,18 @@ void SubwinView::BecomeContentView(WindowImpl* parent) {
                              : State::current()->GetSubwinHolder());
 }
 
+void SubwinView::Invalidate(const Rect& dirty) {
+  // There is no need to invalidate a child window.
+}
+
+void SubwinView::SetFocus(bool focus) {
+  ::SetFocus(focus ? hwnd() : ::GetParent(hwnd()));
+  if (!focus)
+    ::SendMessage(hwnd(), WM_KILLFOCUS, NULL, NULL);
+}
+
+bool SubwinView::IsFocused() const {
+  return ::GetFocus() == hwnd();
+}
+
 }  // namespace nu

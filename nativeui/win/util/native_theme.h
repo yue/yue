@@ -41,7 +41,6 @@ class NativeTheme {
     bool checked;
     bool indeterminate;  // Whether the button state is indeterminate.
     bool is_default;  // Whether the button is default button.
-    bool is_focused;
   };
 
   Size GetThemePartSize(Part part, ControlState state) const;

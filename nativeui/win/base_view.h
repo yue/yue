@@ -65,7 +65,14 @@ class BaseView {
   Rect GetBounds();
 
   // Invalidate the view and trigger a redraw.
-  void Invalidate(const Rect& dirty = Rect());
+  virtual void Invalidate(const Rect& dirty = Rect());
+
+  // Whether the view can get focus.
+  virtual bool CanHaveFocus() const { return false; }
+
+  // Move focus to the view.
+  virtual void SetFocus(bool focus);
+  virtual bool IsFocused() const;
 
   // Set the preferred size.
   void set_pixel_preferred_size(Size size) { preferred_size_ = size; }
@@ -106,6 +113,9 @@ class BaseView {
  private:
   bool is_virtual_;
   ControlType type_;
+
+  // The focus state.
+  bool is_focused_ = false;
 
   // The visible state.
   bool is_visible_ = true;

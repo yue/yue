@@ -80,4 +80,13 @@ void BaseView::Invalidate(const Rect& dirty) {
   InvalidateRect(window_->hwnd(), &rect, TRUE);
 }
 
+void BaseView::SetFocus(bool focus) {
+  is_focused_ = focus;
+  Invalidate();
+}
+
+bool BaseView::IsFocused() const {
+  return is_focused_;
+}
+
 }  // namespace nu
