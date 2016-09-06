@@ -85,6 +85,7 @@ source_set("nativeui") {
     "gtk/entry_gtk.cc",
     "gtk/group_gtk.cc",
     "gtk/label_gtk.cc",
+    "gtk/scroll_gtk.cc",
     "gtk/state_gtk.cc",
     "gtk/view_gtk.cc",
     "gtk/window_gtk.cc",

@@ -10,7 +10,8 @@ void Group::PlatformInit() {
   TakeOverView(gtk_frame_new(""));
 
   // Give the frame an initial size to calculate border size.
-  SetBounds(Rect(0, 0, 100, 100));
+  GdkRectangle rect = { 0, 0, 100, 100 };
+  gtk_widget_size_allocate(view(), &rect);
 }
 
 void Group::PlatformSetContentView(Container* container) {
