@@ -213,6 +213,24 @@ struct Type<nu::Container> {
 };
 
 template<>
+struct Type<nu::Scroll> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Scroll";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "new", &MetaTable<nu::Scroll>::NewInstance<const nu::Size&>,
+           "sethorizontalscrollbar", &nu::Scroll::SetHorizontalScrollBar,
+           "hashorizontalscrollbar", &nu::Scroll::HasHorizontalScrollBar,
+           "setverticalscrollbar", &nu::Scroll::SetVerticalScrollBar,
+           "hasverticalscrollbar", &nu::Scroll::HasVerticalScrollBar,
+           "setautohidescrollbar", &nu::Scroll::SetAutoHideScrollBar,
+           "isscrollbarautohide", &nu::Scroll::IsScrollBarAutoHide,
+           "setcontentview", &nu::Scroll::SetContentView,
+           "getcontentview", &nu::Scroll::GetContentView);
+  }
+};
+
+template<>
 struct Type<nu::Window::Options> {
   static constexpr const char* name = "yue.Window.Options";
   static inline bool To(State* state, int index, nu::Window::Options* out) {
@@ -380,6 +398,9 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   lua_rawset(state, -3);
   lua::Push(state, "Group");
   lua::MetaTable<nu::Group>::Push(state);
+  lua_rawset(state, -3);
+  lua::Push(state, "Scroll");
+  lua::MetaTable<nu::Scroll>::Push(state);
   lua_rawset(state, -3);
   lua::Push(state, "FillLayout");
   lua::MetaTable<nu::FillLayout>::Push(state);

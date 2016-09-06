@@ -11,6 +11,7 @@
 #include "nativeui/label.h"
 #include "nativeui/layout/box_layout.h"
 #include "nativeui/layout/fill_layout.h"
+#include "nativeui/scroll.h"
 #include "nativeui/state.h"
 #include "nativeui/window.h"
 
