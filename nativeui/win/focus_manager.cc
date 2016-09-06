@@ -16,6 +16,10 @@ FocusManager::~FocusManager() {
 }
 
 void FocusManager::TakeFocus(View* view) {
+  // This happens when you switch to a child window.
+  if (focused_view_ == view)
+    return;
+
   if (focused_view_)
     focused_view_->view()->SetFocus(false);
   focused_view_ = view;

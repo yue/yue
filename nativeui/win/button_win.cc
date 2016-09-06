@@ -105,8 +105,9 @@ class ButtonView : public BaseView {
       OnClick();
     }
 
-    // Clear focus when a button is clicked.
-    static_cast<TopLevelWindow*>(window())->focus_manager()->TakeFocus(nullptr);
+    // Clicking a button moves the focus to it.
+    auto* toplevel_window = static_cast<TopLevelWindow*>(window());
+    toplevel_window->focus_manager()->TakeFocus(delegate_);
   }
 
   bool CanHaveFocus() const override {
