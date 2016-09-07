@@ -12,13 +12,16 @@ View::View() : view_(nullptr) {
 }
 
 View::~View() {
-  gtk_widget_destroy(view_);
+  if (view_)
+    gtk_widget_destroy(view_);
 }
 
 void View::TakeOverView(NativeView view) {
   view_ = view;
-  g_object_ref_sink(view);
-  gtk_widget_show(view);
+  if (view_) {
+    g_object_ref_sink(view);
+    gtk_widget_show(view);
+  }
 }
 
 void View::SetBounds(const Rect& bounds) {

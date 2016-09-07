@@ -4,26 +4,19 @@
 
 #include "nativeui/container.h"
 
+#include "nativeui/gtk/container_container.h"
+
 namespace nu {
 
-namespace {
-
-void OnSizeAllocate(GtkWidget* view, GtkAllocation* alloc,
-                    Container* container) {
-  // Ignore empty sizes on initialization.
-  if (alloc->x == -1 && alloc->y == -1 &&
-      alloc->width == 1 && alloc->height == 1)
-    return;
-
-  container->Layout();
+void Container::PlatformInit() {
+  TakeOverView(nu_container_new(this));
 }
 
-}  // namespace
-
-void Container::PlatformInit() {
-  TakeOverView(gtk_fixed_new());
-  g_signal_connect_after(
-      view(), "size-allocate", G_CALLBACK(OnSizeAllocate), this);
+void Container::PlatformDestroy() {
+  // The widget relies on Container to get children, so we must ensure the
+  // widget is destroyed before this class.
+  gtk_widget_destroy(view());
+  TakeOverView(nullptr);
 }
 
 void Container::PlatformAddChildView(View* child) {

@@ -78,6 +78,8 @@ source_set("nativeui") {
     "layout/layout_manager.h",
     "gtk/gtk_event_loop.cc",
     "gtk/gtk_event_loop.h",
+    "gtk/container_container.cc",
+    "gtk/container_container.h",
     "gtk/widget_util.cc",
     "gtk/widget_util.h",
     "gtk/button_gtk.cc",

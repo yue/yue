@@ -45,6 +45,9 @@ void Container::PlatformInit() {
   TakeOverView([[ContainerView alloc] initWithWrapper:this]);
 }
 
+void Container::PlatformDestroy() {
+}
+
 void Container::PlatformAddChildView(View* child) {
   [view() addSubview:child->view()];
 }

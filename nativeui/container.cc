@@ -16,6 +16,7 @@ Container::Container() : layout_manager_(new FillLayout) {
 }
 
 Container::~Container() {
+  PlatformDestroy();
 }
 
 bool Container::UpdatePreferredSize() {

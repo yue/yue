@@ -44,6 +44,7 @@ NATIVEUI_EXPORT class Container : public View {
   ~Container() override;
 
   void PlatformInit();
+  void PlatformDestroy();
   void PlatformAddChildView(View* view);
   void PlatformRemoveChildView(View* view);
 

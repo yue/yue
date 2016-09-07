@@ -113,6 +113,9 @@ void Container::PlatformInit() {
   TakeOverView(new ContainerView(this));
 }
 
+void Container::PlatformDestroy() {
+}
+
 void Container::PlatformAddChildView(View* child) {
   child->view()->SetParent(view());
 }
