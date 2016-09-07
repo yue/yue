@@ -9,7 +9,11 @@ namespace nu {
 void Scroll::PlatformInit(const Size& size) {
   SetPreferredSize(size);
   TakeOverView(gtk_scrolled_window_new(nullptr, nullptr));
-  gtk_container_add(GTK_CONTAINER(view()), gtk_viewport_new(nullptr, nullptr));
+  GtkWidget* viewport = gtk_viewport_new(
+      gtk_scrolled_window_get_hadjustment(GTK_SCROLLED_WINDOW(view())),
+      gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(view())));
+  gtk_widget_show(viewport);
+  gtk_container_add(GTK_CONTAINER(view()), viewport);
   SetBounds(Rect(size));
 }
 
@@ -18,9 +22,18 @@ void Scroll::PlatformSetContentView(Container* container) {
   GtkWidget* child = gtk_bin_get_child(GTK_BIN(viewport));
   if (child)
     gtk_container_remove(GTK_CONTAINER(viewport), child);
-  gtk_container_add(GTK_CONTAINER(viewport), container->view());
+  child = container->view();
+  gtk_container_add(GTK_CONTAINER(viewport), child);
 
-  container->Layout();
+  Rect bounds = container->GetBounds();
+  gtk_widget_set_size_request(child, bounds.width(), bounds.height());
+}
+
+void Scroll::SetContentSize(const Size& size) {
+  GetContentView()->SetBounds(Rect(size));
+  // Viewport calculates the content view according to child's size request.
+  gtk_widget_set_size_request(GetContentView()->view(),
+                              size.width(), size.height());
 }
 
 void Scroll::SetVerticalScrollBar(bool has) {

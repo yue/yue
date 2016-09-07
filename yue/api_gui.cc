@@ -225,6 +225,8 @@ struct Type<nu::Scroll> {
            "hasverticalscrollbar", &nu::Scroll::HasVerticalScrollBar,
            "setautohidescrollbar", &nu::Scroll::SetAutoHideScrollBar,
            "isscrollbarautohide", &nu::Scroll::IsScrollBarAutoHide,
+           "setcontentsize", &nu::Scroll::SetContentSize,
+           "getcontentsize", &nu::Scroll::GetContentSize,
            "setcontentview", &nu::Scroll::SetContentView,
            "getcontentview", &nu::Scroll::GetContentView);
   }

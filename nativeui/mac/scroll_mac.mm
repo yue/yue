@@ -17,8 +17,10 @@ void Scroll::PlatformInit(const Size& size) {
 
 void Scroll::PlatformSetContentView(Container* container) {
   static_cast<NSScrollView*>(view()).documentView = container->view();
-  if (container->GetBounds().IsEmpty())
-    container->SetBounds(Rect(container->preferred_size()));
+}
+
+void Scroll::SetContentSize(const Size& size) {
+  GetContentView()->SetBounds(Rect(size));
 }
 
 void Scroll::SetVerticalScrollBar(bool has) {

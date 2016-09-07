@@ -16,6 +16,9 @@ NATIVEUI_EXPORT class Scroll : public View {
   void SetContentView(Container* view);
   Container* GetContentView() const;
 
+  void SetContentSize(const Size& size);
+  Size GetContentSize() const;
+
   void SetVerticalScrollBar(bool has);
   bool HasVerticalScrollBar() const;
   void SetHorizontalScrollBar(bool has);
