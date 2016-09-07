@@ -13,6 +13,8 @@
 #include <CoreGraphics/CoreGraphics.h>
 #elif defined(OS_MACOSX)
 #include <ApplicationServices/ApplicationServices.h>
+#elif defined(OS_LINUX)
+#include <gtk/gtk.h>
 #endif
 
 #include "base/logging.h"
@@ -43,6 +45,10 @@ Rect::Rect(const RECT& r)
 Rect::Rect(const CGRect& r)
     : origin_(r.origin.x, r.origin.y), size_(r.size.width, r.size.height) {
 }
+#elif defined(OS_LINUX)
+Rect::Rect(const GdkRectangle& r)
+    : origin_(r.x, r.y), size_(r.width, r.height) {
+}
 #endif
 
 #if defined(OS_WIN)
@@ -57,6 +63,11 @@ RECT Rect::ToRECT() const {
 #elif defined(OS_MACOSX)
 CGRect Rect::ToCGRect() const {
   return CGRectMake(x(), y(), width(), height());
+}
+#elif defined(OS_LINUX)
+GdkRectangle Rect::ToGdkRectangle() const {
+  GdkRectangle rect = { x(), y(), width(), height() };
+  return rect;
 }
 #endif
 

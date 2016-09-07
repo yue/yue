@@ -22,8 +22,7 @@ void View::TakeOverView(NativeView view) {
 }
 
 void View::SetBounds(const Rect& bounds) {
-  GdkRectangle rect = { bounds.x(), bounds.y(),
-                        bounds.width(), bounds.height() };
+  GdkRectangle rect = bounds.ToGdkRectangle();
   if (parent()) {
     // The size allocation is relative to the window instead of parent.
     Point pb = parent()->GetWindowOrigin();
@@ -42,7 +41,7 @@ Rect View::GetBounds() const {
     rect.x -= pb.x();
     rect.y -= pb.y();
   }
-  Rect bounds = Rect(rect.x, rect.y, rect.width, rect.height);
+  Rect bounds = Rect(rect);
   // GTK uses (-1, -1, 1, 1) as empty bounds, we should match the behavior of
   // other platforms by returning an empty rect.
   if (bounds == Rect(-1, -1, 1, 1))

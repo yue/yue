@@ -26,6 +26,8 @@
 typedef struct tagRECT RECT;
 #elif defined(OS_MACOSX)
 typedef struct CGRect CGRect;
+#elif defined(OS_LINUX)
+#include <gdk/gdk.h>
 #endif
 
 namespace nu {
@@ -45,6 +47,8 @@ class NATIVEUI_EXPORT Rect {
   explicit Rect(const RECT& r);
 #elif defined(OS_MACOSX)
   explicit Rect(const CGRect& r);
+#elif defined(OS_LINUX)
+  explicit Rect(const GdkRectangle& r);
 #endif
 
   ~Rect() {}
@@ -55,6 +59,9 @@ class NATIVEUI_EXPORT Rect {
 #elif defined(OS_MACOSX)
   // Construct an equivalent CoreGraphics object.
   CGRect ToCGRect() const;
+#elif defined(OS_LINUX)
+  // Construct an equivalent GDK object.
+  GdkRectangle ToGdkRectangle() const;
 #endif
 
   int x() const { return origin_.x(); }
