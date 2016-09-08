@@ -7,8 +7,8 @@
 namespace nu {
 
 Scroll::Scroll(const Size& size) {
-  SetPreferredSize(size);
   PlatformInit(size);
+  SetPreferredSize(size);
   SetContentView(new Container);
 }
 
