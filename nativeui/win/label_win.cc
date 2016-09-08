@@ -28,17 +28,10 @@ class LabelView : public BaseView {
     return text_;
   }
 
-  void Draw(Gdiplus::Graphics* context, const Rect& dirty) override {
-    // Pring the text in middle of rect.
-    Size text_size = ToCeiledSize(MeasureText(this, font_, text_));
-    Size ctrl_size = GetPixelBounds().size();
-    Point origin((ctrl_size.width() - text_size.width()) / 2,
-                      (ctrl_size.height() - text_size.height()) / 2);
-    origin += GetWindowPixelOrigin().OffsetFromOrigin();
-
-    Gdiplus::SolidBrush brush(ToGdi(color_));
-    context->DrawString(text_.c_str(), static_cast<int>(text_.size()),
-                        font_.GetNativeFont(), ToGdi(origin), &brush);
+  void Draw(PainterWin* painter, const Rect& dirty) override {
+    painter->DrawStringWithFlags(text_, font_, color_,
+                                 Rect(GetPixelBounds().size()),
+                                 Painter::TextAlignCenter);
   }
 
   Font font() const { return font_; }

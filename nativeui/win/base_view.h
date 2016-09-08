@@ -5,7 +5,7 @@
 #ifndef NATIVEUI_WIN_BASE_VIEW_H_
 #define NATIVEUI_WIN_BASE_VIEW_H_
 
-#include "nativeui/gfx/win/gdiplus.h"
+#include "nativeui/gfx/win/painter_win.h"
 #include "nativeui/win/screen.h"
 #include "nativeui/win/window_impl.h"
 
@@ -31,6 +31,7 @@ enum class ControlType {
   Container,
   Group,
   Label,
+  Scroll,
   Subwin,
 };
 
@@ -44,7 +45,7 @@ class BaseView {
   virtual Rect GetPixelBounds() const;
 
   // Draw the content.
-  virtual void Draw(Gdiplus::Graphics* context, const Rect& dirty) {}
+  virtual void Draw(PainterWin* painter, const Rect& dirty) {}
 
   // Set the parent view.
   virtual void SetParent(BaseView* parent);

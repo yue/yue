@@ -57,18 +57,24 @@ class ContainerView : public BaseView {
     }
   }
 
-  void Draw(Gdiplus::Graphics* context, const Rect& dirty) override {
-    // Calculate the dirty rect for each child.
+  void Draw(PainterWin* painter, const Rect& dirty) override {
+    // Iterate children for drawing.
     for (int i = 0; i < delegate_->child_count(); ++i) {
       View* child = delegate_->child_at(i);
       if (!child->IsVisible())
         continue;
       Rect child_bounds = child->GetPixelBounds();
       if (child_bounds.Intersects(dirty)) {
+        // Caculate the dirty rect for child.
         Rect child_dirty(dirty);
         child_dirty.Intersect(child_bounds);
         child_dirty -= child_bounds.OffsetFromOrigin();
-        child->view()->Draw(context, child_dirty);
+
+        // Move the painting origin for child.
+        painter->Save();
+        painter->Translate(child_bounds.OffsetFromOrigin());
+        child->view()->Draw(painter, child_dirty);
+        painter->Restore();
       }
     }
   }

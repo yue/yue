@@ -18,16 +18,25 @@ namespace Gdiplus {
 
 #include "nativeui/gfx/color.h"
 #include "nativeui/gfx/geometry/rect.h"
+#include "nativeui/gfx/geometry/rect_f.h"
 
 namespace nu {
 
 // Convert from gfx types to gdiplus types.
-inline Gdiplus::RectF ToGdi(const Rect& rect) {
+inline Gdiplus::RectF ToGdi(const RectF& rect) {
   return Gdiplus::RectF(rect.x(), rect.y(), rect.width(), rect.height());
 }
 
-inline Gdiplus::PointF ToGdi(const Point& point) {
+inline Gdiplus::Rect ToGdi(const Rect& rect) {
+  return Gdiplus::Rect(rect.x(), rect.y(), rect.width(), rect.height());
+}
+
+inline Gdiplus::PointF ToGdi(const PointF& point) {
   return Gdiplus::PointF(point.x(), point.y());
+}
+
+inline Gdiplus::Point ToGdi(const Point& point) {
+  return Gdiplus::Point(point.x(), point.y());
 }
 
 inline Gdiplus::Color ToGdi(const Color& color) {

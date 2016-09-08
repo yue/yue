@@ -114,8 +114,8 @@ class ButtonView : public BaseView {
     return true;
   }
 
-  void Draw(Gdiplus::Graphics* context, const Rect& dirty) override {
-    HDC dc = context->GetHDC();
+  void Draw(PainterWin* painter, const Rect& dirty) override {
+    HDC dc = painter->GetHDC();
 
     // Draw the button background
     if (type() == ControlType::Button)
@@ -126,10 +126,10 @@ class ButtonView : public BaseView {
     Size ctrl_size = GetPixelBounds().size();
     Point origin((ctrl_size.width() - preferred_size.width()) / 2,
                  (ctrl_size.height() - preferred_size.height()) / 2);
-    origin += GetWindowPixelOrigin().OffsetFromOrigin();
 
     // Draw the box.
-    Point box_origin = origin;
+    Point box_origin(origin);
+    box_origin += GetWindowPixelOrigin().OffsetFromOrigin();
     box_origin.Offset(0, (preferred_size.height() - box_size_.height()) / 2);
     if (type() == ControlType::CheckBox)
       theme_->PaintCheckBox(dc, state(), Rect(box_origin, box_size_), params_);
@@ -155,16 +155,14 @@ class ButtonView : public BaseView {
       DrawFocusRect(dc, &rect);
     }
 
-    context->ReleaseHDC(dc);
+    painter->ReleaseHDC(dc);
 
     // The text.
     int padding = delegate_->DIPToPixel(
         type() == ControlType::Button ? kButtonPadding : kCheckBoxPadding);
-    Point text_origin = origin;
-    text_origin.Offset(box_size_.width() + padding, padding);
-    Gdiplus::SolidBrush brush(ToGdi(color_));
-    context->DrawString(title_.c_str(), static_cast<int>(title_.size()),
-                        font_.GetNativeFont(), ToGdi(text_origin), &brush);
+    Rect text_bounds(origin, preferred_size);
+    text_bounds.Inset(box_size_.width() + padding, padding, padding, padding);
+    painter->DrawString(title_, font_, color_, text_bounds);
   }
 
   NativeTheme::ButtonExtraParams* params() { return &params_; }

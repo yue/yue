@@ -4,6 +4,7 @@
 
 #include "nativeui/win/window_win.h"
 
+#include "nativeui/gfx/painter.h"
 #include "nativeui/gfx/win/double_buffer.h"
 #include "nativeui/win/subwin_view.h"
 #include "nativeui/win/util/hwnd_util.h"
@@ -111,14 +112,12 @@ void TopLevelWindow::OnPaint(HDC) {
     DoubleBuffer buffer(dc, bounds.size(), dirty, dirty.origin());
 
     // Background.
-    Gdiplus::Graphics graphics(buffer.dc());
-    Gdiplus::SolidBrush solid_brush(Gdiplus::Color(255, 255, 255, 255));
-    graphics.FillRectangle(&solid_brush,
-                           dirty.x(), dirty.y(),
-                           dirty.width(), dirty.height());
+    std::unique_ptr<Painter> painter = Painter::CreateFromHDC(buffer.dc());
+    painter->FillRect(dirty, Color(255, 255, 255));
 
     // Draw.
-    delegate_->GetContentView()->view()->Draw(&graphics, dirty);
+    delegate_->GetContentView()->view()->Draw(
+        static_cast<PainterWin*>(painter.get()), dirty);
   }
 
   EndPaint(hwnd(), &ps);

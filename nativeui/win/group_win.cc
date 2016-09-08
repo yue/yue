@@ -6,6 +6,7 @@
 
 #include "base/strings/utf_string_conversions.h"
 #include "nativeui/gfx/color.h"
+#include "nativeui/gfx/geometry/insets.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/win/text_win.h"
 #include "nativeui/win/base_view.h"
@@ -29,19 +30,23 @@ class GroupView : public BaseView {
 
     // Update the rect of the title.
     title_bounds_ = Rect(Point(kTitleLeftMargin * scale_factor(), 0),
-                               ToCeiledSize(MeasureText(this, font_, title_)));
+                         ToCeiledSize(MeasureText(this, font_, title_)));
   }
 
   base::string16 GetTitle() const {
     return title_;
   }
 
+  Insets GetBorder() const {
+    int padding = std::ceil(2 * scale_factor());
+    return Insets(title_bounds_.height() + padding, padding * 2,
+                  padding * 2, padding * 2);
+  }
+
   void Layout() {
-    Rect child_bounds(Rect(GetPixelBounds().size()));
-    int padding = CalculatePadding();
-    child_bounds.Inset(padding * 2, title_bounds_.height() + padding,
-                       padding * 2, padding * 2);
-    delegate_->GetContentView()->view()->SetPixelBounds(child_bounds);
+    Rect bounds(Rect(GetPixelBounds().size()));
+    bounds.Inset(GetBorder());
+    delegate_->GetContentView()->view()->SetPixelBounds(bounds);
   }
 
   void SetPixelBounds(const Rect& pixel_bounds) override {
@@ -81,36 +86,31 @@ class GroupView : public BaseView {
     }
   }
 
-  void Draw(Gdiplus::Graphics* context, const Rect& dirty) override {
+  void Draw(PainterWin* painter, const Rect& dirty) override {
     // Draw title.
-    Rect title_bounds =
-        title_bounds_ + GetWindowPixelOrigin().OffsetFromOrigin();
-    Gdiplus::SolidBrush brush(ToGdi(color_));
-    context->DrawString(title_.c_str(), static_cast<int>(title_.size()),
-                        font_.GetNativeFont(), ToGdi(title_bounds.origin()),
-                        &brush);
+    painter->DrawString(title_, font_, color_, title_bounds_);
 
     // Calculate the border bounds.
-    int text_height = title_bounds.height();
-    int padding = CalculatePadding();
-    Rect border_bounds(padding, text_height / 2,
-                       GetPixelBounds().width() - 2 * padding,
-                       GetPixelBounds().height() - text_height / 2 - padding);
-    border_bounds += GetWindowPixelOrigin().OffsetFromOrigin();
+    Rect drawing_bounds(GetPixelBounds().size());
+    Insets border = GetBorder();
+    Rect border_bounds(drawing_bounds);
+    border_bounds.Inset(border.left() / 2, border.top() / 2,
+                        border.right() / 2, border.bottom() / 2);
 
     // Draw border.
-    Gdiplus::Region region(ToGdi(GetWindowPixelBounds()));
-    region.Exclude(ToGdi(title_bounds));
-    Gdiplus::GraphicsContainer container = context->BeginContainer();
-    context->SetClip(&region);
-    Gdiplus::Pen pen(Gdiplus::Color(255, 170, 170, 170));
-    context->DrawRectangle(&pen, ToGdi(border_bounds));
-    context->EndContainer(container);
+    painter->Save();
+    painter->ClipRect(drawing_bounds);
+    painter->ClipRect(title_bounds_, Painter::CombineMode::Exclude);
+    painter->DrawRect(border_bounds, Color(255, 170, 170, 170));
+    painter->Restore();
 
     // Draw child.
-    Rect child_dirty(GetPixelBounds().size());
-    child_dirty.Inset(title_bounds_.height() + 1, 3, 3, 3);
-    delegate_->GetContentView()->view()->Draw(context, dirty);
+    Rect child_dirty(drawing_bounds);
+    child_dirty.Inset(border);
+    painter->Save();
+    painter->Translate(child_dirty.OffsetFromOrigin());
+    delegate_->GetContentView()->view()->Draw(painter, dirty);
+    painter->Restore();
   }
 
   void SetParent(BaseView* parent) override {

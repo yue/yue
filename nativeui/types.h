@@ -53,26 +53,26 @@ class WindowImpl;
 #endif
 
 #if defined(OS_WIN)
-typedef base::string16 String;
+using String = base::string16;
 #else
-typedef std::string String;
+Using String = std::string;
 #endif
 
 #if defined(OS_MACOSX)
-typedef NSView* NativeView;
-typedef NSWindow* NativeWindow;
-typedef NSFont* NativeFont;
+using NativeView = NSView*;
+using NativeWindow = NSWindow*;
+using NativeFont = NSFont*;
 #elif defined(OS_LINUX)
-typedef GtkWidget* NativeView;
-typedef GtkWindow* NativeWindow;
+using NativeView = GtkWidget*;
+using NativeWindow = GtkWindow*;
 #elif defined(OS_WIN)
-typedef BaseView* NativeView;
-typedef WindowImpl* NativeWindow;
-typedef Gdiplus::Font* NativeFont;
+using NativeView = BaseView*;
+using NativeWindow = WindowImpl*;
+using NativeFont = Gdiplus::Font*;
 #elif defined(OS_IOS)
-typedef UIView* NativeView;
-typedef UIWindow* NativeWindow;
-typedef UIFont* NativeFont;
+using NativeView = UIView*;
+using NativeWindow UIWindow*;
+using NativeFont = UIFont*;
 #endif
 
 }  // namespace nu
