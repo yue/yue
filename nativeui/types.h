@@ -55,7 +55,7 @@ class WindowImpl;
 #if defined(OS_WIN)
 using String = base::string16;
 #else
-Using String = std::string;
+using String = std::string;
 #endif
 
 #if defined(OS_MACOSX)
