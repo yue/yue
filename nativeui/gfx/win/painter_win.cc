@@ -4,6 +4,7 @@
 
 #include "nativeui/gfx/win/painter_win.h"
 
+#include "base/win/scoped_gdi_object.h"
 #include "nativeui/gfx/win/pen_win.h"
 
 namespace nu {
@@ -20,7 +21,16 @@ PainterWin::~PainterWin() {
 }
 
 HDC PainterWin::GetHDC() {
-  return graphics_.GetHDC();
+  // Get the clip region of graphics.
+  Gdiplus::Rect clip;
+  graphics_.GetVisibleClipBounds(&clip);
+  base::win::ScopedRegion region(::CreateRectRgn(
+      clip.GetLeft(), clip.GetTop(), clip.GetRight(), clip.GetBottom()));
+
+  // Apply current clip region to the returned HDC.
+  HDC dc = graphics_.GetHDC();
+  ::SelectClipRgn(dc, region.get());
+  return dc;
 }
 
 void PainterWin::ReleaseHDC(HDC dc) {
