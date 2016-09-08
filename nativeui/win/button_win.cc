@@ -136,11 +136,14 @@ class ButtonView : public BaseView {
     if (type() == ControlType::Button)
       theme_->PaintPushButton(dc, state(), GetWindowPixelBounds(), params_);
 
-    // Place the content in the middle.
+    // Checkbox and radio are left aligned.
     Size preferred_size = delegate_->GetPixelPreferredSize();
-    Size ctrl_size = GetPixelBounds().size();
-    Point origin((ctrl_size.width() - preferred_size.width()) / 2,
-                 (ctrl_size.height() - preferred_size.height()) / 2);
+    Point origin;
+    if (type() == ControlType::Button) {
+      Size ctrl_size = GetPixelBounds().size();
+      origin.Offset((ctrl_size.width() - preferred_size.width()) / 2,
+                    (ctrl_size.height() - preferred_size.height()) / 2);
+    }
 
     // Draw the box.
     Point box_origin(origin);
