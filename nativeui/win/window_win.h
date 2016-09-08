@@ -19,10 +19,14 @@ class TopLevelWindow : public WindowImpl {
   Rect GetPixelBounds();
   Rect GetContentPixelBounds();
 
+  void SetCapture(BaseView* view);
+  void ReleaseCapture();
+
   FocusManager* focus_manager() { return &focus_manager_; }
 
  protected:
   CR_BEGIN_MSG_MAP_EX(TopLevelWindow, WindowImpl)
+    CR_MSG_WM_CAPTURECHANGED(OnCaptureChanged)
     CR_MSG_WM_CLOSE(OnClose)
     CR_MSG_WM_COMMAND(OnCommand)
     CR_MSG_WM_SIZE(OnSize)
@@ -35,6 +39,7 @@ class TopLevelWindow : public WindowImpl {
   CR_END_MSG_MAP()
 
  private:
+  void OnCaptureChanged(HWND window);
   void OnClose();
   void OnCommand(UINT code, int command, HWND window);
   void OnSize(UINT param, const Size& size);
@@ -49,6 +54,10 @@ class TopLevelWindow : public WindowImpl {
 
   FocusManager focus_manager_;
   bool mouse_in_window_ = false;
+
+  // The view that has mouse capture.
+  BaseView* capture_view_ = nullptr;
+
   Window* delegate_;
 };
 

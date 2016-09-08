@@ -57,6 +57,9 @@ class BaseView {
   virtual void OnMouseLeave() {}
   virtual void OnMouseClick(UINT message, UINT flags, const Point& point) {}
 
+  // Called when the view lost capture.
+  virtual void OnCaptureLost() {}
+
   // Get the offset to parent HWND.
   Point GetWindowPixelOrigin();
   Rect GetWindowPixelBounds();

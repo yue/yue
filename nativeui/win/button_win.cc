@@ -86,28 +86,43 @@ class ButtonView : public BaseView {
   }
 
   void OnMouseEnter() override {
-    set_state(ControlState::Hovered);
-    Invalidate();
+    is_hovering_ = true;
+    if (!is_capturing_) {
+      set_state(ControlState::Hovered);
+      Invalidate();
+    }
   }
 
   void OnMouseLeave() override {
-    set_state(ControlState::Normal);
-    Invalidate();
+    is_hovering_ = false;
+    if (!is_capturing_) {
+      set_state(ControlState::Normal);
+      Invalidate();
+    }
   }
 
   void OnMouseClick(UINT message, UINT flags, const Point& point) override {
+    auto* toplevel_window = static_cast<TopLevelWindow*>(window());
     if (message == WM_LBUTTONDOWN) {
+      is_capturing_ = true;
+      toplevel_window->SetCapture(this);
       set_state(ControlState::Pressed);
       Invalidate();
     } else if (message == WM_LBUTTONUP) {
+      if (state() == ControlState::Pressed)
+        OnClick();
       set_state(ControlState::Hovered);
       Invalidate();
-      OnClick();
     }
 
     // Clicking a button moves the focus to it.
-    auto* toplevel_window = static_cast<TopLevelWindow*>(window());
     toplevel_window->focus_manager()->TakeFocus(delegate_);
+  }
+
+  void OnCaptureLost() override {
+    is_capturing_ = false;
+    set_state(is_hovering_ ? ControlState::Hovered : ControlState::Normal);
+    Invalidate();
   }
 
   bool CanHaveFocus() const override {
@@ -146,7 +161,8 @@ class ButtonView : public BaseView {
         rect = bounds.ToRECT();
       } else {
         int padding = delegate_->DIPToPixel(kCheckBoxPadding);
-        Point box_origin = origin;
+        Point box_origin(origin);
+        box_origin += GetWindowPixelOrigin().OffsetFromOrigin();
         box_origin.Offset(box_size_.width() + padding, padding);
         Size ring_size = preferred_size;
         ring_size.Enlarge(-box_size_.width() - padding * 2, -padding * 2);
@@ -178,6 +194,12 @@ class ButtonView : public BaseView {
   // Default text color and font.
   Color color_;
   Font font_;
+
+  // Whether the button is capturing the mouse.
+  bool is_capturing_ = false;
+
+  // Whether the mouse is hovering the button.
+  bool is_hovering_ = false;
 
   base::string16 title_;
   Button* delegate_;

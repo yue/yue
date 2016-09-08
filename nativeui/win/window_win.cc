@@ -47,6 +47,23 @@ Rect TopLevelWindow::GetContentPixelBounds() {
   return Rect(point.x, point.y, r.right - r.left, r.bottom - r.top);
 }
 
+void TopLevelWindow::SetCapture(BaseView* view) {
+  capture_view_ = view;
+  ::SetCapture(hwnd());
+}
+
+void TopLevelWindow::ReleaseCapture() {
+  if (::GetCapture() == hwnd())
+    ::ReleaseCapture();
+}
+
+void TopLevelWindow::OnCaptureChanged(HWND window) {
+  if (capture_view_) {
+    capture_view_->OnCaptureLost();
+    capture_view_ = nullptr;
+  }
+}
+
 void TopLevelWindow::OnClose() {
   if (delegate_->should_close.is_null() || delegate_->should_close.Run()) {
     delegate_->on_close.Emit();
@@ -92,6 +109,10 @@ LRESULT TopLevelWindow::OnMouseClick(UINT message, WPARAM w_param,
   delegate_->GetContentView()->view()->OnMouseClick(
       message, static_cast<UINT>(w_param),
       nu::Point(CR_GET_X_LPARAM(l_param), CR_GET_Y_LPARAM(l_param)));
+
+  // Release the capture on mouse up.
+  if (message == WM_LBUTTONUP)
+    ReleaseCapture();
   return 0;
 }
 
