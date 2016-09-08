@@ -8,6 +8,7 @@
 #include "nativeui/gfx/color.h"
 #include "nativeui/gfx/geometry/insets.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
+#include "nativeui/gfx/geometry/vector2d.h"
 #include "nativeui/gfx/win/text_win.h"
 #include "nativeui/win/base_view.h"
 
@@ -61,8 +62,7 @@ class GroupView : public BaseView {
         content_view_hovered_ = true;
         delegate_->GetContentView()->view()->OnMouseEnter();
       }
-      Point child_point = point;
-      child_point -= child_bounds.OffsetFromOrigin();
+      Point child_point = point - child_bounds.OffsetFromOrigin();
       delegate_->GetContentView()->view()->OnMouseMove(flags, child_point);
     } else if (content_view_hovered_) {
       OnMouseLeave();
@@ -88,7 +88,8 @@ class GroupView : public BaseView {
 
   void Draw(PainterWin* painter, const Rect& dirty) override {
     // Draw title.
-    painter->DrawString(title_, font_, color_, title_bounds_);
+    if (dirty.Intersects(title_bounds_))
+      painter->DrawString(title_, font_, color_, title_bounds_);
 
     // Calculate the border bounds.
     Rect drawing_bounds(GetPixelBounds().size());
@@ -105,11 +106,10 @@ class GroupView : public BaseView {
     painter->Restore();
 
     // Draw child.
-    Rect child_dirty(drawing_bounds);
-    child_dirty.Inset(border);
+    Vector2d child_offset(border.left(), border.top());
     painter->Save();
-    painter->Translate(child_dirty.OffsetFromOrigin());
-    delegate_->GetContentView()->view()->Draw(painter, dirty);
+    painter->Translate(child_offset);
+    delegate_->GetContentView()->view()->Draw(painter, dirty - child_offset);
     painter->Restore();
   }
 
@@ -117,12 +117,6 @@ class GroupView : public BaseView {
     BaseView::SetParent(parent);
     delegate_->GetContentView()->view()->SetParent(this);
   }
-
-  int CalculatePadding() const {
-    return std::ceil(2 * scale_factor());
-  }
-
-  int text_height() const { return title_bounds_.height(); }
 
  private:
   Group* delegate_;
@@ -159,9 +153,9 @@ std::string Group::GetTitle() const {
 
 Size Group::GetBorderPixelSize() const {
   GroupView* group = static_cast<GroupView*>(view());
-  int text_height = group->text_height();
-  int padding = group->CalculatePadding();
-  return Size(padding * 4, text_height + padding * 3);
+  Rect bounds;
+  bounds.Inset(-group->GetBorder());
+  return bounds.size();
 }
 
 }  // namespace nu
