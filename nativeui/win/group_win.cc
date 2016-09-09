@@ -56,14 +56,13 @@ class GroupView : public BaseView {
   }
 
   void OnMouseMove(UINT flags, const Point& point) override {
-    Rect child_bounds = delegate_->GetContentView()->GetPixelBounds();
+    Rect child_bounds = delegate_->GetContentView()->view()->size_allocation();
     if (child_bounds.Contains(point)) {
       if (!content_view_hovered_) {
         content_view_hovered_ = true;
         delegate_->GetContentView()->view()->OnMouseEnter();
       }
-      Point child_point = point - child_bounds.OffsetFromOrigin();
-      delegate_->GetContentView()->view()->OnMouseMove(flags, child_point);
+      delegate_->GetContentView()->view()->OnMouseMove(flags, point);
     } else if (content_view_hovered_) {
       OnMouseLeave();
     }
@@ -77,13 +76,9 @@ class GroupView : public BaseView {
   }
 
   void OnMouseClick(UINT message, UINT flags, const Point& point) override {
-    Rect child_bounds = delegate_->GetContentView()->GetPixelBounds();
-    if (child_bounds.Contains(point)) {
-      Point child_point = point;
-      child_point -= child_bounds.OffsetFromOrigin();
-      delegate_->GetContentView()->view()->OnMouseClick(
-          message, flags, child_point);
-    }
+    Rect child_bounds = delegate_->GetContentView()->view()->size_allocation();
+    if (child_bounds.Contains(point))
+      delegate_->GetContentView()->view()->OnMouseClick(message, flags, point);
   }
 
   void Draw(PainterWin* painter, const Rect& dirty) override {

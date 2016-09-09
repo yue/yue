@@ -35,11 +35,8 @@ class ContainerView : public BaseView {
         hover_view_->view()->OnMouseEnter();
     }
     // Emit mouse move events.
-    if (hover_view_) {
-      Point child_point = point;
-      child_point -= hover_view_->GetPixelBounds().OffsetFromOrigin();
-      hover_view_->view()->OnMouseMove(flags, child_point);
-    }
+    if (hover_view_)
+      hover_view_->view()->OnMouseMove(flags, point);
   }
 
   void OnMouseLeave() override {
@@ -51,11 +48,8 @@ class ContainerView : public BaseView {
 
   void OnMouseClick(UINT message, UINT flags, const Point& point) override {
     View* child = FindChildFromPoint(point);
-    if (child) {
-      Point child_point = point;
-      child_point -= child->GetPixelBounds().OffsetFromOrigin();
-      child->view()->OnMouseClick(message, flags, child_point);
-    }
+    if (child)
+      child->view()->OnMouseClick(message, flags, point);
   }
 
   void Draw(PainterWin* painter, const Rect& dirty) override {
@@ -101,7 +95,7 @@ class ContainerView : public BaseView {
       View* child = delegate_->child_at(i);
       if (!child->IsVisible())
         continue;
-      Rect child_bounds = child->GetPixelBounds();
+      Rect child_bounds = child->view()->size_allocation();
       if (child_bounds.Contains(point))
         return child;
     }
