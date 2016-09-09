@@ -4,16 +4,18 @@
 
 #include "nativeui/scroll.h"
 
-#include "nativeui/win/base_view.h"
+#include "nativeui/win/container_win.h"
 
 namespace nu {
 
 namespace {
 
-class ScrollView : public BaseView {
+class ScrollView : public ContainerView,
+                   public ContainerView::Delegate {
  public:
   explicit ScrollView(Scroll* delegate)
-      : BaseView(ControlType::Scroll), delegate_(delegate) {}
+      : ContainerView(this, ControlType::Scroll),
+        delegate_(delegate) {}
 
   void SetOrigin(const Vector2d& origin) {
     origin_ = origin;
@@ -25,41 +27,18 @@ class ScrollView : public BaseView {
     Layout();
   }
 
-  void Layout() {
+  // ContainerView::Delegate:
+  void Layout() override {
     Rect child_alloc = Rect((size_allocation() + origin_).origin(),
                             content_size_);
-    content_view()->SizeAllocate(child_alloc);
+    delegate_->GetContentView()->view()->SizeAllocate(child_alloc);
   }
 
-  void SizeAllocate(const Rect& size_allocation) override {
-    BaseView::SizeAllocate(size_allocation);
-    Layout();
+  std::vector<View*> GetChildren() override {
+    return std::vector<View*>{delegate_->GetContentView()};
   }
 
-  void OnMouseMove(UINT flags, const Point& point) override {
-    if (content_view()->size_allocation().Contains(point)) {
-      if (!content_view_hovered_) {
-        content_view_hovered_ = true;
-        content_view()->OnMouseEnter();
-      }
-      content_view()->OnMouseMove(flags, point);
-    } else if (content_view_hovered_) {
-      OnMouseLeave();
-    }
-  }
-
-  void OnMouseLeave() override {
-    if (content_view_hovered_) {
-      content_view_hovered_ = false;
-      content_view()->OnMouseLeave();
-    }
-  }
-
-  void OnMouseClick(UINT message, UINT flags, const Point& point) override {
-    if (content_view()->size_allocation().Contains(point))
-      content_view()->OnMouseClick(message, flags, point);
-  }
-
+  // BaseView:
   void Draw(PainterWin* painter, const Rect& dirty) override {
     painter->Save();
     painter->ClipRect(Rect(size_allocation().size()));
@@ -68,21 +47,11 @@ class ScrollView : public BaseView {
     painter->Restore();
   }
 
-  void SetParent(BaseView* parent) override {
-    BaseView::SetParent(parent);
-    delegate_->GetContentView()->view()->SetParent(this);
-  }
-
-  BaseView* content_view() const { return delegate_->GetContentView()->view(); }
-
  private:
   Size content_size_;
   Vector2d origin_;
 
   Scroll* delegate_;
-
-  // Whether the content view is hovered.
-  bool content_view_hovered_ = false;
 };
 
 }  // namespace

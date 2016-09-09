@@ -2,116 +2,136 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/container.h"
+#include "nativeui/win/container_win.h"
 
-#include "nativeui/win/base_view.h"
+#include "base/stl_util.h"
 
 namespace nu {
 
+ContainerView::ContainerView(Delegate* delegate, ControlType type)
+    : BaseView(type), delegate_(delegate) {}
+
+void ContainerView::SizeAllocate(const Rect& size_allocation) {
+  BaseView::SizeAllocate(size_allocation);
+  delegate_->Layout();
+}
+
+void ContainerView::OnMouseMove(UINT flags, const Point& point) {
+  // Find the view that has the mouse.
+  View* hover_view = FindChildFromPoint(point);
+
+  // Emit mouse enter/leave events
+  if (hover_view_ != hover_view) {
+    if (hover_view_ &&
+        ContainsValue(delegate_->GetChildren(), hover_view_))
+      hover_view_->view()->OnMouseLeave();
+    hover_view_ = hover_view;
+    if (hover_view_)
+      hover_view_->view()->OnMouseEnter();
+  }
+  // Emit mouse move events.
+  if (hover_view_)
+    hover_view_->view()->OnMouseMove(flags, point);
+}
+
+void ContainerView::OnMouseLeave() {
+  if (hover_view_) {
+    if (ContainsValue(delegate_->GetChildren(), hover_view_))
+      hover_view_->view()->OnMouseLeave();
+    hover_view_ = nullptr;
+  }
+}
+
+void ContainerView::OnMouseClick(UINT message, UINT flags, const Point& point) {
+  View* child = FindChildFromPoint(point);
+  if (child)
+    child->view()->OnMouseClick(message, flags, point);
+}
+
+void ContainerView::Draw(PainterWin* painter, const Rect& dirty) {
+  // Iterate children for drawing.
+  const auto& children = delegate_->GetChildren();
+  for (View* child : children) {
+    if (!child->IsVisible())
+      continue;
+    Rect child_bounds = child->GetPixelBounds();
+    if (child_bounds.Intersects(dirty)) {
+      // Caculate the dirty rect for child.
+      Rect child_dirty(dirty);
+      child_dirty.Intersect(child_bounds);
+      child_dirty -= child_bounds.OffsetFromOrigin();
+
+      // Move the painting origin for child.
+      painter->Save();
+      painter->Translate(child_bounds.OffsetFromOrigin());
+      child->view()->Draw(painter, child_dirty);
+      painter->Restore();
+    }
+  }
+}
+
+void ContainerView::SetParent(BaseView* parent) {
+  BaseView::SetParent(parent);
+  RefreshParentTree();
+}
+
+void ContainerView::BecomeContentView(WindowImpl* parent) {
+  BaseView::BecomeContentView(parent);
+  RefreshParentTree();
+}
+
+void ContainerView::RefreshParentTree() {
+  const auto& children = delegate_->GetChildren();
+  for (View* child : children)
+    child->view()->SetParent(this);
+}
+
+View* ContainerView::FindChildFromPoint(const Point& point) {
+  const auto& children = delegate_->GetChildren();
+  for (View* child : children) {
+    if (!child->IsVisible())
+      continue;
+    Rect child_bounds = child->view()->size_allocation();
+    if (child_bounds.Contains(point))
+      return child;
+  }
+  return nullptr;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Adapter from Container to Container::Delegate.
+
 namespace {
 
-class ContainerView : public BaseView {
+class ContainerAdapter : public ContainerView,
+                         public ContainerView::Delegate {
  public:
-  explicit ContainerView(Container* delegate)
-      : BaseView(ControlType::Container), delegate_(delegate) {}
-  ~ContainerView() override {}
+  explicit ContainerAdapter(Container* container)
+      : ContainerView(this, ControlType::Container), container_(container) {}
 
-  void SizeAllocate(const Rect& size_allocation) override {
-    // Container doesn't draw anything, so only do layout.
-    set_size_allocation(size_allocation);
-    delegate_->Layout();
+  // ContainerView::Delegate:
+  void Layout() override {
+    container_->Layout();
   }
 
-  void OnMouseMove(UINT flags, const Point& point) override {
-    // Find the view that has the mouse.
-    View* hover_view = FindChildFromPoint(point);
-
-    // Emit mouse enter/leave events
-    if (hover_view_ != hover_view) {
-      if (hover_view_)
-        hover_view_->view()->OnMouseLeave();
-      hover_view_ = hover_view;
-      if (hover_view_)
-        hover_view_->view()->OnMouseEnter();
-    }
-    // Emit mouse move events.
-    if (hover_view_)
-      hover_view_->view()->OnMouseMove(flags, point);
-  }
-
-  void OnMouseLeave() override {
-    if (hover_view_) {
-      hover_view_->view()->OnMouseLeave();
-      hover_view_ = nullptr;
-    }
-  }
-
-  void OnMouseClick(UINT message, UINT flags, const Point& point) override {
-    View* child = FindChildFromPoint(point);
-    if (child)
-      child->view()->OnMouseClick(message, flags, point);
-  }
-
-  void Draw(PainterWin* painter, const Rect& dirty) override {
-    // Iterate children for drawing.
-    for (int i = 0; i < delegate_->child_count(); ++i) {
-      View* child = delegate_->child_at(i);
-      if (!child->IsVisible())
-        continue;
-      Rect child_bounds = child->GetPixelBounds();
-      if (child_bounds.Intersects(dirty)) {
-        // Caculate the dirty rect for child.
-        Rect child_dirty(dirty);
-        child_dirty.Intersect(child_bounds);
-        child_dirty -= child_bounds.OffsetFromOrigin();
-
-        // Move the painting origin for child.
-        painter->Save();
-        painter->Translate(child_bounds.OffsetFromOrigin());
-        child->view()->Draw(painter, child_dirty);
-        painter->Restore();
-      }
-    }
-  }
-
-  void SetParent(BaseView* parent) override {
-    BaseView::SetParent(parent);
-    RefreshParentTree();
-  }
-
-  void BecomeContentView(WindowImpl* parent) override {
-    BaseView::BecomeContentView(parent);
-    RefreshParentTree();
+  std::vector<View*> GetChildren() override {
+    std::vector<View*> views(container_->child_count());
+    for (int i = 0; i < container_->child_count(); ++i)
+      views[i] = container_->child_at(i);
+    return views;
   }
 
  private:
-  void RefreshParentTree() {
-    for (int i = 0; i < delegate_->child_count(); ++i)
-      delegate_->child_at(i)->view()->SetParent(this);
-  }
-
-  View* FindChildFromPoint(const Point& point) {
-    for (int i = 0; i < delegate_->child_count(); ++i) {
-      View* child = delegate_->child_at(i);
-      if (!child->IsVisible())
-        continue;
-      Rect child_bounds = child->view()->size_allocation();
-      if (child_bounds.Contains(point))
-        return child;
-    }
-    return nullptr;
-  }
-
-  Container* delegate_;
-
-  // The View in which mouse hovers.
-  View* hover_view_ = nullptr;
+  Container* container_;
 };
 
 }  // namespace
 
+///////////////////////////////////////////////////////////////////////////////
+// Public Container API implementation.
+
 void Container::PlatformInit() {
-  TakeOverView(new ContainerView(this));
+  TakeOverView(new ContainerAdapter(this));
 }
 
 void Container::PlatformDestroy() {

@@ -119,6 +119,7 @@ source_set("nativeui") {
     "win/window_impl.h",
     "win/button_win.cc",
     "win/container_win.cc",
+    "win/container_win.h",
     "win/entry_win.cc",
     "win/group_win.cc",
     "win/label_win.cc",

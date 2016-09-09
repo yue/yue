@@ -10,7 +10,7 @@
 #include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/geometry/vector2d.h"
 #include "nativeui/gfx/win/text_win.h"
-#include "nativeui/win/base_view.h"
+#include "nativeui/win/container_win.h"
 
 namespace nu {
 
@@ -19,10 +19,12 @@ namespace {
 // The offset of title to left of rect.
 const int kTitleLeftMargin = 5;
 
-class GroupView : public BaseView {
+class GroupView : public ContainerView,
+                  public ContainerView::Delegate {
  public:
   explicit GroupView(Group* delegate)
-      : BaseView(ControlType::Group), delegate_(delegate),
+      : ContainerView(this, ControlType::Group),
+        delegate_(delegate),
         color_(GetThemeColor(ThemeColor::Text)) {}
 
 
@@ -44,41 +46,18 @@ class GroupView : public BaseView {
                   padding * 2, padding * 2);
   }
 
-  void Layout() {
+  // ContainerView:
+  void Layout() override {
     Rect child_alloc(size_allocation());
     child_alloc.Inset(GetBorder());
-    content_view()->SizeAllocate(child_alloc);
+    delegate_->GetContentView()->view()->SizeAllocate(child_alloc);
   }
 
-  void SizeAllocate(const Rect& size_allocation) override {
-    BaseView::SizeAllocate(size_allocation);
-    Layout();
+  std::vector<View*> GetChildren() override {
+    return std::vector<View*>{delegate_->GetContentView()};
   }
 
-  void OnMouseMove(UINT flags, const Point& point) override {
-    if (content_view()->size_allocation().Contains(point)) {
-      if (!content_view_hovered_) {
-        content_view_hovered_ = true;
-        content_view()->OnMouseEnter();
-      }
-      content_view()->OnMouseMove(flags, point);
-    } else if (content_view_hovered_) {
-      OnMouseLeave();
-    }
-  }
-
-  void OnMouseLeave() override {
-    if (content_view_hovered_) {
-      content_view_hovered_ = false;
-      content_view()->OnMouseLeave();
-    }
-  }
-
-  void OnMouseClick(UINT message, UINT flags, const Point& point) override {
-    if (content_view()->size_allocation().Contains(point))
-      content_view()->OnMouseClick(message, flags, point);
-  }
-
+  // BaseView:
   void Draw(PainterWin* painter, const Rect& dirty) override {
     // Draw title.
     if (dirty.Intersects(title_bounds_))
@@ -106,13 +85,6 @@ class GroupView : public BaseView {
     painter->Restore();
   }
 
-  void SetParent(BaseView* parent) override {
-    BaseView::SetParent(parent);
-    delegate_->GetContentView()->view()->SetParent(this);
-  }
-
-  BaseView* content_view() const { return delegate_->GetContentView()->view(); }
-
  private:
   Group* delegate_;
 
@@ -121,9 +93,6 @@ class GroupView : public BaseView {
   Rect title_bounds_;
 
   base::string16 title_;
-
-  // Whether the content view is hovered.
-  bool content_view_hovered_ = false;
 };
 
 }  // namespace
