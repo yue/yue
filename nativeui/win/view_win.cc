@@ -51,19 +51,18 @@ Point View::GetWindowPixelOrigin() const {
 }
 
 bool View::SetPreferredSize(const Size& size) {
-  view_->set_pixel_preferred_size(
-      ScaleToCeiledSize(size, view_->scale_factor()));
+  view()->set_preferred_size(ScaleToCeiledSize(size, view()->scale_factor()));
   return DoSetPreferredSize(size);
 }
 
 bool View::SetPixelPreferredSize(const Size& size) {
-  view_->set_pixel_preferred_size(size);
-  return DoSetPreferredSize(
-      ScaleToCeiledSize(size, 1.0f / view_->scale_factor()));
+  view()->set_preferred_size(size);
+  return DoSetPreferredSize(ScaleToCeiledSize(size,
+                                              1.0f / view()->scale_factor()));
 }
 
 Size View::GetPixelPreferredSize() const {
-  return view()->pixel_preferred_size();
+  return view()->preferred_size();
 }
 
 int View::DIPToPixel(int length) const {

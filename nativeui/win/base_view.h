@@ -86,8 +86,8 @@ class BaseView {
   Rect size_allocation() const { return size_allocation_; }
 
   // Set the preferred size.
-  void set_pixel_preferred_size(const Size& size) { preferred_size_ = size; }
-  Size pixel_preferred_size() const { return preferred_size_; }
+  void set_preferred_size(const Size& size) { preferred_size_ = size; }
+  Size preferred_size() const { return preferred_size_; }
 
   // Whether the view is visible.
   void set_visible(bool visible) { is_visible_ = visible; }
