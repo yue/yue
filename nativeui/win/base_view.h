@@ -40,18 +40,31 @@ class BaseView {
  public:
   virtual ~BaseView() {}
 
-  // Subclass should override this.
-  virtual void SetPixelBounds(const Rect& pixel_bounds);
-  virtual Rect GetPixelBounds() const;
+  /////////////////////////////////////////////////////////////////////////////
+  // Core implementations, should be overriden for each kind of view
 
-  Size GetPixelSize() const;
-
-  // Draw the content.
-  virtual void Draw(PainterWin* painter, const Rect& dirty) {}
+  // Changes view's bounds, relative to window.
+  virtual void SizeAllocate(const Rect& bounds);
 
   // Set the parent view.
   virtual void SetParent(BaseView* parent);
   virtual void BecomeContentView(WindowImpl* parent);
+
+  // Invalidate the |dirty| rect.
+  virtual void Invalidate(const Rect& dirty);
+
+  // Whether the view can get focus.
+  virtual bool CanHaveFocus() const { return false; }
+
+  // Move focus to the view.
+  virtual void SetFocus(bool focus);
+  virtual bool IsFocused() const;
+
+  /////////////////////////////////////////////////////////////////////////////
+  // Events
+
+  // Draw the content.
+  virtual void Draw(PainterWin* painter, const Rect& dirty) {}
 
   // The mouse events.
   virtual void OnMouseEnter() {}
@@ -62,26 +75,18 @@ class BaseView {
   // Called when the view lost capture.
   virtual void OnCaptureLost() {}
 
-  // Get the offset to parent HWND.
-  Point GetWindowPixelOrigin();
-  Rect GetWindowPixelBounds();
+  /////////////////////////////////////////////////////////////////////////////
+  // Helpers
 
-  // Returns DIP bounds according to window's scale factor.
-  void SetBounds(const Rect& bounds);
-  Rect GetBounds();
+  // Invalidate the whole view.
+  void Invalidate();
 
-  // Invalidate the view and trigger a redraw.
-  virtual void Invalidate(const Rect& dirty = Rect());
-
-  // Whether the view can get focus.
-  virtual bool CanHaveFocus() const { return false; }
-
-  // Move focus to the view.
-  virtual void SetFocus(bool focus);
-  virtual bool IsFocused() const;
+  // Change the bounds without invalidating.
+  void set_size_allocation(const Rect& bounds) { size_allocation_ = bounds; }
+  Rect size_allocation() const { return size_allocation_; }
 
   // Set the preferred size.
-  void set_pixel_preferred_size(Size size) { preferred_size_ = size; }
+  void set_pixel_preferred_size(const Size& size) { preferred_size_ = size; }
   Size pixel_preferred_size() const { return preferred_size_; }
 
   // Whether the view is visible.
@@ -116,6 +121,9 @@ class BaseView {
   explicit BaseView(ControlType type)
       : type_(type), is_virtual_(type != ControlType::Subwin) {}
 
+  // Called by SetParent/BecomeContentView when parent view changes.
+  void ParentChanged(float old_scale_factor);
+
  private:
   bool is_virtual_;
   ControlType type_;
@@ -133,14 +141,11 @@ class BaseView {
   WindowImpl* window_ = nullptr;
   BaseView* parent_ = nullptr;
 
-  // The bounds relative to parent view.
-  Rect bounds_;
+  // The absolute bounds relative to the origin of window.
+  Rect size_allocation_;
 
   // The preferred size of the view.
   Size preferred_size_;
-
-  // The offset relative the parent HWND.
-  Point window_origin_;
 
   DISALLOW_COPY_AND_ASSIGN(BaseView);
 };

@@ -16,8 +16,8 @@ class ContainerView : public BaseView {
       : BaseView(ControlType::Container), delegate_(delegate) {}
   ~ContainerView() override {}
 
-  void SetPixelBounds(const Rect& pixel_bounds) override {
-    BaseView::SetPixelBounds(pixel_bounds);
+  void SizeAllocate(const Rect& size_allocation) override {
+    BaseView::SizeAllocate(size_allocation);
     delegate_->Layout();
   }
 

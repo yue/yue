@@ -133,7 +133,7 @@ class ButtonView : public BaseView {
   void Draw(PainterWin* painter, const Rect& dirty) override {
     HDC dc = painter->GetHDC();
 
-    Size size = GetPixelSize();
+    Size size = size_allocation().size();
     Size preferred_size = delegate_->GetPixelPreferredSize();
 
     // Draw the button background

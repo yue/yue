@@ -20,28 +20,34 @@ void View::TakeOverView(NativeView view) {
 }
 
 void View::SetBounds(const Rect& bounds) {
-  view_->SetBounds(bounds);
+  SetPixelBounds(ScaleToEnclosingRect(bounds, view()->scale_factor()));
 }
 
 Rect View::GetBounds() const {
-  return view_->GetBounds();
+  return ScaleToEnclosingRect(GetPixelBounds(), 1.0f / view()->scale_factor());
 }
 
 void View::SetPixelBounds(const Rect& bounds) {
-  view_->SetPixelBounds(bounds);
+  Rect size_allocation(bounds);
+  if (parent())
+    size_allocation += parent()->view()->size_allocation().OffsetFromOrigin();
+  view()->SizeAllocate(size_allocation);
 }
 
 Rect View::GetPixelBounds() const {
-  return view_->GetPixelBounds();
+  Rect bounds(view()->size_allocation());
+  if (parent())
+    bounds -= parent()->view()->size_allocation().OffsetFromOrigin();
+  return bounds;
 }
 
 Point View::GetWindowOrigin() const {
   return ScaleToFlooredPoint(GetWindowPixelOrigin(),
-                             1.0f / view_->scale_factor());
+                             1.0f / view()->scale_factor());
 }
 
 Point View::GetWindowPixelOrigin() const {
-  return view_->GetWindowPixelOrigin();
+  return view()->size_allocation().origin();
 }
 
 bool View::SetPreferredSize(const Size& size) {
@@ -57,19 +63,19 @@ bool View::SetPixelPreferredSize(const Size& size) {
 }
 
 Size View::GetPixelPreferredSize() const {
-  return view_->pixel_preferred_size();
+  return view()->pixel_preferred_size();
 }
 
 int View::DIPToPixel(int length) const {
-  return static_cast<int>(std::ceil(length * view_->scale_factor()));
+  return static_cast<int>(std::ceil(length * view()->scale_factor()));
 }
 
 void View::PlatformSetVisible(bool visible) {
-  view_->set_visible(visible);
+  view()->set_visible(visible);
 }
 
 bool View::IsVisible() const {
-  return view_->is_visible();
+  return view()->is_visible();
 }
 
 }  // namespace nu

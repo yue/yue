@@ -28,18 +28,12 @@ SubwinView::SubwinView(base::StringPiece16 class_name,
 SubwinView::~SubwinView() {
 }
 
-void SubwinView::SetPixelBounds(const Rect& bounds) {
-  BaseView::SetPixelBounds(bounds);
+void SubwinView::SizeAllocate(const Rect& size_allocation) {
+  BaseView::SizeAllocate(size_allocation);
 
-  // Calculate the bounds relative to parent HWND.
-  Point pos(bounds.origin());
-  if (parent()) {
-    Point offset = parent()->GetWindowPixelOrigin();
-    pos.set_x(pos.x() + offset.x());
-    pos.set_y(pos.y() + offset.y());
-  }
-
-  SetWindowPos(hwnd(), NULL, pos.x(), pos.y(), bounds.width(), bounds.height(),
+  SetWindowPos(hwnd(), NULL,
+               size_allocation.x(), size_allocation.y(),
+               size_allocation.width(), size_allocation.height(),
                SWP_NOACTIVATE | SWP_NOZORDER);
   RedrawWindow(hwnd(), NULL, NULL, RDW_INVALIDATE | RDW_ALLCHILDREN);
 }

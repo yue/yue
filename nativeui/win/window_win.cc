@@ -85,7 +85,7 @@ void TopLevelWindow::OnCommand(UINT code, int command, HWND window) {
 void TopLevelWindow::OnSize(UINT param, const Size& size) {
   if (!delegate_->GetContentView())
     return;
-  delegate_->GetContentView()->view()->SetPixelBounds(Rect(size));
+  delegate_->GetContentView()->view()->SizeAllocate(Rect(size));
   RedrawWindow(hwnd(), NULL, NULL, RDW_INVALIDATE | RDW_ALLCHILDREN);
 }
 

@@ -20,14 +20,9 @@ class ScrollView : public BaseView {
     Invalidate();
   }
 
-  void SetPixelBounds(const Rect& bounds) override {
-    BaseView::SetPixelBounds(bounds);
-    delegate_->GetContentView()->SetPixelBounds(Rect(content_size_));
-  }
-
   void Draw(PainterWin* painter, const Rect& dirty) override {
     painter->Save();
-    painter->ClipRect(Rect(GetPixelSize()));
+    painter->ClipRect(Rect(size_allocation().size()));
     painter->Translate(origin_);
     delegate_->GetContentView()->view()->Draw(painter, dirty + origin_);
     painter->Restore();
@@ -53,7 +48,7 @@ void Scroll::PlatformSetContentView(Container* container) {
   container->view()->SetParent(view());
 
   auto* scroll = static_cast<ScrollView*>(view());
-  scroll->set_content_pixel_size(container->view()->GetPixelSize());
+  scroll->set_content_pixel_size(container->view()->size_allocation().size());
   scroll->Invalidate();
 }
 

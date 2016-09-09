@@ -45,13 +45,13 @@ class GroupView : public BaseView {
   }
 
   void Layout() {
-    Rect bounds(Rect(GetPixelBounds().size()));
-    bounds.Inset(GetBorder());
-    delegate_->GetContentView()->view()->SetPixelBounds(bounds);
+    Rect child_alloc(size_allocation());
+    child_alloc.Inset(GetBorder());
+    delegate_->GetContentView()->view()->SizeAllocate(child_alloc);
   }
 
-  void SetPixelBounds(const Rect& pixel_bounds) override {
-    BaseView::SetPixelBounds(pixel_bounds);
+  void SizeAllocate(const Rect& size_allocation) override {
+    BaseView::SizeAllocate(size_allocation);
     Layout();
   }
 
@@ -92,7 +92,7 @@ class GroupView : public BaseView {
       painter->DrawString(title_, font_, color_, title_bounds_);
 
     // Calculate the border bounds.
-    Rect drawing_bounds(GetPixelBounds().size());
+    Rect drawing_bounds(size_allocation().size());
     Insets border = GetBorder();
     Rect border_bounds(drawing_bounds);
     border_bounds.Inset(border.left() / 2, border.top() / 2,

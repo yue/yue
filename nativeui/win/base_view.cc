@@ -6,53 +6,13 @@
 
 namespace nu {
 
-void BaseView::SetPixelBounds(const Rect& bounds) {
-  if (bounds_ == bounds)
+void BaseView::SizeAllocate(const Rect& size_allocation) {
+  if (size_allocation == size_allocation_)
     return;
 
-  // Old invalidate bounds.
-  Rect old_bounds = Rect(bounds_.size()) +
-                    GetWindowPixelOrigin().OffsetFromOrigin();
-
-  bounds_ = bounds;
-
-  // Update the origin to parent HWND.
-  window_origin_ = bounds.origin();
-  if (parent())
-    window_origin_ += parent()->GetWindowPixelOrigin().OffsetFromOrigin();
-
-  // Refresh the old bounds.
-  if (window_ && !old_bounds.size().IsEmpty()) {
-    RECT rect = old_bounds.ToRECT();
-    InvalidateRect(window_->hwnd(), &rect, TRUE);
-  }
-
-  // Refresh the new bounds.
-  Invalidate(bounds);
-}
-
-Rect BaseView::GetPixelBounds() const {
-  return bounds_;
-}
-
-Size BaseView::GetPixelSize() const {
-  return GetPixelBounds().size();
-}
-
-void BaseView::SetBounds(const Rect& bounds) {
-  SetPixelBounds(ScaleToEnclosingRect(bounds, scale_factor()));
-}
-
-Rect BaseView::GetBounds() {
-  return ScaleToEnclosingRect(GetPixelBounds(), 1.0f / scale_factor());
-}
-
-Point BaseView::GetWindowPixelOrigin() {
-  return window_origin_;
-}
-
-Rect BaseView::GetWindowPixelBounds() {
-  return Rect(window_origin_, bounds_.size());
+  Invalidate(size_allocation_);  // old
+  size_allocation_ = size_allocation;
+  Invalidate(size_allocation_);  // new
 }
 
 void BaseView::SetParent(BaseView* parent) {
@@ -62,12 +22,7 @@ void BaseView::SetParent(BaseView* parent) {
   parent_ = parent;
   window_ = parent ? parent->window_ : nullptr;
 
-  // Scale the bounds after moving to a new parent.
-  if (old_scale_factor != scale_factor()) {
-    bounds_ = ScaleToEnclosingRect(bounds_, scale_factor() / old_scale_factor);
-    preferred_size_ = ScaleToCeiledSize(preferred_size_,
-                                        scale_factor() / old_scale_factor);
-  }
+  ParentChanged(old_scale_factor);
 }
 
 void BaseView::BecomeContentView(WindowImpl* parent) {
@@ -77,26 +32,15 @@ void BaseView::BecomeContentView(WindowImpl* parent) {
   parent_ = nullptr;
   window_ = parent;
 
-  // Scale the bounds after moving to a new parent.
-  if (old_scale_factor != scale_factor()) {
-    bounds_ = ScaleToEnclosingRect(bounds_, scale_factor() / old_scale_factor);
-    preferred_size_ = ScaleToCeiledSize(preferred_size_,
-                                        scale_factor() / old_scale_factor);
-  }
+  ParentChanged(old_scale_factor);
 }
 
 void BaseView::Invalidate(const Rect& dirty) {
   // Nothing to draw?
-  if (!window_ || bounds_.size().IsEmpty())
+  if (!window_ || size_allocation_.size().IsEmpty() || dirty.IsEmpty())
     return;
 
-  // Default to redraw whole view.
-  if (dirty.IsEmpty()) {
-    Invalidate(Rect(bounds_.size()));
-    return;
-  }
-
-  RECT rect = (dirty + GetWindowPixelOrigin().OffsetFromOrigin()).ToRECT();
+  RECT rect = dirty.ToRECT();
   InvalidateRect(window_->hwnd(), &rect, TRUE);
 }
 
@@ -107,6 +51,20 @@ void BaseView::SetFocus(bool focus) {
 
 bool BaseView::IsFocused() const {
   return is_focused_;
+}
+
+void BaseView::Invalidate() {
+  Invalidate(size_allocation_);
+}
+
+void BaseView::ParentChanged(float old_scale_factor) {
+  // Scale the bounds after moving to a new parent.
+  if (old_scale_factor != scale_factor()) {
+    size_allocation_ = ScaleToEnclosingRect(size_allocation_,
+                                            scale_factor() / old_scale_factor);
+    preferred_size_ = ScaleToCeiledSize(preferred_size_,
+                                        scale_factor() / old_scale_factor);
+  }
 }
 
 }  // namespace nu
