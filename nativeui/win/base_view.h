@@ -129,6 +129,9 @@ class BaseView {
   // The window that owns the view.
   WindowImpl* window_ = nullptr;
 
+  // The viewport that owns this view.
+  BaseView* viewport_ = nullptr;
+
   // The absolute bounds relative to the origin of window.
   Rect size_allocation_;
 

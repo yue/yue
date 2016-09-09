@@ -17,13 +17,27 @@ void BaseView::SizeAllocate(const Rect& size_allocation) {
 
 void BaseView::SetParent(BaseView* parent) {
   float old_scale_factor = scale_factor();
+
   window_ = parent ? parent->window_ : nullptr;
+
+  if (parent) {
+    if (parent->type() == ControlType::Scroll)
+      viewport_ = parent;
+    else
+      viewport_ = parent->viewport_;
+  } else {
+    viewport_ = nullptr;
+  }
+
   ParentChanged(old_scale_factor);
 }
 
 void BaseView::BecomeContentView(WindowImpl* parent) {
   float old_scale_factor = scale_factor();
+
   window_ = parent;
+  viewport_ = nullptr;
+
   ParentChanged(old_scale_factor);
 }
 
@@ -32,7 +46,15 @@ void BaseView::Invalidate(const Rect& dirty) {
   if (!window_ || size_allocation_.size().IsEmpty() || dirty.IsEmpty())
     return;
 
-  RECT rect = dirty.ToRECT();
+  // Can not invalidate outside the viewport.
+  Rect clipped_dirty(dirty);
+  if (viewport_)
+    clipped_dirty.Intersect(viewport_->size_allocation());
+
+  if (clipped_dirty.IsEmpty())
+    return;
+
+  RECT rect = clipped_dirty.ToRECT();
   InvalidateRect(window_->hwnd(), &rect, TRUE);
 }
 

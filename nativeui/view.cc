@@ -10,7 +10,8 @@ namespace nu {
 
 void View::SetVisible(bool visible) {
   PlatformSetVisible(visible);
-  SetPixelPreferredSize(Size());
+  if (parent())
+    parent()->UpdatePreferredSize();
 }
 
 bool View::UpdatePreferredSize() {
