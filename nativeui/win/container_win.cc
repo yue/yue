@@ -17,7 +17,8 @@ class ContainerView : public BaseView {
   ~ContainerView() override {}
 
   void SizeAllocate(const Rect& size_allocation) override {
-    BaseView::SizeAllocate(size_allocation);
+    // Container doesn't draw anything, so only do layout.
+    set_size_allocation(size_allocation);
     delegate_->Layout();
   }
 
