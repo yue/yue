@@ -19,7 +19,7 @@ class SubwinView : public WindowImpl, public BaseView {
              DWORD window_ex_style = 0);
   ~SubwinView() override;
 
-  void SizeAllocate(const Rect& bounds) override;
+  void SizeAllocate(const Rect& size_allocation) override;
   void SetParent(BaseView* parent) override;
   void BecomeContentView(WindowImpl* parent) override;
   void Invalidate(const Rect& dirty) override;

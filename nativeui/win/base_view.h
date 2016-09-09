@@ -93,21 +93,9 @@ class BaseView {
   void set_visible(bool visible) { is_visible_ = visible; }
   bool is_visible() const { return is_visible_; }
 
+  // Set control's state.
   void set_state(ControlState state) { state_ = state; }
   ControlState state() const { return state_; }
-
-  // Parent view and host window.
-  WindowImpl* window() const { return window_; }
-  BaseView* parent() const { return parent_; }
-
-  // Whether it is the content view.
-  bool is_content_view() const { return is_content_view_; }
-
-  // Whether the view owns a HWND.
-  bool is_virtual() const { return is_virtual_; }
-
-  // The control's type.
-  ControlType type() const { return type_; }
 
   // Returns the DPI of current view.
   float scale_factor() const {
@@ -117,15 +105,16 @@ class BaseView {
     return current_scale_factor;
   }
 
+  WindowImpl* window() const { return window_; }
+  ControlType type() const { return type_; }
+
  protected:
-  explicit BaseView(ControlType type)
-      : type_(type), is_virtual_(type != ControlType::Subwin) {}
+  explicit BaseView(ControlType type) : type_(type) {}
 
   // Called by SetParent/BecomeContentView when parent view changes.
   void ParentChanged(float old_scale_factor);
 
  private:
-  bool is_virtual_;
   ControlType type_;
 
   // The focus state.
@@ -137,9 +126,8 @@ class BaseView {
   // The control state.
   ControlState state_ = ControlState::Normal;
 
-  bool is_content_view_ = false;
+  // The window that owns the view.
   WindowImpl* window_ = nullptr;
-  BaseView* parent_ = nullptr;
 
   // The absolute bounds relative to the origin of window.
   Rect size_allocation_;

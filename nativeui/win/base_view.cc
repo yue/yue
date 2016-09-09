@@ -17,21 +17,13 @@ void BaseView::SizeAllocate(const Rect& size_allocation) {
 
 void BaseView::SetParent(BaseView* parent) {
   float old_scale_factor = scale_factor();
-
-  is_content_view_ = false;
-  parent_ = parent;
   window_ = parent ? parent->window_ : nullptr;
-
   ParentChanged(old_scale_factor);
 }
 
 void BaseView::BecomeContentView(WindowImpl* parent) {
   float old_scale_factor = scale_factor();
-
-  is_content_view_ = true;
-  parent_ = nullptr;
   window_ = parent;
-
   ParentChanged(old_scale_factor);
 }
 
