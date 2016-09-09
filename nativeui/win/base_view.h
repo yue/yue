@@ -44,6 +44,8 @@ class BaseView {
   virtual void SetPixelBounds(const Rect& pixel_bounds);
   virtual Rect GetPixelBounds() const;
 
+  Size GetPixelSize() const;
+
   // Draw the content.
   virtual void Draw(PainterWin* painter, const Rect& dirty) {}
 

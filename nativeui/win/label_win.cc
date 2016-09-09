@@ -58,9 +58,8 @@ void Label::SetText(const std::string& text) {
   base::string16 wtext = base::UTF8ToUTF16(text);
   label->SetText(wtext);
 
-  if (SetPixelPreferredSize(
-          ToCeiledSize(MeasureText(label, label->font(), wtext))))
-    Invalidate();
+  SetPixelPreferredSize(ToCeiledSize(MeasureText(label, label->font(), wtext)));
+  label->Invalidate();
 }
 
 std::string Label::GetText() {

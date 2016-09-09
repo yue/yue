@@ -18,12 +18,12 @@ bool View::UpdatePreferredSize() {
 }
 
 bool View::DoSetPreferredSize(const Size& size) {
-  preferred_size_ = size;
-
-  if (parent_)
+  if (preferred_size_ != size && parent_) {
+    preferred_size_ = size;
     return parent_->UpdatePreferredSize();
-  else
+  } else {
     return true;
+  }
 }
 
 }  // namespace nu

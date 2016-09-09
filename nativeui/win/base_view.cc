@@ -7,16 +7,36 @@
 namespace nu {
 
 void BaseView::SetPixelBounds(const Rect& bounds) {
+  if (bounds_ == bounds)
+    return;
+
+  // Old invalidate bounds.
+  Rect old_bounds = Rect(bounds_.size()) +
+                    GetWindowPixelOrigin().OffsetFromOrigin();
+
   bounds_ = bounds;
 
-  // Refresh the origin to parent HWND.
+  // Update the origin to parent HWND.
   window_origin_ = bounds.origin();
   if (parent())
     window_origin_ += parent()->GetWindowPixelOrigin().OffsetFromOrigin();
+
+  // Refresh the old bounds.
+  if (window_ && !old_bounds.size().IsEmpty()) {
+    RECT rect = old_bounds.ToRECT();
+    InvalidateRect(window_->hwnd(), &rect, TRUE);
+  }
+
+  // Refresh the new bounds.
+  Invalidate(bounds);
 }
 
 Rect BaseView::GetPixelBounds() const {
   return bounds_;
+}
+
+Size BaseView::GetPixelSize() const {
+  return GetPixelBounds().size();
 }
 
 void BaseView::SetBounds(const Rect& bounds) {

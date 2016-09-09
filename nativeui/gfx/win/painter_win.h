@@ -35,10 +35,11 @@ class PainterWin : public Painter {
                            const Rect& rect,
                            int flags) override;
 
- private:
+  // The translated origin of the painter.
   Vector2d& origin() { return states_.empty() ? origin_
                                               : states_.top().origin; }
 
+ private:
   // The saved state.
   struct PainterState {
     PainterState(const Vector2d& origin,

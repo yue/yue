@@ -20,12 +20,7 @@ Container::~Container() {
 }
 
 bool Container::UpdatePreferredSize() {
-  // If the preferred size is not changed, ask the child to redraw itself.
-  Size new_preferred_size = layout_manager_->GetPixelPreferredSize(this);
-  if (new_preferred_size == GetPixelPreferredSize())
-    return true;
-
-  if (SetPixelPreferredSize(new_preferred_size))
+  if (SetPixelPreferredSize(layout_manager_->GetPixelPreferredSize(this)))
     Layout();
 
   // The layout of children is managed by Container.
@@ -48,7 +43,6 @@ void Container::Layout() {
     return;
 
   DCHECK(layout_manager_.get());
-  Invalidate();
   layout_manager_->Layout(this);
 }
 

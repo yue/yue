@@ -60,10 +60,6 @@ Size View::GetPixelPreferredSize() const {
   return view_->pixel_preferred_size();
 }
 
-void View::Invalidate(const Rect& dirty) {
-  view_->Invalidate(dirty);
-}
-
 int View::DIPToPixel(int length) const {
   return static_cast<int>(std::ceil(length * view_->scale_factor()));
 }

@@ -15,19 +15,30 @@ class ScrollView : public BaseView {
   explicit ScrollView(Scroll* delegate)
       : BaseView(ControlType::Scroll), delegate_(delegate) {}
 
+  void SetOrigin(const Vector2d& origin) {
+    origin_ = origin;
+    Invalidate();
+  }
+
   void SetPixelBounds(const Rect& bounds) override {
     BaseView::SetPixelBounds(bounds);
-    delegate_->GetContentView()->SetPixelBounds(Rect(bounds.size()));
+    delegate_->GetContentView()->SetPixelBounds(Rect(content_size_));
   }
 
   void Draw(PainterWin* painter, const Rect& dirty) override {
     painter->Save();
-    painter->ClipRect(Rect(GetPixelBounds().size()));
-    delegate_->GetContentView()->view()->Draw(painter, dirty);
+    painter->ClipRect(Rect(GetPixelSize()));
+    painter->Translate(origin_);
+    delegate_->GetContentView()->view()->Draw(painter, dirty + origin_);
     painter->Restore();
   }
 
+  void set_content_pixel_size(const Size& size) { content_size_ = size; }
+
  private:
+  Size content_size_;
+  Vector2d origin_;
+
   Scroll* delegate_;
 };
 
@@ -35,15 +46,22 @@ class ScrollView : public BaseView {
 
 void Scroll::PlatformInit(const Size& size) {
   TakeOverView(new ScrollView(this));
+  // static_cast<ScrollView*>(view())->SetOrigin(Vector2d(-20, -30));
 }
 
 void Scroll::PlatformSetContentView(Container* container) {
   container->view()->SetParent(view());
-  container->SetPixelBounds(Rect(GetPixelBounds().size()));
+
+  auto* scroll = static_cast<ScrollView*>(view());
+  scroll->set_content_pixel_size(container->view()->GetPixelSize());
+  scroll->Invalidate();
 }
 
 void Scroll::SetContentSize(const Size& size) {
-  GetContentView()->SetBounds(Rect(size));
+  auto* scroll = static_cast<ScrollView*>(view());
+  scroll->set_content_pixel_size(ScaleToCeiledSize(size,
+                                                   scroll->scale_factor()));
+  scroll->Invalidate();
 }
 
 void Scroll::SetVerticalScrollBar(bool has) {

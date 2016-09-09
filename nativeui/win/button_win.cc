@@ -40,6 +40,7 @@ class ButtonView : public BaseView {
 
   void SetTitle(const base::string16& title) {
     title_ = title;
+    text_size_ = ToCeiledSize(MeasureText(this, font_, title_));
   }
 
   base::string16 GetTitle() const {
@@ -47,19 +48,19 @@ class ButtonView : public BaseView {
   }
 
   Size GetPreferredSize() const {
-    Size size = ToCeiledSize(MeasureText(this, font_, title_));
     int padding = delegate_->DIPToPixel(
         type() == ControlType::Button ? kButtonPadding : kCheckBoxPadding);
-    size.Enlarge(box_size_.width() + padding * 2, padding * 2);
-    return size;
+    Size preferred_size(text_size_);
+    preferred_size.Enlarge(box_size_.width() + padding * 2, padding * 2);
+    return preferred_size;
   }
 
   void OnClick() {
-    delegate_->on_click.Emit();
     if (type() == ControlType::CheckBox)
       SetChecked(!IsChecked());
     else if (type() == ControlType::Radio && !IsChecked())
       SetChecked(true);
+    delegate_->on_click.Emit();
   }
 
   void SetChecked(bool checked) {
@@ -132,22 +133,23 @@ class ButtonView : public BaseView {
   void Draw(PainterWin* painter, const Rect& dirty) override {
     HDC dc = painter->GetHDC();
 
+    Size size = GetPixelSize();
+    Size preferred_size = delegate_->GetPixelPreferredSize();
+
     // Draw the button background
     if (type() == ControlType::Button)
-      theme_->PaintPushButton(dc, state(), GetWindowPixelBounds(), params_);
+      theme_->PaintPushButton(dc, state(), Rect(size) + painter->origin(),
+                              params_);
 
     // Checkbox and radio are left aligned.
-    Size preferred_size = delegate_->GetPixelPreferredSize();
     Point origin;
     if (type() == ControlType::Button) {
-      Size ctrl_size = GetPixelBounds().size();
-      origin.Offset((ctrl_size.width() - preferred_size.width()) / 2,
-                    (ctrl_size.height() - preferred_size.height()) / 2);
+      origin.Offset((size.width() - preferred_size.width()) / 2,
+                    (size.height() - preferred_size.height()) / 2);
     }
 
     // Draw the box.
-    Point box_origin(origin);
-    box_origin += GetWindowPixelOrigin().OffsetFromOrigin();
+    Point box_origin = origin + painter->origin();
     box_origin.Offset(0, (preferred_size.height() - box_size_.height()) / 2);
     if (type() == ControlType::CheckBox)
       theme_->PaintCheckBox(dc, state(), Rect(box_origin, box_size_), params_);
@@ -158,14 +160,11 @@ class ButtonView : public BaseView {
     if (IsFocused()) {
       RECT rect;
       if (type() == ControlType::Button) {
-        Rect bounds = GetWindowPixelBounds();
-        int padding = delegate_->DIPToPixel(1);
-        bounds.Inset(Insets(padding));
+        Rect bounds = Rect(size) + painter->origin();
+        bounds.Inset(Insets(delegate_->DIPToPixel(1)));
         rect = bounds.ToRECT();
       } else {
         int padding = delegate_->DIPToPixel(kCheckBoxPadding);
-        Point box_origin(origin);
-        box_origin += GetWindowPixelOrigin().OffsetFromOrigin();
         box_origin.Offset(box_size_.width() + padding, padding);
         Size ring_size = preferred_size;
         ring_size.Enlarge(-box_size_.width() - padding * 2, -padding * 2);
@@ -193,6 +192,9 @@ class ButtonView : public BaseView {
 
   // The size of box for radio and checkbox.
   Size box_size_;
+
+  // The size of text.
+  Size text_size_;
 
   // Default text color and font.
   Color color_;
@@ -223,8 +225,8 @@ void Button::SetTitle(const std::string& title) {
   base::string16 wtitle = base::UTF8ToUTF16(title);
   button->SetTitle(wtitle);
 
-  if (SetPixelPreferredSize(button->GetPreferredSize()))
-    Invalidate();
+  SetPixelPreferredSize(button->GetPreferredSize());
+  button->Invalidate();
 }
 
 std::string Button::GetTitle() const {
