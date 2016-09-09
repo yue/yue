@@ -103,25 +103,11 @@ void Scroll::SetContentSize(const Size& size) {
   scroll->SetContentSize(ScaleToCeiledSize(size, scroll->scale_factor()));
 }
 
-void Scroll::SetVerticalScrollBar(bool has) {
+void Scroll::SetScrollBarPolicy(Policy h_policy, Policy v_policy) {
 }
 
-bool Scroll::HasVerticalScrollBar() const {
-  return false;
-}
-
-void Scroll::SetHorizontalScrollBar(bool has) {
-}
-
-bool Scroll::HasHorizontalScrollBar() const {
-  return false;
-}
-
-void Scroll::SetAutoHideScrollBar(bool is) {
-}
-
-bool Scroll::IsScrollBarAutoHide() const {
-  return false;
+std::tuple<Scroll::Policy, Scroll::Policy> Scroll::GetScrollBarPolicy() const {
+  return std::make_tuple(Policy::Automatic, Policy::Automatic);
 }
 
 }  // namespace nu

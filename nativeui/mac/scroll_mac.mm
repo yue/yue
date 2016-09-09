@@ -23,28 +23,21 @@ void Scroll::SetContentSize(const Size& size) {
   GetContentView()->SetBounds(Rect(size));
 }
 
-void Scroll::SetVerticalScrollBar(bool has) {
-  static_cast<NSScrollView*>(view()).hasVerticalScroller = has;
+void Scroll::SetScrollBarPolicy(Policy h_policy, Policy v_policy) {
+  auto* scroll = static_cast<NSScrollView*>(view());
+  scroll.hasHorizontalScroller = (h_policy == Policy::Always) ||
+                                 (h_policy == Policy::Automatic);
+  scroll.hasVerticalScroller = (v_policy == Policy::Always) ||
+                               (v_policy == Policy::Automatic);
 }
 
-bool Scroll::HasVerticalScrollBar() const {
-  return static_cast<NSScrollView*>(view()).hasVerticalScroller;
-}
-
-void Scroll::SetHorizontalScrollBar(bool has) {
-  static_cast<NSScrollView*>(view()).hasHorizontalScroller = has;
-}
-
-bool Scroll::HasHorizontalScrollBar() const {
-  return static_cast<NSScrollView*>(view()).hasHorizontalScroller;
-}
-
-void Scroll::SetAutoHideScrollBar(bool is) {
-  static_cast<NSScrollView*>(view()).autohidesScrollers = is;
-}
-
-bool Scroll::IsScrollBarAutoHide() const {
-  return static_cast<NSScrollView*>(view()).autohidesScrollers;
+std::tuple<Scroll::Policy, Scroll::Policy> Scroll::GetScrollBarPolicy() const {
+  auto* scroll = static_cast<NSScrollView*>(view());
+  Policy h_policy = scroll.hasHorizontalScroller ? Policy::Automatic
+                                                 : Policy::Never;
+  Policy v_policy = scroll.hasVerticalScroller ? Policy::Automatic
+                                               : Policy::Never;
+  return std::make_tuple(h_policy, v_policy);
 }
 
 }  // namespace nu

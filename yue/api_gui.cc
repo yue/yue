@@ -213,18 +213,44 @@ struct Type<nu::Container> {
 };
 
 template<>
+struct Type<nu::Scroll::Policy> {
+  static constexpr const char* name = "yue.Scroll.Policy";
+  static inline bool To(State* state, int index, nu::Scroll::Policy* out) {
+    std::string policy;
+    if (!lua::To(state, index, &policy))
+      return false;
+    if (policy == "automatic") {
+      *out = nu::Scroll::Policy::Automatic;
+      return true;
+    } else if (policy == "always") {
+      *out = nu::Scroll::Policy::Always;
+      return true;
+    } else if (policy == "never") {
+      *out = nu::Scroll::Policy::Never;
+      return true;
+    } else {
+      return false;
+    }
+  }
+  static inline void Push(State* state, nu::Scroll::Policy policy) {
+    if (policy == nu::Scroll::Policy::Always)
+      lua::Push(state, "always");
+    else if (policy == nu::Scroll::Policy::Never)
+      lua::Push(state, "never");
+    else
+      lua::Push(state, "automatic");
+  }
+};
+
+template<>
 struct Type<nu::Scroll> {
   using base = nu::View;
   static constexpr const char* name = "yue.Scroll";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
            "new", &MetaTable<nu::Scroll>::NewInstance<const nu::Size&>,
-           "sethorizontalscrollbar", &nu::Scroll::SetHorizontalScrollBar,
-           "hashorizontalscrollbar", &nu::Scroll::HasHorizontalScrollBar,
-           "setverticalscrollbar", &nu::Scroll::SetVerticalScrollBar,
-           "hasverticalscrollbar", &nu::Scroll::HasVerticalScrollBar,
-           "setautohidescrollbar", &nu::Scroll::SetAutoHideScrollBar,
-           "isscrollbarautohide", &nu::Scroll::IsScrollBarAutoHide,
+           "setscrollbarpolicy", &nu::Scroll::SetScrollBarPolicy,
+           "getscrollbarpolicy", &nu::Scroll::GetScrollBarPolicy,
            "setcontentsize", &nu::Scroll::SetContentSize,
            "getcontentsize", &nu::Scroll::GetContentSize,
            "setcontentview", &nu::Scroll::SetContentView,

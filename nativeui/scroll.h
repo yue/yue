@@ -5,6 +5,8 @@
 #ifndef NATIVEUI_SCROLL_H_
 #define NATIVEUI_SCROLL_H_
 
+#include <tuple>
+
 #include "nativeui/container.h"
 
 namespace nu {
@@ -19,12 +21,13 @@ NATIVEUI_EXPORT class Scroll : public View {
   void SetContentSize(const Size& size);
   Size GetContentSize() const;
 
-  void SetVerticalScrollBar(bool has);
-  bool HasVerticalScrollBar() const;
-  void SetHorizontalScrollBar(bool has);
-  bool HasHorizontalScrollBar() const;
-  void SetAutoHideScrollBar(bool is);
-  bool IsScrollBarAutoHide() const;
+  enum class Policy {
+    Always,
+    Never,
+    Automatic,
+  };
+  void SetScrollBarPolicy(Policy h_policy, Policy v_policy);
+  std::tuple<Policy, Policy> GetScrollBarPolicy() const;
 
  protected:
   ~Scroll() override;

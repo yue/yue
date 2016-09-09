@@ -6,6 +6,28 @@
 
 namespace nu {
 
+namespace {
+
+GtkPolicyType PolicyToGTK(Scroll::Policy policy) {
+  if (policy == Scroll::Policy::Always)
+    return GTK_POLICY_ALWAYS;
+  else if (policy == Scroll::Policy::Never)
+    return GTK_POLICY_NEVER;
+  else
+    return GTK_POLICY_AUTOMATIC;
+}
+
+Scroll::Policy PolicyFromGTK(GtkPolicyType policy) {
+  if (policy == GTK_POLICY_ALWAYS)
+    return Scroll::Policy::Always;
+  else if (policy == GTK_POLICY_NEVER)
+    return Scroll::Policy::Never;
+  else
+    return Scroll::Policy::Automatic;
+}
+
+}  // namespace
+
 void Scroll::PlatformInit(const Size& size) {
   SetPreferredSize(size);
   TakeOverView(gtk_scrolled_window_new(nullptr, nullptr));
@@ -36,41 +58,15 @@ void Scroll::SetContentSize(const Size& size) {
                               size.width(), size.height());
 }
 
-void Scroll::SetVerticalScrollBar(bool has) {
-  GtkPolicyType hp;
-  gtk_scrolled_window_get_policy(GTK_SCROLLED_WINDOW(view()), &hp, nullptr);
-  GtkPolicyType vp = has ? GTK_POLICY_ALWAYS : GTK_POLICY_NEVER;
-  gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(view()), hp, vp);
+void Scroll::SetScrollBarPolicy(Policy h_policy, Policy v_policy) {
+  gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(view()),
+                                 PolicyToGTK(h_policy), PolicyToGTK(v_policy));
 }
 
-bool Scroll::HasVerticalScrollBar() const {
-  GtkPolicyType vp;
-  gtk_scrolled_window_get_policy(GTK_SCROLLED_WINDOW(view()), nullptr, &vp);
-  return vp == GTK_POLICY_ALWAYS;
-}
-
-void Scroll::SetHorizontalScrollBar(bool has) {
-  GtkPolicyType vp;
-  gtk_scrolled_window_get_policy(GTK_SCROLLED_WINDOW(view()), nullptr, &vp);
-  GtkPolicyType hp = has ? GTK_POLICY_ALWAYS : GTK_POLICY_NEVER;
-  gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(view()), hp, vp);
-}
-
-bool Scroll::HasHorizontalScrollBar() const {
-  GtkPolicyType hp;
-  gtk_scrolled_window_get_policy(GTK_SCROLLED_WINDOW(view()), &hp, nullptr);
-  return hp == GTK_POLICY_ALWAYS;
-}
-
-void Scroll::SetAutoHideScrollBar(bool is) {
-  GtkPolicyType p = is ? GTK_POLICY_AUTOMATIC : GTK_POLICY_NEVER;
-  gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(view()), p, p);
-}
-
-bool Scroll::IsScrollBarAutoHide() const {
+std::tuple<Scroll::Policy, Scroll::Policy> Scroll::GetScrollBarPolicy() const {
   GtkPolicyType hp, vp;
   gtk_scrolled_window_get_policy(GTK_SCROLLED_WINDOW(view()), &hp, &vp);
-  return hp == GTK_POLICY_AUTOMATIC && vp == GTK_POLICY_AUTOMATIC;
+  return std::make_tuple(PolicyFromGTK(hp), PolicyFromGTK(vp));
 }
 
 }  // namespace nu
