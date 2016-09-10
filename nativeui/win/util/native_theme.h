@@ -49,6 +49,10 @@ class NativeTheme {
     bool is_hovering;
   };
 
+  struct ScrollbarThumbExtraParams {
+    bool is_hovering;
+  };
+
   struct ScrollbarTrackExtraParams {
     bool is_upper;
     int track_x;
@@ -76,6 +80,11 @@ class NativeTheme {
                               ControlState state,
                               const Rect& rect,
                               const ScrollbarArrowExtraParams& extra) const;
+  HRESULT PaintScrollbarThumb(HDC hdc,
+                              bool vertical,
+                              ControlState state,
+                              const Rect& rect,
+                              const ScrollbarThumbExtraParams& extra) const;
   HRESULT PaintScrollbarTrack(HDC hdc,
                               bool vertical,
                               ControlState state,

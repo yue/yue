@@ -135,6 +135,8 @@ source_set("nativeui") {
     "win/scroll_bar/scroll_bar.h",
     "win/scroll_bar/scroll_bar_button.cc",
     "win/scroll_bar/scroll_bar_button.h",
+    "win/scroll_bar/scroll_bar_thumb.cc",
+    "win/scroll_bar/scroll_bar_thumb.h",
     "win/util/class_registrar.cc",
     "win/util/class_registrar.h",
     "win/util/native_theme.cc",

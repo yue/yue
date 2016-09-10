@@ -17,16 +17,12 @@ ScrollView::ScrollView(Scroll* delegate)
   SetScrollBarPolicy(Scroll::Policy::Automatic, Scroll::Policy::Automatic);
 }
 
-void ScrollView::SetOrigin(const Vector2d& origin) {
-  UpdateOrigin(origin);
-  Layout();
-}
-
 void ScrollView::SetContentSize(const Size& size) {
   content_size_ = size;
   UpdateScrollbar();
   UpdateOrigin(origin_);
   Layout();
+  Invalidate();
 }
 
 void ScrollView::SetScrollBarPolicy(Scroll::Policy h_policy,
@@ -39,15 +35,19 @@ void ScrollView::SetScrollBarPolicy(Scroll::Policy h_policy,
   Invalidate();
 }
 
-Insets ScrollView::GetScrollBarInsets() const {
-  return Insets(0, 0,
-                h_scrollbar_ ? scrollbar_height_ : 0,
-                v_scrollbar_ ? scrollbar_height_ : 0);
+Size ScrollView::GetViewportSize() const {
+  Rect viewport(size_allocation());
+  viewport.Inset(0, 0,
+                 v_scrollbar_ ? scrollbar_height_ : 0,
+                 h_scrollbar_ ? scrollbar_height_ : 0);
+  return viewport.size();
 }
 
 void ScrollView::OnScroll(int x, int y) {
-  if (UpdateOrigin(origin_ + Vector2d(x, y)))
+  if (UpdateOrigin(origin_ + Vector2d(x, y))) {
     Layout();
+    Invalidate();
+  }
 }
 
 void ScrollView::Layout() {
@@ -66,7 +66,12 @@ void ScrollView::Layout() {
 }
 
 std::vector<BaseView*> ScrollView::GetChildren() {
-  return std::vector<BaseView*>{delegate_->GetContentView()->view()};
+  std::vector<BaseView*> children{delegate_->GetContentView()->view()};
+  if (h_scrollbar_)
+    children.push_back(h_scrollbar_.get());
+  if (v_scrollbar_)
+    children.push_back(v_scrollbar_.get());
+  return children;
 }
 
 void ScrollView::SizeAllocate(const Rect& size_allocation) {
@@ -86,24 +91,12 @@ bool ScrollView::OnMouseWheel(bool vertical, UINT flags, int delta,
 }
 
 void ScrollView::Draw(PainterWin* painter, const Rect& dirty) {
-  Rect scroll_area(size_allocation().size());
-  scroll_area.Inset(GetScrollBarInsets());
-
-  painter->Save();
-  painter->ClipRect(scroll_area);
-  painter->Translate(origin_);
-  scroll_area.Intersect(dirty);
-  delegate_->GetContentView()->view()->Draw(painter, scroll_area - origin_);
-  painter->Restore();
-
-  if (h_scrollbar_)
-    DrawScrollBar(false, painter, dirty);
-  if (v_scrollbar_)
-    DrawScrollBar(true, painter, dirty);
+  painter->ClipRect(Rect(size_allocation().size()));
+  ContainerView::Draw(painter, dirty);
 }
 
 void ScrollView::UpdateScrollbar() {
-  Rect viewport = size_allocation();
+  Size viewport = GetViewportSize();
   bool show_h_scrollbar = (h_policy_ == Scroll::Policy::Always) ||
                           (h_policy_ == Scroll::Policy::Automatic &&
                            viewport.width() < content_size_.width());
@@ -111,13 +104,13 @@ void ScrollView::UpdateScrollbar() {
                           (v_policy_ == Scroll::Policy::Automatic &&
                            viewport.height() < content_size_.height());
   if (show_h_scrollbar && !h_scrollbar_) {
-    h_scrollbar_.reset(new ScrollBarView(false, this));
+    h_scrollbar_.reset(new ScrollBarView(false, delegate_));
     h_scrollbar_->SetParent(this);
   } else if (!show_h_scrollbar) {
     h_scrollbar_.reset();
   }
   if (show_v_scrollbar && !v_scrollbar_) {
-    v_scrollbar_.reset(new ScrollBarView(true, this));
+    v_scrollbar_.reset(new ScrollBarView(true, delegate_));
     v_scrollbar_->SetParent(this);
   } else if (!show_v_scrollbar) {
     v_scrollbar_.reset();
@@ -125,9 +118,7 @@ void ScrollView::UpdateScrollbar() {
 }
 
 bool ScrollView::UpdateOrigin(Vector2d new_origin) {
-  Rect viewport = size_allocation();
-  viewport.Inset(GetScrollBarInsets());
-
+  Size viewport = GetViewportSize();
   if (-new_origin.x() + viewport.width() > content_size_.width())
     new_origin.set_x(viewport.width() - content_size_.width());
   if (new_origin.x() > 0)

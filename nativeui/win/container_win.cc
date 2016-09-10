@@ -13,7 +13,8 @@ ContainerView::ContainerView(Delegate* delegate, ControlType type)
 
 void ContainerView::SizeAllocate(const Rect& size_allocation) {
   BaseView::SizeAllocate(size_allocation);
-  delegate_->Layout();
+  if (!size_allocation.size().IsEmpty())
+    delegate_->Layout();
 }
 
 void ContainerView::OnMouseMove(UINT flags, const Point& point) {

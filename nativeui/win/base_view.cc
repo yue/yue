@@ -51,8 +51,8 @@ void BaseView::Invalidate(const Rect& dirty) {
   // Can not invalidate outside the viewport.
   Rect clipped_dirty(dirty);
   if (viewport_) {
-    Rect viewport_rect(viewport_->size_allocation());
-    viewport_rect.Inset(viewport_->GetScrollBarInsets());
+    Rect viewport_rect(viewport_->GetViewportSize());
+    viewport_rect += viewport_->size_allocation().OffsetFromOrigin();
     clipped_dirty.Intersect(viewport_rect);
   }
 

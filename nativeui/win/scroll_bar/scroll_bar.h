@@ -6,6 +6,8 @@
 #define NATIVEUI_WIN_SCROLL_BAR_SCROLL_BAR_H_
 
 #include "nativeui/win/scroll_bar/scroll_bar_button.h"
+#include "nativeui/win/scroll_bar/scroll_bar_thumb.h"
+#include "nativeui/win/scroll_win.h"
 
 namespace nu {
 
@@ -13,8 +15,10 @@ namespace nu {
 class ScrollBarView : public ContainerView,
                       public ContainerView::Delegate {
  public:
-  ScrollBarView(bool vertical, ScrollView* scroll);
+  ScrollBarView(bool vertical, Scroll* scroll);
   ~ScrollBarView() override;
+
+  void UpdateThumbPosition();
 
   // ContainerView::Delegate:
   void Layout() override;
@@ -24,14 +28,19 @@ class ScrollBarView : public ContainerView,
   void Draw(PainterWin* painter, const Rect& dirty) override;
 
  private:
+  int GetTrackSize() const;
+  int GetBoxSize() const;
+  int GetScrollAmout() const;
+
   NativeTheme* theme_;
   NativeTheme::ScrollbarTrackExtraParams params_ = {0};
 
   ScrollBarButton near_button_;
   ScrollBarButton far_button_;
+  ScrollBarThumb thumb_;
 
   bool vertical_;
-  ScrollView* scroll_;  // weak ref
+  Scroll* scroll_;  // weak ref
 };
 
 }  // namespace nu

@@ -26,7 +26,7 @@ class ScrollView : public ContainerView,
   void SetContentSize(const Size& size);
   void SetScrollBarPolicy(Scroll::Policy h_policy, Scroll::Policy v_policy);
 
-  Insets GetScrollBarInsets() const;
+  Size GetViewportSize() const;
   void OnScroll(int x, int y);
 
   // ContainerView::Delegate:
@@ -41,6 +41,7 @@ class ScrollView : public ContainerView,
 
   Scroll::Policy h_policy() const { return h_policy_; }
   Scroll::Policy v_policy() const { return v_policy_; }
+  Vector2d origin() const { return origin_; }
 
  private:
   void UpdateScrollbar();

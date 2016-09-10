@@ -330,6 +330,44 @@ HRESULT NativeTheme::PaintScrollbarArrow(
   return S_OK;
 }
 
+HRESULT NativeTheme::PaintScrollbarThumb(
+    HDC hdc,
+    bool vertical,
+    ControlState state,
+    const Rect& rect,
+    const ScrollbarThumbExtraParams& extra) const {
+  HANDLE handle = GetThemeHandle(ScrollBar);
+  RECT rect_win = rect.ToRECT();
+
+  int part_id = vertical ? SBP_THUMBBTNVERT : SBP_THUMBBTNHORZ;
+  int state_id = SCRBS_NORMAL;
+  switch (state) {
+    case ControlState::Disabled:
+      state_id = SCRBS_DISABLED;
+      break;
+    case ControlState::Hovered:
+      state_id = extra.is_hovering ? SCRBS_HOVER : SCRBS_HOT;
+      break;
+    case ControlState::Normal:
+      break;
+    case ControlState::Pressed:
+      state_id = SCRBS_PRESSED;
+      break;
+    case ControlState::Size:
+      NOTREACHED();
+      break;
+  }
+
+  if (handle && draw_theme_)
+    return PaintScaledTheme(handle, hdc, part_id, state_id, rect);
+
+  // Draw it manually.
+  if ((part_id == SBP_THUMBBTNHORZ) || (part_id == SBP_THUMBBTNVERT))
+    DrawEdge(hdc, &rect_win, EDGE_RAISED, BF_RECT | BF_MIDDLE);
+  // Classic mode doesn't have a gripper.
+  return S_OK;
+}
+
 HRESULT NativeTheme::PaintScrollbarTrack(
     HDC hdc,
     bool vertical,

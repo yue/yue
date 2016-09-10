@@ -35,6 +35,7 @@ enum class ControlType {
   Scroll,
   ScrollBar,
   ScrollBarButton,
+  ScrollBarThumb,
   Subwin,
 };
 
