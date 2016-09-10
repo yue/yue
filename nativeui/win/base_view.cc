@@ -4,6 +4,8 @@
 
 #include "nativeui/win/base_view.h"
 
+#include "nativeui/win/scroll_win.h"
+
 namespace nu {
 
 void BaseView::SizeAllocate(const Rect& size_allocation) {
@@ -22,7 +24,7 @@ void BaseView::SetParent(BaseView* parent) {
 
   if (parent) {
     if (parent->type() == ControlType::Scroll)
-      viewport_ = parent;
+      viewport_ = static_cast<ScrollView*>(parent);
     else
       viewport_ = parent->viewport_;
   } else {
@@ -48,8 +50,11 @@ void BaseView::Invalidate(const Rect& dirty) {
 
   // Can not invalidate outside the viewport.
   Rect clipped_dirty(dirty);
-  if (viewport_)
-    clipped_dirty.Intersect(viewport_->size_allocation());
+  if (viewport_) {
+    Rect viewport_rect(viewport_->size_allocation());
+    viewport_rect.Inset(viewport_->GetScrollBarInsets());
+    clipped_dirty.Intersect(viewport_rect);
+  }
 
   if (clipped_dirty.IsEmpty())
     return;

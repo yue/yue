@@ -45,6 +45,10 @@ class NativeTheme {
     bool is_default;  // Whether the button is default button.
   };
 
+  struct ScrollbarArrowExtraParams {
+    bool is_hovering;
+  };
+
   struct ScrollbarTrackExtraParams {
     bool is_upper;
     int track_x;
@@ -67,6 +71,11 @@ class NativeTheme {
                         ControlState state,
                         const Rect& rect,
                         const ButtonExtraParams& extra) const;
+  HRESULT PaintScrollbarArrow(HDC hdc,
+                              int type,
+                              ControlState state,
+                              const Rect& rect,
+                              const ScrollbarArrowExtraParams& extra) const;
   HRESULT PaintScrollbarTrack(HDC hdc,
                               bool vertical,
                               ControlState state,
@@ -80,6 +89,17 @@ class NativeTheme {
                       int part_id,
                       int state_id,
                       RECT* rect) const;
+
+  // Paints a theme part, with support for scene scaling in high-DPI mode.
+  // |theme| is the theme handle. |hdc| is the handle for the device context.
+  // |part_id| is the identifier for the part (e.g. thumb gripper). |state_id|
+  // is the identifier for the rendering state of the part (e.g. hover). |rect|
+  // is the bounds for rendering, expressed in logical coordinates.
+  HRESULT PaintScaledTheme(HANDLE theme,
+                           HDC hdc,
+                           int part_id,
+                           int state_id,
+                           const Rect& rect) const;
 
   // Update the locally cached set of system colors.
   void UpdateSystemColors();

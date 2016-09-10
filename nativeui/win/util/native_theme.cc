@@ -255,6 +255,81 @@ HRESULT NativeTheme::PaintCheckBox(HDC hdc,
   return PaintButton(hdc, state, extra, BP_CHECKBOX, state_id, &rect_win);
 }
 
+HRESULT NativeTheme::PaintScrollbarArrow(
+    HDC hdc,
+    int type,
+    ControlState state,
+    const Rect& rect,
+    const ScrollbarArrowExtraParams& extra) const {
+  static const int state_id_matrix[4][ControlState::Size] = {
+      {ABS_UPDISABLED, ABS_UPHOT, ABS_UPNORMAL, ABS_UPPRESSED},
+      {ABS_DOWNDISABLED, ABS_DOWNHOT, ABS_DOWNNORMAL, ABS_DOWNPRESSED},
+      {ABS_LEFTDISABLED, ABS_LEFTHOT, ABS_LEFTNORMAL, ABS_LEFTPRESSED},
+      {ABS_RIGHTDISABLED, ABS_RIGHTHOT, ABS_RIGHTNORMAL, ABS_RIGHTPRESSED},
+  };
+  HANDLE handle = GetThemeHandle(ScrollBar);
+  RECT rect_win = rect.ToRECT();
+  if (handle && draw_theme_) {
+    DCHECK_GE(type, 0);
+    DCHECK_LT(static_cast<size_t>(type), arraysize(state_id_matrix));
+    int state_id = state_id_matrix[type][static_cast<int>(state)];
+
+    // Hovering means that the cursor is over the scrollbar, but not over the
+    // specific arrow itself.  We don't want to show it "hot" mode, but only
+    // in "hover" mode.
+    if (state == ControlState::Hovered && extra.is_hovering) {
+      switch (type) {
+        case 0:
+          state_id = ABS_UPHOVER;
+          break;
+        case 1:
+          state_id = ABS_DOWNHOVER;
+          break;
+        case 2:
+          state_id = ABS_LEFTHOVER;
+          break;
+        case 3:
+          state_id = ABS_RIGHTHOVER;
+          break;
+      }
+    }
+    return PaintScaledTheme(handle, hdc, SBP_ARROWBTN, state_id, rect);
+  }
+
+  int classic_state = DFCS_SCROLLDOWN;
+  switch (type) {
+    case 0:
+      classic_state = DFCS_SCROLLUP;
+      break;
+    case 1:
+      break;
+    case 2:
+      classic_state = DFCS_SCROLLLEFT;
+      break;
+    case 3:
+      classic_state = DFCS_SCROLLRIGHT;
+      break;
+  }
+  switch (state) {
+    case ControlState::Disabled:
+      classic_state |= DFCS_INACTIVE;
+      break;
+    case ControlState::Hovered:
+      classic_state |= DFCS_HOT;
+      break;
+    case ControlState::Normal:
+      break;
+    case ControlState::Pressed:
+      classic_state |= DFCS_PUSHED;
+      break;
+    case ControlState::Size:
+      NOTREACHED();
+      break;
+  }
+  DrawFrameControl(hdc, &rect_win, DFC_SCROLL, classic_state);
+  return S_OK;
+}
+
 HRESULT NativeTheme::PaintScrollbarTrack(
     HDC hdc,
     bool vertical,
@@ -369,6 +444,32 @@ HRESULT NativeTheme::PaintButton(HDC hdc,
   }
 
   return S_OK;
+}
+
+HRESULT NativeTheme::PaintScaledTheme(HANDLE theme,
+                                      HDC hdc,
+                                      int part_id,
+                                      int state_id,
+                                      const Rect& rect) const {
+  // Correct the scaling and positioning of sub-components such as scrollbar
+  // arrows and thumb grippers in the event that the world transform applies
+  // scaling (e.g. in high-DPI mode).
+  XFORM save_transform;
+  if (GetWorldTransform(hdc, &save_transform)) {
+    float scale = save_transform.eM11;
+    if (scale != 1 && save_transform.eM12 == 0) {
+      ModifyWorldTransform(hdc, NULL, MWT_IDENTITY);
+      Rect scaled_rect = ScaleToEnclosedRect(rect, scale);
+      scaled_rect.Offset(save_transform.eDx, save_transform.eDy);
+      RECT bounds = scaled_rect.ToRECT();
+      HRESULT result = draw_theme_(theme, hdc, part_id, state_id, &bounds,
+                                   NULL);
+      SetWorldTransform(hdc, &save_transform);
+      return result;
+    }
+  }
+  RECT bounds = rect.ToRECT();
+  return draw_theme_(theme, hdc, part_id, state_id, &bounds, NULL);
 }
 
 HANDLE NativeTheme::GetThemeHandle(Part part) const {

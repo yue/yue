@@ -53,8 +53,8 @@ class GroupView : public ContainerView,
     delegate_->GetContentView()->view()->SizeAllocate(child_alloc);
   }
 
-  std::vector<View*> GetChildren() override {
-    return std::vector<View*>{delegate_->GetContentView()};
+  std::vector<BaseView*> GetChildren() override {
+    return std::vector<BaseView*>{delegate_->GetContentView()->view()};
   }
 
   // BaseView:

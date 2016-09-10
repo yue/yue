@@ -20,7 +20,7 @@ class ContainerView : public BaseView {
     virtual ~Delegate() = default;
 
     virtual void Layout() = 0;
-    virtual std::vector<View*> GetChildren() = 0;
+    virtual std::vector<BaseView*> GetChildren() = 0;
   };
 
   ContainerView(Delegate* delegate, ControlType type);
@@ -38,12 +38,12 @@ class ContainerView : public BaseView {
 
  private:
   void RefreshParentTree();
-  View* FindChildFromPoint(const Point& point);
+  BaseView* FindChildFromPoint(const Point& point);
 
   Delegate* delegate_;
 
   // The View in which mouse hovers.
-  View* hover_view_ = nullptr;
+  BaseView* hover_view_ = nullptr;
 };
 
 }  // namespace nu

@@ -5,8 +5,7 @@
 #ifndef NATIVEUI_WIN_SCROLL_BAR_SCROLL_BAR_H_
 #define NATIVEUI_WIN_SCROLL_BAR_SCROLL_BAR_H_
 
-#include "nativeui/win/scroll_win.h"
-#include "nativeui/win/util/native_theme.h"
+#include "nativeui/win/scroll_bar/scroll_bar_button.h"
 
 namespace nu {
 
@@ -19,7 +18,7 @@ class ScrollBarView : public ContainerView,
 
   // ContainerView::Delegate:
   void Layout() override;
-  std::vector<View*> GetChildren() override;
+  std::vector<BaseView*> GetChildren() override;
 
   // BaseView:
   void Draw(PainterWin* painter, const Rect& dirty) override;
@@ -27,6 +26,9 @@ class ScrollBarView : public ContainerView,
  private:
   NativeTheme* theme_;
   NativeTheme::ScrollbarTrackExtraParams params_ = {0};
+
+  ScrollBarButton near_button_;
+  ScrollBarButton far_button_;
 
   bool vertical_;
   ScrollView* scroll_;  // weak ref

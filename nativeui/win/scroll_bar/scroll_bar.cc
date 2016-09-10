@@ -9,29 +9,62 @@
 namespace nu {
 
 ScrollBarView::ScrollBarView(bool vertical, ScrollView* scroll)
-    : ContainerView(this, ControlType::Scroll),
+    : ContainerView(this, ControlType::ScrollBar),
       theme_(State::current()->GetNativeTheme()),
-      vertical_(true),
-      scroll_(scroll) {}
+      near_button_(vertical ? ScrollBarButton::Up : ScrollBarButton::Left,
+                   scroll),
+      far_button_(vertical ? ScrollBarButton::Down : ScrollBarButton::Right,
+                  scroll),
+      vertical_(vertical),
+      scroll_(scroll) {
+  near_button_.SetParent(this);
+  far_button_.SetParent(this);
+}
 
 ScrollBarView::~ScrollBarView() {
 }
 
 void ScrollBarView::Layout() {
+  int box = vertical_ ? size_allocation().width() : size_allocation().height();
+
+  Rect near_allocation(size_allocation());
+  if (vertical_)
+    near_allocation.set_height(
+        std::min(box,
+                 static_cast<int>(std::ceil(near_allocation.height() / 2))));
+  else
+    near_allocation.set_width(
+        std::min(box,
+                 static_cast<int>(std::ceil(near_allocation.width() / 2))));
+  near_button_.SizeAllocate(near_allocation);
+
+  Rect far_allocation(near_allocation);
+  if (vertical_)
+    far_allocation.set_y(
+        std::max(size_allocation().height() - near_allocation.height(),
+                 size_allocation().height() - box));
+  else
+    far_allocation.set_x(
+        std::max(size_allocation().width() - near_allocation.width(),
+                 size_allocation().width() - box));
+  far_button_.SizeAllocate(far_allocation);
 }
 
-std::vector<View*> ScrollBarView::GetChildren() {
-  return std::vector<View*>();
+std::vector<BaseView*> ScrollBarView::GetChildren() {
+  return std::vector<BaseView*>{&near_button_, &far_button_};
 }
 
 void ScrollBarView::Draw(PainterWin* painter, const Rect& dirty) {
-  HDC dc = painter->GetHDC();
+  Rect track_area(size_allocation());
+  track_area.Subtract(near_button_.size_allocation());
+  track_area.Subtract(far_button_.size_allocation());
+  if (!track_area.IsEmpty()) {
+    HDC dc = painter->GetHDC();
+    theme_->PaintScrollbarTrack(dc, vertical_, state(), track_area, params_);
+    painter->ReleaseHDC(dc);
+  }
 
-  theme_->PaintScrollbarTrack(
-      dc, vertical_, state(),
-      Rect(size_allocation().size()) + painter->origin(), params_);
-
-  painter->ReleaseHDC(dc);
+  ContainerView::Draw(painter, dirty);
 }
 
 }  // namespace nu

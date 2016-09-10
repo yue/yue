@@ -11,6 +11,7 @@
 
 namespace nu {
 
+class ScrollView;
 class WindowImpl;
 
 // The state of the control.
@@ -32,6 +33,8 @@ enum class ControlType {
   Group,
   Label,
   Scroll,
+  ScrollBar,
+  ScrollBarButton,
   Subwin,
 };
 
@@ -132,7 +135,7 @@ class BaseView {
   WindowImpl* window_ = nullptr;
 
   // The viewport that owns this view.
-  BaseView* viewport_ = nullptr;
+  ScrollView* viewport_ = nullptr;
 
   // The absolute bounds relative to the origin of window.
   Rect size_allocation_;

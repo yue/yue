@@ -4,6 +4,8 @@
 
 #include "nativeui/win/scroll_win.h"
 
+#include <tuple>
+
 #include "nativeui/win/scroll_bar/scroll_bar.h"
 
 namespace nu {
@@ -37,41 +39,10 @@ void ScrollView::SetScrollBarPolicy(Scroll::Policy h_policy,
   Invalidate();
 }
 
-void ScrollView::UpdateScrollbar() {
-  Rect viewport = size_allocation();
-  bool show_h_scrollbar = (h_policy_ == Scroll::Policy::Always) ||
-                          (h_policy_ == Scroll::Policy::Automatic &&
-                           viewport.width() < content_size_.width());
-  bool show_v_scrollbar = (v_policy_ == Scroll::Policy::Always) ||
-                          (v_policy_ == Scroll::Policy::Automatic &&
-                           viewport.height() < content_size_.height());
-  if (show_h_scrollbar && !h_scrollbar_)
-    h_scrollbar_.reset(new ScrollBarView(false, this));
-  else if (!show_h_scrollbar)
-    h_scrollbar_.reset();
-  if (show_v_scrollbar && !v_scrollbar_)
-    v_scrollbar_.reset(new ScrollBarView(true, this));
-  else if (!show_v_scrollbar)
-    v_scrollbar_.reset();
-}
-
-bool ScrollView::UpdateOrigin(Vector2d new_origin) {
-  Rect viewport = size_allocation();
-  viewport.Inset(GetScrollBarInsets());
-
-  if (-new_origin.x() + viewport.width() > content_size_.width())
-    new_origin.set_x(viewport.width() - content_size_.width());
-  if (new_origin.x() > 0)
-    new_origin.set_x(0);
-  if (-new_origin.y() + viewport.height() > content_size_.height())
-    new_origin.set_y(viewport.height() - content_size_.height());
-  if (new_origin.y() > 0)
-    new_origin.set_y(0);
-
-  if (new_origin == origin_)
-    return false;
-  origin_ = new_origin;
-  return true;
+Insets ScrollView::GetScrollBarInsets() const {
+  return Insets(0, 0,
+                h_scrollbar_ ? scrollbar_height_ : 0,
+                v_scrollbar_ ? scrollbar_height_ : 0);
 }
 
 void ScrollView::OnScroll(int x, int y) {
@@ -94,8 +65,8 @@ void ScrollView::Layout() {
   }
 }
 
-std::vector<View*> ScrollView::GetChildren() {
-  return std::vector<View*>{delegate_->GetContentView()};
+std::vector<BaseView*> ScrollView::GetChildren() {
+  return std::vector<BaseView*>{delegate_->GetContentView()->view()};
 }
 
 void ScrollView::SizeAllocate(const Rect& size_allocation) {
@@ -131,10 +102,45 @@ void ScrollView::Draw(PainterWin* painter, const Rect& dirty) {
     DrawScrollBar(true, painter, dirty);
 }
 
-Insets ScrollView::GetScrollBarInsets() const {
-  return Insets(0, 0,
-                h_scrollbar_ ? scrollbar_height_ : 0,
-                v_scrollbar_ ? scrollbar_height_ : 0);
+void ScrollView::UpdateScrollbar() {
+  Rect viewport = size_allocation();
+  bool show_h_scrollbar = (h_policy_ == Scroll::Policy::Always) ||
+                          (h_policy_ == Scroll::Policy::Automatic &&
+                           viewport.width() < content_size_.width());
+  bool show_v_scrollbar = (v_policy_ == Scroll::Policy::Always) ||
+                          (v_policy_ == Scroll::Policy::Automatic &&
+                           viewport.height() < content_size_.height());
+  if (show_h_scrollbar && !h_scrollbar_) {
+    h_scrollbar_.reset(new ScrollBarView(false, this));
+    h_scrollbar_->SetParent(this);
+  } else if (!show_h_scrollbar) {
+    h_scrollbar_.reset();
+  }
+  if (show_v_scrollbar && !v_scrollbar_) {
+    v_scrollbar_.reset(new ScrollBarView(true, this));
+    v_scrollbar_->SetParent(this);
+  } else if (!show_v_scrollbar) {
+    v_scrollbar_.reset();
+  }
+}
+
+bool ScrollView::UpdateOrigin(Vector2d new_origin) {
+  Rect viewport = size_allocation();
+  viewport.Inset(GetScrollBarInsets());
+
+  if (-new_origin.x() + viewport.width() > content_size_.width())
+    new_origin.set_x(viewport.width() - content_size_.width());
+  if (new_origin.x() > 0)
+    new_origin.set_x(0);
+  if (-new_origin.y() + viewport.height() > content_size_.height())
+    new_origin.set_y(viewport.height() - content_size_.height());
+  if (new_origin.y() > 0)
+    new_origin.set_y(0);
+
+  if (new_origin == origin_)
+    return false;
+  origin_ = new_origin;
+  return true;
 }
 
 Rect ScrollView::GetScrollBarRect(bool vertical) const {

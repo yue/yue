@@ -5,6 +5,9 @@
 #ifndef NATIVEUI_WIN_SCROLL_WIN_H_
 #define NATIVEUI_WIN_SCROLL_WIN_H_
 
+#include <memory>
+#include <vector>
+
 #include "nativeui/gfx/geometry/insets.h"
 #include "nativeui/scroll.h"
 #include "nativeui/win/container_win.h"
@@ -23,13 +26,12 @@ class ScrollView : public ContainerView,
   void SetContentSize(const Size& size);
   void SetScrollBarPolicy(Scroll::Policy h_policy, Scroll::Policy v_policy);
 
-  void UpdateScrollbar();
-  bool UpdateOrigin(Vector2d new_origin);
+  Insets GetScrollBarInsets() const;
   void OnScroll(int x, int y);
 
   // ContainerView::Delegate:
   void Layout() override;
-  std::vector<View*> GetChildren() override;
+  std::vector<BaseView*> GetChildren() override;
 
   // BaseView:
   void SizeAllocate(const Rect& size_allocation) override;
@@ -41,7 +43,8 @@ class ScrollView : public ContainerView,
   Scroll::Policy v_policy() const { return v_policy_; }
 
  private:
-  Insets GetScrollBarInsets() const;
+  void UpdateScrollbar();
+  bool UpdateOrigin(Vector2d new_origin);
   Rect GetScrollBarRect(bool vertical) const;
   void DrawScrollBar(bool vertical, PainterWin* painter, const Rect& dirty);
 
