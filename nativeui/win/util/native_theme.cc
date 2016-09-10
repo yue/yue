@@ -9,10 +9,36 @@
 #include <vssym32.h>
 
 #include "base/win/scoped_hdc.h"
+#include "nativeui/gfx/painter.h"
+
+// This was removed from Winvers.h but is still used.
+#if !defined(COLOR_MENUHIGHLIGHT)
+#define COLOR_MENUHIGHLIGHT 29
+#endif
 
 namespace nu {
 
 namespace {
+
+// Windows system color IDs cached and updated by the native theme.
+const int kSystemColors[] = {
+  COLOR_3DFACE,
+  COLOR_BTNFACE,
+  COLOR_BTNTEXT,
+  COLOR_GRAYTEXT,
+  COLOR_HIGHLIGHT,
+  COLOR_HIGHLIGHTTEXT,
+  COLOR_HOTLIGHT,
+  COLOR_MENUHIGHLIGHT,
+  COLOR_SCROLLBAR,
+  COLOR_WINDOW,
+  COLOR_WINDOWTEXT,
+};
+
+// Converts COLORREFs (0BGR) to the nativeui Color.
+Color COLORREFToColor(COLORREF color) {
+  return Color(GetRValue(color), GetGValue(color), GetBValue(color));
+}
 
 int GetWindowsPart(NativeTheme::Part part) {
   if (part == NativeTheme::CheckBox)
@@ -111,6 +137,9 @@ NativeTheme::NativeTheme()
         GetProcAddress(theme_dll_, "GetThemeInt"));
   }
   memset(theme_handles_, 0, sizeof(theme_handles_));
+
+  // Initialize the cached system colors.
+  UpdateSystemColors();
 }
 
 NativeTheme::~NativeTheme() {
@@ -118,6 +147,11 @@ NativeTheme::~NativeTheme() {
     CloseHandles();
     FreeLibrary(theme_dll_);
   }
+}
+
+void NativeTheme::UpdateSystemColors() {
+  for (int color : kSystemColors)
+    system_colors_[color] = COLORREFToColor(GetSysColor(color));
 }
 
 Size NativeTheme::GetThemePartSize(Part part, ControlState state) const {
@@ -221,6 +255,47 @@ HRESULT NativeTheme::PaintCheckBox(HDC hdc,
   return PaintButton(hdc, state, extra, BP_CHECKBOX, state_id, &rect_win);
 }
 
+HRESULT NativeTheme::PaintScrollbarTrack(
+    HDC hdc,
+    bool vertical,
+    ControlState state,
+    const Rect& rect,
+    const ScrollbarTrackExtraParams& extra) const {
+  HANDLE handle = GetThemeHandle(ScrollBar);
+  RECT rect_win = rect.ToRECT();
+
+  const int part_id = extra.is_upper ?
+      (vertical ? SBP_UPPERTRACKVERT : SBP_UPPERTRACKHORZ) :
+      (vertical ? SBP_LOWERTRACKVERT : SBP_LOWERTRACKHORZ);
+
+  int state_id = SCRBS_NORMAL;
+  switch (state) {
+    case ControlState::Disabled:
+      state_id = SCRBS_DISABLED;
+      break;
+    case ControlState::Hovered:
+      state_id = SCRBS_HOVER;
+      break;
+    case ControlState::Normal:
+      break;
+    case ControlState::Pressed:
+      state_id = SCRBS_PRESSED;
+      break;
+    case ControlState::Size:
+      NOTREACHED();
+      break;
+  }
+
+  if (handle && draw_theme_)
+    return draw_theme_(handle, hdc, part_id, state_id, &rect_win, NULL);
+
+  // Draw it manually.
+  FillRect(hdc, &rect_win, reinterpret_cast<HBRUSH>(COLOR_SCROLLBAR + 1));
+  if (state == ControlState::Pressed)
+    InvertRect(hdc, &rect_win);
+  return S_OK;
+}
+
 HRESULT NativeTheme::PaintButton(HDC hdc,
                                  ControlState state,
                                  const ButtonExtraParams& extra,
@@ -321,6 +396,9 @@ HANDLE NativeTheme::GetThemeHandle(Part part) const {
       break;
     case TextField:
       handle = open_theme_(NULL, L"Edit");
+      break;
+    case ScrollBar:
+      handle = open_theme_(NULL, L"Scrollbar");
       break;
     default:
       NOTREACHED();

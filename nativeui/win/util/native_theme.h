@@ -15,6 +15,7 @@
 
 #include <map>
 
+#include "nativeui/gfx/color.h"
 #include "nativeui/gfx/geometry/rect.h"
 #include "nativeui/gfx/geometry/size.h"
 #include "nativeui/win/base_view.h"
@@ -31,6 +32,7 @@ class NativeTheme {
     Radio,
     Button,
     TextField,
+    ScrollBar,
     NumParts,
   };
 
@@ -41,6 +43,14 @@ class NativeTheme {
     bool checked;
     bool indeterminate;  // Whether the button state is indeterminate.
     bool is_default;  // Whether the button is default button.
+  };
+
+  struct ScrollbarTrackExtraParams {
+    bool is_upper;
+    int track_x;
+    int track_y;
+    int track_width;
+    int track_height;
   };
 
   Size GetThemePartSize(Part part, ControlState state) const;
@@ -57,6 +67,11 @@ class NativeTheme {
                         ControlState state,
                         const Rect& rect,
                         const ButtonExtraParams& extra) const;
+  HRESULT PaintScrollbarTrack(HDC hdc,
+                              bool vertical,
+                              ControlState state,
+                              const Rect& rect,
+                              const ScrollbarTrackExtraParams& extra) const;
 
  private:
   HRESULT PaintButton(HDC hdc,
@@ -65,6 +80,9 @@ class NativeTheme {
                       int part_id,
                       int state_id,
                       RECT* rect) const;
+
+  // Update the locally cached set of system colors.
+  void UpdateSystemColors();
 
   // Returns a handle to the theme data.
   HANDLE GetThemeHandle(Part part) const;
@@ -132,6 +150,9 @@ class NativeTheme {
 
   // A cache of open theme handles.
   mutable HANDLE theme_handles_[NumParts];
+
+  // Cache of system colors.
+  mutable std::map<int, Color> system_colors_;
 
   DISALLOW_COPY_AND_ASSIGN(NativeTheme);
 };
