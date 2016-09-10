@@ -18,18 +18,18 @@ class ScrollView : public ContainerView,
         delegate_(delegate) {}
 
   void SetOrigin(const Vector2d& origin) {
-    origin_ = origin;
+    UpdateOrigin(origin);
     Layout();
   }
 
   void SetContentSize(const Size& size) {
     content_size_ = size;
+    UpdateOrigin(origin_);
     Layout();
   }
 
-  void OnScroll(int x, int y) {
+  bool UpdateOrigin(Vector2d new_origin) {
     Size viewport_size = size_allocation().size();
-    Vector2d new_origin = origin_ + Vector2d(x, y);
     if (-new_origin.x() + viewport_size.width() > content_size_.width())
       new_origin.set_x(viewport_size.width() - content_size_.width());
     if (new_origin.x() > 0)
@@ -39,10 +39,15 @@ class ScrollView : public ContainerView,
     if (new_origin.y() > 0)
       new_origin.set_y(0);
 
-    if (origin_ != new_origin) {
-      origin_ = new_origin;
+    if (new_origin == origin_)
+      return false;
+    origin_ = new_origin;
+    return true;
+  }
+
+  void OnScroll(int x, int y) {
+    if (UpdateOrigin(origin_ + Vector2d(x, y)))
       Layout();
-    }
   }
 
   // ContainerView::Delegate:
@@ -57,6 +62,12 @@ class ScrollView : public ContainerView,
   }
 
   // BaseView:
+  void SizeAllocate(const Rect& size_allocation) {
+    BaseView::SizeAllocate(size_allocation);
+    UpdateOrigin(origin_);
+    Layout();
+  }
+
   bool OnMouseWheel(bool vertical, UINT flags, int delta,
                     const Point& point) override {
     if (vertical)
