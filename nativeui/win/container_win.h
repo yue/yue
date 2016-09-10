@@ -5,6 +5,8 @@
 #ifndef NATIVEUI_WIN_CONTAINER_WIN_H_
 #define NATIVEUI_WIN_CONTAINER_WIN_H_
 
+#include <vector>
+
 #include "nativeui/container.h"
 #include "nativeui/win/base_view.h"
 
@@ -27,6 +29,8 @@ class ContainerView : public BaseView {
   void SizeAllocate(const Rect& size_allocation) override;
   void OnMouseMove(UINT flags, const Point& point) override;
   void OnMouseLeave() override;
+  bool OnMouseWheel(bool vertical, UINT flags, int delta,
+                    const Point& point) override;
   void OnMouseClick(UINT message, UINT flags, const Point& point) override;
   void Draw(PainterWin* painter, const Rect& dirty) override;
   void SetParent(BaseView* parent) override;

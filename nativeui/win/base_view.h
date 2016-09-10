@@ -70,6 +70,8 @@ class BaseView {
   virtual void OnMouseEnter() {}
   virtual void OnMouseMove(UINT flags, const Point& point) {}
   virtual void OnMouseLeave() {}
+  virtual bool OnMouseWheel(bool vertical, UINT flags, int delta,
+                            const Point& point) { return false; }
   virtual void OnMouseClick(UINT message, UINT flags, const Point& point) {}
 
   // Called when the view lost capture.

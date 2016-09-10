@@ -42,6 +42,14 @@ void ContainerView::OnMouseLeave() {
   }
 }
 
+bool ContainerView::OnMouseWheel(bool vertical, UINT flags, int delta,
+                                 const Point& point) {
+  View* child = FindChildFromPoint(point);
+  if (child)
+    return child->view()->OnMouseWheel(vertical, flags, delta, point);
+  return false;
+}
+
 void ContainerView::OnMouseClick(UINT message, UINT flags, const Point& point) {
   View* child = FindChildFromPoint(point);
   if (child)

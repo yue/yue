@@ -4,6 +4,8 @@
 
 #include "nativeui/gfx/win/painter_win.h"
 
+#include <memory>
+
 #include "base/win/scoped_gdi_object.h"
 #include "nativeui/gfx/win/pen_win.h"
 

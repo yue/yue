@@ -32,6 +32,7 @@ class TopLevelWindow : public WindowImpl {
     CR_MSG_WM_SIZE(OnSize)
     CR_MSG_WM_MOUSEMOVE(OnMouseMove)
     CR_MSG_WM_MOUSELEAVE(OnMouseLeave)
+    CR_MSG_WM_MOUSEWHEEL(OnMouseWheel)
     CR_MESSAGE_RANGE_HANDLER_EX(WM_LBUTTONDOWN, WM_MBUTTONDBLCLK, OnMouseClick)
     CR_MSG_WM_CHAR(OnChar)
     CR_MSG_WM_PAINT(OnPaint)
@@ -45,6 +46,7 @@ class TopLevelWindow : public WindowImpl {
   void OnSize(UINT param, const Size& size);
   void OnMouseMove(UINT flags, const Point& point);
   void OnMouseLeave();
+  BOOL OnMouseWheel(bool vertical, UINT flags, int delta, const Point& point);
   LRESULT OnMouseClick(UINT message, WPARAM w_param, LPARAM l_param);
   void OnChar(UINT ch, UINT repeat, UINT flags);
   void OnPaint(HDC dc);

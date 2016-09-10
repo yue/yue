@@ -4,6 +4,8 @@
 
 #include "nativeui/win/window_win.h"
 
+#include <memory>
+
 #include "nativeui/gfx/painter.h"
 #include "nativeui/gfx/win/double_buffer.h"
 #include "nativeui/win/subwin_view.h"
@@ -102,6 +104,14 @@ void TopLevelWindow::OnMouseLeave() {
   TrackMouse(false);
   mouse_in_window_ = false;
   delegate_->GetContentView()->view()->OnMouseLeave();
+}
+
+BOOL TopLevelWindow::OnMouseWheel(bool vertical, UINT flags, int delta,
+                                  const Point& point) {
+  POINT p = point.ToPOINT();
+  ScreenToClient(hwnd(), &p);
+  return delegate_->GetContentView()->view()->OnMouseWheel(
+      vertical, flags, delta, Point(p));
 }
 
 LRESULT TopLevelWindow::OnMouseClick(UINT message, WPARAM w_param,

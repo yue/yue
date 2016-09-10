@@ -27,6 +27,24 @@ class ScrollView : public ContainerView,
     Layout();
   }
 
+  void OnScroll(int x, int y) {
+    Size viewport_size = size_allocation().size();
+    Vector2d new_origin = origin_ + Vector2d(x, y);
+    if (-new_origin.x() + viewport_size.width() > content_size_.width())
+      new_origin.set_x(viewport_size.width() - content_size_.width());
+    if (new_origin.x() > 0)
+      new_origin.set_x(0);
+    if (-new_origin.y() + viewport_size.height() > content_size_.height())
+      new_origin.set_y(viewport_size.height() - content_size_.height());
+    if (new_origin.y() > 0)
+      new_origin.set_y(0);
+
+    if (origin_ != new_origin) {
+      origin_ = new_origin;
+      Layout();
+    }
+  }
+
   // ContainerView::Delegate:
   void Layout() override {
     Rect child_alloc = Rect((size_allocation() + origin_).origin(),
@@ -39,11 +57,20 @@ class ScrollView : public ContainerView,
   }
 
   // BaseView:
+  bool OnMouseWheel(bool vertical, UINT flags, int delta,
+                    const Point& point) override {
+    if (vertical)
+      OnScroll(0, delta);
+    else
+      OnScroll(delta, 0);
+    return true;
+  }
+
   void Draw(PainterWin* painter, const Rect& dirty) override {
     painter->Save();
     painter->ClipRect(Rect(size_allocation().size()));
     painter->Translate(origin_);
-    delegate_->GetContentView()->view()->Draw(painter, dirty + origin_);
+    delegate_->GetContentView()->view()->Draw(painter, dirty - origin_);
     painter->Restore();
   }
 

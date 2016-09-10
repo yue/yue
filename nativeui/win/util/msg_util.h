@@ -898,11 +898,12 @@
       return TRUE;                                                      \
   }
 
-// BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
+// BOOL OnMouseWheel(bool vertical, UINT nFlags, short zDelta, CPoint pt)
 #define CR_MSG_WM_MOUSEWHEEL(func)                                     \
-  if (uMsg == WM_MOUSEWHEEL) {                                         \
+  if (uMsg == WM_MOUSEWHEEL || uMsg == WM_MOUSEHWHEEL) {               \
     SetMsgHandled(TRUE);                                               \
     lResult = (LRESULT)func(                                           \
+        uMsg == WM_MOUSEWHEEL,                                         \
         (UINT)LOWORD(wParam),                                          \
         (short)HIWORD(wParam),                                         \
         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
