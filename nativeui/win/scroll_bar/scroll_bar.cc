@@ -92,6 +92,24 @@ std::vector<BaseView*> ScrollBarView::GetChildren() {
   return std::vector<BaseView*>{&near_button_, &far_button_, &thumb_};
 }
 
+void ScrollBarView::OnMouseEnter() {
+  set_state(ControlState::Hovered);
+  near_button_.params()->is_hovering = true;
+  far_button_.params()->is_hovering = true;
+  thumb_.params()->is_hovering = true;
+  ContainerView::OnMouseEnter();
+  Invalidate();
+}
+
+void ScrollBarView::OnMouseLeave() {
+  set_state(ControlState::Normal);
+  near_button_.params()->is_hovering = false;
+  far_button_.params()->is_hovering = false;
+  thumb_.params()->is_hovering = false;
+  ContainerView::OnMouseLeave();
+  Invalidate();
+}
+
 void ScrollBarView::Draw(PainterWin* painter, const Rect& dirty) {
   int track_size = GetTrackSize();
   if (track_size > 0) {

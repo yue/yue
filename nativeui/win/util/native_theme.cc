@@ -275,41 +275,20 @@ HRESULT NativeTheme::PaintScrollbarArrow(
     int state_id = state_id_matrix[type][static_cast<int>(state)];
 
     // Hovering means that the cursor is over the scrollbar, but not over the
-    // specific arrow itself.  We don't want to show it "hot" mode, but only
-    // in "hover" mode.
-    if (state == ControlState::Hovered && extra.is_hovering) {
-      switch (type) {
-        case 0:
-          state_id = ABS_UPHOVER;
-          break;
-        case 1:
-          state_id = ABS_DOWNHOVER;
-          break;
-        case 2:
-          state_id = ABS_LEFTHOVER;
-          break;
-        case 3:
-          state_id = ABS_RIGHTHOVER;
-          break;
-      }
+    // specific arrow itself.
+    if (state != ControlState::Hovered && extra.is_hovering) {
+      static const int hover_states[4] = {
+          ABS_UPHOVER, ABS_DOWNHOVER, ABS_LEFTHOVER, ABS_RIGHTHOVER,
+      };
+      state_id = hover_states[type];
     }
     return PaintScaledTheme(handle, hdc, SBP_ARROWBTN, state_id, rect);
   }
 
-  int classic_state = DFCS_SCROLLDOWN;
-  switch (type) {
-    case 0:
-      classic_state = DFCS_SCROLLUP;
-      break;
-    case 1:
-      break;
-    case 2:
-      classic_state = DFCS_SCROLLLEFT;
-      break;
-    case 3:
-      classic_state = DFCS_SCROLLRIGHT;
-      break;
-  }
+  static const int classic_states[4] = {
+      DFCS_SCROLLUP, DFCS_SCROLLDOWN, DFCS_SCROLLLEFT, DFCS_SCROLLRIGHT
+  };
+  int classic_state = classic_states[type];
   switch (state) {
     case ControlState::Disabled:
       classic_state |= DFCS_INACTIVE;
@@ -346,9 +325,10 @@ HRESULT NativeTheme::PaintScrollbarThumb(
       state_id = SCRBS_DISABLED;
       break;
     case ControlState::Hovered:
-      state_id = extra.is_hovering ? SCRBS_HOVER : SCRBS_HOT;
+      state_id = extra.is_hovering ? SCRBS_HOT : SCRBS_HOVER;
       break;
     case ControlState::Normal:
+      state_id = extra.is_hovering ? SCRBS_HOVER : SCRBS_NORMAL;
       break;
     case ControlState::Pressed:
       state_id = SCRBS_PRESSED;

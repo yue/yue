@@ -21,6 +21,8 @@ class ScrollBarThumb : public BaseView {
   void OnMouseLeave() override;
   void Draw(PainterWin* painter, const Rect& dirty) override;
 
+  NativeTheme::ScrollbarThumbExtraParams* params() { return &params_; }
+
  private:
   NativeTheme* theme_;
   NativeTheme::ScrollbarThumbExtraParams params_ = {0};

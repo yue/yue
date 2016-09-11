@@ -18,6 +18,16 @@ ScrollBarButton::ScrollBarButton(Type type, ScrollBarView* scroll_bar)
 ScrollBarButton::~ScrollBarButton() {
 }
 
+void ScrollBarButton::OnMouseEnter() {
+  set_state(ControlState::Hovered);
+  Invalidate();
+}
+
+void ScrollBarButton::OnMouseLeave() {
+  set_state(ControlState::Normal);
+  Invalidate();
+}
+
 void ScrollBarButton::Draw(PainterWin* painter, const Rect& dirty) {
   HDC dc = painter->GetHDC();
   theme_->PaintScrollbarArrow(

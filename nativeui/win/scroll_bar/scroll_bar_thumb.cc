@@ -20,13 +20,11 @@ ScrollBarThumb::~ScrollBarThumb() {
 
 void ScrollBarThumb::OnMouseEnter() {
   set_state(ControlState::Hovered);
-  params_.is_hovering = true;
   Invalidate();
 }
 
 void ScrollBarThumb::OnMouseLeave() {
   set_state(ControlState::Normal);
-  params_.is_hovering = false;
   Invalidate();
 }
 
