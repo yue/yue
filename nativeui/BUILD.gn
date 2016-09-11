@@ -131,6 +131,8 @@ source_set("nativeui") {
     "win/state_win.cc",
     "win/window_win.cc",
     "win/window_win.h",
+    "win/scroll_bar/repeat_controller.cc",
+    "win/scroll_bar/repeat_controller.h",
     "win/scroll_bar/scroll_bar.cc",
     "win/scroll_bar/scroll_bar.h",
     "win/scroll_bar/scroll_bar_button.cc",

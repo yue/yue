@@ -276,7 +276,7 @@ HRESULT NativeTheme::PaintScrollbarArrow(
 
     // Hovering means that the cursor is over the scrollbar, but not over the
     // specific arrow itself.
-    if (state != ControlState::Hovered && extra.is_hovering) {
+    if (state == ControlState::Normal && extra.is_hovering) {
       static const int hover_states[4] = {
           ABS_UPHOVER, ABS_DOWNHOVER, ABS_LEFTHOVER, ABS_RIGHTHOVER,
       };

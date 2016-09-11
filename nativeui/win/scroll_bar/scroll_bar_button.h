@@ -5,6 +5,7 @@
 #ifndef NATIVEUI_WIN_SCROLL_BAR_SCROLL_BAR_BUTTON_H_
 #define NATIVEUI_WIN_SCROLL_BAR_SCROLL_BAR_BUTTON_H_
 
+#include "nativeui/win/scroll_bar/repeat_controller.h"
 #include "nativeui/win/util/native_theme.h"
 
 namespace nu {
@@ -26,13 +27,20 @@ class ScrollBarButton : public BaseView {
   // BaseView:
   void OnMouseEnter() override;
   void OnMouseLeave() override;
+  void OnMouseClick(UINT message, UINT flags, const Point& point) override;
   void Draw(PainterWin* painter, const Rect& dirty) override;
 
   NativeTheme::ScrollbarArrowExtraParams* params() { return &params_; }
 
  private:
+  void OnClick();
+
   NativeTheme* theme_;
   NativeTheme::ScrollbarArrowExtraParams params_ = {0};
+
+  // The repeat controller that we use to repeatedly click the button when the
+  // mouse button is down.
+  RepeatController repeater_;
 
   Type type_;
   ScrollBarView* scroll_bar_;  // weak ref

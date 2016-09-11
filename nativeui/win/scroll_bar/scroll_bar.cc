@@ -4,6 +4,8 @@
 
 #include "nativeui/win/scroll_bar/scroll_bar.h"
 
+#include <algorithm>
+
 #include "nativeui/state.h"
 
 namespace nu {
@@ -26,36 +28,18 @@ ScrollBarView::ScrollBarView(bool vertical, Scroll* scroll)
 ScrollBarView::~ScrollBarView() {
 }
 
-void ScrollBarView::UpdateThumbPosition() {
-  // The size of contents and viewport.
-  int contents_len = vertical_ ?
-      scroll_->GetContentView()->view()->size_allocation().height() :
-      scroll_->GetContentView()->view()->size_allocation().width();
-  Rect viewport(static_cast<ScrollView*>(scroll_->view())->GetViewportRect());
-  int viewport_len = vertical_ ? viewport.height() : viewport.width();
-  if (contents_len == 0 || viewport_len == 0)
-    return;
+void ScrollBarView::LineUp() {
+  if (vertical_)
+    static_cast<ScrollView*>(scroll_->view())->OnScroll(0, GetLineHeight());
+  else
+    static_cast<ScrollView*>(scroll_->view())->OnScroll(GetLineHeight(), 0);
+}
 
-  // Calculate the size of thumb button.
-  double ratio =
-      std::min(1.0, static_cast<double>(viewport_len) / contents_len);
-  int track_size = GetTrackSize();
-  int thumb_size = static_cast<int>(ratio * track_size);
-
-  // Calculate the position of thumb button.
-  int thumb_max = track_size - thumb_size;
-  int scroll_amount = GetScrollAmout();
-  int thumb_pos = (scroll_amount + viewport_len == contents_len) ?
-      thumb_max :
-      ((scroll_amount * thumb_max) / (contents_len - viewport_len));
-
-  // Put the thumb button.
-  int box_size = GetBoxSize();
-  Rect rect(vertical_ ? 0 : (box_size + thumb_pos),
-            vertical_ ? (box_size + thumb_pos) : 0,
-            vertical_ ? box_size : thumb_size,
-            vertical_ ? thumb_size : box_size);
-  thumb_.SizeAllocate(rect + size_allocation().OffsetFromOrigin());
+void ScrollBarView::LineDown() {
+  if (vertical_)
+    static_cast<ScrollView*>(scroll_->view())->OnScroll(0, -GetLineHeight());
+  else
+    static_cast<ScrollView*>(scroll_->view())->OnScroll(-GetLineHeight(), 0);
 }
 
 void ScrollBarView::Layout() {
@@ -126,6 +110,38 @@ void ScrollBarView::Draw(PainterWin* painter, const Rect& dirty) {
   ContainerView::Draw(painter, dirty);
 }
 
+void ScrollBarView::UpdateThumbPosition() {
+  // The size of contents and viewport.
+  int contents_len = vertical_ ?
+      scroll_->GetContentView()->view()->size_allocation().height() :
+      scroll_->GetContentView()->view()->size_allocation().width();
+  Rect viewport(static_cast<ScrollView*>(scroll_->view())->GetViewportRect());
+  int viewport_len = vertical_ ? viewport.height() : viewport.width();
+  if (contents_len == 0 || viewport_len == 0)
+    return;
+
+  // Calculate the size of thumb button.
+  double ratio =
+      std::min(1.0, static_cast<double>(viewport_len) / contents_len);
+  int track_size = GetTrackSize();
+  int thumb_size = static_cast<int>(ratio * track_size);
+
+  // Calculate the position of thumb button.
+  int thumb_max = track_size - thumb_size;
+  int scroll_amount = GetScrollAmout();
+  int thumb_pos = (scroll_amount + viewport_len == contents_len) ?
+      thumb_max :
+      ((scroll_amount * thumb_max) / (contents_len - viewport_len));
+
+  // Put the thumb button.
+  int box_size = GetBoxSize();
+  Rect rect(vertical_ ? 0 : (box_size + thumb_pos),
+            vertical_ ? (box_size + thumb_pos) : 0,
+            vertical_ ? box_size : thumb_size,
+            vertical_ ? thumb_size : box_size);
+  thumb_.SizeAllocate(rect + size_allocation().OffsetFromOrigin());
+}
+
 int ScrollBarView::GetTrackSize() const {
   return vertical_ ?
       size_allocation().height() - near_button_.size_allocation().height()
@@ -141,6 +157,16 @@ int ScrollBarView::GetBoxSize() const {
 int ScrollBarView::GetScrollAmout() const {
   auto* scroll_view = static_cast<ScrollView*>(scroll_->view());
   return vertical_ ? -scroll_view->origin().y() : -scroll_view->origin().x();
+}
+
+int ScrollBarView::GetLineHeight() const {
+  int max_amout = std::ceil(20 * scale_factor());
+  Container* contents = scroll_->GetContentView();
+  if (contents->child_count() > 0)
+    return std::min(max_amout,
+                    contents->child_at(0)->GetPixelBounds().height());
+  else
+    return max_amout;
 }
 
 }  // namespace nu

@@ -5,6 +5,8 @@
 #ifndef NATIVEUI_WIN_SCROLL_BAR_SCROLL_BAR_H_
 #define NATIVEUI_WIN_SCROLL_BAR_SCROLL_BAR_H_
 
+#include <vector>
+
 #include "nativeui/win/scroll_bar/scroll_bar_button.h"
 #include "nativeui/win/scroll_bar/scroll_bar_thumb.h"
 #include "nativeui/win/scroll_win.h"
@@ -18,7 +20,8 @@ class ScrollBarView : public ContainerView,
   ScrollBarView(bool vertical, Scroll* scroll);
   ~ScrollBarView() override;
 
-  void UpdateThumbPosition();
+  void LineUp();
+  void LineDown();
 
   // ContainerView::Delegate:
   void Layout() override;
@@ -30,9 +33,11 @@ class ScrollBarView : public ContainerView,
   void Draw(PainterWin* painter, const Rect& dirty) override;
 
  private:
+  void UpdateThumbPosition();
   int GetTrackSize() const;
   int GetBoxSize() const;
   int GetScrollAmout() const;
+  int GetLineHeight() const;
 
   NativeTheme* theme_;
   NativeTheme::ScrollbarTrackExtraParams params_ = {0};
