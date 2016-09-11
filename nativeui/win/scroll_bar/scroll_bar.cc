@@ -61,12 +61,12 @@ void ScrollBarView::Layout() {
   Rect far_allocation(near_allocation);
   if (vertical_)
     far_allocation.set_y(
-        std::max(size_allocation().height() - near_allocation.height(),
-                 size_allocation().height() - box_size));
+        std::max(size_allocation().bottom() - near_allocation.height(),
+                 size_allocation().bottom() - box_size));
   else
     far_allocation.set_x(
-        std::max(size_allocation().width() - near_allocation.width(),
-                 size_allocation().width() - box_size));
+        std::max(size_allocation().right() - near_allocation.width(),
+                 size_allocation().right() - box_size));
   far_button_.SizeAllocate(far_allocation);
 
   UpdateThumbPosition();
