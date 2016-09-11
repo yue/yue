@@ -26,8 +26,8 @@
 
 namespace nu {
 
-void Scroll::PlatformInit(const Size& size) {
-  auto* scroll = [[NSScrollView alloc] initWithFrame:Rect(size).ToCGRect()];
+void Scroll::PlatformInit() {
+  auto* scroll = [[NSScrollView alloc] init];
   scroll.drawsBackground = NO;
   scroll.contentView = [[[NUFlippedView alloc] init] autorelease];
   TakeOverView(scroll);

@@ -13,7 +13,7 @@ namespace nu {
 
 NATIVEUI_EXPORT class Scroll : public View {
  public:
-  explicit Scroll(const Size& size);
+  Scroll();
 
   void SetContentView(Container* view);
   Container* GetContentView() const;
@@ -33,7 +33,7 @@ NATIVEUI_EXPORT class Scroll : public View {
   ~Scroll() override;
 
   // Following platform implementations should only be called by wrappers.
-  void PlatformInit(const Size& size);
+  void PlatformInit();
   void PlatformSetContentView(Container* container);
 
  private:

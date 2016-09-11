@@ -178,7 +178,7 @@ void ScrollView::DrawScrollBar(bool vertical, PainterWin* painter,
 ///////////////////////////////////////////////////////////////////////////////
 // Public Container API implementation.
 
-void Scroll::PlatformInit(const Size& size) {
+void Scroll::PlatformInit() {
   TakeOverView(new ScrollView(this));
 }
 

@@ -28,15 +28,13 @@ Scroll::Policy PolicyFromGTK(GtkPolicyType policy) {
 
 }  // namespace
 
-void Scroll::PlatformInit(const Size& size) {
-  SetPreferredSize(size);
+void Scroll::PlatformInit() {
   TakeOverView(gtk_scrolled_window_new(nullptr, nullptr));
   GtkWidget* viewport = gtk_viewport_new(
       gtk_scrolled_window_get_hadjustment(GTK_SCROLLED_WINDOW(view())),
       gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(view())));
   gtk_widget_show(viewport);
   gtk_container_add(GTK_CONTAINER(view()), viewport);
-  SetBounds(Rect(size));
 }
 
 void Scroll::PlatformSetContentView(Container* container) {

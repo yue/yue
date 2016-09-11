@@ -9,6 +9,7 @@
 #include "nativeui/entry.h"
 #include "nativeui/group.h"
 #include "nativeui/label.h"
+#include "nativeui/progress.h"
 #include "nativeui/layout/box_layout.h"
 #include "nativeui/layout/fill_layout.h"
 #include "nativeui/scroll.h"

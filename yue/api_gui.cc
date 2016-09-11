@@ -175,6 +175,19 @@ struct Type<nu::Label> {
 };
 
 template<>
+struct Type<nu::Progress> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Progress";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index, "new", &MetaTable<nu::Progress>::NewInstance<>,
+                         "setvalue", &nu::Progress::SetValue,
+                         "getvalue", &nu::Progress::GetValue,
+                         "setindeterminate", &nu::Progress::SetIndeterminate,
+                         "isindeterminate", &nu::Progress::IsIndeterminate);
+  }
+};
+
+template<>
 struct Type<nu::Group> {
   using base = nu::View;
   static constexpr const char* name = "yue.Group";
@@ -248,7 +261,7 @@ struct Type<nu::Scroll> {
   static constexpr const char* name = "yue.Scroll";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
-           "new", &MetaTable<nu::Scroll>::NewInstance<const nu::Size&>,
+           "new", &MetaTable<nu::Scroll>::NewInstance<>,
            "setscrollbarpolicy", &nu::Scroll::SetScrollBarPolicy,
            "getscrollbarpolicy", &nu::Scroll::GetScrollBarPolicy,
            "setcontentsize", &nu::Scroll::SetContentSize,
@@ -423,6 +436,9 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   lua_rawset(state, -3);
   lua::Push(state, "Label");
   lua::MetaTable<nu::Label>::Push(state);
+  lua_rawset(state, -3);
+  lua::Push(state, "Progress");
+  lua::MetaTable<nu::Progress>::Push(state);
   lua_rawset(state, -3);
   lua::Push(state, "Group");
   lua::MetaTable<nu::Group>::Push(state);
