@@ -110,13 +110,13 @@ void ScrollView::UpdateScrollbar() {
                           (v_policy_ == Scroll::Policy::Automatic &&
                            viewport.height() < content_size_.height());
   if (show_h_scrollbar && !h_scrollbar_) {
-    h_scrollbar_.reset(new ScrollBarView(false, delegate_));
+    h_scrollbar_.reset(new ScrollBarView(false, this));
     h_scrollbar_->SetParent(this);
   } else if (!show_h_scrollbar) {
     h_scrollbar_.reset();
   }
   if (show_v_scrollbar && !v_scrollbar_) {
-    v_scrollbar_.reset(new ScrollBarView(true, delegate_));
+    v_scrollbar_.reset(new ScrollBarView(true, this));
     v_scrollbar_->SetParent(this);
   } else if (!show_v_scrollbar) {
     v_scrollbar_.reset();

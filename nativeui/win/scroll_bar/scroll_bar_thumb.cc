@@ -28,6 +28,10 @@ void ScrollBarThumb::OnMouseLeave() {
   Invalidate();
 }
 
+bool ScrollBarThumb::OnMouseClick(UINT message, UINT flags, const Point&) {
+  return true;
+}
+
 void ScrollBarThumb::Draw(PainterWin* painter, const Rect& dirty) {
   HDC dc = painter->GetHDC();
   theme_->PaintScrollbarThumb(

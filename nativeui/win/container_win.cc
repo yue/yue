@@ -51,10 +51,11 @@ bool ContainerView::OnMouseWheel(bool vertical, UINT flags, int delta,
   return false;
 }
 
-void ContainerView::OnMouseClick(UINT message, UINT flags, const Point& point) {
+bool ContainerView::OnMouseClick(UINT message, UINT flags, const Point& point) {
   BaseView* child = FindChildFromPoint(point);
   if (child)
-    child->OnMouseClick(message, flags, point);
+    return child->OnMouseClick(message, flags, point);
+  return false;
 }
 
 void ContainerView::Draw(PainterWin* painter, const Rect& dirty) {

@@ -12,8 +12,7 @@ namespace nu {
 ScrollBarButton::ScrollBarButton(Type type, ScrollBarView* scroll_bar)
     : BaseView(ControlType::ScrollBarButton),
       theme_(State::current()->GetNativeTheme()),
-      repeater_(base::Bind(&ScrollBarButton::OnClick,
-                           base::Unretained(this))),
+      repeater_(base::Bind(&ScrollBarButton::OnClick, base::Unretained(this))),
       type_(type),
       scroll_bar_(scroll_bar) {
 }
@@ -32,7 +31,7 @@ void ScrollBarButton::OnMouseLeave() {
   Invalidate();
 }
 
-void ScrollBarButton::OnMouseClick(UINT message, UINT flags, const Point&) {
+bool ScrollBarButton::OnMouseClick(UINT message, UINT flags, const Point&) {
   if (message == WM_LBUTTONDOWN) {
     set_state(ControlState::Pressed);
     OnClick();
@@ -42,6 +41,7 @@ void ScrollBarButton::OnMouseClick(UINT message, UINT flags, const Point&) {
     repeater_.Stop();
   }
   Invalidate();
+  return true;
 }
 
 void ScrollBarButton::Draw(PainterWin* painter, const Rect& dirty) {

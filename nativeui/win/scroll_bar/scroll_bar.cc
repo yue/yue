@@ -10,7 +10,7 @@
 
 namespace nu {
 
-ScrollBarView::ScrollBarView(bool vertical, Scroll* scroll)
+ScrollBarView::ScrollBarView(bool vertical, ScrollView* scroll)
     : ContainerView(this, ControlType::ScrollBar),
       theme_(State::current()->GetNativeTheme()),
       near_button_(vertical ? ScrollBarButton::Up : ScrollBarButton::Left,
@@ -18,6 +18,7 @@ ScrollBarView::ScrollBarView(bool vertical, Scroll* scroll)
       far_button_(vertical ? ScrollBarButton::Down : ScrollBarButton::Right,
                   this),
       thumb_(vertical, this),
+      repeater_(base::Bind(&ScrollBarView::OnClick, base::Unretained(this))),
       vertical_(vertical),
       scroll_(scroll) {
   near_button_.SetParent(this);
@@ -30,16 +31,30 @@ ScrollBarView::~ScrollBarView() {
 
 void ScrollBarView::LineUp() {
   if (vertical_)
-    static_cast<ScrollView*>(scroll_->view())->OnScroll(0, GetLineHeight());
+    scroll_->OnScroll(0, GetLineHeight());
   else
-    static_cast<ScrollView*>(scroll_->view())->OnScroll(GetLineHeight(), 0);
+    scroll_->OnScroll(GetLineHeight(), 0);
 }
 
 void ScrollBarView::LineDown() {
   if (vertical_)
-    static_cast<ScrollView*>(scroll_->view())->OnScroll(0, -GetLineHeight());
+    scroll_->OnScroll(0, -GetLineHeight());
   else
-    static_cast<ScrollView*>(scroll_->view())->OnScroll(-GetLineHeight(), 0);
+    scroll_->OnScroll(-GetLineHeight(), 0);
+}
+
+void ScrollBarView::PageUp() {
+  if (vertical_)
+    scroll_->OnScroll(0, GetPageHeight());
+  else
+    scroll_->OnScroll(GetPageHeight(), 0);
+}
+
+void ScrollBarView::PageDown() {
+  if (vertical_)
+    scroll_->OnScroll(0, -GetPageHeight());
+  else
+    scroll_->OnScroll(-GetPageHeight(), 0);
 }
 
 void ScrollBarView::Layout() {
@@ -86,12 +101,27 @@ void ScrollBarView::OnMouseEnter() {
 }
 
 void ScrollBarView::OnMouseLeave() {
+  repeater_.Stop();
+
   set_state(ControlState::Normal);
   near_button_.params()->is_hovering = false;
   far_button_.params()->is_hovering = false;
   thumb_.params()->is_hovering = false;
   ContainerView::OnMouseLeave();
   Invalidate();
+}
+
+bool ScrollBarView::OnMouseClick(UINT message, UINT flags,
+                                 const Point& point) {
+  repeater_.Stop();
+  if (ContainerView::OnMouseClick(message, flags, point))
+    return true;
+  if (message == WM_LBUTTONDOWN) {
+    OnClick();
+    repeater_.Start();
+    return true;
+  }
+  return false;
 }
 
 void ScrollBarView::Draw(PainterWin* painter, const Rect& dirty) {
@@ -112,10 +142,10 @@ void ScrollBarView::Draw(PainterWin* painter, const Rect& dirty) {
 
 void ScrollBarView::UpdateThumbPosition() {
   // The size of contents and viewport.
-  int contents_len = vertical_ ?
-      scroll_->GetContentView()->view()->size_allocation().height() :
-      scroll_->GetContentView()->view()->size_allocation().width();
-  Rect viewport(static_cast<ScrollView*>(scroll_->view())->GetViewportRect());
+  BaseView* contents = scroll_->delegate()->GetContentView()->view();
+  int contents_len = vertical_ ? contents->size_allocation().height()
+                               : contents->size_allocation().width();
+  Rect viewport(scroll_->GetViewportRect());
   int viewport_len = vertical_ ? viewport.height() : viewport.width();
   if (contents_len == 0 || viewport_len == 0)
     return;
@@ -142,6 +172,18 @@ void ScrollBarView::UpdateThumbPosition() {
   thumb_.SizeAllocate(rect + size_allocation().OffsetFromOrigin());
 }
 
+void ScrollBarView::OnClick() {
+  Rect thumb(thumb_.size_allocation() - size_allocation().OffsetFromOrigin());
+  Point cursor(GetMousePosition());
+  if (thumb.Contains(cursor))
+    return;
+  if ((vertical_ && cursor.y() < thumb.y()) ||
+      (!vertical_ && cursor.x() < thumb.x()))
+    PageUp();
+  else
+    PageDown();
+}
+
 int ScrollBarView::GetTrackSize() const {
   return vertical_ ?
       size_allocation().height() - near_button_.size_allocation().height()
@@ -155,18 +197,24 @@ int ScrollBarView::GetBoxSize() const {
 }
 
 int ScrollBarView::GetScrollAmout() const {
-  auto* scroll_view = static_cast<ScrollView*>(scroll_->view());
-  return vertical_ ? -scroll_view->origin().y() : -scroll_view->origin().x();
+  return vertical_ ? -scroll_->origin().y() : -scroll_->origin().x();
 }
 
 int ScrollBarView::GetLineHeight() const {
   int max_amout = std::ceil(20 * scale_factor());
-  Container* contents = scroll_->GetContentView();
+  Container* contents = scroll_->delegate()->GetContentView();
   if (contents->child_count() > 0)
     return std::min(max_amout,
                     contents->child_at(0)->GetPixelBounds().height());
   else
     return max_amout;
+}
+
+int ScrollBarView::GetPageHeight() const {
+  if (vertical_)
+    return scroll_->GetViewportRect().height();
+  else
+    return scroll_->GetViewportRect().width();
 }
 
 }  // namespace nu

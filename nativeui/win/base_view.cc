@@ -70,6 +70,15 @@ bool BaseView::IsFocused() const {
   return is_focused_;
 }
 
+Point BaseView::GetMousePosition() const {
+  if (!window_)
+    return Point();
+  POINT p;
+  ::GetCursorPos(&p);
+  ::ScreenToClient(window_->hwnd(), &p);
+  return Point(p) - size_allocation().OffsetFromOrigin();
+}
+
 Rect BaseView::GetClippedRect() const {
   Rect rect(size_allocation());
   if (viewport_)

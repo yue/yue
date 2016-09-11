@@ -102,7 +102,7 @@ class ButtonView : public BaseView {
     }
   }
 
-  void OnMouseClick(UINT message, UINT flags, const Point& point) override {
+  bool OnMouseClick(UINT message, UINT flags, const Point& point) override {
     auto* toplevel_window = static_cast<TopLevelWindow*>(window());
     if (message == WM_LBUTTONDOWN) {
       is_capturing_ = true;
@@ -118,6 +118,7 @@ class ButtonView : public BaseView {
 
     // Clicking a button moves the focus to it.
     toplevel_window->focus_manager()->TakeFocus(delegate_);
+    return true;
   }
 
   void OnCaptureLost() override {

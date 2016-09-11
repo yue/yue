@@ -76,13 +76,18 @@ class BaseView {
   virtual void OnMouseLeave() {}
   virtual bool OnMouseWheel(bool vertical, UINT flags, int delta,
                             const Point& point) { return false; }
-  virtual void OnMouseClick(UINT message, UINT flags, const Point& point) {}
+  virtual bool OnMouseClick(UINT message, UINT flags, const Point& point) {
+      return false;
+  }
 
   // Called when the view lost capture.
   virtual void OnCaptureLost() {}
 
   /////////////////////////////////////////////////////////////////////////////
   // Helpers
+
+  // Get the mouse position in current view.
+  Point GetMousePosition() const;
 
   // Get the size allocation that inside viewport.
   Rect GetClippedRect() const;

@@ -42,6 +42,7 @@ class ScrollView : public ContainerView,
   Scroll::Policy h_policy() const { return h_policy_; }
   Scroll::Policy v_policy() const { return v_policy_; }
   Vector2d origin() const { return origin_; }
+  Scroll* delegate() const { return delegate_; }
 
  private:
   void UpdateScrollbar();

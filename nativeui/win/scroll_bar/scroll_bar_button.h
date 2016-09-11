@@ -27,7 +27,7 @@ class ScrollBarButton : public BaseView {
   // BaseView:
   void OnMouseEnter() override;
   void OnMouseLeave() override;
-  void OnMouseClick(UINT message, UINT flags, const Point& point) override;
+  bool OnMouseClick(UINT message, UINT flags, const Point& point) override;
   void Draw(PainterWin* painter, const Rect& dirty) override;
 
   NativeTheme::ScrollbarArrowExtraParams* params() { return &params_; }

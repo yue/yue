@@ -31,7 +31,7 @@ class ContainerView : public BaseView {
   void OnMouseLeave() override;
   bool OnMouseWheel(bool vertical, UINT flags, int delta,
                     const Point& point) override;
-  void OnMouseClick(UINT message, UINT flags, const Point& point) override;
+  bool OnMouseClick(UINT message, UINT flags, const Point& point) override;
   void Draw(PainterWin* painter, const Rect& dirty) override;
   void SetParent(BaseView* parent) override;
   void BecomeContentView(WindowImpl* parent) override;

@@ -17,11 +17,13 @@ namespace nu {
 class ScrollBarView : public ContainerView,
                       public ContainerView::Delegate {
  public:
-  ScrollBarView(bool vertical, Scroll* scroll);
+  ScrollBarView(bool vertical, ScrollView* scroll);
   ~ScrollBarView() override;
 
   void LineUp();
   void LineDown();
+  void PageUp();
+  void PageDown();
 
   // ContainerView::Delegate:
   void Layout() override;
@@ -30,14 +32,18 @@ class ScrollBarView : public ContainerView,
   // BaseView:
   void OnMouseEnter() override;
   void OnMouseLeave() override;
+  bool OnMouseClick(UINT message, UINT flags, const Point& point) override;
   void Draw(PainterWin* painter, const Rect& dirty) override;
 
  private:
   void UpdateThumbPosition();
+  void OnClick();
+
   int GetTrackSize() const;
   int GetBoxSize() const;
   int GetScrollAmout() const;
   int GetLineHeight() const;
+  int GetPageHeight() const;
 
   NativeTheme* theme_;
   NativeTheme::ScrollbarTrackExtraParams params_ = {0};
@@ -46,8 +52,10 @@ class ScrollBarView : public ContainerView,
   ScrollBarButton far_button_;
   ScrollBarThumb thumb_;
 
+  RepeatController repeater_;
+
   bool vertical_;
-  Scroll* scroll_;  // weak ref
+  ScrollView* scroll_;  // weak ref
 };
 
 }  // namespace nu
