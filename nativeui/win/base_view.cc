@@ -23,7 +23,8 @@ void BaseView::SetParent(BaseView* parent) {
   window_ = parent ? parent->window_ : nullptr;
 
   if (parent) {
-    if (parent->type() == ControlType::Scroll)
+    if (parent->type() == ControlType::Scroll &&
+        type() != ControlType::ScrollBar)
       viewport_ = static_cast<ScrollView*>(parent);
     else
       viewport_ = parent->viewport_;
@@ -50,11 +51,8 @@ void BaseView::Invalidate(const Rect& dirty) {
 
   // Can not invalidate outside the viewport.
   Rect clipped_dirty(dirty);
-  if (viewport_) {
-    Rect viewport_rect(viewport_->GetViewportSize());
-    viewport_rect += viewport_->size_allocation().OffsetFromOrigin();
-    clipped_dirty.Intersect(viewport_rect);
-  }
+  if (viewport_)
+    clipped_dirty.Intersect(GetClippedRect());
 
   if (clipped_dirty.IsEmpty())
     return;
@@ -70,6 +68,13 @@ void BaseView::SetFocus(bool focus) {
 
 bool BaseView::IsFocused() const {
   return is_focused_;
+}
+
+Rect BaseView::GetClippedRect() const {
+  Rect rect(size_allocation());
+  if (viewport_)
+    rect.Intersect(viewport_->GetViewportRect());
+  return rect;
 }
 
 void BaseView::Invalidate() {

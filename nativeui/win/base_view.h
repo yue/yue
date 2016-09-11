@@ -84,6 +84,9 @@ class BaseView {
   /////////////////////////////////////////////////////////////////////////////
   // Helpers
 
+  // Get the size allocation that inside viewport.
+  Rect GetClippedRect() const;
+
   // Invalidate the whole view.
   void Invalidate();
 

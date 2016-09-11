@@ -31,8 +31,8 @@ void ScrollBarView::UpdateThumbPosition() {
   int contents_len = vertical_ ?
       scroll_->GetContentView()->view()->size_allocation().height() :
       scroll_->GetContentView()->view()->size_allocation().width();
-  Rect viewport(static_cast<ScrollView*>(scroll_->view())->GetViewportSize());
-  int viewport_len = vertical_ ?  viewport.height() : viewport.width();
+  Rect viewport(static_cast<ScrollView*>(scroll_->view())->GetViewportRect());
+  int viewport_len = vertical_ ? viewport.height() : viewport.width();
   if (contents_len == 0 || viewport_len == 0)
     return;
 

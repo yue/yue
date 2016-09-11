@@ -26,7 +26,7 @@ class ScrollView : public ContainerView,
   void SetContentSize(const Size& size);
   void SetScrollBarPolicy(Scroll::Policy h_policy, Scroll::Policy v_policy);
 
-  Size GetViewportSize() const;
+  Rect GetViewportRect() const;
   void OnScroll(int x, int y);
 
   // ContainerView::Delegate:

@@ -77,20 +77,19 @@ void ContainerView::DrawChild(BaseView* child, PainterWin* painter,
   if (!child->is_visible())
     return;
 
-  Rect child_bounds = child->size_allocation() -
-                      size_allocation().OffsetFromOrigin();
-  if (!child_bounds.Intersects(dirty))
+  // Caculate the dirty rect for child.
+  Rect child_dirty(child->GetClippedRect() -
+                   size_allocation().OffsetFromOrigin());
+  child_dirty.Intersect(dirty);
+  if (child_dirty.IsEmpty())
     return;
 
-  // Caculate the dirty rect for child.
-  Rect child_dirty(dirty);
-  child_dirty.Intersect(child_bounds);
-  child_dirty -= child_bounds.OffsetFromOrigin();
-
   // Move the painting origin for child.
+  Vector2d child_origin = child->size_allocation().OffsetFromOrigin() -
+                          size_allocation().OffsetFromOrigin();
   painter->Save();
-  painter->Translate(child_bounds.OffsetFromOrigin());
-  child->Draw(painter, child_dirty);
+  painter->Translate(child_origin);
+  child->Draw(painter, child_dirty - child_origin);
   painter->Restore();
 }
 
@@ -105,8 +104,8 @@ BaseView* ContainerView::FindChildFromPoint(const Point& point) {
   for (BaseView* child : children) {
     if (!child->is_visible())
       continue;
-    Rect child_bounds = child->size_allocation();
-    if (child_bounds.Contains(point))
+    Rect child_rect = child->GetClippedRect();
+    if (child_rect.Contains(point))
       return child;
   }
   return nullptr;

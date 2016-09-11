@@ -7,6 +7,7 @@
 #include "base/win/scoped_hdc.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/state.h"
+#include "nativeui/win/scroll_win.h"
 
 namespace nu {
 

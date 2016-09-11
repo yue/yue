@@ -17,6 +17,8 @@ class ScrollBarThumb : public BaseView {
   ~ScrollBarThumb() override;
 
   // BaseView:
+  void OnMouseEnter() override;
+  void OnMouseLeave() override;
   void Draw(PainterWin* painter, const Rect& dirty) override;
 
  private:

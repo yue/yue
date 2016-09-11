@@ -35,12 +35,12 @@ void ScrollView::SetScrollBarPolicy(Scroll::Policy h_policy,
   Invalidate();
 }
 
-Size ScrollView::GetViewportSize() const {
+Rect ScrollView::GetViewportRect() const {
   Rect viewport(size_allocation());
   viewport.Inset(0, 0,
                  v_scrollbar_ ? scrollbar_height_ : 0,
                  h_scrollbar_ ? scrollbar_height_ : 0);
-  return viewport.size();
+  return viewport;
 }
 
 void ScrollView::OnScroll(int x, int y) {
@@ -97,12 +97,12 @@ void ScrollView::Draw(PainterWin* painter, const Rect& dirty) {
     DrawChild(v_scrollbar_.get(), painter, dirty);
 
   // The scroll view must be clipped.
-  painter->ClipRect(Rect(GetViewportSize()));
+  painter->ClipRect(GetViewportRect() - size_allocation().OffsetFromOrigin());
   DrawChild(delegate_->GetContentView()->view(), painter, dirty);
 }
 
 void ScrollView::UpdateScrollbar() {
-  Size viewport = GetViewportSize();
+  Rect viewport = GetViewportRect();
   bool show_h_scrollbar = (h_policy_ == Scroll::Policy::Always) ||
                           (h_policy_ == Scroll::Policy::Automatic &&
                            viewport.width() < content_size_.width());
@@ -124,7 +124,7 @@ void ScrollView::UpdateScrollbar() {
 }
 
 bool ScrollView::UpdateOrigin(Vector2d new_origin) {
-  Size viewport = GetViewportSize();
+  Rect viewport = GetViewportRect();
   if (-new_origin.x() + viewport.width() > content_size_.width())
     new_origin.set_x(viewport.width() - content_size_.width());
   if (new_origin.x() > 0)
@@ -177,9 +177,8 @@ void Scroll::PlatformInit(const Size& size) {
 }
 
 void Scroll::PlatformSetContentView(Container* container) {
-  container->view()->SetParent(view());
-
   auto* scroll = static_cast<ScrollView*>(view());
+  container->view()->SetParent(scroll);
   scroll->SetContentSize(container->view()->size_allocation().size());
 }
 

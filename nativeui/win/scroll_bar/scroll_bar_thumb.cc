@@ -18,6 +18,18 @@ ScrollBarThumb::ScrollBarThumb(bool vertical, ScrollBarView* scroll_bar)
 ScrollBarThumb::~ScrollBarThumb() {
 }
 
+void ScrollBarThumb::OnMouseEnter() {
+  set_state(ControlState::Hovered);
+  params_.is_hovering = true;
+  Invalidate();
+}
+
+void ScrollBarThumb::OnMouseLeave() {
+  set_state(ControlState::Normal);
+  params_.is_hovering = false;
+  Invalidate();
+}
+
 void ScrollBarThumb::Draw(PainterWin* painter, const Rect& dirty) {
   HDC dc = painter->GetHDC();
   theme_->PaintScrollbarThumb(
