@@ -6,17 +6,36 @@
 
 #import <Cocoa/Cocoa.h>
 
+// The NSScrollView tiles the document view from bottom-left by default, by
+// providing a flipped content view, we can make NSScrollView tiles the document
+// view from top-left.
+@interface NUFlippedView : NSClipView
+@end
+
+@implementation NUFlippedView
+
+- (BOOL)isFlipped {
+  return YES;
+}
+
+- (BOOL)drawsBackground {
+  return NO;
+}
+
+@end
+
 namespace nu {
 
 void Scroll::PlatformInit(const Size& size) {
-  NSScrollView* scroll = [[NSScrollView alloc]
-      initWithFrame:Rect(size).ToCGRect()];
+  auto* scroll = [[NSScrollView alloc] initWithFrame:Rect(size).ToCGRect()];
   scroll.drawsBackground = NO;
+  scroll.contentView = [[[NUFlippedView alloc] init] autorelease];
   TakeOverView(scroll);
 }
 
 void Scroll::PlatformSetContentView(Container* container) {
-  static_cast<NSScrollView*>(view()).documentView = container->view();
+  auto* scroll = static_cast<NSScrollView*>(view());
+  scroll.documentView = container->view();
 }
 
 void Scroll::SetContentSize(const Size& size) {
