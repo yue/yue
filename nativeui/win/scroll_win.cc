@@ -91,8 +91,14 @@ bool ScrollView::OnMouseWheel(bool vertical, UINT flags, int delta,
 }
 
 void ScrollView::Draw(PainterWin* painter, const Rect& dirty) {
-  painter->ClipRect(Rect(size_allocation().size()));
-  ContainerView::Draw(painter, dirty);
+  if (h_scrollbar_)
+    DrawChild(h_scrollbar_.get(), painter, dirty);
+  if (v_scrollbar_)
+    DrawChild(v_scrollbar_.get(), painter, dirty);
+
+  // The scroll view must be clipped.
+  painter->ClipRect(Rect(GetViewportSize()));
+  DrawChild(delegate_->GetContentView()->view(), painter, dirty);
 }
 
 void ScrollView::UpdateScrollbar() {

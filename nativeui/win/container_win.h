@@ -36,6 +36,9 @@ class ContainerView : public BaseView {
   void SetParent(BaseView* parent) override;
   void BecomeContentView(WindowImpl* parent) override;
 
+ protected:
+  void DrawChild(BaseView* child, PainterWin* painter, const Rect& dirty);
+
  private:
   void RefreshParentTree();
   BaseView* FindChildFromPoint(const Point& point);

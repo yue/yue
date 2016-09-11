@@ -58,26 +58,8 @@ void ContainerView::OnMouseClick(UINT message, UINT flags, const Point& point) {
 }
 
 void ContainerView::Draw(PainterWin* painter, const Rect& dirty) {
-  // Iterate children for drawing.
-  const auto& children = delegate_->GetChildren();
-  for (BaseView* child : children) {
-    if (!child->is_visible())
-      continue;
-    Rect child_bounds = child->size_allocation() -
-                        size_allocation().OffsetFromOrigin();
-    if (child_bounds.Intersects(dirty)) {
-      // Caculate the dirty rect for child.
-      Rect child_dirty(dirty);
-      child_dirty.Intersect(child_bounds);
-      child_dirty -= child_bounds.OffsetFromOrigin();
-
-      // Move the painting origin for child.
-      painter->Save();
-      painter->Translate(child_bounds.OffsetFromOrigin());
-      child->Draw(painter, child_dirty);
-      painter->Restore();
-    }
-  }
+  for (BaseView* child : delegate_->GetChildren())
+    DrawChild(child, painter, dirty);
 }
 
 void ContainerView::SetParent(BaseView* parent) {
@@ -88,6 +70,28 @@ void ContainerView::SetParent(BaseView* parent) {
 void ContainerView::BecomeContentView(WindowImpl* parent) {
   BaseView::BecomeContentView(parent);
   RefreshParentTree();
+}
+
+void ContainerView::DrawChild(BaseView* child, PainterWin* painter,
+                              const Rect& dirty) {
+  if (!child->is_visible())
+    return;
+
+  Rect child_bounds = child->size_allocation() -
+                      size_allocation().OffsetFromOrigin();
+  if (!child_bounds.Intersects(dirty))
+    return;
+
+  // Caculate the dirty rect for child.
+  Rect child_dirty(dirty);
+  child_dirty.Intersect(child_bounds);
+  child_dirty -= child_bounds.OffsetFromOrigin();
+
+  // Move the painting origin for child.
+  painter->Save();
+  painter->Translate(child_bounds.OffsetFromOrigin());
+  child->Draw(painter, child_dirty);
+  painter->Restore();
 }
 
 void ContainerView::RefreshParentTree() {
