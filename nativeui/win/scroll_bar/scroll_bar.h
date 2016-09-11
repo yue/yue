@@ -25,6 +25,9 @@ class ScrollBarView : public ContainerView,
   void PageUp();
   void PageDown();
 
+  int GetValue() const;
+  void SetValue(int value);
+
   // ContainerView::Delegate:
   void Layout() override;
   std::vector<BaseView*> GetChildren() override;
@@ -47,6 +50,9 @@ class ScrollBarView : public ContainerView,
 
   NativeTheme* theme_;
   NativeTheme::ScrollbarTrackExtraParams params_ = {0};
+
+  int contents_size_ = 1;
+  int viewport_size_ = 1;
 
   ScrollBarButton near_button_;
   ScrollBarButton far_button_;

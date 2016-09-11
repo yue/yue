@@ -16,10 +16,14 @@ class ScrollBarThumb : public BaseView {
   ScrollBarThumb(bool vertical, ScrollBarView* scroll_bar);
   ~ScrollBarThumb() override;
 
+  int GetSize() const;
+
   // BaseView:
   void OnMouseEnter() override;
+  void OnMouseMove(UINT flags, const Point& point) override;
   void OnMouseLeave() override;
   bool OnMouseClick(UINT message, UINT flags, const Point& point) override;
+  void OnCaptureLost() override;
   void Draw(PainterWin* painter, const Rect& dirty) override;
 
   NativeTheme::ScrollbarThumbExtraParams* params() { return &params_; }
@@ -27,6 +31,12 @@ class ScrollBarThumb : public BaseView {
  private:
   NativeTheme* theme_;
   NativeTheme::ScrollbarThumbExtraParams params_ = {0};
+
+  bool is_hovering_ = false;
+  bool is_capturing_ = false;
+
+  Point pressed_point_;
+  int last_value_ = 0;
 
   bool vertical_;
   ScrollBarView* scroll_bar_;  // weak ref

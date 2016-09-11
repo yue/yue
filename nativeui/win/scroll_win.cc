@@ -17,6 +17,12 @@ ScrollView::ScrollView(Scroll* delegate)
   SetScrollBarPolicy(Scroll::Policy::Automatic, Scroll::Policy::Automatic);
 }
 
+void ScrollView::SetOrigin(const Vector2d& origin) {
+  UpdateOrigin(origin);
+  Layout();
+  Invalidate();
+}
+
 void ScrollView::SetContentSize(const Size& size) {
   content_size_ = size;
   UpdateScrollbar();

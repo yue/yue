@@ -97,6 +97,10 @@ void TopLevelWindow::OnMouseMove(UINT flags, const Point& point) {
     delegate_->GetContentView()->view()->OnMouseEnter();
     TrackMouse(true);
   }
+  if (capture_view_) {
+    capture_view_->OnMouseMove(flags, point);
+    return;
+  }
   delegate_->GetContentView()->view()->OnMouseMove(flags, point);
 }
 

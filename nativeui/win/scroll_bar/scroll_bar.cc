@@ -57,6 +57,30 @@ void ScrollBarView::PageDown() {
     scroll_->OnScroll(-GetPageHeight(), 0);
 }
 
+int ScrollBarView::GetValue() const {
+  if (vertical_)
+    return thumb_.size_allocation().y() -
+           near_button_.size_allocation().bottom();
+  else
+    return thumb_.size_allocation().x() -
+           near_button_.size_allocation().right();
+}
+
+void ScrollBarView::SetValue(int value) {
+  int thumb_size = thumb_.GetSize();
+  int track_size = GetTrackSize();
+  if (track_size == thumb_size)
+    return;
+  int offset = (value * (contents_size_ - viewport_size_)) /
+               (track_size - thumb_size);
+  Vector2d origin(scroll_->origin());
+  if (vertical_)
+    origin.set_y(-offset);
+  else
+    origin.set_x(-offset);
+  scroll_->SetOrigin(origin);
+}
+
 void ScrollBarView::Layout() {
   int box_size = GetBoxSize();
 
@@ -143,25 +167,28 @@ void ScrollBarView::Draw(PainterWin* painter, const Rect& dirty) {
 void ScrollBarView::UpdateThumbPosition() {
   // The size of contents and viewport.
   BaseView* contents = scroll_->delegate()->GetContentView()->view();
-  int contents_len = vertical_ ? contents->size_allocation().height()
-                               : contents->size_allocation().width();
+  contents_size_ = vertical_ ? contents->size_allocation().height()
+                             : contents->size_allocation().width();
   Rect viewport(scroll_->GetViewportRect());
-  int viewport_len = vertical_ ? viewport.height() : viewport.width();
-  if (contents_len == 0 || viewport_len == 0)
-    return;
+  viewport_size_ = vertical_ ? viewport.height() : viewport.width();
+
+  // Make sure contents_size is always > 0 to avoid divide by zero errors in
+  // calculations throughout this code.
+  contents_size_ = std::max(1, contents_size_);
+  viewport_size_ = std::max(1, viewport_size_);
 
   // Calculate the size of thumb button.
   double ratio =
-      std::min(1.0, static_cast<double>(viewport_len) / contents_len);
+      std::min(1.0, static_cast<double>(viewport_size_) / contents_size_);
   int track_size = GetTrackSize();
   int thumb_size = static_cast<int>(ratio * track_size);
 
   // Calculate the position of thumb button.
   int thumb_max = track_size - thumb_size;
   int scroll_amount = GetScrollAmout();
-  int thumb_pos = (scroll_amount + viewport_len == contents_len) ?
+  int thumb_pos = (scroll_amount + viewport_size_ == contents_size_) ?
       thumb_max :
-      ((scroll_amount * thumb_max) / (contents_len - viewport_len));
+      ((scroll_amount * thumb_max) / (contents_size_ - viewport_size_));
 
   // Put the thumb button.
   int box_size = GetBoxSize();

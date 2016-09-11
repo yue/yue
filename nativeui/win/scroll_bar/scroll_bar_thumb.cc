@@ -5,6 +5,8 @@
 #include "nativeui/win/scroll_bar/scroll_bar_thumb.h"
 
 #include "nativeui/state.h"
+#include "nativeui/win/scroll_bar/scroll_bar.h"
+#include "nativeui/win/window_win.h"
 
 namespace nu {
 
@@ -18,18 +20,55 @@ ScrollBarThumb::ScrollBarThumb(bool vertical, ScrollBarView* scroll_bar)
 ScrollBarThumb::~ScrollBarThumb() {
 }
 
+int ScrollBarThumb::GetSize() const {
+  return vertical_ ? size_allocation().height() : size_allocation().width();
+}
+
 void ScrollBarThumb::OnMouseEnter() {
-  set_state(ControlState::Hovered);
-  Invalidate();
+  is_hovering_ = true;
+  if (!is_capturing_) {
+    set_state(ControlState::Hovered);
+    Invalidate();
+  }
+}
+
+void ScrollBarThumb::OnMouseMove(UINT flags, const Point& point) {
+  if (is_capturing_) {
+    int offset = vertical_ ? (point.y() - pressed_point_.y())
+                           : (point.x() - pressed_point_.x());
+    scroll_bar_->SetValue(last_value_ + offset);
+  }
 }
 
 void ScrollBarThumb::OnMouseLeave() {
-  set_state(ControlState::Normal);
-  Invalidate();
+  is_hovering_ = false;
+  if (!is_capturing_) {
+    set_state(ControlState::Normal);
+    Invalidate();
+  }
 }
 
-bool ScrollBarThumb::OnMouseClick(UINT message, UINT flags, const Point&) {
+bool ScrollBarThumb::OnMouseClick(UINT message, UINT flags,
+                                  const Point& point) {
+  auto* toplevel_window = static_cast<TopLevelWindow*>(window());
+  if (message == WM_LBUTTONDOWN) {
+    is_capturing_ = true;
+    pressed_point_ = point;
+    last_value_ = scroll_bar_->GetValue();
+    toplevel_window->SetCapture(this);
+    set_state(ControlState::Pressed);
+  } else {
+    set_state(ControlState::Hovered);
+  }
+
+  Invalidate();
   return true;
+}
+
+void ScrollBarThumb::OnCaptureLost() {
+  is_capturing_ = false;
+  set_state(is_hovering_ ? ControlState::Hovered : ControlState::Normal);
+  Invalidate();
 }
 
 void ScrollBarThumb::Draw(PainterWin* painter, const Rect& dirty) {
