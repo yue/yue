@@ -1,0 +1,18 @@
+# Copyright 2016 Cheng Zhao. All rights reserved.
+
+config("csslayout_config") {
+  include_dirs = [ "CSSLayout" ]
+}
+
+source_set("csslayout") {
+  sources = [
+    "CSSLayout/CSSLayout-internal.h",
+    "CSSLayout/CSSLayout.c",
+    "CSSLayout/CSSLayout.h",
+    "CSSLayout/CSSMacros.h",
+    "CSSLayout/CSSNodeList.c",
+    "CSSLayout/CSSNodeList.h",
+  ]
+
+  public_configs = [ ":csslayout_config" ]
+}

@@ -154,6 +154,7 @@ source_set("nativeui") {
 
   deps = [
     "//base",
+    "//third_party/css-layout:csslayout",
   ]
 
   if (is_linux) {
