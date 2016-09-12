@@ -126,6 +126,7 @@ source_set("nativeui") {
     "win/entry_win.cc",
     "win/group_win.cc",
     "win/label_win.cc",
+    "win/progress_win.cc",
     "win/view_win.cc",
     "win/screen.cc",
     "win/screen.h",

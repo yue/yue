@@ -28,6 +28,7 @@ class LabelView : public BaseView {
     return text_;
   }
 
+  // BaseView:
   void Draw(PainterWin* painter, const Rect& dirty) override {
     painter->DrawStringWithFlags(text_, font_, color_,
                                  Rect(size_allocation().size()),
