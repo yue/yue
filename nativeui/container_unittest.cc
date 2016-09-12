@@ -80,9 +80,7 @@ TEST_F(ContainerTest, Layout) {
 TEST_F(ContainerTest, NestedLayout) {
   TestContainer* c1 = new TestContainer;
   window_->SetBounds(nu::Rect(0, 0, 100, 200));
-  EXPECT_EQ(container_->layout_count(), 2);
   container_->AddChildView(c1);
-  EXPECT_EQ(container_->layout_count(), 3);
   EXPECT_EQ(c1->layout_count(), 1);
 }
 

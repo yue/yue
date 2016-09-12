@@ -10,6 +10,8 @@ namespace nu {
 
 void View::SetVisible(bool visible) {
   PlatformSetVisible(visible);
+  if (!visible)
+    preferred_size_ = Size();
   if (parent())
     parent()->UpdatePreferredSize();
 }
