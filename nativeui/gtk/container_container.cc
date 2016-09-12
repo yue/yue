@@ -130,5 +130,4 @@ GtkWidget* nu_container_new(Container* delegate) {
   return GTK_WIDGET(widget);
 }
 
-
 }  // namespace nu
