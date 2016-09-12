@@ -5,12 +5,14 @@
 #ifndef NATIVEUI_LAYOUT_BOX_LAYOUT_H_
 #define NATIVEUI_LAYOUT_BOX_LAYOUT_H_
 
-#include <vector>
+#include <map>
 
 #include "nativeui/gfx/geometry/insets.h"
 #include "nativeui/layout/layout_manager.h"
 
 namespace nu {
+
+class View;
 
 NATIVEUI_EXPORT class BoxLayout : public LayoutManager {
  public:
@@ -30,14 +32,17 @@ NATIVEUI_EXPORT class BoxLayout : public LayoutManager {
   void Layout(Container* host) const override;
   Size GetPixelPreferredSize(Container* host) const override;
 
-  // Sets the flex for nth child. Using the preferred size as the basis, free
+  // Sets the flex for the |view|. Using the preferred size as the basis, free
   // space along the main axis is distributed to views in the ratio of their
   // flex weights. Similarly, if the views will overflow the parent, space is
   // subtracted in these ratios.
   //
   // A flex of 0 means this view is not resized. Flex values must not be
   // negative.
-  void SetFlexAt(int flex, int index);
+  void SetFlexForView(const View* view, int flex);
+
+  // Clears the flex for the given |view|.
+  void ClearFlexForView(const View* view);
 
   void set_orientation(Orientation orientation) { orientation_ = orientation; }
   void set_inner_padding(const Insets& padding) { inner_padding_ = padding; }
@@ -49,11 +54,12 @@ NATIVEUI_EXPORT class BoxLayout : public LayoutManager {
   ~BoxLayout() override;
 
  private:
-  int GetFlexAt(int index) const;
+  // Returns the flex for the specified |view|.
+  int GetFlexForView(const View* view) const;
 
   // Calculate the padding according to the element's flex weight.
-  int GetPaddingAt(int index, int free_space, int flex_sum,
-                   int* total_padding, int* current_flex) const;
+  int GetPaddingForView(const View* view, int free_space, int flex_sum,
+                        int* total_padding, int* current_flex) const;
 
   Orientation orientation_;
 
@@ -73,8 +79,8 @@ NATIVEUI_EXPORT class BoxLayout : public LayoutManager {
   // bottom-aligned.
   AxisAlignment cross_axis_alignment_ = Stretch;
 
-  // Records the flex for children.
-  std::vector<int> flex_;
+  // A map of views to their flex weights.
+  std::map<const View*, int> flex_map_;
 };
 
 }  // namespace nu

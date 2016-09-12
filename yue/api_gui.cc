@@ -373,7 +373,7 @@ struct Type<nu::BoxLayout> {
   static constexpr const char* name = "yue.BoxLayout";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index, "new", &New,
-                         "setflexat", &SetFlexAt,
+                         "setflexforview", &nu::BoxLayout::SetFlexForView,
                          "setorientation", &nu::BoxLayout::set_orientation);
   }
   static nu::BoxLayout* New(CallContext* context) {
@@ -400,10 +400,6 @@ struct Type<nu::BoxLayout> {
       Push(context->state, "BoxLayout must be created with string or table");
       return nullptr;
     }
-  }
-  // Transalte 1-based index to 0-based.
-  static inline void SetFlexAt(nu::BoxLayout* layout, int flex, int i) {
-    layout->SetFlexAt(flex, i - 1);
   }
 };
 

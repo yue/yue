@@ -36,7 +36,10 @@ void BoxLayout::Layout(Container* host) const {
     if (!host->child_at(i)->IsVisible())
       continue;
     child_count++;
-    flex_sum += GetFlexAt(i);
+    int flex = GetFlexForView(host->child_at(i));
+    if (flex == 0)
+      continue;
+    flex_sum += flex;
   }
 
   if (child_count == 0)
@@ -100,8 +103,8 @@ void BoxLayout::Layout(Container* host) const {
     if (orientation_ == Horizontal) {
       // Decide the size on main axis.
       if (flex_sum > 0) {
-        int current_padding = GetPaddingAt(i, free_space, flex_sum,
-                                           &total_padding, &current_flex);
+        int current_padding = GetPaddingForView(child, free_space, flex_sum,
+                                                &total_padding, &current_flex);
         child_size.Enlarge(current_padding, 0);
       } else if (main_axis_alignment_ == Stretch) {
         child_size.set_width(main_axis_size);
@@ -120,8 +123,8 @@ void BoxLayout::Layout(Container* host) const {
       origin.Offset(child_size.width() + child_spacing, 0);
     } else {
       if (flex_sum > 0) {
-        int current_padding = GetPaddingAt(i, free_space, flex_sum,
-                                           &total_padding, &current_flex);
+        int current_padding = GetPaddingForView(child, free_space, flex_sum,
+                                                &total_padding, &current_flex);
         child_size.Enlarge(0, current_padding);
       } else if (main_axis_alignment_ == Stretch) {
         child_size.set_height(main_axis_size);
@@ -181,19 +184,25 @@ Size BoxLayout::GetPixelPreferredSize(Container* host) const {
   return size;
 }
 
-void BoxLayout::SetFlexAt(int flex, int index) {
-  if (static_cast<size_t>(index) >= flex_.size())
-    flex_.resize(index + 1, 0);
-  flex_[index] = flex;
+void BoxLayout::SetFlexForView(const View* view, int flex) {
+  flex_map_[view] = flex;
 }
 
-int BoxLayout::GetFlexAt(int index) const {
-  return static_cast<size_t>(index) < flex_.size() ?  flex_[index] : 0;
+void BoxLayout::ClearFlexForView(const View* view) {
+  DCHECK(view);
+  flex_map_.erase(view);
 }
 
-int BoxLayout::GetPaddingAt(int index, int free_space, int flex_sum,
-                            int* total_padding, int* current_flex) const {
-  int flex = GetFlexAt(index);
+int BoxLayout::GetFlexForView(const View* view) const {
+  std::map<const View*, int>::const_iterator it = flex_map_.find(view);
+  if (it == flex_map_.end())
+    return 0;
+  return it->second;
+}
+
+int BoxLayout::GetPaddingForView(const View* view, int free_space, int flex_sum,
+                                 int* total_padding, int* current_flex) const {
+  int flex = GetFlexForView(view);
   if (flex == 0)
     return 0;
 
