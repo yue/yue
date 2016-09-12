@@ -12,8 +12,10 @@ View::View() : view_(nullptr) {
 }
 
 View::~View() {
-  if (view_)
+  if (view_) {
     gtk_widget_destroy(view_);
+    g_object_unref(view_);
+  }
 }
 
 void View::TakeOverView(NativeView view) {
@@ -45,9 +47,9 @@ Rect View::GetBounds() const {
     rect.y -= pb.y();
   }
   Rect bounds = Rect(rect);
-  // GTK uses (-1, -1, 1, 1) as empty bounds, we should match the behavior of
-  // other platforms by returning an empty rect.
-  if (bounds == Rect(-1, -1, 1, 1))
+  // GTK uses (-1, -1, 1, 1) and (0, 0, 1, 1) as empty bounds, we should match
+  // the behavior of other platforms by returning an empty rect.
+  if (bounds == Rect(-1, -1, 1, 1) || bounds == Rect(0, 0, 1, 1))
     return Rect();
   return bounds;
 }
