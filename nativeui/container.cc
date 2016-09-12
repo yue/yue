@@ -28,6 +28,7 @@ bool Container::UpdatePreferredSize() {
 }
 
 void Container::SetLayoutManager(LayoutManager* layout_manager) {
+  DCHECK(layout_manager);
   layout_manager_ = layout_manager;
   if (UpdatePreferredSize())
     Layout();
@@ -47,12 +48,14 @@ void Container::Layout() {
 }
 
 void Container::AddChildView(View* view) {
+  DCHECK(view);
   if (view->parent() == this)
     return;
   AddChildViewAt(view, child_count());
 }
 
 void Container::AddChildViewAt(View* view, int index) {
+  DCHECK(view);
   if (view == this || index < 0 || index > child_count())
     return;
 
@@ -64,6 +67,7 @@ void Container::AddChildViewAt(View* view, int index) {
 
   children_.insert(children_.begin() + index, view);
   view->set_parent(this);
+  layout_manager_->ViewAdded(this, view);
   PlatformAddChildView(view);
 
   if (UpdatePreferredSize())
@@ -76,6 +80,7 @@ void Container::RemoveChildView(View* view) {
     return;
 
   view->set_parent(nullptr);
+  layout_manager_->ViewRemoved(this, view);
   PlatformRemoveChildView(view);
   children_.erase(i);
 

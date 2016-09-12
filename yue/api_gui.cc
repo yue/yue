@@ -374,6 +374,7 @@ struct Type<nu::BoxLayout> {
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index, "new", &New,
                          "setflexforview", &nu::BoxLayout::SetFlexForView,
+                         "clearflexforview", &nu::BoxLayout::ClearFlexForView,
                          "setorientation", &nu::BoxLayout::set_orientation);
   }
   static nu::BoxLayout* New(CallContext* context) {

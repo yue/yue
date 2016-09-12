@@ -11,8 +11,20 @@ namespace nu {
 
 NATIVEUI_EXPORT class LayoutManager : public base::RefCounted<LayoutManager> {
  public:
+  // Lay out the children of |host| according to implementation-specific
+  // heuristics. The graphics used during painting is provided to allow for
+  // string sizing.
   virtual void Layout(Container* host) const = 0;
+
+  // Return the preferred size which is the size required to give each
+  // children their respective preferred size.
   virtual Size GetPixelPreferredSize(Container* host) const = 0;
+
+  // Notification that a view has been added.
+  virtual void ViewAdded(View* host, View* view) {}
+
+  // Notification that a view has been removed.
+  virtual void ViewRemoved(View* host, View* view) {}
 
  protected:
   LayoutManager() {}

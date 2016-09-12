@@ -31,6 +31,7 @@ NATIVEUI_EXPORT class BoxLayout : public LayoutManager {
   // LayoutManager:
   void Layout(Container* host) const override;
   Size GetPixelPreferredSize(Container* host) const override;
+  void ViewRemoved(View* host, View* view) override;
 
   // Sets the flex for the |view|. Using the preferred size as the basis, free
   // space along the main axis is distributed to views in the ratio of their

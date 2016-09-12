@@ -184,6 +184,10 @@ Size BoxLayout::GetPixelPreferredSize(Container* host) const {
   return size;
 }
 
+void BoxLayout::ViewRemoved(View* host, View* view) {
+  ClearFlexForView(view);
+}
+
 void BoxLayout::SetFlexForView(const View* view, int flex) {
   flex_map_[view] = flex;
 }
