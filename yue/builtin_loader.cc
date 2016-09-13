@@ -16,13 +16,13 @@ namespace yue {
 namespace {
 
 // The search table, it must be manually kept in sorted order.
-std::pair<std::string, lua_CFunction> loaders_map[] = {
+std::pair<const char*, lua_CFunction> loaders_map[] = {
   std::make_pair("yue.GUI", luaopen_yue_gui),
   std::make_pair("yue.MessageLoop", luaopen_yue_message_loop),
 };
 
 // Use the first element of tuple as comparing key.
-bool TupleCompare(const std::pair<std::string, lua_CFunction>& element,
+bool TupleCompare(const std::pair<const char*, lua_CFunction>& element,
                   const std::string& key) {
   return element.first < key;
 }

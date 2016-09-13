@@ -11,10 +11,7 @@
 
 namespace nu {
 
-View::View() : view_(nil) {
-}
-
-View::~View() {
+void View::PlatformDestroy() {
   [view_ release];
 }
 

@@ -8,13 +8,11 @@
 
 namespace nu {
 
-View::View() : view_(nullptr) {
-}
-
-View::~View() {
+void View::PlatformDestroy() {
   if (view_) {
     gtk_widget_destroy(view_);
     g_object_unref(view_);
+    view_ = nullptr;
   }
 }
 

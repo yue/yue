@@ -15,9 +15,7 @@ void Container::PlatformInit() {
 void Container::PlatformDestroy() {
   // The widget relies on Container to get children, so we must ensure the
   // widget is destroyed before this class.
-  gtk_widget_destroy(view());
-  g_object_unref(view());
-  TakeOverView(nullptr);
+  View::PlatformDestroy();
 }
 
 void Container::PlatformAddChildView(View* child) {

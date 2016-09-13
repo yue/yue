@@ -8,10 +8,7 @@
 
 namespace nu {
 
-View::View() : view_(nullptr) {
-}
-
-View::~View() {
+void View::PlatformDestroy() {
   delete view_;
 }
 

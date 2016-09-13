@@ -8,6 +8,7 @@
 
 #include "base/logging.h"
 #include "nativeui/layout/fill_layout.h"
+#include "third_party/css-layout/CSSLayout/CSSLayout.h"
 
 namespace nu {
 
@@ -68,7 +69,10 @@ void Container::AddChildViewAt(View* view, int index) {
   children_.insert(children_.begin() + index, view);
   view->set_parent(this);
   layout_manager_->ViewAdded(this, view);
+  CSSNodeInsertChild(node(), view->node(), index);
   PlatformAddChildView(view);
+
+  DCHECK_EQ(static_cast<int>(CSSNodeChildCount(node())), child_count());
 
   if (UpdatePreferredSize())
     Layout();
@@ -81,8 +85,11 @@ void Container::RemoveChildView(View* view) {
 
   view->set_parent(nullptr);
   layout_manager_->ViewRemoved(this, view);
+  CSSNodeRemoveChild(node(), view->node());
   PlatformRemoveChildView(view);
   children_.erase(i);
+
+  DCHECK_EQ(static_cast<int>(CSSNodeChildCount(node())), child_count());
 
   if (UpdatePreferredSize())
     Layout();

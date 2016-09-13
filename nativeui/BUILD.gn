@@ -81,6 +81,8 @@ source_set("nativeui") {
     "gfx/geometry/vector2d_f.h",
     "layout/box_layout.cc",
     "layout/box_layout.h",
+    "layout/css_layout.cc",
+    "layout/css_layout.h",
     "layout/fill_layout.cc",
     "layout/fill_layout.h",
     "layout/layout_manager.h",

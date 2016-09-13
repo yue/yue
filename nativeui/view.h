@@ -5,10 +5,14 @@
 #ifndef NATIVEUI_VIEW_H_
 #define NATIVEUI_VIEW_H_
 
+#include <string>
+
 #include "base/memory/ref_counted.h"
 #include "nativeui/gfx/geometry/rect.h"
 #include "nativeui/signal.h"
 #include "nativeui/types.h"
+
+typedef struct CSSNode *CSSNodeRef;
 
 namespace nu {
 
@@ -43,6 +47,10 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
   // layout.
   virtual bool UpdatePreferredSize();
 
+  // Set CSS style for the node.
+  void SetStyle(const std::string& name, const std::string& value);
+  void SetStyle(const std::string& name, float value);
+
   // Convert the DIP geometry to pixel geometry.
   int DIPToPixel(int length) const;
 
@@ -54,6 +62,9 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
 
   // Set parent, can only be used internally for now.
   void set_parent(View* parent) { parent_ = parent; }
+
+  // Get the CSS node of the view, can only be used internally.
+  CSSNodeRef node() const { return node_; }
 
  protected:
   View();
@@ -68,6 +79,8 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
  private:
   friend class base::RefCounted<View>;
 
+  void PlatformInit();
+  void PlatformDestroy();
   void PlatformSetVisible(bool visible);
 
   // Relationships.
@@ -78,6 +91,9 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
 
   // The preferred size of widget.
   Size preferred_size_;
+
+  // The node recording CSS styles.
+  CSSNodeRef node_;
 };
 
 }  // namespace nu
