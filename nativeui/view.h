@@ -49,7 +49,6 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
 
   // Set CSS style for the node.
   void SetStyle(const std::string& name, const std::string& value);
-  void SetStyle(const std::string& name, float value);
 
   // Convert the DIP geometry to pixel geometry.
   int DIPToPixel(int length) const;

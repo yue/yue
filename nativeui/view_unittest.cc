@@ -4,6 +4,7 @@
 
 #include "nativeui/nativeui.h"
 #include "testing/gtest/include/gtest/gtest.h"
+#include "third_party/css-layout/CSSLayout/CSSLayout.h"
 
 class ViewTest : public testing::Test {
  protected:
@@ -16,7 +17,6 @@ class ViewTest : public testing::Test {
 };
 
 TEST_F(ViewTest, Bounds) {
-  view_->SetStyle("width", "123px");
   nu::Rect bounds(100, 100, 200, 200);
   view_->SetBounds(bounds);
   EXPECT_EQ(view_->GetBounds(), bounds);
