@@ -75,6 +75,8 @@ struct Type<nu::View> {
   static constexpr const char* name = "yue.View";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
+           "setstyle", &SetStyle,
+           "printstyle", &nu::View::PrintStyle,
            "getpreferredsize", &nu::View::preferred_size,
            "setpreferredsize", &nu::View::SetPreferredSize,
            "setbounds", &nu::View::SetBounds,
@@ -82,6 +84,20 @@ struct Type<nu::View> {
            "setvisible", &nu::View::SetVisible,
            "isvisible", &nu::View::IsVisible,
            "getparent", &nu::View::parent);
+  }
+  static void SetStyle(CallContext* context, nu::View* view) {
+    if (GetType(context->state, 2) != LuaType::Table) {
+      context->has_error = true;
+      Push(context->state, "first arg must be table");
+      return;
+    }
+    Push(context->state, nullptr);
+    while (lua_next(context->state, 2) != 0) {
+      std::string key, value;
+      To(context->state, -2, &key, &value);
+      view->SetStyle(key, value);
+      PopAndIgnore(context->state, 1);
+    }
   }
 };
 

@@ -46,4 +46,10 @@ void View::SetStyle(const std::string& name, const std::string& value) {
   SetCSSStyle(node_, name, value);
 }
 
+void View::PrintStyle() const {
+  CSSNodePrint(node_, static_cast<CSSPrintOptions>(CSSPrintOptionsLayout |
+                                                   CSSPrintOptionsStyle |
+                                                   CSSPrintOptionsChildren));
+}
+
 }  // namespace nu
