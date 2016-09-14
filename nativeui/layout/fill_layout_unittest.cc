@@ -31,7 +31,9 @@ TEST_F(FillLayoutTest, FillChild) {
 TEST_F(FillLayoutTest, FillChildChild) {
   nu::Rect bounds(1, 2, 300, 400);
   nu::Container* c1 = new nu::Container;
+  c1->SetLayoutManager(new nu::FillLayout);
   nu::Container* c2 = new nu::Container;
+  c2->SetLayoutManager(new nu::FillLayout);
   c1->AddChildView(c2);
   window_->GetContentView()->AddChildView(c1);
   window_->SetContentBounds(bounds);

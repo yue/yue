@@ -30,7 +30,7 @@
   DCHECK_EQ(static_cast<int>([[self subviews] count]), wrapper_->child_count())
       << "Subviews do not match children views";
 
-  wrapper_->Layout();
+  wrapper_->BoundsChanged();
 }
 
 - (void)resizeSubviewsWithOldSize:(NSSize)oldBoundsSize {

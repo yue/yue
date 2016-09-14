@@ -82,7 +82,7 @@ static void nu_container_size_allocate(GtkWidget* widget,
 
   Container* delegate = static_cast<Container*>(
       g_object_get_data(G_OBJECT(widget), "delegate"));
-  delegate->Layout();
+  delegate->BoundsChanged();
 }
 
 static void nu_container_style_updated(GtkWidget* widget) {

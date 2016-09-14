@@ -98,6 +98,8 @@ struct Type<nu::View> {
       view->SetStyle(key, value);
       PopAndIgnore(context->state, 1);
     }
+    // Refresh the view.
+    view->UpdatePreferredSize();
   }
 };
 

@@ -30,6 +30,7 @@ TEST_F(ViewTest, Bounds) {
 
 TEST_F(ViewTest, AddToChildView) {
   scoped_refptr<nu::Window> window(new nu::Window(nu::Window::Options()));
+  window->GetContentView()->SetLayoutManager(new nu::FillLayout);
   window->GetContentView()->AddChildView(view_.get());
 
   nu::Rect bounds(100, 100, 200, 200);

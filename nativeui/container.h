@@ -28,7 +28,11 @@ NATIVEUI_EXPORT class Container : public View {
   void SetLayoutManager(LayoutManager* layout_manager);
   LayoutManager* GetLayoutManager() const;
 
+  // Called when the view needs layout aggresively.
   virtual void Layout();
+
+  // Called when view's bounds changed, and probably needs layout.
+  void BoundsChanged();
 
   // Add/Remove children.
   void AddChildView(View* view);
@@ -46,6 +50,8 @@ NATIVEUI_EXPORT class Container : public View {
 
  protected:
   ~Container() override;
+
+  void SetChildBoundsFromCSS();
 
   void PlatformInit();
   void PlatformDestroy();

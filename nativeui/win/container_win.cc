@@ -125,7 +125,7 @@ class ContainerAdapter : public ContainerView,
 
   // ContainerView::Delegate:
   void Layout() override {
-    container_->Layout();
+    container_->BoundsChanged();
   }
 
   std::vector<BaseView*> GetChildren() override {

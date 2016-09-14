@@ -27,6 +27,7 @@ class ContainerTest : public testing::Test {
   void SetUp() override {
     window_ = new nu::Window(nu::Window::Options());
     container_ = new TestContainer;
+    container_->SetLayoutManager(new nu::FillLayout);
     window_->SetContentView(container_.get());
   }
 
@@ -70,11 +71,11 @@ TEST_F(ContainerTest, SetBounds) {
 }
 
 TEST_F(ContainerTest, Layout) {
-  EXPECT_EQ(container_->layout_count(), 1);
-  container_->AddChildView(new nu::Container);
   EXPECT_EQ(container_->layout_count(), 2);
-  window_->SetBounds(nu::Rect(0, 0, 100, 200));
+  container_->AddChildView(new nu::Container);
   EXPECT_EQ(container_->layout_count(), 3);
+  window_->SetBounds(nu::Rect(0, 0, 100, 200));
+  EXPECT_EQ(container_->layout_count(), 4);
 }
 
 TEST_F(ContainerTest, NestedLayout) {
@@ -94,9 +95,9 @@ TEST_F(ContainerTest, VisibleLayout) {
 }
 
 TEST_F(ContainerTest, ChangeLayoutManager) {
-  EXPECT_EQ(container_->layout_count(), 1);
-  container_->SetLayoutManager(new nu::FillLayout);
   EXPECT_EQ(container_->layout_count(), 2);
+  container_->SetLayoutManager(new nu::FillLayout);
+  EXPECT_EQ(container_->layout_count(), 3);
 }
 
 TEST_F(ContainerTest, RemoveAndAddBack) {
@@ -150,11 +151,8 @@ TEST_F(ContainerTest, MoveBetweenContainers) {
 
 TEST_F(ContainerTest, ChildSetPreferredSize) {
   nu::Container* child = new nu::Container;
-  EXPECT_EQ(container_->layout_count(), 1);
   container_->AddChildView(child);
-  EXPECT_EQ(container_->layout_count(), 2);
   nu::Size preferred_size(100, 100);
   child->SetPreferredSize(preferred_size);
-  EXPECT_EQ(container_->layout_count(), 3);
   EXPECT_EQ(container_->preferred_size(), preferred_size);
 }

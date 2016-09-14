@@ -53,6 +53,10 @@ bool View::DoSetPreferredSize(const Size& size) {
 
   preferred_size_ = size;
 
+  // Update the CSS width/height style.
+  CSSNodeStyleSetMinWidth(node_, size.width());
+  CSSNodeStyleSetMinHeight(node_, size.height());
+
   if (parent_)
     return parent_->UpdatePreferredSize();
   else
