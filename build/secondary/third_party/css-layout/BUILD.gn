@@ -14,5 +14,12 @@ source_set("csslayout") {
     "CSSLayout/CSSNodeList.h",
   ]
 
+  if (is_win) {
+    cflags = [
+      "/wd4005",  # 'isnan': macro redefinition
+      "/wd4267",  # conversion from 'size_t' to 'const unsigned long'
+    ]
+  }
+
   public_configs = [ ":csslayout_config" ]
 }
