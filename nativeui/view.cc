@@ -5,7 +5,7 @@
 #include "nativeui/view.h"
 
 #include "nativeui/container.h"
-#include "nativeui/css.h"
+#include "nativeui/util/css.h"
 #include "third_party/css-layout/CSSLayout/CSSLayout.h"
 
 namespace nu {

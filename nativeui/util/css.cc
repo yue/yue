@@ -2,7 +2,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/css.h"
+#include "nativeui/util/css.h"
 
 #include <algorithm>
 #include <tuple>
@@ -119,6 +119,28 @@ int PixelValue(std::string value) {
   return integer;
 }
 
+// Easy helpers to set edge values.
+void SetMargin(const CSSNodeRef node, float margin) {
+  CSSNodeStyleSetMargin(node, CSSEdgeBottom, margin);
+  CSSNodeStyleSetMargin(node, CSSEdgeLeft, margin);
+  CSSNodeStyleSetMargin(node, CSSEdgeRight, margin);
+  CSSNodeStyleSetMargin(node, CSSEdgeTop, margin);
+}
+
+void SetPadding(const CSSNodeRef node, float padding) {
+  CSSNodeStyleSetPadding(node, CSSEdgeBottom, padding);
+  CSSNodeStyleSetPadding(node, CSSEdgeLeft, padding);
+  CSSNodeStyleSetPadding(node, CSSEdgeRight, padding);
+  CSSNodeStyleSetPadding(node, CSSEdgeTop, padding);
+}
+
+void SetBorderWidth(const CSSNodeRef node, float border) {
+  CSSNodeStyleSetBorder(node, CSSEdgeBottom, border);
+  CSSNodeStyleSetBorder(node, CSSEdgeLeft, border);
+  CSSNodeStyleSetBorder(node, CSSEdgeRight, border);
+  CSSNodeStyleSetBorder(node, CSSEdgeTop, border);
+}
+
 // We use int to represent enums.
 using IntSetter = void(*)(const CSSNodeRef, int);
 using FloatSetter = void(*)(const CSSNodeRef, float);
@@ -146,6 +168,8 @@ const std::tuple<const char*, IntConverter, IntSetter> int_setters[] = {
                   reinterpret_cast<IntSetter>(CSSNodeStyleSetPositionType)),
 };
 const std::pair<const char*, FloatSetter> float_setters[] = {
+  std::make_pair("borderwidth",
+                 reinterpret_cast<FloatSetter>(SetBorderWidth)),
   std::make_pair("flexbasis",
                  reinterpret_cast<FloatSetter>(CSSNodeStyleSetFlexBasis)),
   std::make_pair("flexgrow",
@@ -154,6 +178,8 @@ const std::pair<const char*, FloatSetter> float_setters[] = {
                  reinterpret_cast<FloatSetter>(CSSNodeStyleSetFlexShrink)),
   std::make_pair("height",
                  reinterpret_cast<FloatSetter>(CSSNodeStyleSetHeight)),
+  std::make_pair("margin",
+                 reinterpret_cast<FloatSetter>(SetMargin)),
   std::make_pair("maxheight",
                  reinterpret_cast<FloatSetter>(CSSNodeStyleSetMaxHeight)),
   std::make_pair("maxwidth",
@@ -162,6 +188,8 @@ const std::pair<const char*, FloatSetter> float_setters[] = {
                  reinterpret_cast<FloatSetter>(CSSNodeStyleSetMinHeight)),
   std::make_pair("minwidth",
                  reinterpret_cast<FloatSetter>(CSSNodeStyleSetMinWidth)),
+  std::make_pair("padding",
+                 reinterpret_cast<FloatSetter>(SetPadding)),
   std::make_pair("width",
                  reinterpret_cast<FloatSetter>(CSSNodeStyleSetWidth)),
 };

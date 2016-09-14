@@ -2,8 +2,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef NATIVEUI_CSS_H_
-#define NATIVEUI_CSS_H_
+#ifndef NATIVEUI_UTIL_CSS_H_
+#define NATIVEUI_UTIL_CSS_H_
 
 #include <string>
 
@@ -17,4 +17,4 @@ void SetCSSStyle(CSSNodeRef node,
 
 }  // namespace nu
 
-#endif  // NATIVEUI_CSS_H_
+#endif  // NATIVEUI_UTIL_CSS_H_
