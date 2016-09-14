@@ -11,8 +11,6 @@
 
 namespace nu {
 
-class LayoutManager;
-
 NATIVEUI_EXPORT class Container : public View {
  public:
   Container();
@@ -23,10 +21,6 @@ NATIVEUI_EXPORT class Container : public View {
   // View:
   bool UpdatePreferredSize() override;
   const char* GetClassName() const override;
-
-  // Layouts.
-  void SetLayoutManager(LayoutManager* layout_manager);
-  LayoutManager* GetLayoutManager() const;
 
   // Called when the view needs layout aggresively.
   virtual void Layout();
@@ -61,8 +55,6 @@ NATIVEUI_EXPORT class Container : public View {
  private:
   // Relationships.
   std::vector<scoped_refptr<View>> children_;
-
-  scoped_refptr<LayoutManager> layout_manager_;
 };
 
 }  // namespace nu

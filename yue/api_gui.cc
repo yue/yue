@@ -226,8 +226,6 @@ struct Type<nu::Container> {
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
            "new", &MetaTable<nu::Container>::NewInstance<>,
-           "setlayout", &nu::Container::SetLayoutManager,
-           "getlayout", &nu::Container::GetLayoutManager,
            "addchildview", &nu::Container::AddChildView,
            "addchildviewat", &AddChildViewAt,
            "removechildview", &nu::Container::RemoveChildView,
@@ -325,103 +323,6 @@ struct Type<nu::Window> {
   }
 };
 
-template<>
-struct Type<nu::LayoutManager> {
-  static constexpr const char* name = "yue.LayoutManager";
-  static void BuildMetaTable(State* state, int index) {
-  }
-};
-
-template<>
-struct Type<nu::FillLayout> {
-  using base = nu::LayoutManager;
-  static constexpr const char* name = "yue.FillLayout";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index, "new", &MetaTable<nu::FillLayout>::NewInstance<>);
-  }
-};
-
-template<>
-struct Type<nu::BoxLayout::Orientation> {
-  static constexpr const char* name = "yue.BoxLayout.Orientation";
-  static bool To(State* state, int index, nu::BoxLayout::Orientation* out) {
-    std::string orientation;
-    if (!lua::To(state, index, &orientation))
-      return false;
-    if (orientation == "vertical") {
-      *out = nu::BoxLayout::Vertical;
-      return true;
-    } else if (orientation == "horizontal") {
-      *out = nu::BoxLayout::Horizontal;
-      return true;
-    } else {
-      return false;
-    }
-  }
-};
-
-template<>
-struct Type<nu::BoxLayout::AxisAlignment> {
-  static constexpr const char* name = "yue.BoxLayout.AxisAlignment";
-  static bool To(State* state, int index, nu::BoxLayout::AxisAlignment* out) {
-    std::string alignment;
-    if (!lua::To(state, index, &alignment))
-      return false;
-    if (alignment == "start") {
-      *out = nu::BoxLayout::Start;
-      return true;
-    } else if (alignment == "center") {
-      *out = nu::BoxLayout::Center;
-      return true;
-    } else if (alignment == "end") {
-      *out = nu::BoxLayout::End;
-      return true;
-    } else if (alignment == "stretch") {
-      *out = nu::BoxLayout::Stretch;
-      return true;
-    } else {
-      return false;
-    }
-  }
-};
-
-template<>
-struct Type<nu::BoxLayout> {
-  using base = nu::LayoutManager;
-  static constexpr const char* name = "yue.BoxLayout";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index, "new", &New,
-                         "setflexforview", &nu::BoxLayout::SetFlexForView,
-                         "clearflexforview", &nu::BoxLayout::ClearFlexForView,
-                         "setorientation", &nu::BoxLayout::set_orientation);
-  }
-  static nu::BoxLayout* New(CallContext* context) {
-    nu::BoxLayout::Orientation orientation = nu::BoxLayout::Vertical;
-    if (To(context->state, 1, &orientation)) {
-      return new nu::BoxLayout(orientation);
-    } else if (GetType(context->state, 1) == LuaType::Table) {
-      RawGetAndPop(context->state, 1, "orientation", &orientation);
-      auto* box = new nu::BoxLayout(orientation);
-      int n;
-      if (RawGetAndPop(context->state, 1, "childspacing", &n))
-        box->set_child_spacing(n);
-      nu::Insets insets;
-      if (RawGetAndPop(context->state, 1, "innerpadding", &insets))
-        box->set_inner_padding(insets);
-      nu::BoxLayout::AxisAlignment alignment;
-      if (RawGetAndPop(context->state, 1, "mainaxisalignment", &alignment))
-        box->set_main_axis_alignment(alignment);
-      if (RawGetAndPop(context->state, 1, "crossaxisalignment", &alignment))
-        box->set_cross_axis_alignment(alignment);
-      return box;
-    } else {
-      context->has_error = true;
-      Push(context->state, "BoxLayout must be created with string or table");
-      return nullptr;
-    }
-  }
-};
-
 }  // namespace lua
 
 extern "C" int luaopen_yue_gui(lua::State* state) {
@@ -460,12 +361,6 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   lua_rawset(state, -3);
   lua::Push(state, "Scroll");
   lua::MetaTable<nu::Scroll>::Push(state);
-  lua_rawset(state, -3);
-  lua::Push(state, "FillLayout");
-  lua::MetaTable<nu::FillLayout>::Push(state);
-  lua_rawset(state, -3);
-  lua::Push(state, "BoxLayout");
-  lua::MetaTable<nu::BoxLayout>::Push(state);
   lua_rawset(state, -3);
   return 1;
 }

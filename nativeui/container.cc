@@ -7,7 +7,6 @@
 #include <algorithm>
 
 #include "base/logging.h"
-#include "nativeui/layout/fill_layout.h"
 #include "third_party/css-layout/CSSLayout/CSSLayout.h"
 
 namespace nu {
@@ -21,8 +20,7 @@ inline bool IsContainer(View* view) {
 
 // Whether a Container is a root CSS node.
 inline bool IsRootCSSNode(Container* view) {
-  return !view->parent() || !IsContainer(view->parent()) ||
-         !static_cast<Container*>(view->parent())->GetLayoutManager();
+  return !view->parent() || !IsContainer(view->parent());
 }
 
 // Get bounds from the CSS node.
@@ -45,9 +43,8 @@ Container::~Container() {
 }
 
 bool Container::UpdatePreferredSize() {
-  if (!layout_manager_ ||
-      SetPixelPreferredSize(layout_manager_->GetPixelPreferredSize(this)))
-    Layout();
+  // TODO(zcbenz): Set preferred size for container.
+  Layout();
 
   // The layout of children is managed by Container.
   return false;
@@ -57,29 +54,10 @@ const char* Container::GetClassName() const {
   return kClassName;
 }
 
-void Container::SetLayoutManager(LayoutManager* layout_manager) {
-  if (!layout_manager)
-    return;
-
-  layout_manager_ = layout_manager;
-  if (UpdatePreferredSize())
-    Layout();
-}
-
-LayoutManager* Container::GetLayoutManager() const {
-  return layout_manager_.get();
-}
-
 void Container::Layout() {
   // No need to layout when container is not initialized.
   if (GetPixelBounds().IsEmpty())
     return;
-
-  // Do normal layout if there is a layout manager.
-  if (layout_manager_) {
-    layout_manager_->Layout(this);
-    return;
-  }
 
   // For child CSS node, tell parent to do the layout.
   if (!IsRootCSSNode(this)) {
@@ -94,14 +72,10 @@ void Container::Layout() {
 }
 
 void Container::BoundsChanged() {
-  // For normal layouts and root CSS node, do a complete layout.
-  if (layout_manager_ || IsRootCSSNode(this)) {
+  if (IsRootCSSNode(this))
     Layout();
-    return;
-  }
-
-  // The layout has been calculated by parent node, just set bounds.
-  SetChildBoundsFromCSS();
+  else
+    SetChildBoundsFromCSS();
 }
 
 void Container::AddChildView(View* view) {
@@ -116,15 +90,12 @@ void Container::AddChildViewAt(View* view, int index) {
   if (view == this || index < 0 || index > child_count())
     return;
 
-  // TODO(zcbenz): support moving views.
   if (view->parent()) {
     LOG(ERROR) << "The view already has a parent.";
     return;
   }
 
   view->set_parent(this);
-  if (layout_manager_)
-    layout_manager_->ViewAdded(this, view);
   CSSNodeInsertChild(node(), view->node(), index);
 
   children_.insert(children_.begin() + index, view);
@@ -142,8 +113,6 @@ void Container::RemoveChildView(View* view) {
     return;
 
   view->set_parent(nullptr);
-  if (layout_manager_)
-    layout_manager_->ViewRemoved(this, view);
   CSSNodeRemoveChild(node(), view->node());
 
   PlatformRemoveChildView(view);
