@@ -15,8 +15,14 @@ NATIVEUI_EXPORT class Entry : public View{
  public:
   Entry();
 
+  // View class name.
+  static const char kClassName[];
+
   void SetText(const std::string& text);
   std::string GetText() const;
+
+  // View:
+  const char* GetClassName() const override;
 
   // Events.
   Signal<void()> on_text_change;

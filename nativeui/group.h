@@ -15,8 +15,12 @@ NATIVEUI_EXPORT class Group : public View {
  public:
   explicit Group(const std::string& title);
 
+  // View class name.
+  static const char kClassName[];
+
   // View:
   bool UpdatePreferredSize() override;
+  const char* GetClassName() const override;
 
   void SetContentView(Container* view);
   Container* GetContentView() const;

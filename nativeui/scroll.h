@@ -15,6 +15,9 @@ NATIVEUI_EXPORT class Scroll : public View {
  public:
   Scroll();
 
+  // View class name.
+  static const char kClassName[];
+
   void SetContentView(Container* view);
   Container* GetContentView() const;
 
@@ -28,6 +31,9 @@ NATIVEUI_EXPORT class Scroll : public View {
   };
   void SetScrollBarPolicy(Policy h_policy, Policy v_policy);
   std::tuple<Policy, Policy> GetScrollBarPolicy() const;
+
+  // View:
+  const char* GetClassName() const override;
 
  protected:
   ~Scroll() override;

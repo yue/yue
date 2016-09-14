@@ -12,6 +12,9 @@
 
 namespace nu {
 
+// static
+const char Container::kClassName[] = "Container";
+
 Container::Container() : layout_manager_(new FillLayout) {
   PlatformInit();
 }
@@ -26,6 +29,10 @@ bool Container::UpdatePreferredSize() {
 
   // The layout of children is managed by Container.
   return false;
+}
+
+const char* Container::GetClassName() const {
+  return kClassName;
 }
 
 void Container::SetLayoutManager(LayoutManager* layout_manager) {

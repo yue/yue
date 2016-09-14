@@ -13,11 +13,17 @@ NATIVEUI_EXPORT class Progress : public View {
  public:
   Progress();
 
+  // View class name.
+  static const char kClassName[];
+
   void SetValue(int value);
   int GetValue() const;
 
   void SetIndeterminate(bool inditerminate);
   bool IsIndeterminate() const;
+
+  // View:
+  const char* GetClassName() const override;
 
  protected:
   ~Progress() override;

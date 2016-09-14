@@ -20,10 +20,16 @@ NATIVEUI_EXPORT class Button : public View {
   };
   Button(const std::string& title, Type type = Normal);
 
+  // View class name.
+  static const char kClassName[];
+
   void SetTitle(const std::string& title);
   std::string GetTitle() const;
   void SetChecked(bool checked);
   bool IsChecked() const;
+
+  // View:
+  const char* GetClassName() const override;
 
   // Events.
   Signal<void()> on_click;

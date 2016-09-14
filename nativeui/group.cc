@@ -8,6 +8,9 @@
 
 namespace nu {
 
+// static
+const char Group::kClassName[] = "Group";
+
 Group::Group(const std::string& title) {
   PlatformInit();
   SetContentView(new Container);
@@ -24,6 +27,10 @@ bool Group::UpdatePreferredSize() {
   if (SetPixelPreferredSize(preferred_size))
     content_view_->Layout();
   return false;
+}
+
+const char* Group::GetClassName() const {
+  return kClassName;
 }
 
 void Group::SetContentView(Container* container) {

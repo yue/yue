@@ -16,6 +16,11 @@ class ViewTest : public testing::Test {
   scoped_refptr<nu::View> view_;
 };
 
+TEST_F(ViewTest, ClassName) {
+  EXPECT_STREQ(view_->GetClassName(), "Label");
+  EXPECT_EQ(view_->GetClassName(), nu::Label::kClassName);
+}
+
 TEST_F(ViewTest, Bounds) {
   nu::Rect bounds(100, 100, 200, 200);
   view_->SetBounds(bounds);

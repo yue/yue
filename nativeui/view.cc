@@ -10,6 +10,9 @@
 
 namespace nu {
 
+// static
+const char View::kClassName[] = "View";
+
 View::View() : view_(nullptr), node_(CSSNodeNew()) {
 }
 
@@ -30,16 +33,8 @@ bool View::UpdatePreferredSize() {
   return false;
 }
 
-bool View::DoSetPreferredSize(const Size& size) {
-  if (preferred_size_ == size)
-    return true;
-
-  preferred_size_ = size;
-
-  if (parent_)
-    return parent_->UpdatePreferredSize();
-  else
-    return true;
+const char* View::GetClassName() const {
+  return kClassName;
 }
 
 void View::SetStyle(const std::string& name, const std::string& value) {
@@ -50,6 +45,18 @@ void View::PrintStyle() const {
   CSSNodePrint(node_, static_cast<CSSPrintOptions>(CSSPrintOptionsLayout |
                                                    CSSPrintOptionsStyle |
                                                    CSSPrintOptionsChildren));
+}
+
+bool View::DoSetPreferredSize(const Size& size) {
+  if (preferred_size_ == size)
+    return true;
+
+  preferred_size_ = size;
+
+  if (parent_)
+    return parent_->UpdatePreferredSize();
+  else
+    return true;
 }
 
 }  // namespace nu

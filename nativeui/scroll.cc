@@ -6,6 +6,9 @@
 
 namespace nu {
 
+// static
+const char Scroll::kClassName[] = "Scroll";
+
 Scroll::Scroll() {
   PlatformInit();
   SetPreferredSize(Size(100, 100));
@@ -31,6 +34,10 @@ Container* Scroll::GetContentView() const {
 
 Size Scroll::GetContentSize() const {
   return GetContentView()->GetBounds().size();
+}
+
+const char* Scroll::GetClassName() const {
+  return kClassName;
 }
 
 }  // namespace nu

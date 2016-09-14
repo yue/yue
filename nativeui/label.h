@@ -15,8 +15,14 @@ NATIVEUI_EXPORT class Label : public View {
  public:
   explicit Label(const std::string& text = "");
 
+  // View class name.
+  static const char kClassName[];
+
   void SetText(const std::string& text);
   std::string GetText();
+
+  // View:
+  const char* GetClassName() const override;
 
  protected:
   ~Label() override;

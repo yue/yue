@@ -47,6 +47,15 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
   // layout.
   virtual bool UpdatePreferredSize();
 
+  // The view class name.
+  static const char kClassName[];
+
+  // Return the receiving view's class name. A view class is a string which
+  // uniquely identifies the view class. It is intended to be used as a way to
+  // find out during run time if a view can be safely casted to a specific view
+  // subclass.
+  virtual const char* GetClassName() const;
+
   // Set CSS style for the node.
   void SetStyle(const std::string& name, const std::string& value);
 

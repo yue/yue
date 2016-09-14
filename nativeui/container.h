@@ -17,8 +17,12 @@ NATIVEUI_EXPORT class Container : public View {
  public:
   Container();
 
+  // View class name.
+  static const char kClassName[];
+
   // View:
   bool UpdatePreferredSize() override;
+  const char* GetClassName() const override;
 
   // Layouts.
   void SetLayoutManager(LayoutManager* layout_manager);
