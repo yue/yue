@@ -19,7 +19,7 @@ NATIVEUI_EXPORT class Container : public View {
   static const char kClassName[];
 
   // View:
-  bool UpdatePreferredSize() override;
+  void UpdatePreferredSize() override;
   const char* GetClassName() const override;
 
   // Called when the view needs layout aggresively.

@@ -21,8 +21,8 @@ NATIVEUI_EXPORT class Scroll : public View {
   void SetContentView(Container* view);
   Container* GetContentView() const;
 
-  void SetContentSize(const Size& size);
-  Size GetContentSize() const;
+  void SetContentSize(const SizeF& size);
+  SizeF GetContentSize() const;
 
   enum class Policy {
     Always,

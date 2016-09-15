@@ -4,9 +4,30 @@
 
 #include "nativeui/gfx/geometry/size_f.h"
 
+#if defined(OS_MACOSX)
+#include <ApplicationServices/ApplicationServices.h>
+#endif
+
 #include "base/strings/stringprintf.h"
 
 namespace nu {
+
+#if defined(OS_MACOSX)
+SizeF::SizeF(const CGSize& s)
+    : width_(s.width < 0 ? 0 : s.width),
+      height_(s.height < 0 ? 0 : s.height) {
+}
+
+SizeF& SizeF::operator=(const CGSize& s) {
+  set_width(s.width);
+  set_height(s.height);
+  return *this;
+}
+
+CGSize SizeF::ToCGSize() const {
+  return CGSizeMake(width(), height());
+}
+#endif
 
 float SizeF::GetArea() const {
   return width() * height();

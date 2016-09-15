@@ -7,6 +7,8 @@
 #import <Cocoa/Cocoa.h>
 
 #include "nativeui/container.h"
+#include "nativeui/gfx/geometry/point_conversions.h"
+#include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/gfx/mac/coordinate_conversion.h"
 
 namespace nu {
@@ -19,7 +21,7 @@ void View::TakeOverView(NativeView view) {
   view_ = view;
 }
 
-void View::SetBounds(const Rect& bounds) {
+void View::SetBounds(const RectF& bounds) {
   CGRect frame = bounds.ToCGRect();
   if (parent_) {
     frame.origin.y = parent_->GetBounds().height() -
@@ -30,8 +32,8 @@ void View::SetBounds(const Rect& bounds) {
   [view_ resizeSubviewsWithOldSize:frame.size];
 }
 
-Rect View::GetBounds() const {
-  Rect bounds(NSRectToCGRect([view_ frame]));
+RectF View::GetBounds() const {
+  RectF bounds(NSRectToCGRect([view_ frame]));
   if (parent_) {
     bounds.set_y(parent_->GetBounds().height() -
                  (bounds.y() + bounds.height()));
@@ -40,37 +42,25 @@ Rect View::GetBounds() const {
 }
 
 void View::SetPixelBounds(const Rect& bounds) {
-  SetBounds(bounds);
+  SetBounds(RectF(bounds));
 }
 
 Rect View::GetPixelBounds() const {
-  return GetBounds();
+  return ToNearestRect(GetBounds());
 }
 
-Point View::GetWindowOrigin() const {
+PointF View::GetWindowOrigin() const {
   if (!view_.window || !view_.window.contentView)
     return GetBounds().origin();
   NSRect contentFrame = view_.window.contentView.frame;
-  Rect bounds([view_ convertRect:view_.bounds
-                               toView:view_.window.contentView]);
-  return Point(bounds.x(),
-                    NSHeight(contentFrame) - (bounds.y() + bounds.height()));
+  RectF bounds([view_ convertRect:view_.bounds
+                           toView:view_.window.contentView]);
+  return PointF(bounds.x(),
+                NSHeight(contentFrame) - (bounds.y() + bounds.height()));
 }
 
 Point View::GetWindowPixelOrigin() const {
-  return GetWindowOrigin();
-}
-
-bool View::SetPreferredSize(const Size& size) {
-  return DoSetPreferredSize(size);
-}
-
-bool View::SetPixelPreferredSize(const Size& size) {
-  return DoSetPreferredSize(size);
-}
-
-Size View::GetPixelPreferredSize() const {
-  return preferred_size();
+  return ToRoundedPoint(GetWindowOrigin());
 }
 
 int View::DIPToPixel(int length) const {

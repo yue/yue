@@ -4,6 +4,8 @@
 
 #include "nativeui/scroll.h"
 
+#include "nativeui/gfx/geometry/size_conversions.h"
+
 namespace nu {
 
 // static
@@ -11,7 +13,6 @@ const char Scroll::kClassName[] = "Scroll";
 
 Scroll::Scroll() {
   PlatformInit();
-  SetPreferredSize(Size(100, 100));
   SetContentView(new Container);
 }
 
@@ -23,7 +24,7 @@ void Scroll::SetContentView(Container* container) {
   content_view_->set_parent(this);
 
   if (container->GetBounds().IsEmpty())
-    container->SetBounds(Rect(container->preferred_size()));
+    container->SetBounds(RectF(container->preferred_size()));
 
   PlatformSetContentView(container);
 }
@@ -32,7 +33,7 @@ Container* Scroll::GetContentView() const {
   return content_view_.get();
 }
 
-Size Scroll::GetContentSize() const {
+SizeF Scroll::GetContentSize() const {
   return GetContentView()->GetBounds().size();
 }
 

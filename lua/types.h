@@ -70,6 +70,21 @@ struct Type<int> {
 };
 
 template<>
+struct Type<float> {
+  static constexpr const char* name = "number";
+  static inline void Push(State* state, float number) {
+    lua_pushnumber(state, number);
+  }
+  static inline bool To(State* state, int index, float* out) {
+    int success = 0;
+    int ret = lua_tonumberx(state, index, &success);
+    if (success)
+      *out = ret;
+    return success != 0;
+  }
+};
+
+template<>
 struct Type<double> {
   static constexpr const char* name = "number";
   static inline void Push(State* state, double number) {

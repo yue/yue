@@ -59,7 +59,8 @@ void Button::SetTitle(const std::string& title) {
   button.title = base::SysUTF8ToNSString(title);
 
   // Calculate the preferred size by creating a new button.
-  SetPreferredSize(Size([[button cell] cellSize]));
+  SizeF cell_size([[button cell] cellSize]);
+  SetPreferredSize(cell_size, cell_size);
 }
 
 std::string Button::GetTitle() const {

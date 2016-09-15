@@ -8,7 +8,8 @@
 #include <string>
 
 #include "base/memory/ref_counted.h"
-#include "nativeui/gfx/geometry/rect.h"
+#include "nativeui/gfx/geometry/rect_f.h"
+#include "nativeui/gfx/geometry/size_f.h"
 #include "nativeui/signal.h"
 #include "nativeui/types.h"
 
@@ -21,34 +22,30 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
  public:
   NativeView view() const { return view_; }
 
+  // The view class name.
+  static const char kClassName[];
+
   // Change/Get position and size.
-  void SetBounds(const Rect& bounds);
-  Rect GetBounds() const;
+  void SetBounds(const RectF& bounds);
+  RectF GetBounds() const;
 
   // The real pixel bounds that depends on the scale factor.
   void SetPixelBounds(const Rect& bounds);
   Rect GetPixelBounds() const;
 
   // Get the offset to the parent window.
-  Point GetWindowOrigin() const;
+  PointF GetWindowOrigin() const;
   Point GetWindowPixelOrigin() const;
 
   // Show/Hide the view.
   void SetVisible(bool visible);
   bool IsVisible() const;
 
-  // Set the preferred size of the view, returns whether current view should
-  // do a layout.
-  bool SetPreferredSize(const Size& size);
-  bool SetPixelPreferredSize(const Size& size);
-  Size GetPixelPreferredSize() const;
+  // Set the preferred size of the view.
+  void SetPreferredSize(const SizeF& minimum, const SizeF& preferred);
 
-  // A child changed its preferred size, returns true if the child should do a
-  // layout.
-  virtual bool UpdatePreferredSize();
-
-  // The view class name.
-  static const char kClassName[];
+  // Called when a child has changed its style.
+  virtual void UpdatePreferredSize() {}
 
   // Return the receiving view's class name. A view class is a string which
   // uniquely identifies the view class. It is intended to be used as a way to
@@ -66,7 +63,8 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
   int DIPToPixel(int length) const;
 
   // Get the size the view would like to be.
-  Size preferred_size() const { return preferred_size_; }
+  SizeF minimum_size() const { return minimum_size_; }
+  SizeF preferred_size() const { return preferred_size_; }
 
   // Get parent.
   View* parent() const { return parent_; }
@@ -84,9 +82,6 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
   // Called by subclasses to take the ownership of |view|.
   void TakeOverView(NativeView view);
 
-  // Called by sublcasses for setting preferred size.
-  bool DoSetPreferredSize(const Size& size);
-
  private:
   friend class base::RefCounted<View>;
 
@@ -101,7 +96,8 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
   NativeView view_;
 
   // The preferred size of widget.
-  Size preferred_size_;
+  SizeF minimum_size_;
+  SizeF preferred_size_;
 
   // The node recording CSS styles.
   CSSNodeRef node_;

@@ -24,9 +24,9 @@ inline bool IsRootCSSNode(Container* view) {
 }
 
 // Get bounds from the CSS node.
-inline Rect GetCSSNodeBounds(CSSNodeRef node) {
-  return Rect(CSSNodeLayoutGetLeft(node), CSSNodeLayoutGetTop(node),
-              CSSNodeLayoutGetWidth(node), CSSNodeLayoutGetHeight(node));
+inline RectF GetCSSNodeBounds(CSSNodeRef node) {
+  return RectF(CSSNodeLayoutGetLeft(node), CSSNodeLayoutGetTop(node),
+               CSSNodeLayoutGetWidth(node), CSSNodeLayoutGetHeight(node));
 }
 
 }  // namespace
@@ -42,12 +42,11 @@ Container::~Container() {
   PlatformDestroy();
 }
 
-bool Container::UpdatePreferredSize() {
+void Container::UpdatePreferredSize() {
   // TODO(zcbenz): Set preferred size for container.
-  Layout();
+  SetPreferredSize(SizeF(), SizeF());
 
-  // The layout of children is managed by Container.
-  return false;
+  Layout();
 }
 
 const char* Container::GetClassName() const {
@@ -66,7 +65,7 @@ void Container::Layout() {
   }
 
   // So this is a root CSS node, calculate the layout and set bounds.
-  Size size(GetBounds().size());
+  SizeF size(GetBounds().size());
   CSSNodeCalculateLayout(node(), size.width(), size.height(), CSSDirectionLTR);
   SetChildBoundsFromCSS();
 }
@@ -103,8 +102,7 @@ void Container::AddChildViewAt(View* view, int index) {
 
   DCHECK_EQ(static_cast<int>(CSSNodeChildCount(node())), child_count());
 
-  if (UpdatePreferredSize())
-    Layout();
+  UpdatePreferredSize();
 }
 
 void Container::RemoveChildView(View* view) {
@@ -120,8 +118,7 @@ void Container::RemoveChildView(View* view) {
 
   DCHECK_EQ(static_cast<int>(CSSNodeChildCount(node())), child_count());
 
-  if (UpdatePreferredSize())
-    Layout();
+  UpdatePreferredSize();
 }
 
 void Container::SetChildBoundsFromCSS() {

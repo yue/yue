@@ -19,7 +19,7 @@ NATIVEUI_EXPORT class Group : public View {
   static const char kClassName[];
 
   // View:
-  bool UpdatePreferredSize() override;
+  void UpdatePreferredSize() override;
   const char* GetClassName() const override;
 
   void SetContentView(Container* view);
@@ -32,7 +32,7 @@ NATIVEUI_EXPORT class Group : public View {
   ~Group() override;
 
   // Get the spaces taken by the border of group.
-  Size GetBorderPixelSize() const;
+  SizeF GetBorderPixelSize() const;
 
   // Following platform implementations should only be called by wrappers.
   void PlatformInit();

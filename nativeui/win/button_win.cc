@@ -135,7 +135,7 @@ class ButtonView : public BaseView {
     HDC dc = painter->GetHDC();
 
     Size size = size_allocation().size();
-    Size preferred_size = delegate_->GetPixelPreferredSize();
+    Size preferred_size = preferred_size();
 
     // Draw the button background
     if (type() == ControlType::Button)

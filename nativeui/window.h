@@ -6,7 +6,7 @@
 #define NATIVEUI_WINDOW_H_
 
 #include "nativeui/container.h"
-#include "nativeui/gfx/geometry/rect.h"
+#include "nativeui/gfx/geometry/rect_f.h"
 
 namespace nu {
 
@@ -14,7 +14,7 @@ namespace nu {
 NATIVEUI_EXPORT class Window : public base::RefCounted<Window> {
  public:
   struct Options {
-    Rect bounds;
+    RectF bounds;
   };
 
   explicit Window(const Options& options);
@@ -24,11 +24,11 @@ NATIVEUI_EXPORT class Window : public base::RefCounted<Window> {
   void SetContentView(Container* view);
   Container* GetContentView() const;
 
-  void SetContentBounds(const Rect& bounds);
-  Rect GetContentBounds() const;
+  void SetContentBounds(const RectF& bounds);
+  RectF GetContentBounds() const;
 
-  void SetBounds(const Rect& bounds);
-  Rect GetBounds() const;
+  void SetBounds(const RectF& bounds);
+  RectF GetBounds() const;
 
   void SetVisible(bool visible);
   bool IsVisible() const;

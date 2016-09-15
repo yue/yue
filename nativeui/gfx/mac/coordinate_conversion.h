@@ -11,24 +11,24 @@
 
 namespace nu {
 
-class Point;
-class Rect;
+class PointF;
+class RectF;
 
 // Convert a gfx::Rect specified with the origin at the top left of the primary
 // display into AppKit secreen coordinates (origin at the bottom left).
-NATIVEUI_EXPORT NSRect ScreenRectToNSRect(const Rect& rect);
+NATIVEUI_EXPORT NSRect ScreenRectToNSRect(const RectF& rect);
 
 // Convert an AppKit NSRect with origin in the bottom left of the primary
 // display into a gfx::Rect with origin at the top left of the primary display.
-NATIVEUI_EXPORT Rect ScreenRectFromNSRect(const NSRect& point);
+NATIVEUI_EXPORT RectF ScreenRectFromNSRect(const NSRect& point);
 
 // Convert a gfx::Point specified with the origin at the top left of the primary
 // display into AppKit screen coordinates (origin at the bottom left).
-NATIVEUI_EXPORT NSPoint ScreenPointToNSPoint(const Point& point);
+NATIVEUI_EXPORT NSPoint ScreenPointToNSPoint(const PointF& point);
 
 // Convert an AppKit NSPoint with origin in the bottom left of the primary
 // display into a gfx::Point with origin at the top left of the primary display.
-NATIVEUI_EXPORT Point ScreenPointFromNSPoint(const NSPoint& point);
+NATIVEUI_EXPORT PointF ScreenPointFromNSPoint(const NSPoint& point);
 
 }  // namespace nu
 

@@ -20,13 +20,13 @@ Group::Group(const std::string& title) {
 Group::~Group() {
 }
 
-bool Group::UpdatePreferredSize() {
-  Size border = GetBorderPixelSize();
-  Size preferred_size = GetContentView()->GetPixelPreferredSize();
+void Group::UpdatePreferredSize() {
+  SizeF border = GetBorderPixelSize();
+  SizeF preferred_size = GetContentView()->preferred_size();
   preferred_size.Enlarge(border.width(), border.height());
-  if (SetPixelPreferredSize(preferred_size))
-    content_view_->Layout();
-  return false;
+
+  SetPreferredSize(border, preferred_size);
+  content_view_->Layout();
 }
 
 const char* Group::GetClassName() const {

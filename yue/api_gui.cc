@@ -12,40 +12,40 @@
 namespace lua {
 
 template<>
-struct Type<nu::Size> {
-  static constexpr const char* name = "yue.Size";
-  static inline void Push(State* state, const nu::Size& size) {
+struct Type<nu::SizeF> {
+  static constexpr const char* name = "yue.SizeF";
+  static inline void Push(State* state, const nu::SizeF& size) {
     lua::PushNewTable(state);
     lua::RawSet(state, -1, "width", size.width(), "height", size.height());
   }
-  static inline bool To(State* state, int index, nu::Size* out) {
+  static inline bool To(State* state, int index, nu::SizeF* out) {
     if (GetType(state, index) != LuaType::Table)
       return false;
     int width, height;
     if (!RawGetAndPop(state, index, "width", &width, "height", &height))
       return false;
-    *out = nu::Size(width, height);
+    *out = nu::SizeF(width, height);
     return true;
   }
 };
 
 template<>
-struct Type<nu::Rect> {
-  static constexpr const char* name = "yue.Rect";
-  static inline void Push(State* state, const nu::Rect& rect) {
+struct Type<nu::RectF> {
+  static constexpr const char* name = "yue.RectF";
+  static inline void Push(State* state, const nu::RectF& rect) {
     lua::PushNewTable(state);
     lua::RawSet(state, -1,
                 "x", rect.x(), "y", rect.y(),
                 "width", rect.width(), "height", rect.height());
   }
-  static inline bool To(State* state, int index, nu::Rect* out) {
+  static inline bool To(State* state, int index, nu::RectF* out) {
     if (GetType(state, index) != LuaType::Table)
       return false;
-    int x, y, width, height;
+    float x, y, width, height;
     if (!RawGetAndPop(state, index,
                       "x", &x, "y", &y, "width", &width, "height", &height))
       return false;
-    *out = nu::Rect(x, y, width, height);
+    *out = nu::RectF(x, y, width, height);
     return true;
   }
 };

@@ -38,8 +38,8 @@ void Scroll::PlatformSetContentView(Container* container) {
   scroll.documentView = container->view();
 }
 
-void Scroll::SetContentSize(const Size& size) {
-  GetContentView()->SetBounds(Rect(size));
+void Scroll::SetContentSize(const SizeF& size) {
+  GetContentView()->SetBounds(RectF(size));
 }
 
 void Scroll::SetScrollBarPolicy(Policy h_policy, Policy v_policy) {

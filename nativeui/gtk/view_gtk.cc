@@ -78,10 +78,6 @@ bool View::SetPixelPreferredSize(const Size& size) {
   return DoSetPreferredSize(size);
 }
 
-Size View::GetPixelPreferredSize() const {
-  return preferred_size();
-}
-
 int View::DIPToPixel(int length) const {
   return length;
 }

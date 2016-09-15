@@ -58,10 +58,6 @@ bool View::SetPixelPreferredSize(const Size& size) {
                                               1.0f / view()->scale_factor()));
 }
 
-Size View::GetPixelPreferredSize() const {
-  return view()->preferred_size();
-}
-
 int View::DIPToPixel(int length) const {
   return static_cast<int>(std::ceil(length * view()->scale_factor()));
 }

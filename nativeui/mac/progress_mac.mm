@@ -13,7 +13,8 @@ Progress::Progress() {
   progress.indeterminate = NO;
   TakeOverView(progress);
 
-  SetPreferredSize(Size(100, progress.intrinsicContentSize.height));
+  float height = progress.intrinsicContentSize.height;
+  SetPreferredSize(SizeF(0, height), SizeF(100, height));
 }
 
 Progress::~Progress() {

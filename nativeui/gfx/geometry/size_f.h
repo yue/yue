@@ -21,11 +21,22 @@ class NATIVEUI_EXPORT SizeF {
   SizeF() : width_(0.f), height_(0.f) {}
   SizeF(float width, float height)
       : width_(fmaxf(0, width)), height_(fmaxf(0, height)) {}
+#if defined(OS_MACOSX)
+  explicit SizeF(const CGSize& s);
+#endif
   ~SizeF() {}
 
   explicit SizeF(const Size& size)
       : SizeF(static_cast<float>(size.width()),
               static_cast<float>(size.height())) {}
+
+#if defined(OS_MACOSX)
+  SizeF& operator=(const CGSize& s);
+#endif
+
+#if defined(OS_MACOSX)
+  CGSize ToCGSize() const;
+#endif
 
   float width() const { return width_; }
   float height() const { return height_; }

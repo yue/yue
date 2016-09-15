@@ -24,13 +24,30 @@ View::~View() {
 void View::SetVisible(bool visible) {
   PlatformSetVisible(visible);
   if (!visible)
-    preferred_size_ = Size();
+    preferred_size_ = SizeF();
   if (parent())
     parent()->UpdatePreferredSize();
 }
 
-bool View::UpdatePreferredSize() {
-  return false;
+void View::SetPreferredSize(const SizeF& minimum, const SizeF& preferred) {
+  if (minimum_size_ == minimum && preferred_size_ == preferred)
+    return;
+
+  if (minimum == preferred && !minimum.IsEmpty()) {
+    // Fixed-size widget.
+    CSSNodeStyleSetWidth(node_, minimum.width());
+    CSSNodeStyleSetHeight(node_, minimum.height());
+  } else if (minimum != preferred) {
+    // Flexible-size widget.
+    CSSNodeStyleSetMinWidth(node_, minimum.width());
+    CSSNodeStyleSetMinHeight(node_, minimum.height());
+  }
+
+  minimum_size_ = minimum;
+  preferred_size_ = preferred;
+
+  if (parent_)
+    parent_->UpdatePreferredSize();
 }
 
 const char* View::GetClassName() const {
@@ -45,22 +62,6 @@ void View::PrintStyle() const {
   CSSNodePrint(node_, static_cast<CSSPrintOptions>(CSSPrintOptionsLayout |
                                                    CSSPrintOptionsStyle |
                                                    CSSPrintOptionsChildren));
-}
-
-bool View::DoSetPreferredSize(const Size& size) {
-  if (preferred_size_ == size)
-    return true;
-
-  preferred_size_ = size;
-
-  // Update the CSS width/height style.
-  CSSNodeStyleSetMinWidth(node_, size.width());
-  CSSNodeStyleSetMinHeight(node_, size.height());
-
-  if (parent_)
-    return parent_->UpdatePreferredSize();
-  else
-    return true;
 }
 
 }  // namespace nu

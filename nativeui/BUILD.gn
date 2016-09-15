@@ -68,6 +68,8 @@ source_set("nativeui") {
     "gfx/geometry/point_f.h",
     "gfx/geometry/rect.cc",
     "gfx/geometry/rect.h",
+    "gfx/geometry/rect_conversions.cc",
+    "gfx/geometry/rect_conversions.h",
     "gfx/geometry/rect_f.cc",
     "gfx/geometry/rect_f.h",
     "gfx/geometry/safe_integer_conversions.h",

@@ -11,6 +11,16 @@
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/string_util.h"
 #include "third_party/css-layout/CSSLayout/CSSLayout.h"
+#include "third_party/css-layout/CSSLayout/CSSLayout-internal.h"
+
+bool layoutNodeInternal(const CSSNodeRef node,
+                        const float availableWidth,
+                        const float availableHeight,
+                        const CSSDirection parentDirection,
+                        const CSSMeasureMode widthMeasureMode,
+                        const CSSMeasureMode heightMeasureMode,
+                        const bool performLayout,
+                        const char *reason);
 
 namespace nu {
 

@@ -38,15 +38,15 @@ namespace nu {
 namespace {
 
 // Converting between window and content bounds.
-Rect ContentToWindowBounds(NSWindow* window, const Rect& bounds) {
-  Rect window_bounds([window frameRectForContentRect:bounds.ToCGRect()]);
+RectF ContentToWindowBounds(NSWindow* window, const RectF& bounds) {
+  RectF window_bounds([window frameRectForContentRect:bounds.ToCGRect()]);
   int frame_height = window_bounds.height() - bounds.height();
   window_bounds.set_y(window_bounds.y() - frame_height);
   return window_bounds;
 }
 
-Rect WindowToContentBounds(NSWindow* window, const Rect& bounds) {
-  Rect content_bounds([window contentRectForFrameRect:bounds.ToCGRect()]);
+RectF WindowToContentBounds(NSWindow* window, const RectF& bounds) {
+  RectF content_bounds([window contentRectForFrameRect:bounds.ToCGRect()]);
   int frame_height = bounds.height() - content_bounds.height();
   content_bounds.set_y(content_bounds.y() + frame_height);
   return content_bounds;
@@ -85,20 +85,20 @@ void Window::PlatformSetContentView(Container* container) {
   container->Layout();
 }
 
-void Window::SetContentBounds(const Rect& bounds) {
+void Window::SetContentBounds(const RectF& bounds) {
   SetBounds(ContentToWindowBounds(window_, bounds));
 }
 
-Rect Window::GetContentBounds() const {
+RectF Window::GetContentBounds() const {
   return WindowToContentBounds(window_, GetBounds());
 }
 
-void Window::SetBounds(const Rect& bounds) {
+void Window::SetBounds(const RectF& bounds) {
   [window_ setFrame:ScreenRectToNSRect(bounds) display:YES animate:NO];
 }
 
-Rect Window::GetBounds() const {
-  return ScreenRectFromNSRect(NSRectToCGRect([window_ frame]));
+RectF Window::GetBounds() const {
+  return ScreenRectFromNSRect([window_ frame]);
 }
 
 void Window::SetVisible(bool visible) {

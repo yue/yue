@@ -45,7 +45,8 @@ Entry::Entry() {
   [entry setDelegate:entry.target];
   TakeOverView(entry);
 
-  SetPreferredSize(Size(100, [[entry cell] cellSize].height));
+  float height = [[entry cell] cellSize].height;
+  SetPreferredSize(SizeF(0, height), SizeF(100, height));
 }
 
 Entry::~Entry() {
