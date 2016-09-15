@@ -170,6 +170,8 @@ const std::tuple<const char*, IntConverter, IntSetter> int_setters[] = {
 const std::pair<const char*, FloatSetter> float_setters[] = {
   std::make_pair("borderwidth",
                  reinterpret_cast<FloatSetter>(SetBorderWidth)),
+  std::make_pair("flex",
+                 reinterpret_cast<FloatSetter>(CSSNodeStyleSetFlex)),
   std::make_pair("flexbasis",
                  reinterpret_cast<FloatSetter>(CSSNodeStyleSetFlexBasis)),
   std::make_pair("flexgrow",
