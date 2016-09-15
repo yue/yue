@@ -5,9 +5,21 @@
 #include "nativeui/container.h"
 
 #include <algorithm>
+#include <limits>
 
 #include "base/logging.h"
 #include "third_party/css-layout/CSSLayout/CSSLayout.h"
+#include "third_party/css-layout/CSSLayout/CSSLayout-internal.h"
+
+extern "C"
+bool layoutNodeInternal(const CSSNodeRef node,
+                        const float availableWidth,
+                        const float availableHeight,
+                        const CSSDirection parentDirection,
+                        const CSSMeasureMode widthMeasureMode,
+                        const CSSMeasureMode heightMeasureMode,
+                        const bool performLayout,
+                        const char *reason);
 
 namespace nu {
 
@@ -68,6 +80,29 @@ void Container::BoundsChanged() {
     Layout();
   else
     SetChildBoundsFromCSS();
+}
+
+SizeF Container::GetPreferredSize() const {
+  float float_max = std::numeric_limits<float>::max();
+  layoutNodeInternal(node(), float_max, float_max, CSSDirectionLTR,
+                     CSSMeasureModeAtMost, CSSMeasureModeAtMost,
+                     false, "measure");
+  return SizeF(node()->layout.measuredDimensions[CSSDimensionWidth],
+               node()->layout.measuredDimensions[CSSDimensionHeight]);
+}
+
+float Container::GetPreferredHeightForWidth(float width) const {
+  layoutNodeInternal(node(), width, std::numeric_limits<float>::max(),
+                     CSSDirectionLTR, CSSMeasureModeExactly,
+                     CSSMeasureModeAtMost, false, "measure");
+  return node()->layout.measuredDimensions[CSSDimensionHeight];
+}
+
+float Container::GetPreferredWidthForHeight(float height) const {
+  layoutNodeInternal(node(), std::numeric_limits<float>::max(), height,
+                     CSSDirectionLTR, CSSMeasureModeAtMost,
+                     CSSMeasureModeExactly, false, "measure");
+  return node()->layout.measuredDimensions[CSSDimensionWidth];
 }
 
 void Container::AddChildView(View* view) {

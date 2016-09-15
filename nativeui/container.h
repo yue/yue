@@ -25,6 +25,13 @@ NATIVEUI_EXPORT class Container : public View {
   // Called when view's bounds changed, and probably needs layout.
   void BoundsChanged();
 
+  // Gets preferred size of view.
+  SizeF GetPreferredSize() const;
+
+  // Returns the preferred width/height for the specified height/width.
+  float GetPreferredHeightForWidth(float width) const;
+  float GetPreferredWidthForHeight(float height) const;
+
   // Add/Remove children.
   void AddChildView(View* view);
   void AddChildViewAt(View* view, int index);

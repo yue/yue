@@ -224,6 +224,11 @@ struct Type<nu::Container> {
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
            "new", &MetaTable<nu::Container>::NewInstance<>,
+           "getpreferredsize", &nu::Container::GetPreferredSize,
+           "getpreferredwidthforheight",
+           &nu::Container::GetPreferredWidthForHeight,
+           "getpreferredheightforwidth",
+           &nu::Container::GetPreferredHeightForWidth,
            "addchildview", &nu::Container::AddChildView,
            "addchildviewat", &AddChildViewAt,
            "removechildview", &nu::Container::RemoveChildView,
