@@ -26,9 +26,18 @@ const char* View::GetClassName() const {
 }
 
 void View::SetVisible(bool visible) {
+  if (visible == IsVisible())
+    return;
   PlatformSetVisible(visible);
-  if (!visible) {
-    // TODO(zcbenz): Remove the view from CSS node chain.
+  // CSSLayout doesn't support invisible node, so we just mark the invisible
+  // node as absolute to skip the layout, and restore it after it becomes
+  // visible.
+  if (visible) {
+    CSSNodeStyleSetPositionType(node_,
+                                static_cast<CSSPositionType>(node_position_));
+  } else {
+    node_position_ = static_cast<int>(CSSNodeStyleGetPositionType(node_));
+    CSSNodeStyleSetPositionType(node_, CSSPositionTypeAbsolute);
   }
   Layout();
 }
