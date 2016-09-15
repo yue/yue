@@ -42,13 +42,6 @@ Container::~Container() {
   PlatformDestroy();
 }
 
-void Container::UpdatePreferredSize() {
-  // TODO(zcbenz): Set preferred size for container.
-  SetPreferredSize(SizeF(), SizeF());
-
-  Layout();
-}
-
 const char* Container::GetClassName() const {
   return kClassName;
 }
@@ -102,7 +95,7 @@ void Container::AddChildViewAt(View* view, int index) {
 
   DCHECK_EQ(static_cast<int>(CSSNodeChildCount(node())), child_count());
 
-  UpdatePreferredSize();
+  Layout();
 }
 
 void Container::RemoveChildView(View* view) {
@@ -118,7 +111,7 @@ void Container::RemoveChildView(View* view) {
 
   DCHECK_EQ(static_cast<int>(CSSNodeChildCount(node())), child_count());
 
-  UpdatePreferredSize();
+  Layout();
 }
 
 void Container::SetChildBoundsFromCSS() {

@@ -70,12 +70,12 @@ Point View::GetWindowPixelOrigin() const {
   return GetWindowOrigin();
 }
 
-bool View::SetPreferredSize(const Size& size) {
-  return DoSetPreferredSize(size);
+bool View::SetDefaultStyle(const Size& size) {
+  return DoSetDefaultStyle(size);
 }
 
 bool View::SetPixelPreferredSize(const Size& size) {
-  return DoSetPreferredSize(size);
+  return DoSetDefaultStyle(size);
 }
 
 int View::DIPToPixel(int length) const {

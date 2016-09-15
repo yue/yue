@@ -77,8 +77,6 @@ struct Type<nu::View> {
     RawSet(state, index,
            "setstyle", &SetStyle,
            "printstyle", &nu::View::PrintStyle,
-           "getpreferredsize", &nu::View::preferred_size,
-           "setpreferredsize", &nu::View::SetPreferredSize,
            "setbounds", &nu::View::SetBounds,
            "getbounds", &nu::View::GetBounds,
            "setvisible", &nu::View::SetVisible,
@@ -99,7 +97,7 @@ struct Type<nu::View> {
       PopAndIgnore(context->state, 1);
     }
     // Refresh the view.
-    view->UpdatePreferredSize();
+    view->Layout();
   }
 };
 

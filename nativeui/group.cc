@@ -15,29 +15,26 @@ Group::Group(const std::string& title) {
   PlatformInit();
   SetContentView(new Container);
   SetTitle(title);
+  SetDefaultStyle(GetBorderPixelSize());
 }
 
 Group::~Group() {
-}
-
-void Group::UpdatePreferredSize() {
-  SizeF border = GetBorderPixelSize();
-  SizeF preferred_size = GetContentView()->preferred_size();
-  preferred_size.Enlarge(border.width(), border.height());
-
-  SetPreferredSize(border, preferred_size);
-  content_view_->Layout();
 }
 
 const char* Group::GetClassName() const {
   return kClassName;
 }
 
+void Group::Layout() {
+  View::Layout();
+  content_view_->Layout();
+}
+
 void Group::SetContentView(Container* container) {
   content_view_ = container;
   content_view_->set_parent(this);
   PlatformSetContentView(container);
-  UpdatePreferredSize();
+  Layout();
 }
 
 Container* Group::GetContentView() const {

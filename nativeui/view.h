@@ -25,6 +25,12 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
   // The view class name.
   static const char kClassName[];
 
+  // Return the receiving view's class name. A view class is a string which
+  // uniquely identifies the view class. It is intended to be used as a way to
+  // find out during run time if a view can be safely casted to a specific view
+  // subclass.
+  virtual const char* GetClassName() const;
+
   // Change/Get position and size.
   void SetBounds(const RectF& bounds);
   RectF GetBounds() const;
@@ -37,21 +43,12 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
   PointF GetWindowOrigin() const;
   Point GetWindowPixelOrigin() const;
 
+  // Updates layout.
+  virtual void Layout();
+
   // Show/Hide the view.
   void SetVisible(bool visible);
   bool IsVisible() const;
-
-  // Set the preferred size of the view.
-  void SetPreferredSize(const SizeF& minimum, const SizeF& preferred);
-
-  // Called when a child has changed its style.
-  virtual void UpdatePreferredSize() {}
-
-  // Return the receiving view's class name. A view class is a string which
-  // uniquely identifies the view class. It is intended to be used as a way to
-  // find out during run time if a view can be safely casted to a specific view
-  // subclass.
-  virtual const char* GetClassName() const;
 
   // Set CSS style for the node.
   void SetStyle(const std::string& name, const std::string& value);
@@ -61,10 +58,6 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
 
   // Convert the DIP geometry to pixel geometry.
   int DIPToPixel(int length) const;
-
-  // Get the size the view would like to be.
-  SizeF minimum_size() const { return minimum_size_; }
-  SizeF preferred_size() const { return preferred_size_; }
 
   // Get parent.
   View* parent() const { return parent_; }
@@ -78,6 +71,9 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
  protected:
   View();
   virtual ~View();
+
+  // Set the default style of view.
+  void SetDefaultStyle(const SizeF& minimum);
 
   // Called by subclasses to take the ownership of |view|.
   void TakeOverView(NativeView view);
@@ -94,10 +90,6 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
 
   // The native implementation.
   NativeView view_;
-
-  // The preferred size of widget.
-  SizeF minimum_size_;
-  SizeF preferred_size_;
 
   // The node recording CSS styles.
   CSSNodeRef node_;

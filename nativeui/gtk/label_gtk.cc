@@ -10,7 +10,7 @@ namespace nu {
 
 Label::Label(const std::string& text) {
   TakeOverView(gtk_label_new(text.c_str()));
-  SetPreferredSize(GetPreferredSizeForWidget(view()));
+  SetDefaultStyle(GetPreferredSizeForWidget(view()));
 }
 
 Label::~Label() {
@@ -18,7 +18,7 @@ Label::~Label() {
 
 void Label::SetText(const std::string& text) {
   gtk_label_set_text(GTK_LABEL(view()), text.c_str());
-  SetPreferredSize(GetPreferredSizeForWidget(view()));
+  SetDefaultStyle(GetPreferredSizeForWidget(view()));
 }
 
 std::string Label::GetText() {

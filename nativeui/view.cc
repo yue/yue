@@ -21,37 +21,28 @@ View::~View() {
   CSSNodeFree(node_);
 }
 
-void View::SetVisible(bool visible) {
-  PlatformSetVisible(visible);
-  if (!visible)
-    preferred_size_ = SizeF();
-  if (parent())
-    parent()->UpdatePreferredSize();
-}
-
-void View::SetPreferredSize(const SizeF& minimum, const SizeF& preferred) {
-  if (minimum_size_ == minimum && preferred_size_ == preferred)
-    return;
-
-  if (minimum == preferred && !minimum.IsEmpty()) {
-    // Fixed-size widget.
-    CSSNodeStyleSetWidth(node_, minimum.width());
-    CSSNodeStyleSetHeight(node_, minimum.height());
-  } else if (minimum != preferred) {
-    // Flexible-size widget.
-    CSSNodeStyleSetMinWidth(node_, minimum.width());
-    CSSNodeStyleSetMinHeight(node_, minimum.height());
-  }
-
-  minimum_size_ = minimum;
-  preferred_size_ = preferred;
-
-  if (parent_)
-    parent_->UpdatePreferredSize();
-}
-
 const char* View::GetClassName() const {
   return kClassName;
+}
+
+void View::SetVisible(bool visible) {
+  PlatformSetVisible(visible);
+  if (!visible) {
+    // TODO(zcbenz): Remove the view from CSS node chain.
+  }
+  Layout();
+}
+
+void View::Layout() {
+  // By default just make parent do layout.
+  if (parent())
+    static_cast<Container*>(parent())->Layout();
+}
+
+void View::SetDefaultStyle(const SizeF& minimum) {
+  CSSNodeStyleSetMinWidth(node_, minimum.width());
+  CSSNodeStyleSetMinHeight(node_, minimum.height());
+  Layout();
 }
 
 void View::SetStyle(const std::string& name, const std::string& value) {

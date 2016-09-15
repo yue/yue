@@ -9,6 +9,7 @@
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/text.h"
+#include "third_party/css-layout/CSSLayout/CSSLayout.h"
 
 @interface LabelView : NSView {
  @private
@@ -62,9 +63,7 @@ void Label::SetText(const std::string& text) {
   LabelView* label = static_cast<LabelView*>(view());
   label.text = base::SysUTF8ToNSString(text);
   label.needsDisplay = YES;
-
-  SizeF preferred_size(GetPreferredSizeForText(text));
-  SetPreferredSize(preferred_size, preferred_size);
+  SetDefaultStyle(GetPreferredSizeForText(text));
 }
 
 std::string Label::GetText() {

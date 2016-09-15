@@ -38,7 +38,7 @@ TEST_F(GroupTest, PreferredSize) {
   group->SetContentView(view);
   EXPECT_LT(group->preferred_size().width(), preferred_size.width());
   EXPECT_LT(group->preferred_size().height(), preferred_size.height());
-  view->SetPreferredSize(preferred_size);
+  view->SetDefaultStyle(preferred_size);
   EXPECT_GT(group->preferred_size().width(), preferred_size.width());
   EXPECT_GT(group->preferred_size().height(), preferred_size.height());
 }

@@ -19,11 +19,8 @@ NATIVEUI_EXPORT class Container : public View {
   static const char kClassName[];
 
   // View:
-  void UpdatePreferredSize() override;
   const char* GetClassName() const override;
-
-  // Called when the view needs layout aggresively.
-  virtual void Layout();
+  void Layout() override;
 
   // Called when view's bounds changed, and probably needs layout.
   void BoundsChanged();

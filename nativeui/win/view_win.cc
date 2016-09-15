@@ -47,14 +47,14 @@ Point View::GetWindowPixelOrigin() const {
   return view()->size_allocation().origin();
 }
 
-bool View::SetPreferredSize(const Size& size) {
+bool View::SetDefaultStyle(const Size& size) {
   view()->set_preferred_size(ScaleToCeiledSize(size, view()->scale_factor()));
-  return DoSetPreferredSize(size);
+  return DoSetDefaultStyle(size);
 }
 
 bool View::SetPixelPreferredSize(const Size& size) {
   view()->set_preferred_size(size);
-  return DoSetPreferredSize(ScaleToCeiledSize(size,
+  return DoSetDefaultStyle(ScaleToCeiledSize(size,
                                               1.0f / view()->scale_factor()));
 }
 

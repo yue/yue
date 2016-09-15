@@ -19,8 +19,8 @@ NATIVEUI_EXPORT class Group : public View {
   static const char kClassName[];
 
   // View:
-  void UpdatePreferredSize() override;
   const char* GetClassName() const override;
+  void Layout() override;
 
   void SetContentView(Container* view);
   Container* GetContentView() const;

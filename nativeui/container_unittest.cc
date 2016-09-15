@@ -149,10 +149,10 @@ TEST_F(ContainerTest, MoveBetweenContainers) {
   EXPECT_EQ(v2->GetWindowOrigin(), nu::Point(150, 0));
 }
 
-TEST_F(ContainerTest, ChildSetPreferredSize) {
+TEST_F(ContainerTest, ChildSetDefaultStyle) {
   nu::Container* child = new nu::Container;
   container_->AddChildView(child);
   nu::Size preferred_size(100, 100);
-  child->SetPreferredSize(preferred_size);
+  child->SetDefaultStyle(preferred_size);
   EXPECT_EQ(container_->preferred_size(), preferred_size);
 }

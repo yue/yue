@@ -14,7 +14,7 @@ Progress::Progress() {
   TakeOverView(progress);
 
   float height = progress.intrinsicContentSize.height;
-  SetPreferredSize(SizeF(0, height), SizeF(100, height));
+  SetDefaultStyle(SizeF(0, height));
 }
 
 Progress::~Progress() {

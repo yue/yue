@@ -22,10 +22,6 @@ Scroll::~Scroll() {
 void Scroll::SetContentView(Container* container) {
   content_view_ = container;
   content_view_->set_parent(this);
-
-  if (container->GetBounds().IsEmpty())
-    container->SetBounds(RectF(container->preferred_size()));
-
   PlatformSetContentView(container);
 }
 
