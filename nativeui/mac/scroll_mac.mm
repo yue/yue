@@ -39,7 +39,8 @@ void Scroll::PlatformSetContentView(Container* container) {
 }
 
 void Scroll::SetContentSize(const SizeF& size) {
-  GetContentView()->SetBounds(RectF(size));
+  auto* scroll = static_cast<NSScrollView*>(view());
+  [scroll.documentView setFrameSize:size.ToCGSize()];
 }
 
 void Scroll::SetScrollBarPolicy(Policy h_policy, Policy v_policy) {
