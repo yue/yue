@@ -4,7 +4,6 @@
 
 #include "nativeui/nativeui.h"
 #include "testing/gtest/include/gtest/gtest.h"
-#include "third_party/css-layout/CSSLayout/CSSLayout.h"
 
 class ViewTest : public testing::Test {
  protected:
@@ -35,8 +34,17 @@ TEST_F(ViewTest, AddToChildView) {
   EXPECT_EQ(view_->GetBounds(), nu::RectF(0, 0, 200, 16));
 }
 
-TEST_F(ViewTest, Visible) {
+TEST_F(ViewTest, SetVisible) {
   EXPECT_EQ(view_->IsVisible(), true);
   view_->SetVisible(false);
   EXPECT_EQ(view_->IsVisible(), false);
+}
+
+TEST_F(ViewTest, HiddenViewSkipsLayout) {
+  scoped_refptr<nu::Container> container(new nu::Container);
+  container->AddChildView(view_.get());
+  container->AddChildView(new nu::Label("l1"));
+  EXPECT_GT(container->child_at(1)->GetBounds().y(), 0);
+  view_->SetVisible(false);
+  EXPECT_EQ(container->child_at(1)->GetBounds().y(), 0);
 }
