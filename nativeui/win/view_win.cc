@@ -38,30 +38,6 @@ Rect View::GetPixelBounds() const {
   return bounds;
 }
 
-Point View::GetWindowOrigin() const {
-  return ScaleToFlooredPoint(GetWindowPixelOrigin(),
-                             1.0f / view()->scale_factor());
-}
-
-Point View::GetWindowPixelOrigin() const {
-  return view()->size_allocation().origin();
-}
-
-bool View::SetDefaultStyle(const Size& size) {
-  view()->set_preferred_size(ScaleToCeiledSize(size, view()->scale_factor()));
-  return DoSetDefaultStyle(size);
-}
-
-bool View::SetPixelPreferredSize(const Size& size) {
-  view()->set_preferred_size(size);
-  return DoSetDefaultStyle(ScaleToCeiledSize(size,
-                                              1.0f / view()->scale_factor()));
-}
-
-int View::DIPToPixel(int length) const {
-  return static_cast<int>(std::ceil(length * view()->scale_factor()));
-}
-
 void View::PlatformSetVisible(bool visible) {
   view()->set_visible(visible);
 }

@@ -28,9 +28,10 @@ void View::SetBounds(const Rect& bounds) {
   GdkRectangle rect = bounds.ToGdkRectangle();
   if (parent()) {
     // The size allocation is relative to the window instead of parent.
-    Point pb = parent()->GetWindowOrigin();
-    rect.x += pb.x();
-    rect.y += pb.y();
+    GdkRectangle pb;
+    gtk_widget_get_allocation(parent()->view(), &pb);
+    rect.x += pb.x;
+    rect.y += pb.y;
   }
   gtk_widget_size_allocate(view_, &rect);
 }
@@ -40,9 +41,10 @@ Rect View::GetBounds() const {
   gtk_widget_get_allocation(view_, &rect);
   if (parent()) {
     // The size allocation is relative to the window instead of parent.
-    Point pb = parent()->GetWindowOrigin();
-    rect.x -= pb.x();
-    rect.y -= pb.y();
+    GdkRectangle pb;
+    gtk_widget_get_allocation(parent()->view(), &pb);
+    rect.x -= pb.x;
+    rect.y -= pb.y;
   }
   Rect bounds = Rect(rect);
   // GTK uses (-1, -1, 1, 1) and (0, 0, 1, 1) as empty bounds, we should match
@@ -58,28 +60,6 @@ void View::SetPixelBounds(const Rect& bounds) {
 
 Rect View::GetPixelBounds() const {
   return GetBounds();
-}
-
-Point View::GetWindowOrigin() const {
-  GdkRectangle rect;
-  gtk_widget_get_allocation(view_, &rect);
-  return Point(rect.x, rect.y);
-}
-
-Point View::GetWindowPixelOrigin() const {
-  return GetWindowOrigin();
-}
-
-bool View::SetDefaultStyle(const Size& size) {
-  return DoSetDefaultStyle(size);
-}
-
-bool View::SetPixelPreferredSize(const Size& size) {
-  return DoSetDefaultStyle(size);
-}
-
-int View::DIPToPixel(int length) const {
-  return length;
 }
 
 void View::PlatformSetVisible(bool visible) {

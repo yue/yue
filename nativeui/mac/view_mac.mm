@@ -49,24 +49,6 @@ Rect View::GetPixelBounds() const {
   return ToNearestRect(GetBounds());
 }
 
-PointF View::GetWindowOrigin() const {
-  if (!view_.window || !view_.window.contentView)
-    return GetBounds().origin();
-  NSRect contentFrame = view_.window.contentView.frame;
-  RectF bounds([view_ convertRect:view_.bounds
-                           toView:view_.window.contentView]);
-  return PointF(bounds.x(),
-                NSHeight(contentFrame) - (bounds.y() + bounds.height()));
-}
-
-Point View::GetWindowPixelOrigin() const {
-  return ToRoundedPoint(GetWindowOrigin());
-}
-
-int View::DIPToPixel(int length) const {
-  return length;
-}
-
 void View::PlatformSetVisible(bool visible) {
   [view_ setHidden:!visible];
 }

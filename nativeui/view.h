@@ -39,10 +39,6 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
   void SetPixelBounds(const Rect& bounds);
   Rect GetPixelBounds() const;
 
-  // Get the offset to the parent window.
-  PointF GetWindowOrigin() const;
-  Point GetWindowPixelOrigin() const;
-
   // Updates layout.
   virtual void Layout();
 
@@ -55,9 +51,6 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
 
   // Print style layout to stdout.
   void PrintStyle() const;
-
-  // Convert the DIP geometry to pixel geometry.
-  int DIPToPixel(int length) const;
 
   // Get parent.
   View* parent() const { return parent_; }
