@@ -32,7 +32,7 @@ NATIVEUI_EXPORT class Group : public View {
   ~Group() override;
 
   // Get the spaces taken by the border of group.
-  SizeF GetBorderPixelSize() const;
+  SizeF GetBorderSize() const;
 
   // Following platform implementations should only be called by wrappers.
   void PlatformInit();

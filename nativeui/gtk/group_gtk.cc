@@ -31,7 +31,7 @@ std::string Group::GetTitle() const {
   return gtk_frame_get_label(GTK_FRAME(view()));
 }
 
-Size Group::GetBorderPixelSize() const {
+Size Group::GetBorderSize() const {
   GdkRectangle outer;
   gtk_widget_get_allocation(view(), &outer);
   GdkRectangle inner;

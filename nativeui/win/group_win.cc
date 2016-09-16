@@ -115,7 +115,7 @@ std::string Group::GetTitle() const {
   return base::UTF16ToUTF8(static_cast<GroupView*>(view())->GetTitle());
 }
 
-Size Group::GetBorderPixelSize() const {
+Size Group::GetBorderSize() const {
   GroupView* group = static_cast<GroupView*>(view());
   Rect bounds;
   bounds.Inset(-group->GetBorder());

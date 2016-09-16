@@ -77,6 +77,7 @@ struct Type<nu::View> {
     RawSet(state, index,
            "setstyle", &SetStyle,
            "printstyle", &nu::View::PrintStyle,
+           "layout", &nu::View::Layout,
            "setbounds", &nu::View::SetBounds,
            "getbounds", &nu::View::GetBounds,
            "setvisible", &nu::View::SetVisible,

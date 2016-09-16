@@ -81,6 +81,18 @@ inline bool operator!=(const SizeF& lhs, const SizeF& rhs) {
   return !(lhs == rhs);
 }
 
+inline SizeF operator+(const SizeF& lhs, const SizeF& rhs) {
+  SizeF result = lhs;
+  result.Enlarge(rhs.width(), rhs.height());
+  return result;
+}
+
+inline SizeF operator-(const SizeF& lhs, const SizeF& rhs) {
+  SizeF result = lhs;
+  result.Enlarge(-rhs.width(), -rhs.height());
+  return result;
+}
+
 NATIVEUI_EXPORT SizeF ScaleSize(const SizeF& p, float x_scale, float y_scale);
 
 inline SizeF ScaleSize(const SizeF& p, float scale) {

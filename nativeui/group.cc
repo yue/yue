@@ -15,7 +15,7 @@ Group::Group(const std::string& title) {
   PlatformInit();
   SetContentView(new Container);
   SetTitle(title);
-  SetDefaultStyle(GetBorderPixelSize());
+  SetDefaultStyle(GetBorderSize());
 }
 
 Group::~Group() {
@@ -34,6 +34,8 @@ void Group::SetContentView(Container* container) {
   content_view_ = container;
   content_view_->set_parent(this);
   PlatformSetContentView(container);
+
+  SetDefaultStyle(GetBorderSize() + container->GetPreferredSize());
   Layout();
 }
 

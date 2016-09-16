@@ -28,7 +28,7 @@ std::string Group::GetTitle() const {
   return base::SysNSStringToUTF8(static_cast<NSBox*>(view()).title);
 }
 
-SizeF Group::GetBorderPixelSize() const {
+SizeF Group::GetBorderSize() const {
   NSSize outer = [view() frame].size;
   NSSize inner = [GetContentView()->view() frame].size;
   return SizeF(outer.width - inner.width, outer.height - inner.height);
