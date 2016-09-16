@@ -4,6 +4,7 @@
 
 #include "nativeui/nativeui.h"
 #include "testing/gtest/include/gtest/gtest.h"
+#include "third_party/css-layout/CSSLayout/CSSLayout.h"
 
 class LabelTest : public testing::Test {
  protected:
@@ -20,11 +21,11 @@ TEST_F(LabelTest, SetText) {
   EXPECT_EQ(label_->GetText(), "test");
 }
 
-TEST_F(LabelTest, PreferredSize) {
-  nu::Size preferred_size = label_->preferred_size();
+TEST_F(LabelTest, UpdateStyle) {
   label_->SetText("test");
-  EXPECT_NE(preferred_size, label_->preferred_size());
-  preferred_size = label_->preferred_size();
+  float width = CSSNodeStyleGetMinWidth(label_->node());
+  float height = CSSNodeStyleGetMinHeight(label_->node());
   label_->SetText("longlongtest");
-  EXPECT_NE(preferred_size, label_->preferred_size());
+  EXPECT_LT(width, CSSNodeStyleGetMinWidth(label_->node()));
+  EXPECT_EQ(height, CSSNodeStyleGetMinHeight(label_->node()));
 }

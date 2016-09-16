@@ -17,9 +17,9 @@ class WindowTest : public testing::Test {
 };
 
 TEST_F(WindowTest, Bounds) {
-  nu::Rect bounds(123, 456, 789, 10);
+  nu::RectF bounds(123, 456, 789, 10);
   window_->SetContentBounds(bounds);
-  nu::Rect window_bounds = window_->GetBounds();
+  nu::RectF window_bounds = window_->GetBounds();
   EXPECT_EQ(window_->GetContentBounds(), bounds);
   window_->SetBounds(window_bounds);
   EXPECT_EQ(window_->GetBounds(), window_bounds);

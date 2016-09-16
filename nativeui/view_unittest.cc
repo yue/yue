@@ -22,26 +22,21 @@ TEST_F(ViewTest, ClassName) {
 }
 
 TEST_F(ViewTest, Bounds) {
-  nu::Rect bounds(100, 100, 200, 200);
+  nu::RectF bounds(100, 100, 200, 200);
   view_->SetBounds(bounds);
   EXPECT_EQ(view_->GetBounds(), bounds);
-  EXPECT_EQ(view_->GetWindowOrigin(), nu::Point(100, 100));
 }
 
 TEST_F(ViewTest, AddToChildView) {
   scoped_refptr<nu::Window> window(new nu::Window(nu::Window::Options()));
-  window->GetContentView()->SetLayoutManager(new nu::FillLayout);
   window->GetContentView()->AddChildView(view_.get());
-
-  nu::Rect bounds(100, 100, 200, 200);
+  nu::RectF bounds(100, 100, 200, 200);
   window->SetContentBounds(bounds);
-  EXPECT_EQ(view_->GetBounds(), nu::Rect(0, 0, 200, 200));
-  EXPECT_EQ(view_->GetWindowPixelOrigin(), nu::Point(0, 0));
+  EXPECT_EQ(view_->GetBounds(), nu::RectF(0, 0, 200, 16));
 }
 
 TEST_F(ViewTest, Visible) {
   EXPECT_EQ(view_->IsVisible(), true);
   view_->SetVisible(false);
-  EXPECT_EQ(view_->preferred_size(), nu::Size());
   EXPECT_EQ(view_->IsVisible(), false);
 }

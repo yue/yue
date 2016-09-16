@@ -4,6 +4,7 @@
 
 #include "nativeui/nativeui.h"
 #include "testing/gtest/include/gtest/gtest.h"
+#include "third_party/css-layout/CSSLayout/CSSLayout.h"
 
 class ButtonTest : public testing::Test {
  protected:
@@ -20,12 +21,20 @@ TEST_F(ButtonTest, Title) {
   EXPECT_EQ(button->GetTitle(), "title2");
 }
 
-TEST_F(ButtonTest, PreferredSize) {
+TEST_F(ButtonTest, SetBounds) {
   scoped_refptr<nu::Button> button = new nu::Button("title");
-  nu::Size olds = button->preferred_size();
-  button->SetTitle("new");
-  nu::Size news = button->preferred_size();
-  EXPECT_NE(olds, news);
+  nu::RectF bounds(0, 0, 300, 400);
+  button->SetBounds(bounds);
+  EXPECT_EQ(button->GetBounds(), bounds);
+}
+
+TEST_F(ButtonTest, UpdateStyle) {
+  scoped_refptr<nu::Button> button = new nu::Button("title");
+  float width = CSSNodeStyleGetMinWidth(button->node());
+  float height = CSSNodeStyleGetMinHeight(button->node());
+  button->SetTitle("a long long title");
+  EXPECT_LT(width, CSSNodeStyleGetMinWidth(button->node()));
+  EXPECT_EQ(height, CSSNodeStyleGetMinHeight(button->node()));
 }
 
 TEST_F(ButtonTest, CheckBox) {
@@ -49,7 +58,7 @@ TEST_F(ButtonTest, Radio) {
 
 TEST_F(ButtonTest, RadioGroup) {
   scoped_refptr<nu::Container> container = new nu::Container;
-  container->SetBounds(nu::Rect(0, 0, 100, 100));
+  container->SetBounds(nu::RectF(0, 0, 100, 100));
   auto* r1 = new nu::Button("r1", nu::Button::Radio);
   auto* r2 = new nu::Button("r2", nu::Button::Radio);
   auto* r3 = new nu::Button("r3", nu::Button::Radio);

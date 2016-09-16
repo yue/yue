@@ -59,10 +59,6 @@ const char* Container::GetClassName() const {
 }
 
 void Container::Layout() {
-  // No need to layout when container is not initialized.
-  if (GetPixelBounds().IsEmpty())
-    return;
-
   // For child CSS node, tell parent to do the layout.
   if (!IsRootCSSNode(this)) {
     static_cast<Container*>(parent())->Layout();

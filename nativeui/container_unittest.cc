@@ -27,7 +27,6 @@ class ContainerTest : public testing::Test {
   void SetUp() override {
     window_ = new nu::Window(nu::Window::Options());
     container_ = new TestContainer;
-    container_->SetLayoutManager(new nu::FillLayout);
     window_->SetContentView(container_.get());
   }
 
@@ -66,23 +65,23 @@ TEST_F(ContainerTest, RemoveChildView) {
 TEST_F(ContainerTest, SetBounds) {
   scoped_refptr<TestContainer> c = new TestContainer;
   EXPECT_EQ(c->layout_count(), 0);
-  c->SetBounds(nu::Rect(0, 0, 100, 100));
+  c->SetBounds(nu::RectF(0, 0, 100, 100));
   EXPECT_EQ(c->layout_count(), 1);
 }
 
 TEST_F(ContainerTest, Layout) {
-  EXPECT_EQ(container_->layout_count(), 2);
+  EXPECT_EQ(container_->layout_count(), 1);
   container_->AddChildView(new nu::Container);
+  EXPECT_EQ(container_->layout_count(), 2);
+  window_->SetBounds(nu::RectF(0, 0, 100, 200));
   EXPECT_EQ(container_->layout_count(), 3);
-  window_->SetBounds(nu::Rect(0, 0, 100, 200));
-  EXPECT_EQ(container_->layout_count(), 4);
 }
 
-TEST_F(ContainerTest, NestedLayout) {
+TEST_F(ContainerTest, ChildLayout) {
+  window_->SetBounds(nu::RectF(0, 0, 100, 200));
   TestContainer* c1 = new TestContainer;
-  window_->SetBounds(nu::Rect(0, 0, 100, 200));
   container_->AddChildView(c1);
-  EXPECT_EQ(c1->layout_count(), 1);
+  EXPECT_EQ(c1->layout_count(), 0) << "Child CSS node should not layout";
 }
 
 TEST_F(ContainerTest, VisibleLayout) {
@@ -90,14 +89,8 @@ TEST_F(ContainerTest, VisibleLayout) {
   EXPECT_GE(container_->layout_count(), 1);
   container_->AddChildView(new nu::Container);
   EXPECT_GE(container_->layout_count(), 2);
-  window_->SetBounds(nu::Rect(0, 0, 100, 200));
+  window_->SetBounds(nu::RectF(0, 0, 100, 200));
   EXPECT_GE(container_->layout_count(), 3);
-}
-
-TEST_F(ContainerTest, ChangeLayoutManager) {
-  EXPECT_EQ(container_->layout_count(), 2);
-  container_->SetLayoutManager(new nu::FillLayout);
-  EXPECT_EQ(container_->layout_count(), 3);
 }
 
 TEST_F(ContainerTest, RemoveAndAddBack) {
@@ -111,48 +104,33 @@ TEST_F(ContainerTest, RemoveAndAddBack) {
 }
 
 TEST_F(ContainerTest, MoveBetweenContainers) {
-  scoped_refptr<nu::Label> v1 = new nu::Label;
-  scoped_refptr<nu::Label> v2 = new nu::Label;
-  nu::Container* c1 = new nu::Container;
-  nu::BoxLayout* l1 = new nu::BoxLayout(nu::BoxLayout::Vertical);
-  l1->set_main_axis_alignment(nu::BoxLayout::Stretch);
-  l1->set_cross_axis_alignment(nu::BoxLayout::Stretch);
-  c1->SetLayoutManager(l1);
-  nu::Container* c2 = new nu::Container;
-  nu::BoxLayout* l2 = new nu::BoxLayout(nu::BoxLayout::Horizontal);
-  l2->set_main_axis_alignment(nu::BoxLayout::Stretch);
-  l2->set_cross_axis_alignment(nu::BoxLayout::Stretch);
-  c2->SetLayoutManager(l2);
-  nu::BoxLayout* l3 = new nu::BoxLayout(nu::BoxLayout::Horizontal);
-  l3->set_main_axis_alignment(nu::BoxLayout::Stretch);
-  l3->set_cross_axis_alignment(nu::BoxLayout::Stretch);
-  container_->SetLayoutManager(l3);
+  window_->SetContentBounds(nu::RectF(0, 0, 200, 400));
 
+  nu::Container* c1 = new nu::Container;
+  c1->SetStyle("flex", "1");
+  c1->SetStyle("flex-direction", "row");
+  c1->SetStyle("align-content", "stretch");
+  container_->AddChildView(c1);
+
+  nu::Container* c2 = new nu::Container;
+  c2->SetStyle("flex", "1");
+  c2->SetStyle("flex-direction", "column");
+  c2->SetStyle("align-content", "stretch");
+  container_->AddChildView(c2);
+
+  scoped_refptr<nu::Label> v1 = new nu::Label("v1");
+  v1->SetStyle("flex", "1");
+  scoped_refptr<nu::Label> v2 = new nu::Label("v2");
+  v2->SetStyle("flex", "1");
   c1->AddChildView(v1.get());
   c1->AddChildView(v2.get());
-  container_->AddChildView(c1);
-  container_->AddChildView(c2);
-  window_->SetContentBounds(nu::Rect(0, 0, 200, 400));
-  EXPECT_EQ(container_->GetBounds(), nu::Rect(0, 0, 200, 400));
-  EXPECT_EQ(v1->GetBounds(), nu::Rect(0, 0, 100, 200));
-  EXPECT_EQ(v2->GetBounds(), nu::Rect(0, 200, 100, 200));
-  EXPECT_EQ(v1->GetWindowOrigin(), nu::Point(0, 0));
-  EXPECT_EQ(v2->GetWindowOrigin(), nu::Point(0, 200));
+  EXPECT_EQ(v1->GetBounds(), nu::RectF(0, 0, 100, 200));
+  EXPECT_EQ(v2->GetBounds(), nu::RectF(100, 0, 100, 200));
 
   c1->RemoveChildView(v1.get());
   c1->RemoveChildView(v2.get());
   c2->AddChildView(v1.get());
   c2->AddChildView(v2.get());
-  EXPECT_EQ(v1->GetBounds(), nu::Rect(0, 0, 50, 400));
-  EXPECT_EQ(v2->GetBounds(), nu::Rect(50, 0, 50, 400));
-  EXPECT_EQ(v1->GetWindowOrigin(), nu::Point(100, 0));
-  EXPECT_EQ(v2->GetWindowOrigin(), nu::Point(150, 0));
-}
-
-TEST_F(ContainerTest, ChildSetDefaultStyle) {
-  nu::Container* child = new nu::Container;
-  container_->AddChildView(child);
-  nu::Size preferred_size(100, 100);
-  child->SetDefaultStyle(preferred_size);
-  EXPECT_EQ(container_->preferred_size(), preferred_size);
+  EXPECT_EQ(v1->GetBounds(), nu::RectF(0, 0, 200, 100));
+  EXPECT_EQ(v2->GetBounds(), nu::RectF(0, 100, 200, 100));
 }
