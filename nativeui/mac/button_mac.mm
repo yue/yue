@@ -7,7 +7,58 @@
 #import <Cocoa/Cocoa.h>
 
 #include "base/strings/sys_string_conversions.h"
+#include "nativeui/gfx/geometry/insets_f.h"
 
+namespace {
+
+// The insets numbers are from wxWidgets:
+// wxWidgets/src/osx/cocoa/button.mm
+nu::InsetsF GetButtonInsets(NSButton* button) {
+  if ([button bezelStyle] == NSSmallSquareBezelStyle) {
+    return nu::InsetsF(1, 0, 1, 0);
+  } else if ([button bezelStyle] == NSRoundedBezelStyle) {
+    NSControlSize size = [[button cell] controlSize];
+    switch (size) {
+      case NSRegularControlSize: return nu::InsetsF(4, 6, 7, 6);
+      case NSSmallControlSize: return nu::InsetsF(4, 5, 6, 5);
+      case NSMiniControlSize: return nu::InsetsF(0, 1, 1, 1);
+    }
+  }
+  return nu::InsetsF();
+}
+
+}  // namespace
+
+// The default NSButton includes the button's shadow area as its frame, and it
+// gives us wrong coordinates to calculate layout. This class overrides
+// setFrame: frame: to ignore the shadow frame.
+@interface NUButton : NSButton
+@end
+
+@implementation NUButton
+
+- (void)setFrame:(NSRect)frame {
+  nu::InsetsF border(GetButtonInsets(self));
+  frame.origin.x -= border.left();
+  frame.origin.y -= border.bottom();
+  frame.size.width += (border.left() + border.right());
+  frame.size.height += (border.top() + border.bottom());
+  [super setFrame:frame];
+}
+
+- (NSRect)frame {
+  NSRect frame = [super frame];
+  nu::InsetsF border(GetButtonInsets(self));
+  frame.origin.x += border.left();
+  frame.origin.y += border.bottom();
+  frame.size.width -= (border.left() + border.right());
+  frame.size.height -= (border.top() + border.bottom());
+  return frame;
+}
+
+@end
+
+// The button delegate to catch click events.
 @interface NUButtonDelegate : NSObject {
  @private
   nu::Button* shell_;
@@ -33,9 +84,9 @@
 namespace nu {
 
 Button::Button(const std::string& title, Type type) {
-  NSButton* button = [[NSButton alloc] init];
+  NSButton* button = [[NUButton alloc] init];
   if (type == Normal)
-    [button setBezelStyle:NSSmallSquareBezelStyle];
+    [button setBezelStyle:NSRoundedBezelStyle];
   else if (type == CheckBox)
     [button setButtonType:NSSwitchButton];
   else if (type == Radio)
@@ -59,7 +110,9 @@ void Button::SetTitle(const std::string& title) {
   button.title = base::SysUTF8ToNSString(title);
 
   // Calculate the preferred size by creating a new button.
-  SetDefaultStyle(SizeF([[button cell] cellSize]));
+  RectF bounds = RectF(SizeF([[button cell] cellSize]));
+  bounds.Inset(GetButtonInsets(button));
+  SetDefaultStyle(bounds.size());
 }
 
 std::string Button::GetTitle() const {
