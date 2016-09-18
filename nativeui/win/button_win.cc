@@ -148,6 +148,8 @@ class ButtonView : public BaseView {
     if (type() == ControlType::Button) {
       origin.Offset((size.width() - preferred_size.width()) / 2,
                     (size.height() - preferred_size.height()) / 2);
+    } else {
+      origin.Offset(0, (size.height() - preferred_size.height()) / 2);
     }
 
     // Draw the box.
