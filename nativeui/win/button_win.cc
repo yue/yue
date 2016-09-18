@@ -133,10 +133,10 @@ class ButtonView : public BaseView {
   }
 
   void Draw(PainterWin* painter, const Rect& dirty) override {
-    HDC dc = painter->GetHDC();
-
     Size size = size_allocation().size();
     Size preferred_size = GetPreferredSize();
+
+    HDC dc = painter->GetHDC();
 
     // Draw the button background
     if (type() == ControlType::Button)
@@ -160,6 +160,13 @@ class ButtonView : public BaseView {
     else if (type() == ControlType::Radio)
       theme_->PaintRadio(dc, state(), Rect(box_origin, box_size_), params_);
 
+    // The bounds of text.
+    int padding = std::ceil(
+        (type() == ControlType::Button ? kButtonPadding : kCheckBoxPadding) *
+        scale_factor());
+    Rect text_bounds(origin, preferred_size);
+    text_bounds.Inset(box_size_.width() + padding, padding, padding, padding);
+
     // Draw focused ring.
     if (IsFocused()) {
       RECT rect;
@@ -168,11 +175,9 @@ class ButtonView : public BaseView {
         bounds.Inset(Insets(std::ceil(1 * scale_factor())));
         rect = bounds.ToRECT();
       } else {
-        int padding = std::ceil(kCheckBoxPadding * scale_factor());
-        box_origin.Offset(box_size_.width() + padding, padding);
-        Size ring_size = preferred_size;
-        ring_size.Enlarge(-box_size_.width() - padding * 2, -padding * 2);
-        rect = Rect(box_origin, ring_size).ToRECT();
+        Rect bounds = text_bounds + painter->origin();
+        bounds.Inset(Insets(padding));
+        rect = bounds.ToRECT();
       }
       DrawFocusRect(dc, &rect);
     }
@@ -180,11 +185,6 @@ class ButtonView : public BaseView {
     painter->ReleaseHDC(dc);
 
     // The text.
-    int padding = std::ceil(
-        (type() == ControlType::Button ? kButtonPadding : kCheckBoxPadding) *
-        scale_factor());
-    Rect text_bounds(origin, preferred_size);
-    text_bounds.Inset(box_size_.width() + padding, padding, padding, padding);
     painter->DrawString(title_, font_, color_, text_bounds);
   }
 
