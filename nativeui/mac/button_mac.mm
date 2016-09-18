@@ -39,21 +39,16 @@ nu::InsetsF GetButtonInsets(NSButton* button) {
 
 - (void)setFrame:(NSRect)frame {
   nu::InsetsF border(GetButtonInsets(self));
-  frame.origin.x -= border.left();
-  frame.origin.y -= border.bottom();
-  frame.size.width += (border.left() + border.right());
-  frame.size.height += (border.top() + border.bottom());
-  [super setFrame:frame];
+  nu::RectF bounds(frame);
+  bounds.Inset(-border);
+  [super setFrame:bounds.ToCGRect()];
 }
 
 - (NSRect)frame {
-  NSRect frame = [super frame];
   nu::InsetsF border(GetButtonInsets(self));
-  frame.origin.x += border.left();
-  frame.origin.y += border.bottom();
-  frame.size.width -= (border.left() + border.right());
-  frame.size.height -= (border.top() + border.bottom());
-  return frame;
+  nu::RectF bounds([super frame]);
+  bounds.Inset(border);
+  return bounds.ToCGRect();
 }
 
 @end

@@ -4,8 +4,8 @@
 
 #include "nativeui/view.h"
 
-#include "nativeui/label.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
+#include "nativeui/label.h"
 #include "nativeui/win/base_view.h"
 
 namespace nu {

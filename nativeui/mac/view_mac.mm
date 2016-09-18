@@ -9,7 +9,6 @@
 #include "nativeui/container.h"
 #include "nativeui/gfx/geometry/point_conversions.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
-#include "nativeui/gfx/mac/coordinate_conversion.h"
 
 namespace nu {
 
@@ -22,23 +21,14 @@ void View::TakeOverView(NativeView view) {
 }
 
 void View::SetBounds(const RectF& bounds) {
-  CGRect frame = bounds.ToCGRect();
-  if (parent_) {
-    frame.origin.y = parent_->GetBounds().height() -
-                     (frame.origin.y + frame.size.height);
-  }
+  NSRect frame = bounds.ToCGRect();
   [view_ setFrame:frame];
   // Calling setFrame manually does not trigger adjustSubviews.
   [view_ resizeSubviewsWithOldSize:frame.size];
 }
 
 RectF View::GetBounds() const {
-  RectF bounds(NSRectToCGRect([view_ frame]));
-  if (parent_) {
-    bounds.set_y(parent_->GetBounds().height() -
-                 (bounds.y() + bounds.height()));
-  }
-  return bounds;
+  return RectF([view_ frame]);
 }
 
 void View::SetPixelBounds(const Rect& bounds) {

@@ -26,6 +26,10 @@
   return self;
 }
 
+- (BOOL)isFlipped {
+  return YES;
+}
+
 - (void)adjustSubviews {
   DCHECK_EQ(static_cast<int>([[self subviews] count]), wrapper_->child_count())
       << "Subviews do not match children views";
