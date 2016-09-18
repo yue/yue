@@ -14,30 +14,30 @@ namespace lua {
 
 namespace internal {
 
-// Base of PointerWrapper that hides implementations.
-class PointerWrapperBase {
+// Base of RefPtrWrapper that hides implementations.
+class RefPtrWrapperBase {
  public:
   // Convert the class to Lua and push it on stack.
   static bool Push(State* state, void* ptr);
 
  protected:
-  PointerWrapperBase(State* state, void* ptr);
+  RefPtrWrapperBase(State* state, void* ptr);
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(PointerWrapperBase);
+  DISALLOW_COPY_AND_ASSIGN(RefPtrWrapperBase);
 };
 
 // The specialized Wrappable class for storing refcounted class.
-// We need to guareentee that PointerWrapper is standard layout, since we may
-// use convertions like PointerWrapper<Derive> to PointerWrapper<Base>.
+// We need to guareentee that RefPtrWrapper is standard layout, since we may
+// use convertions like RefPtrWrapper<Derive> to RefPtrWrapper<Base>.
 template<typename T>
-class PointerWrapper : public PointerWrapperBase {
+class RefPtrWrapper : public RefPtrWrapperBase {
  public:
-  PointerWrapper(State* state, T* t) : PointerWrapperBase(state, t), ptr_(t) {
+  RefPtrWrapper(State* state, T* t) : RefPtrWrapperBase(state, t), ptr_(t) {
     ptr_->AddRef();
   }
 
-  ~PointerWrapper() {
+  ~RefPtrWrapper() {
     ptr_->Release();
   }
 
@@ -110,7 +110,7 @@ bool PushSingleTypeMetaTable(State* state) {
   if (luaL_newmetatable(state, Type<T>::name) == 0)
     return true;
 
-  RawSet(state, -1, "__gc", CFunction(&OnGC<PointerWrapper<T>>));
+  RawSet(state, -1, "__gc", CFunction(&OnGC<RefPtrWrapper<T>>));
   Indexer<T>::Set(state, -1);
   NewIndexer<T>::Set(state, -1);
   Type<T>::BuildMetaTable(state, -1);

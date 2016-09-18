@@ -10,14 +10,14 @@ namespace internal {
 
 namespace {
 
-const char* kPointerWrapperTableName = "yue.internal.pointerwrappertable";
+const char* kRefPtrWrapperTableName = "yue.internal.refptrwrappertable";
 
 }  // namespace
 
 // static
-bool PointerWrapperBase::Push(State* state, void* ptr) {
+bool RefPtrWrapperBase::Push(State* state, void* ptr) {
   int top = GetTop(state);
-  luaL_getmetatable(state, kPointerWrapperTableName);
+  luaL_getmetatable(state, kRefPtrWrapperTableName);
   if (GetType(state, -1) != LuaType::Table) {
     SetTop(state, top);
     return false;
@@ -31,10 +31,10 @@ bool PointerWrapperBase::Push(State* state, void* ptr) {
   return true;
 }
 
-PointerWrapperBase::PointerWrapperBase(State* state, void* ptr) {
+RefPtrWrapperBase::RefPtrWrapperBase(State* state, void* ptr) {
   DCHECK_EQ(GetType(state, -1), LuaType::UserData);
   StackAutoReset reset(state);
-  PushWeakTable(state, kPointerWrapperTableName, "v");
+  PushWeakTable(state, kRefPtrWrapperTableName, "v");
   RawSet(state, -1, LightUserData(ptr), ValueOnStack(state, -2));
 }
 

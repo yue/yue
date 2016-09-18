@@ -5,13 +5,20 @@
 #ifndef LUA_METATABLE_H_
 #define LUA_METATABLE_H_
 
+#include <type_traits>
+
 #include "lua/metatable_internal.h"
 
 namespace lua {
 
 // Generate metatable for native classes.
+template<typename T, typename Enable = void>
+struct MetaTable;
+
+// Create metatble for RefCounted classes.
 template<typename T>
-struct MetaTable {
+struct MetaTable<T, typename std::enable_if<std::is_base_of<
+                        base::subtle::RefCountedBase, T>::value>::type> {
   // Create the metatable for T and push it on stack.
   static void Push(State* state) {
     internal::InheritanceChain<T>::Push(state);
@@ -29,10 +36,10 @@ struct MetaTable {
 
   // Create a new lua wrapper for T.
   static void PushNewWrapper(State* state, T* instance) {
-    void* memory = lua_newuserdata(state, sizeof(internal::PointerWrapper<T>));
-    new(memory) internal::PointerWrapper<T>(state, instance);
-    static_assert(std::is_standard_layout<internal::PointerWrapper<T>>::value,
-                  "The internal::PointerWrapper<T> must be standard layout");
+    void* memory = lua_newuserdata(state, sizeof(internal::RefPtrWrapper<T>));
+    new(memory) internal::RefPtrWrapper<T>(state, instance);
+    static_assert(std::is_standard_layout<internal::RefPtrWrapper<T>>::value,
+                  "The internal::RefPtrWrapper<T> must be standard layout");
     luaL_getmetatable(state, Type<T>::name);
     DCHECK_EQ(lua::GetType(state, -1), lua::LuaType::Table)
         << "The class must be created before creating the instance";
@@ -54,22 +61,22 @@ struct MetaTable {
 
 // The default type information for RefCounted class.
 template<typename T>
-struct Type<T*, typename std::enable_if<std::is_convertible<
-                    T*, base::subtle::RefCountedBase*>::value>::type> {
+struct Type<T*, typename std::enable_if<std::is_base_of<
+                    base::subtle::RefCountedBase, T>::value>::type> {
   static constexpr const char* name = Type<T>::name;
   static bool To(State* state, int index, T** out) {
     index = AbsIndex(state, index);
     StackAutoReset reset(state);
     // Verify the type and length.
     if (GetType(state, index) != lua::LuaType::UserData ||
-        RawLen(state, index) != sizeof(internal::PointerWrapper<T>) ||
+        RawLen(state, index) != sizeof(internal::RefPtrWrapper<T>) ||
         !GetMetaTable(state, index))
       return false;
     // Verify fine the inheritance chain.
     if (!MetaTable<T>::IsBaseOf(state))
       return false;
     // Convert pointer to actual class.
-    auto* wrapper = static_cast<internal::PointerWrapper<T>*>(
+    auto* wrapper = static_cast<internal::RefPtrWrapper<T>*>(
         lua_touserdata(state, index));
     *out = wrapper->get();
     return true;
@@ -77,7 +84,7 @@ struct Type<T*, typename std::enable_if<std::is_convertible<
   static inline void Push(State* state, T* ptr) {
     if (!ptr)
       lua::Push(state, nullptr);
-    else if (!internal::PointerWrapperBase::Push(state, ptr))
+    else if (!internal::RefPtrWrapperBase::Push(state, ptr))
       MetaTable<T>::PushNewWrapper(state, ptr);
   }
 };
