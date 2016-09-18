@@ -26,7 +26,7 @@ void View::TakeOverView(NativeView view) {
 }
 
 void View::SetBounds(const RectF& bounds) {
-  return SetPixelBounds(ToEnclosedRect(bounds));
+  return SetPixelBounds(ToEnclosingRect(bounds));
 }
 
 RectF View::GetBounds() const {

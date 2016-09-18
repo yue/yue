@@ -8,7 +8,7 @@
 class ViewTest : public testing::Test {
  protected:
   void SetUp() override {
-    view_ = new nu::Label;
+    view_ = new nu::Label("some text");
   }
 
   nu::State state_;

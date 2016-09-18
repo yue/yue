@@ -199,7 +199,7 @@ void Window::PlatformSetContentView(Container* container) {
 
 void Window::SetContentBounds(const RectF& bounds) {
   TopLevelWindow* win = static_cast<TopLevelWindow*>(window_);
-  Rect pixel_bounds(ToEnclosedRect(ScaleRect(bounds, win->scale_factor())));
+  Rect pixel_bounds(ToEnclosingRect(ScaleRect(bounds, win->scale_factor())));
   win->SetPixelBounds(ContentToWindowBounds(win, pixel_bounds));
 }
 
@@ -211,7 +211,7 @@ RectF Window::GetContentBounds() const {
 
 void Window::SetBounds(const RectF& bounds) {
   TopLevelWindow* win = static_cast<TopLevelWindow*>(window_);
-  win->SetPixelBounds(ToEnclosedRect(ScaleRect(bounds, win->scale_factor())));
+  win->SetPixelBounds(ToEnclosingRect(ScaleRect(bounds, win->scale_factor())));
 }
 
 RectF Window::GetBounds() const {
