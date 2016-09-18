@@ -71,12 +71,12 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
   // Called by subclasses to take the ownership of |view|.
   void TakeOverView(NativeView view);
 
- private:
-  friend class base::RefCounted<View>;
-
   void PlatformInit();
   void PlatformDestroy();
   void PlatformSetVisible(bool visible);
+
+ private:
+  friend class base::RefCounted<View>;
 
   // Relationships.
   View* parent_ = nullptr;

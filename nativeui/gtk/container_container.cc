@@ -56,19 +56,17 @@ static void nu_container_realize(GtkWidget* widget) {
 static void nu_container_get_preferred_width(GtkWidget* widget,
                                              gint* minimum,
                                              gint* natural) {
-  Container* delegate = static_cast<Container*>(
-      g_object_get_data(G_OBJECT(widget), "delegate"));
+  // We are not using GTK's layout system, so just return 0.
   *minimum = 0;
-  *natural = delegate->preferred_size().width();
+  *natural = 0;
 }
 
 static void nu_container_get_preferred_height(GtkWidget* widget,
                                               gint* minimum,
                                               gint* natural) {
-  Container* delegate = static_cast<Container*>(
-      g_object_get_data(G_OBJECT(widget), "delegate"));
+  // We are not using GTK's layout system, so just return 0.
   *minimum = 0;
-  *natural = delegate->preferred_size().height();
+  *natural = 0;
 }
 
 static void nu_container_size_allocate(GtkWidget* widget,

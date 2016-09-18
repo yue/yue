@@ -5,6 +5,7 @@
 #include "nativeui/view.h"
 
 #include "nativeui/container.h"
+#include "nativeui/gfx/geometry/rect_conversions.h"
 
 namespace nu {
 
@@ -24,7 +25,15 @@ void View::TakeOverView(NativeView view) {
   }
 }
 
-void View::SetBounds(const Rect& bounds) {
+void View::SetBounds(const RectF& bounds) {
+  return SetPixelBounds(ToEnclosedRect(bounds));
+}
+
+RectF View::GetBounds() const {
+  return RectF(GetPixelBounds());
+}
+
+void View::SetPixelBounds(const Rect& bounds) {
   GdkRectangle rect = bounds.ToGdkRectangle();
   if (parent()) {
     // The size allocation is relative to the window instead of parent.
@@ -36,7 +45,7 @@ void View::SetBounds(const Rect& bounds) {
   gtk_widget_size_allocate(view_, &rect);
 }
 
-Rect View::GetBounds() const {
+Rect View::GetPixelBounds() const {
   GdkRectangle rect;
   gtk_widget_get_allocation(view_, &rect);
   if (parent()) {
@@ -52,14 +61,6 @@ Rect View::GetBounds() const {
   if (bounds == Rect(-1, -1, 1, 1) || bounds == Rect(0, 0, 1, 1))
     return Rect();
   return bounds;
-}
-
-void View::SetPixelBounds(const Rect& bounds) {
-  SetBounds(bounds);
-}
-
-Rect View::GetPixelBounds() const {
-  return GetBounds();
 }
 
 void View::PlatformSetVisible(bool visible) {

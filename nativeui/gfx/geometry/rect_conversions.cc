@@ -83,11 +83,4 @@ bool IsNearestRectWithinDistance(const RectF& rect, float distance) {
       (std::abs(max_y - float_max_y) < distance);
 }
 
-Rect ToFlooredRectDeprecated(const RectF& rect) {
-  return Rect(ToFlooredInt(rect.x()),
-              ToFlooredInt(rect.y()),
-              ToFlooredInt(rect.width()),
-              ToFlooredInt(rect.height()));
-}
-
 }  // namespace nu

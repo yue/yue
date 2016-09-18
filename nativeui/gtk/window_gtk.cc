@@ -63,26 +63,26 @@ void Window::PlatformSetContentView(Container* container) {
   ForceSizeAllocation(window_, container->view());
 }
 
-void Window::SetContentBounds(const Rect& bounds) {
+void Window::SetContentBounds(const RectF& bounds) {
   SetBounds(bounds);
 }
 
-Rect Window::GetContentBounds() const {
+RectF Window::GetContentBounds() const {
   return GetBounds();
 }
 
-void Window::SetBounds(const Rect& bounds) {
+void Window::SetBounds(const RectF& bounds) {
   gtk_window_move(window_, bounds.x(), bounds.y());
   gtk_window_resize(window_, bounds.width(), bounds.height());
 
   ForceSizeAllocation(window_, GetContentView()->view());
 }
 
-Rect Window::GetBounds() const {
+RectF Window::GetBounds() const {
   int x, y, width, height;
   gtk_window_get_position(window_, &x, &y);
   gtk_window_get_size(window_, &width, &height);
-  return Rect(x, y, width, height);
+  return RectF(x, y, width, height);
 }
 
 void Window::SetVisible(bool visible) {

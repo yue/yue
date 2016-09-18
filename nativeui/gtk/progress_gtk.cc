@@ -23,7 +23,7 @@ void OnTimer(Progress* progress) {
 
 Progress::Progress() {
   TakeOverView(gtk_progress_bar_new());
-  SetDefaultStyle(GetPreferredSizeForWidget(view()));
+  SetDefaultStyle(SizeF(GetPreferredSizeForWidget(view())));
 }
 
 Progress::~Progress() {

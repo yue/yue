@@ -45,12 +45,12 @@ void Scroll::PlatformSetContentView(Container* container) {
   child = container->view();
   gtk_container_add(GTK_CONTAINER(viewport), child);
 
-  Rect bounds = container->GetBounds();
+  Rect bounds = container->GetPixelBounds();
   gtk_widget_set_size_request(child, bounds.width(), bounds.height());
 }
 
-void Scroll::SetContentSize(const Size& size) {
-  GetContentView()->SetBounds(Rect(size));
+void Scroll::SetContentSize(const SizeF& size) {
+  GetContentView()->SetBounds(RectF(size));
   // Viewport calculates the content view according to child's size request.
   gtk_widget_set_size_request(GetContentView()->view(),
                               size.width(), size.height());

@@ -24,7 +24,7 @@ Button::Button(const std::string& title, Type type) {
   else if (type == Radio)
     TakeOverView(gtk_radio_button_new_with_label(nullptr, title.c_str()));
 
-  SetDefaultStyle(GetPreferredSizeForWidget(view()));
+  SetDefaultStyle(SizeF(GetPreferredSizeForWidget(view())));
   g_signal_connect(view(), "clicked", G_CALLBACK(OnClick), this);
 }
 
@@ -33,7 +33,7 @@ Button::~Button() {
 
 void Button::SetTitle(const std::string& title) {
   gtk_button_set_label(GTK_BUTTON(view()), title.c_str());
-  SetDefaultStyle(GetPreferredSizeForWidget(view()));
+  SetDefaultStyle(SizeF(GetPreferredSizeForWidget(view())));
 }
 
 std::string Button::GetTitle() const {
