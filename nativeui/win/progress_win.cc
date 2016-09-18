@@ -22,7 +22,8 @@ class ProgressView : public SubwinView {
 
 Progress::Progress() {
   TakeOverView(new ProgressView());
-  SetPixelPreferredSize(Size(DIPToPixel(100), GetSystemMetrics(SM_CYVSCROLL)));
+  SetDefaultStyle(ScaleSize(SizeF(0, GetSystemMetrics(SM_CYVSCROLL)),
+                            1.0f / view()->scale_factor()));
 }
 
 Progress::~Progress() {

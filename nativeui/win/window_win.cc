@@ -6,6 +6,7 @@
 
 #include <memory>
 
+#include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/gfx/painter.h"
 #include "nativeui/gfx/win/double_buffer.h"
 #include "nativeui/win/subwin_view.h"
@@ -196,27 +197,26 @@ void Window::PlatformSetContentView(Container* container) {
   container->Layout();
 }
 
-void Window::SetContentBounds(const Rect& bounds) {
+void Window::SetContentBounds(const RectF& bounds) {
   TopLevelWindow* win = static_cast<TopLevelWindow*>(window_);
-  Rect pixel_bounds(ScaleToEnclosingRect(bounds, win->scale_factor()));
+  Rect pixel_bounds(ToEnclosedRect(ScaleRect(bounds, win->scale_factor())));
   win->SetPixelBounds(ContentToWindowBounds(win, pixel_bounds));
 }
 
-Rect Window::GetContentBounds() const {
+RectF Window::GetContentBounds() const {
   TopLevelWindow* win = static_cast<TopLevelWindow*>(window_);
-  return ScaleToEnclosingRect(win->GetContentPixelBounds(),
-                              1.0f / win->scale_factor());
+  return ScaleRect(RectF(win->GetContentPixelBounds()),
+                   1.0f / win->scale_factor());
 }
 
-void Window::SetBounds(const Rect& bounds) {
+void Window::SetBounds(const RectF& bounds) {
   TopLevelWindow* win = static_cast<TopLevelWindow*>(window_);
-  win->SetPixelBounds(ScaleToEnclosingRect(bounds, win->scale_factor()));
+  win->SetPixelBounds(ToEnclosedRect(ScaleRect(bounds, win->scale_factor())));
 }
 
-Rect Window::GetBounds() const {
+RectF Window::GetBounds() const {
   TopLevelWindow* win = static_cast<TopLevelWindow*>(window_);
-  return ScaleToEnclosingRect(win->GetPixelBounds(),
-                              1.0f / win->scale_factor());
+  return ScaleRect(RectF(win->GetPixelBounds()), 1.0f / win->scale_factor());
 }
 
 void Window::SetVisible(bool visible) {

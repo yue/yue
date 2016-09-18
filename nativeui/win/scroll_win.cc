@@ -6,6 +6,7 @@
 
 #include <tuple>
 
+#include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/win/scroll_bar/scroll_bar.h"
 
 namespace nu {
@@ -188,9 +189,9 @@ void Scroll::PlatformSetContentView(Container* container) {
   scroll->SetContentSize(container->view()->size_allocation().size());
 }
 
-void Scroll::SetContentSize(const Size& size) {
+void Scroll::SetContentSize(const SizeF& size) {
   auto* scroll = static_cast<ScrollView*>(view());
-  scroll->SetContentSize(ScaleToCeiledSize(size, scroll->scale_factor()));
+  scroll->SetContentSize(ToCeiledSize(ScaleSize(size, scroll->scale_factor())));
 }
 
 void Scroll::SetScrollBarPolicy(Policy h_policy, Policy v_policy) {

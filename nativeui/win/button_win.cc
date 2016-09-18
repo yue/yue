@@ -48,8 +48,9 @@ class ButtonView : public BaseView {
   }
 
   Size GetPreferredSize() const {
-    int padding = delegate_->DIPToPixel(
-        type() == ControlType::Button ? kButtonPadding : kCheckBoxPadding);
+    int padding = std::ceil(
+        (type() == ControlType::Button ? kButtonPadding : kCheckBoxPadding) *
+        scale_factor());
     Size preferred_size(text_size_);
     preferred_size.Enlarge(box_size_.width() + padding * 2, padding * 2);
     return preferred_size;
@@ -135,7 +136,7 @@ class ButtonView : public BaseView {
     HDC dc = painter->GetHDC();
 
     Size size = size_allocation().size();
-    Size preferred_size = preferred_size();
+    Size preferred_size = GetPreferredSize();
 
     // Draw the button background
     if (type() == ControlType::Button)
@@ -162,10 +163,10 @@ class ButtonView : public BaseView {
       RECT rect;
       if (type() == ControlType::Button) {
         Rect bounds = Rect(size) + painter->origin();
-        bounds.Inset(Insets(delegate_->DIPToPixel(1)));
+        bounds.Inset(Insets(std::ceil(1 * scale_factor())));
         rect = bounds.ToRECT();
       } else {
-        int padding = delegate_->DIPToPixel(kCheckBoxPadding);
+        int padding = std::ceil(kCheckBoxPadding * scale_factor());
         box_origin.Offset(box_size_.width() + padding, padding);
         Size ring_size = preferred_size;
         ring_size.Enlarge(-box_size_.width() - padding * 2, -padding * 2);
@@ -177,8 +178,9 @@ class ButtonView : public BaseView {
     painter->ReleaseHDC(dc);
 
     // The text.
-    int padding = delegate_->DIPToPixel(
-        type() == ControlType::Button ? kButtonPadding : kCheckBoxPadding);
+    int padding = std::ceil(
+        (type() == ControlType::Button ? kButtonPadding : kCheckBoxPadding) *
+        scale_factor());
     Rect text_bounds(origin, preferred_size);
     text_bounds.Inset(box_size_.width() + padding, padding, padding, padding);
     painter->DrawString(title_, font_, color_, text_bounds);
@@ -226,7 +228,8 @@ void Button::SetTitle(const std::string& title) {
   base::string16 wtitle = base::UTF8ToUTF16(title);
   button->SetTitle(wtitle);
 
-  SetPixelPreferredSize(button->GetPreferredSize());
+  SetDefaultStyle(ScaleSize(SizeF(button->GetPreferredSize()),
+                            1.0f / view()->scale_factor()));
   button->Invalidate();
 }
 

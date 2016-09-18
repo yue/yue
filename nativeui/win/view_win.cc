@@ -4,6 +4,7 @@
 
 #include "nativeui/view.h"
 
+#include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/win/base_view.h"
 
 namespace nu {
@@ -16,12 +17,12 @@ void View::TakeOverView(NativeView view) {
   view_ = view;
 }
 
-void View::SetBounds(const Rect& bounds) {
-  SetPixelBounds(ScaleToEnclosingRect(bounds, view()->scale_factor()));
+void View::SetBounds(const RectF& bounds) {
+  SetPixelBounds(ToEnclosedRect(ScaleRect(bounds, view()->scale_factor())));
 }
 
-Rect View::GetBounds() const {
-  return ScaleToEnclosingRect(GetPixelBounds(), 1.0f / view()->scale_factor());
+RectF View::GetBounds() const {
+  return ScaleRect(RectF(GetPixelBounds()), 1.0f / view()->scale_factor());
 }
 
 void View::SetPixelBounds(const Rect& bounds) {

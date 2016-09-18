@@ -15,8 +15,7 @@ namespace nu {
 
 namespace {
 
-const int kEntryPadding = 2;
-const int kEntryWidth = 100;
+const int kEntryPadding = 1;
 
 class EntryView : public SubwinView {
  public:
@@ -71,10 +70,9 @@ class EntryView : public SubwinView {
 Entry::Entry() {
   TakeOverView(new EntryView(this));
 
-  // Windows doesn't have preferred size for entry, so just add some padding.
-  Size text_size = ToCeiledSize(MeasureText(view(), Font(), L"some text"));
-  int height = text_size.height() + DIPToPixel(kEntryPadding);
-  SetPixelPreferredSize(Size(DIPToPixel(kEntryWidth), height));
+  float height = MeasureText(view(), Font(), L"some text").height() +
+                 2 * kEntryPadding * view()->scale_factor();
+  SetDefaultStyle(ScaleSize(SizeF(0, height), 1.0f / view()->scale_factor()));
 }
 
 Entry::~Entry() {
