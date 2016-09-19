@@ -11,12 +11,13 @@
 
 namespace nu {
 
-PainterWin::PainterState::PainterState(const Vector2d& origin,
+PainterWin::PainterState::PainterState(const Vector2dF& origin,
                                        Gdiplus::GraphicsContainer&& container)
     : origin(origin), container(container) {
 }
 
-PainterWin::PainterWin(HDC dc) : graphics_(dc) {
+PainterWin::PainterWin(HDC dc, float scale_factor)
+    : scale_factor_(scale_factor), graphics_(dc) {
 }
 
 PainterWin::~PainterWin() {
@@ -50,7 +51,36 @@ void PainterWin::Restore() {
   states_.pop();
 }
 
-void PainterWin::ClipRect(const Rect& rect, CombineMode mode) {
+void PainterWin::ClipRect(const RectF& rect, CombineMode mode) {
+  ClipPixelRect(ScaleRect(rect, scale_factor_), mode);
+}
+
+void PainterWin::Translate(const Vector2dF& offset) {
+  TranslatePixel(ScaleVector2d(offset, scale_factor_));
+}
+
+void PainterWin::DrawRect(const RectF& rect, Color color) {
+  DrawPixelRect(ScaleRect(rect, scale_factor_), color);
+}
+
+void PainterWin::DrawRect(const RectF& rect, Pen* pen) {
+  DrawPixelRect(ScaleRect(rect, scale_factor_), pen);
+}
+
+void PainterWin::FillRect(const RectF& rect, Color color) {
+  FillPixelRect(ScaleRect(rect, scale_factor_), color);
+}
+
+void PainterWin::DrawStringWithFlags(const String& text,
+                                     Font font,
+                                     Color color,
+                                     const RectF& rect,
+                                     int flags) {
+  DrawPixelStringWithFlags(text, font, color, ScaleRect(rect, scale_factor_),
+                           flags);
+}
+
+void PainterWin::ClipPixelRect(const RectF& rect, CombineMode mode) {
   Gdiplus::CombineMode cm;
   switch (mode) {
     case CombineMode::Replace   : cm = Gdiplus::CombineModeReplace;   break;
@@ -62,30 +92,30 @@ void PainterWin::ClipRect(const Rect& rect, CombineMode mode) {
   graphics_.SetClip(ToGdi(rect + origin()), cm);
 }
 
-void PainterWin::Translate(const Vector2d& offset) {
+void PainterWin::TranslatePixel(const Vector2dF& offset) {
   origin() += offset;
 }
 
-void PainterWin::DrawRect(const Rect& rect, Color color) {
+void PainterWin::DrawPixelRect(const RectF& rect, Color color) {
   Gdiplus::Pen pen(ToGdi(color));
   graphics_.DrawRectangle(&pen, ToGdi(rect + origin()));
 }
 
-void PainterWin::DrawRect(const Rect& rect, Pen* pen) {
+void PainterWin::DrawPixelRect(const RectF& rect, Pen* pen) {
   graphics_.DrawRectangle(static_cast<PenWin*>(pen)->pen(),
                           ToGdi(rect + origin()));
 }
 
-void PainterWin::FillRect(const Rect& rect, Color color) {
+void PainterWin::FillPixelRect(const RectF& rect, Color color) {
   Gdiplus::SolidBrush brush(ToGdi(color));
   graphics_.FillRectangle(&brush, ToGdi(rect + origin()));
 }
 
-void PainterWin::DrawStringWithFlags(const String& text,
-                                     Font font,
-                                     Color color,
-                                     const Rect& rect,
-                                     int flags) {
+void PainterWin::DrawPixelStringWithFlags(const String& text,
+                                          Font font,
+                                          Color color,
+                                          const RectF& rect,
+                                          int flags) {
   Gdiplus::SolidBrush brush(ToGdi(color));
   Gdiplus::StringFormat format;
   format.SetLineAlignment(Gdiplus::StringAlignmentCenter);
@@ -101,8 +131,8 @@ void PainterWin::DrawStringWithFlags(const String& text,
 }
 
 // static
-std::unique_ptr<Painter> Painter::CreateFromHDC(HDC dc) {
-  return std::unique_ptr<Painter>(new PainterWin(dc));
+std::unique_ptr<Painter> Painter::CreateFromHDC(HDC dc, float scale_factor) {
+  return std::unique_ptr<Painter>(new PainterWin(dc, scale_factor));
 }
 
 }  // namespace nu

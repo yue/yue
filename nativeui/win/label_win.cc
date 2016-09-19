@@ -30,9 +30,9 @@ class LabelView : public BaseView {
 
   // BaseView:
   void Draw(PainterWin* painter, const Rect& dirty) override {
-    painter->DrawStringWithFlags(text_, font_, color_,
-                                 Rect(size_allocation().size()),
-                                 Painter::TextAlignCenter);
+    painter->DrawPixelStringWithFlags(text_, font_, color_,
+                                      RectF(SizeF(size_allocation().size())),
+                                      Painter::TextAlignCenter);
   }
 
   Font font() const { return font_; }

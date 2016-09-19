@@ -148,12 +148,13 @@ void TopLevelWindow::OnPaint(HDC) {
     DoubleBuffer buffer(dc, bounds.size(), dirty, dirty.origin());
 
     // Background.
-    std::unique_ptr<Painter> painter = Painter::CreateFromHDC(buffer.dc());
-    painter->FillRect(dirty, Color(255, 255, 255));
+    std::unique_ptr<Painter> painter_win =
+        Painter::CreateFromHDC(buffer.dc(), scale_factor());
+    auto* painter = static_cast<PainterWin*>(painter_win.get());
+    painter->FillPixelRect(RectF(dirty), Color(255, 255, 255));
 
     // Draw.
-    delegate_->GetContentView()->view()->Draw(
-        static_cast<PainterWin*>(painter.get()), dirty);
+    delegate_->GetContentView()->view()->Draw(painter, dirty);
   }
 
   EndPaint(hwnd(), &ps);

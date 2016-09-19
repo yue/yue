@@ -4,6 +4,7 @@
 
 #include "nativeui/win/scroll_bar/scroll_bar_button.h"
 
+#include "nativeui/gfx/geometry/vector2d_conversions.h"
 #include "nativeui/state.h"
 #include "nativeui/win/scroll_bar/scroll_bar.h"
 
@@ -48,7 +49,8 @@ void ScrollBarButton::Draw(PainterWin* painter, const Rect& dirty) {
   HDC dc = painter->GetHDC();
   theme_->PaintScrollbarArrow(
       dc, static_cast<int>(type_), state(),
-      Rect(size_allocation().size()) + painter->origin(), params_);
+      Rect(size_allocation().size()) + ToCeiledVector2d(painter->origin()),
+      params_);
   painter->ReleaseHDC(dc);
 }
 

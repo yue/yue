@@ -6,6 +6,7 @@
 
 #include <algorithm>
 
+#include "nativeui/gfx/geometry/vector2d_conversions.h"
 #include "nativeui/state.h"
 
 namespace nu {
@@ -156,8 +157,9 @@ void ScrollBarView::Draw(PainterWin* painter, const Rect& dirty) {
     Rect track_area(vertical_ ? 0 : box_size, vertical_ ? box_size : 0,
                     vertical_ ? box_size : track_size,
                     vertical_ ? track_size : box_size);
-    theme_->PaintScrollbarTrack(dc, vertical_, state(),
-                                track_area + painter->origin(), params_);
+    theme_->PaintScrollbarTrack(
+        dc, vertical_, state(),
+        track_area + ToCeiledVector2d(painter->origin()), params_);
     painter->ReleaseHDC(dc);
   }
 

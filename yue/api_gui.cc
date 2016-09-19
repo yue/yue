@@ -13,7 +13,7 @@ namespace lua {
 
 template<>
 struct Type<nu::SizeF> {
-  static constexpr const char* name = "yue.SizeF";
+  static constexpr const char* name = "yue.Size";
   static inline void Push(State* state, const nu::SizeF& size) {
     lua::PushNewTable(state);
     lua::RawSet(state, -1, "width", size.width(), "height", size.height());
@@ -21,7 +21,7 @@ struct Type<nu::SizeF> {
   static inline bool To(State* state, int index, nu::SizeF* out) {
     if (GetType(state, index) != LuaType::Table)
       return false;
-    int width, height;
+    float width, height;
     if (!RawGetAndPop(state, index, "width", &width, "height", &height))
       return false;
     *out = nu::SizeF(width, height);
@@ -31,7 +31,7 @@ struct Type<nu::SizeF> {
 
 template<>
 struct Type<nu::RectF> {
-  static constexpr const char* name = "yue.RectF";
+  static constexpr const char* name = "yue.Rect";
   static inline void Push(State* state, const nu::RectF& rect) {
     lua::PushNewTable(state);
     lua::RawSet(state, -1,

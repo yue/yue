@@ -4,6 +4,7 @@
 
 #include "nativeui/win/scroll_bar/scroll_bar_thumb.h"
 
+#include "nativeui/gfx/geometry/vector2d_conversions.h"
 #include "nativeui/state.h"
 #include "nativeui/win/scroll_bar/scroll_bar.h"
 #include "nativeui/win/window_win.h"
@@ -75,7 +76,8 @@ void ScrollBarThumb::Draw(PainterWin* painter, const Rect& dirty) {
   HDC dc = painter->GetHDC();
   theme_->PaintScrollbarThumb(
       dc, vertical_, state(),
-      Rect(size_allocation().size()) + painter->origin(), params_);
+      Rect(size_allocation().size()) + ToCeiledVector2d(painter->origin()),
+      params_);
   painter->ReleaseHDC(dc);
 }
 

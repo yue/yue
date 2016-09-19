@@ -10,6 +10,7 @@
 #include "nativeui/container.h"
 #include "nativeui/gfx/geometry/insets.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
+#include "nativeui/gfx/geometry/vector2d_conversions.h"
 #include "nativeui/gfx/win/text_win.h"
 #include "nativeui/state.h"
 #include "nativeui/win/base_view.h"
@@ -40,18 +41,18 @@ class ButtonView : public BaseView {
 
   void SetTitle(const base::string16& title) {
     title_ = title;
-    text_size_ = ToCeiledSize(MeasureText(this, font_, title_));
+    text_size_ = MeasureText(this, font_, title_);
   }
 
   base::string16 GetTitle() const {
     return title_;
   }
 
-  Size GetPreferredSize() const {
-    int padding = std::ceil(
+  SizeF GetPreferredSize() const {
+    float padding =
         (type() == ControlType::Button ? kButtonPadding : kCheckBoxPadding) *
-        scale_factor());
-    Size preferred_size(text_size_);
+        scale_factor();
+    SizeF preferred_size(text_size_);
     preferred_size.Enlarge(box_size_.width() + padding * 2, padding * 2);
     return preferred_size;
   }
@@ -134,13 +135,14 @@ class ButtonView : public BaseView {
 
   void Draw(PainterWin* painter, const Rect& dirty) override {
     Size size = size_allocation().size();
-    Size preferred_size = GetPreferredSize();
+    Size preferred_size = ToCeiledSize(GetPreferredSize());
 
     HDC dc = painter->GetHDC();
 
     // Draw the button background
     if (type() == ControlType::Button)
-      theme_->PaintPushButton(dc, state(), Rect(size) + painter->origin(),
+      theme_->PaintPushButton(dc, state(),
+                              Rect(size) + ToCeiledVector2d(painter->origin()),
                               params_);
 
     // Checkbox and radio are left aligned.
@@ -153,7 +155,7 @@ class ButtonView : public BaseView {
     }
 
     // Draw the box.
-    Point box_origin = origin + painter->origin();
+    Point box_origin = origin + ToCeiledVector2d(painter->origin());
     box_origin.Offset(0, (preferred_size.height() - box_size_.height()) / 2);
     if (type() == ControlType::CheckBox)
       theme_->PaintCheckBox(dc, state(), Rect(box_origin, box_size_), params_);
@@ -171,11 +173,11 @@ class ButtonView : public BaseView {
     if (IsFocused()) {
       RECT rect;
       if (type() == ControlType::Button) {
-        Rect bounds = Rect(size) + painter->origin();
+        Rect bounds = Rect(size) + ToCeiledVector2d(painter->origin());
         bounds.Inset(Insets(std::ceil(1 * scale_factor())));
         rect = bounds.ToRECT();
       } else {
-        Rect bounds = text_bounds + painter->origin();
+        Rect bounds = text_bounds + ToCeiledVector2d(painter->origin());
         bounds.Inset(Insets(padding));
         rect = bounds.ToRECT();
       }
@@ -185,7 +187,8 @@ class ButtonView : public BaseView {
     painter->ReleaseHDC(dc);
 
     // The text.
-    painter->DrawString(title_, font_, color_, text_bounds);
+    painter->DrawPixelStringWithFlags(title_, font_, color_, RectF(text_bounds),
+                                      Painter::TextAlignCenter);
   }
 
   NativeTheme::ButtonExtraParams* params() { return &params_; }
@@ -199,7 +202,7 @@ class ButtonView : public BaseView {
   Size box_size_;
 
   // The size of text.
-  Size text_size_;
+  SizeF text_size_;
 
   // Default text color and font.
   Color color_;
@@ -230,7 +233,7 @@ void Button::SetTitle(const std::string& title) {
   base::string16 wtitle = base::UTF8ToUTF16(title);
   button->SetTitle(wtitle);
 
-  SetDefaultStyle(ScaleSize(SizeF(button->GetPreferredSize()),
+  SetDefaultStyle(ScaleSize(button->GetPreferredSize(),
                             1.0f / view()->scale_factor()));
   button->Invalidate();
 }

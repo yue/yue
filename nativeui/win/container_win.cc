@@ -89,7 +89,7 @@ void ContainerView::DrawChild(BaseView* child, PainterWin* painter,
   Vector2d child_origin = child->size_allocation().OffsetFromOrigin() -
                           size_allocation().OffsetFromOrigin();
   painter->Save();
-  painter->Translate(child_origin);
+  painter->TranslatePixel(child_origin);
   child->Draw(painter, child_dirty - child_origin);
   painter->Restore();
 }

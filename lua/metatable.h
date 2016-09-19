@@ -92,8 +92,8 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
 // Create metatable for classes that produce WeakPtr.
 template<typename T>
 struct MetaTable<T, typename std::enable_if<std::is_base_of<
-                        base::internal::WeakPtrBase,
-                        decltype(((T*)nullptr)->GetWeakPtr())>::value>::type> {
+    base::internal::WeakPtrBase,
+    decltype((reinterpret_cast<T*>(nullptr))->GetWeakPtr())>::value>::type> {
   static void Push(State* state) {
     internal::InheritanceChain<T>::Push(state);
   }
@@ -111,8 +111,8 @@ struct MetaTable<T, typename std::enable_if<std::is_base_of<
 // The default type information for WeakPtr class.
 template<typename T>
 struct Type<T*, typename std::enable_if<std::is_base_of<
-                    base::internal::WeakPtrBase,
-                    decltype(((T*)nullptr)->GetWeakPtr())>::value>::type> {
+    base::internal::WeakPtrBase,
+    decltype((reinterpret_cast<T*>(nullptr))->GetWeakPtr())>::value>::type> {
   static constexpr const char* name = Type<T>::name;
   static bool To(State* state, int index, T** out) {
     index = AbsIndex(state, index);

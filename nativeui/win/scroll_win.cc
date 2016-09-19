@@ -104,7 +104,8 @@ void ScrollView::Draw(PainterWin* painter, const Rect& dirty) {
     DrawChild(v_scrollbar_.get(), painter, dirty);
 
   // The scroll view must be clipped.
-  painter->ClipRect(GetViewportRect() - size_allocation().OffsetFromOrigin());
+  RectF clip(GetViewportRect() - size_allocation().OffsetFromOrigin());
+  painter->ClipPixelRect(clip, Painter::CombineMode::Replace);
   DrawChild(delegate_->GetContentView()->view(), painter, dirty);
 }
 
@@ -168,7 +169,7 @@ void ScrollView::DrawScrollBar(bool vertical, PainterWin* painter,
   if (!rect.Intersects(dirty))
     return;
   painter->Save();
-  painter->Translate(rect.OffsetFromOrigin());
+  painter->TranslatePixel(rect.OffsetFromOrigin());
   if (vertical)
     v_scrollbar_->Draw(painter, Rect(rect.size()));
   else

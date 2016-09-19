@@ -14,7 +14,7 @@ namespace nu {
 
 class PainterWin : public Painter {
  public:
-  explicit PainterWin(HDC dc);
+  PainterWin(HDC dc, float scale_factor);
   ~PainterWin() override;
 
   HDC GetHDC();
@@ -23,29 +23,41 @@ class PainterWin : public Painter {
   // Painter:
   void Save() override;
   void Restore() override;
-  void ClipRect(const Rect& rect,
+  void ClipRect(const RectF& rect,
                 CombineMode mode = CombineMode::Replace) override;
-  void Translate(const Vector2d& offset) override;
-  void DrawRect(const Rect& rect, Color color) override;
-  void DrawRect(const Rect& rect, Pen* pen) override;
-  void FillRect(const Rect& rect, Color color) override;
+  void Translate(const Vector2dF& offset) override;
+  void DrawRect(const RectF& rect, Color color) override;
+  void DrawRect(const RectF& rect, Pen* pen) override;
+  void FillRect(const RectF& rect, Color color) override;
   void DrawStringWithFlags(const String& text,
                            Font font,
                            Color color,
-                           const Rect& rect,
+                           const RectF& rect,
                            int flags) override;
 
+  // The pixel versions.
+  void ClipPixelRect(const RectF& rect, CombineMode mode);
+  void TranslatePixel(const Vector2dF& offset);
+  void DrawPixelRect(const RectF& rect, Color color);
+  void DrawPixelRect(const RectF& rect, Pen* pen);
+  void FillPixelRect(const RectF& rect, Color color);
+  void DrawPixelStringWithFlags(const String& text,
+                                Font font,
+                                Color color,
+                                const RectF& rect,
+                                int flags);
+
   // The translated origin of the painter.
-  Vector2d& origin() { return states_.empty() ? origin_
-                                              : states_.top().origin; }
+  Vector2dF& origin() { return states_.empty() ? origin_
+                                               : states_.top().origin; }
 
  private:
   // The saved state.
   struct PainterState {
-    PainterState(const Vector2d& origin,
+    PainterState(const Vector2dF& origin,
                  Gdiplus::GraphicsContainer&& container);
 
-    Vector2d origin;
+    Vector2dF origin;
     Gdiplus::GraphicsContainer container;
   };
 
@@ -53,8 +65,9 @@ class PainterWin : public Painter {
   std::stack<PainterState> states_;
 
   // The root origin.
-  Vector2d origin_;
+  Vector2dF origin_;
 
+  float scale_factor_;
   Gdiplus::Graphics graphics_;
 };
 

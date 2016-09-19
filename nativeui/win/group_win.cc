@@ -32,8 +32,8 @@ class GroupView : public ContainerView,
     title_ = title;
 
     // Update the rect of the title.
-    title_bounds_ = Rect(Point(kTitleLeftMargin * scale_factor(), 0),
-                         ToCeiledSize(MeasureText(this, font_, title_)));
+    title_bounds_ = RectF(PointF(kTitleLeftMargin * scale_factor(), 0),
+                          MeasureText(this, font_, title_));
   }
 
   base::string16 GetTitle() const {
@@ -60,27 +60,28 @@ class GroupView : public ContainerView,
   // BaseView:
   void Draw(PainterWin* painter, const Rect& dirty) override {
     // Draw title.
-    if (dirty.Intersects(title_bounds_))
-      painter->DrawString(title_, font_, color_, title_bounds_);
+    if (RectF(dirty).Intersects(title_bounds_))
+      painter->DrawPixelStringWithFlags(title_, font_, color_, title_bounds_,
+                                        Painter::TextAlignLeft);
 
     // Calculate the border bounds.
-    Rect drawing_bounds(size_allocation().size());
+    RectF drawing_bounds(SizeF(size_allocation().size()));
     Insets border = GetBorder();
-    Rect border_bounds(drawing_bounds);
+    RectF border_bounds(drawing_bounds);
     border_bounds.Inset(border.left() / 2, border.top() / 2,
                         border.right() / 2, border.bottom() / 2);
 
     // Draw border.
     painter->Save();
-    painter->ClipRect(drawing_bounds);
-    painter->ClipRect(title_bounds_, Painter::CombineMode::Exclude);
-    painter->DrawRect(border_bounds, Color(255, 170, 170, 170));
+    painter->ClipPixelRect(drawing_bounds, Painter::CombineMode::Replace);
+    painter->ClipPixelRect(title_bounds_, Painter::CombineMode::Exclude);
+    painter->DrawPixelRect(border_bounds, Color(255, 170, 170, 170));
     painter->Restore();
 
     // Draw child.
     Vector2d child_offset(border.left(), border.top());
     painter->Save();
-    painter->Translate(child_offset);
+    painter->TranslatePixel(child_offset);
     delegate_->GetContentView()->view()->Draw(painter, dirty - child_offset);
     painter->Restore();
   }
@@ -90,7 +91,7 @@ class GroupView : public ContainerView,
 
   Color color_;
   Font font_;
-  Rect title_bounds_;
+  RectF title_bounds_;
 
   base::string16 title_;
 };
