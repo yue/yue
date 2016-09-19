@@ -35,18 +35,6 @@ config("find_bad_constructs") {
       "-add-plugin",
       "-Xclang",
       "find-bad-constructs",
-      "-Xclang",
-      "-plugin-arg-find-bad-constructs",
-      "-Xclang",
-      "check-templates",
-      "-Xclang",
-      "-plugin-arg-find-bad-constructs",
-      "-Xclang",
-      "follow-macro-expansion",
-      "-Xclang",
-      "-plugin-arg-find-bad-constructs",
-      "-Xclang",
-      "check-implicit-copy-ctors",
     ]
 
     if ((is_linux || is_android) && !is_chromecast) {
