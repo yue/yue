@@ -93,7 +93,7 @@ bool ScrollView::OnMouseWheel(bool vertical, UINT flags, int delta,
   if (vertical)
     OnScroll(0, delta);
   else
-    OnScroll(delta, 0);
+    OnScroll(-delta, 0);
   return true;
 }
 
