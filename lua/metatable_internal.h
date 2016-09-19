@@ -8,32 +8,33 @@
 #include <string>
 
 #include "base/memory/ref_counted.h"
+#include "base/memory/weak_ptr.h"
 #include "lua/table.h"
 
 namespace lua {
 
 namespace internal {
 
-// Base of RefPtrWrapper that hides implementations.
-class RefPtrWrapperBase {
+// Base of wrapper classes that maps pointers to lua references.
+class WrapperBase {
  public:
   // Convert the class to Lua and push it on stack.
   static bool Push(State* state, void* ptr);
 
  protected:
-  RefPtrWrapperBase(State* state, void* ptr);
+  WrapperBase(State* state, void* ptr);
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(RefPtrWrapperBase);
+  DISALLOW_COPY_AND_ASSIGN(WrapperBase);
 };
 
 // The specialized Wrappable class for storing refcounted class.
 // We need to guareentee that RefPtrWrapper is standard layout, since we may
 // use convertions like RefPtrWrapper<Derive> to RefPtrWrapper<Base>.
 template<typename T>
-class RefPtrWrapper : public RefPtrWrapperBase {
+class RefPtrWrapper : public WrapperBase {
  public:
-  RefPtrWrapper(State* state, T* t) : RefPtrWrapperBase(state, t), ptr_(t) {
+  RefPtrWrapper(State* state, T* t) : WrapperBase(state, t), ptr_(t) {
     ptr_->AddRef();
   }
 
@@ -45,6 +46,36 @@ class RefPtrWrapper : public RefPtrWrapperBase {
 
  private:
   T* ptr_;
+};
+
+// The specialized Wrappable class for storing weakptr class.
+template<typename T>
+class WeakPtrWrapper : public WrapperBase {
+ public:
+  WeakPtrWrapper(State* state, base::WeakPtr<T> t)
+      : WrapperBase(state, t.get()), ptr_(t) {}
+
+  T* get() const { return ptr_.get(); }
+
+ private:
+  base::WeakPtr<T> ptr_;
+};
+
+// Find the correct GC function for each type.
+template<typename T, typename Enable = void>
+struct FindOnGC;
+
+template<typename T>
+struct FindOnGC<T, typename std::enable_if<std::is_base_of<
+                       base::subtle::RefCountedBase, T>::value>::type> {
+  using type = RefPtrWrapper<T>;
+};
+
+template<typename T>
+struct FindOnGC<T, typename std::enable_if<std::is_base_of<
+                       base::internal::WeakPtrBase,
+                       decltype(((T*)nullptr)->GetWeakPtr())>::value>::type> {
+  using type = WeakPtrWrapper<T>;
 };
 
 // The default __index handler which looks up in the metatable.
@@ -110,7 +141,7 @@ bool PushSingleTypeMetaTable(State* state) {
   if (luaL_newmetatable(state, Type<T>::name) == 0)
     return true;
 
-  RawSet(state, -1, "__gc", CFunction(&OnGC<RefPtrWrapper<T>>));
+  RawSet(state, -1, "__gc", CFunction(&OnGC<typename FindOnGC<T>::type>));
   Indexer<T>::Set(state, -1);
   NewIndexer<T>::Set(state, -1);
   Type<T>::BuildMetaTable(state, -1);

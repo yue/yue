@@ -15,7 +15,7 @@ namespace lua {
 template<typename T, typename Enable = void>
 struct MetaTable;
 
-// Create metatble for RefCounted classes.
+// Create metatable for RefCounted classes.
 template<typename T>
 struct MetaTable<T, typename std::enable_if<std::is_base_of<
                         base::subtle::RefCountedBase, T>::value>::type> {
@@ -84,7 +84,57 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
   static inline void Push(State* state, T* ptr) {
     if (!ptr)
       lua::Push(state, nullptr);
-    else if (!internal::RefPtrWrapperBase::Push(state, ptr))
+    else if (!internal::WrapperBase::Push(state, ptr))
+      MetaTable<T>::PushNewWrapper(state, ptr);
+  }
+};
+
+// Create metatable for classes that produce WeakPtr.
+template<typename T>
+struct MetaTable<T, typename std::enable_if<std::is_base_of<
+                        base::internal::WeakPtrBase,
+                        decltype(((T*)nullptr)->GetWeakPtr())>::value>::type> {
+  static void Push(State* state) {
+    internal::InheritanceChain<T>::Push(state);
+  }
+
+  static void PushNewWrapper(State* state, T* instance) {
+    void* memory = lua_newuserdata(state, sizeof(internal::WeakPtrWrapper<T>));
+    new(memory) internal::WeakPtrWrapper<T>(state, instance->GetWeakPtr());
+    luaL_getmetatable(state, Type<T>::name);
+    DCHECK_EQ(lua::GetType(state, -1), lua::LuaType::Table)
+        << "The class must be created before creating the instance";
+    SetMetaTable(state, -2);
+  }
+};
+
+// The default type information for WeakPtr class.
+template<typename T>
+struct Type<T*, typename std::enable_if<std::is_base_of<
+                    base::internal::WeakPtrBase,
+                    decltype(((T*)nullptr)->GetWeakPtr())>::value>::type> {
+  static constexpr const char* name = Type<T>::name;
+  static bool To(State* state, int index, T** out) {
+    index = AbsIndex(state, index);
+    StackAutoReset reset(state);
+    // Verify the type and length.
+    if (GetType(state, index) != lua::LuaType::UserData ||
+        RawLen(state, index) != sizeof(internal::WeakPtrWrapper<T>))
+      return false;
+    // Convert pointer to actual class.
+    auto* wrapper = static_cast<internal::WeakPtrWrapper<T>*>(
+        lua_touserdata(state, index));
+    T* ptr = wrapper->get();
+    // WeakPtr might be invalidated.
+    if (!ptr)
+      return false;
+    *out = ptr;
+    return true;
+  }
+  static inline void Push(State* state, T* ptr) {
+    if (!ptr)
+      lua::Push(state, nullptr);
+    else if (!internal::WrapperBase::Push(state, ptr))
       MetaTable<T>::PushNewWrapper(state, ptr);
   }
 };

@@ -518,3 +518,43 @@ TEST_F(MetaTableTest, NewIndex) {
   ASSERT_TRUE(lua::PGetAndPop(state_, -1, "property", &property));
   EXPECT_EQ(property, 123);
 }
+
+class TestWeakPtrClass {
+ public:
+  TestWeakPtrClass() : weak_factory_(this) {}
+  ~TestWeakPtrClass() {}
+
+  int Method() { return 123; }
+
+  base::WeakPtr<TestWeakPtrClass> GetWeakPtr() {
+    return weak_factory_.GetWeakPtr();
+  }
+
+ private:
+  base::WeakPtrFactory<TestWeakPtrClass> weak_factory_;
+};
+
+namespace lua {
+
+template<>
+struct Type<TestWeakPtrClass> {
+  static constexpr const char* name = "TestWeakPtrClass";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index, "method", &TestWeakPtrClass::Method);
+  }
+};
+
+}  // namespace lua
+
+TEST_F(MetaTableTest, WeakPtr) {
+  lua::MetaTable<TestWeakPtrClass>::Push(state_);
+  std::unique_ptr<TestWeakPtrClass> instance(new TestWeakPtrClass);
+
+  lua::Push(state_, instance.get());
+  TestWeakPtrClass* ptr;
+  ASSERT_TRUE(lua::To(state_, -1, &ptr));
+  EXPECT_EQ(ptr, instance.get());
+
+  instance.reset();
+  ASSERT_FALSE(lua::To(state_, -1, &ptr));
+}
