@@ -73,8 +73,8 @@ struct FindOnGC<T, typename std::enable_if<std::is_base_of<
 
 template<typename T>
 struct FindOnGC<T, typename std::enable_if<std::is_base_of<
-    base::internal::WeakPtrBase,
-    decltype((reinterpret_cast<T*>(nullptr))->GetWeakPtr())>::value>::type> {
+                       base::internal::WeakPtrBase,
+                       decltype(((T*)nullptr)->GetWeakPtr())>::value>::type> {
   using type = WeakPtrWrapper<T>;
 };
 
