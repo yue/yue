@@ -7,6 +7,7 @@
 
 #include <memory>
 
+#include "base/memory/weak_ptr.h"
 #include "nativeui/gfx/color.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/gfx/geometry/rect.h"
@@ -28,7 +29,7 @@ class Painter {
   static std::unique_ptr<Painter> CreateFromHDC(HDC dc);
 #endif
 
-  virtual ~Painter() = default;
+  virtual ~Painter();
 
   enum {
     // Specifies the alignment for text rendered with the DrawString method.
@@ -78,10 +79,14 @@ class Painter {
                                    const Rect& rect,
                                    int flags) = 0;
 
+  base::WeakPtr<Painter> GetWeakPtr() { return weak_factory_.GetWeakPtr(); }
+
  protected:
-  Painter() = default;
+  Painter();
 
  private:
+  base::WeakPtrFactory<Painter> weak_factory_;
+
   DISALLOW_COPY_AND_ASSIGN(Painter);
 };
 

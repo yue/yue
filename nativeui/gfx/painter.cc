@@ -8,6 +8,10 @@
 
 namespace nu {
 
+Painter::Painter() : weak_factory_(this) {}
+
+Painter::~Painter() {}
+
 void Painter::DrawString(const String& text, Font font, Color color,
                          const Rect& rect) {
   // We might want to support RTL in future.

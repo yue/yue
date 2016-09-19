@@ -8,6 +8,7 @@
 #include "nativeui/button.h"
 #include "nativeui/entry.h"
 #include "nativeui/gfx/geometry/insets.h"
+#include "nativeui/gfx/painter.h"
 #include "nativeui/group.h"
 #include "nativeui/label.h"
 #include "nativeui/progress.h"

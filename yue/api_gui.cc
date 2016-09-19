@@ -327,6 +327,16 @@ struct Type<nu::Window> {
   }
 };
 
+template<>
+struct Type<nu::Painter> {
+  static constexpr const char* name = "yue.Painter";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "save", &nu::Painter::Save,
+           "restore", &nu::Painter::Restore);
+  }
+};
+
 }  // namespace lua
 
 extern "C" int luaopen_yue_gui(lua::State* state) {
@@ -365,6 +375,9 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   lua_rawset(state, -3);
   lua::Push(state, "Scroll");
   lua::MetaTable<nu::Scroll>::Push(state);
+  lua_rawset(state, -3);
+  lua::Push(state, "Painter");
+  lua::MetaTable<nu::Painter>::Push(state);
   lua_rawset(state, -3);
   return 1;
 }
