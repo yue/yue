@@ -7,6 +7,8 @@
 
 #include <stdint.h>
 
+#include <string>
+
 #include "build/build_config.h"
 
 #if defined(OS_MACOSX)
@@ -22,6 +24,7 @@ namespace nu {
 // A class to represent colors.
 class Color {
  public:
+  explicit Color(const std::string& hex);
   Color(unsigned a, unsigned r, unsigned g, unsigned b)
       : value_((a << 24) | (r << 16) | (g << 8) | (b << 0)) {}
   Color(unsigned r, unsigned g, unsigned b)

@@ -112,4 +112,8 @@ bool Window::IsVisible() const {
   return [window_ isVisible];
 }
 
+void Window::SetBackgroundColor(Color color) {
+  [window_ setBackgroundColor:color.ToNSColor()];
+}
+
 }  // namespace nu

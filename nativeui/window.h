@@ -6,6 +6,7 @@
 #define NATIVEUI_WINDOW_H_
 
 #include "nativeui/container.h"
+#include "nativeui/gfx/color.h"
 #include "nativeui/gfx/geometry/rect_f.h"
 
 namespace nu {
@@ -32,6 +33,8 @@ NATIVEUI_EXPORT class Window : public base::RefCounted<Window> {
 
   void SetVisible(bool visible);
   bool IsVisible() const;
+
+  void SetBackgroundColor(Color color);
 
   NativeWindow window() const { return window_; }
 

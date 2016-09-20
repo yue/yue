@@ -103,6 +103,18 @@ struct Type<nu::View> {
 };
 
 template<>
+struct Type<nu::Color> {
+  static constexpr const char* name = "yue.Color";
+  static inline bool To(State* state, int index, nu::Color* out) {
+    std::string hex;
+    if (!lua::To(state, index, &hex))
+      return false;
+    *out = nu::Color(hex);
+    return true;
+  }
+};
+
+template<>
 struct Type<nu::Button::Type> {
   static constexpr const char* name = "yue.Button.Type";
   static bool To(State* state, int index, nu::Button::Type* out) {
@@ -315,7 +327,8 @@ struct Type<nu::Window> {
            "setcontentview", &nu::Window::SetContentView,
            "getcontentview", &nu::Window::GetContentView,
            "setvisible", &nu::Window::SetVisible,
-           "isvisible", &nu::Window::IsVisible);
+           "isvisible", &nu::Window::IsVisible,
+           "setbackgroundcolor", &nu::Window::SetBackgroundColor);
   }
   static bool Index(State* state, const std::string& name) {
     return yue::SignalIndex(state, name, "onclose", &nu::Window::on_close);

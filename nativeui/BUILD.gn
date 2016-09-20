@@ -30,6 +30,7 @@ source_set("nativeui") {
     "view.h",
     "window.cc",
     "window.h",
+    "gfx/color.cc",
     "gfx/color.h",
     "gfx/font.cc",
     "gfx/font.h",
