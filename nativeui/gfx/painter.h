@@ -19,14 +19,15 @@
 
 namespace nu {
 
-class Pen;
-
 // The interface for painting on canvas or window.
 class Painter {
  public:
 #if defined(OS_WIN)
   // Create a painter from HDC.
   static std::unique_ptr<Painter> CreateFromHDC(HDC dc, float scale_factor);
+#elif defined(OS_MACOSX)
+  // Create a painter from current context.
+  static std::unique_ptr<Painter> CreateFromCurrent();
 #endif
 
   virtual ~Painter();
@@ -59,9 +60,6 @@ class Painter {
 
   // Draws a single pixel |rect| in the specified region with |color|.
   virtual void DrawRect(const RectF& rect, Color color) = 0;
-
-  // Draws the given |rect| with the |pen|.
-  virtual void DrawRect(const RectF& rect, Pen* pen) = 0;
 
   // Fills |rect| with |color|.
   virtual void FillRect(const RectF& rect, Color color) = 0;

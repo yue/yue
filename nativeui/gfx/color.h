@@ -7,6 +7,16 @@
 
 #include <stdint.h>
 
+#include "build/build_config.h"
+
+#if defined(OS_MACOSX)
+#ifdef __OBJC__
+@class NSColor;
+#else
+class NSColor;
+#endif
+#endif
+
 namespace nu {
 
 // A class to represent colors.
@@ -17,6 +27,10 @@ class Color {
   Color(unsigned r, unsigned g, unsigned b)
       : Color(0xFF, r, g, b) {}
   Color() : value_(0) {}
+
+#if defined(OS_MACOSX)
+  NSColor* ToNSColor() const;
+#endif
 
   unsigned a() const { return ((value_) >> 24) & 0xFF; }
   unsigned r() const { return ((value_) >> 16) & 0xFF; }

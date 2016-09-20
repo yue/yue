@@ -4,8 +4,6 @@
 
 #include "nativeui/gfx/painter.h"
 
-#include "nativeui/gfx/pen.h"
-
 namespace nu {
 
 Painter::Painter() : weak_factory_(this) {}
