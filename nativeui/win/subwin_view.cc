@@ -66,4 +66,8 @@ bool SubwinView::IsFocused() const {
   return ::GetFocus() == hwnd();
 }
 
+void SubwinView::Draw(PainterWin* painter, const Rect& dirty) {
+  // There is nothing to draw in a sub window.
+}
+
 }  // namespace nu

@@ -25,6 +25,7 @@ class SubwinView : public WindowImpl, public BaseView {
   void Invalidate(const Rect& dirty) override;
   void SetFocus(bool focus) override;
   bool IsFocused() const override;
+  void Draw(PainterWin* painter, const Rect& dirty) override;
 
   // Rerouted from parent window
   virtual void OnCommand(UINT code, int command) {}

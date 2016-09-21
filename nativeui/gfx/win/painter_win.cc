@@ -7,7 +7,6 @@
 #include <memory>
 
 #include "base/win/scoped_gdi_object.h"
-#include "nativeui/gfx/win/pen_win.h"
 
 namespace nu {
 
@@ -63,10 +62,6 @@ void PainterWin::DrawRect(const RectF& rect, Color color) {
   DrawPixelRect(ScaleRect(rect, scale_factor_), color);
 }
 
-void PainterWin::DrawRect(const RectF& rect, Pen* pen) {
-  DrawPixelRect(ScaleRect(rect, scale_factor_), pen);
-}
-
 void PainterWin::FillRect(const RectF& rect, Color color) {
   FillPixelRect(ScaleRect(rect, scale_factor_), color);
 }
@@ -99,11 +94,6 @@ void PainterWin::TranslatePixel(const Vector2dF& offset) {
 void PainterWin::DrawPixelRect(const RectF& rect, Color color) {
   Gdiplus::Pen pen(ToGdi(color));
   graphics_.DrawRectangle(&pen, ToGdi(rect + origin()));
-}
-
-void PainterWin::DrawPixelRect(const RectF& rect, Pen* pen) {
-  graphics_.DrawRectangle(static_cast<PenWin*>(pen)->pen(),
-                          ToGdi(rect + origin()));
 }
 
 void PainterWin::FillPixelRect(const RectF& rect, Color color) {

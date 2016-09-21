@@ -70,6 +70,15 @@ bool BaseView::IsFocused() const {
   return is_focused_;
 }
 
+void BaseView::SetBackgroundColor(Color color) {
+  background_color_ = color;
+  Invalidate();
+}
+
+void BaseView::Draw(PainterWin* painter, const Rect& dirty) {
+  painter->FillPixelRect(RectF(dirty), background_color_);
+}
+
 Point BaseView::GetMousePosition() const {
   if (!window_)
     return Point();

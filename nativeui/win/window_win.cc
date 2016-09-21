@@ -7,8 +7,8 @@
 #include <memory>
 
 #include "nativeui/gfx/geometry/rect_conversions.h"
-#include "nativeui/gfx/painter.h"
 #include "nativeui/gfx/win/double_buffer.h"
+#include "nativeui/gfx/win/painter_win.h"
 #include "nativeui/win/subwin_view.h"
 #include "nativeui/win/util/hwnd_util.h"
 
@@ -58,6 +58,11 @@ void TopLevelWindow::SetCapture(BaseView* view) {
 void TopLevelWindow::ReleaseCapture() {
   if (::GetCapture() == hwnd())
     ::ReleaseCapture();
+}
+
+void TopLevelWindow::SetBackgroundColor(nu::Color color) {
+  background_color_ = color;
+  InvalidateRect(hwnd(), NULL, TRUE);
 }
 
 void TopLevelWindow::OnCaptureChanged(HWND window) {
@@ -148,13 +153,11 @@ void TopLevelWindow::OnPaint(HDC) {
     DoubleBuffer buffer(dc, bounds.size(), dirty, dirty.origin());
 
     // Background.
-    std::unique_ptr<Painter> painter_win =
-        Painter::CreateFromHDC(buffer.dc(), scale_factor());
-    auto* painter = static_cast<PainterWin*>(painter_win.get());
-    painter->FillPixelRect(RectF(dirty), Color(255, 255, 255));
+    PainterWin painter(buffer.dc(), scale_factor());
+    painter.FillPixelRect(RectF(dirty), background_color_);
 
     // Draw.
-    delegate_->GetContentView()->view()->Draw(painter, dirty);
+    delegate_->GetContentView()->view()->Draw(&painter, dirty);
   }
 
   EndPaint(hwnd(), &ps);
@@ -226,6 +229,11 @@ void Window::SetVisible(bool visible) {
 
 bool Window::IsVisible() const {
   return !!::IsWindowVisible(window_->hwnd());
+}
+
+void Window::SetBackgroundColor(Color color) {
+  TopLevelWindow* win = static_cast<TopLevelWindow*>(window_);
+  win->SetBackgroundColor(color);
 }
 
 }  // namespace nu

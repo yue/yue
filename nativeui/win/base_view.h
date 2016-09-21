@@ -64,11 +64,14 @@ class BaseView {
   virtual void SetFocus(bool focus);
   virtual bool IsFocused() const;
 
+  // Set the background color.
+  virtual void SetBackgroundColor(Color color);
+
   /////////////////////////////////////////////////////////////////////////////
   // Events
 
   // Draw the content.
-  virtual void Draw(PainterWin* painter, const Rect& dirty) {}
+  virtual void Draw(PainterWin* painter, const Rect& dirty);
 
   // The mouse events.
   virtual void OnMouseEnter() {}
@@ -119,6 +122,8 @@ class BaseView {
     return current_scale_factor;
   }
 
+  Color background_color() const { return background_color_; }
+
   WindowImpl* window() const { return window_; }
   ControlType type() const { return type_; }
 
@@ -130,6 +135,9 @@ class BaseView {
 
  private:
   ControlType type_;
+
+  // The background color.
+  Color background_color_ = Color(0, 0, 0, 0);  // transparent
 
   // The focus state.
   bool is_focused_ = false;

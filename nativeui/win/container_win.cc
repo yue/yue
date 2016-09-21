@@ -59,6 +59,7 @@ bool ContainerView::OnMouseClick(UINT message, UINT flags, const Point& point) {
 }
 
 void ContainerView::Draw(PainterWin* painter, const Rect& dirty) {
+  BaseView::Draw(painter, dirty);
   for (BaseView* child : delegate_->GetChildren())
     DrawChild(child, painter, dirty);
 }
@@ -149,6 +150,10 @@ void Container::PlatformInit() {
 }
 
 void Container::PlatformDestroy() {
+}
+
+void Container::SetBackgroundColor(Color color) {
+  view()->SetBackgroundColor(color);
 }
 
 void Container::PlatformAddChildView(View* child) {

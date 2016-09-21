@@ -27,7 +27,6 @@ class PainterWin : public Painter {
                 CombineMode mode = CombineMode::Replace) override;
   void Translate(const Vector2dF& offset) override;
   void DrawRect(const RectF& rect, Color color) override;
-  void DrawRect(const RectF& rect, Pen* pen) override;
   void FillRect(const RectF& rect, Color color) override;
   void DrawStringWithFlags(const String& text,
                            Font font,
@@ -39,7 +38,6 @@ class PainterWin : public Painter {
   void ClipPixelRect(const RectF& rect, CombineMode mode);
   void TranslatePixel(const Vector2dF& offset);
   void DrawPixelRect(const RectF& rect, Color color);
-  void DrawPixelRect(const RectF& rect, Pen* pen);
   void FillPixelRect(const RectF& rect, Color color);
   void DrawPixelStringWithFlags(const String& text,
                                 Font font,

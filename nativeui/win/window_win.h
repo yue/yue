@@ -22,6 +22,8 @@ class TopLevelWindow : public WindowImpl {
   void SetCapture(BaseView* view);
   void ReleaseCapture();
 
+  void SetBackgroundColor(nu::Color color);
+
   FocusManager* focus_manager() { return &focus_manager_; }
 
  protected:
@@ -59,6 +61,9 @@ class TopLevelWindow : public WindowImpl {
 
   // The view that has mouse capture.
   BaseView* capture_view_ = nullptr;
+
+  // The background color.
+  nu::Color background_color_ = nu::Color(0xFF, 0xFF, 0xFF);
 
   Window* delegate_;
 };

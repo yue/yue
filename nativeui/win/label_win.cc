@@ -30,6 +30,7 @@ class LabelView : public BaseView {
 
   // BaseView:
   void Draw(PainterWin* painter, const Rect& dirty) override {
+    BaseView::Draw(painter, dirty);
     painter->DrawPixelStringWithFlags(text_, font_, color_,
                                       RectF(SizeF(size_allocation().size())),
                                       Painter::TextAlignCenter);
@@ -67,6 +68,10 @@ void Label::SetText(const std::string& text) {
 std::string Label::GetText() {
   LabelView* label = static_cast<LabelView*>(view());
   return base::UTF16ToUTF8(label->GetText());
+}
+
+void Label::SetBackgroundColor(Color color) {
+  view()->SetBackgroundColor(color);
 }
 
 }  // namespace nu

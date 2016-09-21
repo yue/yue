@@ -137,13 +137,23 @@ class ButtonView : public BaseView {
     Size size = size_allocation().size();
     Size preferred_size = ToCeiledSize(GetPreferredSize());
 
+    // Whether there is a non-transparent background color.
+    bool has_background_color = background_color().a() != 0;
+
     HDC dc = painter->GetHDC();
 
-    // Draw the button background
+    // Draw the button background,
     if (type() == ControlType::Button)
       theme_->PaintPushButton(dc, state(),
                               Rect(size) + ToCeiledVector2d(painter->origin()),
                               params_);
+
+    // Draw control background as a layer on button background.
+    if (has_background_color) {
+      painter->ReleaseHDC(dc);
+      BaseView::Draw(painter, dirty);
+      dc = painter->GetHDC();
+    }
 
     // Checkbox and radio are left aligned.
     Point origin;
@@ -248,6 +258,10 @@ void Button::SetChecked(bool checked) {
 
 bool Button::IsChecked() const {
   return static_cast<ButtonView*>(view())->IsChecked();
+}
+
+void Button::SetBackgroundColor(Color color) {
+  view()->SetBackgroundColor(color);
 }
 
 }  // namespace nu
