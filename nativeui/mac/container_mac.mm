@@ -11,8 +11,10 @@
 @interface ContainerView : NSView {
  @private
   nu::Container* wrapper_;
+  nu::Color background_color_;
 }
 - (id)initWithWrapper:(nu::Container*)wrapper;
+- (void)setBackgroundColor:(nu::Color)color;
 @end
 
 @implementation ContainerView
@@ -22,12 +24,13 @@
   if (!self)
     return nil;
 
-  self->wrapper_ = wrapper;
+  wrapper_ = wrapper;
   return self;
 }
 
-- (BOOL)isFlipped {
-  return YES;
+- (void)setBackgroundColor:(nu::Color)color {
+  background_color_ = color;
+  [self setNeedsDisplay:YES];
 }
 
 - (void)adjustSubviews {
@@ -37,8 +40,20 @@
   wrapper_->BoundsChanged();
 }
 
+- (BOOL)isFlipped {
+  return YES;
+}
+
 - (void)resizeSubviewsWithOldSize:(NSSize)oldBoundsSize {
   [self adjustSubviews];
+}
+
+- (void)drawRect:(NSRect)rect {
+  if (background_color_.a() != 0) {
+    [background_color_.ToNSColor() setFill];
+    NSRectFill(rect);
+  }
+  [super drawRect:rect];
 }
 
 @end
@@ -50,6 +65,11 @@ void Container::PlatformInit() {
 }
 
 void Container::PlatformDestroy() {
+}
+
+void Container::SetBackgroundColor(Color color) {
+  auto* container = static_cast<ContainerView*>(view());
+  [container setBackgroundColor:color];
 }
 
 void Container::PlatformAddChildView(View* child) {

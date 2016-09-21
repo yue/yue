@@ -75,6 +75,7 @@ struct Type<nu::View> {
   static constexpr const char* name = "yue.View";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
+           "setbackgroundcolor", &nu::View::SetBackgroundColor,
            "setstyle", &SetStyle,
            "printstyle", &nu::View::PrintStyle,
            "layout", &nu::View::Layout,

@@ -8,6 +8,7 @@
 #include <string>
 
 #include "base/memory/ref_counted.h"
+#include "nativeui/gfx/color.h"
 #include "nativeui/gfx/geometry/rect_f.h"
 #include "nativeui/gfx/geometry/size_f.h"
 #include "nativeui/signal.h"
@@ -39,12 +40,15 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
   void SetPixelBounds(const Rect& bounds);
   Rect GetPixelBounds() const;
 
-  // Updates layout.
+  // Update layout.
   virtual void Layout();
 
   // Show/Hide the view.
   void SetVisible(bool visible);
   bool IsVisible() const;
+
+  // Set backgroundcolor.
+  virtual void SetBackgroundColor(Color color) {}
 
   // Set CSS style for the node.
   void SetStyle(const std::string& name, const std::string& value);

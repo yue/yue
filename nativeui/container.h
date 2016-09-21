@@ -21,6 +21,7 @@ NATIVEUI_EXPORT class Container : public View {
   // View:
   const char* GetClassName() const override;
   void Layout() override;
+  void SetBackgroundColor(Color color) override;
 
   // Called when view's bounds changed, and probably needs layout.
   void BoundsChanged();

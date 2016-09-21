@@ -122,4 +122,9 @@ bool Button::IsChecked() const {
   return static_cast<NSButton*>(view()).state == NSOnState;
 }
 
+void Button::SetBackgroundColor(Color color) {
+  NSButton* button = static_cast<NSButton*>(view());
+  [button.cell setBackgroundColor:color.ToNSColor()];
+}
+
 }  // namespace nu
