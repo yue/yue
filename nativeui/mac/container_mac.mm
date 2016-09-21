@@ -7,6 +7,7 @@
 #import <Cocoa/Cocoa.h>
 
 #include "base/logging.h"
+#include "nativeui/gfx/mac/painter_mac.h"
 
 @interface ContainerView : NSView {
  @private
@@ -48,12 +49,9 @@
   [self adjustSubviews];
 }
 
-- (void)drawRect:(NSRect)rect {
-  if (background_color_.a() != 0) {
-    [background_color_.ToNSColor() setFill];
-    NSRectFill(rect);
-  }
-  [super drawRect:rect];
+- (void)drawRect:(NSRect)dirtyRect {
+  nu::PainterMac painter;
+  painter.FillRect(nu::RectF(dirtyRect), background_color_);
 }
 
 @end

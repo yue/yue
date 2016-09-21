@@ -8,33 +8,42 @@
 
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
+#include "nativeui/gfx/mac/painter_mac.h"
 #include "nativeui/gfx/text.h"
 #include "third_party/css-layout/CSSLayout/CSSLayout.h"
 
 @interface LabelView : NSView {
  @private
-  NSString* text_;
+  std::string text_;
+  nu::Color background_color_;
 }
-@property(nonatomic, copy) NSString* text;
+- (void)setText:(const std::string&)text;
+- (std::string)text;
+- (void)setBackgroundColor:(nu::Color)color;
 @end
 
 @implementation LabelView
 
-@synthesize text = text_;
+- (void)setText:(const std::string&)text {
+  text_ = text;
+  [self setNeedsDisplay:YES];
+}
+
+- (std::string)text {
+  return text_;
+}
+
+- (void)setBackgroundColor:(nu::Color)color {
+  background_color_ = color;
+  [self setNeedsDisplay:YES];
+}
 
 - (void)drawRect:(NSRect)dirtyRect {
-  NSMutableParagraphStyle* paragraphStyle =
-      [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
-  [paragraphStyle setAlignment:NSCenterTextAlignment];
-  NSDictionary* attributes = [NSDictionary
-      dictionaryWithObject:paragraphStyle
-                    forKey:NSParagraphStyleAttributeName];
-  NSAttributedString* text =
-      [[[NSAttributedString alloc] initWithString:text_
-                                       attributes:attributes] autorelease];
-  NSRect frame = NSMakeRect(0, (self.frame.size.height - text.size.height) / 2,
-                            self.frame.size.width, text.size.height);
-  [text_ drawInRect:frame withAttributes:attributes];
+  nu::PainterMac painter;
+  painter.FillRect(nu::RectF(dirtyRect), background_color_);
+  painter.DrawStringWithFlags(text_, nu::Font(), nu::Color(),
+                              nu::RectF([self frame]),
+                              nu::Painter::TextAlignCenter);
 }
 
 @end
@@ -60,14 +69,16 @@ Label::~Label() {
 }
 
 void Label::SetText(const std::string& text) {
-  LabelView* label = static_cast<LabelView*>(view());
-  label.text = base::SysUTF8ToNSString(text);
-  label.needsDisplay = YES;
+  [static_cast<LabelView*>(view()) setText:text];
   SetDefaultStyle(GetPreferredSizeForText(text));
 }
 
 std::string Label::GetText() {
-  return base::SysNSStringToUTF8(static_cast<LabelView*>(view()).text);
+  return [static_cast<LabelView*>(view()) text];
+}
+
+void Label::SetBackgroundColor(Color color) {
+  [static_cast<LabelView*>(view()) setBackgroundColor:color];
 }
 
 }  // namespace nu

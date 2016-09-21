@@ -23,6 +23,7 @@ NATIVEUI_EXPORT class Entry : public View{
 
   // View:
   const char* GetClassName() const override;
+  void SetBackgroundColor(Color color) override;
 
   // Events.
   Signal<void()> on_text_change;

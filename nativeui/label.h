@@ -23,6 +23,7 @@ NATIVEUI_EXPORT class Label : public View {
 
   // View:
   const char* GetClassName() const override;
+  void SetBackgroundColor(Color color) override;
 
  protected:
   ~Label() override;

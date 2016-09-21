@@ -47,7 +47,7 @@ void PainterMac::DrawRect(const RectF& rect, Color color) {
 
 void PainterMac::FillRect(const RectF& rect, Color color) {
   [color.ToNSColor() set];
-  NSRectFill(rect.ToCGRect());
+  NSRectFillUsingOperation(rect.ToCGRect(), NSCompositeSourceOver);
 }
 
 void PainterMac::DrawStringWithFlags(const String& utf8text,
@@ -75,6 +75,11 @@ void PainterMac::DrawStringWithFlags(const String& utf8text,
   NSRect frame = NSMakeRect(0, (rect.height() - attribute.size.height) / 2,
                             rect.width(), attribute.size.height);
   [text drawInRect:frame withAttributes:attributes];
+}
+
+// static
+std::unique_ptr<Painter> Painter::CreateFromCurrent() {
+  return std::unique_ptr<Painter>(new PainterMac());
 }
 
 }  // namespace nu

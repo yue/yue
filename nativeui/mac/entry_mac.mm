@@ -66,4 +66,9 @@ std::string Entry::GetText() const {
   return base::SysNSStringToUTF8([entry stringValue]);
 }
 
+void Entry::SetBackgroundColor(Color color) {
+  auto* entry = static_cast<NSTextField*>(view());
+  [entry setBackgroundColor:color.ToNSColor()];
+}
+
 }  // namespace nu
