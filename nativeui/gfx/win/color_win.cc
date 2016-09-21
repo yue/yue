@@ -4,9 +4,11 @@
 
 #include "nativeui/gfx/color.h"
 
-#include <windows.h>
-
 namespace nu {
+
+COLORREF Color::ToCOLORREF() const {
+  return RGB(r(), g(), b());
+}
 
 Color GetThemeColor(ThemeColor theme) {
   int index = 0;

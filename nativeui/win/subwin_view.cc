@@ -53,7 +53,7 @@ void SubwinView::BecomeContentView(WindowImpl* parent) {
 }
 
 void SubwinView::Invalidate(const Rect& dirty) {
-  // There is no need to invalidate a child window.
+  InvalidateRect(hwnd(), NULL, TRUE);
 }
 
 void SubwinView::SetFocus(bool focus) {
@@ -68,6 +68,10 @@ bool SubwinView::IsFocused() const {
 
 void SubwinView::Draw(PainterWin* painter, const Rect& dirty) {
   // There is nothing to draw in a sub window.
+}
+
+bool SubwinView::OnCtlColor(HDC dc, HBRUSH* brush) {
+  return false;
 }
 
 }  // namespace nu

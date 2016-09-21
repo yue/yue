@@ -29,6 +29,7 @@ class SubwinView : public WindowImpl, public BaseView {
 
   // Rerouted from parent window
   virtual void OnCommand(UINT code, int command) {}
+  virtual bool OnCtlColor(HDC dc, HBRUSH* brush);
 
  private:
   base::win::ScopedHFONT font_;

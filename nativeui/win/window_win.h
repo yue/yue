@@ -31,6 +31,8 @@ class TopLevelWindow : public WindowImpl {
     CR_MSG_WM_CAPTURECHANGED(OnCaptureChanged)
     CR_MSG_WM_CLOSE(OnClose)
     CR_MSG_WM_COMMAND(OnCommand)
+    CR_MSG_WM_CTLCOLOREDIT(OnCtlColorStatic)
+    CR_MSG_WM_CTLCOLORSTATIC(OnCtlColorStatic)
     CR_MSG_WM_SIZE(OnSize)
     CR_MSG_WM_MOUSEMOVE(OnMouseMove)
     CR_MSG_WM_MOUSELEAVE(OnMouseLeave)
@@ -45,6 +47,7 @@ class TopLevelWindow : public WindowImpl {
   void OnCaptureChanged(HWND window);
   void OnClose();
   void OnCommand(UINT code, int command, HWND window);
+  HBRUSH OnCtlColorStatic(HDC dc, HWND window);
   void OnSize(UINT param, const Size& size);
   void OnMouseMove(UINT flags, const Point& point);
   void OnMouseLeave();

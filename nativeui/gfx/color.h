@@ -11,6 +11,10 @@
 
 #include "build/build_config.h"
 
+#if defined(OS_WIN)
+#include <windows.h>
+#endif
+
 #if defined(OS_MACOSX)
 #ifdef __OBJC__
 @class NSColor;
@@ -33,6 +37,8 @@ class Color {
 
 #if defined(OS_MACOSX)
   NSColor* ToNSColor() const;
+#elif defined(OS_WIN)
+  COLORREF ToCOLORREF() const;
 #endif
 
   unsigned a() const { return ((value_) >> 24) & 0xFF; }

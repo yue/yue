@@ -90,6 +90,13 @@ void TopLevelWindow::OnCommand(UINT code, int command, HWND window) {
   control->OnCommand(code, command);
 }
 
+HBRUSH TopLevelWindow::OnCtlColorStatic(HDC dc, HWND window) {
+  auto* control = reinterpret_cast<SubwinView*>(GetWindowUserData(window));
+  HBRUSH brush = NULL;
+  SetMsgHandled(control->OnCtlColor(dc, &brush));
+  return brush;
+}
+
 void TopLevelWindow::OnSize(UINT param, const Size& size) {
   if (!delegate_->GetContentView())
     return;

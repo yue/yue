@@ -31,9 +31,22 @@ class EntryView : public SubwinView {
     return true;
   }
 
+  void SetBackgroundColor(Color color) override {
+    bg_brush_.reset(CreateSolidBrush(color.ToCOLORREF()));
+    BaseView::SetBackgroundColor(color);
+  }
+
   void OnCommand(UINT code, int command) override {
     if (code == EN_CHANGE)
       delegate_->on_text_change.Emit();
+  }
+
+  bool OnCtlColor(HDC dc, HBRUSH* brush) override {
+    if (!bg_brush_.get())
+      return false;
+    SetBkMode(dc, TRANSPARENT);
+    *brush = bg_brush_.get();
+    return true;
   }
 
  protected:
@@ -60,6 +73,8 @@ class EntryView : public SubwinView {
 
  private:
   Entry* delegate_;
+
+  base::win::ScopedGDIObject<HBRUSH> bg_brush_;
 
   WNDPROC proc_ = nullptr;
 };
@@ -89,6 +104,7 @@ std::string Entry::GetText() const {
 }
 
 void Entry::SetBackgroundColor(Color color) {
+  view()->SetBackgroundColor(color);
 }
 
 }  // namespace nu
