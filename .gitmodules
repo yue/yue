@@ -31,3 +31,6 @@
 [submodule "third_party/css-layout"]
 	path = third_party/css-layout
 	url = https://github.com/facebook/css-layout
+[submodule "third_party/yxml"]
+	path = third_party/yxml
+	url = git://g.blicky.net/yxml.git
