@@ -93,4 +93,10 @@ bool Window::IsVisible() const {
   return gtk_widget_get_visible(GTK_WIDGET(window_));
 }
 
+void Window::SetBackgroundColor(Color color) {
+  GdkRGBA gcolor = color.ToGdkRGBA();
+  gtk_widget_override_background_color(GTK_WIDGET(window_),
+                                       GTK_STATE_FLAG_NORMAL, &gcolor);
+}
+
 }  // namespace nu

@@ -13,6 +13,8 @@
 
 #if defined(OS_WIN)
 #include <windows.h>
+#elif defined(OS_LINUX)
+#include <gdk/gdk.h>
 #endif
 
 #if defined(OS_MACOSX)
@@ -39,6 +41,8 @@ class Color {
   NSColor* ToNSColor() const;
 #elif defined(OS_WIN)
   COLORREF ToCOLORREF() const;
+#elif defined(OS_LINUX)
+  GdkRGBA ToGdkRGBA() const;
 #endif
 
   unsigned a() const { return ((value_) >> 24) & 0xFF; }

@@ -71,4 +71,9 @@ bool View::IsVisible() const {
   return gtk_widget_get_visible(view_);
 }
 
+void View::SetBackgroundColor(Color color) {
+  GdkRGBA rgba = color.ToGdkRGBA();
+  gtk_widget_override_background_color(view_, GTK_STATE_FLAG_NORMAL, &rgba);
+}
+
 }  // namespace nu

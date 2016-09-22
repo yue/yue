@@ -88,6 +88,11 @@ static void nu_container_style_updated(GtkWidget* widget) {
 }
 
 static gboolean nu_container_draw(GtkWidget* widget, cairo_t* cr) {
+  gtk_render_background(gtk_widget_get_style_context(widget), cr,
+                        0, 0,
+                        gtk_widget_get_allocated_width(widget),
+                        gtk_widget_get_allocated_height(widget));
+
   Container* delegate = static_cast<Container*>(
       g_object_get_data(G_OBJECT(widget), "delegate"));
   for (int i = 0; i < delegate->child_count(); ++i)
