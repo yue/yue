@@ -2,6 +2,20 @@
 
 A framework to create cross-platform GUI apps.
 
+## Issues
+
+The Issues page of this repo is disabled on purpose, and I do not answer emails
+on using or building this project. For help please go to the
+[yue/help](https://github.com/yue/help) repo where users help themselves.
+
+The only channel to get help from me is to subscribe to paid plans.
+
+## Contributions
+
+While I appreciate contributions and will do my best to get them merged, please
+understand that I have high code standards and personal code tastes, so your
+patch might be heavily modified or rejected.
+
 ## License
 
 The Yue project is under the [Microsoft Reciprocal License (MS-RL)][LICENSE]
