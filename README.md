@@ -1,35 +1,17 @@
-# base-boilerplate
+# yue
 
-The boilerplate to create projects using Chromium's `base` and `net` libraries.
+A framework to create cross-platform GUI apps.
 
-## Usage
+## License
 
-Bootstrap:
+The Yue project is under the [Microsoft Reciprocal License (MS-RL)][LICENSE]
+with following clarifications:
 
-```bash
-./scripts/bootstrap.js
-```
-
-Change args of configuration:
-
-```bash
-./scripts/args.js
-```
-
-Build:
-
-```bash
-./scripts/build.js
-```
-
-Build a specified target:
-
-```bash
-./scripts/build.js base_unittests
-```
-
-Build a specified target under a configuration:
-
-```bash
-./scripts/build.js out/Default base_unittests
-```
+* Using or copying headers of this software is not considered as containing
+  its code, so you are not obliged to license your source code under MS-RL
+  when using code from header files.
+* Linking with the code of this software is not considered as containing its
+  code too.
+* If your software did modifications to this software, you are only obliged to
+  open source those changes, other parts of your software are not required to
+  be licensed under MS-RL.
