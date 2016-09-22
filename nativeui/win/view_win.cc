@@ -48,4 +48,8 @@ bool View::IsVisible() const {
   return view()->is_visible();
 }
 
+void View::SetBackgroundColor(Color color) {
+  view()->SetBackgroundColor(color);
+}
+
 }  // namespace nu

@@ -4,9 +4,20 @@
 
 #include "nativeui/entry.h"
 
-#import <Cocoa/Cocoa.h>
-
 #include "base/strings/sys_string_conversions.h"
+#include "nativeui/mac/view_mac.h"
+
+@interface NUEntry : NSTextField<BaseView>
+- (void)setNUBackgroundColor:(nu::Color)color;
+@end
+
+@implementation NUEntry
+
+- (void)setNUBackgroundColor:(nu::Color)color {
+  [self setBackgroundColor:color.ToNSColor()];
+}
+
+@end
 
 @interface NUEntryDelegate : NSObject<NSTextFieldDelegate> {
  @private
@@ -37,7 +48,7 @@
 namespace nu {
 
 Entry::Entry() {
-  NSTextField* entry = [[NSTextField alloc] init];
+  NSTextField* entry = [[NUEntry alloc] init];
   [entry setBezelStyle:NSTextFieldSquareBezel];
   [entry setBezeled:YES];
   [entry setTarget:[[NUEntryDelegate alloc] initWithShell:this]];
@@ -64,11 +75,6 @@ void Entry::SetText(const std::string& text) {
 std::string Entry::GetText() const {
   auto* entry = static_cast<NSTextField*>(view());
   return base::SysNSStringToUTF8([entry stringValue]);
-}
-
-void Entry::SetBackgroundColor(Color color) {
-  auto* entry = static_cast<NSTextField*>(view());
-  [entry setBackgroundColor:color.ToNSColor()];
 }
 
 }  // namespace nu

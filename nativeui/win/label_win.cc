@@ -70,8 +70,4 @@ std::string Label::GetText() {
   return base::UTF16ToUTF8(label->GetText());
 }
 
-void Label::SetBackgroundColor(Color color) {
-  view()->SetBackgroundColor(color);
-}
-
 }  // namespace nu

@@ -260,8 +260,4 @@ bool Button::IsChecked() const {
   return static_cast<ButtonView*>(view())->IsChecked();
 }
 
-void Button::SetBackgroundColor(Color color) {
-  view()->SetBackgroundColor(color);
-}
-
 }  // namespace nu

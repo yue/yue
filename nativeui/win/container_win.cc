@@ -152,10 +152,6 @@ void Container::PlatformInit() {
 void Container::PlatformDestroy() {
 }
 
-void Container::SetBackgroundColor(Color color) {
-  view()->SetBackgroundColor(color);
-}
-
 void Container::PlatformAddChildView(View* child) {
   child->view()->SetParent(view());
 }

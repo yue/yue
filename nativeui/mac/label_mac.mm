@@ -4,22 +4,21 @@
 
 #include "nativeui/label.h"
 
-#import <Cocoa/Cocoa.h>
-
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/mac/painter_mac.h"
 #include "nativeui/gfx/text.h"
+#include "nativeui/mac/view_mac.h"
 #include "third_party/css-layout/CSSLayout/CSSLayout.h"
 
-@interface LabelView : NSView {
+@interface LabelView : NSView<BaseView> {
  @private
   std::string text_;
   nu::Color background_color_;
 }
 - (void)setText:(const std::string&)text;
 - (std::string)text;
-- (void)setBackgroundColor:(nu::Color)color;
+- (void)setNUBackgroundColor:(nu::Color)color;
 @end
 
 @implementation LabelView
@@ -33,7 +32,7 @@
   return text_;
 }
 
-- (void)setBackgroundColor:(nu::Color)color {
+- (void)setNUBackgroundColor:(nu::Color)color {
   background_color_ = color;
   [self setNeedsDisplay:YES];
 }
@@ -75,10 +74,6 @@ void Label::SetText(const std::string& text) {
 
 std::string Label::GetText() {
   return [static_cast<LabelView*>(view()) text];
-}
-
-void Label::SetBackgroundColor(Color color) {
-  [static_cast<LabelView*>(view()) setBackgroundColor:color];
 }
 
 }  // namespace nu

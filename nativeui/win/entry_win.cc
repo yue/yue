@@ -103,8 +103,4 @@ std::string Entry::GetText() const {
       GetWindowString(static_cast<SubwinView*>(view())->hwnd()));
 }
 
-void Entry::SetBackgroundColor(Color color) {
-  view()->SetBackgroundColor(color);
-}
-
 }  // namespace nu

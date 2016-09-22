@@ -113,6 +113,7 @@ source_set("nativeui") {
     "mac/scroll_mac.mm",
     "mac/state_mac.mm",
     "mac/view_mac.mm",
+    "mac/view_mac.h",
     "mac/window_mac.mm",
     "win/base_view.cc",
     "win/base_view.h",

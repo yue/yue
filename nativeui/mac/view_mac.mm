@@ -2,13 +2,15 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/view.h"
-
-#import <Cocoa/Cocoa.h>
+#include "nativeui/mac/view_mac.h"
 
 #include "nativeui/container.h"
 #include "nativeui/gfx/geometry/point_conversions.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
+#include "nativeui/gfx/mac/painter_mac.h"
+
+@interface NSView (BaseViewMethods) <BaseView>
+@end
 
 namespace nu {
 
@@ -45,6 +47,11 @@ void View::PlatformSetVisible(bool visible) {
 
 bool View::IsVisible() const {
   return ![view_ isHidden];
+}
+
+void View::SetBackgroundColor(Color color) {
+  if ([view() respondsToSelector:@selector(setNUBackgroundColor:)])
+    [view() setNUBackgroundColor:color];
 }
 
 }  // namespace nu

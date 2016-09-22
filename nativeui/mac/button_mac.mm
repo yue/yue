@@ -4,10 +4,9 @@
 
 #include "nativeui/button.h"
 
-#import <Cocoa/Cocoa.h>
-
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/gfx/geometry/insets_f.h"
+#include "nativeui/mac/view_mac.h"
 
 namespace {
 
@@ -32,10 +31,15 @@ nu::InsetsF GetButtonInsets(NSButton* button) {
 // The default NSButton includes the button's shadow area as its frame, and it
 // gives us wrong coordinates to calculate layout. This class overrides
 // setFrame: frame: to ignore the shadow frame.
-@interface NUButton : NSButton
+@interface NUButton : NSButton<BaseView>
+- (void)setNUBackgroundColor:(nu::Color)color;
 @end
 
 @implementation NUButton
+
+- (void)setNUBackgroundColor:(nu::Color)color {
+  [self.cell setBackgroundColor:color.ToNSColor()];
+}
 
 - (void)setFrame:(NSRect)frame {
   nu::InsetsF border(GetButtonInsets(self));
@@ -120,11 +124,6 @@ void Button::SetChecked(bool checked) {
 
 bool Button::IsChecked() const {
   return static_cast<NSButton*>(view()).state == NSOnState;
-}
-
-void Button::SetBackgroundColor(Color color) {
-  NSButton* button = static_cast<NSButton*>(view());
-  [button.cell setBackgroundColor:color.ToNSColor()];
 }
 
 }  // namespace nu

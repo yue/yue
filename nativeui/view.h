@@ -48,7 +48,7 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
   bool IsVisible() const;
 
   // Set backgroundcolor.
-  virtual void SetBackgroundColor(Color color) {}
+  void SetBackgroundColor(Color color);
 
   // Set CSS style for the node.
   void SetStyle(const std::string& name, const std::string& value);

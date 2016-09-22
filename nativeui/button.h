@@ -30,7 +30,6 @@ NATIVEUI_EXPORT class Button : public View {
 
   // View:
   const char* GetClassName() const override;
-  void SetBackgroundColor(Color color) override;
 
   // Events.
   Signal<void()> on_click;

@@ -4,18 +4,17 @@
 
 #include "nativeui/container.h"
 
-#import <Cocoa/Cocoa.h>
-
 #include "base/logging.h"
 #include "nativeui/gfx/mac/painter_mac.h"
+#include "nativeui/mac/view_mac.h"
 
-@interface ContainerView : NSView {
+@interface ContainerView : NSView<BaseView> {
  @private
   nu::Container* wrapper_;
   nu::Color background_color_;
 }
 - (id)initWithWrapper:(nu::Container*)wrapper;
-- (void)setBackgroundColor:(nu::Color)color;
+- (void)setNUBackgroundColor:(nu::Color)color;
 @end
 
 @implementation ContainerView
@@ -29,7 +28,7 @@
   return self;
 }
 
-- (void)setBackgroundColor:(nu::Color)color {
+- (void)setNUBackgroundColor:(nu::Color)color {
   background_color_ = color;
   [self setNeedsDisplay:YES];
 }
@@ -63,11 +62,6 @@ void Container::PlatformInit() {
 }
 
 void Container::PlatformDestroy() {
-}
-
-void Container::SetBackgroundColor(Color color) {
-  auto* container = static_cast<ContainerView*>(view());
-  [container setBackgroundColor:color];
 }
 
 void Container::PlatformAddChildView(View* child) {
