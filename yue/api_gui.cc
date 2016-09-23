@@ -351,6 +351,32 @@ struct Type<nu::Painter> {
   }
 };
 
+template<>
+struct Type<nu::MenuBase> {
+  static constexpr const char* name = "yue.MenuBase";
+  static void BuildMetaTable(State* state, int index) {
+  }
+};
+
+template<>
+struct Type<nu::MenuBar> {
+  using base = nu::MenuBase;
+  static constexpr const char* name = "yue.MenuBar";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index, "new", &MetaTable<nu::MenuBar>::NewInstance<>);
+  }
+};
+
+template<>
+struct Type<nu::Menu> {
+  using base = nu::MenuBase;
+  static constexpr const char* name = "yue.Menu";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index, "new", &MetaTable<nu::Menu>::NewInstance<>,
+                         "popup", &nu::Menu::Popup);
+  }
+};
+
 }  // namespace lua
 
 extern "C" int luaopen_yue_gui(lua::State* state) {
@@ -392,6 +418,12 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   lua_rawset(state, -3);
   lua::Push(state, "Painter");
   lua::MetaTable<nu::Painter>::Push(state);
+  lua_rawset(state, -3);
+  lua::Push(state, "MenuBar");
+  lua::MetaTable<nu::MenuBar>::Push(state);
+  lua_rawset(state, -3);
+  lua::Push(state, "Menu");
+  lua::MetaTable<nu::Menu>::Push(state);
   lua_rawset(state, -3);
   return 1;
 }
