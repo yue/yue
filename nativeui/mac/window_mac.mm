@@ -54,14 +54,6 @@ RectF WindowToContentBounds(NSWindow* window, const RectF& bounds) {
 
 }  // namespace
 
-Window::~Window() {
-  // Clear the delegate class.
-  [[window_ delegate] release];
-  [window_ setDelegate:nil];
-
-  [window_ release];
-}
-
 void Window::PlatformInit(const Options& options) {
   NSUInteger styleMask = NSTitledWindowMask | NSMiniaturizableWindowMask |
                          NSClosableWindowMask | NSResizableWindowMask |
@@ -74,6 +66,14 @@ void Window::PlatformInit(const Options& options) {
 
   [window_ setDelegate:[[NUWindowDelegate alloc] initWithShell:this]];
   [window_ setReleasedWhenClosed:NO];
+}
+
+void Window::PlatformDestroy() {
+  // Clear the delegate class.
+  [[window_ delegate] release];
+  [window_ setDelegate:nil];
+
+  [window_ release];
 }
 
 void Window::Close() {

@@ -11,6 +11,8 @@
 
 namespace nu {
 
+class MenuBar;
+
 // The native window.
 NATIVEUI_EXPORT class Window : public base::RefCounted<Window> {
  public:
@@ -36,6 +38,9 @@ NATIVEUI_EXPORT class Window : public base::RefCounted<Window> {
 
   void SetBackgroundColor(Color color);
 
+  void SetMenuBar(MenuBar* menu_bar);
+  MenuBar* GetMenuBar() const;
+
   NativeWindow window() const { return window_; }
 
   // Events.
@@ -52,9 +57,12 @@ NATIVEUI_EXPORT class Window : public base::RefCounted<Window> {
 
   // Following platform implementations should only be called by wrappers.
   void PlatformInit(const Options& options);
+  void PlatformDestroy();
   void PlatformSetContentView(Container* container);
+  void PlatformSetMenuBar(MenuBar* menu_bar);
 
   NativeWindow window_;
+  scoped_refptr<MenuBar> menu_bar_;
   scoped_refptr<Container> content_view_;
 };
 

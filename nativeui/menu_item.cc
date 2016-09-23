@@ -4,6 +4,8 @@
 
 #include "nativeui/menu_item.h"
 
+#include "nativeui/menu_base.h"
+
 namespace nu {
 
 MenuItem::MenuItem(Type type) : type_(type) {
@@ -12,6 +14,15 @@ MenuItem::MenuItem(Type type) : type_(type) {
 
 MenuItem::~MenuItem() {
   PlatformDestroy();
+}
+
+void MenuItem::SetSubmenu(MenuBase* submenu) {
+  submenu_ = submenu;
+  PlatformSetSubmenu(submenu);
+}
+
+MenuBase* MenuItem::GetSubmenu() const {
+  return submenu_.get();
 }
 
 }  // namespace nu

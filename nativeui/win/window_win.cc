@@ -187,16 +187,16 @@ void TopLevelWindow::TrackMouse(bool enable) {
 ///////////////////////////////////////////////////////////////////////////////
 // Public Window API implementation.
 
-Window::~Window() {
-  delete window_;
-}
-
 void Window::PlatformInit(const Options& options) {
   TopLevelWindow* win = new TopLevelWindow(this);
   window_ = win;
 
   if (!options.bounds.IsEmpty())
     SetBounds(options.bounds);
+}
+
+void Window::PlatformDestroy() {
+  delete window_;
 }
 
 void Window::Close() {

@@ -39,7 +39,6 @@ NATIVEUI_EXPORT class Container : public View {
 
   // Get children.
   int child_count() const { return static_cast<int>(children_.size()); }
-  bool has_children() const { return !children_.empty(); }
   View* child_at(int index) const {
     if (index < 0 || index >= child_count())
       return nullptr;

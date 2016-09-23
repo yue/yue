@@ -26,11 +26,6 @@ void ForceSizeAllocation(GtkWindow* window, GtkWidget* view) {
 
 }  // namespace
 
-Window::~Window() {
-  if (window_)
-    gtk_widget_destroy(GTK_WIDGET(window_));
-}
-
 void Window::PlatformInit(const Options& options) {
   window_ = GTK_WINDOW(gtk_window_new(GTK_WINDOW_TOPLEVEL));
   gtk_window_set_focus_on_map(window_, false);
@@ -42,6 +37,11 @@ void Window::PlatformInit(const Options& options) {
   }
 
   g_signal_connect(window_, "delete-event", G_CALLBACK(OnClose), this);
+}
+
+void Window::PlatformDestroy() {
+  if (window_)
+    gtk_widget_destroy(GTK_WIDGET(window_));
 }
 
 void Window::Close() {
@@ -61,6 +61,12 @@ void Window::PlatformSetContentView(Container* container) {
   gtk_container_add(GTK_CONTAINER(window_), container->view());
 
   ForceSizeAllocation(window_, container->view());
+}
+
+void Window::PlatformSetMenuBar(MenuBar* menu_bar) {
+  // TODO(zcbenz):
+  // 1. Content bound should take account of menubar;
+  // 2. Setting menubar should not change content bounds.
 }
 
 void Window::SetContentBounds(const RectF& bounds) {

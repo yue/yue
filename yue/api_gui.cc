@@ -329,7 +329,9 @@ struct Type<nu::Window> {
            "getcontentview", &nu::Window::GetContentView,
            "setvisible", &nu::Window::SetVisible,
            "isvisible", &nu::Window::IsVisible,
-           "setbackgroundcolor", &nu::Window::SetBackgroundColor);
+           "setbackgroundcolor", &nu::Window::SetBackgroundColor,
+           "setmenubar", &nu::Window::SetMenuBar,
+           "getmenubar", &nu::Window::GetMenuBar);
   }
   static bool Index(State* state, const std::string& name) {
     return yue::SignalIndex(state, name, "onclose", &nu::Window::on_close);
@@ -355,6 +357,16 @@ template<>
 struct Type<nu::MenuBase> {
   static constexpr const char* name = "yue.MenuBase";
   static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index, "append", &nu::MenuBase::Append,
+                         "insert", &Insert,
+                         "itemcount", &nu::MenuBase::item_count,
+                         "itemat", &ItemAt);
+  }
+  static inline void Insert(nu::MenuBase* menu, nu::MenuItem* item, int i) {
+    menu->Insert(item, i - 1);
+  }
+  static inline nu::MenuItem* ItemAt(nu::MenuBase* menu, int i) {
+    return menu->item_at(i - 1);
   }
 };
 
@@ -395,6 +407,9 @@ struct Type<nu::MenuItem::Type> {
     } else if (type == "separator") {
       *out = nu::MenuItem::Separator;
       return true;
+    } else if (type == "submenu") {
+      *out = nu::MenuItem::Submenu;
+      return true;
     } else {
       return false;
     }
@@ -406,7 +421,11 @@ struct Type<nu::MenuItem> {
   static constexpr const char* name = "yue.MenuItem";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
-           "new", &MetaTable<nu::MenuItem>::NewInstance<nu::MenuItem::Type>);
+           "new", &MetaTable<nu::MenuItem>::NewInstance<nu::MenuItem::Type>,
+           "setlabel", &nu::MenuItem::SetLabel,
+           "getlabel", &nu::MenuItem::GetLabel,
+           "setsubmenu", &nu::MenuItem::SetSubmenu,
+           "getsubmenu", &nu::MenuItem::GetSubmenu);
   }
 };
 

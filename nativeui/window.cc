@@ -5,12 +5,17 @@
 #include "nativeui/window.h"
 
 #include "nativeui/container.h"
+#include "nativeui/menu_bar.h"
 
 namespace nu {
 
 Window::Window(const Options& options) {
   PlatformInit(options);
   SetContentView(new Container);
+}
+
+Window::~Window() {
+  PlatformDestroy();
 }
 
 void Window::SetContentView(Container* container) {
@@ -24,6 +29,15 @@ void Window::SetContentView(Container* container) {
 
 Container* Window::GetContentView() const {
   return content_view_.get();
+}
+
+void Window::SetMenuBar(MenuBar* menu_bar) {
+  menu_bar_ = menu_bar;
+  PlatformSetMenuBar(menu_bar);
+}
+
+MenuBar* Window::GetMenuBar() const {
+  return menu_bar_.get();
 }
 
 }  // namespace nu
