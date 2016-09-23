@@ -13,6 +13,7 @@
 #include "nativeui/label.h"
 #include "nativeui/menu.h"
 #include "nativeui/menu_bar.h"
+#include "nativeui/menu_item.h"
 #include "nativeui/progress.h"
 #include "nativeui/scroll.h"
 #include "nativeui/state.h"

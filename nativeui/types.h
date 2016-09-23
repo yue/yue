@@ -66,6 +66,7 @@ using NativeFont = NSFont*;
 using NativeView = GtkWidget*;
 using NativeWindow = GtkWindow*;
 using NativeMenu = GtkMenuShell*;
+using NativeMenuItem = GtkMenuItem*;
 #elif defined(OS_WIN)
 using NativeView = BaseView*;
 using NativeWindow = WindowImpl*;

@@ -377,6 +377,39 @@ struct Type<nu::Menu> {
   }
 };
 
+template<>
+struct Type<nu::MenuItem::Type> {
+  static constexpr const char* name = "yue.MenuItem.Type";
+  static bool To(State* state, int index, nu::MenuItem::Type* out) {
+    std::string type;
+    lua::To(state, index, &type);
+    if (type.empty() || type == "label") {
+      *out = nu::MenuItem::Label;
+      return true;
+    } else if (type == "checkbox") {
+      *out = nu::MenuItem::CheckBox;
+      return true;
+    } else if (type == "radio") {
+      *out = nu::MenuItem::Radio;
+      return true;
+    } else if (type == "separator") {
+      *out = nu::MenuItem::Separator;
+      return true;
+    } else {
+      return false;
+    }
+  }
+};
+
+template<>
+struct Type<nu::MenuItem> {
+  static constexpr const char* name = "yue.MenuItem";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "new", &MetaTable<nu::MenuItem>::NewInstance<nu::MenuItem::Type>);
+  }
+};
+
 }  // namespace lua
 
 extern "C" int luaopen_yue_gui(lua::State* state) {
@@ -424,6 +457,9 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   lua_rawset(state, -3);
   lua::Push(state, "Menu");
   lua::MetaTable<nu::Menu>::Push(state);
+  lua_rawset(state, -3);
+  lua::Push(state, "MenuItem");
+  lua::MetaTable<nu::MenuItem>::Push(state);
   lua_rawset(state, -3);
   return 1;
 }
