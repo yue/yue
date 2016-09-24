@@ -20,10 +20,14 @@
 #if defined(OS_MACOSX)
 #ifdef __OBJC__
 @class NSFont;
+@class NSMenu;
+@class NSMenuItem;
 @class NSView;
 @class NSWindow;
 #else
 class NSFont;
+class NSMenu;
+class NSMenuItem;
 struct NSView;
 class NSWindow;
 #endif  // __OBJC__
@@ -62,6 +66,8 @@ using String = std::string;
 using NativeView = NSView*;
 using NativeWindow = NSWindow*;
 using NativeFont = NSFont*;
+using NativeMenu = NSMenu*;
+using NativeMenuItem = NSMenuItem*;
 #elif defined(OS_LINUX)
 using NativeView = GtkWidget*;
 using NativeWindow = GtkWindow*;

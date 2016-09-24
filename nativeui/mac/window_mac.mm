@@ -85,6 +85,10 @@ void Window::PlatformSetContentView(Container* container) {
   container->Layout();
 }
 
+void Window::PlatformSetMenuBar(MenuBar* menu_bar) {
+  // There is no menubar on mac.
+}
+
 void Window::SetContentBounds(const RectF& bounds) {
   SetBounds(ContentToWindowBounds(window_, bounds));
 }
