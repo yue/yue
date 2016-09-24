@@ -9,6 +9,28 @@
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/menu_base.h"
 
+@interface NUMenuItemDelegate : NSObject {
+ @private
+  nu::MenuItem* shell_;
+}
+- (id)initWithShell:(nu::MenuItem*)shell;
+- (IBAction)onClick:(id)sender;
+@end
+
+@implementation NUMenuItemDelegate
+
+- (id)initWithShell:(nu::MenuItem*)shell {
+  if ((self = [super init]))
+    shell_ = shell;
+  return self;
+}
+
+- (IBAction)onClick:(id)sender {
+  shell_->on_click.Emit();
+}
+
+@end
+
 namespace nu {
 
 void MenuItem::SetLabel(const std::string& label) {
@@ -20,10 +42,16 @@ std::string MenuItem::GetLabel() const {
 }
 
 void MenuItem::PlatformInit() {
-  menu_item_ = [[NSMenuItem alloc] init];
+  if (type_ == Separator)
+    menu_item_ = [[NSMenuItem separatorItem] retain];
+  else
+    menu_item_ = [[NSMenuItem alloc] init];
+  menu_item_.target = [[NUMenuItemDelegate alloc] initWithShell:this];
+  menu_item_.action = @selector(onClick:);
 }
 
 void MenuItem::PlatformDestroy() {
+  [menu_item_.target release];
   [menu_item_ release];
 }
 

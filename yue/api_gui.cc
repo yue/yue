@@ -427,6 +427,12 @@ struct Type<nu::MenuItem> {
            "setsubmenu", &nu::MenuItem::SetSubmenu,
            "getsubmenu", &nu::MenuItem::GetSubmenu);
   }
+  static bool Index(State* state, const std::string& name) {
+    return yue::SignalIndex(state, name, "onclick", &nu::MenuItem::on_click);
+  }
+  static bool NewIndex(State* state, const std::string& name) {
+    return yue::MemberNewIndex(state, name, "onclick", &nu::MenuItem::on_click);
+  }
 };
 
 }  // namespace lua

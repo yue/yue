@@ -5,8 +5,10 @@
 #ifndef NATIVEUI_MENU_ITEM_H_
 #define NATIVEUI_MENU_ITEM_H_
 
+#include <string>
+
 #include "base/memory/ref_counted.h"
-#include "nativeui/nativeui_export.h"
+#include "nativeui/signal.h"
 #include "nativeui/types.h"
 
 namespace nu {
@@ -30,6 +32,9 @@ NATIVEUI_EXPORT class MenuItem : public base::RefCounted<MenuItem> {
 
   void SetSubmenu(MenuBase* submenu);
   MenuBase* GetSubmenu() const;
+
+  // Events.
+  Signal<void()> on_click;
 
   // Only used internally to set the owner of menu item.
   void set_menu(MenuBase* menu) { menu_ = menu; }

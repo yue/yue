@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "base/callback.h"
+#include "nativeui/nativeui_export.h"
 
 namespace nu {
 
@@ -17,7 +18,7 @@ namespace nu {
 template<typename Sig> class Signal;
 
 template<typename... Args>
-class Signal<void(Args...)> {
+NATIVEUI_EXPORT class Signal<void(Args...)> {
  public:
   using Slot = base::Callback<void(Args...)>;
 
