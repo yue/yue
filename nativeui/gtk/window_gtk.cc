@@ -4,6 +4,8 @@
 
 #include "nativeui/window.h"
 
+#include "nativeui/menu_bar.h"
+
 namespace nu {
 
 namespace {
@@ -17,18 +19,16 @@ gboolean OnClose(GtkWidget *widget, GdkEvent *event, Window* window) {
   return TRUE;
 }
 
-// Force window to allocate size for content view.
-void ForceSizeAllocation(GtkWindow* window, GtkWidget* view) {
-  GdkRectangle rect = { 0, 0 };
-  gtk_window_get_size(window, &rect.width, &rect.height);
-  gtk_widget_size_allocate(view, &rect);
-}
-
 }  // namespace
 
 void Window::PlatformInit(const Options& options) {
   window_ = GTK_WINDOW(gtk_window_new(GTK_WINDOW_TOPLEVEL));
   gtk_window_set_focus_on_map(window_, false);
+
+  // Must use a vbox to pack menubar.
+  GtkWidget* vbox = gtk_vbox_new(FALSE, 0);
+  gtk_widget_show(vbox);
+  gtk_container_add(GTK_CONTAINER(window_), vbox);
 
   if (!options.bounds.IsEmpty()) {
     gtk_window_set_default_size(window_, options.bounds.width(),
@@ -55,18 +55,23 @@ void Window::Close() {
 }
 
 void Window::PlatformSetContentView(Container* container) {
-  GtkWidget* child = gtk_bin_get_child(GTK_BIN(window_));
-  if (child)
-    gtk_container_remove(GTK_CONTAINER(window_), child);
-  gtk_container_add(GTK_CONTAINER(window_), container->view());
-
-  ForceSizeAllocation(window_, container->view());
+  GtkContainer* vbox = GTK_CONTAINER(gtk_bin_get_child(GTK_BIN(window_)));
+  if (content_view_)
+    gtk_container_remove(vbox, content_view_->view());
+  gtk_container_add(vbox, container->view());
+  gtk_box_set_child_packing(GTK_BOX(vbox), container->view(), TRUE, TRUE,
+                            0, GTK_PACK_END);
 }
 
 void Window::PlatformSetMenuBar(MenuBar* menu_bar) {
-  // TODO(zcbenz):
-  // 1. Content bound should take account of menubar;
-  // 2. Setting menubar should not change content bounds.
+  // TODO(zcbenz): Content bound should take account of menubar.
+  GtkContainer* vbox = GTK_CONTAINER(gtk_bin_get_child(GTK_BIN(window_)));
+  if (menu_bar_)
+    gtk_container_remove(vbox, GTK_WIDGET(menu_bar_->menu()));
+  GtkWidget* menu = GTK_WIDGET(menu_bar->menu());
+  gtk_container_add(vbox, menu);
+  gtk_box_set_child_packing(GTK_BOX(vbox), menu, FALSE, FALSE, 0,
+                            GTK_PACK_START);
 }
 
 void Window::SetContentBounds(const RectF& bounds) {
@@ -80,8 +85,6 @@ RectF Window::GetContentBounds() const {
 void Window::SetBounds(const RectF& bounds) {
   gtk_window_move(window_, bounds.x(), bounds.y());
   gtk_window_resize(window_, bounds.width(), bounds.height());
-
-  ForceSizeAllocation(window_, GetContentView()->view());
 }
 
 RectF Window::GetBounds() const {

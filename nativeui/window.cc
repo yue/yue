@@ -23,8 +23,8 @@ void Window::SetContentView(Container* container) {
     LOG(ERROR) << "Content view can not be null";
     return;
   }
-  content_view_ = container;
   PlatformSetContentView(container);
+  content_view_ = container;
 }
 
 Container* Window::GetContentView() const {
@@ -32,8 +32,8 @@ Container* Window::GetContentView() const {
 }
 
 void Window::SetMenuBar(MenuBar* menu_bar) {
-  menu_bar_ = menu_bar;
   PlatformSetMenuBar(menu_bar);
+  menu_bar_ = menu_bar;
 }
 
 MenuBar* Window::GetMenuBar() const {
