@@ -36,6 +36,12 @@ NATIVEUI_EXPORT class MenuItem : public base::RefCounted<MenuItem> {
   void SetChecked(bool checked);
   bool IsChecked() const;
 
+  void SetEnabled(bool enabled);
+  bool IsEnabled() const;
+
+  void SetVisible(bool visible);
+  bool IsVisible() const;
+
   // Events.
   Signal<void()> on_click;
 

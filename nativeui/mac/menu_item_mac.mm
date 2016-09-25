@@ -77,19 +77,35 @@ void FlipRadioMenuItems(nu::MenuBase* menu, nu::MenuItem* sender) {
 namespace nu {
 
 void MenuItem::SetLabel(const std::string& label) {
-  [menu_item_ setTitle:base::SysUTF8ToNSString(label)];
+  menu_item_.title = base::SysUTF8ToNSString(label);
 }
 
 std::string MenuItem::GetLabel() const {
-  return base::SysNSStringToUTF8([menu_item_ title]);
+  return base::SysNSStringToUTF8(menu_item_.title);
 }
 
 void MenuItem::SetChecked(bool checked) {
-  [menu_item_ setState:(checked ? NSOnState : NSOffState)];
+  menu_item_.state = checked ? NSOnState : NSOffState;
 }
 
 bool MenuItem::IsChecked() const {
-  return [menu_item_ state] == NSOnState;
+  return menu_item_.state == NSOnState;
+}
+
+void MenuItem::SetEnabled(bool enabled) {
+  menu_item_.enabled = enabled;
+}
+
+bool MenuItem::IsEnabled() const {
+  return menu_item_.enabled;
+}
+
+void MenuItem::SetVisible(bool visible) {
+  menu_item_.hidden = !visible;
+}
+
+bool MenuItem::IsVisible() const {
+  return !menu_item_.hidden;
 }
 
 void MenuItem::PlatformInit() {

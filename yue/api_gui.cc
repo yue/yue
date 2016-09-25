@@ -426,6 +426,10 @@ struct Type<nu::MenuItem> {
            "getlabel", &nu::MenuItem::GetLabel,
            "setchecked", &nu::MenuItem::SetChecked,
            "ischecked", &nu::MenuItem::IsChecked,
+           "setenabled", &nu::MenuItem::SetEnabled,
+           "isenabled", &nu::MenuItem::IsEnabled,
+           "setvisible", &nu::MenuItem::SetVisible,
+           "isvisible", &nu::MenuItem::IsVisible,
            "setsubmenu", &nu::MenuItem::SetSubmenu,
            "getsubmenu", &nu::MenuItem::GetSubmenu);
   }

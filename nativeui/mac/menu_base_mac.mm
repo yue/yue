@@ -11,6 +11,7 @@
 namespace nu {
 
 void MenuBase::PlatformInit() {
+  [menu_ setAutoenablesItems:NO];
 }
 
 void MenuBase::PlatformDestroy() {
