@@ -9,6 +9,43 @@
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/menu_base.h"
 
+namespace {
+
+// Flip all radio items in the same group with |item|.
+void FlipRadioMenuItems(nu::MenuBase* menu, nu::MenuItem* sender) {
+  // Find out from where the group starts.
+  int group_start = 0;
+  int radio_count = 0;
+  bool found_item = false;
+  for (int i = 0; i < menu->item_count(); ++i) {
+    nu::MenuItem* item = menu->item_at(i);
+    if (item == sender) {
+      found_item = true;  // in the group now
+    } else if (item->type() == nu::MenuItem::Separator) {
+      if (found_item)  // end of group
+        break;
+      // Possible start of a the group.
+      radio_count = 0;
+      group_start = i;
+    } else if (item->type() == nu::MenuItem::Radio) {
+      radio_count++;  // another radio in the group
+    }
+  }
+
+  // No need to flip if there is only one radio in group.
+  if (radio_count == 0)
+    return;
+
+  // Flip all other radios in the group.
+  for (int i = group_start; i < menu->item_count(); ++i) {
+    nu::MenuItem* item = menu->item_at(i);
+    if (item != sender && item->type() == nu::MenuItem::Radio)
+      item->SetChecked(false);
+  }
+}
+
+}  // namespace
+
 @interface NUMenuItemDelegate : NSObject {
  @private
   nu::MenuItem* shell_;
@@ -26,6 +63,12 @@
 }
 
 - (IBAction)onClick:(id)sender {
+  if (shell_->type() == nu::MenuItem::CheckBox) {
+    shell_->SetChecked(!shell_->IsChecked());
+  } else if (shell_->type() == nu::MenuItem::Radio) {
+    shell_->SetChecked(true);
+    FlipRadioMenuItems(shell_->menu(), shell_);
+  }
   shell_->on_click.Emit();
 }
 
@@ -39,6 +82,14 @@ void MenuItem::SetLabel(const std::string& label) {
 
 std::string MenuItem::GetLabel() const {
   return base::SysNSStringToUTF8([menu_item_ title]);
+}
+
+void MenuItem::SetChecked(bool checked) {
+  [menu_item_ setState:(checked ? NSOnState : NSOffState)];
+}
+
+bool MenuItem::IsChecked() const {
+  return [menu_item_ state] == NSOnState;
 }
 
 void MenuItem::PlatformInit() {

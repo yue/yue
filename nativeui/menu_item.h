@@ -33,6 +33,9 @@ NATIVEUI_EXPORT class MenuItem : public base::RefCounted<MenuItem> {
   void SetSubmenu(MenuBase* submenu);
   MenuBase* GetSubmenu() const;
 
+  void SetChecked(bool checked);
+  bool IsChecked() const;
+
   // Events.
   Signal<void()> on_click;
 
@@ -42,6 +45,8 @@ NATIVEUI_EXPORT class MenuItem : public base::RefCounted<MenuItem> {
 
   // Return the native MenuItem object.
   NativeMenuItem menu_item() const { return menu_item_; }
+
+  Type type() const { return type_; }
 
  private:
   friend class base::RefCounted<MenuItem>;

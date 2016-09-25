@@ -424,6 +424,8 @@ struct Type<nu::MenuItem> {
            "new", &MetaTable<nu::MenuItem>::NewInstance<nu::MenuItem::Type>,
            "setlabel", &nu::MenuItem::SetLabel,
            "getlabel", &nu::MenuItem::GetLabel,
+           "setchecked", &nu::MenuItem::SetChecked,
+           "ischecked", &nu::MenuItem::IsChecked,
            "setsubmenu", &nu::MenuItem::SetSubmenu,
            "getsubmenu", &nu::MenuItem::GetSubmenu);
   }
