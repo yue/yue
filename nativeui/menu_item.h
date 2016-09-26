@@ -27,6 +27,8 @@ NATIVEUI_EXPORT class MenuItem : public base::RefCounted<MenuItem> {
 
   explicit MenuItem(Type type);
 
+  void Click();
+
   void SetLabel(const std::string& label);
   std::string GetLabel() const;
 

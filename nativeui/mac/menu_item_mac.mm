@@ -63,18 +63,20 @@ void FlipRadioMenuItems(nu::MenuBase* menu, nu::MenuItem* sender) {
 }
 
 - (IBAction)onClick:(id)sender {
-  if (shell_->type() == nu::MenuItem::CheckBox) {
+  if (shell_->type() == nu::MenuItem::CheckBox)
     shell_->SetChecked(!shell_->IsChecked());
-  } else if (shell_->type() == nu::MenuItem::Radio) {
+  else if (shell_->type() == nu::MenuItem::Radio)
     shell_->SetChecked(true);
-    FlipRadioMenuItems(shell_->menu(), shell_);
-  }
   shell_->on_click.Emit();
 }
 
 @end
 
 namespace nu {
+
+void MenuItem::Click() {
+  [NSApp sendAction:menu_item_.action to:menu_item_.target from:menu_item_];
+}
 
 void MenuItem::SetLabel(const std::string& label) {
   menu_item_.title = base::SysUTF8ToNSString(label);
@@ -86,6 +88,8 @@ std::string MenuItem::GetLabel() const {
 
 void MenuItem::SetChecked(bool checked) {
   menu_item_.state = checked ? NSOnState : NSOffState;
+  if (checked && type_ == nu::MenuItem::Radio && menu_)
+    FlipRadioMenuItems(menu_, this);
 }
 
 bool MenuItem::IsChecked() const {

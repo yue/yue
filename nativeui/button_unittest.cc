@@ -45,16 +45,12 @@ TEST_F(ButtonTest, CheckBox) {
   EXPECT_TRUE(button->IsChecked());
 }
 
-// TODO(zcbenz): Fix the platform differences on radio buttons.
-#if !defined(OS_LINUX)
 TEST_F(ButtonTest, Radio) {
   scoped_refptr<nu::Button> button =
       new nu::Button("title", nu::Button::Radio);
-  EXPECT_FALSE(button->IsChecked());
   button->SetChecked(true);
   EXPECT_TRUE(button->IsChecked());
 }
-#endif
 
 TEST_F(ButtonTest, RadioGroup) {
   scoped_refptr<nu::Container> container = new nu::Container;

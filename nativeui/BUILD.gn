@@ -200,6 +200,8 @@ test("nativeui_unittests") {
     "button_unittest.cc",
     "group_unittest.cc",
     "label_unittest.cc",
+    "menu_unittests.cc",
+    "menu_item_unittests.cc",
     "view_unittest.cc",
     "window_unittest.cc",
     "test/gfx_util.cc",
