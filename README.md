@@ -13,8 +13,11 @@ The only channel to get help from me is to subscribe to paid plans.
 ## Contributions
 
 While I appreciate contributions and will do my best to get them merged, please
-understand that I have high code standards and personal code tastes, so your
-patch might be heavily modified or rejected.
+understand that I have high coding standards and personal tastes, so your patch
+might be heavily modified or rejected.
+
+By sending a pull request, you are agreeing to transfer the copyright of its
+code to me.
 
 ## License
 
@@ -34,7 +37,7 @@ with following clarifications:
 
 The source code of Yue project is also available under the [Microsoft Public
 License (MS-PL)][ms-pl] if you subscribe to the paid plans. Unlike MS-RL,
-the MS-PL license does not require you to open source the modifications of this
+the MS-PL license does not require you to open source the modifications to this
 software if you only publish your software in binary form.
 
 [ms-rl]: https://github.com/yue/yue/blob/master/LICENSE
