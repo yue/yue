@@ -16,6 +16,8 @@ SubwinHolder::~SubwinHolder() {
 }
 
 void SubwinHolder::OnCommand(UINT code, int command, HWND window) {
+  if (!window)
+    return;
   auto* control = reinterpret_cast<SubwinView*>(GetWindowUserData(window));
   control->OnCommand(code, command);
 }

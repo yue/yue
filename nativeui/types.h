@@ -53,6 +53,7 @@ namespace nu {
 
 #if defined(OS_WIN)
 class BaseView;
+struct MenuItemData;
 class WindowImpl;
 #endif
 
@@ -77,6 +78,8 @@ using NativeMenuItem = GtkMenuItem*;
 using NativeView = BaseView*;
 using NativeWindow = WindowImpl*;
 using NativeFont = Gdiplus::Font*;
+using NativeMenu = HMENU;
+using NativeMenuItem = MenuItemData*;
 #elif defined(OS_IOS)
 using NativeView = UIView*;
 using NativeWindow UIWindow*;

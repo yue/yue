@@ -208,6 +208,9 @@ void Window::PlatformSetContentView(Container* container) {
   container->Layout();
 }
 
+void Window::PlatformSetMenuBar(MenuBar* menu_bar) {
+}
+
 void Window::SetContentBounds(const RectF& bounds) {
   TopLevelWindow* win = static_cast<TopLevelWindow*>(window_);
   Rect pixel_bounds(ToEnclosingRect(ScaleRect(bounds, win->scale_factor())));

@@ -35,7 +35,7 @@ void MenuBase::Remove(MenuItem* item) {
   if (i == items_.end())
     return;
   PlatformRemove(item);
-  item->set_menu(this);
+  item->set_menu(nullptr);
   items_.erase(i);
 }
 

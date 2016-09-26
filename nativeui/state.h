@@ -40,6 +40,7 @@ NATIVEUI_EXPORT class State {
   HWND GetSubwinHolder();
   ClassRegistrar* GetClassRegistrar();
   NativeTheme* GetNativeTheme();
+  UINT GetNextCommandID();
 #endif
 
  private:
@@ -61,6 +62,10 @@ NATIVEUI_EXPORT class State {
   std::unique_ptr<ClassRegistrar> class_registrar_;
   std::unique_ptr<SubwinHolder> subwin_holder_;
   std::unique_ptr<NativeTheme> native_theme_;
+
+  // Next ID for custom WM_COMMAND items, the number came from:
+  // https://msdn.microsoft.com/en-us/library/11861byt.aspx
+  UINT next_command_id_ = 0x8000;
 #endif
 
   DISALLOW_COPY_AND_ASSIGN(State);

@@ -93,4 +93,8 @@ NativeTheme* State::GetNativeTheme() {
   return native_theme_.get();
 }
 
+UINT State::GetNextCommandID() {
+  return next_command_id_++;
+}
+
 }  // namespace nu
