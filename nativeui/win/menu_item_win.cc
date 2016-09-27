@@ -12,10 +12,23 @@
 namespace nu {
 
 void MenuItem::Click() {
+  if (type_ == nu::MenuItem::CheckBox)
+    SetChecked(!IsChecked());
+  else if (type_ == nu::MenuItem::Radio)
+    SetChecked(true);
+  on_click.Emit();
 }
 
 void MenuItem::SetLabel(const std::string& label) {
   menu_item_->label = base::UTF8ToUTF16(label);
+  if (menu_) {
+    MENUITEMINFO mii = {0};
+    mii.cbSize = sizeof(mii);
+    mii.fMask = MIIM_STRING;
+    mii.dwTypeData = const_cast<wchar_t*>(menu_item_->label.c_str());
+    mii.cch = static_cast<UINT>(menu_item_->label.size());
+    SetMenuItemInfo(menu_->menu(), menu_item_->id, FALSE, &mii);
+  }
 }
 
 std::string MenuItem::GetLabel() const {
@@ -24,6 +37,13 @@ std::string MenuItem::GetLabel() const {
 
 void MenuItem::SetChecked(bool checked) {
   menu_item_->checked = checked;
+  if (menu_) {
+    if (checked && type_ == nu::MenuItem::Radio)
+      FlipRadioMenuItems(menu_, this);
+    UINT flags = MF_BYCOMMAND;
+    flags |= checked ? MF_CHECKED : MF_UNCHECKED;
+    CheckMenuItem(menu_->menu(), menu_item_->id, flags);
+  }
 }
 
 bool MenuItem::IsChecked() const {
@@ -32,6 +52,11 @@ bool MenuItem::IsChecked() const {
 
 void MenuItem::SetEnabled(bool enabled) {
   menu_item_->enabled = enabled;
+  if (menu_) {
+    UINT flags = MF_BYCOMMAND;
+    flags |= enabled ? MF_ENABLED : MF_DISABLED;
+    EnableMenuItem(menu_->menu(), menu_item_->id, flags);
+  }
 }
 
 bool MenuItem::IsEnabled() const {

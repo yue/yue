@@ -9,43 +9,6 @@
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/menu_base.h"
 
-namespace {
-
-// Flip all radio items in the same group with |item|.
-void FlipRadioMenuItems(nu::MenuBase* menu, nu::MenuItem* sender) {
-  // Find out from where the group starts.
-  int group_start = 0;
-  int radio_count = 0;
-  bool found_item = false;
-  for (int i = 0; i < menu->item_count(); ++i) {
-    nu::MenuItem* item = menu->item_at(i);
-    if (item == sender) {
-      found_item = true;  // in the group now
-    } else if (item->type() == nu::MenuItem::Separator) {
-      if (found_item)  // end of group
-        break;
-      // Possible start of a the group.
-      radio_count = 0;
-      group_start = i;
-    } else if (item->type() == nu::MenuItem::Radio) {
-      radio_count++;  // another radio in the group
-    }
-  }
-
-  // No need to flip if there is only one radio in group.
-  if (radio_count == 0)
-    return;
-
-  // Flip all other radios in the group.
-  for (int i = group_start; i < menu->item_count(); ++i) {
-    nu::MenuItem* item = menu->item_at(i);
-    if (item != sender && item->type() == nu::MenuItem::Radio)
-      item->SetChecked(false);
-  }
-}
-
-}  // namespace
-
 @interface NUMenuItemDelegate : NSObject {
  @private
   nu::MenuItem* shell_;

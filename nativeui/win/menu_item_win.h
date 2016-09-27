@@ -7,10 +7,12 @@
 
 #include <string>
 
+#include <windows.h>
+
 namespace nu {
 
 struct MenuItemData {
-  int id = -1;
+  UINT id = 0;
   std::wstring label;
   bool checked = false;
   bool enabled = true;

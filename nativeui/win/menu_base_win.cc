@@ -21,7 +21,7 @@ void MenuBase::PlatformInsert(MenuItem* item, int index) {
   if (!data->visible)
     return;
 
-  MENUITEMINFO mii;
+  MENUITEMINFO mii = {0};
   mii.cbSize = sizeof(mii);
   if (item->type() == MenuItem::Separator) {
     mii.fMask = MIIM_FTYPE;

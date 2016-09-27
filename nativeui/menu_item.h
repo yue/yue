@@ -65,6 +65,9 @@ NATIVEUI_EXPORT class MenuItem : public base::RefCounted<MenuItem> {
   void PlatformDestroy();
   void PlatformSetSubmenu(MenuBase* submenu);
 
+  // Flip all radio items in the same group with |item|.
+  void FlipRadioMenuItems(nu::MenuBase* menu, nu::MenuItem* sender);
+
   // Weak ref to the owner menu.
   MenuBase* menu_ = nullptr;
 
