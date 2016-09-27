@@ -30,16 +30,13 @@ void MenuBase::PlatformDestroy() {
 }
 
 void MenuBase::PlatformInsert(MenuItem* item, int index) {
-  auto* data = item->menu_item();
-  if (!data->visible)
-    return;
-
   MENUITEMINFO mii = {0};
   mii.cbSize = sizeof(mii);
   if (item->type() == MenuItem::Separator) {
     mii.fMask = MIIM_FTYPE;
     mii.fType = MFT_SEPARATOR;
   } else {
+    auto* data = item->menu_item();
     mii.fMask = MIIM_FTYPE | MIIM_ID | MIIM_STRING | MIIM_STATE;
     mii.wID = data->id;
     if (item->type() == MenuItem::Submenu && item->GetSubmenu()) {
