@@ -148,6 +148,7 @@ source_set("nativeui") {
     "win/label_win.cc",
     "win/menu_win.cc",
     "win/menu_base_win.cc",
+    "win/menu_base_win.h",
     "win/menu_bar_win.cc",
     "win/menu_item_win.cc",
     "win/menu_item_win.h",

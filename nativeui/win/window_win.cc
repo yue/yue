@@ -9,6 +9,8 @@
 #include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/gfx/win/double_buffer.h"
 #include "nativeui/gfx/win/painter_win.h"
+#include "nativeui/menu_bar.h"
+#include "nativeui/win/menu_base_win.h"
 #include "nativeui/win/subwin_view.h"
 #include "nativeui/win/util/hwnd_util.h"
 
@@ -17,10 +19,11 @@ namespace nu {
 namespace {
 
 // Convert between window and client areas.
-Rect ContentToWindowBounds(WindowImpl* window, const Rect& bounds) {
+Rect ContentToWindowBounds(WindowImpl* window, bool has_menu_bar,
+                           const Rect& bounds) {
   RECT rect = bounds.ToRECT();
-  AdjustWindowRectEx(&rect, window->window_style(),
-                     FALSE, window->window_ex_style());
+  AdjustWindowRectEx(&rect, window->window_style(), has_menu_bar,
+                     window->window_ex_style());
   return Rect(rect);
 }
 
@@ -80,9 +83,12 @@ void TopLevelWindow::OnClose() {
 }
 
 void TopLevelWindow::OnCommand(UINT code, int command, HWND window) {
-  if (::GetParent(window) != hwnd()) {
+  if (!code && !window && delegate_->GetMenuBar()) {
+    DispatchCommandToItem(delegate_->GetMenuBar(), command);
+    return;
+  } else if (::GetParent(window) != hwnd()) {
     LOG(ERROR) << "Received notification " << code << " " << command
-               << "from a non-child window";
+               << " from a non-child window";
     return;
   }
 
@@ -209,12 +215,13 @@ void Window::PlatformSetContentView(Container* container) {
 }
 
 void Window::PlatformSetMenuBar(MenuBar* menu_bar) {
+  ::SetMenu(window_->hwnd(), menu_bar ? menu_bar->menu() : NULL);
 }
 
 void Window::SetContentBounds(const RectF& bounds) {
   TopLevelWindow* win = static_cast<TopLevelWindow*>(window_);
   Rect pixel_bounds(ToEnclosingRect(ScaleRect(bounds, win->scale_factor())));
-  win->SetPixelBounds(ContentToWindowBounds(win, pixel_bounds));
+  win->SetPixelBounds(ContentToWindowBounds(win, !!menu_bar_, pixel_bounds));
 }
 
 RectF Window::GetContentBounds() const {

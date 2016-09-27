@@ -81,6 +81,13 @@ void MenuItem::PlatformDestroy() {
 }
 
 void MenuItem::PlatformSetSubmenu(MenuBase* submenu) {
+  if (menu_) {
+    MENUITEMINFO mii = {0};
+    mii.cbSize = sizeof(mii);
+    mii.fMask = MIIM_SUBMENU;
+    mii.hSubMenu = submenu_->menu();
+    SetMenuItemInfo(menu_->menu(), menu_item_->id, FALSE, &mii);
+  }
 }
 
 }  // namespace nu

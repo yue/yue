@@ -2,12 +2,25 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/menu_base.h"
+#include "nativeui/win/menu_base_win.h"
 
 #include "nativeui/menu_item.h"
 #include "nativeui/win/menu_item_win.h"
 
 namespace nu {
+
+void DispatchCommandToItem(MenuBase* menu, UINT command) {
+  // Find the item with the id and click it.
+  for (int i = 0; i < menu->item_count(); ++i) {
+    MenuItem* item = menu->item_at(i);
+    if (item->menu_item()->id == command) {
+      item->Click();
+      break;
+    } else if (item->type() == MenuItem::Submenu && item->GetSubmenu()) {
+      DispatchCommandToItem(item->GetSubmenu(), command);
+    }
+  }
+}
 
 void MenuBase::PlatformInit() {
 }
@@ -29,6 +42,10 @@ void MenuBase::PlatformInsert(MenuItem* item, int index) {
   } else {
     mii.fMask = MIIM_FTYPE | MIIM_ID | MIIM_STRING | MIIM_STATE;
     mii.wID = data->id;
+    if (item->type() == MenuItem::Submenu && item->GetSubmenu()) {
+      mii.fMask |= MIIM_SUBMENU;
+      mii.hSubMenu = item->GetSubmenu()->menu();
+    }
     if (item->type() == MenuItem::Radio)
       mii.fType = MFT_RADIOCHECK;
     else

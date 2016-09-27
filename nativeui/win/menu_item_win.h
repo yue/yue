@@ -5,9 +5,9 @@
 #ifndef NATIVEUI_WIN_MENU_ITEM_WIN_H_
 #define NATIVEUI_WIN_MENU_ITEM_WIN_H_
 
-#include <string>
-
 #include <windows.h>
+
+#include <string>
 
 namespace nu {
 
