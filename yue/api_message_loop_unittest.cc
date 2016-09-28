@@ -16,23 +16,23 @@ class YueMessageLoopTest : public testing::Test {
 };
 
 TEST_F(YueMessageLoopTest, Require) {
-  ASSERT_FALSE(luaL_dostring(state_, "require('yue.MessageLoop')"));
+  ASSERT_FALSE(luaL_dostring(state_, "require('yue.messageloop')"));
 }
 
 TEST_F(YueMessageLoopTest, New) {
-  ASSERT_FALSE(luaL_dostring(state_, "require('yue.MessageLoop').new('ui')"));
-  ASSERT_TRUE(luaL_dostring(state_, "require('yue.MessageLoop').new('none')"));
+  ASSERT_FALSE(luaL_dostring(state_, "require('yue.messageloop').new('ui')"));
+  ASSERT_TRUE(luaL_dostring(state_, "require('yue.messageloop').new('none')"));
   std::string error;
   ASSERT_TRUE(lua::Pop(state_, &error));
   EXPECT_EQ(error, "MessageLoop of type 'none' is not supported");
-  ASSERT_TRUE(luaL_dostring(state_, "require('yue.MessageLoop').new('ui')"));
+  ASSERT_TRUE(luaL_dostring(state_, "require('yue.messageloop').new('ui')"));
   ASSERT_TRUE(lua::Pop(state_, &error));
   EXPECT_EQ(error, "MessageLoop is alraedy created");
 }
 
 TEST_F(YueMessageLoopTest, Run) {
   ASSERT_FALSE(luaL_dostring(state_,
-        "local loop = require('yue.MessageLoop').new('ui')\n"
+        "local loop = require('yue.messageloop').new('ui')\n"
         "local flag = false\n"
         "loop:post(function()\n"
           "flag = true\n"

@@ -17,8 +17,8 @@ namespace {
 
 // The search table, it must be manually kept in sorted order.
 std::pair<const char*, lua_CFunction> loaders_map[] = {
-  std::make_pair("yue.GUI", luaopen_yue_gui),
-  std::make_pair("yue.MessageLoop", luaopen_yue_message_loop),
+  std::make_pair("yue.gui", luaopen_yue_gui),
+  std::make_pair("yue.messageloop", luaopen_yue_message_loop),
 };
 
 // Use the first element of tuple as comparing key.
