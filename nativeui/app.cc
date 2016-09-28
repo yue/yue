@@ -15,9 +15,11 @@ App* App::current() {
 
 App::App() : message_loop_(base::MessageLoop::TYPE_UI),
              weak_factory_(this) {
+  PlatformInit();
 }
 
 App::~App() {
+  PlatformDestroy();
 }
 
 void App::Run() {

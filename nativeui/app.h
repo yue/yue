@@ -8,7 +8,15 @@
 #include "base/memory/weak_ptr.h"
 #include "base/message_loop/message_loop.h"
 #include "base/run_loop.h"
-#include "nativeui/nativeui_export.h"
+#include "nativeui/signal.h"
+
+#if defined(OS_MACOSX)
+#ifdef __OBJC__
+@class NUApplicationDelegate;
+#else
+class NUApplicationDelegate;
+#endif
+#endif
 
 namespace nu {
 
@@ -17,10 +25,14 @@ NATIVEUI_EXPORT class App {
  public:
   static App* current();
 
+  // Control message loop.
   void Run();
   void Quit();
   void PostTask(const base::Closure& task);
   void PostDelayedTask(int ms, const base::Closure& task);
+
+  // Events.
+  Signal<void()> on_ready;
 
   base::WeakPtr<App> GetWeakPtr() { return weak_factory_.GetWeakPtr(); }
 
@@ -30,6 +42,13 @@ NATIVEUI_EXPORT class App {
 
  private:
   friend class State;
+
+  void PlatformInit();
+  void PlatformDestroy();
+
+#if defined(OS_MACOSX)
+  NUApplicationDelegate* app_delegate_;
+#endif
 
   base::MessageLoop message_loop_;
   base::RunLoop run_loop_;

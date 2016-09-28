@@ -124,6 +124,9 @@ struct Type<nu::App> {
                          "post", &nu::App::PostTask,
                          "postdelayed", &nu::App::PostDelayedTask);
   }
+  static bool NewIndex(State* state, const std::string& name) {
+    return yue::MemberNewIndex(state, name, "onready", &nu::App::on_ready);
+  }
 };
 
 template<>
