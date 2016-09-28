@@ -71,6 +71,18 @@ struct Type<nu::Insets> {
 };
 
 template<>
+struct Type<nu::Color> {
+  static constexpr const char* name = "yue.Color";
+  static inline bool To(State* state, int index, nu::Color* out) {
+    std::string hex;
+    if (!lua::To(state, index, &hex))
+      return false;
+    *out = nu::Color(hex);
+    return true;
+  }
+};
+
+template<>
 struct Type<nu::View> {
   static constexpr const char* name = "yue.View";
   static void BuildMetaTable(State* state, int index) {
@@ -104,14 +116,13 @@ struct Type<nu::View> {
 };
 
 template<>
-struct Type<nu::Color> {
-  static constexpr const char* name = "yue.Color";
-  static inline bool To(State* state, int index, nu::Color* out) {
-    std::string hex;
-    if (!lua::To(state, index, &hex))
-      return false;
-    *out = nu::Color(hex);
-    return true;
+struct Type<nu::App> {
+  static constexpr const char* name = "yue.App";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index, "run", &nu::App::Run,
+                         "quit", &nu::App::Quit,
+                         "post", &nu::App::PostTask,
+                         "postdelayed", &nu::App::PostDelayedTask);
   }
 };
 
@@ -456,6 +467,9 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
 
   // Populate the table with GUI elements.
   lua::PushNewTable(state);
+  lua::Push(state, "App");
+  lua::MetaTable<nu::App>::Push(state);
+  lua_rawset(state, -3);
   lua::Push(state, "Window");
   lua::MetaTable<nu::Window>::Push(state);
   lua_rawset(state, -3);
@@ -491,6 +505,11 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   lua_rawset(state, -3);
   lua::Push(state, "MenuItem");
   lua::MetaTable<nu::MenuItem>::Push(state);
+  lua_rawset(state, -3);
+
+  // Create APIs that only available as instances.
+  lua::Push(state, "app");
+  lua::MetaTable<nu::App>::PushNewWrapper(state, nu::App::current());
   lua_rawset(state, -3);
   return 1;
 }

@@ -8,6 +8,8 @@ source_set("nativeui") {
   sources = [
     "nativeui.h",
     "nativeui_export.h",
+    "app.cc",
+    "app.h",
     "button.cc",
     "button.h",
     "container.cc",

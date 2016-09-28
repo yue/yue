@@ -5,6 +5,7 @@
 #ifndef NATIVEUI_NATIVEUI_H_
 #define NATIVEUI_NATIVEUI_H_
 
+#include "nativeui/app.h"
 #include "nativeui/button.h"
 #include "nativeui/entry.h"
 #include "nativeui/gfx/geometry/insets.h"

@@ -8,7 +8,7 @@
 #include <memory>
 
 #include "base/memory/ref_counted.h"
-#include "nativeui/nativeui_export.h"
+#include "nativeui/app.h"
 
 #if defined(OS_LINUX)
 #include "nativeui/gtk/gtk_event_loop.h"
@@ -36,6 +36,10 @@ NATIVEUI_EXPORT class State {
   // Returns the default GUI font.
   PlatformFont* GetDefaultFont();
 
+  // Returns the instance of App.
+  App* app() { return &app_; }
+
+  // Internal classes.
 #if defined(OS_WIN)
   HWND GetSubwinHolder();
   ClassRegistrar* GetClassRegistrar();
@@ -67,6 +71,9 @@ NATIVEUI_EXPORT class State {
   // https://msdn.microsoft.com/en-us/library/11861byt.aspx
   UINT next_command_id_ = 0x8000;
 #endif
+
+  // The app instance.
+  App app_;
 
   DISALLOW_COPY_AND_ASSIGN(State);
 };
