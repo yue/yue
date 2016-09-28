@@ -20,6 +20,8 @@ source_set("libyue") {
     "api_message_loop.h",
     "api_signal.cc",
     "api_signal.h",
+    "api_sys.cc",
+    "api_sys.h",
     "builtin_loader.cc",
     "builtin_loader.h",
   ]
