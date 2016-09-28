@@ -4,6 +4,7 @@
 
 #include "nativeui/app.h"
 
+#include "nativeui/menu_bar.h"
 #include "nativeui/state.h"
 
 namespace nu {
@@ -37,6 +38,15 @@ void App::PostTask(const base::Closure& task) {
 void App::PostDelayedTask(int ms, const base::Closure& task) {
   message_loop_.task_runner()->PostNonNestableDelayedTask(
       FROM_HERE, task, base::TimeDelta::FromMilliseconds(ms));
+}
+
+void App::SetApplicationMenu(MenuBar* menu) {
+  application_menu_ = menu;
+  PlatformSetApplicationMenu(menu);
+}
+
+MenuBar* App::GetApplicationMenu() const {
+  return application_menu_.get();
 }
 
 }  // namespace nu

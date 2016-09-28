@@ -122,7 +122,8 @@ struct Type<nu::App> {
     RawSet(state, index, "run", &nu::App::Run,
                          "quit", &nu::App::Quit,
                          "post", &nu::App::PostTask,
-                         "postdelayed", &nu::App::PostDelayedTask);
+                         "postdelayed", &nu::App::PostDelayedTask,
+                         "setapplicationmenu", &nu::App::SetApplicationMenu);
   }
   static bool NewIndex(State* state, const std::string& name) {
     return yue::MemberNewIndex(state, name, "onready", &nu::App::on_ready);

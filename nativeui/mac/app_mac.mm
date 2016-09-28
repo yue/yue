@@ -5,6 +5,7 @@
 #include "nativeui/app.h"
 
 #include "nativeui/mac/nu_application_delegate.h"
+#include "nativeui/menu_bar.h"
 
 namespace nu {
 
@@ -17,6 +18,10 @@ void App::PlatformInit() {
 void App::PlatformDestroy() {
   [NSApp setDelegate:nil];
   [app_delegate_ release];
+}
+
+void App::PlatformSetApplicationMenu(MenuBar* menu) {
+  [NSApp setMainMenu:menu->menu()];
 }
 
 }  // namespace nu

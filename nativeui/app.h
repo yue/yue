@@ -20,6 +20,8 @@ class NUApplicationDelegate;
 
 namespace nu {
 
+class MenuBar;
+
 // The instance that manages message loop and App wide global APIs.
 NATIVEUI_EXPORT class App {
  public:
@@ -30,6 +32,10 @@ NATIVEUI_EXPORT class App {
   void Quit();
   void PostTask(const base::Closure& task);
   void PostDelayedTask(int ms, const base::Closure& task);
+
+  // Set the application menu.
+  void SetApplicationMenu(MenuBar* menu);
+  MenuBar* GetApplicationMenu() const;
 
   // Events.
   Signal<void()> on_ready;
@@ -45,6 +51,7 @@ NATIVEUI_EXPORT class App {
 
   void PlatformInit();
   void PlatformDestroy();
+  void PlatformSetApplicationMenu(MenuBar* menu);
 
 #if defined(OS_MACOSX)
   NUApplicationDelegate* app_delegate_;
@@ -52,6 +59,8 @@ NATIVEUI_EXPORT class App {
 
   base::MessageLoop message_loop_;
   base::RunLoop run_loop_;
+
+  scoped_refptr<MenuBar> application_menu_;
 
   base::WeakPtrFactory<App> weak_factory_;
 
