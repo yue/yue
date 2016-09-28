@@ -9,6 +9,15 @@
 
 namespace nu {
 
+void App::SetApplicationMenu(MenuBar* menu) {
+  application_menu_ = menu;
+  [NSApp setMainMenu:menu->menu()];
+}
+
+MenuBar* App::GetApplicationMenu() const {
+  return application_menu_.get();
+}
+
 void App::PlatformInit() {
   DCHECK(![NSApp delegate]);
   app_delegate_ = [[NUApplicationDelegate alloc] initWithShell:this];
@@ -18,10 +27,6 @@ void App::PlatformInit() {
 void App::PlatformDestroy() {
   [NSApp setDelegate:nil];
   [app_delegate_ release];
-}
-
-void App::PlatformSetApplicationMenu(MenuBar* menu) {
-  [NSApp setMainMenu:menu->menu()];
 }
 
 }  // namespace nu

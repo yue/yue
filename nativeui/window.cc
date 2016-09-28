@@ -31,6 +31,7 @@ Container* Window::GetContentView() const {
   return content_view_.get();
 }
 
+#if defined(OS_WIN) || defined(OS_LINUX)
 void Window::SetMenuBar(MenuBar* menu_bar) {
   PlatformSetMenuBar(menu_bar);
   menu_bar_ = menu_bar;
@@ -39,5 +40,6 @@ void Window::SetMenuBar(MenuBar* menu_bar) {
 MenuBar* Window::GetMenuBar() const {
   return menu_bar_.get();
 }
+#endif
 
 }  // namespace nu

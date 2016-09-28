@@ -33,9 +33,11 @@ NATIVEUI_EXPORT class App {
   void PostTask(const base::Closure& task);
   void PostDelayedTask(int ms, const base::Closure& task);
 
+#if defined(OS_MACOSX)
   // Set the application menu.
   void SetApplicationMenu(MenuBar* menu);
   MenuBar* GetApplicationMenu() const;
+#endif
 
   // Events.
   Signal<void()> on_ready;
@@ -51,16 +53,14 @@ NATIVEUI_EXPORT class App {
 
   void PlatformInit();
   void PlatformDestroy();
-  void PlatformSetApplicationMenu(MenuBar* menu);
-
-#if defined(OS_MACOSX)
-  NUApplicationDelegate* app_delegate_;
-#endif
 
   base::MessageLoop message_loop_;
   base::RunLoop run_loop_;
 
+#if defined(OS_MACOSX)
   scoped_refptr<MenuBar> application_menu_;
+  NUApplicationDelegate* app_delegate_;
+#endif
 
   base::WeakPtrFactory<App> weak_factory_;
 

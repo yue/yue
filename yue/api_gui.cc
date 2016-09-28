@@ -119,11 +119,14 @@ template<>
 struct Type<nu::App> {
   static constexpr const char* name = "yue.App";
   static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index, "run", &nu::App::Run,
-                         "quit", &nu::App::Quit,
-                         "post", &nu::App::PostTask,
-                         "postdelayed", &nu::App::PostDelayedTask,
-                         "setapplicationmenu", &nu::App::SetApplicationMenu);
+    RawSet(state, index,
+#if defined(OS_MACOSX)
+           "setapplicationmenu", &nu::App::SetApplicationMenu,
+#endif
+           "run", &nu::App::Run,
+           "quit", &nu::App::Quit,
+           "post", &nu::App::PostTask,
+           "postdelayed", &nu::App::PostDelayedTask);
   }
   static bool NewIndex(State* state, const std::string& name) {
     return yue::MemberNewIndex(state, name, "onready", &nu::App::on_ready);
@@ -344,9 +347,11 @@ struct Type<nu::Window> {
            "getcontentview", &nu::Window::GetContentView,
            "setvisible", &nu::Window::SetVisible,
            "isvisible", &nu::Window::IsVisible,
-           "setbackgroundcolor", &nu::Window::SetBackgroundColor,
+#if defined(OS_WIN) || defined(OS_LINUX)
            "setmenubar", &nu::Window::SetMenuBar,
-           "getmenubar", &nu::Window::GetMenuBar);
+           "getmenubar", &nu::Window::GetMenuBar,
+#endif
+           "setbackgroundcolor", &nu::Window::SetBackgroundColor);
   }
   static bool Index(State* state, const std::string& name) {
     return yue::SignalIndex(state, name, "onclose", &nu::Window::on_close);

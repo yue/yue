@@ -36,10 +36,12 @@ NATIVEUI_EXPORT class Window : public base::RefCounted<Window> {
   void SetVisible(bool visible);
   bool IsVisible() const;
 
-  void SetBackgroundColor(Color color);
-
+#if defined(OS_WIN) || defined(OS_LINUX)
   void SetMenuBar(MenuBar* menu_bar);
   MenuBar* GetMenuBar() const;
+#endif
+
+  void SetBackgroundColor(Color color);
 
   // Events.
   Signal<void()> on_close;
@@ -59,7 +61,9 @@ NATIVEUI_EXPORT class Window : public base::RefCounted<Window> {
   void PlatformInit(const Options& options);
   void PlatformDestroy();
   void PlatformSetContentView(Container* container);
+#if defined(OS_WIN) || defined(OS_LINUX)
   void PlatformSetMenuBar(MenuBar* menu_bar);
+#endif
 
   NativeWindow window_;
   scoped_refptr<MenuBar> menu_bar_;

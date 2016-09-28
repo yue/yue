@@ -40,13 +40,4 @@ void App::PostDelayedTask(int ms, const base::Closure& task) {
       FROM_HERE, task, base::TimeDelta::FromMilliseconds(ms));
 }
 
-void App::SetApplicationMenu(MenuBar* menu) {
-  application_menu_ = menu;
-  PlatformSetApplicationMenu(menu);
-}
-
-MenuBar* App::GetApplicationMenu() const {
-  return application_menu_.get();
-}
-
 }  // namespace nu
