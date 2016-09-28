@@ -103,6 +103,7 @@ source_set("nativeui") {
     "gtk/container_container.h",
     "gtk/widget_util.cc",
     "gtk/widget_util.h",
+    "gtk/app_gtk.cc",
     "gtk/button_gtk.cc",
     "gtk/container_gtk.cc",
     "gtk/entry_gtk.cc",
