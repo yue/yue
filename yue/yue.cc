@@ -8,6 +8,8 @@
 #include "base/strings/utf_string_conversions.h"
 #include "yue/builtin_loader.h"
 
+#include "nativeui/events/keyboard_codes.h"
+
 int main(int argc, const char *argv[]) {
   base::AtExitManager exit_manager;
   base::CommandLine::Init(argc, argv);

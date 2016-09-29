@@ -8,6 +8,7 @@ import sys
 SOURCE_ROOT = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
 IGNORE_FILES = [
+  os.path.join(SOURCE_ROOT, 'nativeui', 'mac', 'nu_application_delegate.h'),
   os.path.join(SOURCE_ROOT, 'nativeui', 'win', 'util', 'msg_util.h'),
 ]
 
