@@ -67,7 +67,7 @@ const KeyCodeMap kKeyCodesMap[] = {
   { VKEY_EXECUTE /* 0x2B */, -1, NSExecuteFunctionKey },
   { VKEY_SNAPSHOT /* 0x2C */, -1, NSPrintScreenFunctionKey },
   { VKEY_INSERT /* 0x2D */, kVK_Help, NSInsertFunctionKey },
-  { VKEY_DELETE /* 0x2E */, kVK_ForwardDelete, NSDeleteFunctionKey },
+  { VKEY_DELETE /* 0x2E */, kVK_ForwardDelete, NSDeleteCharacter },
   { VKEY_HELP /* 0x2F */, kVK_Help, kHelpCharCode },
   { VKEY_0 /* 0x30 */, kVK_ANSI_0, '0' },
   { VKEY_1 /* 0x31 */, kVK_ANSI_1, '1' },

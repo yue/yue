@@ -188,23 +188,20 @@ Accelerator::Accelerator(const std::string& description)
     bool shifted = false;
     KeyboardCode code = KeyboardCodeFromStr(token, &shifted);
     if (shifted)
-      modifiers_ |= MODIFIER_SHIFT;
+      modifiers_ |= MASK_SHIFT;
     switch (code) {
       // The token can be a modifier.
       case VKEY_SHIFT:
-        modifiers_ |= MODIFIER_SHIFT;
+        modifiers_ |= MASK_SHIFT;
         break;
       case VKEY_CONTROL:
-        modifiers_ |= MODIFIER_CONTROL;
+        modifiers_ |= MASK_CONTROL;
         break;
       case VKEY_MENU:
-        modifiers_ |= MODIFIER_ALT;
+        modifiers_ |= MASK_ALT;
         break;
       case VKEY_COMMAND:
-        modifiers_ |= MODIFIER_COMMAND;
-        break;
-      case VKEY_ALTGR:
-        modifiers_ |= MODIFIER_ALTGR;
+        modifiers_ |= MASK_COMMAND;
         break;
       // Or it is a normal key.
       default:

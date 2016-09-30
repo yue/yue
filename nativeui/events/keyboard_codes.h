@@ -11,17 +11,4 @@
 #include "nativeui/events/keyboard_codes_mac.h"
 #endif
 
-namespace nu {
-
-enum KeyboardModifier {
-  MODIFIER_NONE    = 0,
-  MODIFIER_SHIFT   = 1 << 1,
-  MODIFIER_CONTROL = 1 << 2,
-  MODIFIER_ALT     = 1 << 3,
-  MODIFIER_COMMAND = 1 << 4,
-  MODIFIER_ALTGR   = 1 << 5,
-};
-
-}  // namespace nu
-
 #endif  // NATIVEUI_EVENTS_KEYBOARD_CODES_H_

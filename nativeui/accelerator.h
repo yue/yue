@@ -14,11 +14,14 @@ namespace nu {
 
 class Accelerator {
  public:
+  explicit Accelerator(KeyboardCode code = VKEY_UNKNOWN, int modifiers = 0);
   explicit Accelerator(const std::string& description);
-  explicit Accelerator(KeyboardCode code, int modifiers = 0);
   ~Accelerator() = default;
 
   bool empty() const { return key_code_ == VKEY_UNKNOWN && modifiers_ == 0; }
+
+  KeyboardCode key_code() const { return key_code_; }
+  int modifiers() const { return modifiers_; }
 
  private:
   // The keycode (VK_...).

@@ -7,6 +7,7 @@
 #import <Cocoa/Cocoa.h>
 
 #include "base/strings/sys_string_conversions.h"
+#include "nativeui/events/keyboard_code_conversion_mac.h"
 #include "nativeui/menu_base.h"
 
 @interface NUMenuItemDelegate : NSObject {
@@ -73,6 +74,23 @@ void MenuItem::SetVisible(bool visible) {
 
 bool MenuItem::IsVisible() const {
   return !menu_item_.hidden;
+}
+
+void MenuItem::SetAccelerator(const Accelerator& accelerator) {
+  menu_item_.keyEquivalentModifierMask = accelerator.modifiers();
+  if (accelerator.empty()) {
+    menu_item_.keyEquivalent = @"";
+    return;
+  }
+
+  unichar character;
+  unichar characterIgnoringModifiers;
+  MacKeyCodeForWindowsKeyCode(accelerator.key_code(),
+                              accelerator.modifiers(),
+                              &character,
+                              &characterIgnoringModifiers);
+  menu_item_.keyEquivalent =
+      [[[NSString alloc] initWithCharacters:&character length:1] autorelease];
 }
 
 void MenuItem::PlatformInit() {

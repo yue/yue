@@ -83,6 +83,21 @@ struct Type<nu::Color> {
 };
 
 template<>
+struct Type<nu::Accelerator> {
+  static constexpr const char* name = "yue.Accelerator";
+  static inline bool To(State* state, int index, nu::Accelerator* out) {
+    std::string description;
+    if (!lua::To(state, index, &description))
+      return false;
+    nu::Accelerator tmp(description);
+    if (tmp.empty())
+      return false;
+    *out = tmp;
+    return true;
+  }
+};
+
+template<>
 struct Type<nu::View> {
   static constexpr const char* name = "yue.View";
   static void BuildMetaTable(State* state, int index) {
@@ -451,7 +466,8 @@ struct Type<nu::MenuItem> {
            "setvisible", &nu::MenuItem::SetVisible,
            "isvisible", &nu::MenuItem::IsVisible,
            "setsubmenu", &nu::MenuItem::SetSubmenu,
-           "getsubmenu", &nu::MenuItem::GetSubmenu);
+           "getsubmenu", &nu::MenuItem::GetSubmenu,
+           "setaccelerator", &nu::MenuItem::SetAccelerator);
   }
   static bool Index(State* state, const std::string& name) {
     return yue::SignalIndex(state, name, "onclick", &nu::MenuItem::on_click);

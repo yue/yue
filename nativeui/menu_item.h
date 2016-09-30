@@ -8,6 +8,7 @@
 #include <string>
 
 #include "base/memory/ref_counted.h"
+#include "nativeui/accelerator.h"
 #include "nativeui/signal.h"
 #include "nativeui/types.h"
 
@@ -43,6 +44,8 @@ NATIVEUI_EXPORT class MenuItem : public base::RefCounted<MenuItem> {
 
   void SetVisible(bool visible);
   bool IsVisible() const;
+
+  void SetAccelerator(const Accelerator& accelerator);
 
   // Events.
   Signal<void()> on_click;

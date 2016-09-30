@@ -7,6 +7,16 @@
 
 namespace nu {
 
+// Code value from NSEvent.h.
+enum KeyboardModifier {
+  MASK_SHIFT   = 1 << 17,
+  MASK_CONTROL = 1 << 18,
+  MASK_ALT     = 1 << 19,
+  MASK_COMMAND = 1 << 20,
+};
+
+// Cocoa does not have complete keyboard codes map, so use psuedo values here
+// and map to keyCode or keyIdentifier later.
 enum KeyboardCode {
   VKEY_CANCEL = 0x03,
   VKEY_BACK = 0x08,
