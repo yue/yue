@@ -30,6 +30,7 @@ void ForceSizeAllocation(GtkWindow* window, GtkWidget* view) {
 
 void Window::PlatformInit(const Options& options) {
   window_ = GTK_WINDOW(gtk_window_new(GTK_WINDOW_TOPLEVEL));
+  gtk_window_add_accel_group(window_, accel_manager_.accel_group());
   gtk_window_set_focus_on_map(window_, false);
 
   // Must use a vbox to pack menubar.

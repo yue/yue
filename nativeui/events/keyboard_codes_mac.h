@@ -31,15 +31,9 @@ enum KeyboardCode {
   VKEY_CAPITAL = 0x14,
   VKEY_KANA = 0x15,
   VKEY_HANGUL = 0x15,
-  VKEY_JUNJA = 0x17,
-  VKEY_FINAL = 0x18,
   VKEY_HANJA = 0x19,
   VKEY_KANJI = 0x19,
   VKEY_ESCAPE = 0x1B,
-  VKEY_CONVERT = 0x1C,
-  VKEY_NONCONVERT = 0x1D,
-  VKEY_ACCEPT = 0x1E,
-  VKEY_MODECHANGE = 0x1F,
   VKEY_SPACE = 0x20,
   VKEY_PRIOR = 0x21,
   VKEY_NEXT = 0x22,
@@ -96,7 +90,6 @@ enum KeyboardCode {
   VKEY_COMMAND = VKEY_LWIN,  // Provide the Mac name for convenience.
   VKEY_RWIN = 0x5C,
   VKEY_APPS = 0x5D,
-  VKEY_SLEEP = 0x5F,
   VKEY_NUMPAD0 = 0x60,
   VKEY_NUMPAD1 = 0x61,
   VKEY_NUMPAD2 = 0x62,
@@ -109,7 +102,6 @@ enum KeyboardCode {
   VKEY_NUMPAD9 = 0x69,
   VKEY_MULTIPLY = 0x6A,
   VKEY_ADD = 0x6B,
-  VKEY_SEPARATOR = 0x6C,
   VKEY_SUBTRACT = 0x6D,
   VKEY_DECIMAL = 0x6E,
   VKEY_DIVIDE = 0x6F,
@@ -174,45 +166,8 @@ enum KeyboardCode {
   VKEY_OEM_5 = 0xDC,
   VKEY_OEM_6 = 0xDD,
   VKEY_OEM_7 = 0xDE,
-  VKEY_OEM_8 = 0xDF,
-  VKEY_OEM_102 = 0xE2,
-  VKEY_OEM_103 = 0xE3,  // GTV KEYCODE_MEDIA_REWIND
-  VKEY_OEM_104 = 0xE4,  // GTV KEYCODE_MEDIA_FAST_FORWARD
-  VKEY_PROCESSKEY = 0xE5,
-  VKEY_PACKET = 0xE7,
-  VKEY_OEM_ATTN = 0xF0,      // JIS DomKey::ALPHANUMERIC
-  VKEY_OEM_FINISH = 0xF1,    // JIS DomKey::KATAKANA
-  VKEY_OEM_COPY = 0xF2,      // JIS DomKey::HIRAGANA
-  VKEY_DBE_SBCSCHAR = 0xF3,  // JIS DomKey::HANKAKU
-  VKEY_DBE_DBCSCHAR = 0xF4,  // JIS DomKey::ZENKAKU
-  VKEY_OEM_BACKTAB = 0xF5,   // JIS DomKey::ROMAJI
-  VKEY_ATTN = 0xF6,          // DomKey::ATTN or JIS DomKey::KANA_MODE
-  VKEY_CRSEL = 0xF7,
-  VKEY_EXSEL = 0xF8,
-  VKEY_EREOF = 0xF9,
-  VKEY_PLAY = 0xFA,
-  VKEY_ZOOM = 0xFB,
-  VKEY_NONAME = 0xFC,
-  VKEY_PA1 = 0xFD,
   VKEY_OEM_CLEAR = 0xFE,
   VKEY_UNKNOWN = 0,
-
-  // POSIX specific VKEYs. Note that as of Windows SDK 7.1, 0x97-9F, 0xD8-DA,
-  // and 0xE8 are unassigned.
-  VKEY_WLAN = 0x97,
-  VKEY_POWER = 0x98,
-  VKEY_BRIGHTNESS_DOWN = 0xD8,
-  VKEY_BRIGHTNESS_UP = 0xD9,
-  VKEY_KBD_BRIGHTNESS_DOWN = 0xDA,
-  VKEY_KBD_BRIGHTNESS_UP = 0xE8,
-
-  // Windows does not have a specific key code for AltGr. We use the unused 0xE1
-  // (VK_OEM_AX) code to represent AltGr, matching the behaviour of Firefox on
-  // Linux.
-  VKEY_ALTGR = 0xE1,
-  // Windows does not have a specific key code for Compose. We use the unused
-  // 0xE6 (VK_ICO_CLEAR) code to represent Compose.
-  VKEY_COMPOSE = 0xE6,
 };
 
 }  // namespace nu

@@ -98,8 +98,6 @@ KeyboardCode KeyboardCodeFromKeyIdentifier(const std::string& s,
     return VKEY_MENU;
   } else if (str == "shift") {
     return VKEY_SHIFT;
-  } else if (str == "altgr") {
-    return VKEY_ALTGR;
   } else if (str == "plus") {
     *shifted = true;
     return VKEY_OEM_PLUS;

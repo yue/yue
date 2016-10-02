@@ -13,6 +13,7 @@
 
 namespace nu {
 
+class AcceleratorManager;
 class MenuItem;
 
 NATIVEUI_EXPORT class MenuBase : public base::RefCounted<MenuBase> {
@@ -27,6 +28,10 @@ NATIVEUI_EXPORT class MenuBase : public base::RefCounted<MenuBase> {
       return nullptr;
     return items_[index].get();
   }
+
+  // Called when AcceleratorManager is changed due to calls of SetMenuBar
+  // or SetApplicationMenu.
+  void OnAcceleratorManagerChanged(AcceleratorManager* accel_manager);
 
   NativeMenu menu() const { return menu_; }
 

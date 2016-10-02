@@ -9,6 +9,8 @@
 
 #if defined(OS_MACOSX)
 #include "nativeui/events/keyboard_codes_mac.h"
+#elif defined(OS_LINUX)
+#include "nativeui/events/keyboard_codes_gtk.h"
 #endif
 
 #endif  // NATIVEUI_EVENTS_KEYBOARD_CODES_H_

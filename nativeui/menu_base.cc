@@ -39,4 +39,9 @@ void MenuBase::Remove(MenuItem* item) {
   items_.erase(i);
 }
 
+void MenuBase::OnAcceleratorManagerChanged(AcceleratorManager* accel_manager) {
+  for (int i = 0; i < item_count(); ++i)
+    item_at(i)->OnAcceleratorManagerChanged(accel_manager);
+}
+
 }  // namespace nu

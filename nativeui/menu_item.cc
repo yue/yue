@@ -4,6 +4,7 @@
 
 #include "nativeui/menu_item.h"
 
+#include "nativeui/accelerator_manager.h"
 #include "nativeui/menu_base.h"
 
 namespace nu {
@@ -23,6 +24,20 @@ void MenuItem::SetSubmenu(MenuBase* submenu) {
 
 MenuBase* MenuItem::GetSubmenu() const {
   return submenu_.get();
+}
+
+void MenuItem::SetAccelerator(const Accelerator& accelerator) {
+  if (accel_manager_) {
+    if (accelerator.empty())
+      accel_manager_->RemoveAccelerator(this, accelerator_);
+    else
+      accel_manager_->RegisterAccelerator(this, accelerator);
+  }
+  accelerator_ = accelerator;
+}
+
+Accelerator MenuItem::GetAccelerator() const {
+  return accelerator_;
 }
 
 // Flip all radio items in the same group with |item|.
@@ -56,6 +71,19 @@ void MenuItem::FlipRadioMenuItems(nu::MenuBase* menu, nu::MenuItem* sender) {
     if (item != sender && item->type() == nu::MenuItem::Radio)
       item->SetChecked(false);
   }
+}
+
+void MenuItem::OnAcceleratorManagerChanged(AcceleratorManager* accel_manager) {
+  if (submenu_) {
+    submenu_->OnAcceleratorManagerChanged(accel_manager);
+    return;
+  }
+
+  if (accel_manager_ && !accelerator_.empty())
+    accel_manager_->RemoveAccelerator(this, accelerator_);
+  accel_manager_ = accel_manager;
+  if (accel_manager_ && !accelerator_.empty())
+    accel_manager_->RegisterAccelerator(this, accelerator_);
 }
 
 }  // namespace nu

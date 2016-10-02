@@ -14,6 +14,7 @@
 
 namespace nu {
 
+class AcceleratorManager;
 class MenuBase;
 
 NATIVEUI_EXPORT class MenuItem : public base::RefCounted<MenuItem> {
@@ -46,6 +47,7 @@ NATIVEUI_EXPORT class MenuItem : public base::RefCounted<MenuItem> {
   bool IsVisible() const;
 
   void SetAccelerator(const Accelerator& accelerator);
+  Accelerator GetAccelerator() const;
 
   // Events.
   Signal<void()> on_click;
@@ -60,6 +62,7 @@ NATIVEUI_EXPORT class MenuItem : public base::RefCounted<MenuItem> {
   Type type() const { return type_; }
 
  private:
+  friend class MenuBase;
   friend class base::RefCounted<MenuItem>;
 
   ~MenuItem();
@@ -67,15 +70,27 @@ NATIVEUI_EXPORT class MenuItem : public base::RefCounted<MenuItem> {
   void PlatformInit();
   void PlatformDestroy();
   void PlatformSetSubmenu(MenuBase* submenu);
+  void PlatformSetAccelerator(const Accelerator& accelerator);
+  void PlatformRemoveAccelerator();
 
   // Flip all radio items in the same group with |item|.
   void FlipRadioMenuItems(nu::MenuBase* menu, nu::MenuItem* sender);
+
+  // Called when AcceleratorManager is changed due to calls of SetMenuBar
+  // or SetApplicationMenu.
+  void OnAcceleratorManagerChanged(AcceleratorManager* accel_manager);
 
   // Weak ref to the owner menu.
   MenuBase* menu_ = nullptr;
 
   // The submenu.
   scoped_refptr<MenuBase> submenu_;
+
+  // Stored accelerator instance.
+  Accelerator accelerator_;
+
+  // Weak ref to the AcceleratorManager.
+  AcceleratorManager* accel_manager_ = nullptr;
 
   Type type_;
   NativeMenuItem menu_item_;
