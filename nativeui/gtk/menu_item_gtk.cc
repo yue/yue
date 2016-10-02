@@ -4,7 +4,7 @@
 
 #include "nativeui/menu_item.h"
 
-#include "nativeui/menu_base.h"
+#include "nativeui/menu.h"
 
 namespace nu {
 
@@ -75,7 +75,7 @@ void MenuItem::PlatformDestroy() {
   g_object_unref(menu_item_);
 }
 
-void MenuItem::PlatformSetSubmenu(MenuBase* submenu) {
+void MenuItem::PlatformSetSubmenu(Menu* submenu) {
   gtk_menu_item_set_submenu(menu_item_, GTK_WIDGET(submenu->menu()));
 }
 

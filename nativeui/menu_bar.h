@@ -5,6 +5,7 @@
 #ifndef NATIVEUI_MENU_BAR_H_
 #define NATIVEUI_MENU_BAR_H_
 
+#include "nativeui/accelerator_manager.h"
 #include "nativeui/menu_base.h"
 
 namespace nu {
@@ -13,8 +14,14 @@ NATIVEUI_EXPORT class MenuBar : public MenuBase {
  public:
   MenuBar();
 
- protected:
+  AcceleratorManager* accel_manager() { return &accel_manager_; }
+
+ private:
   ~MenuBar() override = default;
+
+  NativeMenu PlatformCreate() const;
+
+  AcceleratorManager accel_manager_;
 };
 
 }  // namespace nu

@@ -5,7 +5,6 @@
 #ifndef NATIVEUI_WINDOW_H_
 #define NATIVEUI_WINDOW_H_
 
-#include "nativeui/accelerator_manager.h"
 #include "nativeui/container.h"
 #include "nativeui/gfx/color.h"
 #include "nativeui/gfx/geometry/rect_f.h"
@@ -68,7 +67,6 @@ NATIVEUI_EXPORT class Window : public base::RefCounted<Window> {
 
 #if defined(OS_WIN) || defined(OS_LINUX)
   scoped_refptr<MenuBar> menu_bar_;
-  AcceleratorManager accel_manager_;
 #endif
 
   NativeWindow window_;

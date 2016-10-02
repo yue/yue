@@ -33,12 +33,8 @@ Container* Window::GetContentView() const {
 
 #if defined(OS_WIN) || defined(OS_LINUX)
 void Window::SetMenuBar(MenuBar* menu_bar) {
-  if (menu_bar_)
-    menu_bar_->OnAcceleratorManagerChanged(nullptr);
   PlatformSetMenuBar(menu_bar);
   menu_bar_ = menu_bar;
-  if (menu_bar_)
-    menu_bar_->OnAcceleratorManagerChanged(&accel_manager_);
 }
 
 MenuBar* Window::GetMenuBar() const {

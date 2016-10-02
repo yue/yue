@@ -30,7 +30,6 @@ void ForceSizeAllocation(GtkWindow* window, GtkWidget* view) {
 
 void Window::PlatformInit(const Options& options) {
   window_ = GTK_WINDOW(gtk_window_new(GTK_WINDOW_TOPLEVEL));
-  gtk_window_add_accel_group(window_, accel_manager_.accel_group());
   gtk_window_set_focus_on_map(window_, false);
 
   // Must use a vbox to pack menubar.
@@ -81,6 +80,14 @@ void Window::PlatformSetMenuBar(MenuBar* menu_bar) {
   gtk_container_add(vbox, menu);
   gtk_box_set_child_packing(GTK_BOX(vbox), menu, FALSE, FALSE, 0,
                             GTK_PACK_START);
+
+  // Update the accelerator group.
+  if (menu_bar_)
+    gtk_window_remove_accel_group(window_,
+                                  menu_bar_->accel_manager()->accel_group());
+  if (menu_bar)
+    gtk_window_add_accel_group(window_,
+                               menu_bar->accel_manager()->accel_group());
 
   ForceSizeAllocation(window_, content_view_->view());
 }

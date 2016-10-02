@@ -25,6 +25,7 @@ source_set("nativeui") {
     "label.h",
     "menu_base.cc",
     "menu_base.h",
+    "menu_bar.cc",
     "menu_bar.h",
     "menu_item.cc",
     "menu_item.h",

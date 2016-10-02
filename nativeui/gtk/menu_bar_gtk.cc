@@ -6,7 +6,8 @@
 
 namespace nu {
 
-MenuBar::MenuBar() : MenuBase(GTK_MENU_SHELL(gtk_menu_bar_new())) {
+NativeMenu MenuBar::PlatformCreate() const {
+  return GTK_MENU_SHELL(gtk_menu_bar_new());
 }
 
 }  // namespace nu

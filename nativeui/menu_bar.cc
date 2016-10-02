@@ -4,12 +4,10 @@
 
 #include "nativeui/menu_bar.h"
 
-#import <Cocoa/Cocoa.h>
-
 namespace nu {
 
-NativeMenu MenuBar::PlatformCreate() const {
-  return [[NSMenu alloc] init];
+MenuBar::MenuBar() : MenuBase(PlatformCreate()) {
+  SetAcceleratorManager(&accel_manager_);
 }
 
 }  // namespace nu

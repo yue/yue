@@ -6,7 +6,8 @@
 
 namespace nu {
 
-MenuBar::MenuBar() : MenuBase(CreateMenu()) {
+NativeMenu MenuBar::PlatformCreate() const {
+  return CreateMenu();
 }
 
 }  // namespace nu

@@ -15,6 +15,7 @@
 namespace nu {
 
 class AcceleratorManager;
+class Menu;
 class MenuBase;
 
 NATIVEUI_EXPORT class MenuItem : public base::RefCounted<MenuItem> {
@@ -34,8 +35,8 @@ NATIVEUI_EXPORT class MenuItem : public base::RefCounted<MenuItem> {
   void SetLabel(const std::string& label);
   std::string GetLabel() const;
 
-  void SetSubmenu(MenuBase* submenu);
-  MenuBase* GetSubmenu() const;
+  void SetSubmenu(Menu* submenu);
+  Menu* GetSubmenu() const;
 
   void SetChecked(bool checked);
   bool IsChecked() const;
@@ -49,17 +50,18 @@ NATIVEUI_EXPORT class MenuItem : public base::RefCounted<MenuItem> {
   void SetAccelerator(const Accelerator& accelerator);
   Accelerator GetAccelerator() const;
 
+  // Return the type of menu item.
+  Type type() const { return type_; }
+
   // Events.
   Signal<void()> on_click;
 
-  // Only used internally to set the owner of menu item.
+  // Internal: Set the owner of menu item.
   void set_menu(MenuBase* menu) { menu_ = menu; }
   MenuBase* menu() const { return menu_; }
 
-  // Return the native MenuItem object.
+  // Internal: Return the native MenuItem object.
   NativeMenuItem menu_item() const { return menu_item_; }
-
-  Type type() const { return type_; }
 
  private:
   friend class MenuBase;
@@ -69,22 +71,21 @@ NATIVEUI_EXPORT class MenuItem : public base::RefCounted<MenuItem> {
 
   void PlatformInit();
   void PlatformDestroy();
-  void PlatformSetSubmenu(MenuBase* submenu);
+  void PlatformSetSubmenu(Menu* submenu);
   void PlatformSetAccelerator(const Accelerator& accelerator);
   void PlatformRemoveAccelerator();
 
   // Flip all radio items in the same group with |item|.
   void FlipRadioMenuItems(nu::MenuBase* menu, nu::MenuItem* sender);
 
-  // Called when AcceleratorManager is changed due to calls of SetMenuBar
-  // or SetApplicationMenu.
-  void OnAcceleratorManagerChanged(AcceleratorManager* accel_manager);
+  // Called by menu to change the AcceleratorManager.
+  void SetAcceleratorManager(AcceleratorManager* accel_manager);
 
   // Weak ref to the owner menu.
   MenuBase* menu_ = nullptr;
 
   // The submenu.
-  scoped_refptr<MenuBase> submenu_;
+  scoped_refptr<Menu> submenu_;
 
   // Stored accelerator instance.
   Accelerator accelerator_;

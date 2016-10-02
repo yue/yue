@@ -29,10 +29,10 @@ NATIVEUI_EXPORT class MenuBase : public base::RefCounted<MenuBase> {
     return items_[index].get();
   }
 
-  // Called when AcceleratorManager is changed due to calls of SetMenuBar
-  // or SetApplicationMenu.
-  void OnAcceleratorManagerChanged(AcceleratorManager* accel_manager);
+  // Internal: Notify the change of AcceleratorManager.
+  void SetAcceleratorManager(AcceleratorManager* accel_manager);
 
+  // Internal: Return the native menu object.
   NativeMenu menu() const { return menu_; }
 
  protected:
@@ -47,11 +47,14 @@ NATIVEUI_EXPORT class MenuBase : public base::RefCounted<MenuBase> {
   void PlatformInsert(MenuItem* item, int index);
   void PlatformRemove(MenuItem* item);
 
-  NativeMenu menu_;
+  // Weak ref to the AcceleratorManager.
+  AcceleratorManager* accel_manager_ = nullptr;
 
   // Relationships.
   MenuBase* parent_ = nullptr;
   std::vector<scoped_refptr<MenuItem>> items_;
+
+  NativeMenu menu_;
 };
 
 }  // namespace nu

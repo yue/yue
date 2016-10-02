@@ -28,20 +28,23 @@ void MenuBase::Insert(MenuItem* item, int index) {
   items_.insert(items_.begin() + index, item);
   item->set_menu(this);
   PlatformInsert(item, index);
+  item->SetAcceleratorManager(accel_manager_);
 }
 
 void MenuBase::Remove(MenuItem* item) {
   const auto i(std::find(items_.begin(), items_.end(), item));
   if (i == items_.end())
     return;
+  item->SetAcceleratorManager(nullptr);
   PlatformRemove(item);
   item->set_menu(nullptr);
   items_.erase(i);
 }
 
-void MenuBase::OnAcceleratorManagerChanged(AcceleratorManager* accel_manager) {
+void MenuBase::SetAcceleratorManager(AcceleratorManager* accel_manager) {
+  accel_manager_ = accel_manager;
   for (int i = 0; i < item_count(); ++i)
-    item_at(i)->OnAcceleratorManagerChanged(accel_manager);
+    item_at(i)->SetAcceleratorManager(accel_manager);
 }
 
 }  // namespace nu

@@ -5,7 +5,7 @@
 #include "nativeui/win/menu_item_win.h"
 
 #include "base/strings/utf_string_conversions.h"
-#include "nativeui/menu_base.h"
+#include "nativeui/menu.h"
 #include "nativeui/menu_item.h"
 #include "nativeui/state.h"
 
@@ -80,7 +80,7 @@ void MenuItem::PlatformDestroy() {
   delete menu_item_;
 }
 
-void MenuItem::PlatformSetSubmenu(MenuBase* submenu) {
+void MenuItem::PlatformSetSubmenu(Menu* submenu) {
   if (menu_) {
     MENUITEMINFO mii = {0};
     mii.cbSize = sizeof(mii);

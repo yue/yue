@@ -4,6 +4,8 @@
 
 #include "nativeui/accelerator.h"
 
+#include <vector>
+
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/string_split.h"
 #include "base/strings/string_util.h"

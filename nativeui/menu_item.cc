@@ -5,7 +5,7 @@
 #include "nativeui/menu_item.h"
 
 #include "nativeui/accelerator_manager.h"
-#include "nativeui/menu_base.h"
+#include "nativeui/menu.h"
 
 namespace nu {
 
@@ -17,12 +17,12 @@ MenuItem::~MenuItem() {
   PlatformDestroy();
 }
 
-void MenuItem::SetSubmenu(MenuBase* submenu) {
+void MenuItem::SetSubmenu(Menu* submenu) {
   submenu_ = submenu;
   PlatformSetSubmenu(submenu);
 }
 
-MenuBase* MenuItem::GetSubmenu() const {
+Menu* MenuItem::GetSubmenu() const {
   return submenu_.get();
 }
 
@@ -73,9 +73,9 @@ void MenuItem::FlipRadioMenuItems(nu::MenuBase* menu, nu::MenuItem* sender) {
   }
 }
 
-void MenuItem::OnAcceleratorManagerChanged(AcceleratorManager* accel_manager) {
+void MenuItem::SetAcceleratorManager(AcceleratorManager* accel_manager) {
   if (submenu_) {
-    submenu_->OnAcceleratorManagerChanged(accel_manager);
+    submenu_->SetAcceleratorManager(accel_manager);
     return;
   }
 

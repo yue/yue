@@ -8,7 +8,7 @@
 
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/events/keyboard_code_conversion_mac.h"
-#include "nativeui/menu_base.h"
+#include "nativeui/menu.h"
 
 @interface NUMenuItemDelegate : NSObject {
  @private
@@ -107,7 +107,7 @@ void MenuItem::PlatformDestroy() {
   [menu_item_ release];
 }
 
-void MenuItem::PlatformSetSubmenu(MenuBase* submenu) {
+void MenuItem::PlatformSetSubmenu(Menu* submenu) {
   [menu_item_ setSubmenu:submenu->menu()];
 }
 
