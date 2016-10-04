@@ -431,15 +431,16 @@ struct Type<PropertiesClass> {
     RawSet(state, index,
            "new", &MetaTable<PropertiesClass>::NewInstance<>);
   }
-  static bool Index(State* state, const std::string& name) {
+  static int Index(State* state) {
     PropertiesClass* self;
-    if (!To(state, 1, &self))
-      return false;
+    std::string name;
+    if (!To(state, 1, &self, &name))
+      return 0;
     if (name == "property") {
       Push(state, self->property);
-      return true;
+      return 1;
     } else {
-      return false;
+      return 0;
     }
   }
 };
@@ -480,26 +481,28 @@ struct Type<NewIndexClass> {
     RawSet(state, index,
            "new", &MetaTable<NewIndexClass>::NewInstance<>);
   }
-  static bool Index(State* state, const std::string& name) {
+  static int Index(State* state) {
     NewIndexClass* self;
-    if (!To(state, 1, &self))
-      return false;
+    std::string name;
+    if (!To(state, 1, &self, &name))
+      return 0;
     if (name == "property") {
       Push(state, self->property);
-      return true;
+      return 1;
     }
-    return false;
+    return 0;
   }
-  static bool NewIndex(State* state, const std::string& name) {
+  static int NewIndex(State* state) {
     NewIndexClass* self;
+    std::string name;
     int value;
-    if (!To(state, 1, &self) || !To(state, 3, &value))
-      return false;
+    if (!To(state, 1, &self, &name, &value))
+      return 0;
     if (name == "property") {
       self->property = value;
-      return true;
+      return 1;
     }
-    return false;
+    return 0;
   }
 };
 

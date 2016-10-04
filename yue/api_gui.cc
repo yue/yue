@@ -143,7 +143,10 @@ struct Type<nu::App> {
            "post", &nu::App::PostTask,
            "postdelayed", &nu::App::PostDelayedTask);
   }
-  static bool NewIndex(State* state, const std::string& name) {
+  static int NewIndex(State* state) {
+    std::string name;
+    if (!To(state, 2, &name))
+      return 0;
     return yue::MemberNewIndex(state, name, "onready", &nu::App::on_ready);
   }
 };
@@ -196,10 +199,16 @@ struct Type<nu::Button> {
       return nullptr;
     }
   }
-  static bool Index(State* state, const std::string& name) {
+  static int Index(State* state) {
+    std::string name;
+    if (!To(state, 2, &name))
+      return 0;
     return yue::SignalIndex(state, name, "onclick", &nu::Button::on_click);
   }
-  static bool NewIndex(State* state, const std::string& name) {
+  static int NewIndex(State* state) {
+    std::string name;
+    if (!To(state, 2, &name))
+      return 0;
     return yue::MemberNewIndex(state, name, "onclick", &nu::Button::on_click);
   }
 };
@@ -213,12 +222,18 @@ struct Type<nu::Entry> {
                          "settext", &nu::Entry::SetText,
                          "gettext", &nu::Entry::GetText);
   }
-  static bool Index(State* state, const std::string& name) {
+  static int Index(State* state) {
+    std::string name;
+    if (!To(state, 2, &name))
+      return 0;
     return yue::SignalIndex(state, name,
                             "onactivate", &nu::Entry::on_activate,
                             "ontextchange", &nu::Entry::on_text_change);
   }
-  static bool NewIndex(State* state, const std::string& name) {
+  static int NewIndex(State* state) {
+    std::string name;
+    if (!To(state, 2, &name))
+      return 0;
     return yue::MemberNewIndex(state, name,
                                "onactivate", &nu::Entry::on_activate,
                                "ontextchange", &nu::Entry::on_text_change);
@@ -368,10 +383,16 @@ struct Type<nu::Window> {
 #endif
            "setbackgroundcolor", &nu::Window::SetBackgroundColor);
   }
-  static bool Index(State* state, const std::string& name) {
+  static int Index(State* state) {
+    std::string name;
+    if (!To(state, 2, &name))
+      return 0;
     return yue::SignalIndex(state, name, "onclose", &nu::Window::on_close);
   }
-  static bool NewIndex(State* state, const std::string& name) {
+  static int NewIndex(State* state) {
+    std::string name;
+    if (!To(state, 2, &name))
+      return 0;
     return yue::MemberNewIndex(state, name,
                                "onclose", &nu::Window::on_close,
                                "shouldclose", &nu::Window::should_close);
@@ -403,6 +424,19 @@ struct Type<nu::MenuBase> {
   static inline nu::MenuItem* ItemAt(nu::MenuBase* menu, int i) {
     return menu->item_at(i - 1);
   }
+  // Used by subclasses.
+  static void ReadMembers(State* state, nu::MenuBase* menu) {
+    if (GetType(state, 1) != LuaType::Table)
+      return;
+    Push(state, nullptr);
+    while (lua_next(state, 1) != 0) {
+      nu::MenuItem* item;
+      if (Pop(state, &item))
+        menu->Append(item);
+      else
+        PopAndIgnore(state, 1);
+    }
+  }
 };
 
 template<>
@@ -410,7 +444,12 @@ struct Type<nu::MenuBar> {
   using base = nu::MenuBase;
   static constexpr const char* name = "yue.MenuBar";
   static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index, "new", &MetaTable<nu::MenuBar>::NewInstance<>);
+    RawSet(state, index, "new", &New);
+  }
+  static nu::MenuBar* New(CallContext* context) {
+    nu::MenuBar* menu = new nu::MenuBar;
+    Type<nu::MenuBase>::ReadMembers(context->state, menu);
+    return menu;
   }
 };
 
@@ -419,8 +458,12 @@ struct Type<nu::Menu> {
   using base = nu::MenuBase;
   static constexpr const char* name = "yue.Menu";
   static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index, "new", &MetaTable<nu::Menu>::NewInstance<>,
-                         "popup", &nu::Menu::Popup);
+    RawSet(state, index, "new", &New, "popup", &nu::Menu::Popup);
+  }
+  static nu::Menu* New(CallContext* context) {
+    nu::Menu* menu = new nu::Menu;
+    Type<nu::MenuBase>::ReadMembers(context->state, menu);
+    return menu;
   }
 };
 
@@ -429,8 +472,9 @@ struct Type<nu::MenuItem::Type> {
   static constexpr const char* name = "yue.MenuItem.Type";
   static bool To(State* state, int index, nu::MenuItem::Type* out) {
     std::string type;
-    lua::To(state, index, &type);
-    if (type.empty() || type == "label") {
+    if (!lua::To(state, index, &type))
+      return false;
+    if (type == "label") {
       *out = nu::MenuItem::Label;
       return true;
     } else if (type == "checkbox") {
@@ -456,7 +500,7 @@ struct Type<nu::MenuItem> {
   static constexpr const char* name = "yue.MenuItem";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
-           "new", &MetaTable<nu::MenuItem>::NewInstance<nu::MenuItem::Type>,
+           "new", &New,
            "setlabel", &nu::MenuItem::SetLabel,
            "getlabel", &nu::MenuItem::GetLabel,
            "setchecked", &nu::MenuItem::SetChecked,
@@ -469,11 +513,51 @@ struct Type<nu::MenuItem> {
            "getsubmenu", &nu::MenuItem::GetSubmenu,
            "setaccelerator", &nu::MenuItem::SetAccelerator);
   }
-  static bool Index(State* state, const std::string& name) {
+  static int Index(State* state) {
+    std::string name;
+    if (!To(state, 2, &name))
+      return 0;
     return yue::SignalIndex(state, name, "onclick", &nu::MenuItem::on_click);
   }
-  static bool NewIndex(State* state, const std::string& name) {
+  static int NewIndex(State* state) {
+    std::string name;
+    if (!To(state, 2, &name))
+      return 0;
     return yue::MemberNewIndex(state, name, "onclick", &nu::MenuItem::on_click);
+  }
+  static nu::MenuItem* New(CallContext* context) {
+    nu::MenuItem::Type type = nu::MenuItem::Label;
+    if (lua::To(context->state, 1, &type) ||  // 'type'
+        GetType(context->state, 1) != LuaType::Table)  // {type='type'}
+      return new nu::MenuItem(type);
+    // Use label unless "type" is specified.
+    nu::MenuItem* item = nullptr;
+    if (RawGetAndPop(context->state, 1, "type", &type))
+      item = new nu::MenuItem(type);
+    // Read table fields and set attributes.
+    bool b = false;
+    if (RawGetAndPop(context->state, 1, "checked", &b)) {
+      if (!item) item = new nu::MenuItem(nu::MenuItem::CheckBox);
+      item->SetChecked(b);
+    }
+    nu::Menu* submenu = nullptr;
+    if (RawGetAndPop(context->state, 1, "submenu", &submenu)) {
+      if (!item) item = new nu::MenuItem(nu::MenuItem::Submenu);
+      item->SetSubmenu(submenu);
+    }
+    if (!item)  // can not deduce type from property, assuming Label item.
+      item = new nu::MenuItem(nu::MenuItem::Label);
+    if (RawGetAndPop(context->state, 1, "visible", &b))
+      item->SetVisible(b);
+    if (RawGetAndPop(context->state, 1, "enabled", &b))
+      item->SetEnabled(b);
+    std::string label;
+    if (RawGetAndPop(context->state, 1, "label", &label))
+      item->SetLabel(label);
+    nu::Accelerator accelerator;
+    if (RawGetAndPop(context->state, 1, "accelerator", &accelerator))
+      item->SetAccelerator(accelerator);
+    return item;
   }
 };
 

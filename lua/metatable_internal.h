@@ -97,12 +97,9 @@ struct Indexer<T, typename std::enable_if<std::is_pointer<
     RawSet(state, index, "__index", CFunction(&Index));
   }
   static int Index(State* state) {
-    // The DefaultPropertyLookup may throw error, so wrap the C++ stack.
-    {
-      std::string name;
-      if (To(state, -1, &name) && Type<T>::Index(state, name))
-        return 1;
-    }
+    int r = Type<T>::Index(state);
+    if (r > 0)
+      return r;
     // Go to the default routine.
     return DefaultPropertyLookup(state);
   }
@@ -122,12 +119,9 @@ struct NewIndexer<T, typename std::enable_if<std::is_function<
     RawSet(state, index, "__newindex", CFunction(&NewIndex));
   }
   static int NewIndex(State* state) {
-    // Wrap the C++ stack.
-    {
-      std::string name;
-      if (To(state, 2, &name) && Type<T>::NewIndex(state, name))
-        return 0;
-    }
+    int r = Type<T>::NewIndex(state);
+    if (r > 0)
+      return r;
     lua::Push(state, "unaccepted assignment");
     lua_error(state);
     return 0;

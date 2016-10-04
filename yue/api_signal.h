@@ -95,28 +95,28 @@ void PushObjectMembersTable(lua::State* state, int index);
 void SetSignalMetaTable(lua::State* state, int index);
 
 // Helper to compare name and key and create the signal wrapepr.
-inline bool PushSignal(lua::State* state, const std::string& name) {
-  return false;
+inline int PushSignal(lua::State* state, const std::string& name) {
+  return 0;
 }
 
 template<typename T, typename... Rest>
-inline bool PushSignal(lua::State* state, const std::string& name,
-                       const char* key, T member, Rest... rest) {
+inline int PushSignal(lua::State* state, const std::string& name,
+                      const char* key, T member, Rest... rest) {
   if (name == key) {
     // Create the wrapper for signal class.
     void* memory = lua_newuserdata(state, sizeof(Signal<T>));
     new(memory) Signal<T>(state, 1, member);
     static_assert(base::is_trivially_destructible<Signal<T>>::value,
                   "we are not providing __gc so Signal<T> must be trivial");
-    return true;
+    return 1;
   }
   return PushSignal(state, name, rest...);
 }
 
 // Define the __index handler for signals.
 template<typename T, typename... Rest>
-inline bool SignalIndex(lua::State* state, const std::string& name,
-                        const char* key, T member, Rest... rest) {
+inline int SignalIndex(lua::State* state, const std::string& name,
+                       const char* key, T member, Rest... rest) {
   int top = lua::GetTop(state);
   // Check if the member has already been converted.
   PushObjectMembersTable(state, 1);
@@ -124,7 +124,7 @@ inline bool SignalIndex(lua::State* state, const std::string& name,
   if (lua::GetType(state, -1) != lua::LuaType::UserData) {
     if (!PushSignal(state, name, key, member, rest...)) {
       lua::SetTop(state, top);
-      return false;
+      return 0;
     }
     SetSignalMetaTable(state, -1);
     lua::RawSet(state, top + 1, name, lua::ValueOnStack(state, -1));
@@ -133,7 +133,7 @@ inline bool SignalIndex(lua::State* state, const std::string& name,
   lua::Insert(state, top + 1);
   lua::SetTop(state, top + 1);
   DCHECK_EQ(lua::GetType(state, -1), lua::LuaType::UserData);
-  return true;
+  return 1;
 }
 
 // Defines how a member is assigned.
@@ -170,20 +170,20 @@ struct MemberAssignment<T, DelegateType, typename std::enable_if<
 
 // Helper to compare name and key and set the members.
 template<typename T>
-inline bool MemberNewIndexHelper(
+inline int MemberNewIndexHelper(
     lua::State* state, T object, const std::string& name) {
-  return false;
+  return 0;
 }
 
 template<typename T, typename Member, typename... Rest>
-inline bool MemberNewIndexHelper(
+inline int MemberNewIndexHelper(
     lua::State* state, T object, const std::string& name,
     const char* key, Member member, Rest... rest) {
   if (name == key) {
     MemberAssignment<Member,
                      typename ExtractMemberPointer<Member>::Member>::Do(
         state, object, member);
-    return true;
+    return 1;
   } else {
     return MemberNewIndexHelper(state, object, name, rest...);
   }
@@ -191,12 +191,12 @@ inline bool MemberNewIndexHelper(
 
 // Define the __newindex handler for members.
 template<typename Member, typename... Rest>
-inline bool MemberNewIndex(
+inline int MemberNewIndex(
     lua::State* state, const std::string& name, const char* key, Member member,
     Rest... rest) {
   typename ExtractMemberPointer<Member>::Type* object;
   if (!lua::To(state, 1, &object))
-    return false;
+    return 0;
   return MemberNewIndexHelper(state, object, name, key, member, rest...);
 }
 
