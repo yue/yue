@@ -11,7 +11,7 @@ namespace nu {
 
 // Iterate the menu recursively to find the item with command id, and then emit
 // the click event for it.
-void DispatchCommandToItem(nu::MenuBase* menu, UINT command);
+void DispatchCommandToItem(nu::MenuBase* menu, int command);
 
 }  // namespace nu
 

@@ -11,6 +11,8 @@
 #include "nativeui/events/keyboard_codes_mac.h"
 #elif defined(OS_LINUX)
 #include "nativeui/events/keyboard_codes_gtk.h"
+#elif defined(OS_WIN)
+#include "nativeui/events/keyboard_codes_win.h"
 #endif
 
 #endif  // NATIVEUI_EVENTS_KEYBOARD_CODES_H_

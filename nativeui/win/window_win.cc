@@ -6,6 +6,8 @@
 
 #include <memory>
 
+#include "nativeui/accelerator.h"
+#include "nativeui/accelerator_manager.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/gfx/win/double_buffer.h"
 #include "nativeui/gfx/win/painter_win.h"
@@ -147,6 +149,25 @@ LRESULT TopLevelWindow::OnMouseClick(UINT message, WPARAM w_param,
   if (message == WM_LBUTTONUP)
     ReleaseCapture();
   return 0;
+}
+
+void TopLevelWindow::OnKeyDown(UINT ch, UINT repeat, UINT flags) {
+  if (!delegate_->GetMenuBar())
+    return;
+  int modifiers = 0;
+  if ((::GetKeyState(VK_SHIFT) & 0x8000) == 0x8000)
+    modifiers |= MASK_SHIFT;
+  if ((::GetKeyState(VK_CONTROL) & 0x8000) == 0x8000)
+    modifiers |= MASK_CONTROL;
+  if ((::GetKeyState(VK_MENU) & 0x8000) == 0x8000)
+    modifiers |= MASK_ALT;
+  if ((::GetKeyState(VK_LWIN) & 0x8000) == 0x8000 ||
+      (::GetKeyState(VK_RWIN) & 0x8000) == 0x8000)
+    modifiers |= MASK_COMMAND;
+  Accelerator accelerator(static_cast<KeyboardCode>(ch), modifiers);
+  int command = delegate_->GetMenuBar()->accel_manager()->Process(accelerator);
+  if (command != -1)
+    DispatchCommandToItem(delegate_->GetMenuBar(), command);
 }
 
 void TopLevelWindow::OnChar(UINT ch, UINT repeat, UINT flags) {

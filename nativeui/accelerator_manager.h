@@ -5,6 +5,8 @@
 #ifndef NATIVEUI_ACCELERATOR_MANAGER_H_
 #define NATIVEUI_ACCELERATOR_MANAGER_H_
 
+#include <map>
+
 #include "base/macros.h"
 #include "build/build_config.h"
 
@@ -26,6 +28,12 @@ class AcceleratorManager {
   void RegisterAccelerator(MenuItem* item, const Accelerator& accelerator);
   void RemoveAccelerator(MenuItem* item, const Accelerator& accelerator);
 
+#if defined(OS_WIN)
+  // Activate the target associated with the specified accelerator, return the
+  // ID of activated item.
+  int Process(const Accelerator& accelerator);
+#endif
+
 #if defined(OS_LINUX)
   GtkAccelGroup* accel_group() const { return accel_group_; }
 #endif
@@ -33,6 +41,11 @@ class AcceleratorManager {
  private:
 #if defined(OS_LINUX)
   GtkAccelGroup* accel_group_;
+#endif
+
+#if defined(OS_WIN)
+  using AcceleratorMap = std::map<Accelerator, int>;
+  AcceleratorMap accelerators_;
 #endif
 
   DISALLOW_COPY_AND_ASSIGN(AcceleratorManager);

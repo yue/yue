@@ -5,15 +5,15 @@
 #ifndef NATIVEUI_WIN_MENU_ITEM_WIN_H_
 #define NATIVEUI_WIN_MENU_ITEM_WIN_H_
 
-#include <windows.h>
-
 #include <string>
 
 namespace nu {
 
 struct MenuItemData {
-  UINT id = 0;
-  std::wstring label;
+  int id = 0;
+  std::string label;
+  std::wstring accelerator;
+  std::wstring actual_label;
   bool checked = false;
   bool enabled = true;
   bool visible = true;

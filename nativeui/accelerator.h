@@ -18,6 +18,14 @@ class Accelerator {
   explicit Accelerator(const std::string& description);
   ~Accelerator() = default;
 
+  bool operator <(const Accelerator& rhs) const;
+  bool operator ==(const Accelerator& rhs) const;
+  bool operator !=(const Accelerator& rhs) const;
+
+#if defined(OS_WIN)
+  std::string GetShortcutText() const;
+#endif
+
   bool empty() const { return key_code_ == VKEY_UNKNOWN && modifiers_ == 0; }
 
   KeyboardCode key_code() const { return key_code_; }

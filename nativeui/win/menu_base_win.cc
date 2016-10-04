@@ -4,12 +4,14 @@
 
 #include "nativeui/win/menu_base_win.h"
 
+#include "base/strings/utf_string_conversions.h"
+#include "nativeui/menu.h"
 #include "nativeui/menu_item.h"
 #include "nativeui/win/menu_item_win.h"
 
 namespace nu {
 
-void DispatchCommandToItem(MenuBase* menu, UINT command) {
+void DispatchCommandToItem(MenuBase* menu, int command) {
   // Find the item with the id and click it.
   for (int i = 0; i < menu->item_count(); ++i) {
     MenuItem* item = menu->item_at(i);
@@ -50,8 +52,8 @@ void MenuBase::PlatformInsert(MenuItem* item, int index) {
     mii.fState = data->enabled ? MFS_ENABLED : MFS_ENABLED;
     if (data->checked)
       mii.fState = MFS_CHECKED;
-    mii.dwTypeData = const_cast<wchar_t*>(data->label.c_str());
-    mii.cch = static_cast<UINT>(data->label.size());
+    mii.dwTypeData = const_cast<wchar_t*>(data->actual_label.c_str());
+    mii.cch = static_cast<UINT>(data->actual_label.size());
   }
   InsertMenuItem(menu_, index, TRUE, &mii);
 }

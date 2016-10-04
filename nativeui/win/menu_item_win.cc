@@ -20,19 +20,24 @@ void MenuItem::Click() {
 }
 
 void MenuItem::SetLabel(const std::string& label) {
-  menu_item_->label = base::UTF8ToUTF16(label);
+  menu_item_->label = label;
+  menu_item_->actual_label = base::UTF8ToUTF16(label);
+  if (!menu_item_->accelerator.empty()) {
+    menu_item_->actual_label += L'\t';
+    menu_item_->actual_label += menu_item_->accelerator;
+  }
   if (menu_) {
     MENUITEMINFO mii = {0};
     mii.cbSize = sizeof(mii);
     mii.fMask = MIIM_STRING;
-    mii.dwTypeData = const_cast<wchar_t*>(menu_item_->label.c_str());
-    mii.cch = static_cast<UINT>(menu_item_->label.size());
+    mii.dwTypeData = const_cast<wchar_t*>(menu_item_->actual_label.c_str());
+    mii.cch = static_cast<UINT>(menu_item_->actual_label.size());
     SetMenuItemInfo(menu_->menu(), menu_item_->id, FALSE, &mii);
   }
 }
 
 std::string MenuItem::GetLabel() const {
-  return base::UTF16ToUTF8(menu_item_->label);
+  return menu_item_->label;
 }
 
 void MenuItem::SetChecked(bool checked) {

@@ -210,7 +210,114 @@ Accelerator::Accelerator(const std::string& description)
   }
 }
 
+bool Accelerator::operator <(const Accelerator& rhs) const {
+  if (key_code_ != rhs.key_code_)
+    return key_code_ < rhs.key_code_;
+  return modifiers_ < rhs.modifiers_;
+}
+
+bool Accelerator::operator ==(const Accelerator& rhs) const {
+  return (key_code_ == rhs.key_code_) && (modifiers_ == rhs.modifiers_);
+}
+
+bool Accelerator::operator !=(const Accelerator& rhs) const {
+  return !(*this == rhs);
+}
+
 Accelerator::Accelerator(KeyboardCode code, int modifiers)
     : key_code_(code), modifiers_(modifiers) {}
+
+#if defined(OS_WIN)
+std::string Accelerator::GetShortcutText() const {
+  std::string shortcut;
+  if (modifiers_ & MASK_SHIFT)
+    shortcut += "Shift+";
+  if (modifiers_ & MASK_CONTROL)
+    shortcut += "Control+";
+  if (modifiers_ & MASK_ALT)
+    shortcut += "Alt+";
+  if (modifiers_ & MASK_COMMAND)
+    shortcut += "Super+";
+
+  switch (key_code_) {
+    case VKEY_TAB:
+      shortcut += "Tab";
+      break;
+    case VKEY_RETURN:
+      shortcut += "Enter";
+      break;
+    case VKEY_ESCAPE:
+      shortcut += "Escape";
+      break;
+    case VKEY_SPACE:
+      shortcut += "Space";
+      break;
+    case VKEY_PRIOR:
+      shortcut += "Pageup";
+      break;
+    case VKEY_NEXT:
+      shortcut += "Pagedown";
+      break;
+    case VKEY_END:
+      shortcut += "End";
+      break;
+    case VKEY_HOME:
+      shortcut += "Home";
+      break;
+    case VKEY_INSERT:
+      shortcut += "Insert";
+      break;
+    case VKEY_DELETE:
+      shortcut += "Delete";
+      break;
+    case VKEY_LEFT:
+      shortcut += "Left";
+      break;
+    case VKEY_RIGHT:
+      shortcut += "Right";
+      break;
+    case VKEY_UP:
+      shortcut += "Up";
+      break;
+    case VKEY_DOWN:
+      shortcut += "Down";
+      break;
+    case VKEY_BACK:
+      shortcut += "Backspace";
+      break;
+    case VKEY_OEM_COMMA:
+      shortcut += ",";
+      break;
+    case VKEY_OEM_PERIOD:
+      shortcut += ".";
+      break;
+    case VKEY_MEDIA_NEXT_TRACK:
+      shortcut += "NextTrack";
+      break;
+    case VKEY_MEDIA_PLAY_PAUSE:
+      shortcut += "Play/Pause";
+      break;
+    case VKEY_MEDIA_PREV_TRACK:
+      shortcut += "PreviousTrack";
+      break;
+    case VKEY_MEDIA_STOP:
+      shortcut += "Stop";
+      break;
+    default:
+      break;
+  }
+
+  if (shortcut.empty() || shortcut[shortcut.size() - 1] == '+') {
+    wchar_t key;
+    if (base::IsAsciiDigit(key_code_))
+      key = static_cast<wchar_t>(key_code_);
+    else
+      key = LOWORD(::MapVirtualKeyW(key_code_, MAPVK_VK_TO_CHAR));
+    shortcut += key;
+  }
+
+  return shortcut;
+}
+#endif
 
 }  // namespace nu
