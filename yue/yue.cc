@@ -12,10 +12,6 @@ int main(int argc, const char *argv[]) {
   base::AtExitManager exit_manager;
   base::CommandLine::Init(argc, argv);
 
-  logging::LoggingSettings settings;
-  settings.logging_dest = logging::LOG_TO_SYSTEM_DEBUG_LOG;
-  logging::InitLogging(settings);
-
   auto* cmd = base::CommandLine::ForCurrentProcess();
   if (cmd->GetArgs().size() != 1) {
     fprintf(stderr, "Usage: yue <path-to-script>\n");

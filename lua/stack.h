@@ -79,6 +79,11 @@ inline void Push(State* state, const std::tuple<ArgTypes...>& packed) {
        typename internal::IndicesGenerator<sizeof...(ArgTypes)>::type());
 }
 
+// Helper to push nil.
+inline void PushNil(State* state) {
+  lua_pushnil(state);
+}
+
 // Helpers for pushing strings.
 PRINTF_FORMAT(2, 3)
 inline void PushFormatedString(State* state,

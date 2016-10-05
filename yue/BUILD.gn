@@ -22,6 +22,8 @@ source_set("libyue") {
     "api_signal.h",
     "api_sys.cc",
     "api_sys.h",
+    "api_util.cc",
+    "api_util.h",
     "builtin_loader.cc",
     "builtin_loader.h",
   ]
