@@ -5,6 +5,7 @@
 #include "nativeui/win/container_win.h"
 
 #include "base/stl_util.h"
+#include "nativeui/gfx/win/painter_win.h"
 
 namespace nu {
 
@@ -60,6 +61,7 @@ bool ContainerView::OnMouseClick(UINT message, UINT flags, const Point& point) {
 
 void ContainerView::Draw(PainterWin* painter, const Rect& dirty) {
   BaseView::Draw(painter, dirty);
+  delegate_->OnDraw(painter, dirty);
   for (BaseView* child : delegate_->GetChildren())
     DrawChild(child, painter, dirty);
 }
@@ -134,6 +136,12 @@ class ContainerAdapter : public ContainerView,
     for (int i = 0; i < container_->child_count(); ++i)
       views[i] = container_->child_at(i)->view();
     return views;
+  }
+
+  void OnDraw(PainterWin* painter, const Rect& dirty) override {
+    float scale_factor = container_->view()->scale_factor();
+    container_->on_draw.Emit(container_, static_cast<Painter*>(painter),
+                             ScaleRect(RectF(dirty), 1.0f / scale_factor));
   }
 
  private:

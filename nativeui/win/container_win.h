@@ -21,6 +21,7 @@ class ContainerView : public BaseView {
 
     virtual void Layout() = 0;
     virtual std::vector<BaseView*> GetChildren() = 0;
+    virtual void OnDraw(PainterWin* painter, const Rect& dirty) {}
   };
 
   ContainerView(Delegate* delegate, ControlType type);

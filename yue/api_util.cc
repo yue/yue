@@ -48,10 +48,11 @@ std::string ReduceToSingleString(const std::vector<std::string>& output,
                                  InspectContext* ctx) {
   if (output.empty())
     return "{}";
-  int length = std::accumulate(output.begin(), output.end(), 0,
-                               [](int sum, const std::string str) {
-                                 return sum + str.length() + 1;
-                               });
+  int length = std::accumulate(
+      output.begin(), output.end(), 0,
+      [](int sum, const std::string str) -> int {
+        return sum + static_cast<int>(str.length()) + 1;
+      });
   if (length > ctx->break_length)
     return "{ " +
            base::JoinString(output, ",\n" + std::string(ctx->indent, ' ')) +
