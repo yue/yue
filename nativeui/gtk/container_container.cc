@@ -5,6 +5,7 @@
 #include "nativeui/gtk/container_container.h"
 
 #include "nativeui/container.h"
+#include "nativeui/gfx/gtk/painter_gtk.h"
 
 namespace nu {
 
@@ -88,13 +89,16 @@ static void nu_container_style_updated(GtkWidget* widget) {
 }
 
 static gboolean nu_container_draw(GtkWidget* widget, cairo_t* cr) {
+  int width = gtk_widget_get_allocated_width(widget);
+  int height = gtk_widget_get_allocated_height(widget);
   gtk_render_background(gtk_widget_get_style_context(widget), cr,
-                        0, 0,
-                        gtk_widget_get_allocated_width(widget),
-                        gtk_widget_get_allocated_height(widget));
+                        0, 0, width, height);
 
   Container* delegate = static_cast<Container*>(
       g_object_get_data(G_OBJECT(widget), "delegate"));
+  PainterGtk painter(cr);
+  delegate->on_draw.Emit(delegate, &painter, nu::RectF(0, 0, width, height));
+
   for (int i = 0; i < delegate->child_count(); ++i)
     gtk_container_propagate_draw(GTK_CONTAINER(widget),
                                  delegate->child_at(i)->view(), cr);

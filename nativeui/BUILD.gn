@@ -57,6 +57,8 @@ source_set("nativeui") {
     "gfx/platform_font.h",
     "gfx/text.h",
     "gfx/gtk/color_gtk.cc",
+    "gfx/gtk/painter_gtk.cc",
+    "gfx/gtk/painter_gtk.h",
     "gfx/gtk/platform_font_gtk.cc",
     "gfx/gtk/platform_font_gtk.h",
     "gfx/mac/color_mac.mm",
