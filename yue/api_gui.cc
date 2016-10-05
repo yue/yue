@@ -297,6 +297,18 @@ struct Type<nu::Container> {
            "childcount", &nu::Container::child_count,
            "childat", &ChildAt);
   }
+  static int Index(State* state) {
+    std::string name;
+    if (!To(state, 2, &name))
+      return 0;
+    return yue::SignalIndex(state, name, "ondraw", &nu::Container::on_draw);
+  }
+  static int NewIndex(State* state) {
+    std::string name;
+    if (!To(state, 2, &name))
+      return 0;
+    return yue::MemberNewIndex(state, name, "ondraw", &nu::Container::on_draw);
+  }
   // Transalte 1-based index to 0-based.
   static inline void AddChildViewAt(nu::Container* c, nu::View* view, int i) {
     c->AddChildViewAt(view, i - 1);
@@ -405,7 +417,8 @@ struct Type<nu::Painter> {
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
            "save", &nu::Painter::Save,
-           "restore", &nu::Painter::Restore);
+           "restore", &nu::Painter::Restore,
+           "fillrect", &nu::Painter::FillRect);
   }
 };
 

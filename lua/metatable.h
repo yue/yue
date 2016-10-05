@@ -134,8 +134,10 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
   static inline void Push(State* state, T* ptr) {
     if (!ptr)
       lua::Push(state, nullptr);
-    else if (!internal::WrapperBase::Push(state, ptr))
-      MetaTable<T>::PushNewWrapper(state, ptr);
+    // Do not cache the pointer of WeakPtr, because the pointer may point to a
+    // variable on stack, which can have same address with previous variable on
+    // the stack.
+    MetaTable<T>::PushNewWrapper(state, ptr);
   }
 };
 

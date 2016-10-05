@@ -11,6 +11,8 @@
 
 namespace nu {
 
+class Painter;
+
 NATIVEUI_EXPORT class Container : public View {
  public:
   Container();
@@ -44,6 +46,9 @@ NATIVEUI_EXPORT class Container : public View {
       return nullptr;
     return children_[index].get();
   }
+
+  // Events.
+  Signal<void(Container*, Painter*, const RectF&)> on_draw;
 
  protected:
   ~Container() override;

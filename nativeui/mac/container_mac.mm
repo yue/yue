@@ -10,21 +10,21 @@
 
 @interface ContainerView : NSView<BaseView> {
  @private
-  nu::Container* wrapper_;
+  nu::Container* shell_;
   nu::Color background_color_;
 }
-- (id)initWithWrapper:(nu::Container*)wrapper;
+- (id)initWithShell:(nu::Container*)shell;
 - (void)setNUBackgroundColor:(nu::Color)color;
 @end
 
 @implementation ContainerView
 
-- (id)initWithWrapper:(nu::Container*)wrapper {
+- (id)initWithShell:(nu::Container*)shell {
   self = [super init];
   if (!self)
     return nil;
 
-  wrapper_ = wrapper;
+  shell_ = shell;
   return self;
 }
 
@@ -34,10 +34,10 @@
 }
 
 - (void)adjustSubviews {
-  DCHECK_EQ(static_cast<int>([[self subviews] count]), wrapper_->child_count())
+  DCHECK_EQ(static_cast<int>([[self subviews] count]), shell_->child_count())
       << "Subviews do not match children views";
 
-  wrapper_->BoundsChanged();
+  shell_->BoundsChanged();
 }
 
 - (BOOL)isFlipped {
@@ -49,8 +49,10 @@
 }
 
 - (void)drawRect:(NSRect)dirtyRect {
+  nu::RectF dirty(dirtyRect);
   nu::PainterMac painter;
-  painter.FillRect(nu::RectF(dirtyRect), background_color_);
+  painter.FillRect(dirty, background_color_);
+  shell_->on_draw.Emit(shell_, &painter, dirty);
 }
 
 @end
@@ -58,7 +60,7 @@
 namespace nu {
 
 void Container::PlatformInit() {
-  TakeOverView([[ContainerView alloc] initWithWrapper:this]);
+  TakeOverView([[ContainerView alloc] initWithShell:this]);
 }
 
 void Container::PlatformDestroy() {

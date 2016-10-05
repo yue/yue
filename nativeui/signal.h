@@ -44,7 +44,7 @@ NATIVEUI_EXPORT class Signal<void(Args...)> {
     // elements from the list when iterating.
     auto slots = slots_;
     for (auto& slot : slots)
-      slot.second.Run(std::forward(args)...);
+      slot.second.Run(std::forward<Args>(args)...);
   }
 
  private:
