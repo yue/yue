@@ -6,7 +6,7 @@
 #define NATIVEUI_EVENTS_KEYBOARD_CODES_WIN_H_
 
 #include <windows.h>
-#include <ime.h>
+#include <ime.h>  // NOLINT
 
 namespace nu {
 
