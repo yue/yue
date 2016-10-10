@@ -53,7 +53,7 @@ void Progress::SetIndeterminate(bool indeterminate) {
 
 bool Progress::IsIndeterminate() const {
   auto* progress = static_cast<ProgressView*>(view());
-  return GetWindowLong(progress->hwnd(), GWL_STYLE) & PBS_MARQUEE;
+  return (GetWindowLong(progress->hwnd(), GWL_STYLE) & PBS_MARQUEE) != 0;
 }
 
 }  // namespace nu
