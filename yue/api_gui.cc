@@ -412,6 +412,20 @@ struct Type<nu::Window> {
 };
 
 template<>
+struct Type<nu::Font> {
+  static constexpr const char* name = "yue.Font";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index, "new", &New, "default", &GetDefault);
+  }
+  static nu::Font* New(const std::string& font_name, int font_size ){
+    return nu::Font::CreateFromNameAndSize(font_name, font_size);
+  }
+  static nu::Font* GetDefault() {
+    return nu::State::current()->GetDefaultFont();
+  }
+};
+
+template<>
 struct Type<nu::Image> {
   static constexpr const char* name = "yue.Image";
   static void BuildMetaTable(State* state, int index) {
@@ -624,6 +638,9 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   lua_rawset(state, -3);
   lua::Push(state, "Scroll");
   lua::MetaTable<nu::Scroll>::Push(state);
+  lua_rawset(state, -3);
+  lua::Push(state, "Font");
+  lua::MetaTable<nu::Font>::Push(state);
   lua_rawset(state, -3);
   lua::Push(state, "Image");
   lua::MetaTable<nu::Image>::Push(state);
