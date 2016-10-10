@@ -412,6 +412,15 @@ struct Type<nu::Window> {
 };
 
 template<>
+struct Type<nu::Image> {
+  static constexpr const char* name = "yue.Image";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "new", &MetaTable<nu::Image>::NewInstance<const nu::String&>);
+  }
+};
+
+template<>
 struct Type<nu::Painter> {
   static constexpr const char* name = "yue.Painter";
   static void BuildMetaTable(State* state, int index) {
@@ -615,6 +624,9 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   lua_rawset(state, -3);
   lua::Push(state, "Scroll");
   lua::MetaTable<nu::Scroll>::Push(state);
+  lua_rawset(state, -3);
+  lua::Push(state, "Image");
+  lua::MetaTable<nu::Image>::Push(state);
   lua_rawset(state, -3);
   lua::Push(state, "Painter");
   lua::MetaTable<nu::Painter>::Push(state);
