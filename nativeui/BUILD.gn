@@ -17,6 +17,7 @@ source_set("nativeui") {
     "button.h",
     "container.cc",
     "container.h",
+    "canvas.h",
     "group.cc",
     "group.h",
     "entry.cc",
