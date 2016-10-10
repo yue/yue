@@ -53,7 +53,7 @@ void PainterGtk::FillRect(const RectF& rect, Color color) {
 }
 
 void PainterGtk::DrawStringWithFlags(const String& text,
-                                     Font font,
+                                     Font* font,
                                      Color color,
                                      const RectF& rect,
                                      int flags) {

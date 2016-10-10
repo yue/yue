@@ -9,6 +9,7 @@
 #include "nativeui/gfx/mac/painter_mac.h"
 #include "nativeui/gfx/text.h"
 #include "nativeui/mac/view_mac.h"
+#include "nativeui/state.h"
 #include "third_party/css-layout/CSSLayout/CSSLayout.h"
 
 @interface LabelView : NSView<BaseView> {
@@ -40,7 +41,8 @@
 - (void)drawRect:(NSRect)dirtyRect {
   nu::PainterMac painter;
   painter.FillRect(nu::RectF(dirtyRect), background_color_);
-  painter.DrawStringWithFlags(text_, nu::Font(), nu::Color(),
+  painter.DrawStringWithFlags(text_, nu::State::current()->GetDefaultFont(),
+                              nu::Color(),
                               nu::RectF([self frame]),
                               nu::Painter::TextAlignCenter);
 }
@@ -52,7 +54,7 @@ namespace nu {
 namespace {
 
 SizeF GetPreferredSizeForText(const std::string& text) {
-  SizeF size = MeasureText(Font(), text);
+  SizeF size = MeasureText(nu::State::current()->GetDefaultFont(), text);
   size.Enlarge(1, 1);  // leave space for border
   return size;
 }

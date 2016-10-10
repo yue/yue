@@ -6,7 +6,7 @@
 
 #include "base/lazy_instance.h"
 #include "base/threading/thread_local.h"
-#include "nativeui/gfx/platform_font.h"
+#include "nativeui/gfx/font.h"
 
 #if defined(OS_WIN)
 #include "nativeui/win/subwin_holder.h"
@@ -45,9 +45,9 @@ State* State::current() {
   return lazy_tls_ptr.Pointer()->Get();
 }
 
-PlatformFont* State::GetDefaultFont() {
+Font* State::GetDefaultFont() {
   if (!default_font_)
-    default_font_ = PlatformFont::CreateDefault();
+    default_font_ = Font::CreateDefault();
   return default_font_.get();
 }
 

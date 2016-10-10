@@ -13,49 +13,34 @@
 
 namespace nu {
 
-class PlatformFont;
-
-// Font provides a wrapper around an underlying font. Copy and assignment
-// operators are allowed and cheap.
-NATIVEUI_EXPORT class Font {
+NATIVEUI_EXPORT class Font : public base::RefCounted<Font> {
  public:
-  // Creates a font with the default name and style.
-  Font();
-
-  // Creates a font with the specified name in UTF-8 and size.
-  Font(const std::string& family, int size);
-
-  // Creates a font that is a clone of another font object.
-  Font(const Font& other);
-  Font& operator=(const Font& other);
-
-  ~Font();
+  // Creates an appropriate Font implementation.
+  static Font* CreateDefault();
+  // Creates a Font implementation with the specified |font_name|
+  // (encoded in UTF-8) and |font_size| in pixels.
+  static Font* CreateFromNameAndSize(const std::string& font_name,
+                                             int font_size);
 
   // Returns the specified font name in UTF-8.
-  std::string GetFontName() const;
+  virtual std::string GetFontName() const = 0;
 
-  // Returns the actually used font name in UTF-8.
-  std::string GetActualFontName() const;
-
-  // Returns the font size.
-  int GetFontSize() const;
+  // Returns the font size in pixels.
+  virtual int GetFontSize() const = 0;
 
 #if defined(OS_WIN) || defined(OS_MACOSX) || defined(OS_IOS)
   // Returns the native font handle.
-  // Lifetime lore:
-  // Windows: This handle is owned by the Font object, and should not be
-  //          destroyed by the caller.
-  // Mac:     The object is owned by the system and should not be released.
-  NativeFont GetNativeFont() const;
+  virtual NativeFont GetNativeFont() const = 0;
 #endif
 
-  // Raw access to the underlying platform font implementation. Can be
-  // static_cast to a known implementation type if needed.
-  PlatformFont* platform_font() const { return platform_font_.get(); }
+ protected:
+  Font() {}
+  virtual ~Font() {}
 
  private:
-  // Wrapped platform font implementation.
-  scoped_refptr<PlatformFont> platform_font_;
+  friend class base::RefCounted<Font>;
+
+  DISALLOW_COPY_AND_ASSIGN(Font);
 };
 
 }  // namespace nu

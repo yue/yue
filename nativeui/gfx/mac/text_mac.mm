@@ -10,13 +10,13 @@
 
 namespace nu {
 
-SizeF MeasureText(const Font& font, const String& text) {
+SizeF MeasureText(Font* font, const String& text) {
   NSMutableParagraphStyle* paragraphStyle =
       [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
   [paragraphStyle setAlignment:NSCenterTextAlignment];
   NSDictionary* attrs = @{
     NSParagraphStyleAttributeName : paragraphStyle,
-    NSFontAttributeName : font.GetNativeFont()
+    NSFontAttributeName : font->GetNativeFont()
   };
   NSAttributedString* attribute =
       [[[NSAttributedString alloc] initWithString:base::SysUTF8ToNSString(text)

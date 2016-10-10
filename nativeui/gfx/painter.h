@@ -67,13 +67,13 @@ class Painter {
   // Draws text with the specified color, fonts and location. The text is
   // aligned to the left, vertically centered, clipped to the region. If the
   // text is too big, it is truncated and '...' is added to the end.
-  void DrawString(const String& text, Font font, Color color,
+  void DrawString(const String& text, Font* font, Color color,
                   const RectF& rect);
 
   // Draws text with the specified color, fonts and location. The last argument
   // specifies flags for how the text should be rendered.
   virtual void DrawStringWithFlags(const String& text,
-                                   Font font,
+                                   Font* font,
                                    Color color,
                                    const RectF& rect,
                                    int flags) = 0;

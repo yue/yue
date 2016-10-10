@@ -18,7 +18,7 @@
 
 namespace nu {
 
-class PlatformFont;
+class Font;
 
 #if defined(OS_WIN)
 class ClassRegistrar;
@@ -34,7 +34,7 @@ NATIVEUI_EXPORT class State {
   static State* current();
 
   // Returns the default GUI font.
-  PlatformFont* GetDefaultFont();
+  Font* GetDefaultFont();
 
   // Returns the instance of App.
   App* app() { return &app_; }
@@ -51,7 +51,7 @@ NATIVEUI_EXPORT class State {
   void PlatformInit();
   void PlatformDestroy();
 
-  scoped_refptr<PlatformFont> default_font_;
+  scoped_refptr<Font> default_font_;
 
 #if defined(OS_LINUX)
   GtkEventLoop gtk_event_loop_;

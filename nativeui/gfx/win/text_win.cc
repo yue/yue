@@ -14,25 +14,24 @@ namespace nu {
 
 namespace {
 
-SizeF MeasureText(HDC dc, const Font& font, const String& text) {
+SizeF MeasureText(HDC dc, Font* font, const String& text) {
   Gdiplus::Graphics graphics(dc);
   Gdiplus::RectF rect;
   Gdiplus::StringFormat fomart(Gdiplus::StringFormat::GenericDefault());
   graphics.MeasureString(text.c_str(), static_cast<int>(text.length()),
-                         font.GetNativeFont(), Gdiplus::PointF(0., 0.),
+                         font->GetNativeFont(), Gdiplus::PointF(0., 0.),
                          &fomart, &rect);
   return SizeF(rect.Width, rect.Height);
 }
 
 }  // namespace
 
-SizeF MeasureText(const Font& font, const String& text) {
+SizeF MeasureText(Font* font, const String& text) {
   base::win::ScopedCreateDC dc(CreateCompatibleDC(NULL));
   return MeasureText(dc.Get(), font, text);
 }
 
-SizeF MeasureText(const nu::BaseView* view, const Font& font,
-                  const String& text) {
+SizeF MeasureText(const nu::BaseView* view, Font* font, const String& text) {
   if (!view->window())
     return MeasureText(font, text);
 

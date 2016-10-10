@@ -51,7 +51,7 @@ void PainterMac::FillRect(const RectF& rect, Color color) {
 }
 
 void PainterMac::DrawStringWithFlags(const String& utf8text,
-                                     Font font,
+                                     Font* font,
                                      Color color,
                                      const RectF& rect,
                                      int flags) {

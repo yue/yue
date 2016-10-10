@@ -23,7 +23,7 @@ class PainterMac : public Painter {
   void DrawRect(const RectF& rect, Color color) override;
   void FillRect(const RectF& rect, Color color) override;
   void DrawStringWithFlags(const String& text,
-                           Font font,
+                           Font* font,
                            Color color,
                            const RectF& rect,
                            int flags) override;

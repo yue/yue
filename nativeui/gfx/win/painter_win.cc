@@ -67,7 +67,7 @@ void PainterWin::FillRect(const RectF& rect, Color color) {
 }
 
 void PainterWin::DrawStringWithFlags(const String& text,
-                                     Font font,
+                                     Font* font,
                                      Color color,
                                      const RectF& rect,
                                      int flags) {
@@ -102,7 +102,7 @@ void PainterWin::FillPixelRect(const RectF& rect, Color color) {
 }
 
 void PainterWin::DrawPixelStringWithFlags(const String& text,
-                                          Font font,
+                                          Font* font,
                                           Color color,
                                           const RectF& rect,
                                           int flags) {
@@ -116,7 +116,7 @@ void PainterWin::DrawPixelStringWithFlags(const String& text,
   else if (flags & TextAlignRight)
     format.SetAlignment(Gdiplus::StringAlignmentFar);
   graphics_.DrawString(text.c_str(), static_cast<int>(text.size()),
-                       font.GetNativeFont(), ToGdi(RectF(rect + origin())),
+                       font->GetNativeFont(), ToGdi(RectF(rect + origin())),
                        &format, &brush);
 }
 

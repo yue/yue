@@ -11,7 +11,7 @@
 namespace nu {
 
 // Calculate the size of text.
-SizeF MeasureText(const Font& font, const String& text);
+SizeF MeasureText(Font* font, const String& text);
 
 }  // namespace nu
 
