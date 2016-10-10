@@ -27,8 +27,7 @@ declare_args() {
   # warnings with known toolchains. Allow overriding this e.g. for Chromium
   # builds on Linux that could use a different version of the compiler.
   # With GCC, warnings in no-Chromium code are always not treated as errors.
-  # Note(Yue): lua has linking warnings and we have to ignore them.
-  treat_warnings_as_errors = false
+  treat_warnings_as_errors = true
 
   # Normally, Android builds are lightly optimized, even for debug builds, to
   # keep binary size down. Setting this flag to true disables such optimization
@@ -76,7 +75,8 @@ declare_args() {
   # Enable fatal linker warnings. Building Chromium with certain versions
   # of binutils can cause linker warning.
   # See: https://bugs.chromium.org/p/chromium/issues/detail?id=457359
-  fatal_linker_warnings = true
+  # Note(Yue): lua has linking warnings and we have to ignore them.
+  fatal_linker_warnings = false
 
   # AFDO (Automatic Feedback Directed Optimizer) is a form of profile-guided
   # optimization that GCC supports. It used by ChromeOS in their official
