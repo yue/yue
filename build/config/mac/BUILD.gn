@@ -6,6 +6,12 @@ import("//build/config/sysroot.gni")
 import("//build/config/mac/mac_sdk.gni")
 import("//build/config/mac/symbols.gni")
 
+if (is_ios) {
+  # This needs to be imported after mac_sdk.gni as it overrides some of the
+  # variables defined by it.
+  import("//build/config/ios/ios_sdk.gni")
+}
+
 # This is included by reference in the //build/config/compiler config that
 # is applied to all targets. It is here to separate out the logic.
 #
@@ -37,6 +43,11 @@ config("compiler") {
     ]
   }
 
+  # This is here so that all files get recompiled after an Xcode update.
+  # (defines are passed via the command line, and build system rebuild things
+  # when their commandline changes). Nothing should ever read this define.
+  defines = [ "CR_XCODE_VERSION=$xcode_version" ]
+
   asmflags = common_mac_flags
   cflags = common_mac_flags
 
@@ -48,6 +59,19 @@ config("compiler") {
   cflags_objc = cflags_c
 
   ldflags = common_mac_flags
+
+  if (is_ios && additional_toolchains != []) {
+    # For fat build, the generation of the dSYM happens after the fat binary has
+    # been created with "lipo" thus the stripping cannot happen at link time but
+    # after running "lipo" too.
+    _save_unstripped_output = false
+  } else {
+    _save_unstripped_output = save_unstripped_output
+  }
+
+  if (_save_unstripped_output) {
+    ldflags += [ "-Wcrl,unstripped," + rebase_path(root_out_dir) ]
+  }
 }
 
 # This is included by reference in the //build/config/compiler:runtime_library
@@ -103,7 +127,10 @@ config("mac_executable_flags") {
 # from a binary, but some targets may wish to specify a saves file to preserve
 # specific symbols.
 config("strip_all") {
-  if (enable_stripping) {
+  # On iOS, the final applications are assembled using lipo (to support fat
+  # builds). This configuration is thus always empty and the correct flags
+  # are passed to the linker_driver.py script directly during the lipo call.
+  if (enable_stripping && !is_ios) {
     ldflags = [ "-Wcrl,strip,-x,-S" ]
   }
 }
