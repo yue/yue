@@ -25,6 +25,7 @@
 [submodule "build/toolchain"]
 	path = build/toolchain
 	url = https://chromium.googlesource.com/chromium/src/build/toolchain
+  ignore = untracked
 [submodule "third_party/lua"]
 	path = third_party/lua
 	url = https://github.com/lua/lua
