@@ -19,4 +19,8 @@ Image::~Image() {
   [image_ release];
 }
 
+Size Image::GetSize() const {
+  return Size([image_ size]);
+}
+
 }  // namespace nu

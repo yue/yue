@@ -6,7 +6,7 @@
 #define NATIVEUI_GFX_IMAGE_H_
 
 #include "base/memory/ref_counted.h"
-#include "nativeui/nativeui_export.h"
+#include "nativeui/gfx/geometry/size.h"
 #include "nativeui/types.h"
 
 namespace nu {
@@ -14,6 +14,8 @@ namespace nu {
 NATIVEUI_EXPORT class Image : public base::RefCounted<Image> {
  public:
   Image(const String& file);
+
+  Size GetSize() const;
 
   NativeImage image() const { return image_; }
 
