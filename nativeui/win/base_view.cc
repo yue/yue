@@ -76,7 +76,8 @@ void BaseView::SetBackgroundColor(Color color) {
 }
 
 void BaseView::Draw(PainterWin* painter, const Rect& dirty) {
-  painter->FillPixelRect(RectF(dirty), background_color_);
+  painter->SetColor(background_color_);
+  painter->FillPixelRect(RectF(dirty));
 }
 
 Point BaseView::GetMousePosition() const {

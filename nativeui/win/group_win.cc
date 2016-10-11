@@ -75,7 +75,8 @@ class GroupView : public ContainerView,
     painter->Save();
     painter->ClipPixelRect(drawing_bounds, Painter::CombineMode::Replace);
     painter->ClipPixelRect(title_bounds_, Painter::CombineMode::Exclude);
-    painter->DrawPixelRect(border_bounds, Color(255, 170, 170, 170));
+    painter->SetColor(Color(255, 170, 170, 170));
+    painter->DrawPixelRect(border_bounds);
     painter->Restore();
 
     // Draw child.

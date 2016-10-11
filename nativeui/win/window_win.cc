@@ -188,7 +188,8 @@ void TopLevelWindow::OnPaint(HDC) {
 
     // Background.
     PainterWin painter(buffer.dc(), scale_factor());
-    painter.FillPixelRect(RectF(dirty), background_color_);
+    painter.SetColor(background_color_);
+    painter.FillPixelRect(RectF(dirty));
 
     // Draw.
     delegate_->GetContentView()->view()->Draw(&painter, dirty);

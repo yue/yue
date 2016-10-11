@@ -26,35 +26,34 @@ class PainterWin : public Painter {
   void ClipRect(const RectF& rect,
                 CombineMode mode = CombineMode::Replace) override;
   void Translate(const Vector2dF& offset) override;
-  void DrawRect(const RectF& rect, Color color) override;
-  void FillRect(const RectF& rect, Color color) override;
-  void DrawStringWithFlags(const String& text,
-                           Font* font,
-                           Color color,
-                           const RectF& rect,
-                           int flags) override;
+  void SetColor(Color color) override;
+  void DrawRect(const RectF& rect) override;
+  void FillRect(const RectF& rect) override;
+  void DrawStringWithFlags(
+      const String& text, Font* font, const RectF& rect, int flags) override;
 
   // The pixel versions.
   void ClipPixelRect(const RectF& rect, CombineMode mode);
   void TranslatePixel(const Vector2dF& offset);
-  void DrawPixelRect(const RectF& rect, Color color);
-  void FillPixelRect(const RectF& rect, Color color);
-  void DrawPixelStringWithFlags(const String& text,
-                                Font* font,
-                                Color color,
-                                const RectF& rect,
-                                int flags);
+  void DrawPixelRect(const RectF& rect);
+  void FillPixelRect(const RectF& rect);
+  void DrawPixelStringWithFlags(
+      const String& text, Font* font, const RectF& rect, int flags);
 
-  // The translated origin of the painter.
+  // Helper to get current state.
+  Color color() const { return states_.empty() ? color_
+                                               : states_.top().color; }
   Vector2dF& origin() { return states_.empty() ? origin_
                                                : states_.top().origin; }
 
  private:
   // The saved state.
   struct PainterState {
-    PainterState(const Vector2dF& origin,
+    PainterState(Color color,
+                 const Vector2dF& origin,
                  Gdiplus::GraphicsContainer&& container);
 
+    Color color;
     Vector2dF origin;
     Gdiplus::GraphicsContainer container;
   };
@@ -62,7 +61,8 @@ class PainterWin : public Painter {
   // The stack for all saved states.
   std::stack<PainterState> states_;
 
-  // The root origin.
+  // The root state.
+  Color color_;
   Vector2dF origin_;
 
   float scale_factor_;

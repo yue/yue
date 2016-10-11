@@ -69,6 +69,24 @@ struct Type<nu::RectF> {
 };
 
 template<>
+struct Type<nu::Vector2dF> {
+  static constexpr const char* name = "yue.Vector2d";
+  static inline void Push(State* state, const nu::Vector2dF& vec) {
+    lua::PushNewTable(state);
+    lua::RawSet(state, -1, "x", vec.x(), "y", vec.y());
+  }
+  static inline bool To(State* state, int index, nu::Vector2dF* out) {
+    if (GetType(state, index) != LuaType::Table)
+      return false;
+    float x, y;
+    if (!RawGetAndPop(state, index, "x", &x, "y", &y))
+      return false;
+    *out = nu::Vector2dF(x, y);
+    return true;
+  }
+};
+
+template<>
 struct Type<nu::Insets> {
   static constexpr const char* name = "yue.Insets";
   static inline void Push(State* state, const nu::Insets& insets) {
@@ -439,7 +457,7 @@ struct Type<nu::Font> {
            "getname", &nu::Font::GetName,
            "getsize", &nu::Font::GetSize);
   }
-  static nu::Font* New(const std::string& font_name, int font_size ){
+  static nu::Font* New(const std::string& font_name, int font_size) {
     return nu::Font::CreateFromNameAndSize(font_name, font_size);
   }
   static nu::Font* GetDefault() {
@@ -458,12 +476,36 @@ struct Type<nu::Image> {
 };
 
 template<>
+struct Type<nu::Painter::CombineMode> {
+  static constexpr const char* name = "yue.Painter.CombineMode";
+  static inline bool To(State* state, int index,
+                        nu::Painter::CombineMode* out) {
+    std::string mode;
+    if (!lua::To(state, index, &mode))
+      return false;
+    if (mode == "replace")
+      *out = nu::Painter::CombineMode::Replace;
+    else if (mode == "intersect")
+      *out = nu::Painter::CombineMode::Intersect;
+    else if (mode == "union")
+      *out = nu::Painter::CombineMode::Union;
+    else if (mode == "exclude")
+      *out = nu::Painter::CombineMode::Exclude;
+    else
+      return false;
+    return true;
+  }
+};
+
+template<>
 struct Type<nu::Painter> {
   static constexpr const char* name = "yue.Painter";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
            "save", &nu::Painter::Save,
            "restore", &nu::Painter::Restore,
+           "cliprect", &nu::Painter::ClipRect,
+           "translate", &nu::Painter::Translate,
            "fillrect", &nu::Painter::FillRect);
   }
 };

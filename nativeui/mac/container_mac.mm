@@ -51,7 +51,8 @@
 - (void)drawRect:(NSRect)dirtyRect {
   nu::RectF dirty(dirtyRect);
   nu::PainterMac painter;
-  painter.FillRect(dirty, background_color_);
+  painter.SetColor(background_color_);
+  painter.FillRect(dirty);
   shell_->on_draw.Emit(shell_, &painter, dirty);
 }
 

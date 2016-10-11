@@ -10,9 +10,10 @@
 
 namespace nu {
 
-PainterWin::PainterState::PainterState(const Vector2dF& origin,
+PainterWin::PainterState::PainterState(Color color,
+                                       const Vector2dF& origin,
                                        Gdiplus::GraphicsContainer&& container)
-    : origin(origin), container(container) {
+    : color(color), origin(origin), container(container) {
 }
 
 PainterWin::PainterWin(HDC dc, float scale_factor)
@@ -40,7 +41,7 @@ void PainterWin::ReleaseHDC(HDC dc) {
 }
 
 void PainterWin::Save() {
-  states_.emplace(origin(), graphics_.BeginContainer());
+  states_.emplace(color(), origin(), graphics_.BeginContainer());
 }
 
 void PainterWin::Restore() {
@@ -58,21 +59,21 @@ void PainterWin::Translate(const Vector2dF& offset) {
   TranslatePixel(ScaleVector2d(offset, scale_factor_));
 }
 
-void PainterWin::DrawRect(const RectF& rect, Color color) {
-  DrawPixelRect(ScaleRect(rect, scale_factor_), color);
+void PainterWin::SetColor(Color color) {
+  color_ = color;
 }
 
-void PainterWin::FillRect(const RectF& rect, Color color) {
-  FillPixelRect(ScaleRect(rect, scale_factor_), color);
+void PainterWin::DrawRect(const RectF& rect) {
+  DrawPixelRect(ScaleRect(rect, scale_factor_));
 }
 
-void PainterWin::DrawStringWithFlags(const String& text,
-                                     Font* font,
-                                     Color color,
-                                     const RectF& rect,
-                                     int flags) {
-  DrawPixelStringWithFlags(text, font, color, ScaleRect(rect, scale_factor_),
-                           flags);
+void PainterWin::FillRect(const RectF& rect) {
+  FillPixelRect(ScaleRect(rect, scale_factor_));
+}
+
+void PainterWin::DrawStringWithFlags(
+    const String& text, Font* font, const RectF& rect, int flags) {
+  DrawPixelStringWithFlags(text, font, ScaleRect(rect, scale_factor_), flags);
 }
 
 void PainterWin::ClipPixelRect(const RectF& rect, CombineMode mode) {
@@ -91,22 +92,19 @@ void PainterWin::TranslatePixel(const Vector2dF& offset) {
   origin() += offset;
 }
 
-void PainterWin::DrawPixelRect(const RectF& rect, Color color) {
-  Gdiplus::Pen pen(ToGdi(color));
+void PainterWin::DrawPixelRect(const RectF& rect) {
+  Gdiplus::Pen pen(ToGdi(color()));
   graphics_.DrawRectangle(&pen, ToGdi(rect + origin()));
 }
 
-void PainterWin::FillPixelRect(const RectF& rect, Color color) {
-  Gdiplus::SolidBrush brush(ToGdi(color));
+void PainterWin::FillPixelRect(const RectF& rect) {
+  Gdiplus::SolidBrush brush(ToGdi(color()));
   graphics_.FillRectangle(&brush, ToGdi(rect + origin()));
 }
 
-void PainterWin::DrawPixelStringWithFlags(const String& text,
-                                          Font* font,
-                                          Color color,
-                                          const RectF& rect,
-                                          int flags) {
-  Gdiplus::SolidBrush brush(ToGdi(color));
+void PainterWin::DrawPixelStringWithFlags(
+    const String& text, Font* font, const RectF& rect, int flags) {
+  Gdiplus::SolidBrush brush(ToGdi(color()));
   Gdiplus::StringFormat format;
   format.SetLineAlignment(Gdiplus::StringAlignmentCenter);
   if (flags & TextAlignLeft)

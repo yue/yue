@@ -58,25 +58,24 @@ class Painter {
   // The origin offset of the painting.
   virtual void Translate(const Vector2dF& offset) = 0;
 
-  // Draws a single pixel |rect| in the specified region with |color|.
-  virtual void DrawRect(const RectF& rect, Color color) = 0;
+  // Sets the color used for drawing or filling.
+  virtual void SetColor(Color color) = 0;
 
-  // Fills |rect| with |color|.
-  virtual void FillRect(const RectF& rect, Color color) = 0;
+  // Draws a single pixel |rect|.
+  virtual void DrawRect(const RectF& rect) = 0;
+
+  // Fills |rect|.
+  virtual void FillRect(const RectF& rect) = 0;
 
   // Draws text with the specified color, fonts and location. The text is
   // aligned to the left, vertically centered, clipped to the region. If the
   // text is too big, it is truncated and '...' is added to the end.
-  void DrawString(const String& text, Font* font, Color color,
-                  const RectF& rect);
+  void DrawString(const String& text, Font* font, const RectF& rect);
 
-  // Draws text with the specified color, fonts and location. The last argument
+  // Draws text with the specified font and location. The last argument
   // specifies flags for how the text should be rendered.
-  virtual void DrawStringWithFlags(const String& text,
-                                   Font* font,
-                                   Color color,
-                                   const RectF& rect,
-                                   int flags) = 0;
+  virtual void DrawStringWithFlags(
+      const String& text, Font* font, const RectF& rect, int flags) = 0;
 
   base::WeakPtr<Painter> GetWeakPtr() { return weak_factory_.GetWeakPtr(); }
 

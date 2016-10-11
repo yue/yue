@@ -38,25 +38,23 @@ void PainterGtk::Translate(const Vector2dF& offset) {
   cairo_translate(context_, offset.x(), offset.y());
 }
 
-void PainterGtk::DrawRect(const RectF& rect, Color color) {
-  cairo_rectangle(context_, rect.x(), rect.y(), rect.width(), rect.height());
+void PainterGtk::SetColor(Color color) {
   cairo_set_source_rgba(context_, color.r() / 255., color.g() / 255.,
                                   color.b() / 255., color.a() / 255.);
+}
+
+void PainterGtk::DrawRect(const RectF& rect) {
+  cairo_rectangle(context_, rect.x(), rect.y(), rect.width(), rect.height());
   cairo_stroke(context_);
 }
 
-void PainterGtk::FillRect(const RectF& rect, Color color) {
+void PainterGtk::FillRect(const RectF& rect) {
   cairo_rectangle(context_, rect.x(), rect.y(), rect.width(), rect.height());
-  cairo_set_source_rgba(context_, color.r() / 255., color.g() / 255.,
-                                  color.b() / 255., color.a() / 255.);
   cairo_fill(context_);
 }
 
-void PainterGtk::DrawStringWithFlags(const String& text,
-                                     Font* font,
-                                     Color color,
-                                     const RectF& rect,
-                                     int flags) {
+void PainterGtk::DrawStringWithFlags(
+    const String& text, Font* font, const RectF& rect, int flags) {
 }
 
 }  // namespace nu

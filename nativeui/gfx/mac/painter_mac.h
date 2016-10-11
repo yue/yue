@@ -20,13 +20,11 @@ class PainterMac : public Painter {
   void ClipRect(const RectF& rect,
                 CombineMode mode = CombineMode::Replace) override;
   void Translate(const Vector2dF& offset) override;
-  void DrawRect(const RectF& rect, Color color) override;
-  void FillRect(const RectF& rect, Color color) override;
-  void DrawStringWithFlags(const String& text,
-                           Font* font,
-                           Color color,
-                           const RectF& rect,
-                           int flags) override;
+  void SetColor(Color color) override;
+  void DrawRect(const RectF& rect) override;
+  void FillRect(const RectF& rect) override;
+  void DrawStringWithFlags(
+      const String& text, Font* font, const RectF& rect, int flags) override;
 };
 
 }  // namespace nu

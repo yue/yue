@@ -40,21 +40,20 @@ void PainterMac::Translate(const Vector2dF& offset) {
   [xform concat];
 }
 
-void PainterMac::DrawRect(const RectF& rect, Color color) {
+void PainterMac::SetColor(Color color) {
   [color.ToNSColor() set];
+}
+
+void PainterMac::DrawRect(const RectF& rect) {
   NSFrameRect(rect.ToCGRect());
 }
 
-void PainterMac::FillRect(const RectF& rect, Color color) {
-  [color.ToNSColor() set];
+void PainterMac::FillRect(const RectF& rect) {
   NSRectFillUsingOperation(rect.ToCGRect(), NSCompositeSourceOver);
 }
 
-void PainterMac::DrawStringWithFlags(const String& utf8text,
-                                     Font* font,
-                                     Color color,
-                                     const RectF& rect,
-                                     int flags) {
+void PainterMac::DrawStringWithFlags(
+    const String& utf8text, Font* font, const RectF& rect, int flags) {
   NSMutableParagraphStyle* paragraphStyle =
       [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
   NSDictionary* attributes = [NSDictionary

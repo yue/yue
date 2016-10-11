@@ -40,9 +40,9 @@
 
 - (void)drawRect:(NSRect)dirtyRect {
   nu::PainterMac painter;
-  painter.FillRect(nu::RectF(dirtyRect), background_color_);
+  painter.SetColor(background_color_);
+  painter.FillRect(nu::RectF(dirtyRect));
   painter.DrawStringWithFlags(text_, nu::State::current()->GetDefaultFont(),
-                              nu::Color(),
                               nu::RectF([self frame]),
                               nu::Painter::TextAlignCenter);
 }
