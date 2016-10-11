@@ -75,6 +75,8 @@ using NativeMenuItem = NSMenuItem*;
 #elif defined(OS_LINUX)
 using NativeView = GtkWidget*;
 using NativeWindow = GtkWindow*;
+using NativeImage = GdkPixbuf*;
+using NativeFont = PangoFontDescription*;
 using NativeMenu = GtkMenuShell*;
 using NativeMenuItem = GtkMenuItem*;
 #elif defined(OS_WIN)

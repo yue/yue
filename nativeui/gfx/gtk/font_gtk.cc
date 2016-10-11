@@ -30,6 +30,10 @@ int FontGtk::GetSize() const {
   return pango_font_description_get_size(font_);
 }
 
+NativeFont FontGtk::GetNative() const {
+  return font_;
+}
+
 // static
 Font* Font::CreateDefault() {
   // Receive the default font from control.

@@ -28,10 +28,8 @@ NATIVEUI_EXPORT class Font : public base::RefCounted<Font> {
   // Returns the font size in pixels.
   virtual int GetSize() const = 0;
 
-#if defined(OS_WIN) || defined(OS_MACOSX) || defined(OS_IOS)
   // Returns the native font handle.
   virtual NativeFont GetNative() const = 0;
-#endif
 
  protected:
   Font() {}

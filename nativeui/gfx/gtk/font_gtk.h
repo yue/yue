@@ -19,6 +19,7 @@ NATIVEUI_EXPORT class FontGtk : public Font {
   // Font:
   std::string GetName() const override;
   int GetSize() const override;
+  NativeFont GetNative() const override;
 
  private:
   ~FontGtk() override;

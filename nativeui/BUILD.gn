@@ -57,6 +57,7 @@ source_set("nativeui") {
     "gfx/painter.h",
     "gfx/text.h",
     "gfx/gtk/color_gtk.cc",
+    "gfx/gtk/image_gtk.cc",
     "gfx/gtk/painter_gtk.cc",
     "gfx/gtk/painter_gtk.h",
     "gfx/gtk/font_gtk.cc",
