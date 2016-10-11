@@ -51,15 +51,15 @@ FontMac::FontMac(const std::string& font_name, int font_size)
 FontMac::~FontMac() {
 }
 
-std::string FontMac::GetFontName() const {
+std::string FontMac::GetName() const {
   return base::SysNSStringToUTF8([font_ familyName]);
 }
 
-int FontMac::GetFontSize() const {
+int FontMac::GetSize() const {
   return [font_ pointSize];
 }
 
-NativeFont FontMac::GetNativeFont() const {
+NativeFont FontMac::GetNative() const {
   return font_.get();
 }
 

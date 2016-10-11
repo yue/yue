@@ -20,7 +20,7 @@ SubwinView::SubwinView(base::StringPiece16 class_name,
   base::win::ScopedCreateDC mem_dc(CreateCompatibleDC(NULL));
   Gdiplus::Graphics context(mem_dc.Get());
   LOGFONTW logfont;
-  State::current()->GetDefaultFont()->GetNativeFont()->GetLogFontW(
+  State::current()->GetDefaultFont()->GetNative()->GetLogFontW(
       &context, &logfont);
   font_.reset(CreateFontIndirect(&logfont));
   // Use it as control's default font.

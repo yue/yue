@@ -116,7 +116,7 @@ void PainterWin::DrawPixelStringWithFlags(const String& text,
   else if (flags & TextAlignRight)
     format.SetAlignment(Gdiplus::StringAlignmentFar);
   graphics_.DrawString(text.c_str(), static_cast<int>(text.size()),
-                       font->GetNativeFont(), ToGdi(RectF(rect + origin())),
+                       font->GetNative(), ToGdi(RectF(rect + origin())),
                        &format, &brush);
 }
 

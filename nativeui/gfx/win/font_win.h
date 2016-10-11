@@ -17,9 +17,9 @@ NATIVEUI_EXPORT class FontWin : public Font {
   FontWin(const base::string16& font_name, int font_size);
 
   // Font:
-  std::string GetFontName() const override;
-  int GetFontSize() const override;
-  NativeFont GetNativeFont() const override;
+  std::string GetName() const override;
+  int GetSize() const override;
+  NativeFont GetNative() const override;
 
  private:
   ~FontWin() override;

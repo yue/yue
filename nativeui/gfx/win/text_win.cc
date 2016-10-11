@@ -19,7 +19,7 @@ SizeF MeasureText(HDC dc, Font* font, const String& text) {
   Gdiplus::RectF rect;
   Gdiplus::StringFormat fomart(Gdiplus::StringFormat::GenericDefault());
   graphics.MeasureString(text.c_str(), static_cast<int>(text.length()),
-                         font->GetNativeFont(), Gdiplus::PointF(0., 0.),
+                         font->GetNative(), Gdiplus::PointF(0., 0.),
                          &fomart, &rect);
   return SizeF(rect.Width, rect.Height);
 }

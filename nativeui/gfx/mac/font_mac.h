@@ -18,9 +18,9 @@ NATIVEUI_EXPORT class FontMac : public Font {
   FontMac(const std::string& font_name, int font_size);
 
   // Font:
-  std::string GetFontName() const override;
-  int GetFontSize() const override;
-  NativeFont GetNativeFont() const override;
+  std::string GetName() const override;
+  int GetSize() const override;
+  NativeFont GetNative() const override;
 
  private:
   ~FontMac() override;

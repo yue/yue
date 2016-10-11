@@ -16,7 +16,7 @@ SizeF MeasureText(Font* font, const String& text) {
   [paragraphStyle setAlignment:NSCenterTextAlignment];
   NSDictionary* attrs = @{
     NSParagraphStyleAttributeName : paragraphStyle,
-    NSFontAttributeName : font->GetNativeFont()
+    NSFontAttributeName : font->GetNative()
   };
   NSAttributedString* attribute =
       [[[NSAttributedString alloc] initWithString:base::SysUTF8ToNSString(text)

@@ -415,7 +415,11 @@ template<>
 struct Type<nu::Font> {
   static constexpr const char* name = "yue.Font";
   static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index, "new", &New, "default", &GetDefault);
+    RawSet(state, index,
+           "new", &New,
+           "default", &GetDefault,
+           "getname", &nu::Font::GetName,
+           "getsize", &nu::Font::GetSize);
   }
   static nu::Font* New(const std::string& font_name, int font_size ){
     return nu::Font::CreateFromNameAndSize(font_name, font_size);

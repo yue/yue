@@ -24,17 +24,17 @@ FontWin::FontWin(const base::string16& font_name,
 FontWin::~FontWin() {
 }
 
-std::string FontWin::GetFontName() const {
+std::string FontWin::GetName() const {
   WCHAR buffer[LF_FACESIZE] = {0};
   font_family_.GetFamilyName(buffer);
   return base::UTF16ToUTF8(buffer);
 }
 
-int FontWin::GetFontSize() const {
+int FontWin::GetSize() const {
   return font_.GetSize();
 }
 
-NativeFont FontWin::GetNativeFont() const {
+NativeFont FontWin::GetNative() const {
   return const_cast<NativeFont>(&font_);
 }
 

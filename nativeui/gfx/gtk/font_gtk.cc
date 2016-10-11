@@ -22,11 +22,11 @@ FontGtk::~FontGtk() {
   pango_font_description_free(font_);
 }
 
-std::string FontGtk::GetFontName() const {
+std::string FontGtk::GetName() const {
   return pango_font_description_get_family(font_);
 }
 
-int FontGtk::GetFontSize() const {
+int FontGtk::GetSize() const {
   return pango_font_description_get_size(font_);
 }
 

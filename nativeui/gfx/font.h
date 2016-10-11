@@ -23,14 +23,14 @@ NATIVEUI_EXPORT class Font : public base::RefCounted<Font> {
                                      int font_size);
 
   // Returns the specified font name in UTF-8.
-  virtual std::string GetFontName() const = 0;
+  virtual std::string GetName() const = 0;
 
   // Returns the font size in pixels.
-  virtual int GetFontSize() const = 0;
+  virtual int GetSize() const = 0;
 
 #if defined(OS_WIN) || defined(OS_MACOSX) || defined(OS_IOS)
   // Returns the native font handle.
-  virtual NativeFont GetNativeFont() const = 0;
+  virtual NativeFont GetNative() const = 0;
 #endif
 
  protected:
