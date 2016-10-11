@@ -52,13 +52,14 @@ void PainterMac::FillRect(const RectF& rect) {
   NSRectFillUsingOperation(rect.ToCGRect(), NSCompositeSourceOver);
 }
 
-void PainterMac::DrawStringWithFlags(
+void PainterMac::DrawTextWithFlags(
     const String& utf8text, Font* font, const RectF& rect, int flags) {
   NSMutableParagraphStyle* paragraphStyle =
       [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
-  NSDictionary* attributes = [NSDictionary
-      dictionaryWithObject:paragraphStyle
-                    forKey:NSParagraphStyleAttributeName];
+  NSDictionary* attributes = @{
+    NSFontAttributeName: font->GetNative(),
+    NSParagraphStyleAttributeName: paragraphStyle,
+  };
 
   if (flags & TextAlignRight)
     [paragraphStyle setAlignment:NSRightTextAlignment];

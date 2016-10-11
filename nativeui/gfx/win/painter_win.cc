@@ -71,7 +71,7 @@ void PainterWin::FillRect(const RectF& rect) {
   FillPixelRect(ScaleRect(rect, scale_factor_));
 }
 
-void PainterWin::DrawStringWithFlags(
+void PainterWin::DrawTextWithFlags(
     const String& text, Font* font, const RectF& rect, int flags) {
   DrawPixelStringWithFlags(text, font, ScaleRect(rect, scale_factor_), flags);
 }

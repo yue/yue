@@ -10,9 +10,9 @@ Painter::Painter() : weak_factory_(this) {}
 
 Painter::~Painter() {}
 
-void Painter::DrawString(const String& text, Font* font, const RectF& rect) {
+void Painter::DrawText(const String& text, Font* font, const RectF& rect) {
   // TODO(zcbenz): Support RTL in future.
-  DrawStringWithFlags(text, font, rect, TextAlignLeft);
+  DrawTextWithFlags(text, font, rect, TextAlignLeft);
 }
 
 }  // namespace nu

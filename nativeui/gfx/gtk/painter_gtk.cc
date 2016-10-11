@@ -53,7 +53,7 @@ void PainterGtk::FillRect(const RectF& rect) {
   cairo_fill(context_);
 }
 
-void PainterGtk::DrawStringWithFlags(
+void PainterGtk::DrawTextWithFlags(
     const String& text, Font* font, const RectF& rect, int flags) {
 }
 

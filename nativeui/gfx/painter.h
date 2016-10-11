@@ -33,7 +33,7 @@ class Painter {
   virtual ~Painter();
 
   enum {
-    // Specifies the alignment for text rendered with the DrawString method.
+    // Specifies the alignment for text rendered with the DrawText method.
     TextAlignLeft   = 1 << 0,
     TextAlignCenter = 1 << 1,
     TextAlignRight  = 1 << 2,
@@ -70,11 +70,11 @@ class Painter {
   // Draws text with the specified color, fonts and location. The text is
   // aligned to the left, vertically centered, clipped to the region. If the
   // text is too big, it is truncated and '...' is added to the end.
-  void DrawString(const String& text, Font* font, const RectF& rect);
+  void DrawText(const String& text, Font* font, const RectF& rect);
 
   // Draws text with the specified font and location. The last argument
   // specifies flags for how the text should be rendered.
-  virtual void DrawStringWithFlags(
+  virtual void DrawTextWithFlags(
       const String& text, Font* font, const RectF& rect, int flags) = 0;
 
   base::WeakPtr<Painter> GetWeakPtr() { return weak_factory_.GetWeakPtr(); }

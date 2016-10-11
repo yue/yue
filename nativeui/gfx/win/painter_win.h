@@ -29,7 +29,7 @@ class PainterWin : public Painter {
   void SetColor(Color color) override;
   void DrawRect(const RectF& rect) override;
   void FillRect(const RectF& rect) override;
-  void DrawStringWithFlags(
+  void DrawTextWithFlags(
       const String& text, Font* font, const RectF& rect, int flags) override;
 
   // The pixel versions.

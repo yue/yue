@@ -525,7 +525,8 @@ struct Type<nu::Painter> {
            "translate", &nu::Painter::Translate,
            "setcolor", &nu::Painter::SetColor,
            "drawrect", &nu::Painter::DrawRect,
-           "fillrect", &nu::Painter::FillRect);
+           "fillrect", &nu::Painter::FillRect,
+           "drawtext", &nu::Painter::DrawText);
   }
 };
 
