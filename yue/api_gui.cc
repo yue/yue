@@ -19,9 +19,13 @@ struct Type<nu::Size> {
     lua::RawSet(state, -1, "width", size.width(), "height", size.height());
   }
   static inline bool To(State* state, int index, nu::Size* out) {
+    float width, height;
+    if (GetTop(state) - index == 1 && lua::To(state, index, &width, &height)) {
+      *out = nu::Size(width, height);
+      return true;
+    }
     if (GetType(state, index) != LuaType::Table)
       return false;
-    float width, height;
     if (!RawGetAndPop(state, index, "width", &width, "height", &height))
       return false;
     *out = nu::Size(width, height);
@@ -37,9 +41,13 @@ struct Type<nu::SizeF> {
     lua::RawSet(state, -1, "width", size.width(), "height", size.height());
   }
   static inline bool To(State* state, int index, nu::SizeF* out) {
+    float width, height;
+    if (GetTop(state) - index == 1 && lua::To(state, index, &width, &height)) {
+      *out = nu::SizeF(width, height);
+      return true;
+    }
     if (GetType(state, index) != LuaType::Table)
       return false;
-    float width, height;
     if (!RawGetAndPop(state, index, "width", &width, "height", &height))
       return false;
     *out = nu::SizeF(width, height);
@@ -57,9 +65,14 @@ struct Type<nu::RectF> {
                 "width", rect.width(), "height", rect.height());
   }
   static inline bool To(State* state, int index, nu::RectF* out) {
+    float x, y, width, height;
+    if (GetTop(state) - index == 3 &&
+        lua::To(state, index, &x, &y, &width, &height)) {
+      *out = nu::RectF(x, y, width, height);
+      return true;
+    }
     if (GetType(state, index) != LuaType::Table)
       return false;
-    float x, y, width, height;
     if (!RawGetAndPop(state, index,
                       "x", &x, "y", &y, "width", &width, "height", &height))
       return false;
@@ -76,9 +89,13 @@ struct Type<nu::Vector2dF> {
     lua::RawSet(state, -1, "x", vec.x(), "y", vec.y());
   }
   static inline bool To(State* state, int index, nu::Vector2dF* out) {
+    float x, y;
+    if (GetTop(state) - index == 1 && lua::To(state, index, &x, &y)) {
+      *out = nu::Vector2dF(x, y);
+      return true;
+    }
     if (GetType(state, index) != LuaType::Table)
       return false;
-    float x, y;
     if (!RawGetAndPop(state, index, "x", &x, "y", &y))
       return false;
     *out = nu::Vector2dF(x, y);
@@ -506,6 +523,8 @@ struct Type<nu::Painter> {
            "restore", &nu::Painter::Restore,
            "cliprect", &nu::Painter::ClipRect,
            "translate", &nu::Painter::Translate,
+           "setcolor", &nu::Painter::SetColor,
+           "drawrect", &nu::Painter::DrawRect,
            "fillrect", &nu::Painter::FillRect);
   }
 };
