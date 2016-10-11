@@ -7,7 +7,23 @@
 
 #include "nativeui/gfx/gtk/painter_gtk.h"
 
+#include "nativeui/label.h"
+
 namespace nu {
+
+namespace {
+
+Color GetDefaultTextColor() {
+  scoped_refptr<nu::Label> label = new nu::Label;
+  gtk_widget_ensure_style(label->view());
+  GtkStyle* style = gtk_widget_get_style(label->view());
+  GdkColor color;
+  if (!gtk_style_lookup_color(style, "text_color", &color))
+    return Color();
+  return Color(color.red >> 8, color.green >> 8, color.blue >> 8);
+}
+
+}  // namespace
 
 PainterGtk::PainterGtk(cairo_t* context) : context_(context) {
 }
@@ -55,6 +71,35 @@ void PainterGtk::FillRect(const RectF& rect) {
 
 void PainterGtk::DrawTextWithFlags(
     const String& text, Font* font, const RectF& rect, int flags) {
+  PangoLayout* layout = pango_cairo_create_layout(context_);
+  pango_layout_set_font_description(layout, font->GetNative());
+  cairo_save(context_);
+
+  // Text size.
+  int width, height;
+  pango_layout_set_text(layout, text.c_str(), text.length());
+  pango_layout_get_pixel_size(layout, &width, &height);
+
+  int x = rect.x(), y = rect.y();
+  // Vertical center.
+  y += (rect.height() - height) / 2;
+
+  // Horizontal alignment.
+  if (flags & TextAlignRight)
+    x += rect.width() - width;
+  else if (flags & TextAlignCenter)
+    x += (rect.width() - width) / 2;
+
+  // Use default text color.
+  static Color color = GetDefaultTextColor();
+  SetColor(color);
+
+  // Draw text.
+  cairo_move_to(context_, x, y);
+  pango_cairo_show_layout(context_, layout);
+
+  cairo_restore(context_);
+  g_object_unref(layout);
 }
 
 }  // namespace nu
