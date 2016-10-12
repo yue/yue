@@ -59,8 +59,8 @@ void PainterWin::Translate(const Vector2dF& offset) {
   TranslatePixel(ScaleVector2d(offset, scale_factor_));
 }
 
-void PainterWin::SetColor(Color color) {
-  color_ = color;
+void PainterWin::SetColor(Color new_color) {
+  color() = new_color;
 }
 
 void PainterWin::DrawRect(const RectF& rect) {
@@ -104,7 +104,10 @@ void PainterWin::FillPixelRect(const RectF& rect) {
 
 void PainterWin::DrawPixelStringWithFlags(
     const String& text, Font* font, const RectF& rect, int flags) {
-  Gdiplus::SolidBrush brush(ToGdi(color()));
+  static DWORD text_color = ::GetSysColor(COLOR_WINDOWTEXT);
+  Gdiplus::SolidBrush brush(Gdiplus::Color(GetRValue(text_color),
+                                           GetGValue(text_color),
+                                           GetBValue(text_color)));
   Gdiplus::StringFormat format;
   format.SetLineAlignment(Gdiplus::StringAlignmentCenter);
   if (flags & TextAlignLeft)

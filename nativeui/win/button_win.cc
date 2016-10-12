@@ -32,6 +32,7 @@ class ButtonView : public BaseView {
                                                 : ControlType::Radio)),
         theme_(State::current()->GetNativeTheme()),
         color_(GetThemeColor(ThemeColor::Text)),
+        font_(State::current()->GetDefaultFont()),
         delegate_(delegate) {
     if (type == Button::CheckBox)
       box_size_ = theme_->GetThemePartSize(NativeTheme::CheckBox, state());
@@ -41,7 +42,7 @@ class ButtonView : public BaseView {
 
   void SetTitle(const base::string16& title) {
     title_ = title;
-    text_size_ = MeasureText(this, font_, title_);
+    text_size_ = MeasureText(this, font_.get(), title_);
   }
 
   base::string16 GetTitle() const {
@@ -197,12 +198,11 @@ class ButtonView : public BaseView {
     painter->ReleaseHDC(dc);
 
     // The text.
-    painter->DrawPixelStringWithFlags(title_, font_, color_, RectF(text_bounds),
+    painter->DrawPixelStringWithFlags(title_, font_.get(), RectF(text_bounds),
                                       Painter::TextAlignCenter);
   }
 
   NativeTheme::ButtonExtraParams* params() { return &params_; }
-  Font font() const { return font_; }
 
  private:
   NativeTheme* theme_;
@@ -216,7 +216,7 @@ class ButtonView : public BaseView {
 
   // Default text color and font.
   Color color_;
-  Font font_;
+  scoped_refptr<Font> font_;
 
   // Whether the button is capturing the mouse.
   bool is_capturing_ = false;

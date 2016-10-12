@@ -48,6 +48,7 @@ class UIWindow;
 #if defined(OS_WIN)
 namespace Gdiplus {
 class Font;
+class Image;
 }
 #endif
 
@@ -83,6 +84,7 @@ using NativeMenuItem = GtkMenuItem*;
 using NativeView = BaseView*;
 using NativeWindow = WindowImpl*;
 using NativeFont = Gdiplus::Font*;
+using NativeImage = Gdiplus::Image*;
 using NativeMenu = HMENU;
 using NativeMenuItem = MenuItemData*;
 #elif defined(OS_IOS)

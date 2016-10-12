@@ -8,6 +8,7 @@
 #include "nativeui/gfx/color.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/win/text_win.h"
+#include "nativeui/state.h"
 #include "nativeui/win/base_view.h"
 
 namespace nu {
@@ -17,7 +18,8 @@ namespace {
 class LabelView : public BaseView {
  public:
   LabelView() : BaseView(ControlType::Label),
-                color_(GetThemeColor(ThemeColor::Text)) {
+                color_(GetThemeColor(ThemeColor::Text)),
+                font_(State::current()->GetDefaultFont()) {
   }
 
   void SetText(const base::string16& text) {
@@ -31,16 +33,16 @@ class LabelView : public BaseView {
   // BaseView:
   void Draw(PainterWin* painter, const Rect& dirty) override {
     BaseView::Draw(painter, dirty);
-    painter->DrawPixelStringWithFlags(text_, font_, color_,
+    painter->DrawPixelStringWithFlags(text_, font(),
                                       RectF(SizeF(size_allocation().size())),
                                       Painter::TextAlignCenter);
   }
 
-  Font font() const { return font_; }
+  Font* font() const { return font_.get(); }
 
  private:
   Color color_;
-  Font font_;
+  scoped_refptr<Font> font_;
 
   base::string16 text_;
 };

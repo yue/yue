@@ -41,8 +41,8 @@ class PainterWin : public Painter {
       const String& text, Font* font, const RectF& rect, int flags);
 
   // Helper to get current state.
-  Color color() const { return states_.empty() ? color_
-                                               : states_.top().color; }
+  Color& color() { return states_.empty() ? color_
+                                          : states_.top().color; }
   Vector2dF& origin() { return states_.empty() ? origin_
                                                : states_.top().origin; }
 

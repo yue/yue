@@ -11,6 +11,7 @@
 #include <tuple>
 
 #include "base/strings/string_piece.h"
+#include "base/strings/utf_string_conversions.h"
 #include "lua/state.h"
 
 namespace lua {
@@ -147,6 +148,21 @@ struct Type<std::string> {
     if (!str)
       return false;
     *out = str;
+    return true;  // ignore memory errors.
+  }
+};
+
+template<>
+struct Type<base::string16> {
+  static constexpr const char* name = "string";
+  static inline void Push(State* state, const base::string16& str) {
+    Type<std::string>::Push(state, base::UTF16ToUTF8(str));
+  }
+  static inline bool To(State* state, int index, base::string16* out) {
+    const char* str = lua_tostring(state, index);
+    if (!str)
+      return false;
+    *out = base::UTF8ToUTF16(str);
     return true;  // ignore memory errors.
   }
 };

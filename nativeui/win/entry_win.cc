@@ -7,6 +7,7 @@
 #include "base/strings/utf_string_conversions.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/win/text_win.h"
+#include "nativeui/state.h"
 #include "nativeui/win/subwin_view.h"
 #include "nativeui/win/util/hwnd_util.h"
 #include "nativeui/win/window_win.h"
@@ -85,7 +86,8 @@ class EntryView : public SubwinView {
 Entry::Entry() {
   TakeOverView(new EntryView(this));
 
-  float height = MeasureText(view(), Font(), L"some text").height() +
+  Font* font = State::current()->GetDefaultFont();
+  float height = MeasureText(view(), font, L"some text").height() +
                  2 * kEntryPadding * view()->scale_factor();
   SetDefaultStyle(ScaleSize(SizeF(0, height), 1.0f / view()->scale_factor()));
 }

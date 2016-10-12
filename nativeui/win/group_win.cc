@@ -10,6 +10,7 @@
 #include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/geometry/vector2d.h"
 #include "nativeui/gfx/win/text_win.h"
+#include "nativeui/state.h"
 #include "nativeui/win/container_win.h"
 
 namespace nu {
@@ -25,7 +26,8 @@ class GroupView : public ContainerView,
   explicit GroupView(Group* delegate)
       : ContainerView(this, ControlType::Group),
         delegate_(delegate),
-        color_(GetThemeColor(ThemeColor::Text)) {}
+        color_(GetThemeColor(ThemeColor::Text)),
+        font_(State::current()->GetDefaultFont()) {}
 
 
   void SetTitle(const base::string16& title) {
@@ -33,7 +35,7 @@ class GroupView : public ContainerView,
 
     // Update the rect of the title.
     title_bounds_ = RectF(PointF(kTitleLeftMargin * scale_factor(), 0),
-                          MeasureText(this, font_, title_));
+                          MeasureText(this, font_.get(), title_));
   }
 
   base::string16 GetTitle() const {
@@ -61,7 +63,7 @@ class GroupView : public ContainerView,
   void Draw(PainterWin* painter, const Rect& dirty) override {
     // Draw title.
     if (RectF(dirty).Intersects(title_bounds_))
-      painter->DrawPixelStringWithFlags(title_, font_, color_, title_bounds_,
+      painter->DrawPixelStringWithFlags(title_, font_.get(), title_bounds_,
                                         Painter::TextAlignLeft);
 
     // Calculate the border bounds.
@@ -91,7 +93,7 @@ class GroupView : public ContainerView,
   Group* delegate_;
 
   Color color_;
-  Font font_;
+  scoped_refptr<Font> font_;
   RectF title_bounds_;
 
   base::string16 title_;
