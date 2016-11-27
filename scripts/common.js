@@ -1,6 +1,6 @@
 // Copyright 2016 Cheng Zhao. All rights reserved.
-// Use of this source code is governed by the MIT license that can be
-// found in the LICENSE file.
+// Use of this source code is governed by the license that can be found in the
+// LICENSE file.
 
 const path = require('path')
 const {execSync, spawnSync} = require('child_process')
@@ -48,7 +48,10 @@ const runSync = (command, commandArgs = []) => {
 
 // Don't log out Node.js stack trace.
 if (!verbose) {
-  process.on('uncaughtException', () => process.exit(1))
+  process.on('uncaughtException', (error) => {
+    console.error('Exit with error:', error.message)
+    process.exit(1)
+  })
 }
 
 // Export public APIs.
