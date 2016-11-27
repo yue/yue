@@ -14,6 +14,7 @@
   nu::Color background_color_;
 }
 - (id)initWithShell:(nu::Container*)shell;
+- (nu::View*)shell;
 - (void)setNUBackgroundColor:(nu::Color)color;
 @end
 
@@ -26,6 +27,10 @@
 
   shell_ = shell;
   return self;
+}
+
+- (nu::View*)shell {
+  return shell_;
 }
 
 - (void)setNUBackgroundColor:(nu::Color)color {

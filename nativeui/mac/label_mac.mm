@@ -12,17 +12,38 @@
 #include "nativeui/state.h"
 #include "third_party/css-layout/CSSLayout/CSSLayout.h"
 
-@interface LabelView : NSView<BaseView> {
+@interface NULabel : NSView<BaseView> {
  @private
+  nu::Label* shell_;
   std::string text_;
   nu::Color background_color_;
 }
+- (id)initWithShell:(nu::Label*)shell;
+- (nu::View*)shell;
+- (void)setNUBackgroundColor:(nu::Color)color;
 - (void)setText:(const std::string&)text;
 - (std::string)text;
-- (void)setNUBackgroundColor:(nu::Color)color;
 @end
 
-@implementation LabelView
+@implementation NULabel
+
+- (id)initWithShell:(nu::Label*)shell {
+  self = [super init];
+  if (!self)
+    return nil;
+
+  shell_ = shell;
+  return self;
+}
+
+- (nu::View*)shell {
+  return shell_;
+}
+
+- (void)setNUBackgroundColor:(nu::Color)color {
+  background_color_ = color;
+  [self setNeedsDisplay:YES];
+}
 
 - (void)setText:(const std::string&)text {
   text_ = text;
@@ -31,11 +52,6 @@
 
 - (std::string)text {
   return text_;
-}
-
-- (void)setNUBackgroundColor:(nu::Color)color {
-  background_color_ = color;
-  [self setNeedsDisplay:YES];
 }
 
 - (void)drawRect:(NSRect)dirtyRect {
@@ -62,7 +78,7 @@ SizeF GetPreferredSizeForText(const std::string& text) {
 }  // namespace
 
 Label::Label(const std::string& text) {
-  TakeOverView([[LabelView alloc] init]);
+  TakeOverView([[NULabel alloc] init]);
   SetText(text);
 }
 
@@ -70,12 +86,12 @@ Label::~Label() {
 }
 
 void Label::SetText(const std::string& text) {
-  [static_cast<LabelView*>(view()) setText:text];
+  [static_cast<NULabel*>(view()) setText:text];
   SetDefaultStyle(GetPreferredSizeForText(text));
 }
 
 std::string Label::GetText() {
-  return [static_cast<LabelView*>(view()) text];
+  return [static_cast<NULabel*>(view()) text];
 }
 
 }  // namespace nu

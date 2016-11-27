@@ -13,19 +13,23 @@ namespace nu {
 namespace {
 
 void OnMouseEvent(NSView* self, SEL _cmd, NSEvent* event) {
-  LOG(ERROR) << "OnMouseEvent";
+  if ([self respondsToSelector:@selector(shell)])
+    LOG(ERROR) << "OnMouseEvent";
 }
 
 void OnKeyEvent(NSView* self, SEL _cmd, NSEvent* event) {
-  LOG(ERROR) << "OnKeyEvent";
+  if ([self respondsToSelector:@selector(shell)])
+    LOG(ERROR) << "OnKeyEvent";
 }
 
 void OnInsertText(NSView* self, SEL _cmd, NSString* text) {
-  LOG(ERROR) << "OnInsertText";
+  if ([self respondsToSelector:@selector(shell)])
+    LOG(ERROR) << "OnInsertText";
 }
 
 BOOL OnPerformKeyEquivalent(NSView* self, SEL _cmd, NSEvent* event) {
-  LOG(ERROR) << "OnPerformKeyEquivalent";
+  if ([self respondsToSelector:@selector(shell)])
+    LOG(ERROR) << "OnPerformKeyEquivalent";
   return NO;
 }
 

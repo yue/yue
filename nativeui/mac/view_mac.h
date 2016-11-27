@@ -5,11 +5,12 @@
 #ifndef NATIVEUI_MAC_VIEW_MAC_H_
 #define NATIVEUI_MAC_VIEW_MAC_H_
 
-#include "nativeui/gfx/color.h"
+#include "nativeui/view.h"
 
 #import <Cocoa/Cocoa.h>
 
 @protocol BaseView
+- (nu::View*)shell;
 - (void)setNUBackgroundColor:(nu::Color)color;
 @end
 

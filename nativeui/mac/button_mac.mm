@@ -28,19 +28,37 @@ nu::InsetsF GetButtonInsets(NSButton* button) {
 
 }  // namespace
 
-// The default NSButton includes the button's shadow area as its frame, and it
-// gives us wrong coordinates to calculate layout. This class overrides
-// setFrame: frame: to ignore the shadow frame.
-@interface NUButton : NSButton<BaseView>
+@interface NUButton : NSButton<BaseView> {
+ @private
+  nu::Button* shell_;
+}
+- (id)initWithShell:(nu::Button*)shell;
+- (nu::View*)shell;
 - (void)setNUBackgroundColor:(nu::Color)color;
 @end
 
 @implementation NUButton
 
+- (id)initWithShell:(nu::Button*)shell {
+  self = [super init];
+  if (!self)
+    return nil;
+
+  shell_ = shell;
+  return self;
+}
+
+- (nu::View*)shell {
+  return shell_;
+}
+
 - (void)setNUBackgroundColor:(nu::Color)color {
   [self.cell setBackgroundColor:color.ToNSColor()];
 }
 
+// The default NSButton includes the button's shadow area as its frame, and it
+// gives us wrong coordinates to calculate layout. This method overrides
+// setFrame: frame: to ignore the shadow frame.
 - (void)setFrame:(NSRect)frame {
   nu::InsetsF border(GetButtonInsets(self));
   nu::RectF bounds(frame);

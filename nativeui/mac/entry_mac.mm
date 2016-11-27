@@ -7,11 +7,29 @@
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/mac/view_mac.h"
 
-@interface NUEntry : NSTextField<BaseView>
+@interface NUEntry : NSTextField<BaseView> {
+ @private
+  nu::Entry* shell_;
+}
+- (id)initWithShell:(nu::Entry*)shell;
+- (nu::View*)shell;
 - (void)setNUBackgroundColor:(nu::Color)color;
 @end
 
 @implementation NUEntry
+
+- (id)initWithShell:(nu::Entry*)shell {
+  self = [super init];
+  if (!self)
+    return nil;
+
+  shell_ = shell;
+  return self;
+}
+
+- (nu::View*)shell {
+  return shell_;
+}
 
 - (void)setNUBackgroundColor:(nu::Color)color {
   [self setBackgroundColor:color.ToNSColor()];
@@ -48,7 +66,7 @@
 namespace nu {
 
 Entry::Entry() {
-  NSTextField* entry = [[NUEntry alloc] init];
+  NSTextField* entry = [[NUEntry alloc] initWithShell:this];
   [entry setBezelStyle:NSTextFieldSquareBezel];
   [entry setBezeled:YES];
   [entry setTarget:[[NUEntryDelegate alloc] initWithShell:this]];
