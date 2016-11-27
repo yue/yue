@@ -26,4 +26,9 @@ NativeImage ImageGtk::GetNative() const {
   return image_;
 }
 
+// static
+Image* Image::CreateFromFile(const String& path) {
+  return new ImageGtk(path);
+}
+
 }  // namespace nu

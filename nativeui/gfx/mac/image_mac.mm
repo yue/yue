@@ -26,4 +26,9 @@ NativeImage ImageMac::GetNative() const {
   return image_.get();
 }
 
+// static
+Image* Image::CreateFromFile(const String& path) {
+  return new ImageMac(path);
+}
+
 }  // namespace nu
