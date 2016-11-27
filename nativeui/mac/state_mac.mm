@@ -4,13 +4,16 @@
 
 #include "nativeui/state.h"
 
-#import <Cocoa/Cocoa.h>
+#include "nativeui/mac/events_handler.h"
 
 namespace nu {
 
 void State::PlatformInit() {
   [NSApplication sharedApplication];
   [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+
+  AddMouseEventMethodsToView(NSClassFromString(@"NUContainer"));
+  AddKeyEventMethodsToView(NSClassFromString(@"NUContainer"));
 }
 
 void State::PlatformDestroy() {

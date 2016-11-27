@@ -8,7 +8,7 @@
 #include "nativeui/gfx/mac/painter_mac.h"
 #include "nativeui/mac/view_mac.h"
 
-@interface ContainerView : NSView<BaseView> {
+@interface NUContainer : NSView<BaseView> {
  @private
   nu::Container* shell_;
   nu::Color background_color_;
@@ -17,7 +17,7 @@
 - (void)setNUBackgroundColor:(nu::Color)color;
 @end
 
-@implementation ContainerView
+@implementation NUContainer
 
 - (id)initWithShell:(nu::Container*)shell {
   self = [super init];
@@ -61,7 +61,7 @@
 namespace nu {
 
 void Container::PlatformInit() {
-  TakeOverView([[ContainerView alloc] initWithShell:this]);
+  TakeOverView([[NUContainer alloc] initWithShell:this]);
 }
 
 void Container::PlatformDestroy() {
