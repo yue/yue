@@ -25,7 +25,7 @@ void ContainerView::OnMouseMove(UINT flags, const Point& point) {
   // Emit mouse enter/leave events
   if (hover_view_ != hover_view) {
     if (hover_view_ &&
-        ContainsValue(delegate_->GetChildren(), hover_view_))
+        base::ContainsValue(delegate_->GetChildren(), hover_view_))
       hover_view_->OnMouseLeave();
     hover_view_ = hover_view;
     if (hover_view_)
@@ -38,7 +38,7 @@ void ContainerView::OnMouseMove(UINT flags, const Point& point) {
 
 void ContainerView::OnMouseLeave() {
   if (hover_view_) {
-    if (ContainsValue(delegate_->GetChildren(), hover_view_))
+    if (base::ContainsValue(delegate_->GetChildren(), hover_view_))
       hover_view_->OnMouseLeave();
     hover_view_ = nullptr;
   }

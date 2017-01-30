@@ -77,10 +77,10 @@ require_administrator_manifest = "//build/win/require_administrator.manifest"
 #   }
 
 if (is_win) {
-  # This is the environment file that gyp-win-tool will use for the current
+  # This is the environment file that tool_wrapper.py will use for the current
   # toolchain. It is placed in root_build_dir by the toolchain setup. This
   # variable is the path relative to the root_build_dir which is what
-  # gyp-win-tool expects as an argument.
+  # tool_wrapper.py expects as an argument.
   _environment_file = "environment.$current_cpu"
 
   template("windows_manifest") {
@@ -98,7 +98,7 @@ if (is_win) {
         ":$rc_action_name",
       ]
 
-      script = "$root_build_dir/gyp-win-tool"
+      script = "//build/toolchain/win/tool_wrapper.py"
 
       assert(defined(invoker.sources),
              "\"sources\" must be defined for a windows_manifest target")
@@ -126,11 +126,11 @@ if (is_win) {
     # Make the .rc file that references the final manifest file.
     #
     # This could easily be combined into one step, but this current separation
-    # of .manifest and .rc matches GYP and allows us to re-use gyp-win-tool.
+    # of .manifest and .rc matches GYP and allows us to re-use tool_wrapper.py.
     action(rc_action_name) {
       visibility = [ ":$source_set_name" ]
 
-      script = "$root_build_dir/gyp-win-tool"
+      script = "//build/toolchain/win/tool_wrapper.py"
 
       outputs = [
         rcfile,
