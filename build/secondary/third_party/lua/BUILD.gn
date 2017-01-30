@@ -82,7 +82,11 @@ source_set("liblua") {
       "/wd4310",  # cast truncates constant value
       "/wd4324",  # structure was padded due to alignment specifier
     ]
-  } else {
+  }
+  if (is_posix) {
+    defines = [ "LUA_USE_POSIX" ]
+  }
+  if (!is_win) {
     configs -= [ "//build/config/gcc:symbol_visibility_hidden" ]
   }
 
