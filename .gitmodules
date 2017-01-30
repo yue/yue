@@ -38,6 +38,6 @@
 [submodule "testing/libfuzzer"]
 	path = testing/libfuzzer
 	url = https://chromium.googlesource.com/chromium/src/testing/libfuzzer/
-[submodule "third_party/ced"]
-	path = third_party/ced
+[submodule "third_party/ced/src"]
+	path = third_party/ced/src
 	url = https://github.com/google/compact_enc_det.git

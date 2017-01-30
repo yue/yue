@@ -5,7 +5,7 @@
 import("//testing/test.gni")
 
 config("ced_config") {
-  include_dirs = [ "." ]
+  include_dirs = [ "src" ]
   if (is_clang) {
     cflags = [ "-Wno-unused-function" ]
   }
@@ -15,27 +15,27 @@ static_library("ced") {
   sources = [
     # find src -maxdepth 3 ! -type d | egrep '\.(h|cc)$' | grep -v test.cc |\
     # LC_COLLATE=c sort | sed 's/^\(.*\)$/    "\1",/'
-    "compact_enc_det/compact_enc_det.cc",
-    "compact_enc_det/compact_enc_det_generated_tables.h",
-    "compact_enc_det/compact_enc_det_generated_tables2.h",
-    "compact_enc_det/compact_enc_det_hint_code.cc",
-    "compact_enc_det/compact_enc_det_hint_code.h",
-    "util/basictypes.h",
-    "util/case_insensitive_hash.h",
-    "util/commandlineflags.h",
-    "util/encodings/encodings.cc",
-    "util/encodings/encodings.h",
-    "util/encodings/encodings.pb.h",
-    "util/languages/languages.cc",
-    "util/languages/languages.h",
-    "util/languages/languages.pb.h",
-    "util/logging.h",
-    "util/port.h",
-    "util/string_util.h",
-    "util/varsetter.h",
+    "src/compact_enc_det/compact_enc_det.cc",
+    "src/compact_enc_det/compact_enc_det_generated_tables.h",
+    "src/compact_enc_det/compact_enc_det_generated_tables2.h",
+    "src/compact_enc_det/compact_enc_det_hint_code.cc",
+    "src/compact_enc_det/compact_enc_det_hint_code.h",
+    "src/util/basictypes.h",
+    "src/util/case_insensitive_hash.h",
+    "src/util/commandlineflags.h",
+    "src/util/encodings/encodings.cc",
+    "src/util/encodings/encodings.h",
+    "src/util/encodings/encodings.pb.h",
+    "src/util/languages/languages.cc",
+    "src/util/languages/languages.h",
+    "src/util/languages/languages.pb.h",
+    "src/util/logging.h",
+    "src/util/port.h",
+    "src/util/string_util.h",
+    "src/util/varsetter.h",
   ]
   public = [
-    "compact_enc_det/compact_enc_det.h",
+    "src/compact_enc_det/compact_enc_det.h",
   ]
   configs -= [ "//build/config/compiler:chromium_code" ]
   configs += [ "//build/config/compiler:no_chromium_code" ]
@@ -57,10 +57,10 @@ static_library("ced") {
 
 test("ced_unittests") {
   sources = [
-    "compact_enc_det/compact_enc_det_fuzz_test.cc",
-    "compact_enc_det/compact_enc_det_unittest.cc",
-    "compact_enc_det/detail_head_string.inc",
-    "util/encodings/encodings_unittest.cc",
+    "src/compact_enc_det/compact_enc_det_fuzz_test.cc",
+    "src/compact_enc_det/compact_enc_det_unittest.cc",
+    "src/compact_enc_det/detail_head_string.inc",
+    "src/util/encodings/encodings_unittest.cc",
   ]
 
   if (is_win) {
