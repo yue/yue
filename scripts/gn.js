@@ -6,4 +6,4 @@
 
 const {gn, runSync} = require('./common')
 
-runSync(gn, ['args'])
+runSync(gn, process.argv.splice(2))

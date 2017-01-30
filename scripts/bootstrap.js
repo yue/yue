@@ -18,4 +18,12 @@ if (process.platform === 'linux') {
 
 execSync('git submodule sync --recursive')
 execSync('git submodule update --init --recursive')
-runSync(gn, ['gen'])
+
+gen('out/Debug', ['is_component_build=false', 'is_debug=true'])
+gen('out/Release', ['is_component_build=false',
+                    'is_debug=false',
+                    'is_official_build=true'])
+
+function gen(dir, args) {
+  spawnSync(gn, ['gen', dir, `--args=${args.join(' ')}`], { stdio: 'inherit' })
+}

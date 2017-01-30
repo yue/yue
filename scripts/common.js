@@ -27,7 +27,7 @@ const execSyncWrapper = (command, options = { stdio: 'inherit' }) => {
 
 // Parse args.
 let verbose = false
-let dir = 'out/Default'
+let dir = 'out/Debug'
 const args = process.argv.slice(2).filter((arg) => {
   if (arg.includes('/') && !arg.startsWith('-')) {
     dir = arg
