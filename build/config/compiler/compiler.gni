@@ -4,8 +4,12 @@
 
 import("//build/config/android/config.gni")
 import("//build/config/chrome_build.gni")
+import("//build/config/chromecast_build.gni")
+import("//build/config/compiler/pgo/pgo.gni")
 import("//build/config/sanitizers/sanitizers.gni")
+import("//build/toolchain/goma.gni")
 import("//build/toolchain/toolchain.gni")
+import("//build_overrides/build.gni")
 
 declare_args() {
   # How many symbols to include in the build. This affects the performance of
@@ -37,20 +41,29 @@ declare_args() {
   # can be used to convert a fastlink pdb to a normal one.
   is_win_fastlink = false
 
-  # Specify the current PGO phase, only used for the Windows MSVS build. Here's
-  # the different values that can be used:
-  #     0 : Means that PGO is turned off.
-  #     1 : Used during the PGI (instrumentation) phase.
-  #     2 : Used during the PGO (optimization) phase.
+  # Whether or not we should turn on incremental WPO. Only affects the VS
+  # Windows build.
+  use_incremental_wpo = false
+
+  # Root directory that will store the MSVC link repro. This should only be
+  # used for debugging purposes on the builders where a MSVC linker flakyness
+  # has been observed. The targets for which a link repro should be generated
+  # should add somethink like this to their configuration:
+  #   if (linkrepro_root_dir != "") {
+  #     ldflags = ["/LINKREPRO:" + linkrepro_root_dir + "/" + target_name]
+  #   }
   #
-  # TODO(sebmarchand): Add support for the PGU (update) phase.
-  chrome_pgo_phase = 0
+  # Note that doing a link repro uses a lot of disk space and slows down the
+  # build, so this shouldn't be enabled on too many targets.
+  #
+  # See crbug.com/669854.
+  linkrepro_root_dir = ""
 }
 
 declare_args() {
   # Whether or not the official builds should be built with full WPO. Enabled by
   # default for the PGO and the x64 builds.
-  if (chrome_pgo_phase > 0 || target_cpu == "x64") {
+  if (chrome_pgo_phase > 0) {
     full_wpo_on_official = true
   } else {
     full_wpo_on_official = false
@@ -58,19 +71,13 @@ declare_args() {
 }
 
 declare_args() {
-  # Generate Syzygy optimized binaries. Syzygy optimize mode is a profile
-  # guided optimization that reorders code for better locality.
-  syzygy_optimize = is_win && target_cpu == "x86" && is_official_build &&
-                    !is_clang && !is_win_fastlink && symbol_level == 2
-}
-
-declare_args() {
   # Whether to use the gold linker from binutils instead of lld or bfd.
-  use_gold = !use_lld &&
+  use_gold = !use_lld && !(is_chromecast && is_linux &&
+                           (current_cpu == "arm" || current_cpu == "mipsel")) &&
              ((is_linux && (current_cpu == "x64" || current_cpu == "x86" ||
                             current_cpu == "arm" || current_cpu == "mipsel")) ||
               (is_android && (current_cpu == "x86" || current_cpu == "x64" ||
-                              current_cpu == "arm")))
+                              current_cpu == "arm" || current_cpu == "arm64")))
 }
 
 # If it wasn't manually set, set to an appropriate default.
@@ -80,11 +87,20 @@ if (symbol_level == -1) {
     # With instrumentation enabled, debug info puts libchrome.so over 4gb, which
     # causes the linker to produce an invalid ELF. http://crbug.com/574476
     symbol_level = 0
-  } else if (is_win && is_clang && !using_sanitizer) {
-    # TODO(thakis): Remove this again once building with clang/win and
-    # debug info doesn't make link.exe run for hours.
+  } else if (is_android && !is_component_build && !is_clang &&
+             !(android_64bit_target_cpu && !build_apk_secondary_abi)) {
+    # Reduce symbol level when it will cause invalid elf files to be created
+    # (due to file size). https://crbug.com/648948.
     symbol_level = 1
-  } else if (!is_linux || is_debug || is_official_build) {
+  } else if (is_win && use_goma && !is_clang) {
+    # goma doesn't support PDB files, so we disable symbols during goma
+    # compilation because otherwise the redundant debug information generated
+    # by visual studio (repeated in every .obj file) makes linker
+    # memory consumption and link times unsustainable (crbug.com/630074).
+    # Clang on windows does not have this issue.
+    symbol_level = 1
+  } else if ((!is_nacl && !is_linux) || is_debug || is_official_build ||
+             is_chromecast) {
     # Linux is slowed by having symbols as part of the target binary, whereas
     # Mac and Windows have them separate, so in Release Linux, default them off,
     # but keep them on for Official builds and Chromecast builds.
@@ -96,3 +112,12 @@ if (symbol_level == -1) {
     symbol_level = 0
   }
 }
+
+# Assert that the configuration isn't going to hit https://crbug.com/648948.
+assert(ignore_elf32_limitations || !is_android ||
+           (android_64bit_target_cpu && !build_apk_secondary_abi) ||
+           is_component_build || symbol_level < 2 || is_clang,
+       "Android 32-bit non-component, non-clang builds cannot have " +
+           "symbol_level=2 due to 4GiB file size limit, see " +
+           "https://crbug.com/648948. If you really want to try this out, " +
+           "set ignore_elf32_limitations=true.")
