@@ -1,0 +1,112 @@
+# e.g. RolloverProtectedTickClock
+fun:*MutableInstance*
+
+# WTF allocators.
+fun:*allocate*Backing*
+
+# WTF::ThreadSpecific
+fun:*ThreadSpecific*
+
+# Mesa contains several bad casts.
+src:*third_party/mesa*
+
+# Deliberate bad cast to derived class to hide functions.
+type:*BlockIUnknownMethods*
+type:*BlockRefType*
+type:*SkAutoTUnref*
+type:*SkBlockComRef*
+
+# invalid downcasts for IPC messages
+# https://crbug.com/520760
+src:*nacl_message_scanner.cc*
+
+# src/base/win/event_trace_provider_unittest.cc
+type:*EtwTraceProvider*
+
+# These classes are used to communicate between chrome.exe and
+# chrome_child.dll (see src/sandbox/win/src/sandbox.h,
+# src/chrome/app/chrome_main.cc).
+type:sandbox::BrokerServices
+type:sandbox::TargetPolicy
+type:sandbox::TargetServices
+
+# Likewise (base/win/scoped_handle.cc).
+type:*ActiveVerifier*
+
+#############################################################################
+# Base class's constructor accesses a derived class.
+
+fun:*DoublyLinkedListNode*
+
+# RenderFrameObserverTracker<T>::RenderFrameObserverTracker()
+fun:*content*RenderFrameObserverTracker*RenderFrame*
+
+# RenderViewObserverTracker<T>::RenderViewObserverTracker()
+fun:*content*RenderViewObserverTracker*RenderView*
+
+fun:*RefCountedGarbageCollected*makeKeepAlive*
+fun:*ThreadSafeRefCountedGarbageCollected*makeKeepAlive*
+
+#############################################################################
+# Base class's destructor accesses a derived class.
+
+fun:*DatabaseContext*contextDestroyed*
+
+# FIXME: Cannot handle template function LifecycleObserver<>::setContext,
+# so exclude source file for now. 
+src:*LifecycleObserver.h*
+
+# Blink wtf::Vector cast on non-initialized data
+# https://crbug.com/568891
+src:*wtf/Vector.h*
+src:*wtf/PartitionAllocator.h*
+
+#############################################################################
+# Methods disabled due to perf considerations.
+
+# Skia
+
+# https://crbug.com/638064#c1
+fun:*SkPictureUtils*ApproximateBytesUsed*
+
+# https://crbug.com/638056#c1
+fun:*SkCanvas*onDrawRect*
+
+# https://crbug.com/638064
+fun:*SkCanvas*drawPicture*
+
+# https://crbug.com/638060
+fun:*SkCanvas*onDrawPicture*
+
+# https://crbug.com/638064#c2
+fun:*SkBaseDevice*accessPixels*
+
+# https://crbug.com/638056
+fun:*call_hline_blitter*
+fun:*do_scanline*
+fun:*antifilldot8*
+
+# Unclear what could be done here
+fun:*SkCanvas*drawRect*
+fun:*SkPictureGpuAnalyzer*analyzePicture*
+fun:*SkScalerContext*MakeRec*
+
+# CC
+
+# https://crbug.com/638056
+fun:*LayerTreeHost*NotifySwapPromiseMonitorsOfSetNeedsCommit*
+
+# WebKit
+# The entries below have not been categorized
+
+# cc::DisplayItemList::Inputs::~Inputs
+fun:*cc*DisplayItemList*Inputs*
+
+fun:*PaintInvalidationState*computePaintInvalidationRectInBacking*
+fun:*AdjustAndMarkTrait*mark*
+fun:*TraceTrait*trace*
+fun:*ChromeClientImpl*scheduleAnimation*
+fun:*hasAspectRatio*
+fun:*nextBreakablePosition*
+fun:*supportsCachedOffsets*
+fun:*traceImpl*
