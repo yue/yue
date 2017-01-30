@@ -35,3 +35,9 @@
 [submodule "third_party/yxml"]
 	path = third_party/yxml
 	url = git://g.blicky.net/yxml.git
+[submodule "testing/libfuzzer"]
+	path = testing/libfuzzer
+	url = https://chromium.googlesource.com/chromium/src/testing/libfuzzer/
+[submodule "third_party/ced"]
+	path = third_party/ced
+	url = https://github.com/google/compact_enc_det.git

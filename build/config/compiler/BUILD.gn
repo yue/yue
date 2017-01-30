@@ -8,15 +8,13 @@ import("//build/config/compiler/compiler.gni")
 import("//build/config/nacl/config.gni")
 import("//build/toolchain/cc_wrapper.gni")
 import("//build/toolchain/toolchain.gni")
+import("//build_overrides/build.gni")
 
 if (current_cpu == "arm" || current_cpu == "arm64") {
   import("//build/config/arm.gni")
 }
 if (current_cpu == "mipsel" || current_cpu == "mips64el") {
   import("//build/config/mips.gni")
-}
-if (is_win) {
-  import("//build/config/win/visual_studio_version.gni")
 }
 if (is_mac) {
   import("//build/config/mac/symbols.gni")
@@ -37,8 +35,11 @@ declare_args() {
   # These are not multi-arch so cannot be used except on x86 and x86-64 (the
   # only two architectures that are currently checked in). Turn this off when
   # you are using a custom toolchain and need to control -B in cflags.
-  # Note(Yue): We don't download bundled binutils.
-  linux_use_bundled_binutils = false
+  linux_use_bundled_binutils =
+      linux_use_bundled_binutils_override && is_linux &&
+      (current_cpu == "x64" || current_cpu == "x86")
+  binutils_path = rebase_path("//third_party/binutils/Linux_x64/Release/bin",
+                              root_build_dir)
 
   # Compile in such a way as to make it possible for the profiler to unwind full
   # stack frames. Setting this flag has a large effect on the performance of the
@@ -75,8 +76,12 @@ declare_args() {
   # Enable fatal linker warnings. Building Chromium with certain versions
   # of binutils can cause linker warning.
   # See: https://bugs.chromium.org/p/chromium/issues/detail?id=457359
-  # Note(Yue): lua has linking warnings and we have to ignore them.
-  fatal_linker_warnings = false
+  fatal_linker_warnings = true
+
+  # Build with C++ RTTI enabled. Chromium builds without RTTI by default,
+  # but some sanitizers are known to require it, like CFI diagnostics
+  # and UBsan variants.
+  use_rtti = use_cfi_diag || is_ubsan_vptr || is_ubsan_security
 
   # AFDO (Automatic Feedback Directed Optimizer) is a form of profile-guided
   # optimization that GCC supports. It used by ChromeOS in their official
@@ -311,25 +316,28 @@ config("compiler") {
 
   # Linux-specific compiler flags setup.
   # ------------------------------------
+  if (is_android && is_clang) {
+    _rebased_android_toolchain_root =
+        rebase_path(android_toolchain_root, root_build_dir)
+
+    # Let clang find the linker in the NDK.
+    ldflags += [ "--gcc-toolchain=$_rebased_android_toolchain_root" ]
+  }
+
   if (is_posix && use_lld && !is_nacl) {
     ldflags += [ "-fuse-ld=lld" ]
   } else if (use_gold) {
     ldflags += [ "-fuse-ld=gold" ]
     if (is_android) {
-      if (is_clang) {
-        _rebased_android_toolchain_root =
-            rebase_path(android_toolchain_root, root_build_dir)
-
-        # Let clang find the ld.gold in the NDK.
-        ldflags += [ "--gcc-toolchain=$_rebased_android_toolchain_root" ]
-      }
-
       # Use -mstackrealign due to a bug on ia32 Jelly Bean.
       # See crbug.com/521527
       if (current_cpu == "x86") {
         cflags += [ "-mstackrealign" ]
       }
     } else {
+      # On Android, this isn't needed.  gcc in the NDK knows to look next to
+      # it with -fuse-ld=gold, and clang gets a --gcc-toolchain flag passed
+      # above.
       ldflags += [ "-B$gold_path" ]
 
       if (linux_use_bundled_binutils) {
@@ -359,12 +367,6 @@ config("compiler") {
     # Gold is the default linker for the bundled binutils so we explicitly
     # enable the bfd linker when use_gold is not set.
     ldflags += [ "-fuse-ld=bfd" ]
-  } else if (is_android && is_clang &&
-             (current_cpu == "mipsel" || current_cpu == "mips64el")) {
-    # Let clang find the ld.bfd in the NDK.
-    _rebased_android_toolchain_root =
-        rebase_path(android_toolchain_root, root_build_dir)
-    ldflags += [ "--gcc-toolchain=$_rebased_android_toolchain_root" ]
   }
 
   if (is_posix && (use_gold || (use_lld && !is_nacl)) && !using_sanitizer &&
@@ -375,10 +377,13 @@ config("compiler") {
     # Additionally, on cast Android x86, --icf=all causes issues.
     if (is_android && current_cpu == "x86") {
       ldflags += [ "-Wl,--icf=none" ]
-    } else if (is_clang || is_chromeos ||
+    } else if ((is_clang && !is_android) || is_chromeos ||
                (current_cpu != "x86" && current_cpu != "x64")) {
+      # TODO(thakis): Remove `!is_android` above once our gold has been rolled
+      # with the fix for https://sourceware.org/bugzilla/show_bug.cgi?id=17704
+      # merged.  See also https://crbug.com/663886
       ldflags += [ "-Wl,--icf=all" ]
-    } else if (!is_android) {
+    } else if (!is_android || is_clang) {
       ldflags += [ "-Wl,--icf=safe" ]
     }
   }
@@ -441,13 +446,16 @@ config("compiler") {
   if (!is_debug && (allow_posix_link_time_opt || is_cfi) && !is_nacl) {
     if (use_thin_lto) {
       cflags += [ "-flto=thin" ]
-      ldflags += [
-        "-flto=thin",
+      ldflags += [ "-flto=thin" ]
 
-        # Limit the parallelism to the sweet spot on most of the machines.
-        # As of now, ThinLTO does not scale beyond 16 cores anyway.
-        "-Wl,-plugin-opt,jobs=16",
-      ]
+      # Limit the parallelism to avoid too agressive competition between
+      # linker jobs. This is still suboptimal to a potential dynamic
+      # resource allocation scheme, but should be good enough.
+      if (use_lld) {
+        ldflags += [ "-Wl,--thinlto-jobs=8" ]
+      } else {
+        ldflags += [ "-Wl,-plugin-opt,jobs=8" ]
+      }
     } else {
       # Note: ThinLTO does not currently have this feature implemented
       # For Full LTO, it provides a measurable runtime speedup of Chrome.
@@ -499,6 +507,16 @@ config("compiler") {
   }
 }
 
+# This is separate from :compiler (and not even a sub-config there)
+# so that some targets can remove it from the list with:
+#   configs -= [ "//build/config/compiler:pthread" ]
+config("pthread") {
+  if (is_linux) {
+    cflags = [ "-pthread" ]
+    ldflags = [ "-pthread" ]
+  }
+}
+
 # This provides the basic options to select the target CPU and ABI.
 # It is factored out of "compiler" so that special cases can use this
 # without using everything that "compiler" brings in.  Options that
@@ -537,13 +555,6 @@ config("compiler_cpu_abi") {
           "-march=$arm_arch",
           "-mfloat-abi=$arm_float_abi",
         ]
-        if (arm_use_thumb) {
-          cflags += [ "-mthumb" ]
-          if (is_android && !is_clang) {
-            # Clang doesn't support this option.
-            cflags += [ "-mthumb-interwork" ]
-          }
-        }
       }
       if (arm_tune != "") {
         cflags += [ "-mtune=$arm_tune" ]
@@ -554,12 +565,6 @@ config("compiler_cpu_abi") {
         ldflags += [ "--target=aarch64-linux-gnu" ]
       }
     } else if (current_cpu == "mipsel" && !is_nacl) {
-      if (is_clang) {
-        # Temporarily needed due to unsupported MIPS macro instructions
-        # in inline asm code in third_party projects (libwebp and webrtc).
-        # TODO(lmilko) Enable integrated-as.
-        cflags += [ "-fno-integrated-as" ]
-      }
       if (mips_arch_variant == "r6") {
         if (is_clang) {
           cflags += [
@@ -768,6 +773,25 @@ config("compiler_arm_fpu") {
   }
 }
 
+config("compiler_arm_thumb") {
+  if (current_cpu == "arm" && arm_use_thumb && is_posix &&
+      !(is_mac || is_ios || is_nacl)) {
+    cflags = [ "-mthumb" ]
+    if (is_android && !is_clang) {
+      # Clang doesn't support this option.
+      cflags += [ "-mthumb-interwork" ]
+    }
+  }
+}
+
+config("compiler_arm") {
+  if (current_cpu == "arm" && is_chromeos) {
+    # arm is normally the default mode for clang, but on chromeos a wrapper
+    # is used to pass -mthumb, and therefor change the default.
+    cflags = [ "-marm" ]
+  }
+}
+
 # runtime_library -------------------------------------------------------------
 #
 # Sets the runtime library and associated options.
@@ -814,11 +838,20 @@ config("runtime_library") {
 config("default_warnings") {
   cflags = []
   cflags_cc = []
+  ldflags = []
 
   if (is_win) {
     if (treat_warnings_as_errors) {
       cflags += [ "/WX" ]
     }
+    if (fatal_linker_warnings) {
+      ldflags += [ "/WX" ]
+    }
+
+    cflags += [
+      # Assume UTF-8 by default to avoid code page dependencies.
+      "/utf-8",
+    ]
 
     cflags += [
       # Warnings permanently disabled:
@@ -904,28 +937,20 @@ config("default_warnings") {
       "/wd4459",
     ]
 
-    if (visual_studio_version == "2015") {
+    cflags += [
+      # C4312 is a VS 2015 64-bit warning for integer to larger pointer.
+      # TODO(brucedawson): fix warnings, crbug.com/554200
+      "/wd4312",
+    ]
+
+    if (current_cpu == "x86") {
       cflags += [
-        # C4312 is a VS 2015 64-bit warning for integer to larger pointer.
-        # TODO(brucedawson): fix warnings, crbug.com/554200
-        "/wd4312",
-
-        # TODO(brucedawson): http://crbug.com/593448 - C4595 is an 'illegal
-        # inline operator new' warning that is new in VS 2015 Update 2.
-        # This is equivalent to clang's no-inline-new-delete warning.
-        # See http://bugs.icu-project.org/trac/ticket/11122
-        "/wd4595",
+        # VC++ 2015 changes 32-bit size_t truncation warnings from 4244 to
+        # 4267. Example: short TruncTest(size_t x) { return x; }
+        # Since we disable 4244 we need to disable 4267 during migration.
+        # TODO(jschuh): crbug.com/167187 fix size_t to int truncations.
+        "/wd4267",
       ]
-
-      if (current_cpu == "x86") {
-        cflags += [
-          # VC++ 2015 changes 32-bit size_t truncation warnings from 4244 to
-          # 4267. Example: short TruncTest(size_t x) { return x; }
-          # Since we disable 4244 we need to disable 4267 during migration.
-          # TODO(jschuh): crbug.com/167187 fix size_t to int truncations.
-          "/wd4267",
-        ]
-      }
     }
 
     # VS xtree header file needs to be patched or 4702 (unreachable code
@@ -938,14 +963,12 @@ config("default_warnings") {
 
     # Building with Clang on Windows is a work in progress and very
     # experimental. See crbug.com/82385.
-    # Keep this in sync with the similar block in build/common.gypi
     if (is_clang) {
       cflags += [
         # TODO(hans): Make this list shorter eventually, http://crbug.com/504657
         "-Wno-microsoft-enum-value",  # http://crbug.com/505296
         "-Wno-unknown-pragmas",  # http://crbug.com/505314
         "-Wno-microsoft-cast",  # http://crbug.com/550065
-        "-Wno-ignored-pragmas",  # http://crbug.com/644841
       ]
     }
   } else {
@@ -954,6 +977,12 @@ config("default_warnings") {
       # availability is newer than the deployment target. This is not
       # required when compiling Chrome for iOS.
       cflags += [ "-Wpartial-availability" ]
+    }
+
+    if (is_ios) {
+      # When compiling Objective-C, warns if a selector named via @selector has
+      # not been defined in any visible interface.
+      cflags += [ "-Wundeclared-selector" ]
     }
 
     # Suppress warnings about ABI changes on ARM (Clang doesn't give this
@@ -1049,6 +1078,15 @@ config("default_warnings") {
         # TODO(hans): https://crbug.com/637306
         "-Wno-address-of-packed-member",
       ]
+      if (llvm_force_head_revision) {
+        cflags += [
+          # TODO(hans): https://crbug.com/681136
+          "-Wno-unused-lambda-capture",
+
+          # TODO(thakis ): https://crbug.com/683349
+          "-Wno-user-defined-warnings",
+        ]
+      }
     }
   }
 }
@@ -1065,6 +1103,11 @@ config("chromium_code") {
     cflags = [ "-Wall" ]
     if (treat_warnings_as_errors) {
       cflags += [ "-Werror" ]
+
+      # The compiler driver can sometimes (rarely) emit warnings before calling
+      # the actual linker.  Make sure these warnings are treated as errors as
+      # well.
+      ldflags = [ "-Werror" ]
     }
     if (is_clang) {
       # Enable -Wextra for chromium_code when we control the compiler.
@@ -1121,6 +1164,7 @@ config("no_chromium_code") {
     # code. crbug.com/589724
     if (treat_warnings_as_errors && is_clang) {
       cflags += [ "-Werror" ]
+      ldflags = [ "-Werror" ]
     }
     if (is_clang && !is_nacl) {
       # TODO(thakis): Remove !is_nacl once
@@ -1158,9 +1202,10 @@ config("rtti") {
     cflags_cc = [ "-frtti" ]
   }
 }
+
 config("no_rtti") {
-  # CFI diagnostics and UBsan vptr require RTTI.
-  if (!use_cfi_diag && !is_ubsan_vptr && !is_ubsan_security) {
+  # Some sanitizer configs may require RTTI to be left enabled globally
+  if (!use_rtti) {
     if (is_win) {
       cflags_cc = [ "/GR-" ]
     } else {
@@ -1246,20 +1291,35 @@ if (is_win) {
     ]
   }
   common_optimize_on_ldflags = []
-  if (!is_component_build) {
+
+  # /OPT:ICF is not desirable in Debug builds, since code-folding can result in
+  # misleading symbols in stack traces. It is also incompatible with
+  # incremental linking, which we enable for both Debug and component builds.
+  if (!is_debug && !is_component_build) {
     common_optimize_on_ldflags += [ "/OPT:ICF" ]  # Redundant COMDAT folding.
   }
-  if (is_official_build) {
-    common_optimize_on_ldflags += [
-      "/OPT:REF",  # Remove unreferenced data.
-      "/LTCG",  # Link-time code generation.
 
-      # Set the number of LTCG code-gen threads to eight. The default is four.
-      # This gives a 5-10% link speedup.
-      "/cgthreads:8",
-    ]
-    if (full_wpo_on_official) {
-      arflags = [ "/LTCG" ]
+  if (is_official_build) {
+    common_optimize_on_ldflags += [ "/OPT:REF" ]  # Remove unreferenced data.
+    if (!use_lld) {
+      common_optimize_on_ldflags += [
+        # Set the number of LTCG code-gen threads to eight. The default is four.
+        # This gives a 5-10% link speedup.
+        "/cgthreads:8",
+      ]
+      if (use_incremental_wpo) {
+        # Incremental Link-time code generation.
+        common_optimize_on_ldflags += [ "/LTCG:INCREMENTAL" ]
+      } else {
+        common_optimize_on_ldflags += [ "/LTCG" ]  # Link-time code generation.
+      }
+      if (full_wpo_on_official) {
+        if (use_incremental_wpo) {
+          arflags = [ "/LTCG:INCREMENTAL" ]
+        } else {
+          arflags = [ "/LTCG" ]
+        }
+      }
     }
   }
 } else {
@@ -1403,17 +1463,20 @@ config("optimize_max") {
       # build also specifies /Ot, /Oi, and /GF, but these are implied by /O2.
       cflags = [ "/O2" ] + common_optimize_on_cflags
 
-      # TODO(thakis): Remove is_clang here, https://crbug.com/598772
-      if (is_official_build && !is_clang) {
-        cflags += [
-          "/GL",  # Whole program optimization.
+      if (is_official_build) {
+        if (!is_clang) {
+          cflags += [
+            "/GL",  # Whole program optimization.
 
-          # Disable Warning 4702 ("Unreachable code") for the WPO/PGO builds.
-          # Probably anything that this would catch that wouldn't be caught in a
-          # normal build isn't going to actually be a bug, so the incremental
-          # value of C4702 for PGO builds is likely very small.
-          "/wd4702",
-        ]
+            # Disable Warning 4702 ("Unreachable code") for the WPO/PGO builds.
+            # Probably anything that this would catch that wouldn't be caught
+            # in a normal build isn't going to actually be a bug, so the
+            # incremental value of C4702 for PGO builds is likely very small.
+            "/wd4702",
+          ]
+        } else if (is_clang && use_lld) {
+          cflags += [ "-flto" ]  # Link-time optimization (whole program optimization).
+        }
       }
     } else if (optimize_for_fuzzing) {
       cflags = [ "-O1" ] + common_optimize_on_cflags
@@ -1517,16 +1580,25 @@ config("afdo") {
 # Full symbols.
 config("symbols") {
   if (is_win) {
-    import("//build/toolchain/goma.gni")
     cflags = [ "/Zi" ]  # Produce PDB file, no edit and continue.
 
-    if (is_win_fastlink && visual_studio_version != "2013") {
+    if (is_win_fastlink) {
       # Tell VS 2015+ to create a PDB that references debug
       # information in .obj and .lib files instead of copying
       # it all. This flag is incompatible with /PROFILE
       ldflags = [ "/DEBUG:FASTLINK" ]
     } else {
       ldflags = [ "/DEBUG" ]
+    }
+
+    if (is_clang) {
+      # /DEBUG:FASTLINK requires every object file to have standalone debug
+      # information.
+      if (is_win_fastlink) {
+        cflags += [ "-fstandalone-debug" ]
+      } else {
+        cflags += [ "-fno-standalone-debug" ]
+      }
     }
   } else {
     if (is_mac || is_ios) {
@@ -1563,14 +1635,7 @@ config("minimal_symbols") {
   if (is_win) {
     # Linker symbols for backtraces only.
     cflags = []
-    if (is_win_fastlink && visual_studio_version != "2013") {
-      # Tell VS 2015+ to create a PDB that references debug
-      # information in .obj and .lib files instead of copying
-      # it all. This flag is incompatible with /PROFILE
-      ldflags = [ "/DEBUG:FASTLINK" ]
-    } else {
-      ldflags = [ "/DEBUG" ]
-    }
+    ldflags = [ "/DEBUG" ]
   } else {
     if (is_android) {
       # Breakpad can't handle DWARF 4 symbols properly yet, so use DWARF 3

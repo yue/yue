@@ -3,9 +3,14 @@
 # found in the LICENSE file.
 
 import("//build/config/chrome_build.gni")
+import("//build/config/chromecast_build.gni")
 import("//build/config/clang/clang.gni")
 import("//build/config/sanitizers/sanitizers.gni")
 import("//build/toolchain/toolchain.gni")
+
+if (is_ios) {
+  import("//build/config/ios/ios_sdk.gni")
+}
 
 # Contains the dependencies needed for sanitizers to link into executables and
 # shared_libraries. Unconditionally depend upon this target as it is empty if
@@ -41,6 +46,7 @@ group("deps_no_options") {
       ":default_sanitizer_ldflags",
     ]
     deps = []
+    public_deps = []
 
     data = [
       "//tools/valgrind/asan/",
@@ -56,36 +62,87 @@ group("deps_no_options") {
       data += [ "$clang_base_path/lib/libstdc++.so.6" ]
     }
 
-    if (use_prebuilt_instrumented_libraries) {
+    if (use_prebuilt_instrumented_libraries ||
+        use_locally_built_instrumented_libraries) {
       deps += [ "//third_party/instrumented_libraries:deps" ]
     }
     if (use_custom_libcxx) {
-      public_deps = [
-        "//buildtools/third_party/libc++:libcxx_proxy",
-      ]
+      public_deps += [ "//buildtools/third_party/libc++:libcxx_proxy" ]
       data += [ "$root_out_dir/libc++.so" ]
     }
-    if (is_mac) {
+
+    # ASAN is supported on iOS but the runtime library depends on the compiler
+    # used (Chromium version of clang versus Xcode version of clang). Only copy
+    # the ASAN runtime on iOS if building with Chromium clang.
+    if (is_win || is_mac || (is_ios && !use_xcode_clang)) {
       data_deps = [
+        ":copy_asan_runtime",
+      ]
+    }
+    if (is_mac || (is_ios && !use_xcode_clang)) {
+      public_deps += [ ":asan_runtime_bundle_data" ]
+    }
+  }
+}
+
+if ((is_mac || is_win || (is_ios && !use_xcode_clang)) && using_sanitizer) {
+  if (is_mac) {
+    _clang_rt_dso_path = "darwin/libclang_rt.asan_osx_dynamic.dylib"
+  } else if (is_ios) {
+    _clang_rt_dso_path = "darwin/libclang_rt.asan_iossim_dynamic.dylib"
+  } else if (is_win && target_cpu == "x86") {
+    _clang_rt_dso_path = "windows/clang_rt.asan_dynamic-i386.dll"
+  } else if (is_win && target_cpu == "x64") {
+    _clang_rt_dso_path = "windows/clang_rt.asan_dynamic-x86_64.dll"
+  }
+
+  _clang_rt_dso_full_path =
+      "$clang_base_path/lib/clang/$clang_version/lib/$_clang_rt_dso_path"
+
+  if (!is_ios) {
+    copy("copy_asan_runtime") {
+      sources = [
+        _clang_rt_dso_full_path,
+      ]
+      outputs = [
+        "$root_out_dir/{{source_file_part}}",
+      ]
+    }
+  } else {
+    # On iOS, the runtime library need to be code signed (adhoc signature)
+    # starting with Xcode 8, so use an action instead of a copy on iOS.
+    action("copy_asan_runtime") {
+      script = "//build/config/ios/codesign.py"
+      sources = [
+        _clang_rt_dso_full_path,
+      ]
+      outputs = [
+        "$root_out_dir/" + get_path_info(sources[0], "file"),
+      ]
+      args = [
+        "code-sign-file",
+        "--identity=" + ios_code_signing_identity,
+        "--output=" + rebase_path(outputs[0], root_build_dir),
+        rebase_path(sources[0], root_build_dir),
+      ]
+    }
+  }
+
+  if (is_mac || is_ios) {
+    bundle_data("asan_runtime_bundle_data") {
+      sources = get_target_outputs(":copy_asan_runtime")
+      outputs = [
+        "{{bundle_executable_dir}}/{{source_file_part}}",
+      ]
+      public_deps = [
         ":copy_asan_runtime",
       ]
     }
   }
 }
 
-if (is_mac && using_sanitizer) {
-  copy("copy_asan_runtime") {
-    sources = [
-      "$clang_base_path/lib/clang/$clang_version/lib/darwin/libclang_rt.asan_osx_dynamic.dylib",
-    ]
-    outputs = [
-      "$root_out_dir/{{source_file_part}}",
-    ]
-  }
-}
-
 config("sanitizer_options_link_helper") {
-  if (is_mac) {
+  if (is_mac || is_ios) {
     ldflags = [ "-Wl,-U,_sanitizer_options_link_helper" ]
   } else if (!is_win) {
     ldflags = [ "-Wl,-u_sanitizer_options_link_helper" ]
@@ -109,15 +166,24 @@ static_library("options_sources") {
   configs -= [ "//build/config/sanitizers:default_sanitizer_flags" ]
 
   if (is_asan) {
-    sources += [ "//build/sanitizers/asan_suppressions.cc" ]
+    if (!defined(asan_suppressions_file)) {
+      asan_suppressions_file = "//build/sanitizers/asan_suppressions.cc"
+    }
+    sources += [ asan_suppressions_file ]
   }
 
   if (is_lsan) {
-    sources += [ "//build/sanitizers/lsan_suppressions.cc" ]
+    if (!defined(lsan_suppressions_file)) {
+      lsan_suppressions_file = "//build/sanitizers/lsan_suppressions.cc"
+    }
+    sources += [ lsan_suppressions_file ]
   }
 
   if (is_tsan) {
-    sources += [ "//build/sanitizers/tsan_suppressions.cc" ]
+    if (!defined(tsan_suppressions_file)) {
+      tsan_suppressions_file = "//build/sanitizers/tsan_suppressions.cc"
+    }
+    sources += [ tsan_suppressions_file ]
   }
 }
 
@@ -133,6 +199,9 @@ config("default_sanitizer_ldflags") {
     ldflags = []
     if (is_asan) {
       ldflags += [ "-fsanitize=address" ]
+      if (!is_mac) {
+        ldflags += [ "-fsanitize-address-use-after-scope" ]
+      }
     }
     if (is_lsan) {
       ldflags += [ "-fsanitize=leak" ]
@@ -153,16 +222,46 @@ config("default_sanitizer_ldflags") {
       ldflags += [ "-fsanitize=vptr" ]
     }
 
+    if (use_sanitizer_coverage) {
+      ldflags += [ "-fsanitize-coverage=$sanitizer_coverage_flags" ]
+    }
+
     if (is_cfi && !is_nacl) {
-      ldflags += [
-        "-fsanitize=cfi-vcall",
-        "-fsanitize=cfi-derived-cast",
-        "-fsanitize=cfi-unrelated-cast",
-      ]
+      ldflags += [ "-fsanitize=cfi-vcall" ]
+      if (use_cfi_cast) {
+        ldflags += [
+          "-fsanitize=cfi-derived-cast",
+          "-fsanitize=cfi-unrelated-cast",
+        ]
+      }
       if (use_cfi_diag) {
         ldflags += [
           "-fno-sanitize-trap=cfi",
           "-fsanitize-recover=cfi",
+        ]
+      }
+    }
+  } else if (is_win && is_asan) {
+    # Windows directly calls link.exe instead of the compiler driver when
+    # linking.  Hence, pass the runtime libraries instead of -fsanitize=address.
+    # In the static-library build, libraries are different for executables
+    # and dlls, see link_executable and link_shared_library below.
+    # This here handles only the component build.
+    if (target_cpu == "x64") {
+      # Windows 64-bit. TODO(etienneb): Remove the assert when this is ready.
+      if (is_component_build) {
+        assert(false, "win/asan does not work in 64-bit yet")
+        libs = [
+          "clang_rt.asan_dynamic-x86_64.lib",
+          "clang_rt.asan_dynamic_runtime_thunk-x86_64.lib",
+        ]
+      }
+    } else {
+      assert(target_cpu == "x86", "WinASan unsupported architecture")
+      if (is_component_build) {
+        libs = [
+          "clang_rt.asan_dynamic-i386.lib",
+          "clang_rt.asan_dynamic_runtime_thunk-i386.lib",
         ]
       }
     }
@@ -177,7 +276,14 @@ config("common_sanitizer_flags") {
   # or variable info, so we can leave that out to speed up the build.
   if (using_sanitizer) {
     assert(is_clang, "sanitizers only supported with clang")
-    cflags += [ "-gline-tables-only" ]
+    cflags += [
+      "-gline-tables-only",
+
+      # Column info in debug data confuses Visual Studio's debugger, so don't
+      # use this by default.  However, clusterfuzz needs it for good attribution
+      # of reports to CLs, so turn it on there.
+      "-gcolumn-info",
+    ]
   }
 
   # Common options for AddressSanitizer, LeakSanitizer, ThreadSanitizer,
@@ -205,44 +311,54 @@ config("asan_flags") {
   cflags = []
   if (is_asan) {
     cflags += [ "-fsanitize=address" ]
+    if (!is_mac && !is_win) {
+      cflags += [ "-fsanitize-address-use-after-scope" ]
+    }
+    if (!asan_globals) {
+      cflags += [
+        "-mllvm",
+        "-asan-globals=0",
+      ]
+    }
     if (is_win) {
-      cflags += [ "-fsanitize-blacklist=" +
-                  rebase_path("//tools/memory/asan/blacklist_win.txt",
-                              root_build_dir) ]
+      if (!defined(asan_win_blacklist_path)) {
+        asan_win_blacklist_path =
+            rebase_path("//tools/memory/asan/blacklist_win.txt", root_build_dir)
+      }
+      cflags += [ "-fsanitize-blacklist=$asan_win_blacklist_path" ]
     } else {
       # TODO(rnk): Remove this as discussed in http://crbug.com/427202.
-      cflags +=
-          [ "-fsanitize-blacklist=" +
-            rebase_path("//tools/memory/asan/blacklist.txt", root_build_dir) ]
-    }
-    if (is_android) {
-      # Android build relies on -Wl,--gc-sections removing unreachable code.
-      # ASan instrumentation for globals inhibits this and results in a
-      # library with unresolvable relocations.
-      # TODO(eugenis): find a way to reenable this.
-      cflags += [
-        "-mllvm",
-        "-asan-globals=0",
-      ]
-    } else if (is_mac) {
-      # http://crbug.com/352073
-      cflags += [
-        "-mllvm",
-        "-asan-globals=0",
-      ]
-      # TODO(GYP): deal with mac_bundles.
-    } else if (is_win) {
-      assert(current_cpu == "x86", "WinASan is 32-bit only currently")
-      if (is_component_build) {
-        libs = [
-          "clang_rt.asan_dynamic-i386.lib",
-          "clang_rt.asan_dynamic_runtime_thunk-i386.lib",
-        ]
-      } else {
-        # TODO(rnk): DLLs in the non-component build should link against
-        # clang_rt.asan_dll_thunk-i386.lib instead.
-        libs = [ "clang_rt.asan-i386.lib" ]
+      if (!defined(asan_blacklist_path)) {
+        asan_blacklist_path =
+            rebase_path("//tools/memory/asan/blacklist.txt", root_build_dir)
       }
+      cflags += [ "-fsanitize-blacklist=$asan_blacklist_path" ]
+    }
+  }
+}
+
+config("link_executable") {
+  if (is_asan && is_win && !is_component_build) {
+    if (target_cpu == "x64") {
+      # Windows 64-bit. TODO(etienneb): Remove the assert when this is ready.
+      assert(false, "win/asan does not work in 64-bit yet")
+      libs = [ "clang_rt.asan-x86_64.lib" ]
+    } else {
+      assert(target_cpu == "x86", "WinASan unsupported architecture")
+      libs = [ "clang_rt.asan-i386.lib" ]
+    }
+  }
+}
+
+config("link_shared_library") {
+  if (is_asan && is_win && !is_component_build) {
+    if (target_cpu == "x64") {
+      # Windows 64-bit. TODO(etienneb): Remove the assert when this is ready.
+      assert(false, "win/asan does not work in 64-bit yet")
+      libs = [ "clang_rt.asan_dll_thunk-x86_64.lib" ]
+    } else {
+      assert(target_cpu == "x86", "WinASan unsupported architecture")
+      libs = [ "clang_rt.asan_dll_thunk-i386.lib" ]
     }
   }
 }
@@ -250,14 +366,21 @@ config("asan_flags") {
 config("cfi_flags") {
   cflags = []
   if (is_cfi && !is_nacl) {
-    cfi_blacklist_path =
-        rebase_path("//tools/cfi/blacklist.txt", root_build_dir)
+    if (!defined(cfi_blacklist_path)) {
+      cfi_blacklist_path =
+          rebase_path("//tools/cfi/blacklist.txt", root_build_dir)
+    }
     cflags += [
       "-fsanitize=cfi-vcall",
-      "-fsanitize=cfi-derived-cast",
-      "-fsanitize=cfi-unrelated-cast",
       "-fsanitize-blacklist=$cfi_blacklist_path",
     ]
+
+    if (use_cfi_cast) {
+      cflags += [
+        "-fsanitize=cfi-derived-cast",
+        "-fsanitize=cfi-unrelated-cast",
+      ]
+    }
 
     if (use_cfi_diag) {
       cflags += [
@@ -303,8 +426,10 @@ config("lsan_flags") {
 config("msan_flags") {
   if (is_msan) {
     assert(is_linux, "msan only supported on linux x86_64")
-    msan_blacklist_path =
-        rebase_path("//tools/msan/blacklist.txt", root_build_dir)
+    if (!defined(msan_blacklist_path)) {
+      msan_blacklist_path =
+          rebase_path("//tools/msan/blacklist.txt", root_build_dir)
+    }
     cflags = [
       "-fsanitize=memory",
       "-fsanitize-memory-track-origins=$msan_track_origins",
@@ -316,8 +441,10 @@ config("msan_flags") {
 config("tsan_flags") {
   if (is_tsan) {
     assert(is_linux, "tsan only supported on linux x86_64")
-    tsan_blacklist_path =
-        rebase_path("//tools/memory/tsan_v2/ignores.txt", root_build_dir)
+    if (!defined(tsan_blacklist_path)) {
+      tsan_blacklist_path =
+          rebase_path("//tools/memory/tsan_v2/ignores.txt", root_build_dir)
+    }
     cflags = [
       "-fsanitize=thread",
       "-fsanitize-blacklist=$tsan_blacklist_path",
@@ -328,8 +455,10 @@ config("tsan_flags") {
 config("ubsan_flags") {
   cflags = []
   if (is_ubsan) {
-    ubsan_blacklist_path =
-        rebase_path("//tools/ubsan/blacklist.txt", root_build_dir)
+    if (!defined(ubsan_blacklist_path)) {
+      ubsan_blacklist_path =
+          rebase_path("//tools/ubsan/blacklist.txt", root_build_dir)
+    }
     cflags += [
       # Yasm dies with an "Illegal instruction" error when bounds checking is
       # enabled. See http://crbug.com/489901
@@ -345,18 +474,24 @@ config("ubsan_flags") {
       "-fsanitize=unreachable",
       "-fsanitize=vla-bound",
       "-fsanitize-blacklist=$ubsan_blacklist_path",
-
-      # Employ the experimental PBQP register allocator to avoid slow
-      # compilation on files with too many basic blocks.
-      # See http://crbug.com/426271.
-      "-mllvm",
-      "-regalloc=pbqp",
-
-      # Speculatively use coalescing to slightly improve the code generated
-      # by PBQP regallocator. May increase compile time.
-      "-mllvm",
-      "-pbqp-coalescing",
     ]
+
+    # Chromecast ubsan builds fail to compile with these
+    # experimental flags, so only add them to non-chromecast ubsan builds.
+    if (!is_chromecast) {
+      cflags += [
+        # Employ the experimental PBQP register allocator to avoid slow
+        # compilation on files with too many basic blocks.
+        # See http://crbug.com/426271.
+        "-mllvm",
+        "-regalloc=pbqp",
+
+        # Speculatively use coalescing to slightly improve the code generated
+        # by PBQP regallocator. May increase compile time.
+        "-mllvm",
+        "-pbqp-coalescing",
+      ]
+    }
   }
 }
 
@@ -368,10 +503,12 @@ config("ubsan_no_recover") {
 
 config("ubsan_security_flags") {
   if (is_ubsan_security) {
-    ubsan_security_blacklist_path =
-        rebase_path("//tools/ubsan/security_blacklist.txt", root_build_dir)
+    if (!defined(ubsan_security_blacklist_path)) {
+      ubsan_security_blacklist_path =
+          rebase_path("//tools/ubsan/security_blacklist.txt", root_build_dir)
+    }
     cflags = [
-      "-fsanitize=signed-integer-overflow,shift,vptr",
+      "-fsanitize=signed-integer-overflow,shift,vptr,function,vla-bound",
       "-fsanitize-blacklist=$ubsan_security_blacklist_path",
     ]
   }
@@ -385,8 +522,10 @@ config("ubsan_null_flags") {
 
 config("ubsan_vptr_flags") {
   if (is_ubsan_vptr) {
-    ubsan_vptr_blacklist_path =
-        rebase_path("//tools/ubsan/vptr_blacklist.txt", root_build_dir)
+    if (!defined(ubsan_vptr_blacklist_path)) {
+      ubsan_vptr_blacklist_path =
+          rebase_path("//tools/ubsan/vptr_blacklist.txt", root_build_dir)
+    }
     cflags = [
       "-fsanitize=vptr",
       "-fsanitize-blacklist=$ubsan_vptr_blacklist_path",

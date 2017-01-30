@@ -16,6 +16,7 @@
 #include <iosfwd>
 #include <string>
 
+#include "base/logging.h"
 #include "base/numerics/safe_conversions.h"
 #include "build/build_config.h"
 #include "nativeui/gfx/geometry/point.h"

@@ -1,0 +1,81 @@
+# Copyright 2016 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//testing/test.gni")
+
+config("ced_config") {
+  include_dirs = [ "." ]
+  if (is_clang) {
+    cflags = [ "-Wno-unused-function" ]
+  }
+}
+
+static_library("ced") {
+  sources = [
+    # find src -maxdepth 3 ! -type d | egrep '\.(h|cc)$' | grep -v test.cc |\
+    # LC_COLLATE=c sort | sed 's/^\(.*\)$/    "\1",/'
+    "compact_enc_det/compact_enc_det.cc",
+    "compact_enc_det/compact_enc_det_generated_tables.h",
+    "compact_enc_det/compact_enc_det_generated_tables2.h",
+    "compact_enc_det/compact_enc_det_hint_code.cc",
+    "compact_enc_det/compact_enc_det_hint_code.h",
+    "util/basictypes.h",
+    "util/case_insensitive_hash.h",
+    "util/commandlineflags.h",
+    "util/encodings/encodings.cc",
+    "util/encodings/encodings.h",
+    "util/encodings/encodings.pb.h",
+    "util/languages/languages.cc",
+    "util/languages/languages.h",
+    "util/languages/languages.pb.h",
+    "util/logging.h",
+    "util/port.h",
+    "util/string_util.h",
+    "util/varsetter.h",
+  ]
+  public = [
+    "compact_enc_det/compact_enc_det.h",
+  ]
+  configs -= [ "//build/config/compiler:chromium_code" ]
+  configs += [ "//build/config/compiler:no_chromium_code" ]
+
+  public_configs = [ ":ced_config" ]
+
+  if (is_win) {
+    defines = [ "COMPILER_MSVC" ]
+    cflags = [
+      "/wd4005",  # Macro defined twice.
+      "/wd4006",  # #undef expected an identifier.
+      "/wd4018",  # '<': signed/unsigned mismatch
+      "/wd4309",  # Truncation of constant value.
+    ]
+  } else {
+    defines = [ "COMPILER_GCC" ]
+  }
+}
+
+test("ced_unittests") {
+  sources = [
+    "compact_enc_det/compact_enc_det_fuzz_test.cc",
+    "compact_enc_det/compact_enc_det_unittest.cc",
+    "compact_enc_det/detail_head_string.inc",
+    "util/encodings/encodings_unittest.cc",
+  ]
+
+  if (is_win) {
+    defines = [ "COMPILER_MSVC" ]
+    cflags = [
+      "/wd4310",  # Truncation of constant value.
+      "/wd4267",  # size_t -> int
+    ]
+  } else {
+    defines = [ "COMPILER_GCC" ]
+  }
+
+  deps = [
+    ":ced",
+    "//testing/gtest",
+    "//testing/gtest:gtest_main",
+  ]
+}
