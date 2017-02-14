@@ -10,7 +10,6 @@
 #include "nativeui/gfx/text.h"
 #include "nativeui/mac/view_mac.h"
 #include "nativeui/state.h"
-#include "third_party/css-layout/CSSLayout/CSSLayout.h"
 
 @interface NULabel : NSView<BaseView> {
  @private

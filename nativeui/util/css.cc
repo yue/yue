@@ -10,8 +10,7 @@
 
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/string_util.h"
-#include "third_party/css-layout/CSSLayout/CSSLayout.h"
-#include "third_party/css-layout/CSSLayout/CSSLayout-internal.h"
+#include "third_party/yoga/yoga/Yoga.h"
 
 namespace nu {
 
@@ -22,15 +21,15 @@ using IntConverter = bool(*)(const std::string&, int*);
 
 bool AlignValue(const std::string& value, int* out) {
   if (value == "auto")
-    *out = static_cast<int>(CSSAlignAuto);
+    *out = static_cast<int>(YGAlignAuto);
   else if (value == "center")
-    *out = static_cast<int>(CSSAlignCenter);
+    *out = static_cast<int>(YGAlignCenter);
   else if (value == "stretch")
-    *out = static_cast<int>(CSSAlignStretch);
+    *out = static_cast<int>(YGAlignStretch);
   else if (value == "flex-start")
-    *out = static_cast<int>(CSSAlignFlexStart);
+    *out = static_cast<int>(YGAlignFlexStart);
   else if (value == "flex-end")
-    *out = static_cast<int>(CSSAlignFlexEnd);
+    *out = static_cast<int>(YGAlignFlexEnd);
   else
     return false;
   return true;
@@ -38,11 +37,11 @@ bool AlignValue(const std::string& value, int* out) {
 
 bool DirectionValue(const std::string& value, int* out) {
   if (value == "ltr")
-    *out = static_cast<int>(CSSDirectionLTR);
+    *out = static_cast<int>(YGDirectionLTR);
   else if (value == "rtl")
-    *out = static_cast<int>(CSSDirectionRTL);
+    *out = static_cast<int>(YGDirectionRTL);
   else if (value == "inherit")
-    *out = static_cast<int>(CSSDirectionInherit);
+    *out = static_cast<int>(YGDirectionInherit);
   else
     return false;
   return true;
@@ -50,13 +49,13 @@ bool DirectionValue(const std::string& value, int* out) {
 
 bool FlexDirectionValue(const std::string& value, int* out) {
   if (value == "row")
-    *out = static_cast<int>(CSSFlexDirectionRow);
+    *out = static_cast<int>(YGFlexDirectionRow);
   else if (value == "row-reverse")
-    *out = static_cast<int>(CSSFlexDirectionRowReverse);
+    *out = static_cast<int>(YGFlexDirectionRowReverse);
   else if (value == "column")
-    *out = static_cast<int>(CSSFlexDirectionColumn);
+    *out = static_cast<int>(YGFlexDirectionColumn);
   else if (value == "column-reverse")
-    *out = static_cast<int>(CSSFlexDirectionColumnReverse);
+    *out = static_cast<int>(YGFlexDirectionColumnReverse);
   else
     return false;
   return true;
@@ -64,15 +63,15 @@ bool FlexDirectionValue(const std::string& value, int* out) {
 
 bool JustifyValue(const std::string& value, int* out) {
   if (value == "center")
-    *out = static_cast<int>(CSSJustifyCenter);
+    *out = static_cast<int>(YGJustifyCenter);
   else if (value == "space-around")
-    *out = static_cast<int>(CSSJustifySpaceAround);
+    *out = static_cast<int>(YGJustifySpaceAround);
   else if (value == "space-between")
-    *out = static_cast<int>(CSSJustifySpaceBetween);
+    *out = static_cast<int>(YGJustifySpaceBetween);
   else if (value == "flex-start")
-    *out = static_cast<int>(CSSJustifyFlexStart);
+    *out = static_cast<int>(YGJustifyFlexStart);
   else if (value == "flex-end")
-    *out = static_cast<int>(CSSJustifyFlexEnd);
+    *out = static_cast<int>(YGJustifyFlexEnd);
   else
     return false;
   return true;
@@ -80,9 +79,9 @@ bool JustifyValue(const std::string& value, int* out) {
 
 bool OverflowValue(const std::string& value, int* out) {
   if (value == "visible")
-    *out = static_cast<int>(CSSOverflowVisible);
+    *out = static_cast<int>(YGOverflowVisible);
   else if (value == "hidden")
-    *out = static_cast<int>(CSSOverflowHidden);
+    *out = static_cast<int>(YGOverflowHidden);
   else
     return false;
   return true;
@@ -90,9 +89,9 @@ bool OverflowValue(const std::string& value, int* out) {
 
 bool PositionValue(const std::string& value, int* out) {
   if (value == "absolute")
-    *out = static_cast<int>(CSSPositionTypeAbsolute);
+    *out = static_cast<int>(YGPositionTypeAbsolute);
   else if (value == "relative")
-    *out = static_cast<int>(CSSPositionTypeRelative);
+    *out = static_cast<int>(YGPositionTypeRelative);
   else
     return false;
   return true;
@@ -100,9 +99,9 @@ bool PositionValue(const std::string& value, int* out) {
 
 bool WrapValue(const std::string& value, int* out) {
   if (value == "wrap")
-    *out = static_cast<int>(CSSWrapTypeWrap);
+    *out = static_cast<int>(YGWrapWrap);
   else if (value == "nowrap")
-    *out = static_cast<int>(CSSWrapTypeNoWrap);
+    *out = static_cast<int>(YGWrapNoWrap);
   else
     return false;
   return true;
@@ -121,114 +120,114 @@ int PixelValue(std::string value) {
 }
 
 // Easy helpers to set edge values.
-void SetMargin(const CSSNodeRef node, float margin) {
-  CSSNodeStyleSetMargin(node, CSSEdgeBottom, margin);
-  CSSNodeStyleSetMargin(node, CSSEdgeLeft, margin);
-  CSSNodeStyleSetMargin(node, CSSEdgeRight, margin);
-  CSSNodeStyleSetMargin(node, CSSEdgeTop, margin);
+void SetMargin(const YGNodeRef node, float margin) {
+  YGNodeStyleSetMargin(node, YGEdgeBottom, margin);
+  YGNodeStyleSetMargin(node, YGEdgeLeft, margin);
+  YGNodeStyleSetMargin(node, YGEdgeRight, margin);
+  YGNodeStyleSetMargin(node, YGEdgeTop, margin);
 }
 
-void SetPadding(const CSSNodeRef node, float padding) {
-  CSSNodeStyleSetPadding(node, CSSEdgeBottom, padding);
-  CSSNodeStyleSetPadding(node, CSSEdgeLeft, padding);
-  CSSNodeStyleSetPadding(node, CSSEdgeRight, padding);
-  CSSNodeStyleSetPadding(node, CSSEdgeTop, padding);
+void SetPadding(const YGNodeRef node, float padding) {
+  YGNodeStyleSetPadding(node, YGEdgeBottom, padding);
+  YGNodeStyleSetPadding(node, YGEdgeLeft, padding);
+  YGNodeStyleSetPadding(node, YGEdgeRight, padding);
+  YGNodeStyleSetPadding(node, YGEdgeTop, padding);
 }
 
-void SetBorderWidth(const CSSNodeRef node, float border) {
-  CSSNodeStyleSetBorder(node, CSSEdgeBottom, border);
-  CSSNodeStyleSetBorder(node, CSSEdgeLeft, border);
-  CSSNodeStyleSetBorder(node, CSSEdgeRight, border);
-  CSSNodeStyleSetBorder(node, CSSEdgeTop, border);
+void SetBorderWidth(const YGNodeRef node, float border) {
+  YGNodeStyleSetBorder(node, YGEdgeBottom, border);
+  YGNodeStyleSetBorder(node, YGEdgeLeft, border);
+  YGNodeStyleSetBorder(node, YGEdgeRight, border);
+  YGNodeStyleSetBorder(node, YGEdgeTop, border);
 }
 
 // We use int to represent enums.
-using IntSetter = void(*)(const CSSNodeRef, int);
-using FloatSetter = void(*)(const CSSNodeRef, float);
-using EdgeSetter = void(*)(const CSSNodeRef, const CSSEdge, float);
+using IntSetter = void(*)(const YGNodeRef, int);
+using FloatSetter = void(*)(const YGNodeRef, float);
+using EdgeSetter = void(*)(const YGNodeRef, const YGEdge, float);
 
 // Sorted list of CSS node properties.
 const std::tuple<const char*, IntConverter, IntSetter> int_setters[] = {
   std::make_tuple("aligncontent", AlignValue,
-                  reinterpret_cast<IntSetter>(CSSNodeStyleSetAlignContent)),
+                  reinterpret_cast<IntSetter>(YGNodeStyleSetAlignContent)),
   std::make_tuple("alignitems", AlignValue,
-                  reinterpret_cast<IntSetter>(CSSNodeStyleSetAlignItems)),
+                  reinterpret_cast<IntSetter>(YGNodeStyleSetAlignItems)),
   std::make_tuple("alignself", AlignValue,
-                  reinterpret_cast<IntSetter>(CSSNodeStyleSetAlignSelf)),
+                  reinterpret_cast<IntSetter>(YGNodeStyleSetAlignSelf)),
   std::make_tuple("direction", DirectionValue,
-                  reinterpret_cast<IntSetter>(CSSNodeStyleSetDirection)),
+                  reinterpret_cast<IntSetter>(YGNodeStyleSetDirection)),
   std::make_tuple("flexdirection", FlexDirectionValue,
-                  reinterpret_cast<IntSetter>(CSSNodeStyleSetFlexDirection)),
+                  reinterpret_cast<IntSetter>(YGNodeStyleSetFlexDirection)),
   std::make_tuple("flexwrap", WrapValue,
-                  reinterpret_cast<IntSetter>(CSSNodeStyleSetFlexWrap)),
+                  reinterpret_cast<IntSetter>(YGNodeStyleSetFlexWrap)),
   std::make_tuple("justifycontent", JustifyValue,
-                  reinterpret_cast<IntSetter>(CSSNodeStyleSetJustifyContent)),
+                  reinterpret_cast<IntSetter>(YGNodeStyleSetJustifyContent)),
   std::make_tuple("overflow", OverflowValue,
-                  reinterpret_cast<IntSetter>(CSSNodeStyleSetOverflow)),
+                  reinterpret_cast<IntSetter>(YGNodeStyleSetOverflow)),
   std::make_tuple("position", PositionValue,
-                  reinterpret_cast<IntSetter>(CSSNodeStyleSetPositionType)),
+                  reinterpret_cast<IntSetter>(YGNodeStyleSetPositionType)),
 };
 const std::pair<const char*, FloatSetter> float_setters[] = {
   std::make_pair("borderwidth",
                  reinterpret_cast<FloatSetter>(SetBorderWidth)),
   std::make_pair("flex",
-                 reinterpret_cast<FloatSetter>(CSSNodeStyleSetFlex)),
+                 reinterpret_cast<FloatSetter>(YGNodeStyleSetFlex)),
   std::make_pair("flexbasis",
-                 reinterpret_cast<FloatSetter>(CSSNodeStyleSetFlexBasis)),
+                 reinterpret_cast<FloatSetter>(YGNodeStyleSetFlexBasis)),
   std::make_pair("flexgrow",
-                 reinterpret_cast<FloatSetter>(CSSNodeStyleSetFlexGrow)),
+                 reinterpret_cast<FloatSetter>(YGNodeStyleSetFlexGrow)),
   std::make_pair("flexshrink",
-                 reinterpret_cast<FloatSetter>(CSSNodeStyleSetFlexShrink)),
+                 reinterpret_cast<FloatSetter>(YGNodeStyleSetFlexShrink)),
   std::make_pair("height",
-                 reinterpret_cast<FloatSetter>(CSSNodeStyleSetHeight)),
+                 reinterpret_cast<FloatSetter>(YGNodeStyleSetHeight)),
   std::make_pair("margin",
                  reinterpret_cast<FloatSetter>(SetMargin)),
   std::make_pair("maxheight",
-                 reinterpret_cast<FloatSetter>(CSSNodeStyleSetMaxHeight)),
+                 reinterpret_cast<FloatSetter>(YGNodeStyleSetMaxHeight)),
   std::make_pair("maxwidth",
-                 reinterpret_cast<FloatSetter>(CSSNodeStyleSetMaxWidth)),
+                 reinterpret_cast<FloatSetter>(YGNodeStyleSetMaxWidth)),
   std::make_pair("minheight",
-                 reinterpret_cast<FloatSetter>(CSSNodeStyleSetMinHeight)),
+                 reinterpret_cast<FloatSetter>(YGNodeStyleSetMinHeight)),
   std::make_pair("minwidth",
-                 reinterpret_cast<FloatSetter>(CSSNodeStyleSetMinWidth)),
+                 reinterpret_cast<FloatSetter>(YGNodeStyleSetMinWidth)),
   std::make_pair("padding",
                  reinterpret_cast<FloatSetter>(SetPadding)),
   std::make_pair("width",
-                 reinterpret_cast<FloatSetter>(CSSNodeStyleSetWidth)),
+                 reinterpret_cast<FloatSetter>(YGNodeStyleSetWidth)),
 };
-const std::tuple<const char*, CSSEdge, EdgeSetter> edge_setters[] = {
-  std::make_tuple("borderbottomwidth", CSSEdgeBottom,
-                  reinterpret_cast<EdgeSetter>(CSSNodeStyleSetBorder)),
-  std::make_tuple("borderleftwidth", CSSEdgeLeft,
-                  reinterpret_cast<EdgeSetter>(CSSNodeStyleSetBorder)),
-  std::make_tuple("borderrightwidth", CSSEdgeRight,
-                  reinterpret_cast<EdgeSetter>(CSSNodeStyleSetBorder)),
-  std::make_tuple("bordertopwidth", CSSEdgeTop,
-                  reinterpret_cast<EdgeSetter>(CSSNodeStyleSetBorder)),
-  std::make_tuple("bottom", CSSEdgeBottom,
-                  reinterpret_cast<EdgeSetter>(CSSNodeStyleSetPosition)),
-  std::make_tuple("left", CSSEdgeLeft,
-                  reinterpret_cast<EdgeSetter>(CSSNodeStyleSetPosition)),
-  std::make_tuple("marginbottom", CSSEdgeBottom,
-                  reinterpret_cast<EdgeSetter>(CSSNodeStyleSetMargin)),
-  std::make_tuple("marginleft", CSSEdgeLeft,
-                  reinterpret_cast<EdgeSetter>(CSSNodeStyleSetMargin)),
-  std::make_tuple("marginright", CSSEdgeRight,
-                  reinterpret_cast<EdgeSetter>(CSSNodeStyleSetMargin)),
-  std::make_tuple("margintop", CSSEdgeTop,
-                  reinterpret_cast<EdgeSetter>(CSSNodeStyleSetMargin)),
-  std::make_tuple("paddingbottom", CSSEdgeBottom,
-                  reinterpret_cast<EdgeSetter>(CSSNodeStyleSetPadding)),
-  std::make_tuple("paddingleft", CSSEdgeLeft,
-                  reinterpret_cast<EdgeSetter>(CSSNodeStyleSetPadding)),
-  std::make_tuple("paddingright", CSSEdgeRight,
-                  reinterpret_cast<EdgeSetter>(CSSNodeStyleSetPadding)),
-  std::make_tuple("paddingtop", CSSEdgeTop,
-                  reinterpret_cast<EdgeSetter>(CSSNodeStyleSetPadding)),
-  std::make_tuple("right", CSSEdgeRight,
-                  reinterpret_cast<EdgeSetter>(CSSNodeStyleSetPosition)),
-  std::make_tuple("top", CSSEdgeTop,
-                  reinterpret_cast<EdgeSetter>(CSSNodeStyleSetPosition)),
+const std::tuple<const char*, YGEdge, EdgeSetter> edge_setters[] = {
+  std::make_tuple("borderbottomwidth", YGEdgeBottom,
+                  reinterpret_cast<EdgeSetter>(YGNodeStyleSetBorder)),
+  std::make_tuple("borderleftwidth", YGEdgeLeft,
+                  reinterpret_cast<EdgeSetter>(YGNodeStyleSetBorder)),
+  std::make_tuple("borderrightwidth", YGEdgeRight,
+                  reinterpret_cast<EdgeSetter>(YGNodeStyleSetBorder)),
+  std::make_tuple("bordertopwidth", YGEdgeTop,
+                  reinterpret_cast<EdgeSetter>(YGNodeStyleSetBorder)),
+  std::make_tuple("bottom", YGEdgeBottom,
+                  reinterpret_cast<EdgeSetter>(YGNodeStyleSetPosition)),
+  std::make_tuple("left", YGEdgeLeft,
+                  reinterpret_cast<EdgeSetter>(YGNodeStyleSetPosition)),
+  std::make_tuple("marginbottom", YGEdgeBottom,
+                  reinterpret_cast<EdgeSetter>(YGNodeStyleSetMargin)),
+  std::make_tuple("marginleft", YGEdgeLeft,
+                  reinterpret_cast<EdgeSetter>(YGNodeStyleSetMargin)),
+  std::make_tuple("marginright", YGEdgeRight,
+                  reinterpret_cast<EdgeSetter>(YGNodeStyleSetMargin)),
+  std::make_tuple("margintop", YGEdgeTop,
+                  reinterpret_cast<EdgeSetter>(YGNodeStyleSetMargin)),
+  std::make_tuple("paddingbottom", YGEdgeBottom,
+                  reinterpret_cast<EdgeSetter>(YGNodeStyleSetPadding)),
+  std::make_tuple("paddingleft", YGEdgeLeft,
+                  reinterpret_cast<EdgeSetter>(YGNodeStyleSetPadding)),
+  std::make_tuple("paddingright", YGEdgeRight,
+                  reinterpret_cast<EdgeSetter>(YGNodeStyleSetPadding)),
+  std::make_tuple("paddingtop", YGEdgeTop,
+                  reinterpret_cast<EdgeSetter>(YGNodeStyleSetPadding)),
+  std::make_tuple("right", YGEdgeRight,
+                  reinterpret_cast<EdgeSetter>(YGNodeStyleSetPosition)),
+  std::make_tuple("top", YGEdgeTop,
+                  reinterpret_cast<EdgeSetter>(YGNodeStyleSetPosition)),
 };
 
 // Compare function to compare elements.
@@ -261,7 +260,7 @@ T* Find(T (&setters)[n], const std::string& name) {
 }
 
 // Set style for int properties.
-bool SetIntStyle(CSSNodeRef node,
+bool SetIntStyle(YGNodeRef node,
                  const std::string& name,
                  const std::string& value) {
   auto* tup = Find(int_setters, name);
@@ -277,7 +276,7 @@ bool SetIntStyle(CSSNodeRef node,
 }
 
 // Set style for float properties.
-bool SetFloatStyle(CSSNodeRef node,
+bool SetFloatStyle(YGNodeRef node,
                    const std::string& name,
                    const std::string& value) {
   auto* tup = Find(float_setters, name);
@@ -288,7 +287,7 @@ bool SetFloatStyle(CSSNodeRef node,
 }
 
 // Set style for edge properties.
-bool SetEdgeStyle(CSSNodeRef node,
+bool SetEdgeStyle(YGNodeRef node,
                   const std::string& name,
                   const std::string& value) {
   auto* tup = Find(edge_setters, name);
@@ -311,7 +310,7 @@ std::string ParseName(const std::string& name) {
 
 }  // namespace
 
-void SetCSSStyle(CSSNodeRef node,
+void SetCSSStyle(YGNodeRef node,
                  const std::string& raw_name,
                  const std::string& value) {
   DCHECK(IsSorted(int_setters) &&

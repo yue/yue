@@ -14,7 +14,7 @@
 #include "nativeui/signal.h"
 #include "nativeui/types.h"
 
-typedef struct CSSNode *CSSNodeRef;
+typedef struct YGNode *YGNodeRef;
 
 namespace nu {
 
@@ -63,7 +63,7 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
   void set_parent(View* parent) { parent_ = parent; }
 
   // Get the CSS node of the view, can only be used internally.
-  CSSNodeRef node() const { return node_; }
+  YGNodeRef node() const { return node_; }
 
  protected:
   View();
@@ -89,7 +89,7 @@ NATIVEUI_EXPORT class View : public base::RefCounted<View> {
   NativeView view_;
 
   // The node recording CSS styles.
-  CSSNodeRef node_;
+  YGNodeRef node_;
 
   // Saved state of node's style.
   int node_position_ = 0;

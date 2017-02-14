@@ -8,18 +8,109 @@
 #include <limits>
 
 #include "base/logging.h"
-#include "third_party/css-layout/CSSLayout/CSSLayout.h"
-#include "third_party/css-layout/CSSLayout/CSSLayout-internal.h"
+#include "third_party/yoga/yoga/YGNodeList.h"
+#include "third_party/yoga/yoga/Yoga.h"
 
-extern "C"
-bool layoutNodeInternal(const CSSNodeRef node,
-                        const float availableWidth,
-                        const float availableHeight,
-                        const CSSDirection parentDirection,
-                        const CSSMeasureMode widthMeasureMode,
-                        const CSSMeasureMode heightMeasureMode,
-                        const bool performLayout,
-                        const char *reason);
+// Copied from Yoga.c to expose internal APIs:
+extern "C" {
+
+typedef struct YGCachedMeasurement {
+  float availableWidth;
+  float availableHeight;
+  YGMeasureMode widthMeasureMode;
+  YGMeasureMode heightMeasureMode;
+
+  float computedWidth;
+  float computedHeight;
+} YGCachedMeasurement;
+
+// This value was chosen based on empiracle data. Even the most complicated
+// layouts should not require more than 16 entries to fit within the cache.
+#define YG_MAX_CACHED_RESULT_COUNT 16
+
+typedef struct YGLayout {
+  float position[4];
+  float dimensions[2];
+  float margin[6];
+  float border[6];
+  float padding[6];
+  YGDirection direction;
+
+  uint32_t computedFlexBasisGeneration;
+  float computedFlexBasis;
+
+  // Instead of recomputing the entire layout every single time, we
+  // cache some information to break early when nothing changed
+  uint32_t generationCount;
+  YGDirection lastParentDirection;
+
+  uint32_t nextCachedMeasurementsIndex;
+  YGCachedMeasurement cachedMeasurements[YG_MAX_CACHED_RESULT_COUNT];
+  float measuredDimensions[2];
+
+  YGCachedMeasurement cachedLayout;
+} YGLayout;
+
+typedef struct YGStyle {
+  YGDirection direction;
+  YGFlexDirection flexDirection;
+  YGJustify justifyContent;
+  YGAlign alignContent;
+  YGAlign alignItems;
+  YGAlign alignSelf;
+  YGPositionType positionType;
+  YGWrap flexWrap;
+  YGOverflow overflow;
+  YGDisplay display;
+  float flex;
+  float flexGrow;
+  float flexShrink;
+  YGValue flexBasis;
+  YGValue margin[YGEdgeCount];
+  YGValue position[YGEdgeCount];
+  YGValue padding[YGEdgeCount];
+  YGValue border[YGEdgeCount];
+  YGValue dimensions[2];
+  YGValue minDimensions[2];
+  YGValue maxDimensions[2];
+
+  // Yoga specific properties, not compatible with flexbox specification
+  float aspectRatio;
+} YGStyle;
+
+typedef struct YGNode {
+  YGStyle style;
+  YGLayout layout;
+  uint32_t lineIndex;
+
+  YGNodeRef parent;
+  YGNodeListRef children;
+
+  struct YGNode *nextChild;
+
+  YGMeasureFunc measure;
+  YGBaselineFunc baseline;
+  YGPrintFunc print;
+  void *context;
+
+  bool isDirty;
+  bool hasNewLayout;
+
+  YGValue const *resolvedDimensions[2];
+} YGNode;
+
+bool YGLayoutNodeInternal(const YGNodeRef node,
+                          const float availableWidth,
+                          const float availableHeight,
+                          const YGDirection parentDirection,
+                          const YGMeasureMode widthMeasureMode,
+                          const YGMeasureMode heightMeasureMode,
+                          const float parentWidth,
+                          const float parentHeight,
+                          const bool performLayout,
+                          const char *reason);
+
+}  // extern "C"
 
 namespace nu {
 
@@ -31,14 +122,14 @@ inline bool IsContainer(View* view) {
 }
 
 // Whether a Container is a root CSS node.
-inline bool IsRootCSSNode(Container* view) {
+inline bool IsRootYGNode(Container* view) {
   return !view->parent() || !IsContainer(view->parent());
 }
 
 // Get bounds from the CSS node.
-inline RectF GetCSSNodeBounds(CSSNodeRef node) {
-  return RectF(CSSNodeLayoutGetLeft(node), CSSNodeLayoutGetTop(node),
-               CSSNodeLayoutGetWidth(node), CSSNodeLayoutGetHeight(node));
+inline RectF GetYGNodeBounds(YGNodeRef node) {
+  return RectF(YGNodeLayoutGetLeft(node), YGNodeLayoutGetTop(node),
+               YGNodeLayoutGetWidth(node), YGNodeLayoutGetHeight(node));
 }
 
 }  // namespace
@@ -60,19 +151,19 @@ const char* Container::GetClassName() const {
 
 void Container::Layout() {
   // For child CSS node, tell parent to do the layout.
-  if (!IsRootCSSNode(this)) {
+  if (!IsRootYGNode(this)) {
     static_cast<Container*>(parent())->Layout();
     return;
   }
 
   // So this is a root CSS node, calculate the layout and set bounds.
   SizeF size(GetBounds().size());
-  CSSNodeCalculateLayout(node(), size.width(), size.height(), CSSDirectionLTR);
+  YGNodeCalculateLayout(node(), size.width(), size.height(), YGDirectionLTR);
   SetChildBoundsFromCSS();
 }
 
 void Container::BoundsChanged() {
-  if (IsRootCSSNode(this))
+  if (IsRootYGNode(this))
     Layout();
   else
     SetChildBoundsFromCSS();
@@ -80,25 +171,27 @@ void Container::BoundsChanged() {
 
 SizeF Container::GetPreferredSize() const {
   float float_max = std::numeric_limits<float>::max();
-  layoutNodeInternal(node(), float_max, float_max, CSSDirectionLTR,
-                     CSSMeasureModeAtMost, CSSMeasureModeAtMost,
-                     false, "measure");
-  return SizeF(node()->layout.measuredDimensions[CSSDimensionWidth],
-               node()->layout.measuredDimensions[CSSDimensionHeight]);
+  YGLayoutNodeInternal(node(), float_max, float_max, YGDirectionLTR,
+                       YGMeasureModeAtMost, YGMeasureModeAtMost,
+                       float_max, float_max, false, "GetPreferredSize");
+  return SizeF(node()->layout.measuredDimensions[YGDimensionWidth],
+               node()->layout.measuredDimensions[YGDimensionHeight]);
 }
 
 float Container::GetPreferredHeightForWidth(float width) const {
-  layoutNodeInternal(node(), width, std::numeric_limits<float>::max(),
-                     CSSDirectionLTR, CSSMeasureModeExactly,
-                     CSSMeasureModeAtMost, false, "measure");
-  return node()->layout.measuredDimensions[CSSDimensionHeight];
+  float float_max = std::numeric_limits<float>::max();
+  YGLayoutNodeInternal(node(), width, float_max, YGDirectionLTR,
+                       YGMeasureModeExactly, YGMeasureModeAtMost, float_max,
+                       float_max, false, "GetPreferredHeightForWidth");
+  return node()->layout.measuredDimensions[YGDimensionHeight];
 }
 
 float Container::GetPreferredWidthForHeight(float height) const {
-  layoutNodeInternal(node(), std::numeric_limits<float>::max(), height,
-                     CSSDirectionLTR, CSSMeasureModeAtMost,
-                     CSSMeasureModeExactly, false, "measure");
-  return node()->layout.measuredDimensions[CSSDimensionWidth];
+  float float_max = std::numeric_limits<float>::max();
+  YGLayoutNodeInternal(node(), float_max, height, YGDirectionLTR,
+                       YGMeasureModeAtMost, YGMeasureModeExactly, float_max,
+                       float_max, false, "GetPreferredWidthForHeight");
+  return node()->layout.measuredDimensions[YGDimensionWidth];
 }
 
 void Container::AddChildView(View* view) {
@@ -119,12 +212,12 @@ void Container::AddChildViewAt(View* view, int index) {
   }
 
   view->set_parent(this);
-  CSSNodeInsertChild(node(), view->node(), index);
+  YGNodeInsertChild(node(), view->node(), index);
 
   children_.insert(children_.begin() + index, view);
   PlatformAddChildView(view);
 
-  DCHECK_EQ(static_cast<int>(CSSNodeChildCount(node())), child_count());
+  DCHECK_EQ(static_cast<int>(YGNodeGetChildCount(node())), child_count());
 
   Layout();
 }
@@ -135,12 +228,12 @@ void Container::RemoveChildView(View* view) {
     return;
 
   view->set_parent(nullptr);
-  CSSNodeRemoveChild(node(), view->node());
+  YGNodeRemoveChild(node(), view->node());
 
   PlatformRemoveChildView(view);
   children_.erase(i);
 
-  DCHECK_EQ(static_cast<int>(CSSNodeChildCount(node())), child_count());
+  DCHECK_EQ(static_cast<int>(YGNodeGetChildCount(node())), child_count());
 
   Layout();
 }
@@ -149,7 +242,7 @@ void Container::SetChildBoundsFromCSS() {
   for (int i = 0; i < child_count(); ++i) {
     View* child = child_at(i);
     if (child->IsVisible())
-      child->SetBounds(GetCSSNodeBounds(child->node()));
+      child->SetBounds(GetYGNodeBounds(child->node()));
   }
 }
 

@@ -210,7 +210,7 @@ source_set("nativeui") {
 
   deps = [
     "//base",
-    "//third_party/css-layout:csslayout",
+    "//third_party/yoga",
   ]
 
   if (is_linux) {

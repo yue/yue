@@ -7,11 +7,11 @@
 
 #include <string>
 
-typedef struct CSSNode *CSSNodeRef;
+typedef struct YGNode *YGNodeRef;
 
 namespace nu {
 
-void SetCSSStyle(CSSNodeRef node,
+void SetCSSStyle(YGNodeRef node,
                  const std::string& name,
                  const std::string& value);
 

@@ -1,0 +1,25 @@
+# Copyright 2016 Cheng Zhao. All rights reserved.
+
+config("yoga_config") {
+  include_dirs = [ "yoga" ]
+}
+
+source_set("yoga") {
+  sources = [
+    "yoga/YGEnums.h",
+    "yoga/YGMacros.h",
+    "yoga/YGNodeList.c",
+    "yoga/YGNodeList.h",
+    "yoga/Yoga.c",
+    "yoga/Yoga.h",
+  ]
+
+  if (is_win) {
+    cflags = [
+      "/wd4005",  # 'isnan': macro redefinition
+      "/wd4267",  # conversion from 'size_t' to 'const unsigned long'
+    ]
+  }
+
+  public_configs = [ ":yoga_config" ]
+}

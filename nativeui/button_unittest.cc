@@ -4,7 +4,7 @@
 
 #include "nativeui/nativeui.h"
 #include "testing/gtest/include/gtest/gtest.h"
-#include "third_party/css-layout/CSSLayout/CSSLayout.h"
+#include "third_party/yoga/yoga/Yoga.h"
 
 class ButtonTest : public testing::Test {
  protected:
@@ -30,11 +30,11 @@ TEST_F(ButtonTest, SetBounds) {
 
 TEST_F(ButtonTest, UpdateStyle) {
   scoped_refptr<nu::Button> button = new nu::Button("title");
-  float width = CSSNodeStyleGetMinWidth(button->node());
-  float height = CSSNodeStyleGetMinHeight(button->node());
+  float width = YGNodeStyleGetMinWidth(button->node());
+  float height = YGNodeStyleGetMinHeight(button->node());
   button->SetTitle("a long long title");
-  EXPECT_LT(width, CSSNodeStyleGetMinWidth(button->node()));
-  EXPECT_EQ(height, CSSNodeStyleGetMinHeight(button->node()));
+  EXPECT_LT(width, YGNodeStyleGetMinWidth(button->node()));
+  EXPECT_EQ(height, YGNodeStyleGetMinHeight(button->node()));
 }
 
 TEST_F(ButtonTest, CheckBox) {

@@ -4,7 +4,7 @@
 
 #include "nativeui/nativeui.h"
 #include "testing/gtest/include/gtest/gtest.h"
-#include "third_party/css-layout/CSSLayout/CSSLayout.h"
+#include "third_party/yoga/yoga/Yoga.h"
 
 class LabelTest : public testing::Test {
  protected:
@@ -23,9 +23,9 @@ TEST_F(LabelTest, SetText) {
 
 TEST_F(LabelTest, UpdateStyle) {
   label_->SetText("test");
-  float width = CSSNodeStyleGetMinWidth(label_->node());
-  float height = CSSNodeStyleGetMinHeight(label_->node());
+  float width = YGNodeStyleGetMinWidth(label_->node());
+  float height = YGNodeStyleGetMinHeight(label_->node());
   label_->SetText("longlongtest");
-  EXPECT_LT(width, CSSNodeStyleGetMinWidth(label_->node()));
-  EXPECT_EQ(height, CSSNodeStyleGetMinHeight(label_->node()));
+  EXPECT_LT(width, YGNodeStyleGetMinWidth(label_->node()));
+  EXPECT_EQ(height, YGNodeStyleGetMinHeight(label_->node()));
 }

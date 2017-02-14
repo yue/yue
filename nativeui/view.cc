@@ -6,19 +6,19 @@
 
 #include "nativeui/container.h"
 #include "nativeui/util/css.h"
-#include "third_party/css-layout/CSSLayout/CSSLayout.h"
+#include "third_party/yoga/yoga/Yoga.h"
 
 namespace nu {
 
 // static
 const char View::kClassName[] = "View";
 
-View::View() : view_(nullptr), node_(CSSNodeNew()) {
+View::View() : view_(nullptr), node_(YGNodeNew()) {
 }
 
 View::~View() {
   PlatformDestroy();
-  CSSNodeFree(node_);
+  YGNodeFree(node_);
 }
 
 const char* View::GetClassName() const {
@@ -29,15 +29,15 @@ void View::SetVisible(bool visible) {
   if (visible == IsVisible())
     return;
   PlatformSetVisible(visible);
-  // CSSLayout doesn't support invisible node, so we just mark the invisible
+  // Yoga doesn't support invisible node, so we just mark the invisible
   // node as absolute to skip the layout, and restore it after it becomes
   // visible.
   if (visible) {
-    CSSNodeStyleSetPositionType(node_,
-                                static_cast<CSSPositionType>(node_position_));
+    YGNodeStyleSetPositionType(node_,
+                                static_cast<YGPositionType>(node_position_));
   } else {
-    node_position_ = static_cast<int>(CSSNodeStyleGetPositionType(node_));
-    CSSNodeStyleSetPositionType(node_, CSSPositionTypeAbsolute);
+    node_position_ = static_cast<int>(YGNodeStyleGetPositionType(node_));
+    YGNodeStyleSetPositionType(node_, YGPositionTypeAbsolute);
   }
   Layout();
 }
@@ -49,8 +49,8 @@ void View::Layout() {
 }
 
 void View::SetDefaultStyle(const SizeF& minimum) {
-  CSSNodeStyleSetMinWidth(node_, minimum.width());
-  CSSNodeStyleSetMinHeight(node_, minimum.height());
+  YGNodeStyleSetMinWidth(node_, minimum.width());
+  YGNodeStyleSetMinHeight(node_, minimum.height());
   Layout();
 }
 
@@ -59,9 +59,9 @@ void View::SetStyle(const std::string& name, const std::string& value) {
 }
 
 void View::PrintStyle() const {
-  CSSNodePrint(node_, static_cast<CSSPrintOptions>(CSSPrintOptionsLayout |
-                                                   CSSPrintOptionsStyle |
-                                                   CSSPrintOptionsChildren));
+  YGNodePrint(node_, static_cast<YGPrintOptions>(YGPrintOptionsLayout |
+                                                   YGPrintOptionsStyle |
+                                                   YGPrintOptionsChildren));
 }
 
 }  // namespace nu
