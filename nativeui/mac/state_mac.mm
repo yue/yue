@@ -11,9 +11,6 @@ namespace nu {
 void State::PlatformInit() {
   [NSApplication sharedApplication];
   [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
-
-  AddMouseEventMethodsToView(NSClassFromString(@"NUContainer"));
-  AddKeyEventMethodsToView(NSClassFromString(@"NUContainer"));
 }
 
 void State::PlatformDestroy() {
