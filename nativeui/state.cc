@@ -7,6 +7,7 @@
 #include "base/lazy_instance.h"
 #include "base/threading/thread_local.h"
 #include "nativeui/gfx/font.h"
+#include "third_party/yoga/yoga/Yoga.h"
 
 #if defined(OS_WIN)
 #include "nativeui/win/subwin_holder.h"
@@ -27,6 +28,10 @@ base::LazyInstance<base::ThreadLocalPointer<State>>::Leaky lazy_tls_ptr =
 
 State::State() {
   DCHECK_EQ(current(), nullptr) << "should only have one state per thread";
+
+  // Used rounded value for layout.
+  YGSetExperimentalFeatureEnabled(YGExperimentalFeatureRounding, true);
+
   lazy_tls_ptr.Pointer()->Set(this);
   PlatformInit();
 }
