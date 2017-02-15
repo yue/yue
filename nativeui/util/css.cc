@@ -113,8 +113,18 @@ int PixelValue(std::string value) {
     value = value.substr(0, value.length() - 2);
   int integer;
   if (!base::StringToInt(value, &integer)) {
-    LOG(WARNING) << "Invalid pixel value " << value;
-    return false;
+    LOG(WARNING) << "Invalid pixel value: " << value;
+    return 0;
+  }
+  return integer;
+}
+
+// Convert the value to percent value.
+int PercentValue(const std::string& value) {
+  int integer;
+  if (!base::StringToInt(value.substr(0, value.length() - 1), &integer)) {
+    LOG(WARNING) << "Invalid percent value: " << value;
+    return 0;
   }
   return integer;
 }
@@ -127,11 +137,25 @@ void SetMargin(const YGNodeRef node, float margin) {
   YGNodeStyleSetMargin(node, YGEdgeTop, margin);
 }
 
+void SetMarginPercent(const YGNodeRef node, float margin) {
+  YGNodeStyleSetMarginPercent(node, YGEdgeBottom, margin);
+  YGNodeStyleSetMarginPercent(node, YGEdgeLeft, margin);
+  YGNodeStyleSetMarginPercent(node, YGEdgeRight, margin);
+  YGNodeStyleSetMarginPercent(node, YGEdgeTop, margin);
+}
+
 void SetPadding(const YGNodeRef node, float padding) {
   YGNodeStyleSetPadding(node, YGEdgeBottom, padding);
   YGNodeStyleSetPadding(node, YGEdgeLeft, padding);
   YGNodeStyleSetPadding(node, YGEdgeRight, padding);
   YGNodeStyleSetPadding(node, YGEdgeTop, padding);
+}
+
+void SetPaddingPercent(const YGNodeRef node, float padding) {
+  YGNodeStyleSetPaddingPercent(node, YGEdgeBottom, padding);
+  YGNodeStyleSetPaddingPercent(node, YGEdgeLeft, padding);
+  YGNodeStyleSetPaddingPercent(node, YGEdgeRight, padding);
+  YGNodeStyleSetPaddingPercent(node, YGEdgeTop, padding);
 }
 
 void SetBorderWidth(const YGNodeRef node, float border) {
@@ -168,7 +192,7 @@ const std::tuple<const char*, IntConverter, IntSetter> int_setters[] = {
                   reinterpret_cast<IntSetter>(YGNodeStyleSetPositionType)),
 };
 const std::pair<const char*, FloatSetter> float_setters[] = {
-  std::make_pair("borderwidth",
+  std::make_pair("border",
                  reinterpret_cast<FloatSetter>(SetBorderWidth)),
   std::make_pair("flex",
                  reinterpret_cast<FloatSetter>(YGNodeStyleSetFlex)),
@@ -195,14 +219,34 @@ const std::pair<const char*, FloatSetter> float_setters[] = {
   std::make_pair("width",
                  reinterpret_cast<FloatSetter>(YGNodeStyleSetWidth)),
 };
+const std::pair<const char*, FloatSetter> percent_setters[] = {
+  std::make_pair("flexbasis",
+                 reinterpret_cast<FloatSetter>(YGNodeStyleSetFlexBasisPercent)),
+  std::make_pair("height",
+                 reinterpret_cast<FloatSetter>(YGNodeStyleSetHeightPercent)),
+  std::make_pair("margin",
+                 reinterpret_cast<FloatSetter>(SetMarginPercent)),
+  std::make_pair("maxheight",
+                 reinterpret_cast<FloatSetter>(YGNodeStyleSetMaxHeightPercent)),
+  std::make_pair("maxwidth",
+                 reinterpret_cast<FloatSetter>(YGNodeStyleSetMaxWidthPercent)),
+  std::make_pair("minheight",
+                 reinterpret_cast<FloatSetter>(YGNodeStyleSetMinHeightPercent)),
+  std::make_pair("minwidth",
+                 reinterpret_cast<FloatSetter>(YGNodeStyleSetMinWidthPercent)),
+  std::make_pair("padding",
+                 reinterpret_cast<FloatSetter>(SetPaddingPercent)),
+  std::make_pair("width",
+                 reinterpret_cast<FloatSetter>(YGNodeStyleSetWidthPercent)),
+};
 const std::tuple<const char*, YGEdge, EdgeSetter> edge_setters[] = {
-  std::make_tuple("borderbottomwidth", YGEdgeBottom,
+  std::make_tuple("borderbottom", YGEdgeBottom,
                   reinterpret_cast<EdgeSetter>(YGNodeStyleSetBorder)),
-  std::make_tuple("borderleftwidth", YGEdgeLeft,
+  std::make_tuple("borderleft", YGEdgeLeft,
                   reinterpret_cast<EdgeSetter>(YGNodeStyleSetBorder)),
-  std::make_tuple("borderrightwidth", YGEdgeRight,
+  std::make_tuple("borderright", YGEdgeRight,
                   reinterpret_cast<EdgeSetter>(YGNodeStyleSetBorder)),
-  std::make_tuple("bordertopwidth", YGEdgeTop,
+  std::make_tuple("bordertop", YGEdgeTop,
                   reinterpret_cast<EdgeSetter>(YGNodeStyleSetBorder)),
   std::make_tuple("bottom", YGEdgeBottom,
                   reinterpret_cast<EdgeSetter>(YGNodeStyleSetPosition)),
@@ -228,6 +272,32 @@ const std::tuple<const char*, YGEdge, EdgeSetter> edge_setters[] = {
                   reinterpret_cast<EdgeSetter>(YGNodeStyleSetPosition)),
   std::make_tuple("top", YGEdgeTop,
                   reinterpret_cast<EdgeSetter>(YGNodeStyleSetPosition)),
+};
+const std::tuple<const char*, YGEdge, EdgeSetter> edge_percent_setters[] = {
+  std::make_tuple("bottom", YGEdgeBottom,
+                  reinterpret_cast<EdgeSetter>(YGNodeStyleSetPositionPercent)),
+  std::make_tuple("left", YGEdgeLeft,
+                  reinterpret_cast<EdgeSetter>(YGNodeStyleSetPositionPercent)),
+  std::make_tuple("marginbottom", YGEdgeBottom,
+                  reinterpret_cast<EdgeSetter>(YGNodeStyleSetMarginPercent)),
+  std::make_tuple("marginleft", YGEdgeLeft,
+                  reinterpret_cast<EdgeSetter>(YGNodeStyleSetMarginPercent)),
+  std::make_tuple("marginright", YGEdgeRight,
+                  reinterpret_cast<EdgeSetter>(YGNodeStyleSetMarginPercent)),
+  std::make_tuple("margintop", YGEdgeTop,
+                  reinterpret_cast<EdgeSetter>(YGNodeStyleSetMarginPercent)),
+  std::make_tuple("paddingbottom", YGEdgeBottom,
+                  reinterpret_cast<EdgeSetter>(YGNodeStyleSetPaddingPercent)),
+  std::make_tuple("paddingleft", YGEdgeLeft,
+                  reinterpret_cast<EdgeSetter>(YGNodeStyleSetPaddingPercent)),
+  std::make_tuple("paddingright", YGEdgeRight,
+                  reinterpret_cast<EdgeSetter>(YGNodeStyleSetPaddingPercent)),
+  std::make_tuple("paddingtop", YGEdgeTop,
+                  reinterpret_cast<EdgeSetter>(YGNodeStyleSetPaddingPercent)),
+  std::make_tuple("right", YGEdgeRight,
+                  reinterpret_cast<EdgeSetter>(YGNodeStyleSetPositionPercent)),
+  std::make_tuple("top", YGEdgeTop,
+                  reinterpret_cast<EdgeSetter>(YGNodeStyleSetPositionPercent)),
 };
 
 // Compare function to compare elements.
@@ -286,6 +356,17 @@ bool SetFloatStyle(YGNodeRef node,
   return true;
 }
 
+// Set style for percent properties.
+bool SetPercentStyle(YGNodeRef node,
+                     const std::string& name,
+                     const std::string& value) {
+  auto* tup = Find(percent_setters, name);
+  if (!tup)
+    return false;
+  std::get<1>(*tup)(node, PercentValue(value));
+  return true;
+}
+
 // Set style for edge properties.
 bool SetEdgeStyle(YGNodeRef node,
                   const std::string& name,
@@ -294,6 +375,17 @@ bool SetEdgeStyle(YGNodeRef node,
   if (!tup)
     return false;
   std::get<2>(*tup)(node, std::get<1>(*tup), PixelValue(value));
+  return true;
+}
+
+// Set style for edge percent properties.
+bool SetEdgePercentStyle(YGNodeRef node,
+                         const std::string& name,
+                         const std::string& value) {
+  auto* tup = Find(edge_percent_setters, name);
+  if (!tup)
+    return false;
+  std::get<2>(*tup)(node, std::get<1>(*tup), PercentValue(value));
   return true;
 }
 
@@ -308,6 +400,13 @@ std::string ParseName(const std::string& name) {
   return parsed;
 }
 
+// Check whether the value is xx%.
+bool IsPercentValue(const std::string& value) {
+  if (value.size() < 2 || value.size() > 4)
+    return false;
+  return value.back() == '%';
+}
+
 }  // namespace
 
 void SetCSSStyle(YGNodeRef node,
@@ -315,11 +414,18 @@ void SetCSSStyle(YGNodeRef node,
                  const std::string& value) {
   DCHECK(IsSorted(int_setters) &&
          IsSorted(float_setters) &&
-         IsSorted(edge_setters)) << "Property setters must be sorted";
+         IsSorted(percent_setters) &&
+         IsSorted(edge_setters) &&
+         IsSorted(edge_percent_setters))<< "Property setters must be sorted";
   std::string name = ParseName(raw_name);
-  SetIntStyle(node, name, value) ||
-  SetFloatStyle(node, name, value) ||
-  SetEdgeStyle(node, name, value);
+  if (IsPercentValue(value)) {
+    SetPercentStyle(node, name, value) ||
+    SetEdgePercentStyle(node, name, value);
+  } else {
+    SetIntStyle(node, name, value) ||
+    SetFloatStyle(node, name, value) ||
+    SetEdgeStyle(node, name, value);
+  }
 }
 
 }  // namespace nu
