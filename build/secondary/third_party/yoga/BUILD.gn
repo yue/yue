@@ -18,6 +18,7 @@ source_set("yoga") {
     cflags = [
       "/wd4005",  # 'isnan': macro redefinition
       "/wd4267",  # conversion from 'size_t' to 'const unsigned long'
+      "/wd4232",  # address of dllimport 'free' is not static, identity not guaranteed
     ]
   }
 

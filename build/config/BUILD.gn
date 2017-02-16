@@ -166,6 +166,7 @@ config("default_libs") {
       "comdlg32.lib",
       "dbghelp.lib",
       "delayimp.lib",
+      "gdi32.lib",
       "ole32.lib",
       "oleaut32.lib",
       "psapi.lib",
