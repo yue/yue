@@ -695,8 +695,8 @@ struct Type<nu::MenuItem> {
 namespace {
 
 struct NUInstance {
-  nu::State state;
   nu::Lifetime lifetime;
+  nu::State state;
 };
 
 }  // namespace

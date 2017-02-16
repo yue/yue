@@ -12,8 +12,6 @@
 
 #if defined(OS_LINUX)
 #include "nativeui/gtk/gtk_event_loop.h"
-#elif defined(OS_MACOSX)
-#include "base/mac/scoped_nsautorelease_pool.h"
 #endif
 
 namespace nu {
@@ -55,10 +53,6 @@ class NATIVEUI_EXPORT State {
 
 #if defined(OS_LINUX)
   GtkEventLoop gtk_event_loop_;
-#endif
-
-#if defined(OS_MACOSX)
-  base::mac::ScopedNSAutoreleasePool autorelease_pool_;
 #endif
 
 #if defined(OS_WIN)
