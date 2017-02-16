@@ -14,5 +14,5 @@ Once you stopped subscribing to the paid plan, you may still use the software
 under the alternative license, but you can only use the version earlier than the
 last day of your paid plan.
 
-The price of the paid plan is: __5000.00 U.S. dollars per month__, please
+The price of the paid plan is: __5000 U.S. dollars per month__, please
 contact Cheng Zhao (zcbenz@gmail.com) on how to pay.
