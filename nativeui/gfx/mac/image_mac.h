@@ -14,7 +14,7 @@ namespace nu {
 
 class NATIVEUI_EXPORT ImageMac : public Image {
  public:
-  ImageMac(const std::string& path);
+  explicit ImageMac(const std::string& path);
 
   // Image:
   Size GetSize() const override;

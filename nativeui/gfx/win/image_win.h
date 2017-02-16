@@ -12,7 +12,7 @@ namespace nu {
 
 class NATIVEUI_EXPORT ImageWin : public Image {
  public:
-  ImageWin(const base::string16& path);
+  explicit ImageWin(const base::string16& path);
 
   // Image:
   Size GetSize() const override;

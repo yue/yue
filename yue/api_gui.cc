@@ -692,57 +692,36 @@ struct Type<nu::MenuItem> {
 
 }  // namespace lua
 
+namespace {
+
+template<typename T>
+void SetTable(lua::State* state, const char* name) {
+  lua::Push(state, name);
+  lua::MetaTable<T>::Push(state);
+  lua_rawset(state, -3);
+}
+
+}  // namespace
+
 extern "C" int luaopen_yue_gui(lua::State* state) {
   // Populate the table with GUI elements.
   lua::PushNewTable(state);
-  lua::Push(state, "App");
-  lua::MetaTable<nu::App>::Push(state);
-  lua_rawset(state, -3);
-  lua::Push(state, "Lifetime");
-  lua::MetaTable<nu::Lifetime>::Push(state);
-  lua_rawset(state, -3);
-  lua::Push(state, "Window");
-  lua::MetaTable<nu::Window>::Push(state);
-  lua_rawset(state, -3);
-  lua::Push(state, "Container");
-  lua::MetaTable<nu::Container>::Push(state);
-  lua_rawset(state, -3);
-  lua::Push(state, "Button");
-  lua::MetaTable<nu::Button>::Push(state);
-  lua_rawset(state, -3);
-  lua::Push(state, "Entry");
-  lua::MetaTable<nu::Entry>::Push(state);
-  lua_rawset(state, -3);
-  lua::Push(state, "Label");
-  lua::MetaTable<nu::Label>::Push(state);
-  lua_rawset(state, -3);
-  lua::Push(state, "Progress");
-  lua::MetaTable<nu::Progress>::Push(state);
-  lua_rawset(state, -3);
-  lua::Push(state, "Group");
-  lua::MetaTable<nu::Group>::Push(state);
-  lua_rawset(state, -3);
-  lua::Push(state, "Scroll");
-  lua::MetaTable<nu::Scroll>::Push(state);
-  lua_rawset(state, -3);
-  lua::Push(state, "Font");
-  lua::MetaTable<nu::Font>::Push(state);
-  lua_rawset(state, -3);
-  lua::Push(state, "Image");
-  lua::MetaTable<nu::Image>::Push(state);
-  lua_rawset(state, -3);
-  lua::Push(state, "Painter");
-  lua::MetaTable<nu::Painter>::Push(state);
-  lua_rawset(state, -3);
-  lua::Push(state, "MenuBar");
-  lua::MetaTable<nu::MenuBar>::Push(state);
-  lua_rawset(state, -3);
-  lua::Push(state, "Menu");
-  lua::MetaTable<nu::Menu>::Push(state);
-  lua_rawset(state, -3);
-  lua::Push(state, "MenuItem");
-  lua::MetaTable<nu::MenuItem>::Push(state);
-  lua_rawset(state, -3);
+  SetTable<nu::App>(state, "App");
+  SetTable<nu::Lifetime>(state, "Lifetime");
+  SetTable<nu::Window>(state, "Window");
+  SetTable<nu::Container>(state, "Container");
+  SetTable<nu::Button>(state, "Button");
+  SetTable<nu::Entry>(state, "Entry");
+  SetTable<nu::Label>(state, "Label");
+  SetTable<nu::Progress>(state, "Progress");
+  SetTable<nu::Group>(state, "Group");
+  SetTable<nu::Scroll>(state, "Scroll");
+  SetTable<nu::Font>(state, "Font");
+  SetTable<nu::Image>(state, "Image");
+  SetTable<nu::Painter>(state, "Painter");
+  SetTable<nu::MenuBar>(state, "MenuBar");
+  SetTable<nu::Menu>(state, "Menu");
+  SetTable<nu::MenuItem>(state, "MenuItem");
 
   // Create APIs that only available as instances.
   lua::Push(state, "app");

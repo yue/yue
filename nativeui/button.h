@@ -18,7 +18,7 @@ class NATIVEUI_EXPORT Button : public View {
     CheckBox,
     Radio,
   };
-  Button(const std::string& title, Type type = Normal);
+  explicit Button(const std::string& title, Type type = Normal);
 
   // View class name.
   static const char kClassName[];

@@ -13,7 +13,7 @@ namespace nu {
 
 class NATIVEUI_EXPORT ImageGtk : public Image {
  public:
-  ImageGtk(const std::string& path);
+  explicit ImageGtk(const std::string& path);
 
   // Image:
   Size GetSize() const override;

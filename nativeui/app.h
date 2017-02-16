@@ -15,7 +15,6 @@ class MenuBar;
 // App wide APIs, this class is managed by State.
 class NATIVEUI_EXPORT App {
  public:
-
 #if defined(OS_MACOSX)
   // Set the application menu.
   void SetApplicationMenu(MenuBar* menu);
