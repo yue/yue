@@ -218,6 +218,10 @@ source_set("nativeui") {
 
     # Do not warn on using deprecated GTK APIs.
     cflags_cc = [ "-Wno-deprecated-declarations" ]
+  } else if (is_mac) {
+    libs = [
+      "AppKit.framework",
+    ]
   } else if (is_win) {
     libs = [
       "gdi32.lib",

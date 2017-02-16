@@ -19,7 +19,7 @@ if (process.platform === 'linux') {
 execSync('git submodule sync --recursive')
 execSync('git submodule update --init --recursive')
 
-gen('out/Debug', ['is_component_build=false', 'is_debug=true'])
+gen('out/Debug', ['is_component_build=true', 'is_debug=true'])
 gen('out/Release', ['is_component_build=false',
                     'is_debug=false',
                     'is_official_build=true'])
