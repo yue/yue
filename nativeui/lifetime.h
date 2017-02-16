@@ -19,6 +19,10 @@ class NUApplicationDelegate;
 #endif
 #endif
 
+#if defined(OS_LINUX)
+#include "nativeui/gtk/gtk_event_loop.h"
+#endif
+
 namespace nu {
 
 // Manages the whole application's message loop and lifetime, should only be
@@ -51,6 +55,10 @@ class NATIVEUI_EXPORT Lifetime {
 #if defined(OS_MACOSX)
   base::mac::ScopedNSAutoreleasePool autorelease_pool_;
   NUApplicationDelegate* app_delegate_;
+#endif
+
+#if defined(OS_LINUX)
+  GtkEventLoop gtk_event_loop_;
 #endif
 
   base::WeakPtrFactory<Lifetime> weak_factory_;

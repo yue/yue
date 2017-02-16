@@ -7,6 +7,7 @@
 namespace nu {
 
 void Lifetime::PlatformInit() {
+  gtk_init(nullptr, nullptr);
 }
 
 void Lifetime::PlatformDestroy() {

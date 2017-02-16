@@ -7,7 +7,6 @@
 namespace nu {
 
 void State::PlatformInit() {
-  gtk_init(nullptr, nullptr);
 }
 
 void State::PlatformDestroy() {
