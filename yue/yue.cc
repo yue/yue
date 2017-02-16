@@ -6,11 +6,18 @@
 #include "base/command_line.h"
 #include "base/logging.h"
 #include "base/strings/utf_string_conversions.h"
+#include "nativeui/lifetime.h"
+#include "nativeui/state.h"
 #include "yue/builtin_loader.h"
 
 int main(int argc, const char *argv[]) {
+  // Initialize base library.
   base::AtExitManager exit_manager;
   base::CommandLine::Init(argc, argv);
+
+  // Initialize nativeui library.
+  nu::Lifetime ui_lifetime;
+  nu::State ui_state;
 
   auto* cmd = base::CommandLine::ForCurrentProcess();
   if (cmd->GetArgs().size() != 1) {

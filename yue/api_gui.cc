@@ -692,26 +692,7 @@ struct Type<nu::MenuItem> {
 
 }  // namespace lua
 
-namespace {
-
-struct NUInstance {
-  nu::Lifetime lifetime;
-  nu::State state;
-};
-
-}  // namespace
-
 extern "C" int luaopen_yue_gui(lua::State* state) {
-  // Manage the GUI state in lua.
-  void* memory = lua_newuserdata(state, sizeof(NUInstance));
-  NUInstance* instance = new(memory) NUInstance;
-  lua::PushNewTable(state);
-  lua::RawSet(state, -1, "__gc", lua::CFunction(lua::OnGC<NUInstance>));
-  lua::SetMetaTable(state, -2);
-
-  // Put the gui state into registry, so it is alive through whole lua state.
-  luaL_ref(state, LUA_REGISTRYINDEX);
-
   // Populate the table with GUI elements.
   lua::PushNewTable(state);
   lua::Push(state, "App");
@@ -765,10 +746,10 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
 
   // Create APIs that only available as instances.
   lua::Push(state, "app");
-  lua::MetaTable<nu::App>::PushNewWrapper(state, instance->state.app());
+  lua::MetaTable<nu::App>::PushNewWrapper(state, nu::State::current()->app());
   lua_rawset(state, -3);
   lua::Push(state, "lifetime");
-  lua::MetaTable<nu::Lifetime>::PushNewWrapper(state, &instance->lifetime);
+  lua::MetaTable<nu::Lifetime>::PushNewWrapper(state, nu::Lifetime::current());
   lua_rawset(state, -3);
   return 1;
 }
