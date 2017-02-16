@@ -38,8 +38,8 @@ with following clarifications:
 
 The source code of Yue project is also available under an alternative license if
 you subscribe to the [paid plans][paid-plans]. Unlike MS-RL, the alternative
-license does not require you to open source the modifications to this software
-if you only publish your software in binary form.
+license does not require you to open source your software when you use a
+modified version of this software.
 
 [ms-rl]: https://github.com/yue/yue/blob/master/LICENSE
 [paid-plans]: https://github.com/yue/yue/tree/master/docs/paid_plans
