@@ -1,6 +1,6 @@
-# yue
+# Yue
 
-A framework to create cross-platform GUI apps.
+A library to create cross-platform GUI apps.
 
 ## Issues
 
@@ -8,7 +8,7 @@ The Issues page of this repo is disabled on purpose, and I do not answer emails
 on using or building this project. For help please go to the
 [yue/help](https://github.com/yue/help) repo where users help themselves.
 
-The only way to get help from me is to subscribe to paid plans.
+The only way to get help from me is to subscribe to [paid plans][paid-plans].
 
 ## Contributions
 
@@ -36,10 +36,10 @@ with following clarifications:
 
 ### Alternative license
 
-The source code of Yue project is also available under the [Microsoft Public
-License (MS-PL)][ms-pl] if you subscribe to the paid plans. Unlike MS-RL,
-the MS-PL license does not require you to open source the modifications to this
-software if you only publish your software in binary form.
+The source code of Yue project is also available under an alternative license if
+you subscribe to the [paid plans][paid-plans]. Unlike MS-RL, the alternative
+license does not require you to open source the modifications to this software
+if you only publish your software in binary form.
 
 [ms-rl]: https://github.com/yue/yue/blob/master/LICENSE
-[ms-pl]: https://opensource.org/licenses/MS-PL
+[paid-plans]: https://github.com/yue/yue/tree/master/docs/paid_plans
