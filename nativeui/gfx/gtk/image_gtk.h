@@ -11,7 +11,7 @@
 
 namespace nu {
 
-NATIVEUI_EXPORT class ImageGtk : public Image {
+class NATIVEUI_EXPORT ImageGtk : public Image {
  public:
   ImageGtk(const std::string& path);
 

@@ -18,7 +18,7 @@ class AcceleratorManager;
 class Menu;
 class MenuBase;
 
-NATIVEUI_EXPORT class MenuItem : public base::RefCounted<MenuItem> {
+class NATIVEUI_EXPORT MenuItem : public base::RefCounted<MenuItem> {
  public:
   enum Type {
     Label,

@@ -11,7 +11,7 @@
 
 namespace nu {
 
-NATIVEUI_EXPORT class Group : public View {
+class NATIVEUI_EXPORT Group : public View {
  public:
   explicit Group(const std::string& title);
 

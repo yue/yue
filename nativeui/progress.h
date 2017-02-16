@@ -9,7 +9,7 @@
 
 namespace nu {
 
-NATIVEUI_EXPORT class Progress : public View {
+class NATIVEUI_EXPORT Progress : public View {
  public:
   Progress();
 

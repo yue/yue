@@ -23,7 +23,7 @@ namespace nu {
 class MenuBar;
 
 // The instance that manages message loop and App wide global APIs.
-NATIVEUI_EXPORT class App {
+class NATIVEUI_EXPORT App {
  public:
   static App* current();
 

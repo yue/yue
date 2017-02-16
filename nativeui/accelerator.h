@@ -9,10 +9,11 @@
 #include <string>
 
 #include "nativeui/events/keyboard_codes.h"
+#include "nativeui/nativeui_export.h"
 
 namespace nu {
 
-class Accelerator {
+class NATIVEUI_EXPORT Accelerator {
  public:
   explicit Accelerator(KeyboardCode code = VKEY_UNKNOWN, int modifiers = 0);
   explicit Accelerator(const std::string& description);

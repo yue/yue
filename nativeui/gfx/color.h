@@ -10,6 +10,7 @@
 #include <string>
 
 #include "build/build_config.h"
+#include "nativeui/nativeui_export.h"
 
 #if defined(OS_WIN)
 #include <windows.h>
@@ -28,7 +29,7 @@ class NSColor;
 namespace nu {
 
 // A class to represent colors.
-class Color {
+class NATIVEUI_EXPORT Color {
  public:
   explicit Color(const std::string& hex);
   Color(unsigned a, unsigned r, unsigned g, unsigned b)

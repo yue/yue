@@ -26,7 +26,7 @@ class NativeTheme;
 class SubwinHolder;
 #endif
 
-NATIVEUI_EXPORT class State {
+class NATIVEUI_EXPORT State {
  public:
   State();
   ~State();

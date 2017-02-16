@@ -12,7 +12,7 @@
 
 namespace nu {
 
-NATIVEUI_EXPORT class FontMac : public Font {
+class NATIVEUI_EXPORT FontMac : public Font {
  public:
   FontMac();
   FontMac(const std::string& font_name, int font_size);

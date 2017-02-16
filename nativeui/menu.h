@@ -9,7 +9,7 @@
 
 namespace nu {
 
-NATIVEUI_EXPORT class Menu : public MenuBase {
+class NATIVEUI_EXPORT Menu : public MenuBase {
  public:
   Menu();
 

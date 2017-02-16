@@ -11,7 +11,7 @@
 
 namespace nu {
 
-NATIVEUI_EXPORT class Image : public base::RefCounted<Image> {
+class NATIVEUI_EXPORT Image : public base::RefCounted<Image> {
  public:
   // Creates an image by reading from |path|.
   static Image* CreateFromFile(const String& path);

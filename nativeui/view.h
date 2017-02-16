@@ -19,7 +19,7 @@ typedef struct YGNode *YGNodeRef;
 namespace nu {
 
 // The base class for all kinds of views.
-NATIVEUI_EXPORT class View : public base::RefCounted<View> {
+class NATIVEUI_EXPORT View : public base::RefCounted<View> {
  public:
   NativeView view() const { return view_; }
 

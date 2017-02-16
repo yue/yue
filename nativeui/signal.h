@@ -18,7 +18,7 @@ namespace nu {
 template<typename Sig> class Signal;
 
 template<typename... Args>
-NATIVEUI_EXPORT class Signal<void(Args...)> {
+class NATIVEUI_EXPORT Signal<void(Args...)> {
  public:
   using Slot = base::Callback<void(Args...)>;
 

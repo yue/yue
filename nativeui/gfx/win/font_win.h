@@ -12,7 +12,7 @@
 
 namespace nu {
 
-NATIVEUI_EXPORT class FontWin : public Font {
+class NATIVEUI_EXPORT FontWin : public Font {
  public:
   FontWin(const base::string16& font_name, int font_size);
 

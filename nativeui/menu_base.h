@@ -16,7 +16,7 @@ namespace nu {
 class AcceleratorManager;
 class MenuItem;
 
-NATIVEUI_EXPORT class MenuBase : public base::RefCounted<MenuBase> {
+class NATIVEUI_EXPORT MenuBase : public base::RefCounted<MenuBase> {
  public:
   void Append(MenuItem* item);
   void Insert(MenuItem* item, int index);

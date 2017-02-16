@@ -10,7 +10,7 @@
 
 namespace nu {
 
-NATIVEUI_EXPORT class ImageWin : public Image {
+class NATIVEUI_EXPORT ImageWin : public Image {
  public:
   ImageWin(const base::string16& path);
 

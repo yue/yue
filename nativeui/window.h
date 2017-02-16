@@ -14,7 +14,7 @@ namespace nu {
 class MenuBar;
 
 // The native window.
-NATIVEUI_EXPORT class Window : public base::RefCounted<Window> {
+class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
  public:
   struct Options {
     RectF bounds;

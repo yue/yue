@@ -11,7 +11,7 @@
 
 namespace nu {
 
-NATIVEUI_EXPORT class Scroll : public View {
+class NATIVEUI_EXPORT Scroll : public View {
  public:
   Scroll();
 

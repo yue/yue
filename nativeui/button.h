@@ -11,7 +11,7 @@
 
 namespace nu {
 
-NATIVEUI_EXPORT class Button : public View {
+class NATIVEUI_EXPORT Button : public View {
  public:
   enum Type {
     Normal,

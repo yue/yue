@@ -11,7 +11,7 @@
 
 namespace nu {
 
-NATIVEUI_EXPORT class FontGtk : public Font {
+class NATIVEUI_EXPORT FontGtk : public Font {
  public:
   explicit FontGtk(PangoFontDescription* font);
   FontGtk(const std::string& font_name, int font_size);

@@ -4,7 +4,7 @@
 
 import("//testing/test.gni")
 
-source_set("nativeui") {
+component("nativeui") {
   sources = [
     "nativeui.h",
     "nativeui_export.h",
@@ -212,6 +212,8 @@ source_set("nativeui") {
     "//base",
     "//third_party/yoga",
   ]
+
+  defines = [ "NATIVEUI_IMPLEMENTATION" ]
 
   if (is_linux) {
     public_configs = [ "//build/config/linux/gtk3" ]

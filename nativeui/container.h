@@ -13,7 +13,7 @@ namespace nu {
 
 class Painter;
 
-NATIVEUI_EXPORT class Container : public View {
+class NATIVEUI_EXPORT Container : public View {
  public:
   Container();
 

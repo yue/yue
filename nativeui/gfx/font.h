@@ -13,7 +13,7 @@
 
 namespace nu {
 
-NATIVEUI_EXPORT class Font : public base::RefCounted<Font> {
+class NATIVEUI_EXPORT Font : public base::RefCounted<Font> {
  public:
   // Creates an appropriate Font implementation.
   static Font* CreateDefault();

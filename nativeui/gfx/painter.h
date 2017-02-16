@@ -20,7 +20,7 @@
 namespace nu {
 
 // The interface for painting on canvas or window.
-class Painter {
+class NATIVEUI_EXPORT Painter {
  public:
 #if defined(OS_WIN)
   // Create a painter from HDC.

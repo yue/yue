@@ -12,7 +12,7 @@
 
 namespace nu {
 
-NATIVEUI_EXPORT class ImageMac : public Image {
+class NATIVEUI_EXPORT ImageMac : public Image {
  public:
   ImageMac(const std::string& path);
 

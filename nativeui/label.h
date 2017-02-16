@@ -11,7 +11,7 @@
 
 namespace nu {
 
-NATIVEUI_EXPORT class Label : public View {
+class NATIVEUI_EXPORT Label : public View {
  public:
   explicit Label(const std::string& text = "");
 
