@@ -18,15 +18,4 @@ MenuBar* App::GetApplicationMenu() const {
   return application_menu_.get();
 }
 
-void App::PlatformInit() {
-  DCHECK(![NSApp delegate]);
-  app_delegate_ = [[NUApplicationDelegate alloc] initWithShell:this];
-  [NSApp setDelegate:app_delegate_];
-}
-
-void App::PlatformDestroy() {
-  [NSApp setDelegate:nil];
-  [app_delegate_ release];
-}
-
 }  // namespace nu

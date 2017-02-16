@@ -187,20 +187,28 @@ template<>
 struct Type<nu::App> {
   static constexpr const char* name = "yue.App";
   static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index,
 #if defined(OS_MACOSX)
-           "setapplicationmenu", &nu::App::SetApplicationMenu,
+    RawSet(state, index,
+           "setapplicationmenu", &nu::App::SetApplicationMenu);
 #endif
-           "run", &nu::App::Run,
-           "quit", &nu::App::Quit,
-           "post", &nu::App::PostTask,
-           "postdelayed", &nu::App::PostDelayedTask);
+  }
+};
+
+template<>
+struct Type<nu::Lifetime> {
+  static constexpr const char* name = "yue.Lifetime";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "run", &nu::Lifetime::Run,
+           "quit", &nu::Lifetime::Quit,
+           "post", &nu::Lifetime::PostTask,
+           "postdelayed", &nu::Lifetime::PostDelayedTask);
   }
   static int NewIndex(State* state) {
     std::string name;
     if (!To(state, 2, &name))
       return 0;
-    return yue::MemberNewIndex(state, name, "onready", &nu::App::on_ready);
+    return yue::MemberNewIndex(state, name, "onready", &nu::Lifetime::on_ready);
   }
 };
 
@@ -684,12 +692,21 @@ struct Type<nu::MenuItem> {
 
 }  // namespace lua
 
+namespace {
+
+struct NUInstance {
+  nu::State state;
+  nu::Lifetime lifetime;
+};
+
+}  // namespace
+
 extern "C" int luaopen_yue_gui(lua::State* state) {
-  // Manage the gui state in lua.
-  void* memory = lua_newuserdata(state, sizeof(nu::State));
-  new(memory) nu::State;
+  // Manage the GUI state in lua.
+  void* memory = lua_newuserdata(state, sizeof(NUInstance));
+  NUInstance* instance = new(memory) NUInstance;
   lua::PushNewTable(state);
-  lua::RawSet(state, -1, "__gc", lua::CFunction(lua::OnGC<nu::State>));
+  lua::RawSet(state, -1, "__gc", lua::CFunction(lua::OnGC<NUInstance>));
   lua::SetMetaTable(state, -2);
 
   // Put the gui state into registry, so it is alive through whole lua state.
@@ -699,6 +716,9 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   lua::PushNewTable(state);
   lua::Push(state, "App");
   lua::MetaTable<nu::App>::Push(state);
+  lua_rawset(state, -3);
+  lua::Push(state, "Lifetime");
+  lua::MetaTable<nu::Lifetime>::Push(state);
   lua_rawset(state, -3);
   lua::Push(state, "Window");
   lua::MetaTable<nu::Window>::Push(state);
@@ -745,7 +765,10 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
 
   // Create APIs that only available as instances.
   lua::Push(state, "app");
-  lua::MetaTable<nu::App>::PushNewWrapper(state, nu::App::current());
+  lua::MetaTable<nu::App>::PushNewWrapper(state, instance->state.app());
+  lua_rawset(state, -3);
+  lua::Push(state, "lifetime");
+  lua::MetaTable<nu::Lifetime>::PushNewWrapper(state, &instance->lifetime);
   lua_rawset(state, -3);
   return 1;
 }

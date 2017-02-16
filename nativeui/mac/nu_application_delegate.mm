@@ -4,11 +4,11 @@
 
 #include "nativeui/mac/nu_application_delegate.h"
 
-#include "nativeui/app.h"
+#include "nativeui/lifetime.h"
 
 @implementation NUApplicationDelegate
 
-- (id)initWithShell:(nu::App*)shell {
+- (id)initWithShell:(nu::Lifetime*)shell {
   if ((self = [super init]))
     shell_ = shell;
   return self;

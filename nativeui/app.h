@@ -6,32 +6,15 @@
 #define NATIVEUI_APP_H_
 
 #include "base/memory/weak_ptr.h"
-#include "base/message_loop/message_loop.h"
-#include "base/run_loop.h"
-#include "nativeui/signal.h"
-
-#if defined(OS_MACOSX)
-#ifdef __OBJC__
-@class NUApplicationDelegate;
-#else
-class NUApplicationDelegate;
-#endif
-#endif
+#include "nativeui/nativeui_export.h"
 
 namespace nu {
 
 class MenuBar;
 
-// The instance that manages message loop and App wide global APIs.
+// App wide APIs, this class is managed by State.
 class NATIVEUI_EXPORT App {
  public:
-  static App* current();
-
-  // Control message loop.
-  void Run();
-  void Quit();
-  void PostTask(const base::Closure& task);
-  void PostDelayedTask(int ms, const base::Closure& task);
 
 #if defined(OS_MACOSX)
   // Set the application menu.
@@ -39,27 +22,17 @@ class NATIVEUI_EXPORT App {
   MenuBar* GetApplicationMenu() const;
 #endif
 
-  // Events.
-  Signal<void()> on_ready;
-
   base::WeakPtr<App> GetWeakPtr() { return weak_factory_.GetWeakPtr(); }
 
  protected:
   App();
-  virtual ~App();
+  ~App();
 
  private:
   friend class State;
 
-  void PlatformInit();
-  void PlatformDestroy();
-
-  base::MessageLoop message_loop_;
-  base::RunLoop run_loop_;
-
 #if defined(OS_MACOSX)
   scoped_refptr<MenuBar> application_menu_;
-  NUApplicationDelegate* app_delegate_;
 #endif
 
   base::WeakPtrFactory<App> weak_factory_;

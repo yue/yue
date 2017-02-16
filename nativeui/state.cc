@@ -20,7 +20,7 @@ namespace nu {
 namespace {
 
 // A lazily created thread local storage for quick access to a thread's message
-// loop, if one exists.  This should be safe and free of static constructors.
+// loop, if one exists. This should be safe and free of static constructors.
 base::LazyInstance<base::ThreadLocalPointer<State>>::Leaky lazy_tls_ptr =
     LAZY_INSTANCE_INITIALIZER;
 

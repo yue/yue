@@ -8,14 +8,14 @@
 #import <Cocoa/Cocoa.h>
 
 namespace nu {
-class App;
+class Lifetime;
 }
 
 @interface NUApplicationDelegate : NSObject<NSApplicationDelegate> {
  @private
-  nu::App* shell_;
+  nu::Lifetime* shell_;
 }
-- (id)initWithShell:(nu::App*)shell;
+- (id)initWithShell:(nu::Lifetime*)shell;
 @end
 
 #endif  // NATIVEUI_MAC_NU_APPLICATION_DELEGATE_H_

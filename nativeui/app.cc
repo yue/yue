@@ -9,35 +9,10 @@
 
 namespace nu {
 
-// static
-App* App::current() {
-  return State::current()->app();
-}
-
-App::App() : message_loop_(base::MessageLoop::TYPE_UI),
-             weak_factory_(this) {
-  PlatformInit();
+App::App() : weak_factory_(this) {
 }
 
 App::~App() {
-  PlatformDestroy();
-}
-
-void App::Run() {
-  run_loop_.Run();
-}
-
-void App::Quit() {
-  run_loop_.Quit();
-}
-
-void App::PostTask(const base::Closure& task) {
-  message_loop_.task_runner()->PostNonNestableTask(FROM_HERE, task);
-}
-
-void App::PostDelayedTask(int ms, const base::Closure& task) {
-  message_loop_.task_runner()->PostNonNestableDelayedTask(
-      FROM_HERE, task, base::TimeDelta::FromMilliseconds(ms));
 }
 
 }  // namespace nu
