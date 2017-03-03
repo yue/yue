@@ -2,21 +2,10 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/container.h"
+#include "nativeui/mac/container_mac.h"
 
 #include "base/logging.h"
 #include "nativeui/gfx/mac/painter_mac.h"
-#include "nativeui/mac/view_mac.h"
-
-@interface NUContainer : NSView<BaseView> {
- @private
-  nu::Container* shell_;
-  nu::Color background_color_;
-}
-- (id)initWithShell:(nu::Container*)shell;
-- (nu::View*)shell;
-- (void)setNUBackgroundColor:(nu::Color)color;
-@end
 
 @implementation NUContainer
 
@@ -34,7 +23,6 @@
 }
 
 - (void)setNUBackgroundColor:(nu::Color)color {
-  background_color_ = color;
   [self setNeedsDisplay:YES];
 }
 
@@ -42,7 +30,7 @@
   DCHECK_EQ(static_cast<int>([[self subviews] count]), shell_->child_count())
       << "Subviews do not match children views";
 
-  shell_->BoundsChanged();
+  static_cast<nu::Container*>([self shell])->BoundsChanged();
 }
 
 - (BOOL)isFlipped {
@@ -54,11 +42,12 @@
 }
 
 - (void)drawRect:(NSRect)dirtyRect {
+  nu::Container* shell = static_cast<nu::Container*>([self shell]);
   nu::RectF dirty(dirtyRect);
   nu::PainterMac painter;
-  painter.SetColor(background_color_);
+  painter.SetColor(shell->GetBackgroundColor());
   painter.FillRect(dirty);
-  shell_->on_draw.Emit(shell_, &painter, dirty);
+  shell->on_draw.Emit(shell_, &painter, dirty);
 }
 
 @end

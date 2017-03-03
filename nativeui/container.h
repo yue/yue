@@ -53,6 +53,9 @@ class NATIVEUI_EXPORT Container : public View {
  protected:
   ~Container() override;
 
+  // Empty constructor used by subclasses.
+  explicit Container(const char* an_empty_constructor);
+
   void SetChildBoundsFromCSS();
 
   void PlatformInit();

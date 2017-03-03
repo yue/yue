@@ -48,7 +48,7 @@ bool View::IsVisible() const {
   return view()->is_visible();
 }
 
-void View::SetBackgroundColor(Color color) {
+void View::PlatformSetBackgroundColor(Color color) {
   view()->SetBackgroundColor(color);
 }
 

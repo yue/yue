@@ -379,6 +379,23 @@ struct Type<nu::Container> {
   }
 };
 
+#if defined(OS_MACOSX)
+template<>
+struct Type<nu::Vibrant> {
+  using base = nu::Container;
+  static constexpr const char* name = "yue.Vibrant";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index, "new", &MetaTable<nu::Vibrant>::NewInstance<>);
+  }
+  static int Index(State* state) {
+    return Type<base>::Index(state);
+  }
+  static int NewIndex(State* state) {
+    return Type<base>::NewIndex(state);
+  }
+};
+#endif
+
 template<>
 struct Type<nu::Scroll::Policy> {
   static constexpr const char* name = "yue.Scroll.Policy";
@@ -722,6 +739,9 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   SetTable<nu::MenuBar>(state, "MenuBar");
   SetTable<nu::Menu>(state, "Menu");
   SetTable<nu::MenuItem>(state, "MenuItem");
+#if defined(OS_MACOSX)
+  SetTable<nu::Vibrant>(state, "Vibrant");
+#endif
 
   // Create APIs that only available as instances.
   lua::Push(state, "app");

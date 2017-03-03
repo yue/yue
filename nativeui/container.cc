@@ -141,6 +141,9 @@ Container::Container() {
   PlatformInit();
 }
 
+Container::Container(const char* an_empty_constructor) {
+}
+
 Container::~Container() {
   PlatformDestroy();
 }

@@ -22,4 +22,8 @@
 #include "nativeui/state.h"
 #include "nativeui/window.h"
 
+#if defined(OS_MACOSX)
+#include "nativeui/vibrant.h"
+#endif
+
 #endif  // NATIVEUI_NATIVEUI_H_

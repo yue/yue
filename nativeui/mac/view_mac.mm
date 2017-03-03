@@ -49,7 +49,7 @@ bool View::IsVisible() const {
   return ![view_ isHidden];
 }
 
-void View::SetBackgroundColor(Color color) {
+void View::PlatformSetBackgroundColor(Color color) {
   if ([view() respondsToSelector:@selector(setNUBackgroundColor:)])
     [view() setNUBackgroundColor:color];
 }
