@@ -15,10 +15,6 @@ int main(int argc, const char *argv[]) {
   base::AtExitManager exit_manager;
   base::CommandLine::Init(argc, argv);
 
-  // Initialize nativeui library.
-  nu::Lifetime ui_lifetime;
-  nu::State ui_state;
-
   auto* cmd = base::CommandLine::ForCurrentProcess();
   if (cmd->GetArgs().size() != 1) {
     fprintf(stderr, "Usage: yue <path-to-script>\n");
@@ -31,6 +27,11 @@ int main(int argc, const char *argv[]) {
     return 1;
   }
 
+  // Initialize nativeui library.
+  nu::Lifetime ui_lifetime;
+  nu::State ui_state;
+
+  // Load builtin libraries in lua environment.
   luaL_openlibs(state);
   yue::InsertBuiltinModuleLoader(state);
 
