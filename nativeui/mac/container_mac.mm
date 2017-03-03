@@ -27,10 +27,11 @@
 }
 
 - (void)adjustSubviews {
-  DCHECK_EQ(static_cast<int>([[self subviews] count]), shell_->child_count())
+  nu::Container* shell = static_cast<nu::Container*>([self shell]);
+  DCHECK_EQ(static_cast<int>([[self subviews] count]), shell->child_count())
       << "Subviews do not match children views";
 
-  static_cast<nu::Container*>([self shell])->BoundsChanged();
+  shell->BoundsChanged();
 }
 
 - (BOOL)isFlipped {
