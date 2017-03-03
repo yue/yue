@@ -30,11 +30,11 @@ TEST_F(ButtonTest, SetBounds) {
 
 TEST_F(ButtonTest, UpdateStyle) {
   scoped_refptr<nu::Button> button = new nu::Button("title");
-  float width = YGNodeStyleGetMinWidth(button->node());
-  float height = YGNodeStyleGetMinHeight(button->node());
+  YGValue width = YGNodeStyleGetMinWidth(button->node());
+  YGValue height = YGNodeStyleGetMinHeight(button->node());
   button->SetTitle("a long long title");
-  EXPECT_LT(width, YGNodeStyleGetMinWidth(button->node()));
-  EXPECT_EQ(height, YGNodeStyleGetMinHeight(button->node()));
+  EXPECT_LT(width.value, YGNodeStyleGetMinWidth(button->node()).value);
+  EXPECT_EQ(height.value, YGNodeStyleGetMinHeight(button->node()).value);
 }
 
 TEST_F(ButtonTest, CheckBox) {

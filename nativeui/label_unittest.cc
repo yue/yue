@@ -23,9 +23,9 @@ TEST_F(LabelTest, SetText) {
 
 TEST_F(LabelTest, UpdateStyle) {
   label_->SetText("test");
-  float width = YGNodeStyleGetMinWidth(label_->node());
-  float height = YGNodeStyleGetMinHeight(label_->node());
+  YGValue width = YGNodeStyleGetMinWidth(label_->node());
+  YGValue height = YGNodeStyleGetMinHeight(label_->node());
   label_->SetText("longlongtest");
-  EXPECT_LT(width, YGNodeStyleGetMinWidth(label_->node()));
-  EXPECT_EQ(height, YGNodeStyleGetMinHeight(label_->node()));
+  EXPECT_LT(width.value, YGNodeStyleGetMinWidth(label_->node()).value);
+  EXPECT_EQ(height.value, YGNodeStyleGetMinHeight(label_->node()).value);
 }

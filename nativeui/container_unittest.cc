@@ -118,9 +118,9 @@ TEST_F(ContainerTest, MoveBetweenContainers) {
   c2->SetStyle("align-content", "stretch");
   container_->AddChildView(c2);
 
-  scoped_refptr<nu::Label> v1 = new nu::Label("v1");
+  scoped_refptr<nu::Container> v1 = new nu::Container;
   v1->SetStyle("flex", "1");
-  scoped_refptr<nu::Label> v2 = new nu::Label("v2");
+  scoped_refptr<nu::Container> v2 = new nu::Container;
   v2->SetStyle("flex", "1");
   c1->AddChildView(v1.get());
   c1->AddChildView(v2.get());
