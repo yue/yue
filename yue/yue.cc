@@ -21,26 +21,33 @@ int main(int argc, const char *argv[]) {
     return 1;
   }
 
+  // Create lua environment.
   lua::ManagedState state;
   if (!state) {
     fprintf(stderr, "Unable to create lua state\n");
     return 1;
   }
 
-  // Initialize nativeui library.
-  nu::Lifetime ui_lifetime;
-  nu::State ui_state;
+  // Initialize nativeui library and leak it.
+  // Doing cleanup job on exit have troubles for us, because nativeui may store
+  // lua objects, and lua may store nativeui objects. So either freeing lua or
+  // nativeui will make the other one crash.
+  new nu::Lifetime;
+  new nu::State;
 
   // Load builtin libraries in lua environment.
   luaL_openlibs(state);
   yue::InsertBuiltinModuleLoader(state);
 
+  // Lua only accepts UTF-8 strings.
+  // FIXME(zcbenz): Write our own luaL_loadfile.
 #if defined(OS_WIN)
   std::string filename = base::UTF16ToUTF8(cmd->GetArgs()[0]);
 #else
   std::string filename = cmd->GetArgs()[0];
 #endif
 
+  // Load the main script.
   if (luaL_loadfile(state, filename.c_str()) != LUA_OK ||
       !lua::PCall(state, nullptr)) {
     std::string error;
