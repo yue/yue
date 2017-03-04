@@ -2,7 +2,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/gfx/mac/image_mac.h"
+#include "nativeui/gfx/image.h"
 
 #import <Cocoa/Cocoa.h>
 
@@ -10,25 +10,21 @@
 
 namespace nu {
 
-ImageMac::ImageMac(const std::string& path)
+Image::Image(const std::string& path)
     : image_([[NSImage alloc]
                  initWithContentsOfFile:base::SysUTF8ToNSString(path)]) {
 }
 
-ImageMac::~ImageMac() {
+Image::~Image() {
+  [image_ release];
 }
 
-Size ImageMac::GetSize() const {
+Size Image::GetSize() const {
   return Size([image_ size]);
 }
 
-NativeImage ImageMac::GetNative() const {
-  return image_.get();
-}
-
-// static
-Image* Image::CreateFromFile(const String& path) {
-  return new ImageMac(path);
+NativeImage Image::GetNative() const {
+  return image_;
 }
 
 }  // namespace nu

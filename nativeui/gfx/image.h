@@ -14,19 +14,21 @@ namespace nu {
 class NATIVEUI_EXPORT Image : public base::RefCounted<Image> {
  public:
   // Creates an image by reading from |path|.
-  static Image* CreateFromFile(const String& path);
+  explicit Image(const String& path);
 
   // Gets the size of image.
-  virtual Size GetSize() const = 0;
+  Size GetSize() const;
 
   // Returns the native instance of image object.
-  virtual NativeImage GetNative() const = 0;
+  NativeImage GetNative() const;
 
  protected:
-  virtual ~Image() = default;
+  virtual ~Image();
 
  private:
   friend class base::RefCounted<Image>;
+
+  NativeImage image_;
 };
 
 }  // namespace nu

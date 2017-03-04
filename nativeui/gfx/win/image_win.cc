@@ -2,28 +2,27 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/gfx/win/image_win.h"
+#include "nativeui/gfx/image.h"
+
+#include "nativeui/gfx/win/gdiplus.h"
 
 namespace nu {
 
-ImageWin::ImageWin(const base::string16& path) : image_(path.c_str()) {
+Image::Image(const base::string16& path)
+    : image_(new Gdiplus::Image(path.c_str())) {
 }
 
-ImageWin::~ImageWin() {
+Image::~Image() {
+  delete image_;
 }
 
-Size ImageWin::GetSize() const {
-  ImageWin* self = const_cast<ImageWin*>(this);
-  return Size(self->image_.GetWidth(), self->image_.GetHeight());
+Size Image::GetSize() const {
+  Gdiplus::Image* image = const_cast<Gdiplus::Image*>(image_);
+  return Size(image->GetWidth(), image->GetHeight());
 }
 
-NativeImage ImageWin::GetNative() const {
-  return const_cast<NativeImage>(&image_);
-}
-
-// static
-Image* Image::CreateFromFile(const String& path) {
-  return new ImageWin(path);
+NativeImage Image::GetNative() const {
+  return image_;
 }
 
 }  // namespace nu

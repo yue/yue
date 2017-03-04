@@ -12,6 +12,7 @@ require('./common')
 
 // Do not lint following files.
 const blacklist = [
+  path.join('nativeui', 'mac', 'container_mac.h'),
   path.join('nativeui', 'mac', 'nu_application_delegate.h'),
   path.join('nativeui', 'win', 'util', 'msg_util.h'),
 ]
