@@ -7,6 +7,7 @@
 
 class GroupTest : public testing::Test {
  protected:
+  nu::Lifetime lifetime_;
   nu::State state_;
 };
 

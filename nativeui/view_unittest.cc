@@ -11,6 +11,7 @@ class ViewTest : public testing::Test {
     view_ = new nu::Label("some text");
   }
 
+  nu::Lifetime lifetime_;
   nu::State state_;
   scoped_refptr<nu::View> view_;
 };

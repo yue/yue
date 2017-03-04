@@ -11,6 +11,7 @@ class ButtonTest : public testing::Test {
   void SetUp() override {
   }
 
+  nu::Lifetime lifetime_;
   nu::State state_;
 };
 

@@ -27,6 +27,7 @@ Lifetime::Lifetime() : message_loop_(base::MessageLoop::TYPE_UI),
 }
 
 Lifetime::~Lifetime() {
+  g_lifetime = nullptr;
   PlatformDestroy();
 }
 

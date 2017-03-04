@@ -30,6 +30,7 @@ class ContainerTest : public testing::Test {
     window_->SetContentView(container_.get());
   }
 
+  nu::Lifetime lifetime_;
   nu::State state_;
   scoped_refptr<nu::Window> window_;
   scoped_refptr<TestContainer> container_;

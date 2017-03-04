@@ -11,6 +11,7 @@ class MenuTest : public testing::Test {
     menu_ = new nu::Menu;
   }
 
+  nu::Lifetime lifetime_;
   nu::State state_;
   scoped_refptr<nu::Menu> menu_;
 };

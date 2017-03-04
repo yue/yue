@@ -12,6 +12,7 @@ class LabelTest : public testing::Test {
     label_ = new nu::Label;
   }
 
+  nu::Lifetime lifetime_;
   nu::State state_;
   scoped_refptr<nu::Label> label_;
 };

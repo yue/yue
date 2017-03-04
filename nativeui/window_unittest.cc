@@ -12,6 +12,7 @@ class WindowTest : public testing::Test {
     window_ = new nu::Window(nu::Window::Options());
   }
 
+  nu::Lifetime lifetime_;
   nu::State state_;
   scoped_refptr<nu::Window> window_;
 };
