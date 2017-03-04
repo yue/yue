@@ -29,6 +29,8 @@ TEST_F(ButtonTest, SetBounds) {
   EXPECT_EQ(button->GetBounds(), bounds);
 }
 
+// FIXME: Enable this test after we have View::GetStyle.
+#if 0
 TEST_F(ButtonTest, UpdateStyle) {
   scoped_refptr<nu::Button> button = new nu::Button("title");
   YGValue width = YGNodeStyleGetMinWidth(button->node());
@@ -37,6 +39,7 @@ TEST_F(ButtonTest, UpdateStyle) {
   EXPECT_LT(width.value, YGNodeStyleGetMinWidth(button->node()).value);
   EXPECT_EQ(height.value, YGNodeStyleGetMinHeight(button->node()).value);
 }
+#endif
 
 TEST_F(ButtonTest, CheckBox) {
   scoped_refptr<nu::Button> button =

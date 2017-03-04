@@ -2,7 +2,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/gfx/win/font_win.h"
+#include "nativeui/gfx/font.h"
 
 #include <algorithm>
 
@@ -10,6 +10,7 @@
 #include "base/win/scoped_gdi_object.h"
 #include "base/win/scoped_hdc.h"
 #include "base/win/scoped_select_object.h"
+#include "nativeui/gfx/win/gdiplus.h"
 #include "nativeui/gfx/win/scoped_set_map_mode.h"
 
 namespace nu {
@@ -34,19 +35,21 @@ Font::Font() {
                             Gdiplus::FontStyleRegular, Gdiplus::UnitPixel);
 }
 
-Font::Font(const base::string16& font_name, int font_size)
-    : font_(new Gdiplus::Font(font_name.c_str(), font_size,
-                              Gdiplus::FontStyleRegular, Gdiplus::UnitPixel) {
+Font::Font(const std::string& font_name, int font_size)
+    : font_(new Gdiplus::Font(base::UTF8ToUTF16(font_name).c_str(),
+                              font_size,
+                              Gdiplus::FontStyleRegular,
+                              Gdiplus::UnitPixel)) {
 }
 
 Font::~Font() {
 }
 
 std::string Font::GetName() const {
-  FontFamily family;
+  Gdiplus::FontFamily family;
   font_->GetFamily(&family);
   WCHAR buffer[LF_FACESIZE] = {0};
-  font_family_.GetFamilyName(buffer);
+  family.GetFamilyName(buffer);
   return base::UTF16ToUTF8(buffer);
 }
 
@@ -56,10 +59,6 @@ int Font::GetSize() const {
 
 NativeFont Font::GetNative() const {
   return font_;
-}
-
-// static
-Font* Font::CreateDefault() {
 }
 
 }  // namespace nu
