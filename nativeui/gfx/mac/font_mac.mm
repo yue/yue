@@ -2,7 +2,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/gfx/mac/font_mac.h"
+#include "nativeui/gfx/font.h"
 
 #include <Cocoa/Cocoa.h>
 
@@ -41,37 +41,27 @@ NSFont* NSFontWithSpec(const std::string& font_name, int font_size) {
 
 }  // namespace
 
-FontMac::FontMac()
+Font::Font()
     : font_([[NSFont systemFontOfSize:[NSFont systemFontSize]] retain]) {
 }
 
-FontMac::FontMac(const std::string& font_name, int font_size)
+Font::Font(const std::string& font_name, int font_size)
     : font_([NSFontWithSpec(font_name, font_size) retain]) {}
 
-FontMac::~FontMac() {
+Font::~Font() {
+  [font_ release];
 }
 
-std::string FontMac::GetName() const {
+std::string Font::GetName() const {
   return base::SysNSStringToUTF8([font_ familyName]);
 }
 
-int FontMac::GetSize() const {
+int Font::GetSize() const {
   return [font_ pointSize];
 }
 
-NativeFont FontMac::GetNative() const {
-  return font_.get();
-}
-
-// static
-Font* Font::CreateDefault() {
-  return new FontMac;
-}
-
-// static
-Font* Font::CreateFromNameAndSize(const std::string& font_name,
-                                                  int font_size) {
-  return new FontMac(font_name, font_size);
+NativeFont Font::GetNative() const {
+  return font_;
 }
 
 }  // namespace nu

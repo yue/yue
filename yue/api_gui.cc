@@ -457,7 +457,8 @@ struct Type<nu::Window> {
   static constexpr const char* name = "yue.Window";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
-           "new", &MetaTable<nu::Window>::NewInstance<nu::Window::Options>,
+           "new",
+           &MetaTable<nu::Window>::NewInstance<const nu::Window::Options&>,
            "close", &nu::Window::Close,
            "setcontentbounds", &nu::Window::SetContentBounds,
            "getcontentbounds", &nu::Window::GetContentBounds,
@@ -494,13 +495,10 @@ struct Type<nu::Font> {
   static constexpr const char* name = "yue.Font";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
-           "new", &New,
+           "new", &MetaTable<nu::Font>::NewInstance<const std::string&, int>,
            "default", &GetDefault,
            "getname", &nu::Font::GetName,
            "getsize", &nu::Font::GetSize);
-  }
-  static nu::Font* New(const std::string& font_name, int font_size) {
-    return nu::Font::CreateFromNameAndSize(font_name, font_size);
   }
   static nu::Font* GetDefault() {
     return nu::State::current()->GetDefaultFont();
@@ -512,7 +510,7 @@ struct Type<nu::Image> {
   static constexpr const char* name = "yue.Image";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
-           "newfromfile", &MetaTable<nu::Image>::NewInstance<nu::String>,
+           "newfromfile", &MetaTable<nu::Image>::NewInstance<const nu::String&>,
            "getsize", &nu::Image::GetSize);
   }
 };

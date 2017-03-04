@@ -16,29 +16,27 @@ namespace nu {
 class NATIVEUI_EXPORT Font : public base::RefCounted<Font> {
  public:
   // Creates an appropriate Font implementation.
-  static Font* CreateDefault();
+  Font();
   // Creates a Font implementation with the specified |font_name|
   // (encoded in UTF-8) and |font_size| in pixels.
-  static Font* CreateFromNameAndSize(const std::string& font_name,
-                                     int font_size);
+  Font(const std::string& font_name, int font_size);
 
   // Returns the specified font name in UTF-8.
-  virtual std::string GetName() const = 0;
+  std::string GetName() const;
 
   // Returns the font size in pixels.
-  virtual int GetSize() const = 0;
+  int GetSize() const;
 
   // Returns the native font handle.
-  virtual NativeFont GetNative() const = 0;
+  NativeFont GetNative() const;
 
  protected:
-  Font() {}
-  virtual ~Font() {}
+  virtual ~Font();
 
  private:
   friend class base::RefCounted<Font>;
 
-  DISALLOW_COPY_AND_ASSIGN(Font);
+  NativeFont font_;
 };
 
 }  // namespace nu

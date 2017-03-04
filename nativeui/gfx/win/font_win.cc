@@ -14,32 +14,8 @@
 
 namespace nu {
 
-FontWin::FontWin(const base::string16& font_name,
-                                 int font_size)
-    : font_family_(font_name.c_str()),
-      font_(&font_family_, font_size,
-            Gdiplus::FontStyleRegular, Gdiplus::UnitPixel) {
-}
-
-FontWin::~FontWin() {
-}
-
-std::string FontWin::GetName() const {
-  WCHAR buffer[LF_FACESIZE] = {0};
-  font_family_.GetFamilyName(buffer);
-  return base::UTF16ToUTF8(buffer);
-}
-
-int FontWin::GetSize() const {
-  return font_.GetSize();
-}
-
-NativeFont FontWin::GetNative() const {
-  return const_cast<NativeFont>(&font_);
-}
-
-// static
-Font* Font::CreateDefault() {
+Font::Font() {
+  // Receive default font family and size.
   NONCLIENTMETRICS metrics = {0};
   metrics.cbSize = sizeof(metrics);
   SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, sizeof(metrics), &metrics, 0);
@@ -52,13 +28,38 @@ Font* Font::CreateDefault() {
   ::GetTextMetrics(screen_dc, &font_metrics);
   int font_size =
       std::max<int>(1, font_metrics.tmHeight - font_metrics.tmInternalLeading);
-  return new FontWin(metrics.lfMessageFont.lfFaceName, font_size);
+
+  // Create default font.
+  font_ = new Gdiplus::Font(metrics.lfMessageFont.lfFaceName, font_size,
+                            Gdiplus::FontStyleRegular, Gdiplus::UnitPixel);
+}
+
+Font::Font(const base::string16& font_name, int font_size)
+    : font_(new Gdiplus::Font(font_name.c_str(), font_size,
+                              Gdiplus::FontStyleRegular, Gdiplus::UnitPixel) {
+}
+
+Font::~Font() {
+}
+
+std::string Font::GetName() const {
+  FontFamily family;
+  font_->GetFamily(&family);
+  WCHAR buffer[LF_FACESIZE] = {0};
+  font_family_.GetFamilyName(buffer);
+  return base::UTF16ToUTF8(buffer);
+}
+
+int Font::GetSize() const {
+  return font_->GetSize();
+}
+
+NativeFont Font::GetNative() const {
+  return font_;
 }
 
 // static
-Font* Font::CreateFromNameAndSize(const std::string& font_name,
-                                                  int font_size) {
-  return new FontWin(base::UTF8ToUTF16(font_name), font_size);
+Font* Font::CreateDefault() {
 }
 
 }  // namespace nu

@@ -52,7 +52,7 @@ State* State::current() {
 
 Font* State::GetDefaultFont() {
   if (!default_font_)
-    default_font_ = Font::CreateDefault();
+    default_font_ = new Font;
   return default_font_.get();
 }
 
