@@ -14,8 +14,10 @@
 
 #if defined(OS_WIN)
 #include <windows.h>
-#elif defined(OS_LINUX)
-#include <gdk/gdk.h>
+#endif
+
+#if defined(OS_LINUX)
+typedef struct _GdkRGBA GdkRGBA;
 #endif
 
 #if defined(OS_MACOSX)

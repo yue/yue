@@ -4,6 +4,8 @@
 
 #include "nativeui/gfx/color.h"
 
+#include <gdk/gdk.h>
+
 namespace nu {
 
 GdkRGBA Color::ToGdkRGBA() const {

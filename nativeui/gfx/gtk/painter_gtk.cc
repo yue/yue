@@ -7,6 +7,8 @@
 
 #include "nativeui/gfx/gtk/painter_gtk.h"
 
+#include <gtk/gtk.h>
+
 #include "nativeui/label.h"
 
 namespace nu {

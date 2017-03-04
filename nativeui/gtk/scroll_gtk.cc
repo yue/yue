@@ -4,6 +4,8 @@
 
 #include "nativeui/scroll.h"
 
+#include <gtk/gtk.h>
+
 namespace nu {
 
 namespace {

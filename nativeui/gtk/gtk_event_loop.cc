@@ -5,6 +5,7 @@
 #include "nativeui/gtk/gtk_event_loop.h"
 
 #include <gdk/gdk.h>
+#include <gtk/gtk.h>
 
 namespace nu {
 

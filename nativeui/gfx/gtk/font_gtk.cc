@@ -4,6 +4,8 @@
 
 #include "nativeui/gfx/font.h"
 
+#include <gtk/gtk.h>
+
 #include "nativeui/label.h"
 
 namespace nu {

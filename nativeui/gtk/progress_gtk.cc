@@ -4,6 +4,8 @@
 
 #include "nativeui/progress.h"
 
+#include <gtk/gtk.h>
+
 #include "base/timer/timer.h"
 #include "nativeui/gtk/widget_util.h"
 

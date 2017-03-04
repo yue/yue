@@ -4,6 +4,8 @@
 
 #include "nativeui/view.h"
 
+#include <gtk/gtk.h>
+
 #include "nativeui/container.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
 

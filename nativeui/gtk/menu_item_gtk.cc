@@ -4,6 +4,8 @@
 
 #include "nativeui/menu_item.h"
 
+#include <gtk/gtk.h>
+
 #include "nativeui/menu.h"
 
 namespace nu {

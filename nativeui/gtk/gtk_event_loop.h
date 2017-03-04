@@ -8,6 +8,8 @@
 #include "base/macros.h"
 #include "nativeui/types.h"
 
+typedef union _GdkEvent GdkEvent;
+
 namespace nu {
 
 // The message loop of base only iterates through glib events, this class
@@ -18,7 +20,7 @@ class GtkEventLoop {
   ~GtkEventLoop();
 
  private:
-  static void DispatchGdkEvent(GdkEvent* gdk_event, gpointer);
+  static void DispatchGdkEvent(GdkEvent* gdk_event, void*);
 
   DISALLOW_COPY_AND_ASSIGN(GtkEventLoop);
 };

@@ -4,6 +4,8 @@
 
 #include "nativeui/gtk/widget_util.h"
 
+#include <gtk/gtk.h>
+
 namespace nu {
 
 Size GetPreferredSizeForWidget(GtkWidget* widget) {

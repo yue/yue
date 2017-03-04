@@ -4,6 +4,8 @@
 
 #include "nativeui/container.h"
 
+#include <gtk/gtk.h>
+
 #include "nativeui/gtk/container_container.h"
 
 namespace nu {

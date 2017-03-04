@@ -4,6 +4,8 @@
 
 #include "nativeui/label.h"
 
+#include <gtk/gtk.h>
+
 #include "nativeui/gtk/widget_util.h"
 
 namespace nu {

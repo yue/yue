@@ -7,14 +7,19 @@
 
 #include "build/build_config.h"
 
-#if defined(OS_LINUX)
-#include <gtk/gtk.h>  // NOLINT
-#endif
-
 #if defined(OS_WIN)
 #include "base/strings/string16.h"
 #else
 #include <string>
+#endif
+
+#if defined(OS_LINUX)
+typedef struct _GdkPixbuf GdkPixbuf;
+typedef struct _GtkMenuItem GtkMenuItem;
+typedef struct _GtkMenuShell GtkMenuShell;
+typedef struct _GtkWidget GtkWidget;
+typedef struct _GtkWindow GtkWindow;
+typedef struct _PangoFontDescription PangoFontDescription;
 #endif
 
 #if defined(OS_MACOSX)

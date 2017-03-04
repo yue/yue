@@ -4,6 +4,8 @@
 
 #include "nativeui/menu_bar.h"
 
+#include <gtk/gtk.h>
+
 namespace nu {
 
 NativeMenu MenuBar::PlatformCreate() const {

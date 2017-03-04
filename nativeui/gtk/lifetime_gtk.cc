@@ -4,6 +4,8 @@
 
 #include "nativeui/lifetime.h"
 
+#include <gtk/gtk.h>
+
 namespace nu {
 
 void Lifetime::PlatformInit() {

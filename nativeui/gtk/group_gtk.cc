@@ -4,6 +4,8 @@
 
 #include "nativeui/group.h"
 
+#include <gtk/gtk.h>
+
 namespace nu {
 
 void Group::PlatformInit() {

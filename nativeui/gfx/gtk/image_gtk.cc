@@ -4,6 +4,8 @@
 
 #include "nativeui/gfx/image.h"
 
+#include <gtk/gtk.h>
+
 namespace nu {
 
 Image::Image(const std::string& path)
