@@ -9,7 +9,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@protocol BaseView
+@protocol NUView
 - (nu::View*)shell;
 - (void)setNUBackgroundColor:(nu::Color)color;
 @end

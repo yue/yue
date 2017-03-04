@@ -9,7 +9,7 @@
 #include "base/mac/sdk_forward_declarations.h"
 #include "nativeui/mac/container_mac.h"
 
-@interface NUVibrant : NSVisualEffectView<BaseView> {
+@interface NUVibrant : NSVisualEffectView<NUView> {
  @private
   nu::Vibrant* shell_;
 }

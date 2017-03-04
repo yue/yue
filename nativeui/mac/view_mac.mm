@@ -9,7 +9,7 @@
 #include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/gfx/mac/painter_mac.h"
 
-@interface NSView (BaseViewMethods) <BaseView>
+@interface NSView (NUViewMethods) <NUView>
 @end
 
 namespace nu {

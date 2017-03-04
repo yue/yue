@@ -28,7 +28,7 @@ nu::InsetsF GetButtonInsets(NSButton* button) {
 
 }  // namespace
 
-@interface NUButton : NSButton<BaseView> {
+@interface NUButton : NSButton<NUView> {
  @private
   nu::Button* shell_;
 }

@@ -11,7 +11,7 @@
 #include "nativeui/mac/view_mac.h"
 #include "nativeui/state.h"
 
-@interface NULabel : NSView<BaseView> {
+@interface NULabel : NSView<NUView> {
  @private
   nu::Label* shell_;
   std::string text_;

@@ -8,7 +8,7 @@
 #include "nativeui/container.h"
 #include "nativeui/mac/view_mac.h"
 
-@interface NUContainer : NSView<BaseView> {
+@interface NUContainer : NSView<NUView> {
  @private
   nu::Container* shell_;
 }
