@@ -1,0 +1,33 @@
+declare_args() {
+  # The version of Node that should build against to.
+  node_version = "v6.6.0"
+}
+
+loadable_module("node_yue") {
+  output_name = "yue.node"
+
+  deps = [
+    "//nativeui",
+  ]
+
+  sources = [
+    "test.cc",
+  ]
+
+  defines = [
+    "USING_UV_SHARED=1",
+    "USING_V8_SHARED=1",
+    "BUILDING_NODE_EXTENSION",
+  ]
+
+  include_dirs = [
+    "//third_party/node-" + node_version + "/include/node"
+  ]
+
+  if (is_mac) {
+    ldflags = [
+      "-undefined",
+      "dynamic_lookup",
+    ]
+  }
+}

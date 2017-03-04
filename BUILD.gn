@@ -4,6 +4,12 @@
 
 group("default") {
   deps = [
-    "//yue:yue",
+    "//yue",
+  ]
+}
+
+group("all") {
+  deps = [
+    "//node_yue",
   ]
 }
