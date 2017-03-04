@@ -16,11 +16,6 @@ class MenuTest : public testing::Test {
   scoped_refptr<nu::Menu> menu_;
 };
 
-TEST_F(MenuTest, Popup) {
-  menu_->Popup();
-  menu_ = nullptr;
-}
-
 TEST_F(MenuTest, ItemCount) {
   EXPECT_EQ(menu_->item_count(), 0);
   menu_->Append(new nu::MenuItem(nu::MenuItem::Label));
