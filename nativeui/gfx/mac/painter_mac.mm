@@ -77,9 +77,4 @@ void PainterMac::DrawTextWithFlags(
   [text drawInRect:frame withAttributes:attributes];
 }
 
-// static
-std::unique_ptr<Painter> Painter::CreateFromCurrent() {
-  return std::unique_ptr<Painter>(new PainterMac());
-}
-
 }  // namespace nu

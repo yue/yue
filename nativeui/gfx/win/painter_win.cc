@@ -121,9 +121,4 @@ void PainterWin::DrawPixelStringWithFlags(
                        &format, &brush);
 }
 
-// static
-std::unique_ptr<Painter> Painter::CreateFromHDC(HDC dc, float scale_factor) {
-  return std::unique_ptr<Painter>(new PainterWin(dc, scale_factor));
-}
-
 }  // namespace nu

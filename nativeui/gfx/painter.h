@@ -22,14 +22,6 @@ namespace nu {
 // The interface for painting on canvas or window.
 class NATIVEUI_EXPORT Painter {
  public:
-#if defined(OS_WIN)
-  // Create a painter from HDC.
-  static std::unique_ptr<Painter> CreateFromHDC(HDC dc, float scale_factor);
-#elif defined(OS_MACOSX)
-  // Create a painter from current context.
-  static std::unique_ptr<Painter> CreateFromCurrent();
-#endif
-
   virtual ~Painter();
 
   enum {
