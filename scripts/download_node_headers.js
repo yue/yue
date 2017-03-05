@@ -23,10 +23,6 @@ const prefix = {
   electron: 'https://gh-contractor-zcbenz.s3.amazonaws.com/atom-shell/dist',
   node: 'https://nodejs.org/dist',
 }
-const suffix = {
-  electron: '.tar.gz',
-  node: '-headers.tar.gz',
-}
 
 if (!(runtime in prefix)) {
   console.error(`Unkown runtime: ${runtime}`)
@@ -37,7 +33,7 @@ if (fs.existsSync(`third_party/node-${version}`)) {
   process.exit(0)
 }
 
-const url = `${prefix[runtime]}/${version}/node-${version}${suffix[runtime]}`
+const url = `${prefix[runtime]}/${version}/node-${version}.tar.gz`
 https.get(url, (response) => {
   response.pipe(zlib.createGunzip())
           .pipe(cp.exec('tar x', {cwd: 'third_party'}).stdin)

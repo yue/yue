@@ -2,34 +2,12 @@ loadable_module("node_yue") {
   output_name = "yue"
   output_extension = "node"
 
+  sources = [
+    "init.cc",
+  ]
+
   deps = [
     "//nativeui",
+    "//third_party/native_mate",
   ]
-
-  sources = [
-    "test.cc",
-  ]
-
-  defines = [
-    "USING_UV_SHARED=1",
-    "USING_V8_SHARED=1",
-    "BUILDING_NODE_EXTENSION",
-  ]
-
-  node_dir = "//third_party/node-" + getenv("NODE_VERSION")
-
-  include_dirs = [
-    node_dir + "/include/node",
-    node_dir + "/src",
-    node_dir + "/deps/uv/include",
-    node_dir + "/deps/v8/include",
-    node_dir + "/deps/chakrashim/include",
-  ]
-
-  if (is_mac) {
-    ldflags = [
-      "-undefined",
-      "dynamic_lookup",
-    ]
-  }
 }

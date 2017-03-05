@@ -1,0 +1,65 @@
+# Copyright 2017 Cheng Zhao. All rights reserved.
+# Use of this source code is governed by the license that can be found in the
+# LICENSE file.
+
+config("node_config") {
+  defines = [
+    "USING_UV_SHARED=1",
+    "USING_V8_SHARED=1",
+    "BUILDING_NODE_EXTENSION",
+  ]
+
+  assert(getenv("NODE_VERSION") != "", "Please run create_node_extension again")
+
+  node_dir = "//third_party/node-" + getenv("NODE_VERSION")
+
+  include_dirs = [
+    node_dir + "/include/node",
+    node_dir + "/src",
+    node_dir + "/deps",
+    node_dir + "/deps/uv/include",
+    node_dir + "/deps/v8/include",
+    node_dir + "/deps/chakrashim/include",
+  ]
+
+  if (is_mac) {
+    ldflags = [
+      "-undefined", "dynamic_lookup",
+    ]
+  }
+}
+
+config("native_mate_config") {
+  include_dirs = [ "." ]
+}
+
+source_set("native_mate") {
+  sources = [
+    "native_mate/arguments.cc",
+    "native_mate/arguments.h",
+    "native_mate/compat.h",
+    "native_mate/constructor.h",
+    "native_mate/converter.cc",
+    "native_mate/converter.h",
+    "native_mate/dictionary.cc",
+    "native_mate/dictionary.h",
+    "native_mate/function_template.cc",
+    "native_mate/function_template.h",
+    "native_mate/handle.h",
+    "native_mate/object_template_builder.cc",
+    "native_mate/object_template_builder.h",
+    "native_mate/persistent_dictionary.cc",
+    "native_mate/persistent_dictionary.h",
+    "native_mate/scoped_persistent.h",
+    "native_mate/try_catch.cc",
+    "native_mate/try_catch.h",
+    "native_mate/wrappable.cc",
+    "native_mate/wrappable.h",
+    "native_mate/wrappable_base.h",
+  ]
+
+  public_configs = [
+    ":node_config",
+    ":native_mate_config",
+  ]
+}

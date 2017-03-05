@@ -6,6 +6,14 @@
 
 const {argv, execSync} = require('./common')
 
-const dir = argv.length > 0 ? argv[0] : 'out/Debug'
+let dir = 'out/Debug'
+const args = argv.filter((arg) => {
+  if (arg.startsWith('out')) {
+    dir = arg
+    return false;
+  } else {
+    return true;
+  }
+})
 
-execSync(`ninja -C ${dir}`)
+execSync(`ninja -C ${dir} ${args.join(' ')}`)

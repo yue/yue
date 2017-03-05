@@ -1,4 +1,6 @@
-# Copyright 2016 Cheng Zhao. All rights reserved.
+# Copyright 2017 Cheng Zhao. All rights reserved.
+# Use of this source code is governed by the license that can be found in the
+# LICENSE file.
 
 declare_args() {
   # Enable 64-bit GC references.
