@@ -4,7 +4,8 @@ declare_args() {
 }
 
 loadable_module("node_yue") {
-  output_name = "yue.node"
+  output_name = "yue"
+  output_extension = "node"
 
   deps = [
     "//nativeui",
