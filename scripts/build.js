@@ -4,6 +4,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {ninja, runSync} = require('./common')
+const {execSync} = require('./common')
 
-process.exit(runSync(ninja, ['-C']).status)
+const dir = process.argv.length > 3 ? process.argv[2] : 'out/Debug'
+
+execSync(`ninja -C ${dir}`)
