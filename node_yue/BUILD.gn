@@ -8,6 +8,6 @@ loadable_module("node_yue") {
 
   deps = [
     "//nativeui",
-    "//third_party/native_mate",
+    "//v8binding",
   ]
 }

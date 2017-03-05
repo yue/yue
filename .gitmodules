@@ -41,6 +41,3 @@
 [submodule "third_party/ced/src"]
 	path = third_party/ced/src
 	url = https://github.com/google/compact_enc_det.git
-[submodule "third_party/native_mate"]
-	path = third_party/native_mate
-	url = https://github.com/electron/native-mate

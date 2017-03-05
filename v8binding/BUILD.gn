@@ -1,0 +1,47 @@
+# Copyright 2017 Cheng Zhao. All rights reserved.
+# Use of this source code is governed by the license that can be found in the
+# LICENSE file.
+
+config("node_config") {
+  defines = [
+    "USING_UV_SHARED=1",
+    "USING_V8_SHARED=1",
+    "BUILDING_NODE_EXTENSION",
+  ]
+
+  assert(getenv("NODE_VERSION") != "", "Please run create_node_extension again")
+
+  node_dir = "//third_party/node-" + getenv("NODE_VERSION")
+
+  include_dirs = [
+    node_dir + "/include/node",
+    node_dir + "/src",
+    node_dir + "/deps",
+    node_dir + "/deps/uv/include",
+    node_dir + "/deps/v8/include",
+    node_dir + "/deps/chakrashim/include",
+  ]
+
+  if (is_mac) {
+    ldflags = [
+      "-undefined", "dynamic_lookup",
+    ]
+  }
+}
+
+source_set("v8binding") {
+  sources = [
+    "dict.cc",
+    "dict.h",
+    "per_isolate_data.cc",
+    "per_isolate_data.h",
+    "prototype.cc",
+    "prototype.h",
+    "prototype_internal.h",
+    "types.h",
+    "v8binding.h",
+  ]
+
+  public_configs = [ ":node_config" ]
+}
+

@@ -17,7 +17,12 @@ const blacklist = [
   path.join('nativeui', 'win', 'util', 'msg_util.h'),
 ]
 
-const sourceFiles = listFiles(['yue', 'lua', 'nativeui', 'node_yue'])
+const sourceFiles = listFiles([
+  'yue',
+  'lua',
+  'nativeui',
+  'node_yue',
+  'v8binding'])
 .filter((name) => {
   return name.endsWith('.cc') || name.endsWith('.h')
 })
