@@ -9,26 +9,32 @@
 
 namespace vb {
 
-class Dict {
- public:
-  Dict(v8::Local<v8::Context> context, v8::Local<v8::Object> object);
-  ~Dict();
+// Helper for setting Object.
+template<typename Key, typename Value>
+inline bool Set(v8::Local<v8::Context> context, v8::Local<v8::Object> object,
+                const Key& key, const Value& value) {
+  auto result = object->Set(context, ToV8(context, key), ToV8(context, value));
+  return !result.IsNothing() && result.FromJust();
+}
 
-  template<typename T>
-  bool Set(const std::string& key, const T& value) {
-    v8::Local<v8::Value> v8_key, v8_value;
-    if (!ToV8(context_, value, &v8_value) || !ToV8(context_, key, &v8_key))
-      return false;
-    v8::Maybe<bool> result = object_->Set(context_, v8_key, v8_value);
-    return !result.IsNothing() && result.FromJust();
-  }
+// Helper for setting ObjectTemplate.
+template<typename Key, typename Value>
+inline bool Set(v8::Local<v8::Context> context,
+                v8::Local<v8::ObjectTemplate> templ,
+                const Key& key, const Value& value) {
+  templ->Set(ToV8(context, key).template As<v8::String>(),
+             ToV8Data(context, value));
+  return true;
+}
 
- private:
-  v8::Local<v8::Context> context_;
-  v8::Local<v8::Object> object_;
-
-  DISALLOW_COPY_AND_ASSIGN(Dict);
-};
+// Allow setting arbitrary key/value pairs.
+template<typename Dict, typename Key, typename Value, typename... ArgTypes>
+inline bool Set(v8::Local<v8::Context> context, Dict dict,
+                const Key& key, const Value& value,
+                const ArgTypes&... args) {
+  return Set(context, dict, key, value) &&
+         Set(context, dict, args...);
+}
 
 }  // namespace vb
 

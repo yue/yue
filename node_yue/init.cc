@@ -12,7 +12,10 @@ namespace vb {
 template<>
 struct Type<nu::Window> {
   static constexpr const char* name = "yue.Window";
-  static void BuildPrototype(v8::Isolate* isolate) {
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "close", &nu::Window::Close);
   }
 };
 
@@ -27,8 +30,8 @@ void Initialize(v8::Local<v8::Object> exports) {
   // Populate with GUI elements.
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::Local<v8::Context> context = isolate->GetCurrentContext();
-  vb::Dict(context, exports)
-      .Set("Window", vb::Prototype<nu::Window>::Get(context));
+  vb::Set(context, exports,
+          "Window", vb::Prototype<nu::Window>::Get(context));
 }
 
 }  // namespace node_yue

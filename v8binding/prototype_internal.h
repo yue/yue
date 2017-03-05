@@ -20,13 +20,26 @@ bool GetOrCreateFunctionTemplate(
     const char* name,
     v8::Local<v8::FunctionTemplate>* templ);
 
+// Get populated prototype for T.
+template<typename T>
+bool GetOrCreatePrototype(
+    v8::Local<v8::Context> context,
+    const char* name,
+    v8::Local<v8::FunctionTemplate>* templ) {
+  if (GetOrCreateFunctionTemplate(context->GetIsolate(), name, templ))
+    return true;
+  (*templ)->InstanceTemplate()->SetInternalFieldCount(1);
+  Type<T>::BuildPrototype(context, (*templ)->PrototypeTemplate());
+  return false;
+}
+
 // Create prototype inheritance chain for T and its BaseTypes.
 template<typename T, typename Enable = void>
 struct InheritanceChain {
   // There is no base type.
-  static inline v8::Local<v8::FunctionTemplate> Get(v8::Isolate* isolate) {
+  static v8::Local<v8::FunctionTemplate> Get(v8::Local<v8::Context> context) {
     v8::Local<v8::FunctionTemplate> templ;
-    GetOrCreateFunctionTemplate(isolate, Type<T>::name, &templ);
+    GetOrCreatePrototype<T>(context, Type<T>::name, &templ);
     return templ;
   }
 };
@@ -34,13 +47,13 @@ struct InheritanceChain {
 template<typename T>
 struct InheritanceChain<T, typename std::enable_if<std::is_class<
                                typename Type<T>::base>::value>::type> {
-  static inline v8::Local<v8::FunctionTemplate> Get(v8::Isolate* isolate) {
+  static v8::Local<v8::FunctionTemplate> Get(v8::Local<v8::Context> context) {
     v8::Local<v8::FunctionTemplate> templ;
-    if (GetOrCreateFunctionTemplate(isolate, Type<T>::name, &templ))
+    if (GetOrCreatePrototype<T>(context, Type<T>::name, &templ))
       return templ;
 
     // Inherit from base type's metatable.
-    auto parent = InheritanceChain<typename Type<T>::base>::Get(isolate);
+    auto parent = InheritanceChain<typename Type<T>::base>::Get(context);
     templ->Inherit(parent);
     return templ;
   }

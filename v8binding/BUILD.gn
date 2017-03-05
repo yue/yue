@@ -31,13 +31,18 @@ config("node_config") {
 
 source_set("v8binding") {
   sources = [
-    "dict.cc",
+    "arguments.cc",
+    "arguments.h",
+    "callback.cc",
+    "callback.h",
+    "callback_internal.h",
     "dict.h",
     "per_isolate_data.cc",
     "per_isolate_data.h",
     "prototype.cc",
     "prototype.h",
     "prototype_internal.h",
+    "template_util.h",
     "types.h",
     "v8binding.h",
   ]
