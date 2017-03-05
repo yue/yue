@@ -13,7 +13,7 @@ if (process.platform !== 'win32') {
 }
 if (process.platform === 'linux') {
   execSync('python build/linux/sysroot_scripts/install-sysroot.py')
-  spawnSync(process.execPath, ['scripts/update-gold.js'], { stdio: 'inherit' })
+  spawnSync(process.execPath, ['scripts/update_gold.js'], { stdio: 'inherit' })
 }
 
 execSync('git submodule sync --recursive')
