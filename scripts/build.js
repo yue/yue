@@ -4,8 +4,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {execSync} = require('./common')
+const {argv, execSync} = require('./common')
 
-const dir = process.argv.length > 3 ? process.argv[2] : 'out/Debug'
+const dir = argv.length > 0 ? argv[0] : 'out/Debug'
 
 execSync(`ninja -C ${dir}`)

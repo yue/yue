@@ -5,18 +5,19 @@
 // LICENSE file.
 
 const cp    = require('child_process')
+const fs    = require('fs')
 const https = require('https')
 const zlib  = require('zlib')
 
-require('./common')
+const {argv} = require('./common')
 
-if (process.argv.length != 4) {
-  console.error('Usage: download-node-headers node|electron VERSION')
+if (argv.length != 2) {
+  console.error('Usage: download_node_headers runtime version')
   process.exit(1)
 }
 
-const runtime = process.argv[2]
-const version = process.argv[3]
+const runtime = argv[0]
+const version = argv[1]
 
 const prefix = {
   electron: 'https://atom.io/download/electron',
@@ -26,6 +27,10 @@ const prefix = {
 if (!(runtime in prefix)) {
   console.error(`Unkown runtime: ${runtime}`)
   process.exit(2)
+}
+
+if (fs.existsSync(`third_party/node-${version}`)) {
+  process.exit(0)
 }
 
 const url = `${prefix[runtime]}/${version}/node-${version}-headers.tar.gz`

@@ -1,8 +1,3 @@
-declare_args() {
-  # The version of Node that should build against to.
-  node_version = "v6.6.0"
-}
-
 loadable_module("node_yue") {
   output_name = "yue"
   output_extension = "node"
@@ -20,6 +15,8 @@ loadable_module("node_yue") {
     "USING_V8_SHARED=1",
     "BUILDING_NODE_EXTENSION",
   ]
+
+  node_version = getenv("NODE_VERSION")
 
   include_dirs = [
     "//third_party/node-" + node_version + "/include/node"

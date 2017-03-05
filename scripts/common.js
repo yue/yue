@@ -17,7 +17,7 @@ process.env.PATH = `${binaries_dir}${path.delimiter}${process.env.PATH}`
 
 // Parse args.
 let verbose = false
-process.argv = process.argv.slice(2).filter((arg) => {
+const argv = process.argv.slice(2).filter((arg) => {
   if (arg === '-v' || arg === '--verbose') {
     verbose = true
     return false
@@ -26,8 +26,14 @@ process.argv = process.argv.slice(2).filter((arg) => {
   }
 })
 
-// Print command output by default.
-const execSyncWrapper = (command, options = { stdio: 'inherit' }) => {
+// Helper around execSync.
+const execSyncWrapper = (command, options = {}) => {
+  // Print command output by default.
+  if (!options.stdio)
+    options.stdio = 'inherit'
+  // Merge the custom env to global env.
+  if (options.env)
+    options.env = Object.assign(options.env, process.env)
   return execSync(command, options)
 }
 
@@ -40,4 +46,4 @@ if (!verbose) {
 }
 
 // Export public APIs.
-module.exports = { verbose, execSync: execSyncWrapper }
+module.exports = { verbose, argv, execSync: execSyncWrapper }
