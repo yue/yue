@@ -14,7 +14,15 @@ if (argv.length != 2) {
 const runtime = argv[0]
 const version = argv[1]
 
+const args = [
+  // Same with Release build.
+  'is_component_build=false',
+  'is_debug=false',
+  'is_official_build=true',
+  // Set node version.
+  `node_version="${version}"`,
+]
+
 execSync(`node ./scripts/download_node_headers.js ${runtime} ${version}`)
-execSync('gn gen out/Debug', {env: {NODE_VERSION: version}})
-execSync('gn gen out/Release', {env: {NODE_VERSION: version}})
-execSync('ninja -C out/Release node_yue')
+execSync(`gn gen out/Node '--args=${args.join(' ')}'`)
+execSync('ninja -C out/Node node_yue')

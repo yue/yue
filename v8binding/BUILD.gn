@@ -2,6 +2,11 @@
 # Use of this source code is governed by the license that can be found in the
 # LICENSE file.
 
+declare_args() {
+  # The version of Node to build against to.
+  node_version = "v7.7.1"
+}
+
 config("node_config") {
   defines = [
     "USING_UV_SHARED=1",
@@ -9,9 +14,7 @@ config("node_config") {
     "BUILDING_NODE_EXTENSION",
   ]
 
-  assert(getenv("NODE_VERSION") != "", "Please run create_node_extension again")
-
-  node_dir = "//third_party/node-" + getenv("NODE_VERSION")
+  node_dir = "//third_party/node-" + node_version
 
   include_dirs = [
     node_dir + "/include/node",

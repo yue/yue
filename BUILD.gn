@@ -8,10 +8,8 @@ group("default") {
   ]
 }
 
-if (getenv("NODE_VERSION") != "") {
-  group("all") {
-    deps = [
-      "//node_yue",
-    ]
-  }
+group("all") {
+  deps = [
+    "//node_yue",
+  ]
 }

@@ -1,6 +1,7 @@
 loadable_module("node_yue") {
   output_name = "yue"
   output_extension = "node"
+  output_prefix_override = true  # do not add "lib" prefix
 
   sources = [
     "init.cc",
