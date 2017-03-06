@@ -28,7 +28,7 @@ v8::Local<v8::FunctionTemplate> CreateFunctionTemplate(
 
   v8::Local<v8::FunctionTemplate> tmpl = v8::FunctionTemplate::New(
       isolate, &internal::Dispatcher<Sig>::DispatchToCallback,
-      ToV8<v8::Local<v8::External>>(context, holder->GetHandle(isolate)));
+      holder->GetHandle(isolate));
   tmpl->RemovePrototype();
   return tmpl;
 }

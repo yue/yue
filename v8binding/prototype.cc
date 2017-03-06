@@ -13,13 +13,38 @@ namespace internal {
 namespace {
 
 void DefaultConstructor(const v8::FunctionCallbackInfo<v8::Value>& info) {
-  const char* message = "The constructor of this class can not be used.";
-  v8::Isolate* isolate = info.GetIsolate();
-  isolate->ThrowException(v8::Exception::TypeError(
-      ToV8(isolate->GetCurrentContext(), message).As<v8::String>()));
+  if (info.Length() < 1 || !info[0]->IsExternal()) {
+    const char* message = "The constructor of this class can not be used.";
+    v8::Isolate* isolate = info.GetIsolate();
+    isolate->ThrowException(v8::Exception::TypeError(
+        ToV8(isolate->GetCurrentContext(), message).As<v8::String>()));
+  }
 }
 
 }  // namespace
+
+ObjectTracker::ObjectTracker(v8::Isolate* isolate, v8::Local<v8::Object> obj)
+    : v8_ref_(isolate, obj) {
+  v8_ref_.SetWeak(this, &ObjectTracker::FirstWeakCallback,
+                  v8::WeakCallbackType::kParameter);
+}
+
+ObjectTracker::~ObjectTracker() {
+  DCHECK(v8_ref_.IsEmpty());
+}
+
+// static
+void ObjectTracker::FirstWeakCallback(
+    const v8::WeakCallbackInfo<ObjectTracker>& data) {
+  data.GetParameter()->v8_ref_.Reset();
+  data.SetSecondPassCallback(SecondWeakCallback);
+}
+
+// static
+void ObjectTracker::SecondWeakCallback(
+    const v8::WeakCallbackInfo<ObjectTracker>& data) {
+  delete data.GetParameter();
+}
 
 bool GetOrCreateFunctionTemplate(
     v8::Isolate* isolate,

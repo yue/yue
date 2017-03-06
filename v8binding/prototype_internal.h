@@ -14,6 +14,40 @@ namespace vb {
 
 namespace internal {
 
+// Common base for tracking lifetime of v8::Object.
+class ObjectTracker {
+ public:
+  ObjectTracker(v8::Isolate* isolate, v8::Local<v8::Object> obj);
+  virtual ~ObjectTracker();
+
+ private:
+  static void FirstWeakCallback(
+      const v8::WeakCallbackInfo<ObjectTracker>& data);
+  static void SecondWeakCallback(
+      const v8::WeakCallbackInfo<ObjectTracker>& data);
+
+  v8::Global<v8::Object> v8_ref_;
+
+  DISALLOW_COPY_AND_ASSIGN(ObjectTracker);
+};
+
+// Tracks the lifetime of v8::Object that wraps RefPtr.
+template<typename T>
+class RefPtrObjectTracker : public ObjectTracker {
+ public:
+  RefPtrObjectTracker(v8::Isolate* isolate, v8::Local<v8::Object> obj, T* ptr)
+      : ObjectTracker(isolate, obj), ptr_(ptr) {
+    ptr_->AddRef();
+  }
+
+  ~RefPtrObjectTracker() override {
+    ptr_->Release();
+  }
+
+ private:
+  T* ptr_;
+};
+
 // Get or create FunctionTemplate, returns true if the |name| exists.
 bool GetOrCreateFunctionTemplate(
     v8::Isolate* isolate,

@@ -66,27 +66,18 @@ struct Type<v8::Local<v8::Value>> {
   }
 };
 
-template<>
-struct Type<v8::Local<v8::Function>> {
+template<typename T>
+struct Type<v8::Local<T>, typename std::enable_if<std::is_base_of<
+                              v8::Value, T>::value>::type> {
   static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
-                                          v8::Local<v8::Function> value) {
-    return value;
-  }
-};
-
-template<>
-struct Type<v8::Local<v8::External>> {
-  static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
-                                          v8::Local<v8::External> value) {
+                                          v8::Local<T> value) {
     return value;
   }
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
-                     v8::Local<v8::External>* out) {
-    if (!value->IsExternal())
-      return false;
-    *out = v8::Local<v8::External>::Cast(value);
-    return true;
+                     v8::Local<T>* out) {
+    *out = v8::Local<T>::Cast(value);
+    return out->IsEmpty();
   }
 };
 
@@ -115,6 +106,15 @@ template<size_t n>
 inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                  const char (&str)[n]) {
   return Type<const char[n]>::ToV8(context, str);
+}
+
+// Create V8 symbol.
+template<size_t n>
+inline v8::Local<v8::String> ToV8Symbol(v8::Local<v8::Context> context,
+                                        const char (&str)[n]) {
+  return v8::String::NewFromUtf8(context->GetIsolate(), str,
+                                 v8::NewStringType::kInternalized,
+                                 n - 1).ToLocalChecked();
 }
 
 }  // namespace vb

@@ -19,13 +19,39 @@ struct Prototype;
 template<typename T>
 struct Prototype<T, typename std::enable_if<std::is_base_of<
                         base::subtle::RefCountedBase, T>::value>::type> {
+  // Get the constructor of the prototype.
   static v8::Local<v8::Function> Get(v8::Local<v8::Context> context) {
+    v8::Isolate* isolate = context->GetIsolate();
     auto templ = internal::InheritanceChain<T>::Get(context);
-    auto result = templ->GetFunction(context);
+    auto constructor = templ->GetFunction(context).ToLocalChecked();
+    // Build the constructor if we did not do it before.
+    auto indicator = v8::Private::ForApi(isolate, ToV8Symbol(context, "vbb"));
+    if (!constructor->HasPrivate(context, indicator).ToChecked()) {
+      constructor->SetPrivate(context, indicator, v8::True(isolate));
+      Type<T>::BuildConstructor(context, constructor);
+    }
+    return constructor;
+  }
+
+  // Create an instance of T and store it in an v8::Object.
+  template<typename... ArgTypes>
+  static v8::Local<v8::Value> NewInstance(v8::Local<v8::Context> context,
+                                          const ArgTypes&... args) {
+    // Pass an External to indicate it is called from native code.
+    v8::Local<v8::Function> constructor = Get(context);
+    v8::Local<v8::Value> indicator = v8::External::New(
+        context->GetIsolate(), nullptr);
+    v8::MaybeLocal<v8::Object> result = constructor->NewInstance(
+        context, 1, &indicator);
     if (result.IsEmpty())
-      return v8::Local<v8::Function>();
-    else
-      return result.ToLocalChecked();
+      return v8::Null(context->GetIsolate());
+    // Store the new instance in the object.
+    v8::Local<v8::Object> obj = result.ToLocalChecked();
+    T* instance = new T(args...);
+    obj->SetAlignedPointerInInternalField(0, instance);
+    // Keep track of its lifetime.
+    new internal::RefPtrObjectTracker<T>(context->GetIsolate(), obj, instance);
+    return obj;
   }
 
   // Check if current prototype is a base class of the passed one.

@@ -10,8 +10,23 @@
 namespace vb {
 
 template<>
+struct Type<nu::Window::Options> {
+  static constexpr const char* name = "yue.Window.Options";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::Window::Options* out) {
+    return true;
+  }
+};
+
+template<>
 struct Type<nu::Window> {
   static constexpr const char* name = "yue.Window";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+        "create", &Prototype<nu::Window>::NewInstance<nu::Window::Options>);
+  }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,

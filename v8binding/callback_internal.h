@@ -105,6 +105,13 @@ inline bool GetNextArgument(Arguments* args, int create_flags,
   return true;
 }
 
+// Helper to get context.
+inline bool GetNextArgument(Arguments* args, int create_flags,
+                            bool is_first, v8::Local<v8::Context>* result) {
+  *result = args->isolate()->GetCurrentContext();
+  return true;
+}
+
 // Class template for extracting and storing single argument for callback
 // at position |index|.
 template<size_t index, typename ArgType>
@@ -188,7 +195,7 @@ struct Dispatcher<ReturnType(ArgTypes...)> {
       const v8::FunctionCallbackInfo<v8::Value>& info) {
     Arguments args(info);
     v8::Local<v8::External> v8_holder;
-    CHECK(args.GetData(&v8_holder));
+    args.GetData(&v8_holder);
     CallbackHolderBase* holder_base = reinterpret_cast<CallbackHolderBase*>(
         v8_holder->Value());
 
