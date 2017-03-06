@@ -104,26 +104,6 @@ struct Type<nu::Vector2dF> {
 };
 
 template<>
-struct Type<nu::Insets> {
-  static constexpr const char* name = "yue.Insets";
-  static inline void Push(State* state, const nu::Insets& insets) {
-    lua::PushNewTable(state);
-    lua::RawSet(state, -1, "top", insets.top(), "left", insets.left(),
-                           "bottom", insets.bottom(), "right", insets.right());
-  }
-  static inline bool To(State* state, int index, nu::Insets* out) {
-    if (GetType(state, index) != LuaType::Table)
-      return false;
-    int top, left, bottom, right;;
-    if (!RawGetAndPop(state, index, "top", &top, "left", &left,
-                                    "bottom", &bottom, "right", &right))
-      return false;
-    *out = nu::Insets(top, left, bottom, right);
-    return true;
-  }
-};
-
-template<>
 struct Type<nu::Color> {
   static constexpr const char* name = "yue.Color";
   static inline bool To(State* state, int index, nu::Color* out) {
