@@ -4,7 +4,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {argv, execSync} = require('./common')
+const {argv, execSync, spawnSync} = require('./common')
 
 if (argv.length != 2) {
   console.error('Usage: create_node_extension runtime version')
@@ -24,5 +24,5 @@ const args = [
 ]
 
 execSync(`node ./scripts/download_node_headers.js ${runtime} ${version}`)
-execSync(`gn gen out/Node '--args=${args.join(' ')}'`)
+spawnSync('gn', ['gen', 'out/Node', `--args=${args.join(' ')}`])
 execSync('ninja -C out/Node node_yue')

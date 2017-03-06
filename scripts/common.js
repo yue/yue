@@ -37,6 +37,16 @@ const execSyncWrapper = (command, options = {}) => {
   return execSync(command, options)
 }
 
+const spawnSyncWrapper = (exec, args, options = {}) => {
+  // Print command output by default.
+  if (!options.stdio)
+    options.stdio = 'inherit'
+  // Merge the custom env to global env.
+  if (options.env)
+    options.env = Object.assign(options.env, process.env)
+  return spawnSync(exec, args, options)
+}
+
 // Don't log out Node.js stack trace.
 if (!verbose) {
   process.on('uncaughtException', (error) => {
@@ -46,4 +56,9 @@ if (!verbose) {
 }
 
 // Export public APIs.
-module.exports = { verbose, argv, execSync: execSyncWrapper }
+module.exports = {
+  verbose,
+  argv,
+  execSync: execSyncWrapper,
+  spawnSync: spawnSyncWrapper,
+}

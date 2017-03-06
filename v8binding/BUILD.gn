@@ -30,6 +30,12 @@ config("node_config") {
       "-undefined", "dynamic_lookup",
     ]
   }
+
+  if (is_win) {
+    libs = [
+      node_dir + "/" + target_cpu + "/node.lib",
+    ]
+  }
 }
 
 source_set("v8binding") {
