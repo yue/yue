@@ -36,6 +36,24 @@ inline bool Set(v8::Local<v8::Context> context, Dict dict,
          Set(context, dict, args...);
 }
 
+// Helper for getting from Object.
+template<typename Key, typename Value>
+inline bool Get(v8::Local<v8::Context> context, v8::Local<v8::Object> object,
+                const Key& key, Value* out) {
+  v8::Local<v8::Value> value;
+  if (!object->Get(context, ToV8(context, key)).ToLocal(&value))
+    return false;
+  return FromV8(context, value, out);
+}
+
+// Allow getting arbitrary values.
+template<typename Key, typename Value, typename... ArgTypes>
+inline bool Get(v8::Local<v8::Context> context, v8::Local<v8::Object> object,
+                const Key& key, Value* out, const ArgTypes&... args) {
+  return Get(context, object, key, out) &&
+         Get(context, object, args...);
+}
+
 }  // namespace vb
 
 #endif  // V8BINDING_DICT_H_

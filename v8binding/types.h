@@ -14,8 +14,59 @@ template<typename T, typename Enable = void>
 struct Type {};
 
 template<>
+struct Type<int> {
+  static constexpr const char* name = "Integer";
+  static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                          int32_t value) {
+    return v8::Integer::New(context->GetIsolate(), value);
+  }
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     int32_t* out) {
+    if (!value->IsInt32())
+      return false;
+    *out = value->Int32Value();
+    return true;
+  }
+};
+
+template<>
+struct Type<float> {
+  static constexpr const char* name = "Number";
+  static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                          float value) {
+    return v8::Number::New(context->GetIsolate(), value);
+  }
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     float* out) {
+    if (!value->IsNumber())
+      return false;
+    *out = static_cast<float>(value->NumberValue());
+    return true;
+  }
+};
+
+template<>
+struct Type<bool> {
+  static constexpr const char* name = "Boolean";
+  static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                          bool value) {
+    return v8::Boolean::New(context->GetIsolate(), value);
+  }
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     bool* out) {
+    if (!value->IsBoolean())
+      return false;
+    *out = value->BooleanValue();
+    return true;
+  }
+};
+
+template<>
 struct Type<std::string> {
-  static constexpr const char* name = "string";
+  static constexpr const char* name = "String";
   static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                           const std::string& value) {
     return v8::String::NewFromUtf8(
@@ -38,7 +89,7 @@ struct Type<std::string> {
 
 template<>
 struct Type<const char*> {
-  static constexpr const char* name = "string";
+  static constexpr const char* name = "String";
   static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                           const char* value) {
     return v8::String::NewFromUtf8(context->GetIsolate(), value,
@@ -49,7 +100,7 @@ struct Type<const char*> {
 
 template<size_t n>
 struct Type<const char[n]> {
-  static constexpr const char* name = "string";
+  static constexpr const char* name = "String";
   static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                           const char* value) {
     return v8::String::NewFromUtf8(context->GetIsolate(), value,

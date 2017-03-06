@@ -37,7 +37,7 @@ v8::Local<v8::FunctionTemplate> CreateFunctionTemplate(
 template<typename T>
 struct Type<T, typename std::enable_if<
                    internal::is_function_pointer<T>::value>::type> {
-  static constexpr const char* name = "function";
+  static constexpr const char* name = "Function";
   static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                           T callback) {
     return CreateFunctionTemplate(context, base::Bind(callback))->GetFunction();
@@ -52,7 +52,7 @@ struct Type<T, typename std::enable_if<
 template<typename T>
 struct Type<T, typename std::enable_if<
                    std::is_member_function_pointer<T>::value>::type> {
-  static constexpr const char* name = "method";
+  static constexpr const char* name = "Method";
   static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                           T callback) {
     return CreateFunctionTemplate(context, base::Bind(callback),
@@ -60,7 +60,8 @@ struct Type<T, typename std::enable_if<
   }
   static inline v8::Local<v8::Data> ToV8Data(v8::Local<v8::Context> context,
                                              T callback) {
-    return CreateFunctionTemplate(context, base::Bind(callback));
+    return CreateFunctionTemplate(context, base::Bind(callback),
+                                  HolderIsFirstArgument);
   }
 };
 
