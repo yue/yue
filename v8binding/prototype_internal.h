@@ -7,8 +7,8 @@
 
 #include "base/memory/ref_counted.h"
 #include "base/memory/weak_ptr.h"
-#include "v8binding/types.h"
 #include "v8binding/per_isolate_data.h"
+#include "v8binding/types.h"
 
 namespace vb {
 
@@ -92,6 +92,21 @@ struct InheritanceChain<T, typename std::enable_if<std::is_class<
     return templ;
   }
 };
+
+// Create constructor for the prototype.
+template<typename T>
+v8::Local<v8::Function> GetConstructor(v8::Local<v8::Context> context) {
+  v8::Isolate* isolate = context->GetIsolate();
+  auto templ = InheritanceChain<T>::Get(context);
+  auto constructor = templ->GetFunction(context).ToLocalChecked();
+  // Build the constructor if we did not do it before.
+  auto indicator = v8::Private::ForApi(isolate, ToV8Symbol(context, "vbb"));
+  if (!constructor->HasPrivate(context, indicator).ToChecked()) {
+    constructor->SetPrivate(context, indicator, v8::True(isolate));
+    Type<T>::BuildConstructor(context, constructor);
+  }
+  return constructor;
+}
 
 }  // namespace internal
 

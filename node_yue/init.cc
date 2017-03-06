@@ -4,8 +4,7 @@
 
 #include <node.h>
 
-#include "nativeui/nativeui.h"
-#include "v8binding/v8binding.h"
+#include "node_yue/lifetime.h"
 
 namespace vb {
 
@@ -104,6 +103,19 @@ struct Type<nu::Vector2dF> {
 };
 
 template<>
+struct Type<node_yue::Lifetime> {
+  static constexpr const char* name = "yue.Lifetime";
+  static void BuildConstructor(v8::Local<v8::Context>, v8::Local<v8::Object>) {
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "run", &node_yue::Lifetime::Run,
+        "quit", &node_yue::Lifetime::Quit);
+  }
+};
+
+template<>
 struct Type<nu::Window::Options> {
   static constexpr const char* name = "yue.Window.Options";
   static bool FromV8(v8::Local<v8::Context> context,
@@ -150,7 +162,13 @@ void Initialize(v8::Local<v8::Object> exports) {
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::Local<v8::Context> context = isolate->GetCurrentContext();
   vb::Set(context, exports,
+          "Lifetime", vb::Prototype<Lifetime>::Get(context));
+  vb::Set(context, exports,
           "Window", vb::Prototype<nu::Window>::Get(context));
+
+  // Create APIs that only available as instances.
+  vb::Set(context, exports,
+          "lifetime", vb::Prototype<Lifetime>::NewInstance<>(context));
 }
 
 }  // namespace node_yue

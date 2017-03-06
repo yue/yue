@@ -20,17 +20,8 @@ template<typename T>
 struct Prototype<T, typename std::enable_if<std::is_base_of<
                         base::subtle::RefCountedBase, T>::value>::type> {
   // Get the constructor of the prototype.
-  static v8::Local<v8::Function> Get(v8::Local<v8::Context> context) {
-    v8::Isolate* isolate = context->GetIsolate();
-    auto templ = internal::InheritanceChain<T>::Get(context);
-    auto constructor = templ->GetFunction(context).ToLocalChecked();
-    // Build the constructor if we did not do it before.
-    auto indicator = v8::Private::ForApi(isolate, ToV8Symbol(context, "vbb"));
-    if (!constructor->HasPrivate(context, indicator).ToChecked()) {
-      constructor->SetPrivate(context, indicator, v8::True(isolate));
-      Type<T>::BuildConstructor(context, constructor);
-    }
-    return constructor;
+  static inline v8::Local<v8::Function> Get(v8::Local<v8::Context> context) {
+    return internal::GetConstructor<T>(context);
   }
 
   // Create an instance of T and store it in an v8::Object.
@@ -72,6 +63,17 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
     // Convert pointer to actual class.
     *out = static_cast<T*>(obj->GetAlignedPointerFromInternalField(0));
     return true;
+  }
+};
+
+// Create prototype for classes that produce WeakPtr.
+template<typename T>
+struct Prototype<T, typename std::enable_if<std::is_base_of<
+                        base::internal::WeakPtrBase,
+                        decltype(((T*)nullptr)->GetWeakPtr())>::value>::type> {
+  // Get the constructor of the prototype.
+  static inline v8::Local<v8::Function> Get(v8::Local<v8::Context> context) {
+    return internal::GetConstructor<T>(context);
   }
 };
 

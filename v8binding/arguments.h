@@ -5,6 +5,8 @@
 #ifndef V8BINDING_ARGUMENTS_H_
 #define V8BINDING_ARGUMENTS_H_
 
+#include <string>
+
 #include "v8binding/types.h"
 
 namespace vb {

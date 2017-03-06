@@ -4,6 +4,8 @@ loadable_module("node_yue") {
 
   sources = [
     "init.cc",
+    "lifetime.cc",
+    "lifetime.h",
   ]
 
   deps = [
