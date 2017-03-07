@@ -48,6 +48,24 @@ class RefPtrObjectTracker : public ObjectTracker {
   T* ptr_;
 };
 
+// A wrapper of WeakPtr which is stored in v8::Object.
+template<typename T>
+class WeakPtrObjectTracker : public ObjectTracker {
+ public:
+  WeakPtrObjectTracker(v8::Isolate* isolate, v8::Local<v8::Object> obj,
+                       base::WeakPtr<T> ptr)
+      : ObjectTracker(isolate, obj), ptr_(ptr) {
+  }
+
+  T* Get() {
+    return ptr_.Get();
+  }
+
+ private:
+  base::WeakPtr<T> ptr_;
+};
+
+
 // Get or create FunctionTemplate, returns true if the |name| exists.
 bool GetOrCreateFunctionTemplate(
     v8::Isolate* isolate,
@@ -62,6 +80,7 @@ bool GetOrCreatePrototype(
     v8::Local<v8::FunctionTemplate>* templ) {
   if (GetOrCreateFunctionTemplate(context->GetIsolate(), name, templ))
     return true;
+  (*templ)->SetClassName(ToV8(context, name).As<v8::String>());
   (*templ)->InstanceTemplate()->SetInternalFieldCount(1);
   Type<T>::BuildPrototype(context, (*templ)->PrototypeTemplate());
   return false;
@@ -106,6 +125,16 @@ v8::Local<v8::Function> GetConstructor(v8::Local<v8::Context> context) {
     Type<T>::BuildConstructor(context, constructor);
   }
   return constructor;
+}
+
+// Create a new instance of v8::Object from the prototype of T.
+template<typename T>
+v8::MaybeLocal<v8::Object> CallConstructor(v8::Local<v8::Context> context) {
+  // Pass an External to indicate it is called from native code.
+  v8::Local<v8::Function> constructor = GetConstructor<T>(context);
+  v8::Local<v8::Value> indicator = v8::External::New(
+      context->GetIsolate(), nullptr);
+  return constructor->NewInstance(context, 1, &indicator);
 }
 
 }  // namespace internal

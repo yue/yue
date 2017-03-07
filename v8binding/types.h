@@ -16,6 +16,15 @@ template<typename T, typename Enable = void>
 struct Type {};
 
 template<>
+struct Type<std::nullptr_t> {
+  static constexpr const char* name = "Null";
+  static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                          nullptr_t value) {
+    return v8::Null(context->GetIsolate());
+  }
+};
+
+template<>
 struct Type<int> {
   static constexpr const char* name = "Integer";
   static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,

@@ -28,12 +28,7 @@ struct Prototype<T, typename std::enable_if<std::is_base_of<
   template<typename... ArgTypes>
   static v8::Local<v8::Value> NewInstance(v8::Local<v8::Context> context,
                                           const ArgTypes&... args) {
-    // Pass an External to indicate it is called from native code.
-    v8::Local<v8::Function> constructor = Get(context);
-    v8::Local<v8::Value> indicator = v8::External::New(
-        context->GetIsolate(), nullptr);
-    v8::MaybeLocal<v8::Object> result = constructor->NewInstance(
-        context, 1, &indicator);
+    auto result = internal::CallConstructor<T>(context);
     if (result.IsEmpty())
       return v8::Null(context->GetIsolate());
     // Store the new instance in the object.
@@ -74,6 +69,49 @@ struct Prototype<T, typename std::enable_if<std::is_base_of<
   // Get the constructor of the prototype.
   static inline v8::Local<v8::Function> Get(v8::Local<v8::Context> context) {
     return internal::GetConstructor<T>(context);
+  }
+};
+
+// The default type information for WeakPtr class.
+template<typename T>
+struct Type<T*, typename std::enable_if<std::is_base_of<
+                    base::internal::WeakPtrBase,
+                    decltype(((T*)nullptr)->GetWeakPtr())>::value>::type> {
+  static constexpr const char* name = Type<T>::name;
+  static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                          T* ptr) {
+    v8::Isolate* isolate = context->GetIsolate();
+    if (!ptr)
+      return v8::Null(isolate);
+    // Do not cache the pointer of WeakPtr, because the pointer may point to a
+    // variable on stack, which can have same address with previous variable on
+    // the stack.
+    auto result = internal::CallConstructor<T>(context);
+    if (result.IsEmpty())
+      return v8::Null(isolate);
+    // Store the new instance in the object.
+    v8::Local<v8::Object> obj = result.ToLocalChecked();
+    obj->SetAlignedPointerInInternalField(
+        0,
+        new internal::WeakPtrObjectTracker<T>(isolate, obj, ptr->GetWeakPtr()));
+    return obj;
+  }
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     T** out) {
+    // Verify the type.
+    if (!value->IsObject())
+      return false;
+    v8::Local<v8::Object> obj = v8::Local<v8::Object>::Cast(value);
+    if (obj->InternalFieldCount() != 1)
+      return false;
+    // Convert pointer to actual class.
+    auto* ptr = static_cast<internal::WeakPtrObjectTracker<T>*>(
+        obj->GetAlignedPointerFromInternalField(0));
+    if (!ptr || !ptr->Get())
+      return false;
+    *out = ptr->Get();
+    return true;
   }
 };
 

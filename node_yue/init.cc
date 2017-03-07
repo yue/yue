@@ -103,6 +103,34 @@ struct Type<nu::Vector2dF> {
 };
 
 template<>
+struct Type<nu::Color> {
+  static constexpr const char* name = "yue.Color";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::Color* out) {
+    std::string hex;
+    if (!vb::FromV8(context, value, &hex))
+      return false;
+    *out = nu::Color(hex);
+    return true;
+  }
+};
+
+template<>
+struct Type<nu::Accelerator> {
+  static constexpr const char* name = "yue.Accelerator";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::Accelerator* out) {
+    std::string description;
+    if (!vb::FromV8(context, value, &description))
+      return false;
+    *out = nu::Accelerator(description);
+    return true;
+  }
+};
+
+template<>
 struct Type<node_yue::Lifetime> {
   static constexpr const char* name = "yue.Lifetime";
   static void BuildConstructor(v8::Local<v8::Context>, v8::Local<v8::Object>) {
@@ -112,6 +140,16 @@ struct Type<node_yue::Lifetime> {
     Set(context, templ,
         "run", &node_yue::Lifetime::Run,
         "quit", &node_yue::Lifetime::Quit);
+  }
+};
+
+template<>
+struct Type<nu::App> {
+  static constexpr const char* name = "yue.App";
+  static void BuildConstructor(v8::Local<v8::Context>, v8::Local<v8::Object>) {
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
   }
 };
 
@@ -158,17 +196,16 @@ void Initialize(v8::Local<v8::Object> exports) {
   // Initialize the nativeui and leak it.
   new nu::State;
 
-  // Populate with GUI elements.
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::Local<v8::Context> context = isolate->GetCurrentContext();
   vb::Set(context, exports,
-          "Lifetime", vb::Prototype<Lifetime>::Get(context));
-  vb::Set(context, exports,
-          "Window", vb::Prototype<nu::Window>::Get(context));
-
-  // Create APIs that only available as instances.
-  vb::Set(context, exports,
-          "lifetime", vb::Prototype<Lifetime>::NewInstance<>(context));
+          // GUI classes.
+          "Lifetime", vb::Prototype<Lifetime>::Get(context),
+          "App", vb::Prototype<nu::App>::Get(context),
+          "Window", vb::Prototype<nu::Window>::Get(context),
+          // Methods.
+          "lifetime", vb::Prototype<Lifetime>::NewInstance<>(context),
+          "app", nu::State::current()->app());
 }
 
 }  // namespace node_yue
