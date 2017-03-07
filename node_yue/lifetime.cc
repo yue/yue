@@ -4,21 +4,26 @@
 
 #include "node_yue/lifetime.h"
 
+#include "node_yue/node_bindings.h"
+
 namespace node_yue {
 
-Lifetime::Lifetime() : lifetime_(new nu::Lifetime) {
+Lifetime::Lifetime()
+    : lifetime_(new nu::Lifetime),
+      node_bindings_(NodeBindings::Create()) {
+  node_bindings_->PrepareMessageLoop();
 }
 
 Lifetime::~Lifetime() {
 }
 
 void Lifetime::Run() {
+  node_bindings_->RunMessageLoop();
   lifetime_->Run();
 }
 
 void Lifetime::Quit() {
   lifetime_->Quit();
-  lifetime_.reset();
 }
 
 }  // namespace node_yue

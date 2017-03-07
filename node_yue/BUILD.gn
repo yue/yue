@@ -7,6 +7,14 @@ loadable_module("node_yue") {
     "init.cc",
     "lifetime.cc",
     "lifetime.h",
+    "node_bindings.cc",
+    "node_bindings.h",
+    "node_bindings_linux.cc",
+    "node_bindings_linux.h",
+    "node_bindings_mac.cc",
+    "node_bindings_mac.h",
+    "node_bindings_win.cc",
+    "node_bindings_win.h",
   ]
 
   deps = [

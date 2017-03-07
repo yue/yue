@@ -12,6 +12,8 @@
 
 namespace node_yue {
 
+class NodeBindings;
+
 // A wrapper of nu::Lifetime that destroys the lifetime on exit.
 class Lifetime : public base::RefCounted<Lifetime> {
  public:
@@ -27,6 +29,7 @@ class Lifetime : public base::RefCounted<Lifetime> {
   friend class base::RefCounted<Lifetime>;
 
   std::unique_ptr<nu::Lifetime> lifetime_;
+  std::unique_ptr<NodeBindings> node_bindings_;
 };
 
 }  // namespace node_yue
