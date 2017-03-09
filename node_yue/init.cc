@@ -191,8 +191,9 @@ struct Type<nu::Window> {
         "setVisible", &nu::Window::SetVisible,
         "isVisible", &nu::Window::IsVisible,
         "setBackgroundColor", &nu::Window::SetBackgroundColor);
-    DefineMember(context, templ,
-                 "shouldClose", &nu::Window::should_close);
+    SetProperty(context, templ,
+                "onClose", &nu::Window::on_close,
+                "shouldClose", &nu::Window::should_close);
   }
 };
 

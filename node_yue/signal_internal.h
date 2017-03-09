@@ -12,16 +12,11 @@ namespace vb {
 // Describe how a member T can be converted.
 template<typename T>
 struct MemberTraits {
-  // How the member is converted from V8.
-  static inline bool FromV8(v8::Local<v8::Context> context,
-                            v8::Local<v8::Value> value,
-                            T* out) {
-    return vb::FromV8(context, value, out);
-  }
   // Decides should we return cached value or converted value.
   static const bool kShouldCacheValue = true;
   // Converter used when we decide not to use cached value.
   static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                          v8::Global<v8::Value>* holder_value,
                                           const T&) {
     return v8::Undefined(context->GetIsolate());
   }
@@ -84,8 +79,8 @@ void MemberHolder<T>::Getter(v8::Local<v8::String> property,
           v8::Local<v8::Value>::New(info.GetIsolate(), holder->value));
     }
   } else {
-    info.GetReturnValue().Set(
-        MemberTraits<MemberType>::ToV8(context, instance->*(holder->ptr_)));
+    info.GetReturnValue().Set(MemberTraits<MemberType>::ToV8(
+        context, &holder->value, instance->*(holder->ptr_)));
   }
 }
 
@@ -106,8 +101,7 @@ void MemberHolder<T>::Setter(v8::Local<v8::String> property,
     return;
   }
 
-  if (!MemberTraits<MemberType>::FromV8(
-          context, value, &(instance->*holder->ptr_))) {
+  if (!FromV8(context, value, &(instance->*holder->ptr_))) {
     vb::ThrowTypeError(context, "Invalid value passed to Setter");
     return;
   }
