@@ -121,6 +121,17 @@ struct Type<const char[n]> {
 };
 
 template<>
+struct Type<base::StringPiece> {
+  static constexpr const char* name = "String";
+  static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                          base::StringPiece value) {
+    return v8::String::NewFromUtf8(context->GetIsolate(), value.data(),
+                                   v8::NewStringType::kNormal,
+                                   value.length()).ToLocalChecked();
+  }
+};
+
+template<>
 struct Type<v8::Local<v8::Value>> {
   static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                           v8::Local<v8::Value> value) {
@@ -177,6 +188,13 @@ inline v8::Local<v8::String> ToV8Symbol(v8::Local<v8::Context> context,
   return v8::String::NewFromUtf8(context->GetIsolate(), str,
                                  v8::NewStringType::kInternalized,
                                  n - 1).ToLocalChecked();
+}
+
+// Helper to throw errors.
+inline void ThrowTypeError(v8::Local<v8::Context> context,
+                           base::StringPiece message) {
+  context->GetIsolate()->ThrowException(v8::Exception::TypeError(
+      ToV8(context, message).As<v8::String>()));
 }
 
 }  // namespace vb

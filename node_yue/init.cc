@@ -5,6 +5,7 @@
 #include <node.h>
 
 #include "node_yue/lifetime.h"
+#include "node_yue/signal.h"
 
 namespace vb {
 
@@ -190,6 +191,8 @@ struct Type<nu::Window> {
         "setVisible", &nu::Window::SetVisible,
         "isVisible", &nu::Window::IsVisible,
         "setBackgroundColor", &nu::Window::SetBackgroundColor);
+    DefineMember(context, templ,
+                 "shouldClose", &nu::Window::should_close);
   }
 };
 

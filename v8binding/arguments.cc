@@ -43,17 +43,13 @@ Arguments::~Arguments() {
 }
 
 void Arguments::ThrowError() const {
+  v8::Local<v8::Context> context = isolate_->GetCurrentContext();
   if (insufficient_arguments_)
-    return ThrowTypeError("Insufficient number of arguments.");
+    return ThrowTypeError(context, "Insufficient number of arguments.");
 
-  return ThrowTypeError(base::StringPrintf(
+  ThrowTypeError(context, base::StringPrintf(
       "Error processing argument at index %d, conversion failure from %s",
       next_ - 1, V8TypeAsString(isolate_, (*info_)[next_ - 1]).c_str()));
-}
-
-void Arguments::ThrowTypeError(const std::string& message) const {
-  isolate_->ThrowException(v8::Exception::TypeError(
-      ToV8(isolate_->GetCurrentContext(), message).As<v8::String>()));
 }
 
 }  // namespace vb

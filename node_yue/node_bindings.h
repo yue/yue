@@ -8,8 +8,8 @@
 
 #include "base/memory/weak_ptr.h"
 #include "base/single_thread_task_runner.h"
-#include "uv.h"
-#include "v8.h"
+#include "uv.h"  // NOLINT(build/include)
+#include "v8.h"  // NOLINT(build/include)
 
 namespace node {
 class Environment;

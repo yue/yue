@@ -4,7 +4,7 @@
 
 #include "v8binding/locker.h"
 
-#include "v8.h"
+#include "v8.h"  // NOLINT(build/include)
 
 namespace vb {
 
