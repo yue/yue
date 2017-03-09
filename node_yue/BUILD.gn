@@ -17,8 +17,6 @@ loadable_module("node_yue") {
 
   if (node_runtime != "electron") {
     sources += [
-      "lifetime.cc",
-      "lifetime.h",
       "node_bindings.cc",
       "node_bindings.h",
       "node_bindings_linux.cc",

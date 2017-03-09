@@ -66,7 +66,7 @@ class WeakPtrObjectTracker : public ObjectTracker {
   }
 
   T* Get() {
-    return ptr_.Get();
+    return ptr_.get();
   }
 
  private:

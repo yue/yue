@@ -4,7 +4,8 @@
 
 #include <node.h>
 
-#include "node_yue/lifetime.h"
+#include "nativeui/nativeui.h"
+#include "node_yue/node_bindings.h"
 #include "node_yue/signal.h"
 
 namespace vb {
@@ -131,17 +132,19 @@ struct Type<nu::Accelerator> {
 
 #ifndef ELECTRON_BUILD
 template<>
-struct Type<node_yue::Lifetime> {
+struct Type<nu::Lifetime> {
   static constexpr const char* name = "yue.Lifetime";
   static void BuildConstructor(v8::Local<v8::Context>, v8::Local<v8::Object>) {
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
-        "run", &node_yue::Lifetime::Run,
-        "quit", &node_yue::Lifetime::Quit,
-        "postTask", &node_yue::Lifetime::PostTask,
-        "postDelayedTask", &node_yue::Lifetime::PostDelayedTask);
+        "run", &nu::Lifetime::Run,
+        "quit", &nu::Lifetime::Quit,
+        "postTask", &nu::Lifetime::PostTask,
+        "postDelayedTask", &nu::Lifetime::PostDelayedTask);
+    SetProperty(context, templ,
+                "onReady", &nu::Lifetime::on_ready);
   }
 };
 #endif
@@ -250,13 +253,18 @@ namespace node_yue {
 void Initialize(v8::Local<v8::Object> exports) {
   // Initialize the nativeui and leak it.
   new nu::State;
+  new nu::Lifetime;
+  // Initialize node integration and leak it.
+  NodeBindings* node_bindings = NodeBindings::Create();
+  node_bindings->PrepareMessageLoop();
+  node_bindings->RunMessageLoop();
 
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::Local<v8::Context> context = isolate->GetCurrentContext();
   vb::Set(context, exports,
           // GUI classes.
 #ifndef ELECTRON_BUILD
-          "Lifetime", vb::Prototype<Lifetime>::Get(context),
+          "Lifetime", vb::Prototype<nu::Lifetime>::Get(context),
 #endif
           "App", vb::Prototype<nu::App>::Get(context),
           "Window", vb::Prototype<nu::Window>::Get(context),
@@ -264,7 +272,7 @@ void Initialize(v8::Local<v8::Object> exports) {
           "Container", vb::Prototype<nu::Container>::Get(context),
           // Methods.
 #ifndef ELECTRON_BUILD
-          "lifetime", vb::Prototype<Lifetime>::NewInstance<>(context),
+          "lifetime", nu::Lifetime::current(),
 #endif
           "app", nu::State::current()->app());
 }
