@@ -46,8 +46,8 @@ struct Type<base::Callback<Sig>> {
     *out = base::Bind(
         &internal::V8FunctionInvoker<Sig>::Go,
         isolate,
-        base::Passed(v8::Global<v8::Function>(isolate,
-                                              val.As<v8::Function>())));
+        base::RetainedRef(
+            new internal::V8FunctionWrapper(isolate, val.As<v8::Function>())));
     return true;
   }
 };

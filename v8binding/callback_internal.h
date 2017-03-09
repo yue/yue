@@ -210,6 +210,21 @@ struct Dispatcher<ReturnType(ArgTypes...)> {
   }
 };
 
+// A RefCounted struct that stores a v8::Function.
+class V8FunctionWrapper : public base::RefCounted<V8FunctionWrapper> {
+ public:
+  V8FunctionWrapper(v8::Isolate* isolate, v8::Local<v8::Function> v8_ref);
+
+  v8::Local<v8::Function> Get(v8::Isolate* isolate) const;
+
+ private:
+  friend class base::RefCounted<V8FunctionWrapper>;
+
+  ~V8FunctionWrapper();
+
+  v8::Global<v8::Function> v8_ref_;
+};
+
 // Helper to invoke a V8 function with C++ parameters.
 template<typename Sig>
 struct V8FunctionInvoker {};
@@ -217,18 +232,18 @@ struct V8FunctionInvoker {};
 template<typename... ArgTypes>
 struct V8FunctionInvoker<v8::Local<v8::Value>(ArgTypes...)> {
   static v8::Local<v8::Value> Go(v8::Isolate* isolate,
-                                 v8::Global<v8::Function> func,
+                                 V8FunctionWrapper* wrapper,
                                  const ArgTypes&... raw) {
     Locker locker(isolate);
     v8::EscapableHandleScope handle_scope(isolate);
     v8::MicrotasksScope script_scope(isolate,
                                      v8::MicrotasksScope::kRunMicrotasks);
-    auto holder = v8::Local<v8::Function>::New(isolate, func);
-    auto context = holder->CreationContext();
+    auto func = wrapper->Get(isolate);
+    auto context = func->CreationContext();
     v8::Context::Scope context_scope(context);
     std::vector<v8::Local<v8::Value>> args = { ConvertToV8(isolate, raw)... };
     v8::Local<v8::Value> val;
-    if (holder->Call(context, holder, args.size(), &args.front()).ToLocal(&val))
+    if (func->Call(context, func, args.size(), &args.front()).ToLocal(&val))
       return handle_scope.Escape(val);
     else
       return v8::Undefined(isolate);
@@ -238,36 +253,36 @@ struct V8FunctionInvoker<v8::Local<v8::Value>(ArgTypes...)> {
 template<typename... ArgTypes>
 struct V8FunctionInvoker<void(ArgTypes...)> {
   static void Go(v8::Isolate* isolate,
-                 v8::Global<v8::Function> func,
+                 V8FunctionWrapper* wrapper,
                  const ArgTypes&... raw) {
     Locker locker(isolate);
     v8::HandleScope handle_scope(isolate);
     v8::MicrotasksScope script_scope(isolate,
                                      v8::MicrotasksScope::kRunMicrotasks);
-    auto holder = v8::Local<v8::Function>::New(isolate, func);
-    auto context = holder->CreationContext();
+    auto func = wrapper->Get(isolate);
+    auto context = func->CreationContext();
     v8::Context::Scope context_scope(context);
     std::vector<v8::Local<v8::Value>> args = { ConvertToV8(isolate, raw)... };
-    holder->Call(holder, args.size(), &args.front());
+    func->Call(func, args.size(), &args.front());
   }
 };
 
 template<typename ReturnType, typename... ArgTypes>
 struct V8FunctionInvoker<ReturnType(ArgTypes...)> {
   static ReturnType Go(v8::Isolate* isolate,
-                       v8::Global<v8::Function> func,
+                       V8FunctionWrapper* wrapper,
                        const ArgTypes&... raw) {
     Locker locker(isolate);
     v8::HandleScope handle_scope(isolate);
     ReturnType ret = ReturnType();
     v8::MicrotasksScope script_scope(isolate,
                                      v8::MicrotasksScope::kRunMicrotasks);
-    auto holder = v8::Local<v8::Function>::New(isolate, func);
-    auto context = holder->CreationContext();
+    auto func = wrapper->Get(isolate);
+    auto context = func->CreationContext();
     v8::Context::Scope context_scope(context);
     std::vector<v8::Local<v8::Value>> args = { ConvertToV8(isolate, raw)... };
     v8::Local<v8::Value> val;
-    if (holder->Call(context, holder, args.size(), &args.front()).ToLocal(&val))
+    if (func->Call(context, func, args.size(), &args.front()).ToLocal(&val))
       FromV8(context, val, &ret);
     return ret;
   }

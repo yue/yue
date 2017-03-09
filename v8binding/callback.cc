@@ -35,6 +35,18 @@ void CallbackHolderBase::SecondWeakCallback(
   delete data.GetParameter();
 }
 
+V8FunctionWrapper::V8FunctionWrapper(v8::Isolate* isolate,
+                                     v8::Local<v8::Function> v8_ref)
+    : v8_ref_(isolate, v8_ref) {
+}
+
+V8FunctionWrapper::~V8FunctionWrapper() {
+}
+
+v8::Local<v8::Function> V8FunctionWrapper::Get(v8::Isolate* isolate) const {
+  return v8::Local<v8::Function>::New(isolate, v8_ref_);
+}
+
 }  // namespace internal
 
 }  // namespace vb
