@@ -4,6 +4,8 @@
 
 #include "v8binding/per_isolate_data.h"
 
+#include "base/logging.h"
+
 // The slot 3 had been reserved for Node, but since it is not using the slot
 // after Node v7, we are free to take it.
 #ifndef V8BINDING_ISOLATE_SLOT
@@ -42,6 +44,22 @@ v8::Local<v8::FunctionTemplate> PerIsolateData::GetFunctionTemplate(
   if (it == function_templates_.end())
     return v8::Local<v8::FunctionTemplate>();
   return it->second.Get(isolate_);
+}
+
+void PerIsolateData::SetObjectTracker(void* ptr,
+                                      internal::ObjectTracker* wrapper) {
+  DCHECK(object_trackers_.find(ptr) == object_trackers_.end());
+  if (wrapper)
+    object_trackers_[ptr] = wrapper;
+  else
+    object_trackers_.erase(ptr);
+}
+
+internal::ObjectTracker* PerIsolateData::GetObjectTracker(void* ptr) {
+  auto it = object_trackers_.find(ptr);
+  if (it == object_trackers_.end())
+    return nullptr;
+  return it->second;
 }
 
 }  // namespace vb

@@ -24,13 +24,21 @@ void DefaultConstructor(const v8::FunctionCallbackInfo<v8::Value>& info) {
 }  // namespace
 
 ObjectTracker::ObjectTracker(v8::Isolate* isolate, v8::Local<v8::Object> obj)
-    : v8_ref_(isolate, obj) {
+    : isolate_(isolate), v8_ref_(isolate, obj) {
   v8_ref_.SetWeak(this, &ObjectTracker::FirstWeakCallback,
                   v8::WeakCallbackType::kParameter);
 }
 
 ObjectTracker::~ObjectTracker() {
   DCHECK(v8_ref_.IsEmpty());
+}
+
+v8::Local<v8::Object> ObjectTracker::GetHandle() const {
+  return v8::Local<v8::Object>::New(isolate_, v8_ref_);
+}
+
+v8::Isolate* ObjectTracker::GetIsolate() const {
+  return isolate_;
 }
 
 // static

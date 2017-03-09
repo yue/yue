@@ -20,12 +20,16 @@ class ObjectTracker {
   ObjectTracker(v8::Isolate* isolate, v8::Local<v8::Object> obj);
   virtual ~ObjectTracker();
 
+  v8::Local<v8::Object> GetHandle() const;
+  v8::Isolate* GetIsolate() const;
+
  private:
   static void FirstWeakCallback(
       const v8::WeakCallbackInfo<ObjectTracker>& data);
   static void SecondWeakCallback(
       const v8::WeakCallbackInfo<ObjectTracker>& data);
 
+  v8::Isolate* isolate_;
   v8::Global<v8::Object> v8_ref_;
 
   DISALLOW_COPY_AND_ASSIGN(ObjectTracker);
@@ -37,10 +41,13 @@ class RefPtrObjectTracker : public ObjectTracker {
  public:
   RefPtrObjectTracker(v8::Isolate* isolate, v8::Local<v8::Object> obj, T* ptr)
       : ObjectTracker(isolate, obj), ptr_(ptr) {
+    obj->SetAlignedPointerInInternalField(0, ptr);
     ptr_->AddRef();
+    PerIsolateData::Get(isolate)->SetObjectTracker(ptr, this);
   }
 
   ~RefPtrObjectTracker() override {
+    PerIsolateData::Get(GetIsolate())->SetObjectTracker(ptr_, nullptr);
     ptr_->Release();
   }
 
@@ -55,6 +62,7 @@ class WeakPtrObjectTracker : public ObjectTracker {
   WeakPtrObjectTracker(v8::Isolate* isolate, v8::Local<v8::Object> obj,
                        base::WeakPtr<T> ptr)
       : ObjectTracker(isolate, obj), ptr_(ptr) {
+    obj->SetAlignedPointerInInternalField(0, this);
   }
 
   T* Get() {

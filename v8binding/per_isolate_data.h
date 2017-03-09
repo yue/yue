@@ -12,6 +12,10 @@
 
 namespace vb {
 
+namespace internal {
+class ObjectTracker;
+}
+
 class PerIsolateData {
  public:
   static PerIsolateData* Get(v8::Isolate* isolate);
@@ -23,6 +27,10 @@ class PerIsolateData {
                            v8::Local<v8::FunctionTemplate> function_template);
   v8::Local<v8::FunctionTemplate> GetFunctionTemplate(const char* name);
 
+  // Cache RefPtr wrappers.
+  void SetObjectTracker(void* ptr, internal::ObjectTracker* wrapper);
+  internal::ObjectTracker* GetObjectTracker(void* ptr);
+
  protected:
   explicit PerIsolateData(v8::Isolate* isolate);
   ~PerIsolateData();
@@ -30,9 +38,11 @@ class PerIsolateData {
  private:
   typedef std::map<const char*,
                    v8::Eternal<v8::FunctionTemplate>> FunctionTemplateMap;
+  typedef std::map<void*, internal::ObjectTracker*> ObjectTrackerMap;
 
   v8::Isolate* isolate_;
   FunctionTemplateMap function_templates_;
+  ObjectTrackerMap object_trackers_;
 
   DISALLOW_COPY_AND_ASSIGN(PerIsolateData);
 };

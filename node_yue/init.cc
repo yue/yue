@@ -183,8 +183,57 @@ struct Type<nu::Window> {
         "getContentBounds", &nu::Window::GetContentBounds,
         "setBounds", &nu::Window::SetBounds,
         "getBounds", &nu::Window::GetBounds,
+        "setContentView", &nu::Window::SetContentView,
+        "getContentView", &nu::Window::GetContentView,
         "setVisible", &nu::Window::SetVisible,
-        "isVisible", &nu::Window::IsVisible);
+        "isVisible", &nu::Window::IsVisible,
+        "setBackgroundColor", &nu::Window::SetBackgroundColor);
+  }
+};
+
+template<>
+struct Type<nu::View> {
+  static constexpr const char* name = "yue.View";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "setBackgroundColor", &nu::View::SetBackgroundColor,
+        "setStyle", &nu::View::SetStyle,
+        "printStyle", &nu::View::PrintStyle,
+        "layout", &nu::View::Layout,
+        "setBounds", &nu::View::SetBounds,
+        "getBounds", &nu::View::GetBounds,
+        "setVisible", &nu::View::SetVisible,
+        "isVisible", &nu::View::IsVisible,
+        "getParent", &nu::View::parent);
+  }
+};
+
+template<>
+struct Type<nu::Container> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Container";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+        "create", &Prototype<nu::Container>::NewInstance<>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "getPreferredSize", &nu::Container::GetPreferredSize,
+        "getPreferredWidthForHeight",
+        &nu::Container::GetPreferredWidthForHeight,
+        "getPreferredHeightForWidth",
+        &nu::Container::GetPreferredHeightForWidth,
+        "addChildView", &nu::Container::AddChildView,
+        "addChildViewAt", &nu::Container::AddChildViewAt,
+        "removeChildView", &nu::Container::RemoveChildView,
+        "childCount", &nu::Container::child_count,
+        "childAt", &nu::Container::child_at);
   }
 };
 
@@ -203,6 +252,8 @@ void Initialize(v8::Local<v8::Object> exports) {
           "Lifetime", vb::Prototype<Lifetime>::Get(context),
           "App", vb::Prototype<nu::App>::Get(context),
           "Window", vb::Prototype<nu::Window>::Get(context),
+          "View", vb::Prototype<nu::View>::Get(context),
+          "Container", vb::Prototype<nu::Container>::Get(context),
           // Methods.
           "lifetime", vb::Prototype<Lifetime>::NewInstance<>(context),
           "app", nu::State::current()->app());

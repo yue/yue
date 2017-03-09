@@ -28,15 +28,13 @@ struct Prototype<T, typename std::enable_if<std::is_base_of<
   template<typename... ArgTypes>
   static v8::Local<v8::Value> NewInstance(v8::Local<v8::Context> context,
                                           const ArgTypes&... args) {
+    v8::Isolate* isolate = context->GetIsolate();
     auto result = internal::CallConstructor<T>(context);
     if (result.IsEmpty())
-      return v8::Null(context->GetIsolate());
+      return v8::Null(isolate);
     // Store the new instance in the object.
     v8::Local<v8::Object> obj = result.ToLocalChecked();
-    T* instance = new T(args...);
-    obj->SetAlignedPointerInInternalField(0, instance);
-    // Keep track of its lifetime.
-    new internal::RefPtrObjectTracker<T>(context->GetIsolate(), obj, instance);
+    new internal::RefPtrObjectTracker<T>(isolate, obj, new T(args...));
     return obj;
   }
 };
@@ -46,6 +44,22 @@ template<typename T>
 struct Type<T*, typename std::enable_if<std::is_base_of<
                     base::subtle::RefCountedBase, T>::value>::type> {
   static constexpr const char* name = Type<T>::name;
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context, T* ptr) {
+    v8::Isolate* isolate = context->GetIsolate();
+    if (!ptr)
+      return v8::Null(isolate);
+    // Whether there is already a wrapper for |ptr|.
+    auto wrapper = PerIsolateData::Get(isolate)->GetObjectTracker(ptr);
+    if (wrapper)
+      return wrapper->GetHandle();
+    // If not create a new wrapper for it.
+    auto result = internal::CallConstructor<T>(context);
+    if (result.IsEmpty())
+      return v8::Null(isolate);
+    v8::Local<v8::Object> obj = result.ToLocalChecked();
+    new internal::RefPtrObjectTracker<T>(isolate, obj, ptr);
+    return obj;
+  }
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      T** out) {
@@ -78,8 +92,7 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
                     base::internal::WeakPtrBase,
                     decltype(((T*)nullptr)->GetWeakPtr())>::value>::type> {
   static constexpr const char* name = Type<T>::name;
-  static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
-                                          T* ptr) {
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context, T* ptr) {
     v8::Isolate* isolate = context->GetIsolate();
     if (!ptr)
       return v8::Null(isolate);
@@ -91,9 +104,7 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
       return v8::Null(isolate);
     // Store the new instance in the object.
     v8::Local<v8::Object> obj = result.ToLocalChecked();
-    obj->SetAlignedPointerInInternalField(
-        0,
-        new internal::WeakPtrObjectTracker<T>(isolate, obj, ptr->GetWeakPtr()));
+    new internal::WeakPtrObjectTracker<T>(isolate, obj, ptr->GetWeakPtr());
     return obj;
   }
   static bool FromV8(v8::Local<v8::Context> context,
