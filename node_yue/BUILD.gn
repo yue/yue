@@ -1,3 +1,9 @@
+# Copyright 2017 Cheng Zhao. All rights reserved.
+# Use of this source code is governed by the license that can be found in the
+# LICENSE file.
+
+import("//v8binding/node.gni")
+
 loadable_module("node_yue") {
   output_name = "yue"
   output_extension = "node"
@@ -5,17 +11,22 @@ loadable_module("node_yue") {
 
   sources = [
     "init.cc",
-    "lifetime.cc",
-    "lifetime.h",
-    "node_bindings.cc",
-    "node_bindings.h",
-    "node_bindings_linux.cc",
-    "node_bindings_linux.h",
-    "node_bindings_mac.cc",
-    "node_bindings_mac.h",
-    "node_bindings_win.cc",
-    "node_bindings_win.h",
   ]
+
+  if (node_runtime != "electron") {
+    sources += [
+      "lifetime.cc",
+      "lifetime.h",
+      "node_bindings.cc",
+      "node_bindings.h",
+      "node_bindings_linux.cc",
+      "node_bindings_linux.h",
+      "node_bindings_mac.cc",
+      "node_bindings_mac.h",
+      "node_bindings_win.cc",
+      "node_bindings_win.h",
+    ]
+  }
 
   deps = [
     "//nativeui",

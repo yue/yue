@@ -20,11 +20,11 @@ struct Type<nu::Size> {
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::Size* out) {
-    auto obj = value.As<v8::Object>();
-    if (obj.IsEmpty())
+    if (!value->IsObject())
       return false;
     int width, height;
-    if (!Get(context, obj, "width", &width, "height", &height))
+    if (!Get(context, value.As<v8::Object>(),
+             "width", &width, "height", &height))
       return false;
     *out = nu::Size(width, height);
     return true;
@@ -43,11 +43,11 @@ struct Type<nu::SizeF> {
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::SizeF* out) {
-    auto obj = value.As<v8::Object>();
-    if (obj.IsEmpty())
+    if (!value->IsObject())
       return false;
     float width, height;
-    if (!Get(context, obj, "width", &width, "height", &height))
+    if (!Get(context, value.As<v8::Object>(),
+             "width", &width, "height", &height))
       return false;
     *out = nu::SizeF(width, height);
     return true;
@@ -67,12 +67,11 @@ struct Type<nu::RectF> {
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::RectF* out) {
-    auto obj = value.As<v8::Object>();
-    if (obj.IsEmpty())
+    if (!value->IsObject())
       return false;
     float x, y, width, height;
-    if (!Get(context, obj, "x", &x, "y", &y,
-             "width", &width, "height", &height))
+    if (!Get(context, value.As<v8::Object>(),
+             "x", &x, "y", &y, "width", &width, "height", &height))
       return false;
     *out = nu::RectF(x, y, width, height);
     return true;
@@ -91,11 +90,10 @@ struct Type<nu::Vector2dF> {
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::Vector2dF* out) {
-    auto obj = value.As<v8::Object>();
-    if (obj.IsEmpty())
+    if (!value->IsObject())
       return false;
     float x, y;
-    if (!Get(context, obj, "x", &x, "y", &y))
+    if (!Get(context, value.As<v8::Object>(), "x", &x, "y", &y))
       return false;
     *out = nu::Vector2dF(x, y);
     return true;
@@ -130,6 +128,7 @@ struct Type<nu::Accelerator> {
   }
 };
 
+#ifndef ELECTRON_BUILD
 template<>
 struct Type<node_yue::Lifetime> {
   static constexpr const char* name = "yue.Lifetime";
@@ -142,6 +141,7 @@ struct Type<node_yue::Lifetime> {
         "quit", &node_yue::Lifetime::Quit);
   }
 };
+#endif
 
 template<>
 struct Type<nu::App> {
@@ -249,13 +249,17 @@ void Initialize(v8::Local<v8::Object> exports) {
   v8::Local<v8::Context> context = isolate->GetCurrentContext();
   vb::Set(context, exports,
           // GUI classes.
+#ifndef ELECTRON_BUILD
           "Lifetime", vb::Prototype<Lifetime>::Get(context),
+#endif
           "App", vb::Prototype<nu::App>::Get(context),
           "Window", vb::Prototype<nu::Window>::Get(context),
           "View", vb::Prototype<nu::View>::Get(context),
           "Container", vb::Prototype<nu::Container>::Get(context),
           // Methods.
+#ifndef ELECTRON_BUILD
           "lifetime", vb::Prototype<Lifetime>::NewInstance<>(context),
+#endif
           "app", nu::State::current()->app());
 }
 

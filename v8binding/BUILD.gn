@@ -2,10 +2,7 @@
 # Use of this source code is governed by the license that can be found in the
 # LICENSE file.
 
-declare_args() {
-  # The version of Node to build against to.
-  node_version = "v7.7.1"
-}
+import("//v8binding/node.gni")
 
 config("node_config") {
   defines = [
@@ -22,16 +19,23 @@ config("node_config") {
     node_dir + "/deps",
     node_dir + "/deps/uv/include",
     node_dir + "/deps/v8/include",
-    node_dir + "/deps/chakrashim/include",
   ]
+
+  if (node_runtime == "chakracore") {
+    include_dirs += [
+      node_dir + "/deps/chakrashim/include",
+    ]
+  } else if (node_runtime == "electron") {
+    defines += [
+      "ELECTRON_BUILD",
+    ]
+  }
 
   if (is_mac) {
     ldflags = [
       "-undefined", "dynamic_lookup",
     ]
-  }
-
-  if (is_win) {
+  } else if (is_win) {
     libs = [
       node_dir + "/" + target_cpu + "/node.lib",
     ]

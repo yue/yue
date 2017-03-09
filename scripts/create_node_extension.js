@@ -19,8 +19,9 @@ const args = [
   'is_component_build=false',
   'is_debug=false',
   'is_official_build=true',
-  // Set node version.
+  // Set node version and runtime.
   `node_version="${version}"`,
+  `node_runtime="${runtime}"`,
 ]
 
 execSync(`node ./scripts/download_node_headers.js ${runtime} ${version}`)
