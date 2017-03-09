@@ -21,6 +21,8 @@ class Lifetime : public base::RefCounted<Lifetime> {
 
   void Run();
   void Quit();
+  void PostTask(const base::Closure& task);
+  void PostDelayedTask(int ms, const base::Closure& task);
 
  protected:
   virtual ~Lifetime();

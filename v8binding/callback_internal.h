@@ -10,6 +10,7 @@
 #include "base/bind.h"
 #include "base/callback.h"
 #include "v8binding/arguments.h"
+#include "v8binding/locker.h"
 #include "v8binding/template_util.h"
 
 namespace vb {
@@ -186,10 +187,10 @@ class Invoker<IndicesHolder<indices...>, ArgTypes...>
 
 // DispatchToCallback converts all the JavaScript arguments to C++ types and
 // invokes the base::Callback.
-template <typename Sig>
+template<typename Sig>
 struct Dispatcher {};
 
-template <typename ReturnType, typename... ArgTypes>
+template<typename ReturnType, typename... ArgTypes>
 struct Dispatcher<ReturnType(ArgTypes...)> {
   static void DispatchToCallback(
       const v8::FunctionCallbackInfo<v8::Value>& info) {
@@ -206,6 +207,69 @@ struct Dispatcher<ReturnType(ArgTypes...)> {
     Invoker<Indices, ArgTypes...> invoker(&args, holder->flags);
     if (invoker.IsOK())
       invoker.DispatchToCallback(holder->callback);
+  }
+};
+
+// Helper to invoke a V8 function with C++ parameters.
+template<typename Sig>
+struct V8FunctionInvoker {};
+
+template<typename... ArgTypes>
+struct V8FunctionInvoker<v8::Local<v8::Value>(ArgTypes...)> {
+  static v8::Local<v8::Value> Go(v8::Isolate* isolate,
+                                 v8::Global<v8::Function> func,
+                                 const ArgTypes&... raw) {
+    Locker locker(isolate);
+    v8::EscapableHandleScope handle_scope(isolate);
+    v8::MicrotasksScope script_scope(isolate,
+                                     v8::MicrotasksScope::kRunMicrotasks);
+    auto holder = v8::Local<v8::Function>::New(isolate, func);
+    auto context = holder->CreationContext();
+    v8::Context::Scope context_scope(context);
+    std::vector<v8::Local<v8::Value>> args = { ConvertToV8(isolate, raw)... };
+    v8::Local<v8::Value> val;
+    if (holder->Call(context, holder, args.size(), &args.front()).ToLocal(&val))
+      return handle_scope.Escape(val);
+    else
+      return v8::Undefined(isolate);
+  }
+};
+
+template<typename... ArgTypes>
+struct V8FunctionInvoker<void(ArgTypes...)> {
+  static void Go(v8::Isolate* isolate,
+                 v8::Global<v8::Function> func,
+                 const ArgTypes&... raw) {
+    Locker locker(isolate);
+    v8::HandleScope handle_scope(isolate);
+    v8::MicrotasksScope script_scope(isolate,
+                                     v8::MicrotasksScope::kRunMicrotasks);
+    auto holder = v8::Local<v8::Function>::New(isolate, func);
+    auto context = holder->CreationContext();
+    v8::Context::Scope context_scope(context);
+    std::vector<v8::Local<v8::Value>> args = { ConvertToV8(isolate, raw)... };
+    holder->Call(holder, args.size(), &args.front());
+  }
+};
+
+template<typename ReturnType, typename... ArgTypes>
+struct V8FunctionInvoker<ReturnType(ArgTypes...)> {
+  static ReturnType Go(v8::Isolate* isolate,
+                       v8::Global<v8::Function> func,
+                       const ArgTypes&... raw) {
+    Locker locker(isolate);
+    v8::HandleScope handle_scope(isolate);
+    ReturnType ret = ReturnType();
+    v8::MicrotasksScope script_scope(isolate,
+                                     v8::MicrotasksScope::kRunMicrotasks);
+    auto holder = v8::Local<v8::Function>::New(isolate, func);
+    auto context = holder->CreationContext();
+    v8::Context::Scope context_scope(context);
+    std::vector<v8::Local<v8::Value>> args = { ConvertToV8(isolate, raw)... };
+    v8::Local<v8::Value> val;
+    if (holder->Call(context, holder, args.size(), &args.front()).ToLocal(&val))
+      FromV8(context, val, &ret);
+    return ret;
   }
 };
 

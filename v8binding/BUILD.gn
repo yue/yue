@@ -50,6 +50,8 @@ source_set("v8binding") {
     "callback.h",
     "callback_internal.h",
     "dict.h",
+    "locker.cc",
+    "locker.h",
     "per_isolate_data.cc",
     "per_isolate_data.h",
     "prototype.cc",

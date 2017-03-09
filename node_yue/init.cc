@@ -138,7 +138,9 @@ struct Type<node_yue::Lifetime> {
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
         "run", &node_yue::Lifetime::Run,
-        "quit", &node_yue::Lifetime::Quit);
+        "quit", &node_yue::Lifetime::Quit,
+        "postTask", &node_yue::Lifetime::PostTask,
+        "postDelayedTask", &node_yue::Lifetime::PostDelayedTask);
   }
 };
 #endif

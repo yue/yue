@@ -26,4 +26,12 @@ void Lifetime::Quit() {
   lifetime_->Quit();
 }
 
+void Lifetime::PostTask(const base::Closure& task) {
+  lifetime_->PostTask(task);
+}
+
+void Lifetime::PostDelayedTask(int ms, const base::Closure& task) {
+  lifetime_->PostDelayedTask(ms, task);
+}
+
 }  // namespace node_yue

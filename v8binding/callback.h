@@ -33,6 +33,25 @@ v8::Local<v8::FunctionTemplate> CreateFunctionTemplate(
   return tmpl;
 }
 
+// Define how callbacks are converted.
+template<typename Sig>
+struct Type<base::Callback<Sig>> {
+  static constexpr const char* name = "Function";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> val,
+                     base::Callback<Sig>* out) {
+    if (!val->IsFunction())
+      return false;
+    v8::Isolate* isolate = context->GetIsolate();
+    *out = base::Bind(
+        &internal::V8FunctionInvoker<Sig>::Go,
+        isolate,
+        base::Passed(v8::Global<v8::Function>(isolate,
+                                              val.As<v8::Function>())));
+    return true;
+  }
+};
+
 // Specialize for native functions.
 template<typename T>
 struct Type<T, typename std::enable_if<
