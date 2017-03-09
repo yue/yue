@@ -50,7 +50,7 @@ class NATIVEUI_EXPORT Lifetime {
   void PlatformDestroy();
 
   base::MessageLoop message_loop_;
-  base::RunLoop run_loop_;
+  std::unique_ptr<base::RunLoop> run_loop_;
 
 #if defined(OS_MACOSX)
   base::mac::ScopedNSAutoreleasePool autorelease_pool_;

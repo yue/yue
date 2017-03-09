@@ -32,11 +32,16 @@ Lifetime::~Lifetime() {
 }
 
 void Lifetime::Run() {
-  run_loop_.Run();
+  if (!run_loop_)
+    run_loop_.reset(new base::RunLoop);
+  run_loop_->Run();
+  run_loop_.reset();
 }
 
 void Lifetime::Quit() {
-  run_loop_.Quit();
+  if (!run_loop_)
+    return;
+  PostTask(run_loop_->QuitClosure());
 }
 
 void Lifetime::PostTask(const base::Closure& task) {
