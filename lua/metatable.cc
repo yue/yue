@@ -22,8 +22,8 @@ bool WrapperBase::Push(State* state, void* ptr) {
     SetTop(state, top);
     return false;
   }
-  RawGet(state, -1, LightUserData(ptr));
-  if (GetType(state, -1) != LuaType::UserData) {
+  RawGet(state, -1, ptr);
+  if (GetType(state, -1) == LuaType::Nil) {
     SetTop(state, top);
     return false;
   }

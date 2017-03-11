@@ -127,6 +127,14 @@ struct Type<std::nullptr_t> {
 };
 
 template<>
+struct Type<void*> {
+  static constexpr const char* name = "lightuserdata";
+  static inline void Push(State* state, void* ptr) {
+    lua_pushlightuserdata(state, ptr);
+  }
+};
+
+template<>
 struct Type<base::StringPiece> {
   static constexpr const char* name = "string";
   static inline void Push(State* state, base::StringPiece str) {
