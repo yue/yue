@@ -12,7 +12,6 @@ loadable_module("node_yue") {
   sources = [
     "init.cc",
     "signal.h",
-    "signal_internal.h",
   ]
 
   if (node_runtime != "electron") {

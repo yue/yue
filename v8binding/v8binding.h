@@ -7,6 +7,7 @@
 
 #include "v8binding/callback.h"
 #include "v8binding/dict.h"
+#include "v8binding/property.h"
 #include "v8binding/prototype.h"
 
 #endif  // V8BINDING_V8BINDING_H_

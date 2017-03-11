@@ -5,6 +5,8 @@
 #ifndef NATIVEUI_LIFETIME_H_
 #define NATIVEUI_LIFETIME_H_
 
+#include <memory>
+
 #include "base/memory/weak_ptr.h"
 #include "base/message_loop/message_loop.h"
 #include "base/run_loop.h"
