@@ -36,15 +36,6 @@ inline void Push(State* state, ValueOnStack index) {
   lua_pushvalue(state, index.index);
 }
 
-// Thin wrapper for lua_pushlightuserdata.
-struct LightUserData {
-  explicit LightUserData(void* data) : data(data) {}
-  void* data;
-};
-inline void Push(State* state, LightUserData data) {
-  lua_pushlightuserdata(state, data.data);
-}
-
 // Thin wrapper for lua_pushcfunction.
 struct CFunction {
   explicit CFunction(lua_CFunction func) : func(func) {}
