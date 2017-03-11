@@ -48,7 +48,8 @@ v8::Local<v8::FunctionTemplate> PerIsolateData::GetFunctionTemplate(
 
 void PerIsolateData::SetObjectTracker(void* ptr,
                                       internal::ObjectTracker* wrapper) {
-  DCHECK(object_trackers_.find(ptr) == object_trackers_.end());
+  DCHECK(object_trackers_.find(ptr) == object_trackers_.end() ||
+         wrapper == nullptr);
   if (wrapper)
     object_trackers_[ptr] = wrapper;
   else

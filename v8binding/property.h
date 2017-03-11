@@ -16,6 +16,7 @@ struct MemberTraits {
   static const bool kShouldCacheValue = true;
   // Converter used when we decide not to use cached value.
   static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                          v8::Local<v8::Object> owner,
                                           v8::Global<v8::Value>* holder_value,
                                           const T&) {
     return v8::Undefined(context->GetIsolate());
@@ -53,7 +54,7 @@ class MemberHolder : public base::RefCounted<MemberHolder<T>> {
   ~MemberHolder() {}
 
   T ptr_;
-  v8::Global<v8::Value> value;
+  v8::Global<v8::Value> value_;
 };
 
 // static
@@ -74,13 +75,13 @@ void MemberHolder<T>::Getter(v8::Local<v8::String> property,
   }
 
   if (MemberTraits<MemberType>::kShouldCacheValue) {
-    if (!holder->value.IsEmpty()) {
+    if (!holder->value_.IsEmpty()) {
       info.GetReturnValue().Set(
-          v8::Local<v8::Value>::New(info.GetIsolate(), holder->value));
+          v8::Local<v8::Value>::New(info.GetIsolate(), holder->value_));
     }
   } else {
     info.GetReturnValue().Set(MemberTraits<MemberType>::ToV8(
-        context, &holder->value, instance->*(holder->ptr_)));
+        context, info.This(), &holder->value_, instance->*(holder->ptr_)));
   }
 }
 
@@ -106,7 +107,7 @@ void MemberHolder<T>::Setter(v8::Local<v8::String> property,
     return;
   }
   if (MemberTraits<MemberType>::kShouldCacheValue) {
-    holder->value = v8::Global<v8::Value>(info.GetIsolate(), value);
+    holder->value_ = v8::Global<v8::Value>(info.GetIsolate(), value);
   }
 }
 

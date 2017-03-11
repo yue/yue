@@ -11,6 +11,7 @@ loadable_module("node_yue") {
 
   sources = [
     "init.cc",
+    "signal.cc",
     "signal.h",
   ]
 

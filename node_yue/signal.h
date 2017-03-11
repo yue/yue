@@ -8,6 +8,22 @@
 #include "nativeui/nativeui.h"
 #include "v8binding/v8binding.h"
 
+namespace node_yue {
+
+// Tracks owner's lifetime and releases the holder on GC.
+class OwnerTracker : public vb::internal::ObjectTracker {
+ public:
+  OwnerTracker(v8::Isolate* isolate,
+               v8::Local<v8::Object> owner,
+               v8::Local<v8::Object> holder);
+  ~OwnerTracker() override;
+
+ private:
+  v8::Global<v8::Object> holder_ref_;
+};
+
+}  // namespace node_yue
+
 namespace vb {
 
 // Converter for Signal.
@@ -63,18 +79,22 @@ template<typename Sig>
 struct MemberTraits<nu::Signal<Sig>> {
   static const bool kShouldCacheValue = false;
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   v8::Local<v8::Object> owner,
                                    v8::Global<v8::Value>* holder_value,
                                    const nu::Signal<Sig>& signal) {
+    v8::Isolate* isolate = context->GetIsolate();
     if (!holder_value->IsEmpty())
-      return v8::Local<v8::Value>::New(context->GetIsolate(), *holder_value);
+      return v8::Local<v8::Value>::New(isolate, *holder_value);
     auto result = internal::CallConstructor<nu::Signal<Sig>>(context);
     if (result.IsEmpty())
-      return v8::Null(context->GetIsolate());
+      return v8::Null(isolate);
     // Store the pointer of signal in the object.
     v8::Local<v8::Object> obj = result.ToLocalChecked();
     obj->SetAlignedPointerInInternalField(
         0, const_cast<nu::Signal<Sig>*>(&signal));
-    holder_value->Reset(context->GetIsolate(), obj);
+    holder_value->Reset(isolate, obj);
+    // Track the lifetime of owner.
+    new node_yue::OwnerTracker(isolate, owner, obj);
     return obj;
   }
 };

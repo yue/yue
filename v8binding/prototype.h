@@ -71,7 +71,7 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
       return false;
     // Convert pointer to actual class.
     *out = static_cast<T*>(obj->GetAlignedPointerFromInternalField(0));
-    return true;
+    return *out != nullptr;
   }
 };
 
