@@ -24,8 +24,7 @@ struct MetaTable<T, typename std::enable_if<std::is_base_of<
     internal::InheritanceChain<T>::Push(state);
   }
 
-  // Create an instance of T.
-  // The returned pointer is managed by lua, so avoid keeping it.
+  // Create a new instance of T.
   template<typename... ArgTypes>
   static T* NewInstance(State* state, const ArgTypes&... args) {
     StackAutoReset reset(state);
@@ -34,15 +33,12 @@ struct MetaTable<T, typename std::enable_if<std::is_base_of<
     return instance;
   }
 
-  // Create a new lua wrapper for T.
+  // Create a new lua wrapper from existing |instance|.
   static void PushNewWrapper(State* state, T* instance) {
-    void* memory = lua_newuserdata(state, sizeof(internal::RefPtrWrapper<T>));
-    new(memory) internal::RefPtrWrapper<T>(state, instance);
-    static_assert(std::is_standard_layout<internal::RefPtrWrapper<T>>::value,
-                  "The internal::RefPtrWrapper<T> must be standard layout");
-    luaL_getmetatable(state, Type<T>::name);
-    DCHECK_EQ(lua::GetType(state, -1), lua::LuaType::Table)
-        << "The class must be created before creating the instance";
+    instance->AddRef();
+    *static_cast<T**>(lua_newuserdata(state, sizeof(T*))) = instance;
+    internal::WrapperTableSet(state, instance, -1);
+    Push(state);
     SetMetaTable(state, -2);
   }
 
@@ -69,16 +65,14 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
     StackAutoReset reset(state);
     // Verify the type and length.
     if (GetType(state, index) != lua::LuaType::UserData ||
-        RawLen(state, index) != sizeof(internal::RefPtrWrapper<T>) ||
+        RawLen(state, index) != sizeof(T**) ||
         !GetMetaTable(state, index))
       return false;
     // Verify fine the inheritance chain.
     if (!MetaTable<T>::IsBaseOf(state))
       return false;
     // Convert pointer to actual class.
-    auto* wrapper = static_cast<internal::RefPtrWrapper<T>*>(
-        lua_touserdata(state, index));
-    *out = wrapper->get();
+    *out = *static_cast<T**>(lua_touserdata(state, index));
     return true;
   }
   static inline void Push(State* state, T* ptr) {
@@ -99,12 +93,6 @@ struct MetaTable<T, typename std::enable_if<std::is_base_of<
   }
 
   static void PushNewWrapper(State* state, T* instance) {
-    void* memory = lua_newuserdata(state, sizeof(internal::WeakPtrWrapper<T>));
-    new(memory) internal::WeakPtrWrapper<T>(state, instance->GetWeakPtr());
-    luaL_getmetatable(state, Type<T>::name);
-    DCHECK_EQ(lua::GetType(state, -1), lua::LuaType::Table)
-        << "The class must be created before creating the instance";
-    SetMetaTable(state, -2);
   }
 };
 
@@ -119,10 +107,10 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
     StackAutoReset reset(state);
     // Verify the type and length.
     if (GetType(state, index) != lua::LuaType::UserData ||
-        RawLen(state, index) != sizeof(internal::WeakPtrWrapper<T>))
+        RawLen(state, index) != sizeof(base::WeakPtr<T>))
       return false;
     // Convert pointer to actual class.
-    auto* wrapper = static_cast<internal::WeakPtrWrapper<T>*>(
+    auto* wrapper = static_cast<base::WeakPtr<T>*>(
         lua_touserdata(state, index));
     T* ptr = wrapper->get();
     // WeakPtr might be invalidated.
@@ -137,7 +125,10 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
     // Do not cache the pointer of WeakPtr, because the pointer may point to a
     // variable on stack, which can have same address with previous variable on
     // the stack.
-    MetaTable<T>::PushNewWrapper(state, ptr);
+    void* memory = lua_newuserdata(state, sizeof(base::WeakPtr<T>));
+    new(memory) base::WeakPtr<T>(ptr->GetWeakPtr());
+    MetaTable<T>::Push(state);
+    SetMetaTable(state, -2);
   }
 };
 

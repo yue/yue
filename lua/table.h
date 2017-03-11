@@ -185,11 +185,18 @@ inline void PushWeakTable(State* state, const char* name, const char* mode) {
   }
 }
 
+// Define how a type handles __gc.
+template<typename T, typename Enable = void>
+struct GCTratis {
+  static inline void Destruct(void* data) {
+    static_cast<T*>(data)->~T();
+  }
+};
+
 // Generic callback for __gc.
 template<typename T>
 int OnGC(lua::State* state) {
-  auto* self = static_cast<T*>(lua_touserdata(state, 1));
-  self->~T();
+  GCTratis<T>::Destruct(lua_touserdata(state, 1));
   return 0;
 }
 
