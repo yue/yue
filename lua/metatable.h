@@ -11,19 +11,35 @@
 
 namespace lua {
 
+// Defines how the wrapper of RefCounted is destructed.
+template<typename T>
+struct GCTratis<T, typename std::enable_if<std::is_base_of<
+                       base::subtle::RefCountedBase, T>::value>::type> {
+  static inline void Destruct(void* data) {
+    (*static_cast<T**>(data))->Release();
+  }
+};
+
+// Defines how the wrapper of WeakPtr is destructed.
+template<typename T>
+struct GCTratis<T, typename std::enable_if<std::is_base_of<
+                       base::internal::WeakPtrBase,
+                       decltype(((T*)nullptr)->GetWeakPtr())>::value>::type> {
+  static inline void Destruct(void* data) {
+    using WrapperType = base::WeakPtr<T>;
+    static_cast<WrapperType*>(data)->~WrapperType();
+  }
+};
+
 // Generate metatable for native classes.
 template<typename T, typename Enable = void>
-struct MetaTable;
+struct MetaTable {
+};
 
 // Create metatable for RefCounted classes.
 template<typename T>
 struct MetaTable<T, typename std::enable_if<std::is_base_of<
                         base::subtle::RefCountedBase, T>::value>::type> {
-  // Create the metatable for T and push it on stack.
-  static void Push(State* state) {
-    internal::InheritanceChain<T>::Push(state);
-  }
-
   // Create a new instance of T.
   template<typename... ArgTypes>
   static T* NewInstance(State* state, const ArgTypes&... args) {
@@ -38,7 +54,7 @@ struct MetaTable<T, typename std::enable_if<std::is_base_of<
     instance->AddRef();
     *static_cast<T**>(lua_newuserdata(state, sizeof(T*))) = instance;
     internal::WrapperTableSet(state, instance, -1);
-    Push(state);
+    internal::InheritanceChain<T>::Push(state);
     SetMetaTable(state, -2);
   }
 
@@ -83,16 +99,6 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
   }
 };
 
-// Create metatable for classes that produce WeakPtr.
-template<typename T>
-struct MetaTable<T, typename std::enable_if<std::is_base_of<
-                        base::internal::WeakPtrBase,
-                        decltype(((T*)nullptr)->GetWeakPtr())>::value>::type> {
-  static void Push(State* state) {
-    internal::InheritanceChain<T>::Push(state);
-  }
-};
-
 // The default type information for WeakPtr class.
 template<typename T>
 struct Type<T*, typename std::enable_if<std::is_base_of<
@@ -124,7 +130,7 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
     // the stack.
     void* memory = lua_newuserdata(state, sizeof(base::WeakPtr<T>));
     new(memory) base::WeakPtr<T>(ptr->GetWeakPtr());
-    MetaTable<T>::Push(state);
+    internal::InheritanceChain<T>::Push(state);
     SetMetaTable(state, -2);
   }
 };
@@ -132,7 +138,7 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
 // Helper to push metatable.
 template<typename T>
 inline void Push(State* state, MetaTable<T>) {
-  MetaTable<T>::Push(state);
+  internal::InheritanceChain<T>::Push(state);
 }
 
 }  // namespace lua

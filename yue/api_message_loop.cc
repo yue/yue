@@ -78,6 +78,6 @@ struct Type<MessageLoop> {
 }  // namespace lua
 
 extern "C" int luaopen_yue_message_loop(lua::State* state) {
-  lua::MetaTable<MessageLoop>::Push(state);
+  lua::Push(state, lua::MetaTable<MessageLoop>());
   return 1;
 }
