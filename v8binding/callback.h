@@ -40,6 +40,10 @@ struct Type<base::Callback<Sig>> {
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> val,
                      base::Callback<Sig>* out) {
+    if (val->IsNull()) {
+      *out = base::Callback<Sig>();
+      return true;
+    }
     if (!val->IsFunction())
       return false;
     v8::Isolate* isolate = context->GetIsolate();

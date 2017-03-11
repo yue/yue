@@ -23,6 +23,10 @@ struct Type<base::Callback<ReturnType(ArgTypes...)>> {
   }
   static inline bool To(State* state, int index,
                         base::Callback<ReturnType(ArgTypes...)>* out) {
+    if (GetType(state, index) == LuaType::Nil) {
+      *out = base::Callback<ReturnType(ArgTypes...)>();
+      return true;
+    }
     if (GetType(state, index) != LuaType::Function)
       return false;
     *out = base::Bind(&internal::PCallHelper<ReturnType, ArgTypes...>::Run,
