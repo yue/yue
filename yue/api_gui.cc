@@ -687,46 +687,31 @@ struct Type<nu::MenuItem> {
 
 }  // namespace lua
 
-namespace {
-
-template<typename T>
-void SetTable(lua::State* state, const char* name) {
-  lua::Push(state, name);
-  lua::MetaTable<T>::Push(state);
-  lua_rawset(state, -3);
-}
-
-}  // namespace
-
 extern "C" int luaopen_yue_gui(lua::State* state) {
-  // Populate the table with GUI elements.
   lua::PushNewTable(state);
-  SetTable<nu::App>(state, "App");
-  SetTable<nu::Lifetime>(state, "Lifetime");
-  SetTable<nu::Window>(state, "Window");
-  SetTable<nu::Container>(state, "Container");
-  SetTable<nu::Button>(state, "Button");
-  SetTable<nu::Entry>(state, "Entry");
-  SetTable<nu::Label>(state, "Label");
-  SetTable<nu::Progress>(state, "Progress");
-  SetTable<nu::Group>(state, "Group");
-  SetTable<nu::Scroll>(state, "Scroll");
-  SetTable<nu::Font>(state, "Font");
-  SetTable<nu::Image>(state, "Image");
-  SetTable<nu::Painter>(state, "Painter");
-  SetTable<nu::MenuBar>(state, "MenuBar");
-  SetTable<nu::Menu>(state, "Menu");
-  SetTable<nu::MenuItem>(state, "MenuItem");
+  lua::RawSet(state, -1,
+              // Classes.
+              "App", lua::MetaTable<nu::App>(),
+              "Lifetime", lua::MetaTable<nu::Lifetime>(),
+              "Window", lua::MetaTable<nu::Window>(),
+              "Container", lua::MetaTable<nu::Container>(),
+              "Button", lua::MetaTable<nu::Button>(),
+              "Entry", lua::MetaTable<nu::Entry>(),
+              "Label", lua::MetaTable<nu::Label>(),
+              "Progress", lua::MetaTable<nu::Progress>(),
+              "Group", lua::MetaTable<nu::Group>(),
+              "Scroll", lua::MetaTable<nu::Scroll>(),
+              "Font", lua::MetaTable<nu::Font>(),
+              "Image", lua::MetaTable<nu::Image>(),
+              "Painter", lua::MetaTable<nu::Painter>(),
+              "MenuBar", lua::MetaTable<nu::MenuBar>(),
+              "Menu", lua::MetaTable<nu::Menu>(),
+              "MenuItem", lua::MetaTable<nu::MenuItem>(),
 #if defined(OS_MACOSX)
-  SetTable<nu::Vibrant>(state, "Vibrant");
+              "Vibrant", lua::MetaTable<nu::Vibrant>(),
 #endif
-
-  // Create APIs that only available as instances.
-  lua::Push(state, "app");
-  lua::MetaTable<nu::App>::PushNewWrapper(state, nu::State::current()->app());
-  lua_rawset(state, -3);
-  lua::Push(state, "lifetime");
-  lua::MetaTable<nu::Lifetime>::PushNewWrapper(state, nu::Lifetime::current());
-  lua_rawset(state, -3);
+              // Instances.
+              "app", nu::State::current()->app(),
+              "lifetime", nu::Lifetime::current());
   return 1;
 }

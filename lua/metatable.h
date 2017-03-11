@@ -91,9 +91,6 @@ struct MetaTable<T, typename std::enable_if<std::is_base_of<
   static void Push(State* state) {
     internal::InheritanceChain<T>::Push(state);
   }
-
-  static void PushNewWrapper(State* state, T* instance) {
-  }
 };
 
 // The default type information for WeakPtr class.
@@ -131,6 +128,12 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
     SetMetaTable(state, -2);
   }
 };
+
+// Helper to push metatable.
+template<typename T>
+inline void Push(State* state, MetaTable<T>) {
+  MetaTable<T>::Push(state);
+}
 
 }  // namespace lua
 
