@@ -19,7 +19,15 @@ inline bool PCall(State* state, ReturnType* result, const ArgTypes&... args) {
                 0 /* no message handler */) != LUA_OK)
     return false;
 
-  return Pop(state, result);
+  if (!Pop(state, result)) {
+    const char* name = GetTypeName(state, -1);
+    PopAndIgnore(state, 1);
+    PushFormatedString(state, "error converting return value from %s to %s",
+                       name, Type<ReturnType>::name);
+    return false;
+  }
+
+  return true;
 }
 
 // Passing nullptr means there is no result expected.

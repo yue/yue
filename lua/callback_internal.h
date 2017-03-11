@@ -183,9 +183,8 @@ struct Dispatcher<ReturnType(ArgTypes...)> {
           PushFormatedString(
               state, "error converting arg at index %d from %s to %s",
               context.invalid_arg,
-              name.empty() ?
-                  lua_typename(state, lua_type(state, context.invalid_arg)) :
-                  name.data(),
+              name.empty() ? GetTypeName(state, context.invalid_arg)
+                           : name.data(),
               context.invalid_arg_name);
         }
       } else {

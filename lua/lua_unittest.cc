@@ -181,6 +181,17 @@ TEST_F(LuaTest, PCallWithReturnValue) {
   ASSERT_EQ(lua::GetTop(state_), 0);
 }
 
+TEST_F(LuaTest, PCallFailToConvertReturnValue) {
+  int num = 42;
+  bool out;
+  lua::Push(state_, &FunctionReturnsInt);
+  ASSERT_FALSE(lua::PCall(state_, &out, num));
+  EXPECT_EQ(lua::GetTop(state_), 1);
+  std::string error;
+  ASSERT_TRUE(lua::Pop(state_, &error));
+  EXPECT_EQ(error, "error converting return value from number to boolean");
+}
+
 std::tuple<std::string, int> FunctionReturnsTuple(
     const std::string& str, int number) {
   return std::make_tuple(str, number);

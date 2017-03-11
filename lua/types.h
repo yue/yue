@@ -35,6 +35,10 @@ inline LuaType GetType(State* state, int index) {
   return static_cast<LuaType>(lua_type(state, index));
 }
 
+inline const char* GetTypeName(State* state, int index) {
+  return lua_typename(state, lua_type(state, index));
+}
+
 // Get how many lua values the type represents.
 template<typename T>
 struct Values {
@@ -184,9 +188,16 @@ struct Type<const char*> {
 
 template<size_t n>
 struct Type<const char[n]> {
+  static constexpr const char* name = "string";
   static inline void Push(State* state, const char* str) {
     lua_pushlstring(state, str, n - 1);
   }
+};
+
+// Provide type description for tuple type.
+template<typename... ArgTypes>
+struct Type<std::tuple<ArgTypes...>> {
+  static constexpr const char* name = "tuple<>";
 };
 
 }  // namespace lua
