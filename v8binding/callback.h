@@ -65,10 +65,6 @@ struct Type<T, typename std::enable_if<
                                           T callback) {
     return CreateFunctionTemplate(context, base::Bind(callback))->GetFunction();
   }
-  static inline v8::Local<v8::Data> ToV8Data(v8::Local<v8::Context> context,
-                                             T callback) {
-    return CreateFunctionTemplate(context, base::Bind(callback));
-  }
 };
 
 // Specialize for member function.
@@ -80,11 +76,6 @@ struct Type<T, typename std::enable_if<
                                           T callback) {
     return CreateFunctionTemplate(context, base::Bind(callback),
                                   HolderIsFirstArgument)->GetFunction();
-  }
-  static inline v8::Local<v8::Data> ToV8Data(v8::Local<v8::Context> context,
-                                             T callback) {
-    return CreateFunctionTemplate(context, base::Bind(callback),
-                                  HolderIsFirstArgument);
   }
 };
 

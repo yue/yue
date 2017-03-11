@@ -162,12 +162,6 @@ inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
 }
 
 template<typename T>
-inline v8::Local<v8::Data> ToV8Data(v8::Local<v8::Context> context,
-                                    const T& type) {
-  return Type<T>::ToV8Data(context, type);
-}
-
-template<typename T>
 inline bool FromV8(v8::Local<v8::Context> context,
                    v8::Local<v8::Value> value,
                    T* out) {

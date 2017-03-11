@@ -5,9 +5,43 @@
 #ifndef V8BINDING_DICT_H_
 #define V8BINDING_DICT_H_
 
-#include "v8binding/types.h"
+#include "v8binding/callback.h"
 
 namespace vb {
+
+namespace internal {
+
+// Define how can a type be converted to a field of ObjectTemplate.
+template<typename T, typename Enable = void>
+struct ToV8Data {
+  static inline v8::Local<v8::Data> Do(v8::Local<v8::Context> context,
+                                       const T& value) {
+    return ToV8(context, value);
+  }
+};
+
+// Specialize for native functions.
+template<typename T>
+struct ToV8Data<T, typename std::enable_if<
+                       internal::is_function_pointer<T>::value>::type> {
+  static inline v8::Local<v8::Data> Do(v8::Local<v8::Context> context,
+                                       T callback) {
+    return CreateFunctionTemplate(context, base::Bind(callback));
+  }
+};
+
+// Specialize for member function.
+template<typename T>
+struct ToV8Data<T, typename std::enable_if<
+                       std::is_member_function_pointer<T>::value>::type> {
+  static inline v8::Local<v8::Data> Do(v8::Local<v8::Context> context,
+                                       T callback) {
+    return CreateFunctionTemplate(context, base::Bind(callback),
+                                  HolderIsFirstArgument);
+  }
+};
+
+}  // namespace internal
 
 // Helper for setting Object.
 template<typename Key, typename Value>
@@ -23,7 +57,7 @@ inline bool Set(v8::Local<v8::Context> context,
                 v8::Local<v8::ObjectTemplate> templ,
                 const Key& key, const Value& value) {
   templ->Set(ToV8(context, key).template As<v8::String>(),
-             ToV8Data(context, value));
+             internal::ToV8Data<Value>::Do(context, value));
   return true;
 }
 
@@ -32,8 +66,7 @@ template<typename Dict, typename Key, typename Value, typename... ArgTypes>
 inline bool Set(v8::Local<v8::Context> context, Dict dict,
                 const Key& key, const Value& value,
                 const ArgTypes&... args) {
-  return Set(context, dict, key, value) &&
-         Set(context, dict, args...);
+  return Set(context, dict, key, value) && Set(context, dict, args...);
 }
 
 // Helper for getting from Object.
