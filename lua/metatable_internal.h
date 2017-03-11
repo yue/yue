@@ -15,26 +15,21 @@ namespace lua {
 
 namespace internal {
 
-// Base of wrapper classes that maps pointers to lua references.
-class WrapperBase {
- public:
-  // Convert the class to Lua and push it on stack.
-  static bool Push(State* state, void* ptr);
+// Read a |key| from weak wrapper table and put the wrapper on stack.
+// Return false when there is no such |key| in table.
+bool WrapperTableGet(State* state, void* key);
 
- protected:
-  WrapperBase(State* state, void* ptr);
-
- private:
-  DISALLOW_COPY_AND_ASSIGN(WrapperBase);
-};
+// Save a wrapper at |index| to weak wrapper table with |key|.
+void WrapperTableSet(State* state, void* key, int index);
 
 // The specialized Wrappable class for storing refcounted class.
 // We need to guareentee that RefPtrWrapper is standard layout, since we may
 // use convertions like RefPtrWrapper<Derive> to RefPtrWrapper<Base>.
 template<typename T>
-class RefPtrWrapper : public WrapperBase {
+class RefPtrWrapper {
  public:
-  RefPtrWrapper(State* state, T* t) : WrapperBase(state, t), ptr_(t) {
+  RefPtrWrapper(State* state, T* ptr) : ptr_(ptr) {
+    WrapperTableSet(state, ptr, -1);
     ptr_->AddRef();
   }
 
@@ -50,10 +45,11 @@ class RefPtrWrapper : public WrapperBase {
 
 // The specialized Wrappable class for storing weakptr class.
 template<typename T>
-class WeakPtrWrapper : public WrapperBase {
+class WeakPtrWrapper {
  public:
-  WeakPtrWrapper(State* state, base::WeakPtr<T> t)
-      : WrapperBase(state, t.get()), ptr_(t) {}
+  WeakPtrWrapper(State* state, base::WeakPtr<T> ptr) : ptr_(ptr) {
+    WrapperTableSet(state, ptr.get(), -1);
+  }
 
   T* get() const { return ptr_.get(); }
 

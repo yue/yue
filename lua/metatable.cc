@@ -14,15 +14,10 @@ const char* kWrappaerTablename = "yue.internal.wrappertable";
 
 }  // namespace
 
-// static
-bool WrapperBase::Push(State* state, void* ptr) {
+bool WrapperTableGet(State* state, void* key) {
   int top = GetTop(state);
-  luaL_getmetatable(state, kWrappaerTablename);
-  if (GetType(state, -1) != LuaType::Table) {
-    SetTop(state, top);
-    return false;
-  }
-  RawGet(state, -1, ptr);
+  PushWeakTable(state, kWrappaerTablename, "v");
+  RawGet(state, -1, key);
   if (GetType(state, -1) == LuaType::Nil) {
     SetTop(state, top);
     return false;
@@ -31,11 +26,11 @@ bool WrapperBase::Push(State* state, void* ptr) {
   return true;
 }
 
-WrapperBase::WrapperBase(State* state, void* ptr) {
-  DCHECK_EQ(GetType(state, -1), LuaType::UserData);
+void WrapperTableSet(State* state, void* key, int index) {
+  index = AbsIndex(state, index);
   StackAutoReset reset(state);
   PushWeakTable(state, kWrappaerTablename, "v");
-  RawSet(state, -1, LightUserData(ptr), ValueOnStack(state, -2));
+  RawSet(state, -1, key, ValueOnStack(state, index));
 }
 
 int DefaultPropertyLookup(State* state) {
