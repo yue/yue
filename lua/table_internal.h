@@ -80,6 +80,11 @@ inline void UnsafeGet(State* state, int index, const Key& key) {
   lua_gettable(state, index);
 }
 
+// Get and put on stack.
+inline void UnsafeGet(State* state, int index) {
+  lua_gettable(state, index);
+}
+
 // Optimize for lua_geti.
 template<typename Value>
 inline void UnsafeGet(State* state, int index, int key) {

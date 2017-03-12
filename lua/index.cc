@@ -6,13 +6,40 @@
 
 namespace lua {
 
+namespace internal {
+
 int DefaultPropertyLookup(State* state) {
   DCHECK_EQ(GetType(state, 1), LuaType::UserData);
-  lua_getmetatable(state, 1);
-  DCHECK_EQ(GetType(state, 3), LuaType::Table);
-  lua_pushvalue(state, 2);
-  lua_gettable(state, 3);
+  GetMetaTable(state, 1);  // self
+  int metatable = AbsIndex(state, -1);
+  DCHECK_EQ(GetType(state, metatable), LuaType::Table);
+  Push(state, ValueOnStack(state, 2));  // key
+  internal::UnsafeGet(state, metatable);
   return 1;
 }
+
+int MemberLookup(State* state) {
+  int members = lua_upvalueindex(1);
+  RawGet(state, members, ValueOnStack(state, 2));
+  if (GetType(state, -1) != LuaType::Nil) {
+    auto* holder = static_cast<MemberHolderBase*>(lua_touserdata(state, -1));
+    DCHECK(holder);
+    return holder->Index(state);
+  }
+  return DefaultPropertyLookup(state);
+}
+
+int MemberAssign(State* state) {
+  int members = lua_upvalueindex(1);
+  RawGet(state, members, ValueOnStack(state, 2));
+  if (GetType(state, -1) != LuaType::Nil) {
+    auto* holder = static_cast<MemberHolderBase*>(lua_touserdata(state, -1));
+    DCHECK(holder);
+    return holder->NewIndex(state);
+  }
+  return 0;
+}
+
+}  // namespace internal
 
 }  // namespace lua

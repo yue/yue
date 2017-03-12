@@ -209,7 +209,7 @@ inline void PushCFunction(State* state, const base::Callback<Sig>& callback) {
   void* holder = lua_newuserdata(state, sizeof(HolderT));
   new(holder) HolderT(state, callback);
 
-  Push(state, CClosure(&internal::Dispatcher<Sig>::DispatchToCallback, 1));
+  lua_pushcclosure(state, &internal::Dispatcher<Sig>::DispatchToCallback, 1);
 }
 
 // Call PCall for the gloal handle.

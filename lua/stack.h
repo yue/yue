@@ -15,6 +15,31 @@
 
 namespace lua {
 
+// Thin wrappers of settop/gettop.
+inline void SetTop(State* state, int index) {
+  lua_settop(state, index);
+}
+
+inline int GetTop(State* state) {
+  return lua_gettop(state);
+}
+
+// Automatically clear the values on stack.
+class StackAutoReset {
+ public:
+  explicit StackAutoReset(State* state) : state_(state), top_(GetTop(state)) {}
+  ~StackAutoReset() { SetTop(state_, top_); }
+
+  int top() const { return top_; }
+
+ private:
+  State* state_;
+  int top_;
+
+  DISALLOW_COPY_AND_ASSIGN(StackAutoReset);
+};
+
+
 // Function template for Type<ArgType>::Push.
 template<typename ArgType>
 inline void Push(State* state, const ArgType& arg) {
@@ -47,11 +72,15 @@ inline void Push(State* state, CFunction func) {
 
 // Thin wrapper for lua_pushcclosure.
 struct CClosure {
-  explicit CClosure(lua_CFunction func, int n) : func(func), n(n) {}
+  CClosure(State* state, lua_CFunction func, int n)
+      : func(func), n(n), top(GetTop(state)) {}
   lua_CFunction func;
   int n;
+  int top;
 };
 inline void Push(State* state, CClosure closure) {
+  for (int n = closure.n - 1; n >= 0; n--)
+    lua_pushvalue(state, closure.top - n);
   lua_pushcclosure(state, closure.func, closure.n);
 }
 
@@ -147,30 +176,6 @@ inline bool Pop(State* state, ArgTypes... args) {
     return false;
   }
 }
-
-// Thin wrappers of settop/gettop.
-inline void SetTop(State* state, int index) {
-  lua_settop(state, index);
-}
-
-inline int GetTop(State* state) {
-  return lua_gettop(state);
-}
-
-// Automatically clear the values on stack.
-class StackAutoReset {
- public:
-  explicit StackAutoReset(State* state) : state_(state), top_(GetTop(state)) {}
-  ~StackAutoReset() { SetTop(state_, top_); }
-
-  int top() const { return top_; }
-
- private:
-  State* state_;
-  int top_;
-
-  DISALLOW_COPY_AND_ASSIGN(StackAutoReset);
-};
 
 // Thin wrapper of lua_compare.
 enum class CompareOp {

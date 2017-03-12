@@ -20,6 +20,9 @@ struct UserData {
   static inline void Destruct(Type* data) {
     data->~Type();
   }
+  static inline T* From(Type* data) {
+    return data;
+  }
 };
 
 // Generic callback for __gc.

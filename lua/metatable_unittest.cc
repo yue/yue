@@ -426,20 +426,9 @@ namespace lua {
 template<>
 struct Type<PropertiesClass> {
   static constexpr const char* name = "PropertiesClass";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index, "new", &CreateInstance<PropertiesClass>);
-  }
-  static int Index(State* state) {
-    PropertiesClass* self;
-    std::string name;
-    if (!To(state, 1, &self, &name))
-      return 0;
-    if (name == "property") {
-      Push(state, self->property);
-      return 1;
-    } else {
-      return 0;
-    }
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable, "new", &CreateInstance<PropertiesClass>);
+    RawSetProperty(state, metatable, "property", &PropertiesClass::property);
   }
 };
 
@@ -450,73 +439,29 @@ TEST_F(MetaTableTest, Index) {
   lua::RawGet(state_, 1, "__index");
   EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Function);
   lua::RawGet(state_, 1, "__newindex");
-  EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Nil);
+  EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Function);
 
   lua::Push(state_, new PropertiesClass);
   int property = -1;
   ASSERT_TRUE(lua::PGetAndPop(state_, -1, "property", &property));
   EXPECT_EQ(property, 0);
-}
-
-class NewIndexClass : public base::RefCounted<NewIndexClass> {
- public:
-  NewIndexClass() {}
-
-  int property = 0;
-
- private:
-  friend class base::RefCounted<NewIndexClass>;
-
-  ~NewIndexClass() {}
-};
-
-namespace lua {
-
-template<>
-struct Type<NewIndexClass> {
-  static constexpr const char* name = "NewIndexClass";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index, "new", &CreateInstance<NewIndexClass>);
-  }
-  static int Index(State* state) {
-    NewIndexClass* self;
-    std::string name;
-    if (!To(state, 1, &self, &name))
-      return 0;
-    if (name == "property") {
-      Push(state, self->property);
-      return 1;
-    }
-    return 0;
-  }
-  static int NewIndex(State* state) {
-    NewIndexClass* self;
-    std::string name;
-    int value;
-    if (!To(state, 1, &self, &name, &value))
-      return 0;
-    if (name == "property") {
-      self->property = value;
-      return 1;
-    }
-    return 0;
-  }
-};
-
-}  // namespace lua
-
-TEST_F(MetaTableTest, NewIndex) {
-  lua::Push(state_, lua::MetaTable<NewIndexClass>());
-  lua::RawGet(state_, 1, "__index");
-  EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Function);
-  lua::RawGet(state_, 1, "__newindex");
-  EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Function);
-
-  lua::Push(state_, new NewIndexClass);
   ASSERT_TRUE(lua::PSet(state_, -1, "property", 123));
-  int property;
   ASSERT_TRUE(lua::PGetAndPop(state_, -1, "property", &property));
   EXPECT_EQ(property, 123);
+}
+
+TEST_F(MetaTableTest, DefaultIndex) {
+  lua::Push(state_, new PropertiesClass);
+  ASSERT_TRUE(lua::PGet(state_, -1, "new"));
+  EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Function);
+}
+
+TEST_F(MetaTableTest, NewIndexFailure) {
+  lua::Push(state_, new PropertiesClass);
+  ASSERT_FALSE(lua::PSet(state_, -1, "property", "string"));
+  std::string error;
+  ASSERT_TRUE(lua::Pop(state_, &error));
+  ASSERT_EQ(error, "error converting string to integer");
 }
 
 class TestWeakPtrClass {
