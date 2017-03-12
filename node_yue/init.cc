@@ -246,6 +246,174 @@ struct Type<nu::Container> {
   }
 };
 
+template<>
+struct Type<nu::Button::Type> {
+  static constexpr const char* name = "yue.Button.Type";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::Button::Type* out) {
+    std::string type;
+    if (!vb::FromV8(context, value, &type))
+      return false;
+    if (type.empty() || type == "normal") {
+      *out = nu::Button::Normal;
+      return true;
+    } else if (type == "checkbox") {
+      *out = nu::Button::CheckBox;
+      return true;
+    } else if (type == "radio") {
+      *out = nu::Button::Radio;
+      return true;
+    } else {
+      return false;
+    }
+  }
+};
+
+template<>
+struct Type<nu::Button> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Button";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "setTitle", &nu::Button::SetTitle,
+        "getTitle", &nu::Button::GetTitle,
+        "setChecked", &nu::Button::SetChecked,
+        "isChecked", &nu::Button::IsChecked);
+    SetProperty(context, templ,
+                "onClick", &nu::Button::on_click);
+  }
+};
+
+template<>
+struct Type<nu::Entry> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Entry";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor, "create", &NewInstance<nu::Entry>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "setText", &nu::Entry::SetText,
+        "getText", &nu::Entry::GetText);
+    SetProperty(context, templ,
+                "onActivate", &nu::Entry::on_activate,
+                "onTextChange", &nu::Entry::on_text_change);
+  }
+};
+
+template<>
+struct Type<nu::Label> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Label";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+        "create", &NewInstance<nu::Label, const std::string&>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "setText", &nu::Label::SetText,
+        "getText", &nu::Label::GetText);
+  }
+};
+
+template<>
+struct Type<nu::Progress> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Progress";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor, "create", &NewInstance<nu::Progress>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "setValue", &nu::Progress::SetValue,
+        "getValue", &nu::Progress::GetValue,
+        "setIndeterminate", &nu::Progress::SetIndeterminate,
+        "isIndeterminate", &nu::Progress::IsIndeterminate);
+  }
+};
+
+template<>
+struct Type<nu::Group> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Group";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+        "create", &NewInstance<nu::Group, const std::string&>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "setContentView", &nu::Group::SetContentView,
+        "getContentView", &nu::Group::GetContentView,
+        "setTitle", &nu::Group::SetTitle,
+        "getTitle", &nu::Group::GetTitle);
+  }
+};
+
+template<>
+struct Type<nu::Scroll::Policy> {
+  static constexpr const char* name = "yue.Scroll.Policy";
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   nu::Scroll::Policy policy) {
+    if (policy == nu::Scroll::Policy::Always)
+      return vb::ToV8(context, "always");
+    else if (policy == nu::Scroll::Policy::Never)
+      return vb::ToV8(context, "never");
+    else
+      return vb::ToV8(context, "automatic");
+  }
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::Scroll::Policy* out) {
+    std::string policy;
+    if (!vb::FromV8(context, value, &policy))
+      return false;
+    if (policy == "automatic") {
+      *out = nu::Scroll::Policy::Automatic;
+      return true;
+    } else if (policy == "always") {
+      *out = nu::Scroll::Policy::Always;
+      return true;
+    } else if (policy == "never") {
+      *out = nu::Scroll::Policy::Never;
+      return true;
+    } else {
+      return false;
+    }
+  }
+};
+
+template<>
+struct Type<nu::Scroll> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Scroll";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor, "create", &NewInstance<nu::Scroll>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "setScrollBarPolicy", &nu::Scroll::SetScrollBarPolicy,
+        "setContentSize", &nu::Scroll::SetContentSize,
+        "getContentSize", &nu::Scroll::GetContentSize,
+        "setContentView", &nu::Scroll::SetContentView,
+        "getContentView", &nu::Scroll::GetContentView);
+  }
+};
+
 }  // namespace vb
 
 namespace node_yue {
@@ -270,6 +438,12 @@ void Initialize(v8::Local<v8::Object> exports) {
           "Window", vb::GetConstructor<nu::Window>(context),
           "View", vb::GetConstructor<nu::View>(context),
           "Container", vb::GetConstructor<nu::Container>(context),
+          "Button", vb::GetConstructor<nu::Button>(context),
+          "Entry", vb::GetConstructor<nu::Entry>(context),
+          "Label", vb::GetConstructor<nu::Label>(context),
+          "Progress", vb::GetConstructor<nu::Progress>(context),
+          "Group", vb::GetConstructor<nu::Group>(context),
+          "Scroll", vb::GetConstructor<nu::Scroll>(context),
           // Methods.
 #ifndef ELECTRON_BUILD
           "lifetime", nu::Lifetime::current(),

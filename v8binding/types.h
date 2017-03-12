@@ -131,14 +131,6 @@ struct Type<base::StringPiece> {
   }
 };
 
-template<>
-struct Type<v8::Local<v8::Value>> {
-  static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
-                                          v8::Local<v8::Value> value) {
-    return value;
-  }
-};
-
 template<typename T>
 struct Type<v8::Local<T>, typename std::enable_if<std::is_base_of<
                               v8::Value, T>::value>::type> {
