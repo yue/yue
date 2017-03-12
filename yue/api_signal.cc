@@ -20,7 +20,7 @@ void PushObjectMembersTable(lua::State* state, int index) {
   lua::RawGet(state, -1, lua::ValueOnStack(state, index));
   if (lua::GetType(state, -1) != lua::LuaType::Table) {
     // This is the first record.
-    lua::PushNewTable(state);
+    lua::NewTable(state);
     lua::RawSet(state, -3, lua::ValueOnStack(state, index),
                            lua::ValueOnStack(state, -1));
   }

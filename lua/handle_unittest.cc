@@ -19,7 +19,7 @@ class HandleTest : public testing::Test {
 
 TEST_F(HandleTest, Persistent) {
   size_t original_registry_len = lua::RawLen(state_, LUA_REGISTRYINDEX);
-  lua::PushNewTable(state_);
+  lua::NewTable(state_);
   std::unique_ptr<lua::Persistent> handle(lua::Persistent::New(state_, -1));
   ASSERT_EQ(lua::RawLen(state_, LUA_REGISTRYINDEX), original_registry_len + 1);
   lua::PopAndIgnore(state_, 1);
@@ -40,8 +40,8 @@ void OnGC(int* ptr) {
 
 TEST_F(HandleTest, GC) {
   int changed = 123;
-  lua::PushNewTable(state_);
-  lua::PushNewTable(state_);
+  lua::NewTable(state_);
+  lua::NewTable(state_);
   lua::RawSet(state_, 2, "__gc", base::Bind(&OnGC, &changed));
   lua::SetMetaTable(state_, 1);
   ASSERT_EQ(lua::GetTop(state_), 1);
@@ -53,8 +53,8 @@ TEST_F(HandleTest, GC) {
 
 TEST_F(HandleTest, Weak) {
   int changed = 123;
-  lua::PushNewTable(state_);
-  lua::PushNewTable(state_);
+  lua::NewTable(state_);
+  lua::NewTable(state_);
   lua::RawSet(state_, 2, "__gc", base::Bind(&OnGC, &changed));
   lua::SetMetaTable(state_, 1);
   ASSERT_EQ(lua::GetTop(state_), 1);

@@ -15,7 +15,7 @@ template<>
 struct Type<nu::Size> {
   static constexpr const char* name = "yue.Size";
   static inline void Push(State* state, const nu::Size& size) {
-    lua::PushNewTable(state);
+    lua::NewTable(state);
     lua::RawSet(state, -1, "width", size.width(), "height", size.height());
   }
   static inline bool To(State* state, int index, nu::Size* out) {
@@ -37,7 +37,7 @@ template<>
 struct Type<nu::SizeF> {
   static constexpr const char* name = "yue.Size";
   static inline void Push(State* state, const nu::SizeF& size) {
-    lua::PushNewTable(state);
+    lua::NewTable(state);
     lua::RawSet(state, -1, "width", size.width(), "height", size.height());
   }
   static inline bool To(State* state, int index, nu::SizeF* out) {
@@ -59,7 +59,7 @@ template<>
 struct Type<nu::RectF> {
   static constexpr const char* name = "yue.Rect";
   static inline void Push(State* state, const nu::RectF& rect) {
-    lua::PushNewTable(state);
+    lua::NewTable(state);
     lua::RawSet(state, -1,
                 "x", rect.x(), "y", rect.y(),
                 "width", rect.width(), "height", rect.height());
@@ -85,7 +85,7 @@ template<>
 struct Type<nu::Vector2dF> {
   static constexpr const char* name = "yue.Vector2d";
   static inline void Push(State* state, const nu::Vector2dF& vec) {
-    lua::PushNewTable(state);
+    lua::NewTable(state);
     lua::RawSet(state, -1, "x", vec.x(), "y", vec.y());
   }
   static inline bool To(State* state, int index, nu::Vector2dF* out) {
@@ -259,7 +259,7 @@ struct Type<nu::Entry> {
   using base = nu::View;
   static constexpr const char* name = "yue.Entry";
   static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index, "new", &NewInstance<nu::Entry>,
+    RawSet(state, index, "new", &CreateInstance<nu::Entry>,
                          "settext", &nu::Entry::SetText,
                          "gettext", &nu::Entry::GetText);
   }
@@ -287,7 +287,7 @@ struct Type<nu::Label> {
   static constexpr const char* name = "yue.Label";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
-           "new", &NewInstance<nu::Label, const std::string&>,
+           "new", &CreateInstance<nu::Label, const std::string&>,
            "settext", &nu::Label::SetText,
            "gettext", &nu::Label::GetText);
   }
@@ -298,7 +298,7 @@ struct Type<nu::Progress> {
   using base = nu::View;
   static constexpr const char* name = "yue.Progress";
   static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index, "new", &NewInstance<nu::Progress>,
+    RawSet(state, index, "new", &CreateInstance<nu::Progress>,
                          "setvalue", &nu::Progress::SetValue,
                          "getvalue", &nu::Progress::GetValue,
                          "setindeterminate", &nu::Progress::SetIndeterminate,
@@ -312,7 +312,7 @@ struct Type<nu::Group> {
   static constexpr const char* name = "yue.Group";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
-           "new", &NewInstance<nu::Group, const std::string&>,
+           "new", &CreateInstance<nu::Group, const std::string&>,
            "setcontentview", &nu::Group::SetContentView,
            "getcontentview", &nu::Group::GetContentView,
            "settitle", &nu::Group::SetTitle,
@@ -326,7 +326,7 @@ struct Type<nu::Container> {
   static constexpr const char* name = "yue.Container";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
-           "new", &NewInstance<nu::Container>,
+           "new", &CreateInstance<nu::Container>,
            "getpreferredsize", &nu::Container::GetPreferredSize,
            "getpreferredwidthforheight",
            &nu::Container::GetPreferredWidthForHeight,
@@ -365,7 +365,7 @@ struct Type<nu::Vibrant> {
   using base = nu::Container;
   static constexpr const char* name = "yue.Vibrant";
   static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index, "new", &NewInstance<nu::Vibrant>);
+    RawSet(state, index, "new", &CreateInstance<nu::Vibrant>);
   }
   static int Index(State* state) {
     return Type<base>::Index(state);
@@ -412,7 +412,7 @@ struct Type<nu::Scroll> {
   static constexpr const char* name = "yue.Scroll";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
-           "new", &NewInstance<nu::Scroll>,
+           "new", &CreateInstance<nu::Scroll>,
            "setscrollbarpolicy", &nu::Scroll::SetScrollBarPolicy,
            "getscrollbarpolicy", &nu::Scroll::GetScrollBarPolicy,
            "setcontentsize", &nu::Scroll::SetContentSize,
@@ -437,7 +437,7 @@ struct Type<nu::Window> {
   static constexpr const char* name = "yue.Window";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
-           "new", &NewInstance<nu::Window, const nu::Window::Options&>,
+           "new", &CreateInstance<nu::Window, const nu::Window::Options&>,
            "close", &nu::Window::Close,
            "setcontentbounds", &nu::Window::SetContentBounds,
            "getcontentbounds", &nu::Window::GetContentBounds,
@@ -474,7 +474,7 @@ struct Type<nu::Font> {
   static constexpr const char* name = "yue.Font";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
-           "new", &NewInstance<nu::Font, const std::string&, int>,
+           "new", &CreateInstance<nu::Font, const std::string&, int>,
            "default", &GetDefault,
            "getname", &nu::Font::GetName,
            "getsize", &nu::Font::GetSize);
@@ -489,7 +489,7 @@ struct Type<nu::Image> {
   static constexpr const char* name = "yue.Image";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
-           "newfromfile", &NewInstance<nu::Image, const nu::String&>,
+           "newfromfile", &CreateInstance<nu::Image, const nu::String&>,
            "getsize", &nu::Image::GetSize);
   }
 };
@@ -687,7 +687,7 @@ struct Type<nu::MenuItem> {
 }  // namespace lua
 
 extern "C" int luaopen_yue_gui(lua::State* state) {
-  lua::PushNewTable(state);
+  lua::NewTable(state);
   lua::RawSet(state, -1,
               // Classes.
               "App", lua::MetaTable<nu::App>(),

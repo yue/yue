@@ -147,7 +147,7 @@ int Print(lua::State* state) {
 }  // namespace
 
 extern "C" int luaopen_yue_util(lua::State* state) {
-  lua::PushNewTable(state);
+  lua::NewTable(state);
   lua::RawSet(state, -1, "inspect", lua::CFunction(&Inspect));
   lua::RawSet(state, -1, "print", lua::CFunction(&Print));
   return 1;

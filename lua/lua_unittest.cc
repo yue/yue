@@ -207,7 +207,7 @@ TEST_F(LuaTest, PCallWithMultipleReturnValues) {
 }
 
 TEST_F(LuaTest, RawSetGet) {
-  lua::PushNewTable(state_);
+  lua::NewTable(state_);
   ASSERT_EQ(lua::GetTop(state_), 1);
   lua::RawSet(state_, 1, "key1", 1);
   lua::RawSet(state_, -1, "key2", 2, 1, "v1");
@@ -228,7 +228,7 @@ TEST_F(LuaTest, RawSetGet) {
 }
 
 TEST_F(LuaTest, RawGetWithPop) {
-  lua::PushNewTable(state_);
+  lua::NewTable(state_);
   lua::RawSet(state_, 1, 123, "oldvalue");
   lua::RawSet(state_, 1, "key", 123, 123, "value");
   std::string str;
@@ -245,7 +245,7 @@ TEST_F(LuaTest, RawGetWithPop) {
 }
 
 TEST_F(LuaTest, PSetGet) {
-  lua::PushNewTable(state_);
+  lua::NewTable(state_);
   ASSERT_EQ(lua::GetTop(state_), 1);
   ASSERT_TRUE(lua::PSet(state_, 1, "key1", 1, "key2", "value2", 3, "value3"));
   int v1;
@@ -259,7 +259,7 @@ TEST_F(LuaTest, PSetGet) {
 }
 
 TEST_F(LuaTest, PGetAndPop) {
-  lua::PushNewTable(state_);
+  lua::NewTable(state_);
   ASSERT_EQ(lua::GetTop(state_), 1);
   ASSERT_TRUE(lua::PSet(state_, 1, "key1", true, "key2", "v2", 3, "value3"));
   bool v1;

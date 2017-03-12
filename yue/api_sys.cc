@@ -22,7 +22,7 @@ namespace {
 }  // namespace
 
 extern "C" int luaopen_yue_sys(lua::State* state) {
-  lua::PushNewTable(state);
+  lua::NewTable(state);
   lua::RawSet(state, -1, "platform", PLATFORM);
   return 1;
 }

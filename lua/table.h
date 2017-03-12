@@ -14,7 +14,7 @@
 namespace lua {
 
 // Thin wrapper of lua_createtable.
-inline void PushNewTable(State* state, int nargs = 0, int nrec = 0) {
+inline void NewTable(State* state, int nargs = 0, int nrec = 0) {
   lua_createtable(state, nargs, nrec);
 }
 
@@ -178,7 +178,7 @@ inline bool PGetAndPop(State* state, int index, const ArgTypes&... args) {
 // Helper to create weak tables.
 inline void PushWeakTable(State* state, const char* name, const char* mode) {
   if (luaL_newmetatable(state, name)) {
-    lua::PushNewTable(state);
+    lua::NewTable(state);
     lua::RawSet(state, -1, "__mode", mode);
     lua::SetMetaTable(state, -2);
   }

@@ -71,7 +71,7 @@ bool IsMetaTableInheritedFrom(State* state) {
 
 // A helper for creating a new instance of T.
 template<typename T, typename... ArgTypes>
-T* NewInstance(State* state, const ArgTypes&... args) {
+T* CreateInstance(State* state, const ArgTypes&... args) {
   StackAutoReset reset(state);
   T* ptr = new T(args...);
   NewUserData(state, ptr);

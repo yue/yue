@@ -45,6 +45,16 @@ inline void Push(State* state, CFunction func) {
   lua_pushcfunction(state, func.func);
 }
 
+// Thin wrapper for lua_pushcclosure.
+struct CClosure {
+  explicit CClosure(lua_CFunction func, int n) : func(func), n(n) {}
+  lua_CFunction func;
+  int n;
+};
+inline void Push(State* state, CClosure closure) {
+  lua_pushcclosure(state, closure.func, closure.n);
+}
+
 // Certain template functions are pushing nothing.
 inline void Push(State* state) {
 }

@@ -12,7 +12,7 @@ namespace lua {
 namespace internal {
 
 CallbackHolderBase::CallbackHolderBase(State* state) {
-  PushNewTable(state);
+  NewTable(state);
   RawSet(state, -1, "__gc", CFunction(&OnGC<CallbackHolderBase>));
   SetMetaTable(state, -2);
 }

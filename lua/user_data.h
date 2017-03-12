@@ -22,6 +22,14 @@ struct UserData {
   }
 };
 
+// Generic callback for __gc.
+template<typename T>
+int OnGC(lua::State* state) {
+  void* data = lua_touserdata(state, 1);
+  UserData<T>::Destruct(static_cast<typename UserData<T>::Type*>(data));
+  return 0;
+}
+
 // Pushing a new UserData from |ptr|.
 template<typename T>
 void NewUserData(State* state, T* ptr) {
@@ -30,12 +38,15 @@ void NewUserData(State* state, T* ptr) {
   UserData<T>::Construct(memory, ptr);
 }
 
-// Generic callback for __gc.
-template<typename T>
-int OnGC(lua::State* state) {
-  void* data = lua_touserdata(state, 1);
-  UserData<T>::Destruct(static_cast<typename UserData<T>::Type*>(data));
-  return 0;
+// Construct a new UserData with |T|, and assign it with a default metatable.
+template<typename T, typename... ArgTypes>
+void NewUserData(State* state, const ArgTypes... args) {
+  using Type = typename UserData<T>::Type;
+  Type* memory = static_cast<Type*>(lua_newuserdata(state, sizeof(Type)));
+  new(memory) T(args...);
+  NewTable(state, 0, 1);
+  RawSet(state, -1, "__gc", CFunction(&OnGC<T>));
+  SetMetaTable(state, -2);
 }
 
 }  // namespace lua

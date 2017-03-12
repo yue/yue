@@ -13,6 +13,8 @@ source_set("lua") {
     "callback_internal.h",
     "handle.cc",
     "handle.h",
+    "index.cc",
+    "index.h",
     "metatable.cc",
     "metatable.h",
     "metatable_internal.h",
