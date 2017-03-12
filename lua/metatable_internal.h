@@ -10,6 +10,7 @@
 #include "base/memory/ref_counted.h"
 #include "base/memory/weak_ptr.h"
 #include "lua/table.h"
+#include "lua/user_data.h"
 
 namespace lua {
 

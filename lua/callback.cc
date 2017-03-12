@@ -5,6 +5,7 @@
 #include "lua/callback.h"
 
 #include "lua/table.h"
+#include "lua/user_data.h"
 
 namespace lua {
 

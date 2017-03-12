@@ -13,21 +13,22 @@ namespace lua {
 
 // Defines how the wrapper of RefCounted is destructed.
 template<typename T>
-struct GCTratis<T, typename std::enable_if<std::is_base_of<
+struct UserData<T, typename std::enable_if<std::is_base_of<
                        base::subtle::RefCountedBase, T>::value>::type> {
-  static inline void Destruct(void* data) {
-    (*static_cast<T**>(data))->Release();
+  using Type = T*;
+  static inline void Destruct(T** data) {
+    (*data)->Release();
   }
 };
 
 // Defines how the wrapper of WeakPtr is destructed.
 template<typename T>
-struct GCTratis<T, typename std::enable_if<std::is_base_of<
+struct UserData<T, typename std::enable_if<std::is_base_of<
                        base::internal::WeakPtrBase,
                        decltype(((T*)nullptr)->GetWeakPtr())>::value>::type> {
-  static inline void Destruct(void* data) {
-    using WrapperType = base::WeakPtr<T>;
-    static_cast<WrapperType*>(data)->~WrapperType();
+  using Type = base::WeakPtr<T>;
+  static inline void Destruct(base::WeakPtr<T>* data) {
+    data->~Type();
   }
 };
 
