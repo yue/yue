@@ -120,31 +120,6 @@ struct InheritanceChain<T, typename std::enable_if<std::is_class<
   }
 };
 
-// Create constructor for the prototype.
-template<typename T>
-v8::Local<v8::Function> GetConstructor(v8::Local<v8::Context> context) {
-  v8::Isolate* isolate = context->GetIsolate();
-  auto templ = InheritanceChain<T>::Get(context);
-  auto constructor = templ->GetFunction(context).ToLocalChecked();
-  // Build the constructor if we did not do it before.
-  auto indicator = v8::Private::ForApi(isolate, ToV8Symbol(context, "vbb"));
-  if (!constructor->HasPrivate(context, indicator).ToChecked()) {
-    constructor->SetPrivate(context, indicator, v8::True(isolate));
-    Type<T>::BuildConstructor(context, constructor);
-  }
-  return constructor;
-}
-
-// Create a new instance of v8::Object from the prototype of T.
-template<typename T>
-v8::MaybeLocal<v8::Object> CallConstructor(v8::Local<v8::Context> context) {
-  // Pass an External to indicate it is called from native code.
-  v8::Local<v8::Function> constructor = GetConstructor<T>(context);
-  v8::Local<v8::Value> indicator = v8::External::New(
-      context->GetIsolate(), nullptr);
-  return constructor->NewInstance(context, 1, &indicator);
-}
-
 }  // namespace internal
 
 }  // namespace vb

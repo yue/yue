@@ -11,33 +11,44 @@
 
 namespace vb {
 
-// Generate prototype for native classes.
-template<typename T, typename Enable = void>
-struct Prototype;
-
-// Create prototype for RefCounted classes.
+// Create constructor for the prototype.
 template<typename T>
-struct Prototype<T, typename std::enable_if<std::is_base_of<
-                        base::subtle::RefCountedBase, T>::value>::type> {
-  // Get the constructor of the prototype.
-  static inline v8::Local<v8::Function> Get(v8::Local<v8::Context> context) {
-    return internal::GetConstructor<T>(context);
+v8::Local<v8::Function> GetConstructor(v8::Local<v8::Context> context) {
+  v8::Isolate* isolate = context->GetIsolate();
+  auto templ = internal::InheritanceChain<T>::Get(context);
+  auto constructor = templ->GetFunction(context).ToLocalChecked();
+  // Build the constructor if we did not do it before.
+  auto indicator = v8::Private::ForApi(isolate, ToV8Symbol(context, "vbb"));
+  if (!constructor->HasPrivate(context, indicator).ToChecked()) {
+    constructor->SetPrivate(context, indicator, v8::True(isolate));
+    Type<T>::BuildConstructor(context, constructor);
   }
+  return constructor;
+}
 
-  // Create an instance of T and store it in an v8::Object.
-  template<typename... ArgTypes>
-  static v8::Local<v8::Value> NewInstance(v8::Local<v8::Context> context,
-                                          const ArgTypes&... args) {
-    v8::Isolate* isolate = context->GetIsolate();
-    auto result = internal::CallConstructor<T>(context);
-    if (result.IsEmpty())
-      return v8::Null(isolate);
-    // Store the new instance in the object.
-    v8::Local<v8::Object> obj = result.ToLocalChecked();
-    new internal::RefPtrObjectTracker<T>(isolate, obj, new T(args...));
-    return obj;
-  }
-};
+// Create a new instance of v8::Object from the prototype of T.
+template<typename T>
+v8::MaybeLocal<v8::Object> CallConstructor(v8::Local<v8::Context> context) {
+  // Pass an External to indicate it is called from native code.
+  v8::Local<v8::Function> constructor = GetConstructor<T>(context);
+  v8::Local<v8::Value> indicator = v8::External::New(
+      context->GetIsolate(), nullptr);
+  return constructor->NewInstance(context, 1, &indicator);
+}
+
+// Helper to create a new instance of |T|.
+template<typename T, typename... ArgTypes>
+v8::Local<v8::Value> NewInstance(v8::Local<v8::Context> context,
+                                 const ArgTypes&... args) {
+  v8::Isolate* isolate = context->GetIsolate();
+  auto result = CallConstructor<T>(context);
+  if (result.IsEmpty())
+    return v8::Null(isolate);
+  // Store the new instance in the object.
+  v8::Local<v8::Object> obj = result.ToLocalChecked();
+  new internal::RefPtrObjectTracker<T>(isolate, obj, new T(args...));
+  return obj;
+}
 
 // The default type information for RefCounted class.
 template<typename T>
@@ -53,7 +64,7 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
     if (wrapper)
       return wrapper->GetHandle();
     // If not create a new wrapper for it.
-    auto result = internal::CallConstructor<T>(context);
+    auto result = CallConstructor<T>(context);
     if (result.IsEmpty())
       return v8::Null(isolate);
     v8::Local<v8::Object> obj = result.ToLocalChecked();
@@ -75,17 +86,6 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
   }
 };
 
-// Create prototype for classes that produce WeakPtr.
-template<typename T>
-struct Prototype<T, typename std::enable_if<std::is_base_of<
-                        base::internal::WeakPtrBase,
-                        decltype(((T*)nullptr)->GetWeakPtr())>::value>::type> {
-  // Get the constructor of the prototype.
-  static inline v8::Local<v8::Function> Get(v8::Local<v8::Context> context) {
-    return internal::GetConstructor<T>(context);
-  }
-};
-
 // The default type information for WeakPtr class.
 template<typename T>
 struct Type<T*, typename std::enable_if<std::is_base_of<
@@ -99,7 +99,7 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
     // Do not cache the pointer of WeakPtr, because the pointer may point to a
     // variable on stack, which can have same address with previous variable on
     // the stack.
-    auto result = internal::CallConstructor<T>(context);
+    auto result = CallConstructor<T>(context);
     if (result.IsEmpty())
       return v8::Null(isolate);
     // Store the new instance in the object.

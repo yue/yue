@@ -179,7 +179,7 @@ struct Type<nu::Window> {
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
-        "create", &Prototype<nu::Window>::NewInstance<nu::Window::Options>);
+        "create", &NewInstance<nu::Window, nu::Window::Options>);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
@@ -228,7 +228,7 @@ struct Type<nu::Container> {
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
-        "create", &Prototype<nu::Container>::NewInstance<>);
+        "create", &NewInstance<nu::Container>);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
@@ -264,12 +264,12 @@ void Initialize(v8::Local<v8::Object> exports) {
   vb::Set(context, exports,
           // GUI classes.
 #ifndef ELECTRON_BUILD
-          "Lifetime", vb::Prototype<nu::Lifetime>::Get(context),
+          "Lifetime", vb::GetConstructor<nu::Lifetime>(context),
 #endif
-          "App", vb::Prototype<nu::App>::Get(context),
-          "Window", vb::Prototype<nu::Window>::Get(context),
-          "View", vb::Prototype<nu::View>::Get(context),
-          "Container", vb::Prototype<nu::Container>::Get(context),
+          "App", vb::GetConstructor<nu::App>(context),
+          "Window", vb::GetConstructor<nu::Window>(context),
+          "View", vb::GetConstructor<nu::View>(context),
+          "Container", vb::GetConstructor<nu::Container>(context),
           // Methods.
 #ifndef ELECTRON_BUILD
           "lifetime", nu::Lifetime::current(),

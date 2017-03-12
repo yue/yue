@@ -85,7 +85,7 @@ struct MemberTraits<nu::Signal<Sig>> {
     v8::Isolate* isolate = context->GetIsolate();
     if (!holder_value->IsEmpty())
       return v8::Local<v8::Value>::New(isolate, *holder_value);
-    auto result = internal::CallConstructor<nu::Signal<Sig>>(context);
+    auto result = CallConstructor<nu::Signal<Sig>>(context);
     if (result.IsEmpty())
       return v8::Null(isolate);
     // Store the pointer of signal in the object.
