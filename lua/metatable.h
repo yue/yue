@@ -16,7 +16,12 @@ template<typename T>
 struct UserData<T, typename std::enable_if<std::is_base_of<
                        base::subtle::RefCountedBase, T>::value>::type> {
   using Type = T*;
-  static inline void Destruct(T** data) {
+  static inline void Construct(State* state, T** data, T* ptr) {
+    ptr->AddRef();
+    *data = ptr;
+    internal::WrapperTableSet(state, ptr, -1);
+  }
+  static inline void Destruct(State* state, T** data) {
     (*data)->Release();
   }
 };
@@ -27,7 +32,10 @@ struct UserData<T, typename std::enable_if<std::is_base_of<
                        base::internal::WeakPtrBase,
                        decltype(((T*)nullptr)->GetWeakPtr())>::value>::type> {
   using Type = base::WeakPtr<T>;
-  static inline void Destruct(base::WeakPtr<T>* data) {
+  static inline void Construct(State* state, base::WeakPtr<T>* data, T* ptr) {
+    new(data) base::WeakPtr<T>(ptr->GetWeakPtr());
+  }
+  static inline void Destruct(State* state, base::WeakPtr<T>* data) {
     data->~Type();
   }
 };
@@ -50,11 +58,9 @@ struct MetaTable<T, typename std::enable_if<std::is_base_of<
     return instance;
   }
 
-  // Create a new lua wrapper from existing |instance|.
-  static void PushNewWrapper(State* state, T* instance) {
-    instance->AddRef();
-    *static_cast<T**>(lua_newuserdata(state, sizeof(T*))) = instance;
-    internal::WrapperTableSet(state, instance, -1);
+  // Create a new lua wrapper from existing |ptr|.
+  static void PushNewWrapper(State* state, T* ptr) {
+    NewUserData(state, ptr);
     internal::InheritanceChain<T>::Push(state);
     SetMetaTable(state, -2);
   }
@@ -126,11 +132,7 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
   static inline void Push(State* state, T* ptr) {
     if (!ptr)
       lua::Push(state, nullptr);
-    // Do not cache the pointer of WeakPtr, because the pointer may point to a
-    // variable on stack, which can have same address with previous variable on
-    // the stack.
-    void* memory = lua_newuserdata(state, sizeof(base::WeakPtr<T>));
-    new(memory) base::WeakPtr<T>(ptr->GetWeakPtr());
+    NewUserData(state, ptr);
     internal::InheritanceChain<T>::Push(state);
     SetMetaTable(state, -2);
   }
