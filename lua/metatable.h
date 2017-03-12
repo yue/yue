@@ -16,12 +16,11 @@ template<typename T>
 struct UserData<T, typename std::enable_if<std::is_base_of<
                        base::subtle::RefCountedBase, T>::value>::type> {
   using Type = T*;
-  static inline void Construct(State* state, T** data, T* ptr) {
+  static inline void Construct(T** data, T* ptr) {
     ptr->AddRef();
     *data = ptr;
-    internal::WrapperTableSet(state, ptr, -1);
   }
-  static inline void Destruct(State* state, T** data) {
+  static inline void Destruct(T** data) {
     (*data)->Release();
   }
   static inline T* From(T** data) {
@@ -35,10 +34,10 @@ struct UserData<T, typename std::enable_if<std::is_base_of<
                        base::internal::WeakPtrBase,
                        decltype(((T*)nullptr)->GetWeakPtr())>::value>::type> {
   using Type = base::WeakPtr<T>;
-  static inline void Construct(State* state, base::WeakPtr<T>* data, T* ptr) {
+  static inline void Construct(base::WeakPtr<T>* data, T* ptr) {
     new(data) base::WeakPtr<T>(ptr->GetWeakPtr());
   }
-  static inline void Destruct(State* state, base::WeakPtr<T>* data) {
+  static inline void Destruct(base::WeakPtr<T>* data) {
     data->~Type();
   }
   static inline T* From(base::WeakPtr<T>* data) {
@@ -76,7 +75,7 @@ T* NewInstance(State* state, const ArgTypes&... args) {
   StackAutoReset reset(state);
   T* ptr = new T(args...);
   NewUserData(state, ptr);
-  internal::InheritanceChain<T>::Push(state);
+  Push(state, MetaTable<T>());
   SetMetaTable(state, -2);
   return ptr;
 }
@@ -105,6 +104,7 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
       lua::Push(state, nullptr);
     } else if (!internal::WrapperTableGet(state, ptr)) {
       NewUserData(state, ptr);
+      internal::WrapperTableSet(state, ptr, -1);
       internal::InheritanceChain<T>::Push(state);
       SetMetaTable(state, -2);
     }
