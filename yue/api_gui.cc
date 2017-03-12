@@ -131,39 +131,6 @@ struct Type<nu::Accelerator> {
 };
 
 template<>
-struct Type<nu::View> {
-  static constexpr const char* name = "yue.View";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index,
-           "setbackgroundcolor", &nu::View::SetBackgroundColor,
-           "setstyle", &SetStyle,
-           "printstyle", &nu::View::PrintStyle,
-           "layout", &nu::View::Layout,
-           "setbounds", &nu::View::SetBounds,
-           "getbounds", &nu::View::GetBounds,
-           "setvisible", &nu::View::SetVisible,
-           "isvisible", &nu::View::IsVisible,
-           "getparent", &nu::View::parent);
-  }
-  static void SetStyle(CallContext* context, nu::View* view) {
-    if (GetType(context->state, 2) != LuaType::Table) {
-      context->has_error = true;
-      Push(context->state, "first arg must be table");
-      return;
-    }
-    Push(context->state, nullptr);
-    while (lua_next(context->state, 2) != 0) {
-      std::string key, value;
-      To(context->state, -2, &key, &value);
-      view->SetStyle(key, value);
-      PopAndIgnore(context->state, 1);
-    }
-    // Refresh the view.
-    view->Layout();
-  }
-};
-
-template<>
 struct Type<nu::App> {
   static constexpr const char* name = "yue.App";
   static void BuildMetaTable(State* state, int index) {
@@ -189,283 +156,6 @@ struct Type<nu::Lifetime> {
     if (!To(state, 2, &name))
       return 0;
     return yue::MemberNewIndex(state, name, "onready", &nu::Lifetime::on_ready);
-  }
-};
-
-template<>
-struct Type<nu::Button::Type> {
-  static constexpr const char* name = "yue.Button.Type";
-  static bool To(State* state, int index, nu::Button::Type* out) {
-    std::string type;
-    if (!lua::To(state, index, &type))
-      return false;
-    if (type.empty() || type == "normal") {
-      *out = nu::Button::Normal;
-      return true;
-    } else if (type == "checkbox") {
-      *out = nu::Button::CheckBox;
-      return true;
-    } else if (type == "radio") {
-      *out = nu::Button::Radio;
-      return true;
-    } else {
-      return false;
-    }
-  }
-};
-
-template<>
-struct Type<nu::Button> {
-  using base = nu::View;
-  static constexpr const char* name = "yue.Button";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index, "new", &New,
-                         "settitle", &nu::Button::SetTitle,
-                         "gettitle", &nu::Button::GetTitle,
-                         "setchecked", &nu::Button::SetChecked,
-                         "ischecked", &nu::Button::IsChecked);
-  }
-  static nu::Button* New(CallContext* context) {
-    std::string title;
-    if (To(context->state, 1, &title)) {
-      return new nu::Button(title);
-    } else if (GetType(context->state, 1) == LuaType::Table) {
-      RawGetAndPop(context->state, 1, "title", &title);
-      nu::Button::Type type = nu::Button::Normal;
-      RawGetAndPop(context->state, 1, "type", &type);
-      return new nu::Button(title, type);
-    } else {
-      context->has_error = true;
-      Push(context->state, "Button must be created with string or table");
-      return nullptr;
-    }
-  }
-  static int Index(State* state) {
-    std::string name;
-    if (!To(state, 2, &name))
-      return 0;
-    return yue::SignalIndex(state, name, "onclick", &nu::Button::on_click);
-  }
-  static int NewIndex(State* state) {
-    std::string name;
-    if (!To(state, 2, &name))
-      return 0;
-    return yue::MemberNewIndex(state, name, "onclick", &nu::Button::on_click);
-  }
-};
-
-template<>
-struct Type<nu::Entry> {
-  using base = nu::View;
-  static constexpr const char* name = "yue.Entry";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index, "new", &CreateInstance<nu::Entry>,
-                         "settext", &nu::Entry::SetText,
-                         "gettext", &nu::Entry::GetText);
-  }
-  static int Index(State* state) {
-    std::string name;
-    if (!To(state, 2, &name))
-      return 0;
-    return yue::SignalIndex(state, name,
-                            "onactivate", &nu::Entry::on_activate,
-                            "ontextchange", &nu::Entry::on_text_change);
-  }
-  static int NewIndex(State* state) {
-    std::string name;
-    if (!To(state, 2, &name))
-      return 0;
-    return yue::MemberNewIndex(state, name,
-                               "onactivate", &nu::Entry::on_activate,
-                               "ontextchange", &nu::Entry::on_text_change);
-  }
-};
-
-template<>
-struct Type<nu::Label> {
-  using base = nu::View;
-  static constexpr const char* name = "yue.Label";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index,
-           "new", &CreateInstance<nu::Label, const std::string&>,
-           "settext", &nu::Label::SetText,
-           "gettext", &nu::Label::GetText);
-  }
-};
-
-template<>
-struct Type<nu::Progress> {
-  using base = nu::View;
-  static constexpr const char* name = "yue.Progress";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index, "new", &CreateInstance<nu::Progress>,
-                         "setvalue", &nu::Progress::SetValue,
-                         "getvalue", &nu::Progress::GetValue,
-                         "setindeterminate", &nu::Progress::SetIndeterminate,
-                         "isindeterminate", &nu::Progress::IsIndeterminate);
-  }
-};
-
-template<>
-struct Type<nu::Group> {
-  using base = nu::View;
-  static constexpr const char* name = "yue.Group";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index,
-           "new", &CreateInstance<nu::Group, const std::string&>,
-           "setcontentview", &nu::Group::SetContentView,
-           "getcontentview", &nu::Group::GetContentView,
-           "settitle", &nu::Group::SetTitle,
-           "gettitle", &nu::Group::GetTitle);
-  }
-};
-
-template<>
-struct Type<nu::Container> {
-  using base = nu::View;
-  static constexpr const char* name = "yue.Container";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index,
-           "new", &CreateInstance<nu::Container>,
-           "getpreferredsize", &nu::Container::GetPreferredSize,
-           "getpreferredwidthforheight",
-           &nu::Container::GetPreferredWidthForHeight,
-           "getpreferredheightforwidth",
-           &nu::Container::GetPreferredHeightForWidth,
-           "addchildview", &nu::Container::AddChildView,
-           "addchildviewat", &AddChildViewAt,
-           "removechildview", &nu::Container::RemoveChildView,
-           "childcount", &nu::Container::child_count,
-           "childat", &ChildAt);
-  }
-  static int Index(State* state) {
-    std::string name;
-    if (!To(state, 2, &name))
-      return 0;
-    return yue::SignalIndex(state, name, "ondraw", &nu::Container::on_draw);
-  }
-  static int NewIndex(State* state) {
-    std::string name;
-    if (!To(state, 2, &name))
-      return 0;
-    return yue::MemberNewIndex(state, name, "ondraw", &nu::Container::on_draw);
-  }
-  // Transalte 1-based index to 0-based.
-  static inline void AddChildViewAt(nu::Container* c, nu::View* view, int i) {
-    c->AddChildViewAt(view, i - 1);
-  }
-  static inline nu::View* ChildAt(nu::Container* container, int i) {
-    return container->child_at(i - 1);
-  }
-};
-
-#if defined(OS_MACOSX)
-template<>
-struct Type<nu::Vibrant> {
-  using base = nu::Container;
-  static constexpr const char* name = "yue.Vibrant";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index, "new", &CreateInstance<nu::Vibrant>);
-  }
-  static int Index(State* state) {
-    return Type<base>::Index(state);
-  }
-  static int NewIndex(State* state) {
-    return Type<base>::NewIndex(state);
-  }
-};
-#endif
-
-template<>
-struct Type<nu::Scroll::Policy> {
-  static constexpr const char* name = "yue.Scroll.Policy";
-  static inline bool To(State* state, int index, nu::Scroll::Policy* out) {
-    std::string policy;
-    if (!lua::To(state, index, &policy))
-      return false;
-    if (policy == "automatic") {
-      *out = nu::Scroll::Policy::Automatic;
-      return true;
-    } else if (policy == "always") {
-      *out = nu::Scroll::Policy::Always;
-      return true;
-    } else if (policy == "never") {
-      *out = nu::Scroll::Policy::Never;
-      return true;
-    } else {
-      return false;
-    }
-  }
-  static inline void Push(State* state, nu::Scroll::Policy policy) {
-    if (policy == nu::Scroll::Policy::Always)
-      lua::Push(state, "always");
-    else if (policy == nu::Scroll::Policy::Never)
-      lua::Push(state, "never");
-    else
-      lua::Push(state, "automatic");
-  }
-};
-
-template<>
-struct Type<nu::Scroll> {
-  using base = nu::View;
-  static constexpr const char* name = "yue.Scroll";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index,
-           "new", &CreateInstance<nu::Scroll>,
-           "setscrollbarpolicy", &nu::Scroll::SetScrollBarPolicy,
-           "getscrollbarpolicy", &nu::Scroll::GetScrollBarPolicy,
-           "setcontentsize", &nu::Scroll::SetContentSize,
-           "getcontentsize", &nu::Scroll::GetContentSize,
-           "setcontentview", &nu::Scroll::SetContentView,
-           "getcontentview", &nu::Scroll::GetContentView);
-  }
-};
-
-template<>
-struct Type<nu::Window::Options> {
-  static constexpr const char* name = "yue.Window.Options";
-  static inline bool To(State* state, int index, nu::Window::Options* out) {
-    if (GetType(state, index) == LuaType::Table)
-      RawGetAndPop(state, index, "bounds", &out->bounds);
-    return true;
-  }
-};
-
-template<>
-struct Type<nu::Window> {
-  static constexpr const char* name = "yue.Window";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index,
-           "new", &CreateInstance<nu::Window, const nu::Window::Options&>,
-           "close", &nu::Window::Close,
-           "setcontentbounds", &nu::Window::SetContentBounds,
-           "getcontentbounds", &nu::Window::GetContentBounds,
-           "setbounds", &nu::Window::SetBounds,
-           "getbounds", &nu::Window::GetBounds,
-           "setcontentview", &nu::Window::SetContentView,
-           "getcontentview", &nu::Window::GetContentView,
-           "setvisible", &nu::Window::SetVisible,
-           "isvisible", &nu::Window::IsVisible,
-#if defined(OS_WIN) || defined(OS_LINUX)
-           "setmenubar", &nu::Window::SetMenuBar,
-           "getmenubar", &nu::Window::GetMenuBar,
-#endif
-           "setbackgroundcolor", &nu::Window::SetBackgroundColor);
-  }
-  static int Index(State* state) {
-    std::string name;
-    if (!To(state, 2, &name))
-      return 0;
-    return yue::SignalIndex(state, name, "onclose", &nu::Window::on_close);
-  }
-  static int NewIndex(State* state) {
-    std::string name;
-    if (!To(state, 2, &name))
-      return 0;
-    return yue::MemberNewIndex(state, name,
-                               "onclose", &nu::Window::on_close,
-                               "shouldclose", &nu::Window::should_close);
   }
 };
 
@@ -684,6 +374,316 @@ struct Type<nu::MenuItem> {
   }
 };
 
+template<>
+struct Type<nu::Window::Options> {
+  static constexpr const char* name = "yue.Window.Options";
+  static inline bool To(State* state, int index, nu::Window::Options* out) {
+    if (GetType(state, index) == LuaType::Table)
+      RawGetAndPop(state, index, "bounds", &out->bounds);
+    return true;
+  }
+};
+
+template<>
+struct Type<nu::Window> {
+  static constexpr const char* name = "yue.Window";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "new", &CreateInstance<nu::Window, const nu::Window::Options&>,
+           "close", &nu::Window::Close,
+           "setcontentbounds", &nu::Window::SetContentBounds,
+           "getcontentbounds", &nu::Window::GetContentBounds,
+           "setbounds", &nu::Window::SetBounds,
+           "getbounds", &nu::Window::GetBounds,
+           "setcontentview", &nu::Window::SetContentView,
+           "getcontentview", &nu::Window::GetContentView,
+           "setvisible", &nu::Window::SetVisible,
+           "isvisible", &nu::Window::IsVisible,
+#if defined(OS_WIN) || defined(OS_LINUX)
+           "setmenubar", &nu::Window::SetMenuBar,
+           "getmenubar", &nu::Window::GetMenuBar,
+#endif
+           "setbackgroundcolor", &nu::Window::SetBackgroundColor);
+  }
+  static int Index(State* state) {
+    std::string name;
+    if (!To(state, 2, &name))
+      return 0;
+    return yue::SignalIndex(state, name, "onclose", &nu::Window::on_close);
+  }
+  static int NewIndex(State* state) {
+    std::string name;
+    if (!To(state, 2, &name))
+      return 0;
+    return yue::MemberNewIndex(state, name,
+                               "onclose", &nu::Window::on_close,
+                               "shouldclose", &nu::Window::should_close);
+  }
+};
+
+template<>
+struct Type<nu::View> {
+  static constexpr const char* name = "yue.View";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "setbackgroundcolor", &nu::View::SetBackgroundColor,
+           "setstyle", &SetStyle,
+           "printstyle", &nu::View::PrintStyle,
+           "layout", &nu::View::Layout,
+           "setbounds", &nu::View::SetBounds,
+           "getbounds", &nu::View::GetBounds,
+           "setvisible", &nu::View::SetVisible,
+           "isvisible", &nu::View::IsVisible,
+           "getparent", &nu::View::parent);
+  }
+  static void SetStyle(CallContext* context, nu::View* view) {
+    if (GetType(context->state, 2) != LuaType::Table) {
+      context->has_error = true;
+      Push(context->state, "first arg must be table");
+      return;
+    }
+    Push(context->state, nullptr);
+    while (lua_next(context->state, 2) != 0) {
+      std::string key, value;
+      To(context->state, -2, &key, &value);
+      view->SetStyle(key, value);
+      PopAndIgnore(context->state, 1);
+    }
+    // Refresh the view.
+    view->Layout();
+  }
+};
+
+template<>
+struct Type<nu::Container> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Container";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "new", &CreateInstance<nu::Container>,
+           "getpreferredsize", &nu::Container::GetPreferredSize,
+           "getpreferredwidthforheight",
+           &nu::Container::GetPreferredWidthForHeight,
+           "getpreferredheightforwidth",
+           &nu::Container::GetPreferredHeightForWidth,
+           "addchildview", &nu::Container::AddChildView,
+           "addchildviewat", &AddChildViewAt,
+           "removechildview", &nu::Container::RemoveChildView,
+           "childcount", &nu::Container::child_count,
+           "childat", &ChildAt);
+  }
+  static int Index(State* state) {
+    std::string name;
+    if (!To(state, 2, &name))
+      return 0;
+    return yue::SignalIndex(state, name, "ondraw", &nu::Container::on_draw);
+  }
+  static int NewIndex(State* state) {
+    std::string name;
+    if (!To(state, 2, &name))
+      return 0;
+    return yue::MemberNewIndex(state, name, "ondraw", &nu::Container::on_draw);
+  }
+  // Transalte 1-based index to 0-based.
+  static inline void AddChildViewAt(nu::Container* c, nu::View* view, int i) {
+    c->AddChildViewAt(view, i - 1);
+  }
+  static inline nu::View* ChildAt(nu::Container* container, int i) {
+    return container->child_at(i - 1);
+  }
+};
+
+template<>
+struct Type<nu::Button::Type> {
+  static constexpr const char* name = "yue.Button.Type";
+  static bool To(State* state, int index, nu::Button::Type* out) {
+    std::string type;
+    if (!lua::To(state, index, &type))
+      return false;
+    if (type.empty() || type == "normal") {
+      *out = nu::Button::Normal;
+      return true;
+    } else if (type == "checkbox") {
+      *out = nu::Button::CheckBox;
+      return true;
+    } else if (type == "radio") {
+      *out = nu::Button::Radio;
+      return true;
+    } else {
+      return false;
+    }
+  }
+};
+
+template<>
+struct Type<nu::Button> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Button";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index, "new", &New,
+                         "settitle", &nu::Button::SetTitle,
+                         "gettitle", &nu::Button::GetTitle,
+                         "setchecked", &nu::Button::SetChecked,
+                         "ischecked", &nu::Button::IsChecked);
+  }
+  static nu::Button* New(CallContext* context) {
+    std::string title;
+    if (To(context->state, 1, &title)) {
+      return new nu::Button(title);
+    } else if (GetType(context->state, 1) == LuaType::Table) {
+      RawGetAndPop(context->state, 1, "title", &title);
+      nu::Button::Type type = nu::Button::Normal;
+      RawGetAndPop(context->state, 1, "type", &type);
+      return new nu::Button(title, type);
+    } else {
+      context->has_error = true;
+      Push(context->state, "Button must be created with string or table");
+      return nullptr;
+    }
+  }
+  static int Index(State* state) {
+    std::string name;
+    if (!To(state, 2, &name))
+      return 0;
+    return yue::SignalIndex(state, name, "onclick", &nu::Button::on_click);
+  }
+  static int NewIndex(State* state) {
+    std::string name;
+    if (!To(state, 2, &name))
+      return 0;
+    return yue::MemberNewIndex(state, name, "onclick", &nu::Button::on_click);
+  }
+};
+
+template<>
+struct Type<nu::Entry> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Entry";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index, "new", &CreateInstance<nu::Entry>,
+                         "settext", &nu::Entry::SetText,
+                         "gettext", &nu::Entry::GetText);
+  }
+  static int Index(State* state) {
+    std::string name;
+    if (!To(state, 2, &name))
+      return 0;
+    return yue::SignalIndex(state, name,
+                            "onactivate", &nu::Entry::on_activate,
+                            "ontextchange", &nu::Entry::on_text_change);
+  }
+  static int NewIndex(State* state) {
+    std::string name;
+    if (!To(state, 2, &name))
+      return 0;
+    return yue::MemberNewIndex(state, name,
+                               "onactivate", &nu::Entry::on_activate,
+                               "ontextchange", &nu::Entry::on_text_change);
+  }
+};
+
+template<>
+struct Type<nu::Label> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Label";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "new", &CreateInstance<nu::Label, const std::string&>,
+           "settext", &nu::Label::SetText,
+           "gettext", &nu::Label::GetText);
+  }
+};
+
+template<>
+struct Type<nu::Progress> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Progress";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index, "new", &CreateInstance<nu::Progress>,
+                         "setvalue", &nu::Progress::SetValue,
+                         "getvalue", &nu::Progress::GetValue,
+                         "setindeterminate", &nu::Progress::SetIndeterminate,
+                         "isindeterminate", &nu::Progress::IsIndeterminate);
+  }
+};
+
+template<>
+struct Type<nu::Group> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Group";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "new", &CreateInstance<nu::Group, const std::string&>,
+           "setcontentview", &nu::Group::SetContentView,
+           "getcontentview", &nu::Group::GetContentView,
+           "settitle", &nu::Group::SetTitle,
+           "gettitle", &nu::Group::GetTitle);
+  }
+};
+
+template<>
+struct Type<nu::Scroll::Policy> {
+  static constexpr const char* name = "yue.Scroll.Policy";
+  static inline bool To(State* state, int index, nu::Scroll::Policy* out) {
+    std::string policy;
+    if (!lua::To(state, index, &policy))
+      return false;
+    if (policy == "automatic") {
+      *out = nu::Scroll::Policy::Automatic;
+      return true;
+    } else if (policy == "always") {
+      *out = nu::Scroll::Policy::Always;
+      return true;
+    } else if (policy == "never") {
+      *out = nu::Scroll::Policy::Never;
+      return true;
+    } else {
+      return false;
+    }
+  }
+  static inline void Push(State* state, nu::Scroll::Policy policy) {
+    if (policy == nu::Scroll::Policy::Always)
+      lua::Push(state, "always");
+    else if (policy == nu::Scroll::Policy::Never)
+      lua::Push(state, "never");
+    else
+      lua::Push(state, "automatic");
+  }
+};
+
+template<>
+struct Type<nu::Scroll> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Scroll";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "new", &CreateInstance<nu::Scroll>,
+           "setscrollbarpolicy", &nu::Scroll::SetScrollBarPolicy,
+           "getscrollbarpolicy", &nu::Scroll::GetScrollBarPolicy,
+           "setcontentsize", &nu::Scroll::SetContentSize,
+           "getcontentsize", &nu::Scroll::GetContentSize,
+           "setcontentview", &nu::Scroll::SetContentView,
+           "getcontentview", &nu::Scroll::GetContentView);
+  }
+};
+
+#if defined(OS_MACOSX)
+template<>
+struct Type<nu::Vibrant> {
+  using base = nu::Container;
+  static constexpr const char* name = "yue.Vibrant";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index, "new", &CreateInstance<nu::Vibrant>);
+  }
+  static int Index(State* state) {
+    return Type<base>::Index(state);
+  }
+  static int NewIndex(State* state) {
+    return Type<base>::NewIndex(state);
+  }
+};
+#endif
+
 }  // namespace lua
 
 extern "C" int luaopen_yue_gui(lua::State* state) {
@@ -692,6 +692,12 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
               // Classes.
               "App", lua::MetaTable<nu::App>(),
               "Lifetime", lua::MetaTable<nu::Lifetime>(),
+              "Font", lua::MetaTable<nu::Font>(),
+              "Image", lua::MetaTable<nu::Image>(),
+              "Painter", lua::MetaTable<nu::Painter>(),
+              "MenuBar", lua::MetaTable<nu::MenuBar>(),
+              "Menu", lua::MetaTable<nu::Menu>(),
+              "MenuItem", lua::MetaTable<nu::MenuItem>(),
               "Window", lua::MetaTable<nu::Window>(),
               "Container", lua::MetaTable<nu::Container>(),
               "Button", lua::MetaTable<nu::Button>(),
@@ -700,12 +706,6 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
               "Progress", lua::MetaTable<nu::Progress>(),
               "Group", lua::MetaTable<nu::Group>(),
               "Scroll", lua::MetaTable<nu::Scroll>(),
-              "Font", lua::MetaTable<nu::Font>(),
-              "Image", lua::MetaTable<nu::Image>(),
-              "Painter", lua::MetaTable<nu::Painter>(),
-              "MenuBar", lua::MetaTable<nu::MenuBar>(),
-              "Menu", lua::MetaTable<nu::Menu>(),
-              "MenuItem", lua::MetaTable<nu::MenuItem>(),
 #if defined(OS_MACOSX)
               "Vibrant", lua::MetaTable<nu::Vibrant>(),
 #endif
