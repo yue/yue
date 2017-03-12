@@ -24,6 +24,9 @@ struct UserData<T, typename std::enable_if<std::is_base_of<
   static inline void Destruct(State* state, T** data) {
     (*data)->Release();
   }
+  static inline T* From(T** data) {
+    return *data;
+  }
 };
 
 // Defines how the wrapper of WeakPtr is destructed.
@@ -38,6 +41,9 @@ struct UserData<T, typename std::enable_if<std::is_base_of<
   static inline void Destruct(State* state, base::WeakPtr<T>* data) {
     data->~Type();
   }
+  static inline T* From(base::WeakPtr<T>* data) {
+    return data->get();
+  }
 };
 
 // Generate metatable for native classes.
@@ -45,38 +51,35 @@ template<typename T, typename Enable = void>
 struct MetaTable {
 };
 
-// Create metatable for RefCounted classes.
+// Helper to push metatable.
 template<typename T>
-struct MetaTable<T, typename std::enable_if<std::is_base_of<
-                        base::subtle::RefCountedBase, T>::value>::type> {
-  // Create a new instance of T.
-  template<typename... ArgTypes>
-  static T* NewInstance(State* state, const ArgTypes&... args) {
-    StackAutoReset reset(state);
-    T* instance = new T(args...);
-    PushNewWrapper(state, instance);
-    return instance;
-  }
+inline void Push(State* state, MetaTable<T>) {
+  internal::InheritanceChain<T>::Push(state);
+}
 
-  // Create a new lua wrapper from existing |ptr|.
-  static void PushNewWrapper(State* state, T* ptr) {
-    NewUserData(state, ptr);
-    internal::InheritanceChain<T>::Push(state);
-    SetMetaTable(state, -2);
-  }
+// Check if T's metatable is base of the metatable on top of stack.
+template<typename T>
+bool IsMetaTableInheritedFrom(State* state) {
+  StackAutoReset reset(state);
+  base::StringPiece name;
+  if (RawGetAndPop(state, -1, "__name", &name) && name == Type<T>::name)
+    return true;
+  if (!GetMetaTable(state, -1))
+    return false;
+  RawGet(state, -1, "__index");
+  return IsMetaTableInheritedFrom<T>(state);
+}
 
-  // Check if current metatable is base of the metatable on top of stack.
-  static bool IsBaseOf(State* state) {
-    StackAutoReset reset(state);
-    base::StringPiece name;
-    if (RawGetAndPop(state, -1, "__name", &name) && name == Type<T>::name)
-      return true;
-    if (!GetMetaTable(state, -1))
-      return false;
-    RawGet(state, -1, "__index");
-    return IsBaseOf(state);
-  }
-};
+// A helper for creating a new instance of T.
+template<typename T, typename... ArgTypes>
+T* NewInstance(State* state, const ArgTypes&... args) {
+  StackAutoReset reset(state);
+  T* ptr = new T(args...);
+  NewUserData(state, ptr);
+  internal::InheritanceChain<T>::Push(state);
+  SetMetaTable(state, -2);
+  return ptr;
+}
 
 // The default type information for RefCounted class.
 template<typename T>
@@ -88,21 +91,23 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
     StackAutoReset reset(state);
     // Verify the type and length.
     if (GetType(state, index) != lua::LuaType::UserData ||
-        RawLen(state, index) != sizeof(T**) ||
-        !GetMetaTable(state, index))
+        RawLen(state, index) != sizeof(typename UserData<T>::Type))
       return false;
-    // Verify fine the inheritance chain.
-    if (!MetaTable<T>::IsBaseOf(state))
+    // Verify the inheritance chain.
+    if (!GetMetaTable(state, index) || !IsMetaTableInheritedFrom<T>(state))
       return false;
     // Convert pointer to actual class.
-    *out = *static_cast<T**>(lua_touserdata(state, index));
+    *out = UserData<T>::From(static_cast<T**>(lua_touserdata(state, index)));
     return true;
   }
   static inline void Push(State* state, T* ptr) {
-    if (!ptr)
+    if (!ptr) {
       lua::Push(state, nullptr);
-    else if (!internal::WrapperTableGet(state, ptr))
-      MetaTable<T>::PushNewWrapper(state, ptr);
+    } else if (!internal::WrapperTableGet(state, ptr)) {
+      NewUserData(state, ptr);
+      internal::InheritanceChain<T>::Push(state);
+      SetMetaTable(state, -2);
+    }
   }
 };
 
@@ -117,12 +122,11 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
     StackAutoReset reset(state);
     // Verify the type and length.
     if (GetType(state, index) != lua::LuaType::UserData ||
-        RawLen(state, index) != sizeof(base::WeakPtr<T>))
+        RawLen(state, index) != sizeof(typename UserData<T>::Type))
       return false;
     // Convert pointer to actual class.
-    auto* wrapper = static_cast<base::WeakPtr<T>*>(
-        lua_touserdata(state, index));
-    T* ptr = wrapper->get();
+    T* ptr = UserData<T>::From(
+        static_cast<base::WeakPtr<T>*>(lua_touserdata(state, index)));
     // WeakPtr might be invalidated.
     if (!ptr)
       return false;
@@ -137,12 +141,6 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
     SetMetaTable(state, -2);
   }
 };
-
-// Helper to push metatable.
-template<typename T>
-inline void Push(State* state, MetaTable<T>) {
-  internal::InheritanceChain<T>::Push(state);
-}
 
 }  // namespace lua
 
