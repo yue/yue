@@ -10,6 +10,27 @@
 
 namespace lua {
 
+// Describe how a member T can be converted.
+template<typename T, typename Enable = void>
+struct MemberTraits {
+  // Decides should we return cached value or converted value.
+  static const bool kShouldCacheValue = true;
+  // Converter used when we decide not to use cached value.
+  static inline void Push(State* state, const T& ptr) {
+    lua::Push(state, nullptr);
+  }
+};
+
+// For primary types we just do normal conversion.
+template<typename T>
+struct MemberTraits<T, typename std::enable_if<
+                           std::is_fundamental<T>::value>::type> {
+  static const bool kShouldCacheValue = false;
+  static inline void Push(State* state, const T& ptr) {
+    lua::Push(state, ptr);
+  }
+};
+
 namespace internal {
 
 // The default __index handler which looks up in the metatable.
@@ -29,7 +50,7 @@ struct ExtractMemberPointer<TMember(TType::*)> {
   using MemberType = TMember;
 };
 
-// Holds the C++ member pointer.
+// Provides the virtual interface which will be called by MemberLookup/Assign.
 class MemberHolderBase {
  public:
   virtual ~MemberHolderBase() {}
@@ -37,6 +58,7 @@ class MemberHolderBase {
   virtual int NewIndex(State* state) = 0;
 };
 
+// Holds the type information and pointer to a member data.
 template<typename T>
 class MemberHolder : public MemberHolderBase {
  public:
@@ -60,7 +82,12 @@ int MemberHolder<T>::Index(State* state) {
   ClassType* owner;
   if (!To(state, 1, &owner))
     return 0;
-  Push(state, owner->*ptr_);
+  if (MemberTraits<MemberType>::kShouldCacheValue) {
+    int cache = lua_upvalueindex(2);
+    RawGet(state, cache, ValueOnStack(state, 2));
+  } else {
+    MemberTraits<MemberType>::Push(state, owner->*ptr_);
+  }
   return 1;
 }
 
@@ -74,6 +101,10 @@ int MemberHolder<T>::NewIndex(State* state) {
                        GetTypeName(state, 3), Type<MemberType>::name);
     lua_error(state);
     NOTREACHED() << "Code after lua_error() gets called";
+  }
+  if (MemberTraits<MemberType>::kShouldCacheValue) {
+    int cache = lua_upvalueindex(2);
+    RawSet(state, cache, ValueOnStack(state, 2), ValueOnStack(state, 3));
   }
   return 1;
 }
@@ -148,12 +179,14 @@ template<typename... ArgTypes>
 void RawSetProperty(State* state, int metatable, ArgTypes... args) {
   StackAutoReset reset(state);
   // Upvalue for storing pre-defined members.
-  NewTable(state, 0, sizeof...(args));
+  NewTable(state, 0, sizeof...(args) / 2);
   internal::SetMemberHolder(state, AbsIndex(state, -1), args...);
+  // Upvalue for cache.
+  NewTable(state, 0, sizeof...(args) / 2);
   // Define the __index and __newindex handlers.
   RawSet(state, metatable,
-         "__index", CClosure(state, &internal::MemberLookup, 1),
-         "__newindex", CClosure(state, &internal::MemberAssign, 1));
+         "__index", CClosure(state, &internal::MemberLookup, 2),
+         "__newindex", CClosure(state, &internal::MemberAssign, 2));
 }
 
 }  // namespace lua

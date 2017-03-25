@@ -42,6 +42,7 @@ source_set("lua") {
 test("lua_unittests") {
   sources = [
     "handle_unittest.cc",
+    "index_unittest.cc",
     "lua_unittest.cc",
     "metatable_unittest.cc",
     "test/run_all_unittests.cc",

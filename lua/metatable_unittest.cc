@@ -409,61 +409,6 @@ TEST_F(MetaTableTest, ConvertedBaseWithoutParentMethods) {
   EXPECT_EQ(lua::GetType(state_, -3), lua::LuaType::Function);
 }
 
-class PropertiesClass : public base::RefCounted<PropertiesClass> {
- public:
-  PropertiesClass() {}
-
-  int property = 0;
-
- private:
-  friend class base::RefCounted<PropertiesClass>;
-
-  ~PropertiesClass() {}
-};
-
-namespace lua {
-
-template<>
-struct Type<PropertiesClass> {
-  static constexpr const char* name = "PropertiesClass";
-  static void BuildMetaTable(State* state, int metatable) {
-    RawSet(state, metatable, "new", &CreateInstance<PropertiesClass>);
-    RawSetProperty(state, metatable, "property", &PropertiesClass::property);
-  }
-};
-
-}  // namespace lua
-
-TEST_F(MetaTableTest, Index) {
-  lua::Push(state_, lua::MetaTable<PropertiesClass>());
-  lua::RawGet(state_, 1, "__index");
-  EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Function);
-  lua::RawGet(state_, 1, "__newindex");
-  EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Function);
-
-  lua::Push(state_, new PropertiesClass);
-  int property = -1;
-  ASSERT_TRUE(lua::PGetAndPop(state_, -1, "property", &property));
-  EXPECT_EQ(property, 0);
-  ASSERT_TRUE(lua::PSet(state_, -1, "property", 123));
-  ASSERT_TRUE(lua::PGetAndPop(state_, -1, "property", &property));
-  EXPECT_EQ(property, 123);
-}
-
-TEST_F(MetaTableTest, DefaultIndex) {
-  lua::Push(state_, new PropertiesClass);
-  ASSERT_TRUE(lua::PGet(state_, -1, "new"));
-  EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Function);
-}
-
-TEST_F(MetaTableTest, NewIndexFailure) {
-  lua::Push(state_, new PropertiesClass);
-  ASSERT_FALSE(lua::PSet(state_, -1, "property", "string"));
-  std::string error;
-  ASSERT_TRUE(lua::Pop(state_, &error));
-  ASSERT_EQ(error, "error converting string to integer");
-}
-
 class TestWeakPtrClass {
  public:
   TestWeakPtrClass() : weak_factory_(this) {}
