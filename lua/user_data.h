@@ -14,13 +14,13 @@ namespace lua {
 template<typename T, typename Enable = void>
 struct UserData {
   using Type = T;
-  static inline void Construct(Type* data, T* ptr) {
+  static inline void Construct(State* state, Type* data, T* ptr) {
     *data = *ptr;
   }
   static inline void Destruct(Type* data) {
     data->~Type();
   }
-  static inline T* From(Type* data) {
+  static inline T* From(State* state, Type* data) {
     return data;
   }
 };
@@ -38,7 +38,7 @@ template<typename T>
 void NewUserData(State* state, T* ptr) {
   using Type = typename UserData<T>::Type;
   Type* memory = static_cast<Type*>(lua_newuserdata(state, sizeof(Type)));
-  UserData<T>::Construct(memory, ptr);
+  UserData<T>::Construct(state, memory, ptr);
 }
 
 // Construct a new UserData with |T|, and assign it with a default metatable.

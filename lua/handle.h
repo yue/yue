@@ -61,6 +61,7 @@ class Persistent {
 // The weak reference.
 int CreateWeakReference(State* state, int index);
 void PushWeakReference(State* state, int ref);
+bool WeakReferenceExists(State* state, int ref);
 
 }  // namespace lua
 

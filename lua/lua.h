@@ -6,6 +6,7 @@
 #define LUA_LUA_H_
 
 #include "lua/callback.h"
+#include "lua/index.h"
 #include "lua/metatable.h"
 #include "lua/pcall.h"
 

@@ -12,202 +12,107 @@
 
 namespace yue {
 
-// Get type from member pointer.
-template<typename T> struct ExtractMemberPointer;
-template<typename TType, typename TMember>
-struct ExtractMemberPointer<TMember(TType::*)> {
-  using Type = TType;
-  using Member = TMember;
-};
-
-// The wrapper for nu::Signal.
-class SignalBase {
+// A simple structure that records the signal pointer and owner reference.
+template<typename Sig>
+class SignalWrapper {
  public:
-  virtual int Connect(lua::CallContext* context) = 0;
-  virtual void Disconnect(lua::CallContext* context, int id) = 0;
-  virtual void DisconnectAll(lua::CallContext* context) = 0;
-};
+  SignalWrapper(lua::State* state, int owner, nu::Signal<Sig>* signal)
+      : owner_(lua::CreateWeakReference(state, owner)), signal_(signal) {}
 
-template<typename T>
-class Signal : SignalBase {
- public:
-  using Type = typename ExtractMemberPointer<T>::Type;
-  using Slot = typename ExtractMemberPointer<T>::Member::Slot;
-
-  // The singal doesn't store the object or the member directly, instead it only
-  // keeps a weak reference to the object and stores the pointer to member, so
-  // it can still work when user copies the signal and uses it after the object
-  // gets deleted.
-  Signal(lua::State* state, int index, T member)
-      : object_ref_(lua::CreateWeakReference(state, index)),
-        member_(member) {}
-
-  int Connect(lua::CallContext* context) override {
-    Slot slot;
-    if (!lua::Pop(context->state, &slot)) {
-      context->has_error = true;
-      lua::Push(context->state, "first arg must be function");
-      return -1;
-    }
-
-    Type* object;
-    if (!GetObject(context, &object))
-      return -1;
-
-    return (object->*member_).Connect(slot);
-  }
-
-  void Disconnect(lua::CallContext* context, int id) override {
-    Type* object;
-    if (!GetObject(context, &object))
-      return;
-
-    (object->*member_).Disconnect(id);
-  }
-
-  void DisconnectAll(lua::CallContext* context) override {
-    Type* object;
-    if (!GetObject(context, &object))
-      return;
-
-    (object->*member_).DisconnectAll();
+  nu::Signal<Sig>* Get(lua::State* state) {
+    if (lua::WeakReferenceExists(state, owner_))
+      return signal_;
+    else
+      return nullptr;
   }
 
  private:
-  bool GetObject(lua::CallContext* context, Type** object) {
-    lua::PushWeakReference(context->state, object_ref_);
-    if (!lua::Pop(context->state, object)) {
-      context->has_error = true;
-      lua::Push(context->state, "owner of signal is gone");
-      return false;
-    }
-    return true;
-  }
-
-  int object_ref_;
-  T member_;
+  int owner_;
+  nu::Signal<Sig>* signal_;
 };
-
-// Push a weak table which records the object's members.
-void PushObjectMembersTable(lua::State* state, int index);
-
-// Set metatable for signal.
-void SetSignalMetaTable(lua::State* state, int index);
-
-// Helper to compare name and key and create the signal wrapepr.
-inline int PushSignal(lua::State* state, const std::string& name) {
-  return 0;
-}
-
-template<typename T, typename... Rest>
-inline int PushSignal(lua::State* state, const std::string& name,
-                      const char* key, T member, Rest... rest) {
-  if (name == key) {
-    // Create the wrapper for signal class.
-    void* memory = lua_newuserdata(state, sizeof(Signal<T>));
-    new(memory) Signal<T>(state, 1, member);
-    static_assert(base::is_trivially_destructible<Signal<T>>::value,
-                  "we are not providing __gc so Signal<T> must be trivial");
-    return 1;
-  }
-  return PushSignal(state, name, rest...);
-}
-
-// Define the __index handler for signals.
-template<typename T, typename... Rest>
-inline int SignalIndex(lua::State* state, const std::string& name,
-                       const char* key, T member, Rest... rest) {
-  int top = lua::GetTop(state);
-  // Check if the member has already been converted.
-  PushObjectMembersTable(state, 1);
-  lua::RawGet(state, -1, name);
-  if (lua::GetType(state, -1) != lua::LuaType::UserData) {
-    if (!PushSignal(state, name, key, member, rest...)) {
-      lua::SetTop(state, top);
-      return 0;
-    }
-    SetSignalMetaTable(state, -1);
-    lua::RawSet(state, top + 1, name, lua::ValueOnStack(state, -1));
-  }
-  // Pop the table and keep the signal.
-  lua::Insert(state, top + 1);
-  lua::SetTop(state, top + 1);
-  DCHECK_EQ(lua::GetType(state, -1), lua::LuaType::UserData);
-  return 1;
-}
-
-// Defines how a member is assigned.
-template<typename T, typename Type, typename Enable = void>
-struct MemberAssignment {};
-
-// Assignment for signals.
-template<typename T, typename SignalType>
-struct MemberAssignment<T, SignalType, typename std::enable_if<std::is_class<
-    typename SignalType::Slot>::value>::type> {
-  static void Do(lua::State* state,
-                 typename ExtractMemberPointer<T>::Type* object, T member) {
-    (object->*member).DisconnectAll();
-    typename ExtractMemberPointer<T>::Member::Slot slot;
-    if (lua::To(state, 3, &slot))
-      (object->*member).Connect(slot);
-  }
-};
-
-// Assignment for delegates.
-template<typename T, typename DelegateType>
-struct MemberAssignment<T, DelegateType, typename std::enable_if<
-    std::is_member_function_pointer<
-        decltype(&DelegateType::Reset)>::value>::type> {
-  static void Do(lua::State* state,
-                 typename ExtractMemberPointer<T>::Type* object, T member) {
-    typename ExtractMemberPointer<T>::Member slot;
-    if (lua::To(state, 3, &slot))
-      (object->*member) = slot;
-    else
-      (object->*member).Reset();
-  }
-};
-
-// Helper to compare name and key and set the members.
-template<typename T>
-inline int MemberNewIndexHelper(
-    lua::State* state, T object, const std::string& name) {
-  return 0;
-}
-
-template<typename T, typename Member, typename... Rest>
-inline int MemberNewIndexHelper(
-    lua::State* state, T object, const std::string& name,
-    const char* key, Member member, Rest... rest) {
-  if (name == key) {
-    MemberAssignment<Member,
-                     typename ExtractMemberPointer<Member>::Member>::Do(
-        state, object, member);
-    return 1;
-  } else {
-    return MemberNewIndexHelper(state, object, name, rest...);
-  }
-}
-
-// Define the __newindex handler for members.
-template<typename Member, typename... Rest>
-inline int MemberNewIndex(
-    lua::State* state, const std::string& name, const char* key, Member member,
-    Rest... rest) {
-  typename ExtractMemberPointer<Member>::Type* object;
-  if (!lua::To(state, 1, &object))
-    return 0;
-  return MemberNewIndexHelper(state, object, name, key, member, rest...);
-}
 
 }  // namespace yue
 
 namespace lua {
 
-template<>
-struct Type<yue::SignalBase*> {
+template<typename Sig>
+struct Type<nu::Signal<Sig>> {
   static constexpr const char* name = "yue.Signal";
-  static bool To(State* state, int index, yue::SignalBase** out);
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "connect", &nu::Signal<Sig>::Connect,
+           "disconnect", &nu::Signal<Sig>::Disconnect,
+           "disconnectall", &nu::Signal<Sig>::DisconnectAll);
+  }
+  static bool To(State* state, int value, nu::Signal<Sig>* out) {
+    if (lua::GetType(state, value) != lua::LuaType::Function)
+      return false;
+    base::Callback<Sig> callback;
+    if (!lua::To(state, value, &callback))
+      return false;
+    out->Connect(callback);
+    return true;
+  }
+};
+
+template<typename Sig>
+struct UserData<nu::Signal<Sig>> {
+  using Type = yue::SignalWrapper<Sig>;
+  static inline void Construct(State* state,
+                               yue::SignalWrapper<Sig>* data,
+                               nu::Signal<Sig>* ptr) {
+    new(data) yue::SignalWrapper<Sig>(state, 1, ptr);
+  }
+  static inline void Destruct(yue::SignalWrapper<Sig>* data) {
+    data->~Type();
+  }
+  static inline nu::Signal<Sig>* From(State* state,
+                                      yue::SignalWrapper<Sig>* data) {
+    return data->Get(state);
+  }
+};
+
+template<typename Sig>
+struct Type<nu::Signal<Sig>*> {
+  static constexpr const char* name = "yue.Signal";
+  static bool To(State* state, int index, nu::Signal<Sig>** out) {
+    index = AbsIndex(state, index);
+    StackAutoReset reset(state);
+    // Verify the type and length.
+    if (GetType(state, index) != lua::LuaType::UserData ||
+        RawLen(state, index) != sizeof(yue::SignalWrapper<Sig>))
+      return false;
+    // Verify the inheritance chain.
+    if (!GetMetaTable(state, index) ||
+        !IsMetaTableInheritedFrom<nu::Signal<Sig>>(state))
+      return false;
+    // Convert pointer to actual class.
+    nu::Signal<Sig>* ptr = UserData<nu::Signal<Sig>>::From(
+        state,
+        static_cast<yue::SignalWrapper<Sig>*>(lua_touserdata(state, index)));
+    if (!ptr)
+      return false;
+    *out = ptr;
+    return true;
+  }
+};
+
+// Define how the Signal member is converted.
+template<typename Sig>
+struct MemberTraits<nu::Signal<Sig>> {
+  static const bool kShouldCacheValue = false;
+  static inline void Push(State* state, int cache,
+                          const nu::Signal<Sig>& signal) {
+    RawGet(state, cache, ValueOnStack(state, 2));
+    if (GetType(state, -1) != LuaType::Nil)
+      return;  // cache match.
+    else
+      PopAndIgnore(state, 1);
+    NewUserData(state, const_cast<nu::Signal<Sig>*>(&signal));
+    lua::Push(state, MetaTable<nu::Signal<Sig>>());
+    SetMetaTable(state, -2);
+    RawSet(state, cache, ValueOnStack(state, 2), ValueOnStack(state, -1));
+  }
 };
 
 }  // namespace lua

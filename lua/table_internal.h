@@ -6,6 +6,7 @@
 #define LUA_TABLE_INTERNAL_H_
 
 #include <tuple>
+#include <utility>
 
 #include "lua/stack.h"
 

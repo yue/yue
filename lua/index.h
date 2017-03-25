@@ -16,7 +16,7 @@ struct MemberTraits {
   // Decides should we return cached value or converted value.
   static const bool kShouldCacheValue = true;
   // Converter used when we decide not to use cached value.
-  static inline void Push(State* state, const T& ptr) {
+  static inline void Push(State* state, int cache, const T& ptr) {
     lua::Push(state, nullptr);
   }
 };
@@ -26,7 +26,7 @@ template<typename T>
 struct MemberTraits<T, typename std::enable_if<
                            std::is_fundamental<T>::value>::type> {
   static const bool kShouldCacheValue = false;
-  static inline void Push(State* state, const T& ptr) {
+  static inline void Push(State* state, int cache, const T& ptr) {
     lua::Push(state, ptr);
   }
 };
@@ -82,11 +82,11 @@ int MemberHolder<T>::Index(State* state) {
   ClassType* owner;
   if (!To(state, 1, &owner))
     return 0;
+  int cache = lua_upvalueindex(2);
   if (MemberTraits<MemberType>::kShouldCacheValue) {
-    int cache = lua_upvalueindex(2);
     RawGet(state, cache, ValueOnStack(state, 2));
   } else {
-    MemberTraits<MemberType>::Push(state, owner->*ptr_);
+    MemberTraits<MemberType>::Push(state, cache, owner->*ptr_);
   }
   return 1;
 }
@@ -126,53 +126,6 @@ void SetMemberHolder(State* state, int table,
 }
 
 }  // namespace internal
-
-// Check whether T has an Index handler, if not use the default property lookup
-// that searches in metatable.
-template<typename T, typename Enable = void>
-struct Indexer {
-  static inline void Set(State* state, int index) {
-    RawSet(state, index, "__index", ValueOnStack(state, index));
-  }
-};
-
-template<typename T>
-struct Indexer<T, typename std::enable_if<std::is_pointer<
-                      decltype(&Type<T>::Index)>::value>::type> {
-  static inline void Set(State* state, int index) {
-    RawSet(state, index, "__index", CFunction(&Index));
-  }
-  static int Index(State* state) {
-    int r = Type<T>::Index(state);
-    if (r > 0)
-      return r;
-    // Go to the default routine.
-    return internal::DefaultPropertyLookup(state);
-  }
-};
-
-// Check whether T has an NewIndex handler, if it does then set __newindex.
-template<typename T, typename Enable = void>
-struct NewIndexer {
-  static inline void Set(State* state, int index) {
-  }
-};
-
-template<typename T>
-struct NewIndexer<T, typename std::enable_if<std::is_function<
-                         decltype(Type<T>::NewIndex)>::value>::type> {
-  static inline void Set(State* state, int index) {
-    RawSet(state, index, "__newindex", CFunction(&NewIndex));
-  }
-  static int NewIndex(State* state) {
-    int r = Type<T>::NewIndex(state);
-    if (r > 0)
-      return r;
-    lua::Push(state, "unaccepted assignment");
-    lua_error(state);
-    return 0;
-  }
-};
 
 // Define properties for the metatable.
 template<typename... ArgTypes>

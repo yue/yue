@@ -16,9 +16,6 @@ source_set("libyue") {
   sources = [
     "api_gui.cc",
     "api_gui.h",
-    "api_message_loop.cc",
-    "api_message_loop.h",
-    "api_signal.cc",
     "api_signal.h",
     "api_sys.cc",
     "api_sys.h",
@@ -38,7 +35,6 @@ source_set("libyue") {
 test("yue_unittests") {
   sources = [
     "api_signal_unittest.cc",
-    "api_message_loop_unittest.cc",
     "test/run_all_unittests.cc",
   ]
 

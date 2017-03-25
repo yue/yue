@@ -16,14 +16,14 @@ template<typename T>
 struct UserData<T, typename std::enable_if<std::is_base_of<
                        base::subtle::RefCountedBase, T>::value>::type> {
   using Type = T*;
-  static inline void Construct(T** data, T* ptr) {
+  static inline void Construct(State* state, T** data, T* ptr) {
     ptr->AddRef();
     *data = ptr;
   }
   static inline void Destruct(T** data) {
     (*data)->Release();
   }
-  static inline T* From(T** data) {
+  static inline T* From(State* state, T** data) {
     return *data;
   }
 };
@@ -34,13 +34,13 @@ struct UserData<T, typename std::enable_if<std::is_base_of<
                        base::internal::WeakPtrBase,
                        decltype(((T*)nullptr)->GetWeakPtr())>::value>::type> {
   using Type = base::WeakPtr<T>;
-  static inline void Construct(base::WeakPtr<T>* data, T* ptr) {
+  static inline void Construct(State* state, base::WeakPtr<T>* data, T* ptr) {
     new(data) base::WeakPtr<T>(ptr->GetWeakPtr());
   }
   static inline void Destruct(base::WeakPtr<T>* data) {
     data->~Type();
   }
-  static inline T* From(base::WeakPtr<T>* data) {
+  static inline T* From(State* state, base::WeakPtr<T>* data) {
     return data->get();
   }
 };
@@ -96,7 +96,8 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
     if (!GetMetaTable(state, index) || !IsMetaTableInheritedFrom<T>(state))
       return false;
     // Convert pointer to actual class.
-    *out = UserData<T>::From(static_cast<T**>(lua_touserdata(state, index)));
+    *out = UserData<T>::From(
+        state, static_cast<T**>(lua_touserdata(state, index)));
     return true;
   }
   static inline void Push(State* state, T* ptr) {
@@ -126,7 +127,7 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
       return false;
     // Convert pointer to actual class.
     T* ptr = UserData<T>::From(
-        static_cast<base::WeakPtr<T>*>(lua_touserdata(state, index)));
+        state, static_cast<base::WeakPtr<T>*>(lua_touserdata(state, index)));
     // WeakPtr might be invalidated.
     if (!ptr)
       return false;

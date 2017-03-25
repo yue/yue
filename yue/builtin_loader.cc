@@ -9,7 +9,6 @@
 #include <utility>
 
 #include "yue/api_gui.h"
-#include "yue/api_message_loop.h"
 #include "yue/api_sys.h"
 #include "yue/api_util.h"
 
@@ -20,7 +19,6 @@ namespace {
 // The search table, it must be manually kept in sorted order.
 std::pair<const char*, lua_CFunction> loaders_map[] = {
   std::make_pair("yue.gui", luaopen_yue_gui),
-  std::make_pair("yue.messageloop", luaopen_yue_message_loop),
   std::make_pair("yue.sys", luaopen_yue_sys),
   std::make_pair("yue.util", luaopen_yue_util),
 };

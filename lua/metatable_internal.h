@@ -9,7 +9,8 @@
 
 #include "base/memory/ref_counted.h"
 #include "base/memory/weak_ptr.h"
-#include "lua/index.h"
+#include "lua/table.h"
+#include "lua/user_data.h"
 
 namespace lua {
 
@@ -29,9 +30,9 @@ bool NewMetaTable(State* state) {
   if (luaL_newmetatable(state, Type<T>::name) == 0)
     return true;
 
-  RawSet(state, -1, "__gc", CFunction(&OnGC<T>));
-  Indexer<T>::Set(state, -1);
-  NewIndexer<T>::Set(state, -1);
+  RawSet(state, -1,
+         "__gc", CFunction(&OnGC<T>),
+         "__index", ValueOnStack(state, -1));
   Type<T>::BuildMetaTable(state, AbsIndex(state, -1));
   return false;
 }

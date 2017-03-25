@@ -29,4 +29,12 @@ void PushWeakReference(State* state, int ref) {
   lua_remove(state, -2);
 }
 
+bool WeakReferenceExists(State* state, int ref) {
+  StackAutoReset reset(state);
+  luaL_getmetatable(state, kWeakTableName);
+  DCHECK_EQ(GetType(state, -1), LuaType::Table);
+  lua_rawgeti(state, -1, ref);
+  return GetType(state, -1) != LuaType::Nil;
+}
+
 }  // namespace lua

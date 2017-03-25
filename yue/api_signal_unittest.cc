@@ -2,6 +2,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
+#include "nativeui/nativeui.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "yue/builtin_loader.h"
 
@@ -14,6 +15,8 @@ class YueSignalTest : public testing::Test {
   }
 
   lua::ManagedState state_;
+  nu::Lifetime lifetime_;
+  nu::State nu_state_;
 };
 
 void OnClose(bool* ptr) {
@@ -34,7 +37,7 @@ TEST_F(YueSignalTest, ConnectCheckParam) {
   ASSERT_TRUE(luaL_dostring(state_, "win.onclose:connect(123)\n"));
   std::string error;
   ASSERT_TRUE(lua::Pop(state_, &error));
-  EXPECT_EQ(error, "first arg must be function");
+  EXPECT_EQ(error, "error converting arg at index 2 from number to function");
 }
 
 TEST_F(YueSignalTest, Disconnect) {
@@ -79,28 +82,6 @@ TEST_F(YueSignalTest, OwnerGarbageCollected) {
   EXPECT_EQ(error, "owner of signal is gone");
 }
 
-int CountTable(lua::State* state, int index) {
-  lua::StackAutoReset reset(state);
-  index = lua::AbsIndex(state, index);
-  int count = 0;
-  lua::Push(state, nullptr);
-  while (lua_next(state, index)) {
-    ++count;
-    lua::PopAndIgnore(state, 1);
-  }
-  return count;
-}
-
-TEST_F(YueSignalTest, WeakTableCleared) {
-  ASSERT_FALSE(luaL_dostring(state_, "win.onclose:disconnectall()"));
-  ASSERT_FALSE(luaL_newmetatable(state_, "yue.internal.membersmap"));
-  EXPECT_EQ(CountTable(state_, 1), 2);
-  ASSERT_FALSE(luaL_dostring(state_, "win = nil"));
-  lua::CollectGarbage(state_);
-  lua::CollectGarbage(state_);
-  EXPECT_EQ(CountTable(state_, 1), 1);
-}
-
 TEST_F(YueSignalTest, EventAssignment) {
   bool closed = false;
   lua::Push(state_, base::Bind(&OnClose, &closed));
@@ -116,8 +97,8 @@ TEST_F(YueSignalTest, NilAssignment) {
   lua::Push(state_, base::Bind(&OnClose, &closed));
   lua_setglobal(state_, "callback");
   ASSERT_FALSE(luaL_dostring(state_,
-      "win.onclose = callback\n"
-      "win.onclose = 123\n"
+      "win.shouldclose = callback\n"
+      "win.shouldclose = nil\n"
       "win:close()"));
   EXPECT_FALSE(closed);
 }
@@ -135,11 +116,4 @@ TEST_F(YueSignalTest, DelegateAssignment) {
       "win.shouldclose = nil\n"
       "win:close()"));
   EXPECT_TRUE(closed);
-}
-
-TEST_F(YueSignalTest, InvalidAssignment) {
-  ASSERT_TRUE(luaL_dostring(state_, "win.onnothing = callback"));
-  std::string error;
-  lua::Pop(state_, &error);
-  EXPECT_EQ(error, "unaccepted assignment");
 }

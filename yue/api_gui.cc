@@ -150,12 +150,7 @@ struct Type<nu::Lifetime> {
            "quit", &nu::Lifetime::Quit,
            "post", &nu::Lifetime::PostTask,
            "postdelayed", &nu::Lifetime::PostDelayedTask);
-  }
-  static int NewIndex(State* state) {
-    std::string name;
-    if (!To(state, 2, &name))
-      return 0;
-    return yue::MemberNewIndex(state, name, "onready", &nu::Lifetime::on_ready);
+    RawSetProperty(state, index, "onready", &nu::Lifetime::on_ready);
   }
 };
 
@@ -325,18 +320,7 @@ struct Type<nu::MenuItem> {
            "setsubmenu", &nu::MenuItem::SetSubmenu,
            "getsubmenu", &nu::MenuItem::GetSubmenu,
            "setaccelerator", &nu::MenuItem::SetAccelerator);
-  }
-  static int Index(State* state) {
-    std::string name;
-    if (!To(state, 2, &name))
-      return 0;
-    return yue::SignalIndex(state, name, "onclick", &nu::MenuItem::on_click);
-  }
-  static int NewIndex(State* state) {
-    std::string name;
-    if (!To(state, 2, &name))
-      return 0;
-    return yue::MemberNewIndex(state, name, "onclick", &nu::MenuItem::on_click);
+    RawSetProperty(state, index, "onclick", &nu::MenuItem::on_click);
   }
   static nu::MenuItem* New(CallContext* context) {
     nu::MenuItem::Type type = nu::MenuItem::Label;
@@ -387,8 +371,8 @@ struct Type<nu::Window::Options> {
 template<>
 struct Type<nu::Window> {
   static constexpr const char* name = "yue.Window";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index,
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
            "new", &CreateInstance<nu::Window, const nu::Window::Options&>,
            "close", &nu::Window::Close,
            "setcontentbounds", &nu::Window::SetContentBounds,
@@ -404,20 +388,9 @@ struct Type<nu::Window> {
            "getmenubar", &nu::Window::GetMenuBar,
 #endif
            "setbackgroundcolor", &nu::Window::SetBackgroundColor);
-  }
-  static int Index(State* state) {
-    std::string name;
-    if (!To(state, 2, &name))
-      return 0;
-    return yue::SignalIndex(state, name, "onclose", &nu::Window::on_close);
-  }
-  static int NewIndex(State* state) {
-    std::string name;
-    if (!To(state, 2, &name))
-      return 0;
-    return yue::MemberNewIndex(state, name,
-                               "onclose", &nu::Window::on_close,
-                               "shouldclose", &nu::Window::should_close);
+    RawSetProperty(state, metatable,
+                   "onclose", &nu::Window::on_close,
+                   "shouldclose", &nu::Window::should_close);
   }
 };
 
@@ -471,18 +444,7 @@ struct Type<nu::Container> {
            "removechildview", &nu::Container::RemoveChildView,
            "childcount", &nu::Container::child_count,
            "childat", &ChildAt);
-  }
-  static int Index(State* state) {
-    std::string name;
-    if (!To(state, 2, &name))
-      return 0;
-    return yue::SignalIndex(state, name, "ondraw", &nu::Container::on_draw);
-  }
-  static int NewIndex(State* state) {
-    std::string name;
-    if (!To(state, 2, &name))
-      return 0;
-    return yue::MemberNewIndex(state, name, "ondraw", &nu::Container::on_draw);
+    RawSetProperty(state, index, "ondraw", &nu::Container::on_draw);
   }
   // Transalte 1-based index to 0-based.
   static inline void AddChildViewAt(nu::Container* c, nu::View* view, int i) {
@@ -525,6 +487,7 @@ struct Type<nu::Button> {
                          "gettitle", &nu::Button::GetTitle,
                          "setchecked", &nu::Button::SetChecked,
                          "ischecked", &nu::Button::IsChecked);
+    RawSetProperty(state, index, "onclick", &nu::Button::on_click);
   }
   static nu::Button* New(CallContext* context) {
     std::string title;
@@ -541,18 +504,6 @@ struct Type<nu::Button> {
       return nullptr;
     }
   }
-  static int Index(State* state) {
-    std::string name;
-    if (!To(state, 2, &name))
-      return 0;
-    return yue::SignalIndex(state, name, "onclick", &nu::Button::on_click);
-  }
-  static int NewIndex(State* state) {
-    std::string name;
-    if (!To(state, 2, &name))
-      return 0;
-    return yue::MemberNewIndex(state, name, "onclick", &nu::Button::on_click);
-  }
 };
 
 template<>
@@ -560,25 +511,13 @@ struct Type<nu::Entry> {
   using base = nu::View;
   static constexpr const char* name = "yue.Entry";
   static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index, "new", &CreateInstance<nu::Entry>,
-                         "settext", &nu::Entry::SetText,
-                         "gettext", &nu::Entry::GetText);
-  }
-  static int Index(State* state) {
-    std::string name;
-    if (!To(state, 2, &name))
-      return 0;
-    return yue::SignalIndex(state, name,
-                            "onactivate", &nu::Entry::on_activate,
-                            "ontextchange", &nu::Entry::on_text_change);
-  }
-  static int NewIndex(State* state) {
-    std::string name;
-    if (!To(state, 2, &name))
-      return 0;
-    return yue::MemberNewIndex(state, name,
-                               "onactivate", &nu::Entry::on_activate,
-                               "ontextchange", &nu::Entry::on_text_change);
+    RawSet(state, index,
+           "new", &CreateInstance<nu::Entry>,
+           "settext", &nu::Entry::SetText,
+           "gettext", &nu::Entry::GetText);
+    RawSetProperty(state, index,
+                   "onactivate", &nu::Entry::on_activate,
+                   "ontextchange", &nu::Entry::on_text_change);
   }
 };
 
@@ -674,12 +613,6 @@ struct Type<nu::Vibrant> {
   static constexpr const char* name = "yue.Vibrant";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index, "new", &CreateInstance<nu::Vibrant>);
-  }
-  static int Index(State* state) {
-    return Type<base>::Index(state);
-  }
-  static int NewIndex(State* state) {
-    return Type<base>::NewIndex(state);
   }
 };
 #endif
