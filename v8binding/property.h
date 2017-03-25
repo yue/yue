@@ -10,11 +10,24 @@
 namespace vb {
 
 // Describe how a member T can be converted.
-template<typename T>
+template<typename T, typename Enable = void>
 struct MemberTraits {
   // Decides should we return cached value or converted value.
   static const bool kShouldCacheValue = true;
   // Converter used when we decide not to use cached value.
+  static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                          v8::Local<v8::Object> owner,
+                                          v8::Global<v8::Value>* holder_value,
+                                          const T&) {
+    return v8::Undefined(context->GetIsolate());
+  }
+};
+
+// For primary types we just do normal conversion.
+template<typename T>
+struct MemberTraits<T, typename std::enable_if<
+                           std::is_fundamental<T>::value>::type> {
+  static const bool kShouldCacheValue = false;
   static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                           v8::Local<v8::Object> owner,
                                           v8::Global<v8::Value>* holder_value,
