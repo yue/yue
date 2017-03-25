@@ -17,7 +17,7 @@ namespace internal {
 template<typename Key, typename Value>
 inline void UnsafeSet(State* state, int index, const Key& key,
                       const Value& value) {
-  index = lua_absindex(state, index);
+  index = AbsIndex(state, index);
   Push(state, key, value);
   lua_settable(state, index);
 }
@@ -25,7 +25,7 @@ inline void UnsafeSet(State* state, int index, const Key& key,
 // Optimize for lua_seti.
 template<typename Value>
 inline void UnsafeSet(State* state, int index, int key, const Value& value) {
-  index = lua_absindex(state, index);
+  index = AbsIndex(state, index);
   Push(state, value);
   lua_seti(state, index, key);
 }
@@ -34,7 +34,7 @@ inline void UnsafeSet(State* state, int index, int key, const Value& value) {
 template<typename Value>
 inline void UnsafeSet(State* state, int index, const char* key,
                       const Value& value) {
-  index = lua_absindex(state, index);
+  index = AbsIndex(state, index);
   Push(state, value);
   lua_setfield(state, index, key);
 }
@@ -66,16 +66,45 @@ inline void UnsafeSet(State* state, int index,
 // The wrapper used by Set to call UnsafeSet.
 template<typename... ArgTypes>
 int UnsafeSetWrapper(State* state) {
-  const std::tuple<const ArgTypes&...>& args =
-      *static_cast<std::tuple<const ArgTypes&...>*>(lua_touserdata(state, 1));
+  const auto& args =
+      *static_cast<std::tuple<ArgTypes...>*>(lua_touserdata(state, 1));
   UnsafeSet(state, 2, args);
   return 0;
 }
 
+// Create a tuple but replaces ValueOnStack with UpValue.
+template<typename T>
+struct PSetArgReplacer {
+  using Type = T;
+  static inline Type Do(State* state, int* upvalues, T arg) {
+    static_assert(std::is_reference<T>::value,
+                  "Type passed to PSetArgReplacer must be reference type");
+    return arg;
+  }
+};
+
+template<>
+struct PSetArgReplacer<const ValueOnStack&> {
+  using Type = UpValue;
+  static inline Type Do(State* state, int* upvalues, const ValueOnStack& arg) {
+    Push(state, arg);
+    return UpValue(++(*upvalues));
+  }
+};
+
+template<typename... ArgTypes>
+struct PSetArgs {
+  using Tuple = std::tuple<typename PSetArgReplacer<const ArgTypes&>::Type...>;
+  static Tuple Convert(State* state, int* upvalues, const ArgTypes&... args) {
+    Tuple refs(PSetArgReplacer<const ArgTypes&>::Do(state, upvalues, args)...);
+    return std::move(refs);
+  }
+};
+
 // The generic version of lua_gettable.
 template<typename Key>
 inline void UnsafeGet(State* state, int index, const Key& key) {
-  index = lua_absindex(state, index);
+  index = AbsIndex(state, index);
   Push(state, key);
   lua_gettable(state, index);
 }

@@ -136,8 +136,14 @@ inline bool RawGetAndPop(State* state, int index, const Key& key, Value* out,
 template<typename... ArgTypes>
 inline bool PSet(State* state, int index, const ArgTypes&... args) {
   index = AbsIndex(state, index);
-  std::tuple<const ArgTypes&...> args_refs(args...);
-  lua_pushcfunction(state, &internal::UnsafeSetWrapper<const ArgTypes&...>);
+  int upvalues = 0;
+  auto args_refs =
+      internal::PSetArgs<ArgTypes...>::Convert(state, &upvalues, args...);
+  lua_pushcclosure(
+      state,
+      &internal::UnsafeSetWrapper<
+          typename internal::PSetArgReplacer<const ArgTypes&>::Type...>,
+      upvalues);
   lua_pushlightuserdata(state, &args_refs);
   lua_pushvalue(state, index);
   return lua_pcall(state, 2, 0, 0) == LUA_OK;

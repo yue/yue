@@ -258,6 +258,20 @@ TEST_F(LuaTest, PSetGet) {
   EXPECT_EQ(v3, "value3");
 }
 
+TEST_F(LuaTest, PSetValueOnStack) {
+  lua::NewTable(state_);
+  lua::Push(state_, 123);
+  lua::Push(state_, "value");
+  ASSERT_TRUE(lua::PSet(state_, 1,
+                        "key1", lua::ValueOnStack(state_, 2),
+                        "key2", lua::ValueOnStack(state_, 3)));
+  int value1;
+  std::string value2;
+  ASSERT_TRUE(lua::PGetAndPop(state_, 1, "key1", &value1, "key2", &value2));
+  EXPECT_EQ(value1, 123);
+  EXPECT_EQ(value2, "value");
+}
+
 TEST_F(LuaTest, PGetAndPop) {
   lua::NewTable(state_);
   ASSERT_EQ(lua::GetTop(state_), 1);

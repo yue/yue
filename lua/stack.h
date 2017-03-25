@@ -57,8 +57,17 @@ struct ValueOnStack {
   ValueOnStack(State* state, int index) : index(AbsIndex(state, index)) {}
   int index;
 };
-inline void Push(State* state, ValueOnStack index) {
-  lua_pushvalue(state, index.index);
+inline void Push(State* state, ValueOnStack value) {
+  lua_pushvalue(state, value.index);
+}
+
+// Thin wrapper for lua_upvalueindex.
+struct UpValue {
+  explicit UpValue(int index) : index(index) {}
+  int index;
+};
+inline void Push(State* state, UpValue value) {
+  lua_pushvalue(state, lua_upvalueindex(value.index));
 }
 
 // Thin wrapper for lua_pushcfunction.
