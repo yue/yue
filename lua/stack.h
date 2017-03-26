@@ -10,18 +10,15 @@
 #include <tuple>
 
 #include "base/compiler_specific.h"
+#include "lua/inline.h"
 #include "lua/template_util.h"
 #include "lua/types.h"
 
 namespace lua {
 
-// Thin wrappers of settop/gettop.
+// Thin wrappers of settop.
 inline void SetTop(State* state, int index) {
   lua_settop(state, index);
-}
-
-inline int GetTop(State* state) {
-  return lua_gettop(state);
 }
 
 // Automatically clear the values on stack.

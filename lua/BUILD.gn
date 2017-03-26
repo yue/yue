@@ -15,6 +15,7 @@ source_set("lua") {
     "handle.h",
     "index.cc",
     "index.h",
+    "inline.h",
     "metatable.cc",
     "metatable.h",
     "metatable_internal.h",
