@@ -76,10 +76,12 @@ TEST_F(YueSignalTest, OwnerGarbageCollected) {
   std::string error;
   ASSERT_TRUE(luaL_dostring(state_, "signal:disconnect(1)\n"));
   ASSERT_TRUE(lua::Pop(state_, &error));
-  EXPECT_EQ(error, "owner of signal is gone");
+  EXPECT_EQ(error,
+            "error converting arg at index 1 from yue.Signal to yue.Signal");
   ASSERT_TRUE(luaL_dostring(state_, "signal:connect(function() end)\n"));
   ASSERT_TRUE(lua::Pop(state_, &error));
-  EXPECT_EQ(error, "owner of signal is gone");
+  EXPECT_EQ(error,
+            "error converting arg at index 1 from yue.Signal to yue.Signal");
 }
 
 TEST_F(YueSignalTest, EventAssignment) {

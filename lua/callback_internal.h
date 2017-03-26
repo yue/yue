@@ -71,16 +71,16 @@ struct ArgumentHolder {
   using ArgLocalType = typename CallbackParamTraits<ArgType>::LocalType;
 
   ArgLocalType value;
-  const bool ok;
 
-  explicit ArgumentHolder(CallContext* context)
-      : ok(To(context->state, context->current_arg, &value)) {
+  bool Convert(CallContext* context) {
+    bool ok = To(context->state, context->current_arg, &value);
     if (ok) {
       context->current_arg++;
     } else {
       context->invalid_arg = context->current_arg;
       context->invalid_arg_name = Type<ArgLocalType>::name;
     }
+    return ok;
   }
 };
 
@@ -88,16 +88,20 @@ struct ArgumentHolder {
 template<size_t index>
 struct ArgumentHolder<index, State*> {
   State* value;
-  const bool ok = true;
-  explicit ArgumentHolder(CallContext* context) : value(context->state) {}
+  bool Convert(CallContext* context) {
+    value = context->state;
+    return true;
+  }
 };
 
 // The holder for CallContext*
 template<size_t index>
 struct ArgumentHolder<index, CallContext*> {
   CallContext* value;
-  const bool ok = true;
-  explicit ArgumentHolder(CallContext* context) : value(context) {}
+  bool Convert(CallContext* context) {
+    value = context;
+    return true;
+  }
 };
 
 // Class template for converting arguments from JavaScript to C++ and running
@@ -109,16 +113,11 @@ template<size_t... indices, typename... ArgTypes>
 class Invoker<IndicesHolder<indices...>, ArgTypes...>
     : public ArgumentHolder<indices, ArgTypes>... {
  public:
-  // Invoker<> inherits from ArgumentHolder<> for each argument.
-  // C++ has always been strict about the class initialization order,
-  // so it is guaranteed ArgumentHolders will be initialized (and thus, will
-  // extract arguments from Arguments) in the right order.
-  explicit Invoker(CallContext* context)
-      : ArgumentHolder<indices, ArgTypes>(context)...,
-        context_(context) {}
+  explicit Invoker(CallContext* context) : context_(context) {}
 
-  bool IsOK() {
-    return And(ArgumentHolder<indices, ArgTypes>::ok...);
+  bool ConvertArgs() {
+    return ConvertRestArgs(
+        context_, IndicesHolder<indices...>(), ArgsHolder<ArgTypes...>());
   }
 
   template<typename ReturnType>
@@ -138,10 +137,18 @@ class Invoker<IndicesHolder<indices...>, ArgTypes...>
   }
 
  private:
-  static bool And() { return true; }
-  template<typename... T>
-  static bool And(bool arg1, T... args) {
-    return arg1 && And(args...);
+  // Recusrively call Convert for each argument.
+  bool ConvertRestArgs(CallContext*, IndicesHolder<>, ArgsHolder<>) {
+    return true;
+  }
+  template<size_t... all_indices, typename... AllArgTypes>
+  bool ConvertRestArgs(CallContext* context,
+                       IndicesHolder<all_indices...>,
+                       ArgsHolder<AllArgTypes...>) {
+    using IS = IndicesSplitter<all_indices...>;
+    using AS = ArgsSplitter<AllArgTypes...>;
+    return ArgumentHolder<IS::first, typename AS::first>::Convert(context) &&
+           ConvertRestArgs(context, typename IS::rest(), typename AS::rest());
   }
 
   CallContext* context_;
@@ -166,7 +173,7 @@ struct Dispatcher<ReturnType(ArgTypes...)> {
     {  // Make sure C++ stack is destroyed before calling lua_error.
       using Indices = typename IndicesGenerator<sizeof...(ArgTypes)>::type;
       Invoker<Indices, ArgTypes...> invoker(&context);
-      if (!invoker.IsOK()) {
+      if (!invoker.ConvertArgs()) {
         context.has_error = true;
         if (GetType(state, context.invalid_arg) == LuaType::None) {
           PushFormatedString(state, "insufficient args, only %d supplied",

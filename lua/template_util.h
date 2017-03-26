@@ -35,6 +35,22 @@ struct is_function_pointer
           std::is_pointer<Fun>::value &&
           std::is_function<typename std::remove_pointer<Fun>::type>::value> {};
 
+template<typename... ArgTypes>
+struct ArgsHolder {
+};
+
+template<typename ArgType, typename... ArgTypes>
+struct ArgsSplitter {
+  using first = ArgType;
+  using rest = ArgsHolder<ArgTypes...>;
+};
+
+template<size_t indice, size_t... indices>
+struct IndicesSplitter {
+  static constexpr size_t first = indice;
+  using rest = IndicesHolder<indices...>;
+};
+
 }  // namespace internal
 
 }  // namespace lua
