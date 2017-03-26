@@ -6,8 +6,10 @@
 #define V8BINDING_TYPES_H_
 
 #include <string>
+#include <tuple>
 
 #include "base/strings/string_piece.h"
+#include "v8binding/template_util.h"
 #include "v8.h"  // NOLINT(build/include)
 
 namespace vb {
@@ -134,8 +136,8 @@ struct Type<base::StringPiece> {
 template<typename T>
 struct Type<v8::Local<T>, typename std::enable_if<std::is_base_of<
                               v8::Value, T>::value>::type> {
-  static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
-                                          v8::Local<T> value) {
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   v8::Local<T> value) {
     return value;
   }
   static bool FromV8(v8::Local<v8::Context> context,
@@ -143,6 +145,42 @@ struct Type<v8::Local<T>, typename std::enable_if<std::is_base_of<
                      v8::Local<T>* out) {
     *out = v8::Local<T>::Cast(value);
     return out->IsEmpty();
+  }
+};
+
+namespace internal {
+
+inline void SetArray(v8::Local<v8::Context>, v8::Local<v8::Array>, int) {
+}
+
+template<typename ArgType, typename... ArgTypes>
+inline void SetArray(v8::Local<v8::Context> context,
+                     v8::Local<v8::Array> arr,
+                     int i, const ArgType& arg,
+                     ArgTypes... args) {
+  if (arr->Set(context, i, Type<ArgType>::ToV8(context, arg)).IsNothing())
+    return;
+  SetArray(context, arr, i + 1, args...);
+}
+
+template<typename T, size_t... indices>
+inline void SetArray(v8::Local<v8::Context> context,
+                     v8::Local<v8::Array> arr,
+                     const T& tup,
+                     IndicesHolder<indices...>) {
+  SetArray(context, arr, 0, std::get<indices>(tup)...);
+}
+
+}  // namespace internal
+
+template<typename... ArgTypes>
+struct Type<std::tuple<ArgTypes...>> {
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   const std::tuple<ArgTypes...>& tup) {
+    auto arr = v8::Array::New(context->GetIsolate(), sizeof...(ArgTypes));
+    SetArray(context, arr, tup,
+             typename internal::IndicesGenerator<sizeof...(ArgTypes)>::type());
+    return arr;
   }
 };
 
