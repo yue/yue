@@ -86,3 +86,11 @@ TEST_F(IndexTest, IndexCache) {
   EXPECT_TRUE(lua::Compare(state_, 3, 4, lua::CompareOp::EQ))
       << "Cached property should return the original assigned one";
 }
+
+TEST_F(IndexTest, CustomData) {
+  lua::Push(state_, new PropertiesClass);
+  ASSERT_TRUE(lua::PSet(state_, 1, "custom", "data"));
+  std::string data;
+  ASSERT_TRUE(lua::PGetAndPop(state_, 1, "custom", &data));
+  EXPECT_EQ(data, "data");
+}

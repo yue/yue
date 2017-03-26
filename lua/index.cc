@@ -8,6 +8,7 @@ namespace lua {
 
 namespace internal {
 
+// Implement the default __index handler which looks up in the metatable.
 int DefaultPropertyLookup(State* state) {
   DCHECK_EQ(GetType(state, 1), LuaType::UserData);
   GetMetaTable(state, 1);  // self
@@ -19,7 +20,14 @@ int DefaultPropertyLookup(State* state) {
 }
 
 int MemberLookup(State* state) {
-  int members = lua_upvalueindex(1);
+  // Check the user-added members.
+  int datas = lua_upvalueindex(1);
+  RawGet(state, datas, ValueOnStack(state, 2));
+  if (GetType(state, -1) != LuaType::Nil) {
+    return 1;
+  }
+  // Check the pre-defined members.
+  int members = lua_upvalueindex(2);
   RawGet(state, members, ValueOnStack(state, 2));
   if (GetType(state, -1) != LuaType::Nil) {
     auto* holder = static_cast<MemberHolderBase*>(lua_touserdata(state, -1));
@@ -30,14 +38,18 @@ int MemberLookup(State* state) {
 }
 
 int MemberAssign(State* state) {
-  int members = lua_upvalueindex(1);
+  // Check the pre-defined members.
+  int members = lua_upvalueindex(2);
   RawGet(state, members, ValueOnStack(state, 2));
   if (GetType(state, -1) != LuaType::Nil) {
     auto* holder = static_cast<MemberHolderBase*>(lua_touserdata(state, -1));
     DCHECK(holder);
     return holder->NewIndex(state);
   }
-  return 0;
+  // Set a custom data.
+  int datas = lua_upvalueindex(1);
+  RawSet(state, datas, ValueOnStack(state, 2), ValueOnStack(state, 3));
+  return 1;
 }
 
 }  // namespace internal
