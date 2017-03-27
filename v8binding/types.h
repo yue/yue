@@ -9,8 +9,8 @@
 #include <tuple>
 
 #include "base/strings/string_piece.h"
-#include "v8binding/template_util.h"
 #include "v8.h"  // NOLINT(build/include)
+#include "v8binding/template_util.h"
 
 namespace vb {
 

@@ -143,10 +143,11 @@ void SetProperty(v8::Local<v8::Context> context,
                  v8::Local<v8::ObjectTemplate> templ,
                  base::StringPiece key,
                  T ptr) {
-  templ->SetAccessor(vb::ToV8(context, key).As<v8::String>(),
-                     &internal::MemberHolder<T>::Getter,
-                     &internal::MemberHolder<T>::Setter,
-                     vb::NewInstance<internal::MemberHolder<T>>(context, ptr));
+  templ->SetAccessor(
+      vb::ToV8(context, key).As<v8::String>(),
+      &internal::MemberHolder<T>::Getter,
+      &internal::MemberHolder<T>::Setter,
+      vb::CreateInstance<internal::MemberHolder<T>>(context, ptr));
 }
 
 // Allow setting arbitrary members.

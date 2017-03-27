@@ -38,8 +38,8 @@ v8::MaybeLocal<v8::Object> CallConstructor(v8::Local<v8::Context> context) {
 
 // Helper to create a new instance of |T|.
 template<typename T, typename... ArgTypes>
-v8::Local<v8::Value> NewInstance(v8::Local<v8::Context> context,
-                                 const ArgTypes&... args) {
+v8::Local<v8::Value> CreateInstance(v8::Local<v8::Context> context,
+                                    const ArgTypes&... args) {
   v8::Isolate* isolate = context->GetIsolate();
   auto result = CallConstructor<T>(context);
   if (result.IsEmpty())
