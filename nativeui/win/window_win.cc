@@ -233,7 +233,7 @@ void Window::Close() {
 
 void Window::PlatformSetContentView(Container* container) {
   container->GetNative()->BecomeContentView(window_);
-  container->Layout();
+  container->SetPixelBounds(Rect(window_->GetContentPixelBounds().size()));
 }
 
 void Window::PlatformSetMenuBar(MenuBar* menu_bar) {

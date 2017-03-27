@@ -62,7 +62,7 @@ namespace nu {
 #if defined(OS_WIN)
 class BaseView;
 struct MenuItemData;
-class WindowImpl;
+class TopLevelWindow;
 #endif
 
 #if defined(OS_WIN)
@@ -87,7 +87,7 @@ using NativeMenu = GtkMenuShell*;
 using NativeMenuItem = GtkMenuItem*;
 #elif defined(OS_WIN)
 using NativeView = BaseView*;
-using NativeWindow = WindowImpl*;
+using NativeWindow = TopLevelWindow*;
 using NativeFont = Gdiplus::Font*;
 using NativeImage = Gdiplus::Image*;
 using NativeMenu = HMENU;
