@@ -24,21 +24,21 @@ void OnTextChange(GtkEditable*, Entry* entry) {
 
 Entry::Entry() {
   TakeOverView(gtk_entry_new());
-  SetDefaultStyle(SizeF(GetPreferredSizeForWidget(view())));
+  SetDefaultStyle(SizeF(GetPreferredSizeForWidget(GetNative())));
 
-  g_signal_connect(view(), "activate", G_CALLBACK(OnActivate), this);
-  g_signal_connect(view(), "changed", G_CALLBACK(OnTextChange), this);
+  g_signal_connect(GetNative(), "activate", G_CALLBACK(OnActivate), this);
+  g_signal_connect(GetNative(), "changed", G_CALLBACK(OnTextChange), this);
 }
 
 Entry::~Entry() {
 }
 
 void Entry::SetText(const std::string& text) {
-  gtk_entry_set_text(GTK_ENTRY(view()), text.c_str());
+  gtk_entry_set_text(GTK_ENTRY(GetNative()), text.c_str());
 }
 
 std::string Entry::GetText() const {
-  return gtk_entry_get_text(GTK_ENTRY(view()));
+  return gtk_entry_get_text(GTK_ENTRY(GetNative()));
 }
 
 }  // namespace nu

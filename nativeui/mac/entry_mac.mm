@@ -79,19 +79,19 @@ Entry::Entry() {
 }
 
 Entry::~Entry() {
-  NSTextField* entry = static_cast<NSTextField*>(view());
+  NSTextField* entry = static_cast<NSTextField*>(GetNative());
   [entry.target release];
   [entry setTarget:nil];
   [entry setDelegate:nil];
 }
 
 void Entry::SetText(const std::string& text) {
-  auto* entry = static_cast<NSTextField*>(view());
+  auto* entry = static_cast<NSTextField*>(GetNative());
   [entry setStringValue:base::SysUTF8ToNSString(text)];
 }
 
 std::string Entry::GetText() const {
-  auto* entry = static_cast<NSTextField*>(view());
+  auto* entry = static_cast<NSTextField*>(GetNative());
   return base::SysNSStringToUTF8([entry stringValue]);
 }
 

@@ -168,7 +168,7 @@ void ScrollBarView::Draw(PainterWin* painter, const Rect& dirty) {
 
 void ScrollBarView::UpdateThumbPosition() {
   // The size of contents and viewport.
-  BaseView* contents = scroll_->delegate()->GetContentView()->view();
+  BaseView* contents = scroll_->delegate()->GetContentView()->GetNative();
   contents_size_ = vertical_ ? contents->size_allocation().height()
                              : contents->size_allocation().width();
   Rect viewport(scroll_->GetViewportRect());

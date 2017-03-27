@@ -12,19 +12,19 @@ namespace nu {
 
 Label::Label(const std::string& text) {
   TakeOverView(gtk_label_new(text.c_str()));
-  SetDefaultStyle(SizeF(GetPreferredSizeForWidget(view())));
+  SetDefaultStyle(SizeF(GetPreferredSizeForWidget(GetNative())));
 }
 
 Label::~Label() {
 }
 
 void Label::SetText(const std::string& text) {
-  gtk_label_set_text(GTK_LABEL(view()), text.c_str());
-  SetDefaultStyle(SizeF(GetPreferredSizeForWidget(view())));
+  gtk_label_set_text(GTK_LABEL(GetNative()), text.c_str());
+  SetDefaultStyle(SizeF(GetPreferredSizeForWidget(GetNative())));
 }
 
 std::string Label::GetText() {
-  return gtk_label_get_text(GTK_LABEL(view()));
+  return gtk_label_get_text(GTK_LABEL(GetNative()));
 }
 
 }  // namespace nu

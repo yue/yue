@@ -13,32 +13,32 @@ void Group::PlatformInit() {
 
   // Give the frame an initial size to calculate border size.
   GdkRectangle rect = { 0, 0, 100, 100 };
-  gtk_widget_size_allocate(view(), &rect);
+  gtk_widget_size_allocate(GetNative(), &rect);
 }
 
 void Group::PlatformSetContentView(Container* container) {
-  GtkWidget* child = gtk_bin_get_child(GTK_BIN(view()));
+  GtkWidget* child = gtk_bin_get_child(GTK_BIN(GetNative()));
   if (child)
-    gtk_container_remove(GTK_CONTAINER(view()), child);
-  gtk_container_add(GTK_CONTAINER(view()), container->view());
+    gtk_container_remove(GTK_CONTAINER(GetNative()), child);
+  gtk_container_add(GTK_CONTAINER(GetNative()), container->GetNative());
 
   container->Layout();
 }
 
 void Group::SetTitle(const std::string& title) {
-  gtk_frame_set_label(GTK_FRAME(view()), title.c_str());
+  gtk_frame_set_label(GTK_FRAME(GetNative()), title.c_str());
 }
 
 std::string Group::GetTitle() const {
-  return gtk_frame_get_label(GTK_FRAME(view()));
+  return gtk_frame_get_label(GTK_FRAME(GetNative()));
 }
 
 SizeF Group::GetBorderSize() const {
   GdkRectangle outer;
-  gtk_widget_get_allocation(view(), &outer);
+  gtk_widget_get_allocation(GetNative(), &outer);
   GdkRectangle inner;
-  GTK_FRAME_GET_CLASS(view())->compute_child_allocation(
-      GTK_FRAME(view()), &inner);
+  GTK_FRAME_GET_CLASS(GetNative())->compute_child_allocation(
+      GTK_FRAME(GetNative()), &inner);
   return SizeF(outer.width - inner.width, outer.height - inner.height);
 }
 

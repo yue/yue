@@ -22,14 +22,15 @@ Menu::Menu() : MenuBase(GTK_MENU_SHELL(gtk_menu_new())) {
 }
 
 void Menu::Popup() {
-  gtk_menu_popup(GTK_MENU(menu()), nullptr, nullptr, nullptr, nullptr,
+  gtk_menu_popup(GTK_MENU(GetNative()), nullptr, nullptr, nullptr, nullptr,
                  0, gtk_get_current_event_time());
 
   // Block until the menu is hidden.
   base::RunLoop loop;
-  gint id = g_signal_connect(menu(), "hide", G_CALLBACK(OnMenuHidden), &loop);
+  gint id = g_signal_connect(GetNative(), "hide", G_CALLBACK(OnMenuHidden),
+                             &loop);
   loop.Run();
-  g_signal_handler_disconnect(menu(), id);
+  g_signal_handler_disconnect(GetNative(), id);
 }
 
 }  // namespace nu

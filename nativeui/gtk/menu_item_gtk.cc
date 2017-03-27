@@ -78,7 +78,7 @@ void MenuItem::PlatformDestroy() {
 }
 
 void MenuItem::PlatformSetSubmenu(Menu* submenu) {
-  gtk_menu_item_set_submenu(menu_item_, GTK_WIDGET(submenu->menu()));
+  gtk_menu_item_set_submenu(menu_item_, GTK_WIDGET(submenu->GetNative()));
 }
 
 }  // namespace nu

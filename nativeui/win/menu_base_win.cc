@@ -15,7 +15,7 @@ void DispatchCommandToItem(MenuBase* menu, int command) {
   // Find the item with the id and click it.
   for (int i = 0; i < menu->ItemCount(); ++i) {
     MenuItem* item = menu->ItemAt(i);
-    if (item->menu_item()->id == command) {
+    if (item->GetNative()->id == command) {
       item->Click();
       break;
     } else if (item->GetType() == MenuItem::Submenu && item->GetSubmenu()) {
@@ -38,12 +38,12 @@ void MenuBase::PlatformInsert(MenuItem* item, int index) {
     mii.fMask = MIIM_FTYPE;
     mii.fType = MFT_SEPARATOR;
   } else {
-    auto* data = item->menu_item();
+    auto* data = item->GetNative();
     mii.fMask = MIIM_FTYPE | MIIM_ID | MIIM_STRING | MIIM_STATE;
     mii.wID = data->id;
     if (item->GetType() == MenuItem::Submenu && item->GetSubmenu()) {
       mii.fMask |= MIIM_SUBMENU;
-      mii.hSubMenu = item->GetSubmenu()->menu();
+      mii.hSubMenu = item->GetSubmenu()->GetNative();
     }
     if (item->GetType() == MenuItem::Radio)
       mii.fType = MFT_RADIOCHECK;
@@ -59,7 +59,7 @@ void MenuBase::PlatformInsert(MenuItem* item, int index) {
 }
 
 void MenuBase::PlatformRemove(MenuItem* item) {
-  RemoveMenu(menu_, item->menu_item()->id, MF_BYCOMMAND);
+  RemoveMenu(menu_, item->GetNative()->id, MF_BYCOMMAND);
 }
 
 }  // namespace nu

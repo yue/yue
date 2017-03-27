@@ -108,40 +108,40 @@ HBRUSH TopLevelWindow::OnCtlColorStatic(HDC dc, HWND window) {
 void TopLevelWindow::OnSize(UINT param, const Size& size) {
   if (!delegate_->GetContentView())
     return;
-  delegate_->GetContentView()->view()->SizeAllocate(Rect(size));
+  delegate_->GetContentView()->GetNative()->SizeAllocate(Rect(size));
   RedrawWindow(hwnd(), NULL, NULL, RDW_INVALIDATE | RDW_ALLCHILDREN);
 }
 
 void TopLevelWindow::OnMouseMove(UINT flags, const Point& point) {
   if (!mouse_in_window_) {
     mouse_in_window_ = true;
-    delegate_->GetContentView()->view()->OnMouseEnter();
+    delegate_->GetContentView()->GetNative()->OnMouseEnter();
     TrackMouse(true);
   }
   if (capture_view_) {
     capture_view_->OnMouseMove(flags, point);
     return;
   }
-  delegate_->GetContentView()->view()->OnMouseMove(flags, point);
+  delegate_->GetContentView()->GetNative()->OnMouseMove(flags, point);
 }
 
 void TopLevelWindow::OnMouseLeave() {
   TrackMouse(false);
   mouse_in_window_ = false;
-  delegate_->GetContentView()->view()->OnMouseLeave();
+  delegate_->GetContentView()->GetNative()->OnMouseLeave();
 }
 
 BOOL TopLevelWindow::OnMouseWheel(bool vertical, UINT flags, int delta,
                                   const Point& point) {
   POINT p = point.ToPOINT();
   ScreenToClient(hwnd(), &p);
-  return delegate_->GetContentView()->view()->OnMouseWheel(
+  return delegate_->GetContentView()->GetNative()->OnMouseWheel(
       vertical, flags, delta, Point(p));
 }
 
 LRESULT TopLevelWindow::OnMouseClick(UINT message, WPARAM w_param,
                                      LPARAM l_param) {
-  delegate_->GetContentView()->view()->OnMouseClick(
+  delegate_->GetContentView()->GetNative()->OnMouseClick(
       message, static_cast<UINT>(w_param),
       nu::Point(CR_GET_X_LPARAM(l_param), CR_GET_Y_LPARAM(l_param)));
 
@@ -192,7 +192,7 @@ void TopLevelWindow::OnPaint(HDC) {
     painter.FillPixelRect(RectF(dirty));
 
     // Draw.
-    delegate_->GetContentView()->view()->Draw(&painter, dirty);
+    delegate_->GetContentView()->GetNative()->Draw(&painter, dirty);
   }
 
   EndPaint(hwnd(), &ps);
@@ -232,12 +232,12 @@ void Window::Close() {
 }
 
 void Window::PlatformSetContentView(Container* container) {
-  container->view()->BecomeContentView(window_);
+  container->GetNative()->BecomeContentView(window_);
   container->Layout();
 }
 
 void Window::PlatformSetMenuBar(MenuBar* menu_bar) {
-  ::SetMenu(window_->hwnd(), menu_bar ? menu_bar->menu() : NULL);
+  ::SetMenu(window_->hwnd(), menu_bar ? menu_bar->GetNative() : NULL);
 }
 
 void Window::SetContentBounds(const RectF& bounds) {

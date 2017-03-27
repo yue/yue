@@ -23,14 +23,14 @@ class ProgressView : public SubwinView {
 Progress::Progress() {
   TakeOverView(new ProgressView());
   SetDefaultStyle(ScaleSize(SizeF(0, GetSystemMetrics(SM_CYVSCROLL)),
-                            1.0f / view()->scale_factor()));
+                            1.0f / GetNative()->scale_factor()));
 }
 
 Progress::~Progress() {
 }
 
 void Progress::SetValue(int value) {
-  auto* progress = static_cast<ProgressView*>(view());
+  auto* progress = static_cast<ProgressView*>(GetNative());
   SetIndeterminate(false);
   SendMessageW(progress->hwnd(), PBM_SETPOS, value, 0);
 }
@@ -40,7 +40,7 @@ int Progress::GetValue() const {
 }
 
 void Progress::SetIndeterminate(bool indeterminate) {
-  auto* progress = static_cast<ProgressView*>(view());
+  auto* progress = static_cast<ProgressView*>(GetNative());
   DWORD style = GetWindowLong(progress->hwnd(), GWL_STYLE);
   if (indeterminate) {
     SetWindowLong(progress->hwnd(), GWL_STYLE, style | PBS_MARQUEE);
@@ -52,7 +52,7 @@ void Progress::SetIndeterminate(bool indeterminate) {
 }
 
 bool Progress::IsIndeterminate() const {
-  auto* progress = static_cast<ProgressView*>(view());
+  auto* progress = static_cast<ProgressView*>(GetNative());
   return (GetWindowLong(progress->hwnd(), GWL_STYLE) & PBS_MARQUEE) != 0;
 }
 

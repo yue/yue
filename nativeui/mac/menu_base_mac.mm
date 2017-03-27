@@ -19,11 +19,11 @@ void MenuBase::PlatformDestroy() {
 }
 
 void MenuBase::PlatformInsert(MenuItem* item, int index) {
-  [menu_ insertItem:item->menu_item() atIndex:index];
+  [menu_ insertItem:item->GetNative() atIndex:index];
 }
 
 void MenuBase::PlatformRemove(MenuItem* item) {
-  [menu_ removeItem:item->menu_item()];
+  [menu_ removeItem:item->GetNative()];
 }
 
 }  // namespace nu

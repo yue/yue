@@ -29,11 +29,11 @@ class NATIVEUI_EXPORT MenuBase : public base::RefCounted<MenuBase> {
     return items_[index].get();
   }
 
+  // Return the native Menu object.
+  NativeMenu GetNative() const { return menu_; }
+
   // Internal: Notify the change of AcceleratorManager.
   void SetAcceleratorManager(AcceleratorManager* accel_manager);
-
-  // Internal: Return the native menu object.
-  NativeMenu menu() const { return menu_; }
 
  protected:
   explicit MenuBase(NativeMenu menu);

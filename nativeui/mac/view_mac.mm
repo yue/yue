@@ -50,8 +50,8 @@ bool View::IsVisible() const {
 }
 
 void View::PlatformSetBackgroundColor(Color color) {
-  if ([view() respondsToSelector:@selector(setNUBackgroundColor:)])
-    [view() setNUBackgroundColor:color];
+  if ([GetNative() respondsToSelector:@selector(setNUBackgroundColor:)])
+    [GetNative() setNUBackgroundColor:color];
 }
 
 }  // namespace nu

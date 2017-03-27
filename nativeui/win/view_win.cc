@@ -19,38 +19,40 @@ void View::TakeOverView(NativeView view) {
 }
 
 void View::SetBounds(const RectF& bounds) {
-  SetPixelBounds(ToEnclosingRect(ScaleRect(bounds, view()->scale_factor())));
+  SetPixelBounds(ToEnclosingRect(ScaleRect(bounds,
+                                 GetNative()->scale_factor())));
 }
 
 RectF View::GetBounds() const {
-  return ScaleRect(RectF(GetPixelBounds()), 1.0f / view()->scale_factor());
+  return ScaleRect(RectF(GetPixelBounds()), 1.0f / GetNative()->scale_factor());
 }
 
 void View::SetPixelBounds(const Rect& bounds) {
   Rect size_allocation(bounds);
-  View* parent = GetParent();
-  if (parent)
-    size_allocation += parent->view()->size_allocation().OffsetFromOrigin();
-  view()->SizeAllocate(size_allocation);
+  if (GetParent()) {
+    size_allocation +=
+        GetParent()->GetNative()->size_allocation().OffsetFromOrigin();
+  }
+  GetNative()->SizeAllocate(size_allocation);
 }
 
 Rect View::GetPixelBounds() const {
-  Rect bounds(view()->size_allocation());
+  Rect bounds(GetNative()->size_allocation());
   if (GetParent())
-    bounds -= GetParent()->view()->size_allocation().OffsetFromOrigin();
+    bounds -= GetParent()->GetNative()->size_allocation().OffsetFromOrigin();
   return bounds;
 }
 
 void View::PlatformSetVisible(bool visible) {
-  view()->set_visible(visible);
+  GetNative()->set_visible(visible);
 }
 
 bool View::IsVisible() const {
-  return view()->is_visible();
+  return GetNative()->is_visible();
 }
 
 void View::PlatformSetBackgroundColor(Color color) {
-  view()->SetBackgroundColor(color);
+  GetNative()->SetBackgroundColor(color);
 }
 
 }  // namespace nu

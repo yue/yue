@@ -75,11 +75,12 @@ class ButtonView : public BaseView {
 
     // And flip all other radio buttons' state.
     if (checked && type() == ControlType::Radio && delegate_->GetParent() &&
-        delegate_->GetParent()->view()->type() == ControlType::Container) {
+        delegate_->GetParent()->GetNative()->type() == ControlType::Container) {
       auto* container = static_cast<Container*>(delegate_->GetParent());
       for (int i = 0; i < container->ChildCount(); ++i) {
         View* child = container->ChildAt(i);
-        if (child != delegate_ && child->view()->type() == ControlType::Radio)
+        if (child != delegate_ &&
+            child->GetNative()->type() == ControlType::Radio)
           static_cast<Button*>(child)->SetChecked(false);
       }
     }
@@ -106,7 +107,7 @@ class ButtonView : public BaseView {
   }
 
   bool OnMouseClick(UINT message, UINT flags, const Point& point) override {
-    auto* toplevel_window = static_cast<TopLevelWindow*>(window());
+    auto* toplevel_window = static_cast<TopLevelWindow*>(GetNative());
     if (message == WM_LBUTTONDOWN) {
       is_capturing_ = true;
       toplevel_window->SetCapture(this);
@@ -239,25 +240,25 @@ Button::~Button() {
 }
 
 void Button::SetTitle(const std::string& title) {
-  auto* button = static_cast<ButtonView*>(view());
+  auto* button = static_cast<ButtonView*>(GetNative());
   base::string16 wtitle = base::UTF8ToUTF16(title);
   button->SetTitle(wtitle);
 
   SetDefaultStyle(ScaleSize(button->GetPreferredSize(),
-                            1.0f / view()->scale_factor()));
+                            1.0f / GetNative()->scale_factor()));
   button->Invalidate();
 }
 
 std::string Button::GetTitle() const {
-  return base::UTF16ToUTF8(static_cast<ButtonView*>(view())->GetTitle());
+  return base::UTF16ToUTF8(static_cast<ButtonView*>(GetNative())->GetTitle());
 }
 
 void Button::SetChecked(bool checked) {
-  static_cast<ButtonView*>(view())->SetChecked(checked);
+  static_cast<ButtonView*>(GetNative())->SetChecked(checked);
 }
 
 bool Button::IsChecked() const {
-  return static_cast<ButtonView*>(view())->IsChecked();
+  return static_cast<ButtonView*>(GetNative())->IsChecked();
 }
 
 }  // namespace nu

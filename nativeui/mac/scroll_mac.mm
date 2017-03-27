@@ -15,17 +15,17 @@ void Scroll::PlatformInit() {
 }
 
 void Scroll::PlatformSetContentView(Container* container) {
-  auto* scroll = static_cast<NSScrollView*>(view());
-  scroll.documentView = container->view();
+  auto* scroll = static_cast<NSScrollView*>(GetNative());
+  scroll.documentView = container->GetNative();
 }
 
 void Scroll::SetContentSize(const SizeF& size) {
-  auto* scroll = static_cast<NSScrollView*>(view());
+  auto* scroll = static_cast<NSScrollView*>(GetNative());
   [scroll.documentView setFrameSize:size.ToCGSize()];
 }
 
 void Scroll::SetScrollBarPolicy(Policy h_policy, Policy v_policy) {
-  auto* scroll = static_cast<NSScrollView*>(view());
+  auto* scroll = static_cast<NSScrollView*>(GetNative());
   scroll.hasHorizontalScroller = (h_policy == Policy::Always) ||
                                  (h_policy == Policy::Automatic);
   scroll.hasVerticalScroller = (v_policy == Policy::Always) ||
@@ -33,7 +33,7 @@ void Scroll::SetScrollBarPolicy(Policy h_policy, Policy v_policy) {
 }
 
 std::tuple<Scroll::Policy, Scroll::Policy> Scroll::GetScrollBarPolicy() const {
-  auto* scroll = static_cast<NSScrollView*>(view());
+  auto* scroll = static_cast<NSScrollView*>(GetNative());
   Policy h_policy = scroll.hasHorizontalScroller ? Policy::Automatic
                                                  : Policy::Never;
   Policy v_policy = scroll.hasVerticalScroller ? Policy::Automatic

@@ -18,19 +18,19 @@ AcceleratorManager::~AcceleratorManager() {
 
 void AcceleratorManager::RegisterAccelerator(MenuItem* item,
                                              const Accelerator& accelerator) {
-  accelerators_[accelerator] = item->menu_item()->id;
-  item->menu_item()->accelerator =
+  accelerators_[accelerator] = item->GetNative()->id;
+  item->GetNative()->accelerator =
       base::ASCIIToUTF16(accelerator.GetShortcutText());
   // Refresh.
-  item->SetLabel(item->menu_item()->label);
+  item->SetLabel(item->GetNative()->label);
 }
 
 void AcceleratorManager::RemoveAccelerator(MenuItem* item,
                                            const Accelerator& accelerator) {
   accelerators_.erase(accelerator);
-  item->menu_item()->accelerator.clear();
+  item->GetNative()->accelerator.clear();
   // Refresh.
-  item->SetLabel(item->menu_item()->label);
+  item->SetLabel(item->GetNative()->label);
 }
 
 int AcceleratorManager::Process(const Accelerator& accelerator) {

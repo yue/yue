@@ -17,8 +17,8 @@ namespace {
 
 Color GetDefaultTextColor() {
   scoped_refptr<nu::Label> label = new nu::Label;
-  gtk_widget_ensure_style(label->view());
-  GtkStyle* style = gtk_widget_get_style(label->view());
+  gtk_widget_ensure_style(label->GetNative());
+  GtkStyle* style = gtk_widget_get_style(label->GetNative());
   GdkColor color;
   if (!gtk_style_lookup_color(style, "text_color", &color))
     return Color();

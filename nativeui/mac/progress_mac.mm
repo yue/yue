@@ -21,18 +21,18 @@ Progress::~Progress() {
 }
 
 void Progress::SetValue(int value) {
-  auto* progress = static_cast<NSProgressIndicator*>(view());
+  auto* progress = static_cast<NSProgressIndicator*>(GetNative());
   progress.indeterminate = NO;
   progress.doubleValue = value;
 }
 
 int Progress::GetValue() const {
-  auto* progress = static_cast<NSProgressIndicator*>(view());
+  auto* progress = static_cast<NSProgressIndicator*>(GetNative());
   return progress.doubleValue;
 }
 
 void Progress::SetIndeterminate(bool indeterminate) {
-  auto* progress = static_cast<NSProgressIndicator*>(view());
+  auto* progress = static_cast<NSProgressIndicator*>(GetNative());
   progress.indeterminate = indeterminate;
   if (indeterminate)
     [progress startAnimation:nil];
@@ -41,7 +41,7 @@ void Progress::SetIndeterminate(bool indeterminate) {
 }
 
 bool Progress::IsIndeterminate() const {
-  auto* progress = static_cast<NSProgressIndicator*>(view());
+  auto* progress = static_cast<NSProgressIndicator*>(GetNative());
   return progress.isIndeterminate;
 }
 

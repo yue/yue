@@ -66,19 +66,19 @@ void Window::Close() {
 void Window::PlatformSetContentView(Container* container) {
   GtkContainer* vbox = GTK_CONTAINER(gtk_bin_get_child(GTK_BIN(window_)));
   if (content_view_)
-    gtk_container_remove(vbox, content_view_->view());
-  gtk_container_add(vbox, container->view());
-  gtk_box_set_child_packing(GTK_BOX(vbox), container->view(), TRUE, TRUE,
+    gtk_container_remove(vbox, content_view_->GetNative());
+  gtk_container_add(vbox, container->GetNative());
+  gtk_box_set_child_packing(GTK_BOX(vbox), container->GetNative(), TRUE, TRUE,
                             0, GTK_PACK_END);
 
-  ForceSizeAllocation(window_, container->view());
+  ForceSizeAllocation(window_, container->GetNative());
 }
 
 void Window::PlatformSetMenuBar(MenuBar* menu_bar) {
   GtkContainer* vbox = GTK_CONTAINER(gtk_bin_get_child(GTK_BIN(window_)));
   if (menu_bar_)
-    gtk_container_remove(vbox, GTK_WIDGET(menu_bar_->menu()));
-  GtkWidget* menu = GTK_WIDGET(menu_bar->menu());
+    gtk_container_remove(vbox, GTK_WIDGET(menu_bar_->GetNative()));
+  GtkWidget* menu = GTK_WIDGET(menu_bar->GetNative());
   gtk_container_add(vbox, menu);
   gtk_box_set_child_packing(GTK_BOX(vbox), menu, FALSE, FALSE, 0,
                             GTK_PACK_START);
@@ -91,7 +91,7 @@ void Window::PlatformSetMenuBar(MenuBar* menu_bar) {
     gtk_window_add_accel_group(window_,
                                menu_bar->accel_manager()->accel_group());
 
-  ForceSizeAllocation(window_, content_view_->view());
+  ForceSizeAllocation(window_, content_view_->GetNative());
 }
 
 void Window::SetContentBounds(const RectF& bounds) {
@@ -108,12 +108,12 @@ void Window::SetContentBounds(const RectF& bounds) {
   }
   // The position of menubar.
   GdkRectangle alloc;
-  gtk_widget_get_allocation(content_view_->view(), &alloc);
+  gtk_widget_get_allocation(content_view_->GetNative(), &alloc);
   window_bounds.Inset(-alloc.x, -alloc.y, 0, 0);
 
   gtk_window_resize(window_, window_bounds.width(), window_bounds.height());
   gtk_window_move(window_, window_bounds.x(), window_bounds.y());
-  ForceSizeAllocation(window_, content_view_->view());
+  ForceSizeAllocation(window_, content_view_->GetNative());
 }
 
 RectF Window::GetContentBounds() const {
@@ -126,7 +126,7 @@ RectF Window::GetContentBounds() const {
     gtk_window_get_position(window_, &x, &y);
   // The relative position of content view.
   GdkRectangle alloc;
-  gtk_widget_get_allocation(content_view_->view(), &alloc);
+  gtk_widget_get_allocation(content_view_->GetNative(), &alloc);
   return RectF(x + alloc.x, y + alloc.y, alloc.width, alloc.height);
 }
 
@@ -144,7 +144,7 @@ void Window::SetBounds(const RectF& bounds) {
 
   gtk_window_resize(window_, window_size.width(), window_size.height());
   gtk_window_move(window_, bounds.x(), bounds.y());
-  ForceSizeAllocation(window_, content_view_->view());
+  ForceSizeAllocation(window_, content_view_->GetNative());
 }
 
 RectF Window::GetBounds() const {

@@ -85,12 +85,12 @@ Label::~Label() {
 }
 
 void Label::SetText(const std::string& text) {
-  [static_cast<NULabel*>(view()) setText:text];
+  [static_cast<NULabel*>(GetNative()) setText:text];
   SetDefaultStyle(GetPreferredSizeForText(text));
 }
 
 std::string Label::GetText() {
-  return [static_cast<NULabel*>(view()) text];
+  return [static_cast<NULabel*>(GetNative()) text];
 }
 
 }  // namespace nu

@@ -117,13 +117,13 @@ Button::Button(const std::string& title, Type type) {
 }
 
 Button::~Button() {
-  NSButton* button = static_cast<NSButton*>(view());
+  NSButton* button = static_cast<NSButton*>(GetNative());
   [button.target release];
   [button setTarget:nil];
 }
 
 void Button::SetTitle(const std::string& title) {
-  NSButton* button = static_cast<NSButton*>(view());
+  NSButton* button = static_cast<NSButton*>(GetNative());
   button.title = base::SysUTF8ToNSString(title);
 
   // Calculate the preferred size by creating a new button.
@@ -133,15 +133,15 @@ void Button::SetTitle(const std::string& title) {
 }
 
 std::string Button::GetTitle() const {
-  return base::SysNSStringToUTF8(static_cast<NSButton*>(view()).title);
+  return base::SysNSStringToUTF8(static_cast<NSButton*>(GetNative()).title);
 }
 
 void Button::SetChecked(bool checked) {
-  static_cast<NSButton*>(view()).state = checked ? NSOnState : NSOffState;
+  static_cast<NSButton*>(GetNative()).state = checked ? NSOnState : NSOffState;
 }
 
 bool Button::IsChecked() const {
-  return static_cast<NSButton*>(view()).state == NSOnState;
+  return static_cast<NSButton*>(GetNative()).state == NSOnState;
 }
 
 }  // namespace nu

@@ -40,7 +40,7 @@ void View::SetPixelBounds(const Rect& bounds) {
   if (GetParent()) {
     // The size allocation is relative to the window instead of parent.
     GdkRectangle pb;
-    gtk_widget_get_allocation(GetParent()->view(), &pb);
+    gtk_widget_get_allocation(GetParent()->GetNative(), &pb);
     rect.x += pb.x;
     rect.y += pb.y;
   }
@@ -53,7 +53,7 @@ Rect View::GetPixelBounds() const {
   if (GetParent()) {
     // The size allocation is relative to the window instead of parent.
     GdkRectangle pb;
-    gtk_widget_get_allocation(GetParent()->view(), &pb);
+    gtk_widget_get_allocation(GetParent()->GetNative(), &pb);
     rect.x -= pb.x;
     rect.y -= pb.y;
   }

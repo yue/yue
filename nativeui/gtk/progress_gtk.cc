@@ -18,14 +18,14 @@ void DeleteTimer(void* timer) {
 }
 
 void OnTimer(Progress* progress) {
-  gtk_progress_bar_pulse(GTK_PROGRESS_BAR(progress->view()));
+  gtk_progress_bar_pulse(GTK_PROGRESS_BAR(progress->GetNative()));
 }
 
 }  // namespace
 
 Progress::Progress() {
   TakeOverView(gtk_progress_bar_new());
-  SetDefaultStyle(SizeF(GetPreferredSizeForWidget(view())));
+  SetDefaultStyle(SizeF(GetPreferredSizeForWidget(GetNative())));
 }
 
 Progress::~Progress() {
@@ -33,11 +33,11 @@ Progress::~Progress() {
 
 void Progress::SetValue(int value) {
   SetIndeterminate(false);
-  gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(view()), value / 100.0);
+  gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(GetNative()), value / 100.0);
 }
 
 int Progress::GetValue() const {
-  return gtk_progress_bar_get_fraction(GTK_PROGRESS_BAR(view())) * 100;
+  return gtk_progress_bar_get_fraction(GTK_PROGRESS_BAR(GetNative())) * 100;
 }
 
 void Progress::SetIndeterminate(bool indeterminate) {
@@ -50,14 +50,14 @@ void Progress::SetIndeterminate(bool indeterminate) {
                                   base::Bind(OnTimer, base::Unretained(this)),
                                   true);
     timer->Reset();
-    g_object_set_data_full(G_OBJECT(view()), "timer", timer, DeleteTimer);
+    g_object_set_data_full(G_OBJECT(GetNative()), "timer", timer, DeleteTimer);
   } else {
-    g_object_set_data(G_OBJECT(view()), "timer", nullptr);
+    g_object_set_data(G_OBJECT(GetNative()), "timer", nullptr);
   }
 }
 
 bool Progress::IsIndeterminate() const {
-  return g_object_get_data(G_OBJECT(view()), "timer");
+  return g_object_get_data(G_OBJECT(GetNative()), "timer");
 }
 
 }  // namespace nu

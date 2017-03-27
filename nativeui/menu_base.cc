@@ -23,7 +23,7 @@ void MenuBase::Append(MenuItem* item) {
 }
 
 void MenuBase::Insert(MenuItem* item, int index) {
-  if (!item || item->menu() || index < 0 || index > ItemCount())
+  if (!item || item->GetMenu() || index < 0 || index > ItemCount())
     return;
   items_.insert(items_.begin() + index, item);
   item->set_menu(this);

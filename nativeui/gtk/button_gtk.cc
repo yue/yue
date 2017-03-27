@@ -26,28 +26,28 @@ Button::Button(const std::string& title, Type type) {
   else if (type == Radio)
     TakeOverView(gtk_radio_button_new_with_label(nullptr, title.c_str()));
 
-  SetDefaultStyle(SizeF(GetPreferredSizeForWidget(view())));
-  g_signal_connect(view(), "clicked", G_CALLBACK(OnClick), this);
+  SetDefaultStyle(SizeF(GetPreferredSizeForWidget(GetNative())));
+  g_signal_connect(GetNative(), "clicked", G_CALLBACK(OnClick), this);
 }
 
 Button::~Button() {
 }
 
 void Button::SetTitle(const std::string& title) {
-  gtk_button_set_label(GTK_BUTTON(view()), title.c_str());
-  SetDefaultStyle(SizeF(GetPreferredSizeForWidget(view())));
+  gtk_button_set_label(GTK_BUTTON(GetNative()), title.c_str());
+  SetDefaultStyle(SizeF(GetPreferredSizeForWidget(GetNative())));
 }
 
 std::string Button::GetTitle() const {
-  return gtk_button_get_label(GTK_BUTTON(view()));
+  return gtk_button_get_label(GTK_BUTTON(GetNative()));
 }
 
 void Button::SetChecked(bool checked) {
-  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(view()), checked);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(GetNative()), checked);
 }
 
 bool Button::IsChecked() const {
-  return gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(view()));
+  return gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(GetNative()));
 }
 
 }  // namespace nu

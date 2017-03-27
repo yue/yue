@@ -20,7 +20,7 @@ AcceleratorManager::~AcceleratorManager() {
 void AcceleratorManager::RegisterAccelerator(MenuItem* item,
                                              const Accelerator& accelerator) {
   gtk_widget_add_accelerator(
-      GTK_WIDGET(item->menu_item()), "activate", accel_group_,
+      GTK_WIDGET(item->GetNative()), "activate", accel_group_,
       accelerator.GetKeyCode(),
       static_cast<GdkModifierType>(accelerator.GetModifiers()),
       GTK_ACCEL_VISIBLE);
@@ -29,7 +29,7 @@ void AcceleratorManager::RegisterAccelerator(MenuItem* item,
 void AcceleratorManager::RemoveAccelerator(MenuItem* item,
                                            const Accelerator& accelerator) {
   gtk_widget_remove_accelerator(
-      GTK_WIDGET(item->menu_item()), accel_group_,
+      GTK_WIDGET(item->GetNative()), accel_group_,
       accelerator.GetKeyCode(),
       static_cast<GdkModifierType>(accelerator.GetModifiers()));
 }

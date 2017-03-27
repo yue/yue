@@ -43,14 +43,14 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
 
   void SetBackgroundColor(Color color);
 
+  // Get the native window object.
+  NativeWindow GetNative() const { return window_; }
+
   // Events.
   Signal<void()> on_close;
 
   // Delegate methods.
   base::Callback<bool()> should_close;
-
-  // Internal: The native window object.
-  NativeWindow window() const { return window_; }
 
  protected:
   virtual ~Window();

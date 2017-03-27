@@ -21,8 +21,6 @@ namespace nu {
 // The base class for all kinds of views.
 class NATIVEUI_EXPORT View : public base::RefCounted<View> {
  public:
-  NativeView view() const { return view_; }
-
   // The view class name.
   static const char kClassName[];
 
@@ -59,6 +57,9 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
 
   // Get parent.
   View* GetParent() const { return parent_; }
+
+  // Get the native View object.
+  NativeView GetNative() const { return view_; }
 
   // Internal: Set parent view.
   void set_parent(View* parent) { parent_ = parent; }

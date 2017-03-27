@@ -124,7 +124,7 @@ class BaseView {
 
   Color background_color() const { return background_color_; }
 
-  WindowImpl* window() const { return window_; }
+  WindowImpl* GetNative() const { return window_; }
   ControlType type() const { return type_; }
 
  protected:

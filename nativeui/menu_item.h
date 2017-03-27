@@ -53,15 +53,17 @@ class NATIVEUI_EXPORT MenuItem : public base::RefCounted<MenuItem> {
   // Return the type of menu item.
   Type GetType() const { return type_; }
 
+  // Get the owner of this item.
+  MenuBase* GetMenu() const { return menu_; }
+
+  // Return the native MenuItem object.
+  NativeMenuItem GetNative() const { return menu_item_; }
+
   // Events.
   Signal<void()> on_click;
 
   // Internal: Set the owner of menu item.
   void set_menu(MenuBase* menu) { menu_ = menu; }
-  MenuBase* menu() const { return menu_; }
-
-  // Internal: Return the native MenuItem object.
-  NativeMenuItem menu_item() const { return menu_item_; }
 
  private:
   friend class MenuBase;

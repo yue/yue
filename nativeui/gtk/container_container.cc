@@ -101,7 +101,7 @@ static gboolean nu_container_draw(GtkWidget* widget, cairo_t* cr) {
 
   for (int i = 0; i < delegate->ChildCount(); ++i)
     gtk_container_propagate_draw(GTK_CONTAINER(widget),
-                                 delegate->ChildAt(i)->view(), cr);
+                                 delegate->ChildAt(i)->GetNative(), cr);
   return FALSE;
 }
 
@@ -120,7 +120,7 @@ static void nu_container_forall(GtkContainer* container,
   Container* delegate = static_cast<Container*>(
       g_object_get_data(G_OBJECT(container), "delegate"));
   for (int i = 0; i < delegate->ChildCount(); ++i)
-    (*callback)(delegate->ChildAt(i)->view(), callback_data);
+    (*callback)(delegate->ChildAt(i)->GetNative(), callback_data);
 }
 
 static GType nu_container_child_type(GtkContainer* container) {

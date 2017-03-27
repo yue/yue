@@ -63,11 +63,11 @@ void Container::PlatformDestroy() {
 }
 
 void Container::PlatformAddChildView(View* child) {
-  [view() addSubview:child->view()];
+  [GetNative() addSubview:child->GetNative()];
 }
 
 void Container::PlatformRemoveChildView(View* child) {
-  [child->view() removeFromSuperview];
+  [child->GetNative() removeFromSuperview];
 }
 
 }  // namespace nu

@@ -19,21 +19,21 @@ void Group::PlatformInit() {
 }
 
 void Group::PlatformSetContentView(Container* container) {
-  [static_cast<NSBox*>(view()) setContentView:container->view()];
+  [static_cast<NSBox*>(GetNative()) setContentView:container->GetNative()];
   container->Layout();
 }
 
 void Group::SetTitle(const std::string& title) {
-  static_cast<NSBox*>(view()).title = base::SysUTF8ToNSString(title);
+  static_cast<NSBox*>(GetNative()).title = base::SysUTF8ToNSString(title);
 }
 
 std::string Group::GetTitle() const {
-  return base::SysNSStringToUTF8(static_cast<NSBox*>(view()).title);
+  return base::SysNSStringToUTF8(static_cast<NSBox*>(GetNative()).title);
 }
 
 SizeF Group::GetBorderSize() const {
-  NSSize outer = [view() frame].size;
-  NSSize inner = [GetContentView()->view() frame].size;
+  NSSize outer = [GetNative() frame].size;
+  NSSize inner = [GetContentView()->GetNative() frame].size;
   return SizeF(outer.width - inner.width, outer.height - inner.height);
 }
 

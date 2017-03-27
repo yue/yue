@@ -25,7 +25,7 @@ void AcceleratorManager::RegisterAccelerator(MenuItem* item,
                               accelerator.GetModifiers(),
                               &character,
                               &characterIgnoringModifiers);
-  NSMenuItem* menu_item = item->menu_item();
+  NSMenuItem* menu_item = item->GetNative();
   menu_item.keyEquivalentModifierMask = accelerator.GetModifiers();
   menu_item.keyEquivalent =
       [[[NSString alloc] initWithCharacters:&character length:1] autorelease];
@@ -33,7 +33,7 @@ void AcceleratorManager::RegisterAccelerator(MenuItem* item,
 
 void AcceleratorManager::RemoveAccelerator(MenuItem* item,
                                            const Accelerator& accelerator) {
-  NSMenuItem* menu_item = item->menu_item();
+  NSMenuItem* menu_item = item->GetNative();
   menu_item.keyEquivalent = @"";
   menu_item.keyEquivalentModifierMask = 0;
 }

@@ -11,7 +11,7 @@ namespace nu {
 
 void App::SetApplicationMenu(MenuBar* menu) {
   application_menu_ = menu;
-  [NSApp setMainMenu:menu->menu()];
+  [NSApp setMainMenu:menu->GetNative()];
 }
 
 MenuBar* App::GetApplicationMenu() const {

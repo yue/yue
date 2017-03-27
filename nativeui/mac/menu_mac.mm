@@ -12,7 +12,7 @@ Menu::Menu() : MenuBase([[NSMenu alloc] init]) {
 }
 
 void Menu::Popup() {
-  [menu() popUpMenuPositioningItem:nil
+  [GetNative() popUpMenuPositioningItem:nil
                         atLocation:[NSEvent mouseLocation]
                             inView:nil];
 }

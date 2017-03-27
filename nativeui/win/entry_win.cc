@@ -64,8 +64,8 @@ class EntryView : public SubwinView {
       return 0;
     } else if (message == WM_SETFOCUS) {
       // Notify the window that focus has changed.
-      if (self->window()) {
-        static_cast<TopLevelWindow*>(self->window())->focus_manager()->
+      if (self->GetNative()) {
+        static_cast<TopLevelWindow*>(self->GetNative())->focus_manager()->
           TakeFocus(self->delegate_);
       }
     }
@@ -87,22 +87,23 @@ Entry::Entry() {
   TakeOverView(new EntryView(this));
 
   Font* font = State::GetCurrent()->GetDefaultFont();
-  float height = MeasureText(view(), font, L"some text").height() +
-                 2 * kEntryPadding * view()->scale_factor();
-  SetDefaultStyle(ScaleSize(SizeF(0, height), 1.0f / view()->scale_factor()));
+  float height = MeasureText(GetNative(), font, L"some text").height() +
+                 2 * kEntryPadding * GetNative()->scale_factor();
+  SetDefaultStyle(ScaleSize(SizeF(0, height),
+                            1.0f / GetNative()->scale_factor()));
 }
 
 Entry::~Entry() {
 }
 
 void Entry::SetText(const std::string& text) {
-  ::SetWindowTextW(static_cast<SubwinView*>(view())->hwnd(),
+  ::SetWindowTextW(static_cast<SubwinView*>(GetNative())->hwnd(),
                    base::UTF8ToUTF16(text).c_str());
 }
 
 std::string Entry::GetText() const {
   return base::UTF16ToUTF8(
-      GetWindowString(static_cast<SubwinView*>(view())->hwnd()));
+      GetWindowString(static_cast<SubwinView*>(GetNative())->hwnd()));
 }
 
 }  // namespace nu

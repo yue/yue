@@ -81,7 +81,7 @@ void Window::Close() {
 }
 
 void Window::PlatformSetContentView(Container* container) {
-  [window_ setContentView:container->view()];
+  [window_ setContentView:container->GetNative()];
   container->Layout();
 }
 

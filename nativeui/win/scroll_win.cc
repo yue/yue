@@ -68,12 +68,12 @@ void ScrollView::Layout() {
   if (delegate_->GetContentView()) {
     Rect content_alloc = Rect(size_allocation().origin() + origin_,
                               content_size_);
-    delegate_->GetContentView()->view()->SizeAllocate(content_alloc);
+    delegate_->GetContentView()->GetNative()->SizeAllocate(content_alloc);
   }
 }
 
 std::vector<BaseView*> ScrollView::GetChildren() {
-  std::vector<BaseView*> children{delegate_->GetContentView()->view()};
+  std::vector<BaseView*> children{delegate_->GetContentView()->GetNative()};
   if (h_scrollbar_)
     children.push_back(h_scrollbar_.get());
   if (v_scrollbar_)
@@ -106,7 +106,7 @@ void ScrollView::Draw(PainterWin* painter, const Rect& dirty) {
   // The scroll view must be clipped.
   RectF clip(GetViewportRect() - size_allocation().OffsetFromOrigin());
   painter->ClipPixelRect(clip, Painter::CombineMode::Replace);
-  DrawChild(delegate_->GetContentView()->view(), painter, dirty);
+  DrawChild(delegate_->GetContentView()->GetNative(), painter, dirty);
 }
 
 void ScrollView::UpdateScrollbar() {
@@ -185,23 +185,23 @@ void Scroll::PlatformInit() {
 }
 
 void Scroll::PlatformSetContentView(Container* container) {
-  auto* scroll = static_cast<ScrollView*>(view());
-  container->view()->SetParent(scroll);
-  scroll->SetContentSize(container->view()->size_allocation().size());
+  auto* scroll = static_cast<ScrollView*>(GetNative());
+  container->GetNative()->SetParent(scroll);
+  scroll->SetContentSize(container->GetNative()->size_allocation().size());
 }
 
 void Scroll::SetContentSize(const SizeF& size) {
-  auto* scroll = static_cast<ScrollView*>(view());
+  auto* scroll = static_cast<ScrollView*>(GetNative());
   scroll->SetContentSize(ToCeiledSize(ScaleSize(size, scroll->scale_factor())));
 }
 
 void Scroll::SetScrollBarPolicy(Policy h_policy, Policy v_policy) {
-  auto* scroll = static_cast<ScrollView*>(view());
+  auto* scroll = static_cast<ScrollView*>(GetNative());
   scroll->SetScrollBarPolicy(h_policy, v_policy);
 }
 
 std::tuple<Scroll::Policy, Scroll::Policy> Scroll::GetScrollBarPolicy() const {
-  auto* scroll = static_cast<ScrollView*>(view());
+  auto* scroll = static_cast<ScrollView*>(GetNative());
   return std::make_tuple(scroll->h_policy(), scroll->v_policy());
 }
 

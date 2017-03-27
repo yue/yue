@@ -52,11 +52,11 @@ class GroupView : public ContainerView,
   void Layout() override {
     Rect child_alloc(size_allocation());
     child_alloc.Inset(GetBorder());
-    delegate_->GetContentView()->view()->SizeAllocate(child_alloc);
+    delegate_->GetContentView()->GetNative()->SizeAllocate(child_alloc);
   }
 
   std::vector<BaseView*> GetChildren() override {
-    return std::vector<BaseView*>{delegate_->GetContentView()->view()};
+    return std::vector<BaseView*>{delegate_->GetContentView()->GetNative()};
   }
 
   // BaseView:
@@ -85,7 +85,8 @@ class GroupView : public ContainerView,
     Vector2d child_offset(border.left(), border.top());
     painter->Save();
     painter->TranslatePixel(child_offset);
-    delegate_->GetContentView()->view()->Draw(painter, dirty - child_offset);
+    delegate_->GetContentView()->GetNative()->Draw(
+        painter, dirty - child_offset);
     painter->Restore();
   }
 
@@ -106,21 +107,21 @@ void Group::PlatformInit() {
 }
 
 void Group::PlatformSetContentView(Container* container) {
-  container->view()->SetParent(view());
-  static_cast<GroupView*>(view())->Layout();
+  container->GetNative()->SetParent(GetNative());
+  static_cast<GroupView*>(GetNative())->Layout();
 }
 
 void Group::SetTitle(const std::string& title) {
-  static_cast<GroupView*>(view())->SetTitle(base::UTF8ToUTF16(title));
-  view()->Invalidate();
+  static_cast<GroupView*>(GetNative())->SetTitle(base::UTF8ToUTF16(title));
+  GetNative()->Invalidate();
 }
 
 std::string Group::GetTitle() const {
-  return base::UTF16ToUTF8(static_cast<GroupView*>(view())->GetTitle());
+  return base::UTF16ToUTF8(static_cast<GroupView*>(GetNative())->GetTitle());
 }
 
 SizeF Group::GetBorderSize() const {
-  GroupView* group = static_cast<GroupView*>(view());
+  GroupView* group = static_cast<GroupView*>(GetNative());
   Rect bounds;
   bounds.Inset(-group->GetBorder());
   return ScaleSize(SizeF(bounds.size()), 1.0f / group->scale_factor());

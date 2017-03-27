@@ -21,7 +21,7 @@ void FocusManager::TakeFocus(View* view) {
     return;
 
   if (focused_view_)
-    focused_view_->view()->SetFocus(false);
+    focused_view_->GetNative()->SetFocus(false);
   focused_view_ = view;
 }
 
@@ -33,7 +33,7 @@ void FocusManager::AdvanceFocus(Container* container, bool reverse) {
 
   // Search again from start.
   if (!found && focus_on_next_view && focused_view_) {
-    focused_view_->view()->SetFocus(false);
+    focused_view_->GetNative()->SetFocus(false);
     focused_view_ = nullptr;
     DoAdvanceFocus(container, reverse, &focus_on_next_view);
   }
@@ -46,11 +46,11 @@ bool FocusManager::DoAdvanceFocus(Container* container, bool reverse,
        reverse ? (i >= 0) : (i < container->ChildCount());
        reverse ? --i : ++i) {
     View* child = container->ChildAt(i);
-    if (child->view()->type() == ControlType::Container &&
+    if (child->GetNative()->type() == ControlType::Container &&
         DoAdvanceFocus(static_cast<Container*>(child), reverse,
                        focus_on_next_view)) {
       return true;
-    } else if (child->view()->type() == ControlType::Group &&
+    } else if (child->GetNative()->type() == ControlType::Group &&
                DoAdvanceFocus(static_cast<Group*>(child)->GetContentView(),
                               reverse, focus_on_next_view)) {
       return true;
@@ -58,11 +58,11 @@ bool FocusManager::DoAdvanceFocus(Container* container, bool reverse,
 
     if (child == focused_view_) {
       *focus_on_next_view = true;
-    } else if (*focus_on_next_view && child->view()->CanHaveFocus()) {
+    } else if (*focus_on_next_view && child->GetNative()->CanHaveFocus()) {
       if (focused_view_)
-        focused_view_->view()->SetFocus(false);
+        focused_view_->GetNative()->SetFocus(false);
       focused_view_ = child;
-      child->view()->SetFocus(true);
+      child->GetNative()->SetFocus(true);
       return true;
     }
   }

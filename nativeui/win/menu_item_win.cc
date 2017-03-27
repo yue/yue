@@ -32,7 +32,7 @@ void MenuItem::SetLabel(const std::string& label) {
     mii.fMask = MIIM_STRING;
     mii.dwTypeData = const_cast<wchar_t*>(menu_item_->actual_label.c_str());
     mii.cch = static_cast<UINT>(menu_item_->actual_label.size());
-    SetMenuItemInfo(menu_->menu(), menu_item_->id, FALSE, &mii);
+    SetMenuItemInfo(menu_->GetNative(), menu_item_->id, FALSE, &mii);
   }
 }
 
@@ -47,7 +47,7 @@ void MenuItem::SetChecked(bool checked) {
       FlipRadioMenuItems(menu_, this);
     UINT flags = MF_BYCOMMAND;
     flags |= checked ? MF_CHECKED : MF_UNCHECKED;
-    CheckMenuItem(menu_->menu(), menu_item_->id, flags);
+    CheckMenuItem(menu_->GetNative(), menu_item_->id, flags);
   }
 }
 
@@ -60,7 +60,7 @@ void MenuItem::SetEnabled(bool enabled) {
   if (menu_) {
     UINT flags = MF_BYCOMMAND;
     flags |= enabled ? MF_ENABLED : MF_DISABLED;
-    EnableMenuItem(menu_->menu(), menu_item_->id, flags);
+    EnableMenuItem(menu_->GetNative(), menu_item_->id, flags);
   }
 }
 
@@ -90,8 +90,8 @@ void MenuItem::PlatformSetSubmenu(Menu* submenu) {
     MENUITEMINFO mii = {0};
     mii.cbSize = sizeof(mii);
     mii.fMask = MIIM_SUBMENU;
-    mii.hSubMenu = submenu_->menu();
-    SetMenuItemInfo(menu_->menu(), menu_item_->id, FALSE, &mii);
+    mii.hSubMenu = submenu_->GetNative();
+    SetMenuItemInfo(menu_->GetNative(), menu_item_->id, FALSE, &mii);
   }
 }
 

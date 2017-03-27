@@ -134,12 +134,12 @@ class ContainerAdapter : public ContainerView,
   std::vector<BaseView*> GetChildren() override {
     std::vector<BaseView*> views(container_->ChildCount());
     for (int i = 0; i < container_->ChildCount(); ++i)
-      views[i] = container_->ChildAt(i)->view();
+      views[i] = container_->ChildAt(i)->GetNative();
     return views;
   }
 
   void OnDraw(PainterWin* painter, const Rect& dirty) override {
-    float scale_factor = container_->view()->scale_factor();
+    float scale_factor = container_->GetNative()->scale_factor();
     container_->on_draw.Emit(container_, static_cast<Painter*>(painter),
                              ScaleRect(RectF(dirty), 1.0f / scale_factor));
   }
@@ -161,11 +161,11 @@ void Container::PlatformDestroy() {
 }
 
 void Container::PlatformAddChildView(View* child) {
-  child->view()->SetParent(view());
+  child->GetNative()->SetParent(GetNative());
 }
 
 void Container::PlatformRemoveChildView(View* child) {
-  child->view()->SetParent(nullptr);
+  child->GetNative()->SetParent(nullptr);
 }
 
 }  // namespace nu

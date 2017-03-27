@@ -17,7 +17,7 @@ Menu::Menu() : MenuBase(CreatePopupMenu()) {
 void Menu::Popup() {
   POINT p;
   GetCursorPos(&p);
-  UINT id = TrackPopupMenuEx(menu(),
+  UINT id = TrackPopupMenuEx(GetNative(),
                              TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD,
                              p.x, p.y, State::GetCurrent()->GetSubwinHolder(),
                              nullptr);

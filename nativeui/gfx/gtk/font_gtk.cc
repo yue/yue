@@ -15,8 +15,8 @@ namespace {
 PangoFontDescription* GetDefaultFontDescription() {
   // Receive the default font from control.
   scoped_refptr<nu::Label> label = new nu::Label;
-  gtk_widget_ensure_style(label->view());
-  GtkStyle* style = gtk_widget_get_style(label->view());
+  gtk_widget_ensure_style(label->GetNative());
+  GtkStyle* style = gtk_widget_get_style(label->GetNative());
   return pango_font_description_copy(style->font_desc);
 }
 

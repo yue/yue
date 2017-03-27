@@ -22,7 +22,7 @@ GtkRadioMenuItem* SearchRadioInSameGroup(MenuBase* menu, MenuItem* radio,
       break;
     else if (item != radio &&
              item->GetType() == nu::MenuItem::Radio)  // found a radio
-      return GTK_RADIO_MENU_ITEM(item->menu_item());
+      return GTK_RADIO_MENU_ITEM(item->GetNative());
   }
   // Then search forward.
   for (int i = index + 1; i < menu->ItemCount(); ++i) {
@@ -31,7 +31,7 @@ GtkRadioMenuItem* SearchRadioInSameGroup(MenuBase* menu, MenuItem* radio,
       break;
     else if (item != radio &&
              item->GetType() == nu::MenuItem::Radio)  // found a radio
-      return GTK_RADIO_MENU_ITEM(item->menu_item());
+      return GTK_RADIO_MENU_ITEM(item->GetNative());
   }
   return nullptr;
 }
@@ -49,17 +49,17 @@ void MenuBase::PlatformDestroy() {
 }
 
 void MenuBase::PlatformInsert(MenuItem* item, int index) {
-  if (GTK_IS_RADIO_MENU_ITEM(item->menu_item())) {
+  if (GTK_IS_RADIO_MENU_ITEM(item->GetNative())) {
     GtkRadioMenuItem* group_item = SearchRadioInSameGroup(this, item, index);
     if (group_item)
-      gtk_radio_menu_item_set_group(GTK_RADIO_MENU_ITEM(item->menu_item()),
+      gtk_radio_menu_item_set_group(GTK_RADIO_MENU_ITEM(item->GetNative()),
                                     gtk_radio_menu_item_get_group(group_item));
   }
-  gtk_menu_shell_insert(menu_, GTK_WIDGET(item->menu_item()), index);
+  gtk_menu_shell_insert(menu_, GTK_WIDGET(item->GetNative()), index);
 }
 
 void MenuBase::PlatformRemove(MenuItem* item) {
-  gtk_container_remove(GTK_CONTAINER(menu_), GTK_WIDGET(item->menu_item()));
+  gtk_container_remove(GTK_CONTAINER(menu_), GTK_WIDGET(item->GetNative()));
 }
 
 }  // namespace nu

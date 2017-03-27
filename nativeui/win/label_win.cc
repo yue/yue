@@ -58,7 +58,7 @@ Label::~Label() {
 }
 
 void Label::SetText(const std::string& text) {
-  LabelView* label = static_cast<LabelView*>(view());
+  LabelView* label = static_cast<LabelView*>(GetNative());
   base::string16 wtext = base::UTF8ToUTF16(text);
   label->SetText(wtext);
 
@@ -68,7 +68,7 @@ void Label::SetText(const std::string& text) {
 }
 
 std::string Label::GetText() {
-  LabelView* label = static_cast<LabelView*>(view());
+  LabelView* label = static_cast<LabelView*>(GetNative());
   return base::UTF16ToUTF8(label->GetText());
 }
 
