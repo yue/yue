@@ -27,7 +27,7 @@ class GroupView : public ContainerView,
       : ContainerView(this, ControlType::Group),
         delegate_(delegate),
         color_(GetThemeColor(ThemeColor::Text)),
-        font_(State::current()->GetDefaultFont()) {}
+        font_(State::GetCurrent()->GetDefaultFont()) {}
 
 
   void SetTitle(const base::string16& title) {

@@ -30,9 +30,9 @@ class ButtonView : public BaseView {
       : BaseView(type == Button::Normal ? ControlType::Button
                     : (type == Button::CheckBox ? ControlType::CheckBox
                                                 : ControlType::Radio)),
-        theme_(State::current()->GetNativeTheme()),
+        theme_(State::GetCurrent()->GetNativeTheme()),
         color_(GetThemeColor(ThemeColor::Text)),
-        font_(State::current()->GetDefaultFont()),
+        font_(State::GetCurrent()->GetDefaultFont()),
         delegate_(delegate) {
     if (type == Button::CheckBox)
       box_size_ = theme_->GetThemePartSize(NativeTheme::CheckBox, state());
@@ -74,11 +74,11 @@ class ButtonView : public BaseView {
     Invalidate();
 
     // And flip all other radio buttons' state.
-    if (checked && type() == ControlType::Radio && delegate_->parent() &&
-        delegate_->parent()->view()->type() == ControlType::Container) {
-      auto* container = static_cast<Container*>(delegate_->parent());
-      for (int i = 0; i < container->child_count(); ++i) {
-        View* child = container->child_at(i);
+    if (checked && type() == ControlType::Radio && delegate_->GetParent() &&
+        delegate_->GetParent()->view()->type() == ControlType::Container) {
+      auto* container = static_cast<Container*>(delegate_->GetParent());
+      for (int i = 0; i < container->ChildCount(); ++i) {
+        View* child = container->ChildAt(i);
         if (child != delegate_ && child->view()->type() == ControlType::Radio)
           static_cast<Button*>(child)->SetChecked(false);
       }

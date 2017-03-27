@@ -13,7 +13,7 @@ namespace nu {
 
 ScrollBarView::ScrollBarView(bool vertical, ScrollView* scroll)
     : ContainerView(this, ControlType::ScrollBar),
-      theme_(State::current()->GetNativeTheme()),
+      theme_(State::GetCurrent()->GetNativeTheme()),
       near_button_(vertical ? ScrollBarButton::Up : ScrollBarButton::Left,
                    this),
       far_button_(vertical ? ScrollBarButton::Down : ScrollBarButton::Right,
@@ -232,9 +232,9 @@ int ScrollBarView::GetScrollAmout() const {
 int ScrollBarView::GetLineHeight() const {
   int max_amout = std::ceil(20 * scale_factor());
   Container* contents = scroll_->delegate()->GetContentView();
-  if (contents->child_count() > 0)
+  if (contents->ChildCount() > 0)
     return std::min(max_amout,
-                    contents->child_at(0)->GetPixelBounds().height());
+                    contents->ChildAt(0)->GetPixelBounds().height());
   else
     return max_amout;
 }

@@ -46,7 +46,7 @@ TEST_F(ViewTest, HiddenViewSkipsLayout) {
   scoped_refptr<nu::Container> container(new nu::Container);
   container->AddChildView(view_.get());
   container->AddChildView(new nu::Label("l1"));
-  EXPECT_GT(container->child_at(1)->GetBounds().y(), 0);
+  EXPECT_GT(container->ChildAt(1)->GetBounds().y(), 0);
   view_->SetVisible(false);
-  EXPECT_EQ(container->child_at(1)->GetBounds().y(), 0);
+  EXPECT_EQ(container->ChildAt(1)->GetBounds().y(), 0);
 }

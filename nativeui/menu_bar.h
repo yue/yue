@@ -14,6 +14,7 @@ class NATIVEUI_EXPORT MenuBar : public MenuBase {
  public:
   MenuBar();
 
+  // Internal: The AcceleratorManager managed by the MenuBar.
   AcceleratorManager* accel_manager() { return &accel_manager_; }
 
  private:

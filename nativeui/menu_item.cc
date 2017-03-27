@@ -28,7 +28,7 @@ Menu* MenuItem::GetSubmenu() const {
 
 void MenuItem::SetAccelerator(const Accelerator& accelerator) {
   if (accel_manager_) {
-    if (accelerator.empty())
+    if (accelerator.IsEmpty())
       accel_manager_->RemoveAccelerator(this, accelerator_);
     else
       accel_manager_->RegisterAccelerator(this, accelerator);
@@ -46,17 +46,17 @@ void MenuItem::FlipRadioMenuItems(nu::MenuBase* menu, nu::MenuItem* sender) {
   int group_start = 0;
   int radio_count = 0;
   bool found_item = false;
-  for (int i = 0; i < menu->item_count(); ++i) {
-    nu::MenuItem* item = menu->item_at(i);
+  for (int i = 0; i < menu->ItemCount(); ++i) {
+    nu::MenuItem* item = menu->ItemAt(i);
     if (item == sender) {
       found_item = true;  // in the group now
-    } else if (item->type() == nu::MenuItem::Separator) {
+    } else if (item->GetType() == nu::MenuItem::Separator) {
       if (found_item)  // end of group
         break;
       // Possible start of a the group.
       radio_count = 0;
       group_start = i;
-    } else if (item->type() == nu::MenuItem::Radio) {
+    } else if (item->GetType() == nu::MenuItem::Radio) {
       radio_count++;  // another radio in the group
     }
   }
@@ -66,9 +66,9 @@ void MenuItem::FlipRadioMenuItems(nu::MenuBase* menu, nu::MenuItem* sender) {
     return;
 
   // Flip all other radios in the group.
-  for (int i = group_start; i < menu->item_count(); ++i) {
-    nu::MenuItem* item = menu->item_at(i);
-    if (item != sender && item->type() == nu::MenuItem::Radio)
+  for (int i = group_start; i < menu->ItemCount(); ++i) {
+    nu::MenuItem* item = menu->ItemAt(i);
+    if (item != sender && item->GetType() == nu::MenuItem::Radio)
       item->SetChecked(false);
   }
 }
@@ -79,10 +79,10 @@ void MenuItem::SetAcceleratorManager(AcceleratorManager* accel_manager) {
     return;
   }
 
-  if (accel_manager_ && !accelerator_.empty())
+  if (accel_manager_ && !accelerator_.IsEmpty())
     accel_manager_->RemoveAccelerator(this, accelerator_);
   accel_manager_ = accel_manager;
-  if (accel_manager_ && !accelerator_.empty())
+  if (accel_manager_ && !accelerator_.IsEmpty())
     accel_manager_->RegisterAccelerator(this, accelerator_);
 }
 

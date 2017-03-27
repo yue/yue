@@ -123,7 +123,7 @@ inline bool IsContainer(View* view) {
 
 // Whether a Container is a root CSS node.
 inline bool IsRootYGNode(Container* view) {
-  return !view->parent() || !IsContainer(view->parent());
+  return !view->GetParent() || !IsContainer(view->GetParent());
 }
 
 // Get bounds from the CSS node.
@@ -155,7 +155,7 @@ const char* Container::GetClassName() const {
 void Container::Layout() {
   // For child CSS node, tell parent to do the layout.
   if (!IsRootYGNode(this)) {
-    static_cast<Container*>(parent())->Layout();
+    static_cast<Container*>(GetParent())->Layout();
     return;
   }
 
@@ -199,17 +199,17 @@ float Container::GetPreferredWidthForHeight(float height) const {
 
 void Container::AddChildView(View* view) {
   DCHECK(view);
-  if (view->parent() == this)
+  if (view->GetParent() == this)
     return;
-  AddChildViewAt(view, child_count());
+  AddChildViewAt(view, ChildCount());
 }
 
 void Container::AddChildViewAt(View* view, int index) {
   DCHECK(view);
-  if (view == this || index < 0 || index > child_count())
+  if (view == this || index < 0 || index > ChildCount())
     return;
 
-  if (view->parent()) {
+  if (view->GetParent()) {
     LOG(ERROR) << "The view already has a parent.";
     return;
   }
@@ -220,7 +220,7 @@ void Container::AddChildViewAt(View* view, int index) {
   children_.insert(children_.begin() + index, view);
   PlatformAddChildView(view);
 
-  DCHECK_EQ(static_cast<int>(YGNodeGetChildCount(node())), child_count());
+  DCHECK_EQ(static_cast<int>(YGNodeGetChildCount(node())), ChildCount());
 
   Layout();
 }
@@ -236,14 +236,14 @@ void Container::RemoveChildView(View* view) {
   PlatformRemoveChildView(view);
   children_.erase(i);
 
-  DCHECK_EQ(static_cast<int>(YGNodeGetChildCount(node())), child_count());
+  DCHECK_EQ(static_cast<int>(YGNodeGetChildCount(node())), ChildCount());
 
   Layout();
 }
 
 void Container::SetChildBoundsFromCSS() {
-  for (int i = 0; i < child_count(); ++i) {
-    View* child = child_at(i);
+  for (int i = 0; i < ChildCount(); ++i) {
+    View* child = ChildAt(i);
     if (child->IsVisible())
       child->SetBounds(GetYGNodeBounds(child->node()));
   }

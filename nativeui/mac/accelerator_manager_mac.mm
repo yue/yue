@@ -21,12 +21,12 @@ void AcceleratorManager::RegisterAccelerator(MenuItem* item,
                                              const Accelerator& accelerator) {
   unichar character;
   unichar characterIgnoringModifiers;
-  MacKeyCodeForWindowsKeyCode(accelerator.key_code(),
-                              accelerator.modifiers(),
+  MacKeyCodeForWindowsKeyCode(accelerator.GetKeyCode(),
+                              accelerator.GetModifiers(),
                               &character,
                               &characterIgnoringModifiers);
   NSMenuItem* menu_item = item->menu_item();
-  menu_item.keyEquivalentModifierMask = accelerator.modifiers();
+  menu_item.keyEquivalentModifierMask = accelerator.GetModifiers();
   menu_item.keyEquivalent =
       [[[NSString alloc] initWithCharacters:&character length:1] autorelease];
 }

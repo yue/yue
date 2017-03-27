@@ -132,9 +132,9 @@ class ContainerAdapter : public ContainerView,
   }
 
   std::vector<BaseView*> GetChildren() override {
-    std::vector<BaseView*> views(container_->child_count());
-    for (int i = 0; i < container_->child_count(); ++i)
-      views[i] = container_->child_at(i)->view();
+    std::vector<BaseView*> views(container_->ChildCount());
+    for (int i = 0; i < container_->ChildCount(); ++i)
+      views[i] = container_->ChildAt(i)->view();
     return views;
   }
 

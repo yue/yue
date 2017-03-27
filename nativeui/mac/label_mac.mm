@@ -57,7 +57,7 @@
   nu::PainterMac painter;
   painter.SetColor(background_color_);
   painter.FillRect(nu::RectF(dirtyRect));
-  painter.DrawTextWithFlags(text_, nu::State::current()->GetDefaultFont(),
+  painter.DrawTextWithFlags(text_, nu::State::GetCurrent()->GetDefaultFont(),
                               nu::RectF([self frame]),
                               nu::Painter::TextAlignCenter);
 }
@@ -69,7 +69,7 @@ namespace nu {
 namespace {
 
 SizeF GetPreferredSizeForText(const std::string& text) {
-  SizeF size = MeasureText(nu::State::current()->GetDefaultFont(), text);
+  SizeF size = MeasureText(nu::State::GetCurrent()->GetDefaultFont(), text);
   size.Enlarge(1, 1);  // leave space for border
   return size;
 }

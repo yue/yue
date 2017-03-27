@@ -27,10 +27,10 @@ class NATIVEUI_EXPORT Accelerator {
   std::string GetShortcutText() const;
 #endif
 
-  bool empty() const { return key_code_ == VKEY_UNKNOWN && modifiers_ == 0; }
+  bool IsEmpty() const { return key_code_ == VKEY_UNKNOWN && modifiers_ == 0; }
 
-  KeyboardCode key_code() const { return key_code_; }
-  int modifiers() const { return modifiers_; }
+  KeyboardCode GetKeyCode() const { return key_code_; }
+  int GetModifiers() const { return modifiers_; }
 
  private:
   // The keycode (VK_...).

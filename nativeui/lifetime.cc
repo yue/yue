@@ -15,7 +15,7 @@ Lifetime* g_lifetime = nullptr;
 }  // namespace
 
 // static
-Lifetime* Lifetime::current() {
+Lifetime* Lifetime::GetCurrent() {
   return g_lifetime;
 }
 

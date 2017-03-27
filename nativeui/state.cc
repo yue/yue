@@ -27,7 +27,7 @@ base::LazyInstance<base::ThreadLocalPointer<State>>::Leaky lazy_tls_ptr =
 }  // namespace
 
 State::State() {
-  DCHECK_EQ(current(), nullptr) << "should only have one state per thread";
+  DCHECK_EQ(GetCurrent(), nullptr) << "should only have one state per thread";
 
   // Used rounded value for layout.
   YGSetExperimentalFeatureEnabled(YGExperimentalFeatureRounding, true);
@@ -41,12 +41,12 @@ State::~State() {
   default_font_ = nullptr;
 
   PlatformDestroy();
-  DCHECK_EQ(current(), this);
+  DCHECK_EQ(GetCurrent(), this);
   lazy_tls_ptr.Pointer()->Set(nullptr);
 }
 
 // static
-State* State::current() {
+State* State::GetCurrent() {
   return lazy_tls_ptr.Pointer()->Get();
 }
 

@@ -26,9 +26,9 @@
 }
 
 - (IBAction)onClick:(id)sender {
-  if (shell_->type() == nu::MenuItem::CheckBox)
+  if (shell_->GetType() == nu::MenuItem::CheckBox)
     shell_->SetChecked(!shell_->IsChecked());
-  else if (shell_->type() == nu::MenuItem::Radio)
+  else if (shell_->GetType() == nu::MenuItem::Radio)
     shell_->SetChecked(true);
   shell_->on_click.Emit();
 }

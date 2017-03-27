@@ -179,7 +179,7 @@ struct Type<nu::Font> {
         "getSize", &nu::Font::GetSize);
   }
   static nu::Font* GetDefault() {
-    return nu::State::current()->GetDefaultFont();
+    return nu::State::GetCurrent()->GetDefaultFont();
   }
 };
 
@@ -252,8 +252,8 @@ struct Type<nu::MenuBase> {
     Set(context, templ,
         "append", &nu::MenuBase::Append,
         "insert", &nu::MenuBase::Insert,
-        "itemCount", &nu::MenuBase::item_count,
-        "itemAt", &nu::MenuBase::item_at);
+        "itemCount", &nu::MenuBase::ItemCount,
+        "itemAt", &nu::MenuBase::ItemAt);
   }
 };
 
@@ -401,7 +401,7 @@ struct Type<nu::View> {
         "getBounds", &nu::View::GetBounds,
         "setVisible", &nu::View::SetVisible,
         "isVisible", &nu::View::IsVisible,
-        "getParent", &nu::View::parent);
+        "getParent", &nu::View::GetParent);
   }
 };
 
@@ -425,8 +425,8 @@ struct Type<nu::Container> {
         "addChildView", &nu::Container::AddChildView,
         "addChildViewAt", &nu::Container::AddChildViewAt,
         "removeChildView", &nu::Container::RemoveChildView,
-        "childCount", &nu::Container::child_count,
-        "childAt", &nu::Container::child_at);
+        "childCount", &nu::Container::ChildCount,
+        "childAt", &nu::Container::ChildAt);
   }
 };
 
@@ -655,9 +655,9 @@ void Initialize(v8::Local<v8::Object> exports) {
 #endif
           // Properties.
 #ifndef ELECTRON_BUILD
-          "lifetime", nu::Lifetime::current(),
+          "lifetime", nu::Lifetime::GetCurrent(),
 #endif
-          "app",      nu::State::current()->app());
+          "app",      nu::State::GetCurrent()->app());
 }
 
 }  // namespace node_yue

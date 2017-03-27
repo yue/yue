@@ -34,7 +34,7 @@ class NATIVEUI_EXPORT Lifetime {
   Lifetime();
   ~Lifetime();
 
-  static Lifetime* current();
+  static Lifetime* GetCurrent();
 
   // Control message loop.
   void Run();

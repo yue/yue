@@ -124,8 +124,8 @@ LRESULT CALLBACK WindowImpl::WndProc(HWND hwnd,
 ATOM WindowImpl::GetWindowClassAtom() {
   HICON icon = GetDefaultWindowIcon();
   HICON small_icon = GetSmallWindowIcon();
-  ClassInfo class_info(CS_DBLCLKS, icon, small_icon);
-  return State::current()->GetClassRegistrar()->RetrieveClassAtom(class_info);
+  ClassInfo info(CS_DBLCLKS, icon, small_icon);
+  return State::GetCurrent()->GetClassRegistrar()->RetrieveClassAtom(info);
 }
 
 }  // namespace nu

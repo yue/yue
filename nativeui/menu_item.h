@@ -51,7 +51,7 @@ class NATIVEUI_EXPORT MenuItem : public base::RefCounted<MenuItem> {
   Accelerator GetAccelerator() const;
 
   // Return the type of menu item.
-  Type type() const { return type_; }
+  Type GetType() const { return type_; }
 
   // Events.
   Signal<void()> on_click;

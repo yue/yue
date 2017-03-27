@@ -58,12 +58,12 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   void PrintStyle() const;
 
   // Get parent.
-  View* parent() const { return parent_; }
+  View* GetParent() const { return parent_; }
 
-  // Set parent, can only be used internally for now.
+  // Internal: Set parent view.
   void set_parent(View* parent) { parent_ = parent; }
 
-  // Get the CSS node of the view, can only be used internally.
+  // Internal: Get the CSS node of the view.
   YGNodeRef node() const { return node_; }
 
  protected:

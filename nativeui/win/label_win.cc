@@ -19,7 +19,7 @@ class LabelView : public BaseView {
  public:
   LabelView() : BaseView(ControlType::Label),
                 color_(GetThemeColor(ThemeColor::Text)),
-                font_(State::current()->GetDefaultFont()) {
+                font_(State::GetCurrent()->GetDefaultFont()) {
   }
 
   void SetText(const base::string16& text) {

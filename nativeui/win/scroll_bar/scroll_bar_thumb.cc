@@ -14,7 +14,7 @@ namespace nu {
 ScrollBarThumb::ScrollBarThumb(bool vertical, ScrollBarView* scroll_bar)
     : BaseView(ControlType::ScrollBarThumb),
       vertical_(vertical),
-      theme_(State::current()->GetNativeTheme()),
+      theme_(State::GetCurrent()->GetNativeTheme()),
       scroll_bar_(scroll_bar) {
 }
 

@@ -12,7 +12,7 @@ namespace nu {
 
 ScrollBarButton::ScrollBarButton(Type type, ScrollBarView* scroll_bar)
     : BaseView(ControlType::ScrollBarButton),
-      theme_(State::current()->GetNativeTheme()),
+      theme_(State::GetCurrent()->GetNativeTheme()),
       repeater_(base::Bind(&ScrollBarButton::OnClick, base::Unretained(this))),
       type_(type),
       scroll_bar_(scroll_bar) {

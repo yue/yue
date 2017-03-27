@@ -19,11 +19,11 @@ MenuBase::~MenuBase() {
 }
 
 void MenuBase::Append(MenuItem* item) {
-  Insert(item, item_count());
+  Insert(item, ItemCount());
 }
 
 void MenuBase::Insert(MenuItem* item, int index) {
-  if (!item || item->menu() || index < 0 || index > item_count())
+  if (!item || item->menu() || index < 0 || index > ItemCount())
     return;
   items_.insert(items_.begin() + index, item);
   item->set_menu(this);
@@ -43,8 +43,8 @@ void MenuBase::Remove(MenuItem* item) {
 
 void MenuBase::SetAcceleratorManager(AcceleratorManager* accel_manager) {
   accel_manager_ = accel_manager;
-  for (int i = 0; i < item_count(); ++i)
-    item_at(i)->SetAcceleratorManager(accel_manager);
+  for (int i = 0; i < ItemCount(); ++i)
+    ItemAt(i)->SetAcceleratorManager(accel_manager);
 }
 
 }  // namespace nu

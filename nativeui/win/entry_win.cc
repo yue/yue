@@ -86,7 +86,7 @@ class EntryView : public SubwinView {
 Entry::Entry() {
   TakeOverView(new EntryView(this));
 
-  Font* font = State::current()->GetDefaultFont();
+  Font* font = State::GetCurrent()->GetDefaultFont();
   float height = MeasureText(view(), font, L"some text").height() +
                  2 * kEntryPadding * view()->scale_factor();
   SetDefaultStyle(ScaleSize(SizeF(0, height), 1.0f / view()->scale_factor()));

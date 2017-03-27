@@ -41,8 +41,8 @@ TEST_F(ContainerTest, AddChildView) {
   nu::Label* v2 = new nu::Label;
   container_->AddChildView(v1);
   container_->AddChildView(v2);
-  EXPECT_EQ(container_->child_at(0), v1);
-  EXPECT_EQ(container_->child_at(1), v2);
+  EXPECT_EQ(container_->ChildAt(0), v1);
+  EXPECT_EQ(container_->ChildAt(1), v2);
 }
 
 TEST_F(ContainerTest, AddChildViewAt) {
@@ -50,8 +50,8 @@ TEST_F(ContainerTest, AddChildViewAt) {
   nu::Label* v2 = new nu::Label;
   container_->AddChildView(v1);
   container_->AddChildViewAt(v2, 0);
-  EXPECT_EQ(container_->child_at(0), v2);
-  EXPECT_EQ(container_->child_at(1), v1);
+  EXPECT_EQ(container_->ChildAt(0), v2);
+  EXPECT_EQ(container_->ChildAt(1), v1);
 }
 
 TEST_F(ContainerTest, RemoveChildView) {
@@ -60,7 +60,7 @@ TEST_F(ContainerTest, RemoveChildView) {
   container_->AddChildView(v1);
   container_->AddChildView(v2);
   container_->RemoveChildView(v1);
-  EXPECT_EQ(container_->child_at(0), v2);
+  EXPECT_EQ(container_->ChildAt(0), v2);
 }
 
 TEST_F(ContainerTest, SetBounds) {
@@ -97,11 +97,11 @@ TEST_F(ContainerTest, VisibleLayout) {
 TEST_F(ContainerTest, RemoveAndAddBack) {
   scoped_refptr<nu::Label> v = new nu::Label;
   container_->AddChildView(v.get());
-  EXPECT_EQ(container_->child_count(), 1);
+  EXPECT_EQ(container_->ChildCount(), 1);
   container_->RemoveChildView(v.get());
-  EXPECT_EQ(container_->child_count(), 0);
+  EXPECT_EQ(container_->ChildCount(), 0);
   container_->AddChildView(v.get());
-  EXPECT_EQ(container_->child_count(), 1);
+  EXPECT_EQ(container_->ChildCount(), 1);
 }
 
 TEST_F(ContainerTest, MoveBetweenContainers) {

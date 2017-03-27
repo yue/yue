@@ -49,6 +49,7 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
   // Delegate methods.
   base::Callback<bool()> should_close;
 
+  // Internal: The native window object.
   NativeWindow window() const { return window_; }
 
  protected:

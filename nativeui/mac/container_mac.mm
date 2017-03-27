@@ -28,7 +28,7 @@
 
 - (void)adjustSubviews {
   nu::Container* shell = static_cast<nu::Container*>([self shell]);
-  DCHECK_EQ(static_cast<int>([[self subviews] count]), shell->child_count())
+  DCHECK_EQ(static_cast<int>([[self subviews] count]), shell->ChildCount())
       << "Subviews do not match children views";
 
   shell->BoundsChanged();

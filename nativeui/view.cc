@@ -44,8 +44,8 @@ void View::SetVisible(bool visible) {
 
 void View::Layout() {
   // By default just make parent do layout.
-  if (parent())
-    static_cast<Container*>(parent())->Layout();
+  if (GetParent())
+    static_cast<Container*>(GetParent())->Layout();
 }
 
 void View::SetBackgroundColor(Color color) {

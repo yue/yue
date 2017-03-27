@@ -123,7 +123,7 @@ struct Type<nu::Accelerator> {
     if (!lua::To(state, index, &description))
       return false;
     nu::Accelerator tmp(description);
-    if (tmp.empty())
+    if (tmp.IsEmpty())
       return false;
     *out = tmp;
     return true;
@@ -165,7 +165,7 @@ struct Type<nu::Font> {
            "getsize", &nu::Font::GetSize);
   }
   static nu::Font* GetDefault() {
-    return nu::State::current()->GetDefaultFont();
+    return nu::State::GetCurrent()->GetDefaultFont();
   }
 };
 
@@ -224,14 +224,14 @@ struct Type<nu::MenuBase> {
     RawSet(state, metatable,
            "append", &nu::MenuBase::Append,
            "insert", &Insert,
-           "itemcount", &nu::MenuBase::item_count,
+           "itemcount", &nu::MenuBase::ItemCount,
            "itemat", &ItemAt);
   }
   static inline void Insert(nu::MenuBase* menu, nu::MenuItem* item, int i) {
     menu->Insert(item, i - 1);
   }
   static inline nu::MenuItem* ItemAt(nu::MenuBase* menu, int i) {
-    return menu->item_at(i - 1);
+    return menu->ItemAt(i - 1);
   }
   // Used by subclasses.
   static void ReadMembers(State* state, nu::MenuBase* menu) {
@@ -407,7 +407,7 @@ struct Type<nu::View> {
            "getbounds", &nu::View::GetBounds,
            "setvisible", &nu::View::SetVisible,
            "isvisible", &nu::View::IsVisible,
-           "getparent", &nu::View::parent);
+           "getparent", &nu::View::GetParent);
   }
   static void SetStyle(CallContext* context, nu::View* view) {
     if (GetType(context->state, 2) != LuaType::Table) {
@@ -442,7 +442,7 @@ struct Type<nu::Container> {
            "addchildview", &nu::Container::AddChildView,
            "addchildviewat", &AddChildViewAt,
            "removechildview", &nu::Container::RemoveChildView,
-           "childcount", &nu::Container::child_count,
+           "childcount", &nu::Container::ChildCount,
            "childat", &ChildAt);
     RawSetProperty(state, index, "ondraw", &nu::Container::on_draw);
   }
@@ -451,7 +451,7 @@ struct Type<nu::Container> {
     c->AddChildViewAt(view, i - 1);
   }
   static inline nu::View* ChildAt(nu::Container* container, int i) {
-    return container->child_at(i - 1);
+    return container->ChildAt(i - 1);
   }
 };
 
@@ -646,7 +646,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
               "Vibrant",   lua::MetaTable<nu::Vibrant>(),
 #endif
               // Properties.
-              "lifetime", nu::Lifetime::current(),
-              "app",      nu::State::current()->app());
+              "lifetime", nu::Lifetime::GetCurrent(),
+              "app",      nu::State::GetCurrent()->app());
   return 1;
 }

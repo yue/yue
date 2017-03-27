@@ -13,12 +13,12 @@ namespace nu {
 
 void DispatchCommandToItem(MenuBase* menu, int command) {
   // Find the item with the id and click it.
-  for (int i = 0; i < menu->item_count(); ++i) {
-    MenuItem* item = menu->item_at(i);
+  for (int i = 0; i < menu->ItemCount(); ++i) {
+    MenuItem* item = menu->ItemAt(i);
     if (item->menu_item()->id == command) {
       item->Click();
       break;
-    } else if (item->type() == MenuItem::Submenu && item->GetSubmenu()) {
+    } else if (item->GetType() == MenuItem::Submenu && item->GetSubmenu()) {
       DispatchCommandToItem(item->GetSubmenu(), command);
     }
   }
@@ -34,18 +34,18 @@ void MenuBase::PlatformDestroy() {
 void MenuBase::PlatformInsert(MenuItem* item, int index) {
   MENUITEMINFO mii = {0};
   mii.cbSize = sizeof(mii);
-  if (item->type() == MenuItem::Separator) {
+  if (item->GetType() == MenuItem::Separator) {
     mii.fMask = MIIM_FTYPE;
     mii.fType = MFT_SEPARATOR;
   } else {
     auto* data = item->menu_item();
     mii.fMask = MIIM_FTYPE | MIIM_ID | MIIM_STRING | MIIM_STATE;
     mii.wID = data->id;
-    if (item->type() == MenuItem::Submenu && item->GetSubmenu()) {
+    if (item->GetType() == MenuItem::Submenu && item->GetSubmenu()) {
       mii.fMask |= MIIM_SUBMENU;
       mii.hSubMenu = item->GetSubmenu()->menu();
     }
-    if (item->type() == MenuItem::Radio)
+    if (item->GetType() == MenuItem::Radio)
       mii.fType = MFT_RADIOCHECK;
     else
       mii.fType = MFT_STRING;

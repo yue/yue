@@ -19,7 +19,7 @@ void Menu::Popup() {
   GetCursorPos(&p);
   UINT id = TrackPopupMenuEx(menu(),
                              TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD,
-                             p.x, p.y, State::current()->GetSubwinHolder(),
+                             p.x, p.y, State::GetCurrent()->GetSubwinHolder(),
                              nullptr);
   if (id > 0)
     DispatchCommandToItem(this, id);

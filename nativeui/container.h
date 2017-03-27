@@ -40,9 +40,9 @@ class NATIVEUI_EXPORT Container : public View {
   void RemoveChildView(View* view);
 
   // Get children.
-  int child_count() const { return static_cast<int>(children_.size()); }
-  View* child_at(int index) const {
-    if (index < 0 || index >= child_count())
+  int ChildCount() const { return static_cast<int>(children_.size()); }
+  View* ChildAt(int index) const {
+    if (index < 0 || index >= ChildCount())
       return nullptr;
     return children_[index].get();
   }

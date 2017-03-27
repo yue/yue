@@ -25,7 +25,7 @@ class NATIVEUI_EXPORT State {
   State();
   ~State();
 
-  static State* current();
+  static State* GetCurrent();
 
   // Returns the default GUI font.
   Font* GetDefaultFont();

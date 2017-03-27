@@ -22,9 +22,9 @@ class NATIVEUI_EXPORT MenuBase : public base::RefCounted<MenuBase> {
   void Insert(MenuItem* item, int index);
   void Remove(MenuItem* item);
 
-  int item_count() const { return static_cast<int>(items_.size()); }
-  MenuItem* item_at(int index) const {
-    if (index < 0 || index >= item_count())
+  int ItemCount() const { return static_cast<int>(items_.size()); }
+  MenuItem* ItemAt(int index) const {
+    if (index < 0 || index >= ItemCount())
       return nullptr;
     return items_[index].get();
   }

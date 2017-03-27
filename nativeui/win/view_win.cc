@@ -28,15 +28,16 @@ RectF View::GetBounds() const {
 
 void View::SetPixelBounds(const Rect& bounds) {
   Rect size_allocation(bounds);
-  if (parent())
-    size_allocation += parent()->view()->size_allocation().OffsetFromOrigin();
+  View* parent = GetParent();
+  if (parent)
+    size_allocation += parent->view()->size_allocation().OffsetFromOrigin();
   view()->SizeAllocate(size_allocation);
 }
 
 Rect View::GetPixelBounds() const {
   Rect bounds(view()->size_allocation());
-  if (parent())
-    bounds -= parent()->view()->size_allocation().OffsetFromOrigin();
+  if (GetParent())
+    bounds -= GetParent()->view()->size_allocation().OffsetFromOrigin();
   return bounds;
 }
 

@@ -58,13 +58,13 @@ TEST_F(MenuItemTest, RadioGroup) {
   menu->Append(new nu::MenuItem(nu::MenuItem::Separator));
   menu->Append(new nu::MenuItem(nu::MenuItem::Radio));
   menu->Append(new nu::MenuItem(nu::MenuItem::Radio));
-  menu->item_at(0)->Click();
-  menu->item_at(2)->Click();
-  EXPECT_TRUE(menu->item_at(0)->IsChecked());
-  EXPECT_TRUE(menu->item_at(2)->IsChecked());
-  EXPECT_FALSE(menu->item_at(3)->IsChecked());
-  menu->item_at(3)->Click();
-  EXPECT_TRUE(menu->item_at(0)->IsChecked());
-  EXPECT_FALSE(menu->item_at(2)->IsChecked());
-  EXPECT_TRUE(menu->item_at(3)->IsChecked());
+  menu->ItemAt(0)->Click();
+  menu->ItemAt(2)->Click();
+  EXPECT_TRUE(menu->ItemAt(0)->IsChecked());
+  EXPECT_TRUE(menu->ItemAt(2)->IsChecked());
+  EXPECT_FALSE(menu->ItemAt(3)->IsChecked());
+  menu->ItemAt(3)->Click();
+  EXPECT_TRUE(menu->ItemAt(0)->IsChecked());
+  EXPECT_FALSE(menu->ItemAt(2)->IsChecked());
+  EXPECT_TRUE(menu->ItemAt(3)->IsChecked());
 }

@@ -13,14 +13,14 @@ namespace nu {
 
 SubwinView::SubwinView(base::StringPiece16 class_name,
                        DWORD window_style, DWORD window_ex_style)
-    : WindowImpl(class_name, State::current()->GetSubwinHolder(),
+    : WindowImpl(class_name, State::GetCurrent()->GetSubwinHolder(),
                  window_style, window_ex_style),
       BaseView(ControlType::Subwin) {
   // Create HFONT from default system font.
   base::win::ScopedCreateDC mem_dc(CreateCompatibleDC(NULL));
   Gdiplus::Graphics context(mem_dc.Get());
   LOGFONTW logfont;
-  State::current()->GetDefaultFont()->GetNative()->GetLogFontW(
+  State::GetCurrent()->GetDefaultFont()->GetNative()->GetLogFontW(
       &context, &logfont);
   font_.reset(CreateFontIndirect(&logfont));
   // Use it as control's default font.
@@ -43,14 +43,15 @@ void SubwinView::SizeAllocate(const Rect& size_allocation) {
 void SubwinView::SetParent(BaseView* parent) {
   BaseView::SetParent(parent);
   ::SetParent(hwnd(),
-              parent && parent->window() ? parent->window()->hwnd()
-                                         : State::current()->GetSubwinHolder());
+              parent && parent->window()
+                  ? parent->window()->hwnd()
+                  : State::GetCurrent()->GetSubwinHolder());
 }
 
 void SubwinView::BecomeContentView(WindowImpl* parent) {
   BaseView::BecomeContentView(parent);
   ::SetParent(hwnd(), parent ? parent->hwnd()
-                             : State::current()->GetSubwinHolder());
+                             : State::GetCurrent()->GetSubwinHolder());
 }
 
 void SubwinView::Invalidate(const Rect& dirty) {

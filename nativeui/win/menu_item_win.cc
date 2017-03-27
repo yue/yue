@@ -78,7 +78,7 @@ bool MenuItem::IsVisible() const {
 
 void MenuItem::PlatformInit() {
   menu_item_ = new MenuItemData;
-  menu_item_->id = State::current()->GetNextCommandID();
+  menu_item_->id = State::GetCurrent()->GetNextCommandID();
 }
 
 void MenuItem::PlatformDestroy() {

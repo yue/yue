@@ -21,8 +21,8 @@ void AcceleratorManager::RegisterAccelerator(MenuItem* item,
                                              const Accelerator& accelerator) {
   gtk_widget_add_accelerator(
       GTK_WIDGET(item->menu_item()), "activate", accel_group_,
-      accelerator.key_code(),
-      static_cast<GdkModifierType>(accelerator.modifiers()),
+      accelerator.GetKeyCode(),
+      static_cast<GdkModifierType>(accelerator.GetModifiers()),
       GTK_ACCEL_VISIBLE);
 }
 
@@ -30,8 +30,8 @@ void AcceleratorManager::RemoveAccelerator(MenuItem* item,
                                            const Accelerator& accelerator) {
   gtk_widget_remove_accelerator(
       GTK_WIDGET(item->menu_item()), accel_group_,
-      accelerator.key_code(),
-      static_cast<GdkModifierType>(accelerator.modifiers()));
+      accelerator.GetKeyCode(),
+      static_cast<GdkModifierType>(accelerator.GetModifiers()));
 }
 
 }  // namespace nu
