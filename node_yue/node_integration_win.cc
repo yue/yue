@@ -7,10 +7,6 @@
 
 #include <windows.h>
 
-extern "C" {
-#include "deps/uv/src/win/internal.h"
-}
-
 namespace node_yue {
 
 NodeIntegrationWin::NodeIntegrationWin() {

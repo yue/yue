@@ -29,6 +29,7 @@ loadable_module("node_yue") {
   }
 
   deps = [
+    "//base",
     "//nativeui",
     "//v8binding",
   ]

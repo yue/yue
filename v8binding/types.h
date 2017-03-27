@@ -83,7 +83,8 @@ struct Type<std::string> {
   static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                           const std::string& value) {
     return v8::String::NewFromUtf8(
-        context->GetIsolate(), value.data(),
+        context->GetIsolate(),
+        value.data(),
         v8::NewStringType::kNormal,
         static_cast<uint32_t>(value.length())).ToLocalChecked();
   }
@@ -127,9 +128,33 @@ struct Type<base::StringPiece> {
   static constexpr const char* name = "String";
   static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                           base::StringPiece value) {
-    return v8::String::NewFromUtf8(context->GetIsolate(), value.data(),
-                                   v8::NewStringType::kNormal,
-                                   value.length()).ToLocalChecked();
+    return v8::String::NewFromUtf8(
+        context->GetIsolate(),
+        value.data(),
+        v8::NewStringType::kNormal,
+        static_cast<uint32_t>(value.length())).ToLocalChecked();
+  }
+};
+
+template<>
+struct Type<base::string16> {
+  static constexpr const char* name = "String";
+  static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                          const base::string16& value) {
+    return v8::String::NewFromTwoByte(
+        context->GetIsolate(),
+        reinterpret_cast<const uint16_t*>(value.data()),
+        v8::NewStringType::kNormal,
+        static_cast<uint32_t>(value.length())).ToLocalChecked();
+  }
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     base::string16* out) {
+    if (!value->IsString())
+      return false;
+    v8::String::Value s(value);
+    out->assign(reinterpret_cast<const base::char16*>(*s), s.length());
+    return true;
   }
 };
 
