@@ -3,7 +3,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "node_yue/node_bindings_mac.h"
+#include "node_yue/node_integration_mac.h"
 
 #include <errno.h>
 #include <sys/select.h>
@@ -13,13 +13,13 @@
 
 namespace node_yue {
 
-NodeBindingsMac::NodeBindingsMac() {
+NodeIntegrationMac::NodeIntegrationMac() {
 }
 
-NodeBindingsMac::~NodeBindingsMac() {
+NodeIntegrationMac::~NodeIntegrationMac() {
 }
 
-void NodeBindingsMac::PollEvents() {
+void NodeIntegrationMac::PollEvents() {
   struct timeval tv;
   int timeout = uv_backend_timeout(uv_loop_);
   if (timeout != -1) {
@@ -41,8 +41,8 @@ void NodeBindingsMac::PollEvents() {
 }
 
 // static
-NodeBindings* NodeBindings::Create() {
-  return new NodeBindingsMac();
+NodeIntegration* NodeIntegration::Create() {
+  return new NodeIntegrationMac();
 }
 
 }  // namespace node_yue

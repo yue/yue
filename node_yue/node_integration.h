@@ -3,8 +3,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef NODE_YUE_NODE_BINDINGS_H_
-#define NODE_YUE_NODE_BINDINGS_H_
+#ifndef NODE_YUE_NODE_INTEGRATION_H_
+#define NODE_YUE_NODE_INTEGRATION_H_
 
 #include "base/memory/weak_ptr.h"
 #include "base/single_thread_task_runner.h"
@@ -17,11 +17,11 @@ class Environment;
 
 namespace node_yue {
 
-class NodeBindings {
+class NodeIntegration {
  public:
-  static NodeBindings* Create();
+  static NodeIntegration* Create();
 
-  virtual ~NodeBindings();
+  virtual ~NodeIntegration();
 
   // Prepare for message loop integration.
   void PrepareMessageLoop();
@@ -30,7 +30,7 @@ class NodeBindings {
   virtual void RunMessageLoop();
 
  protected:
-  NodeBindings();
+  NodeIntegration();
 
   // Called to poll events in new thread.
   virtual void PollEvents() = 0;
@@ -66,11 +66,11 @@ class NodeBindings {
   // Semaphore to wait for main loop in the embed thread.
   uv_sem_t embed_sem_;
 
-  base::WeakPtrFactory<NodeBindings> weak_factory_;
+  base::WeakPtrFactory<NodeIntegration> weak_factory_;
 
-  DISALLOW_COPY_AND_ASSIGN(NodeBindings);
+  DISALLOW_COPY_AND_ASSIGN(NodeIntegration);
 };
 
 }  // namespace node_yue
 
-#endif  // NODE_YUE_NODE_BINDINGS_H_
+#endif  // NODE_YUE_NODE_INTEGRATION_H_

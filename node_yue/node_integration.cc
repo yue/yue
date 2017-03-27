@@ -3,7 +3,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "node_yue/node_bindings.h"
+#include "node_yue/node_integration.h"
 
 #include <string>
 #include <vector>
@@ -16,13 +16,13 @@
 
 namespace node_yue {
 
-NodeBindings::NodeBindings()
+NodeIntegration::NodeIntegration()
     : uv_loop_(uv_default_loop()),
       embed_closed_(false),
       weak_factory_(this) {
 }
 
-NodeBindings::~NodeBindings() {
+NodeIntegration::~NodeIntegration() {
   // Quit the embed thread.
   embed_closed_ = true;
   uv_sem_post(&embed_sem_);
@@ -36,7 +36,7 @@ NodeBindings::~NodeBindings() {
   uv_close(reinterpret_cast<uv_handle_t*>(&dummy_uv_handle_), nullptr);
 }
 
-void NodeBindings::PrepareMessageLoop() {
+void NodeIntegration::PrepareMessageLoop() {
   // Add dummy handle for libuv, otherwise libuv would quit when there is
   // nothing to do.
   uv_async_init(uv_loop_, &dummy_uv_handle_, nullptr);
@@ -46,7 +46,7 @@ void NodeBindings::PrepareMessageLoop() {
   uv_thread_create(&embed_thread_, EmbedThreadRunner, this);
 }
 
-void NodeBindings::RunMessageLoop() {
+void NodeIntegration::RunMessageLoop() {
   // The MessageLoop should have been created, remember the one in main thread.
   task_runner_ = base::ThreadTaskRunnerHandle::Get();
 
@@ -54,7 +54,7 @@ void NodeBindings::RunMessageLoop() {
   UvRunOnce();
 }
 
-void NodeBindings::UvRunOnce() {
+void NodeIntegration::UvRunOnce() {
   // Deal with uv events.
   uv_run(uv_loop_, UV_RUN_NOWAIT);
 
@@ -62,19 +62,19 @@ void NodeBindings::UvRunOnce() {
   uv_sem_post(&embed_sem_);
 }
 
-void NodeBindings::WakeupMainThread() {
+void NodeIntegration::WakeupMainThread() {
   DCHECK(task_runner_);
-  task_runner_->PostTask(FROM_HERE, base::Bind(&NodeBindings::UvRunOnce,
+  task_runner_->PostTask(FROM_HERE, base::Bind(&NodeIntegration::UvRunOnce,
                                                weak_factory_.GetWeakPtr()));
 }
 
-void NodeBindings::WakeupEmbedThread() {
+void NodeIntegration::WakeupEmbedThread() {
   uv_async_send(&dummy_uv_handle_);
 }
 
 // static
-void NodeBindings::EmbedThreadRunner(void *arg) {
-  NodeBindings* self = static_cast<NodeBindings*>(arg);
+void NodeIntegration::EmbedThreadRunner(void *arg) {
+  NodeIntegration* self = static_cast<NodeIntegration*>(arg);
 
   while (true) {
     // Wait for the main loop to deal with events.

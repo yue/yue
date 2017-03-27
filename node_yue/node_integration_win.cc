@@ -3,7 +3,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "node_yue/node_bindings_win.h"
+#include "node_yue/node_integration_win.h"
 
 #include <windows.h>
 
@@ -13,13 +13,13 @@ extern "C" {
 
 namespace node_yue {
 
-NodeBindingsWin::NodeBindingsWin() {
+NodeIntegrationWin::NodeIntegrationWin() {
 }
 
-NodeBindingsWin::~NodeBindingsWin() {
+NodeIntegrationWin::~NodeIntegrationWin() {
 }
 
-void NodeBindingsWin::PollEvents() {
+void NodeIntegrationWin::PollEvents() {
   // If there are other kinds of events pending, uv_backend_timeout will
   // instruct us not to wait.
   DWORD bytes, timeout;
@@ -43,8 +43,8 @@ void NodeBindingsWin::PollEvents() {
 }
 
 // static
-NodeBindings* NodeBindings::Create() {
-  return new NodeBindingsWin();
+NodeIntegration* NodeIntegration::Create() {
+  return new NodeIntegrationWin();
 }
 
 }  // namespace node_yue

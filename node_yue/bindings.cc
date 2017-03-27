@@ -5,7 +5,7 @@
 #include <node.h>
 
 #include "nativeui/nativeui.h"
-#include "node_yue/node_bindings.h"
+#include "node_yue/node_integration.h"
 #include "node_yue/signal.h"
 
 namespace vb {
@@ -623,9 +623,9 @@ void Initialize(v8::Local<v8::Object> exports) {
   new nu::State;
   new nu::Lifetime;
   // Initialize node integration and leak it.
-  NodeBindings* node_bindings = NodeBindings::Create();
-  node_bindings->PrepareMessageLoop();
-  node_bindings->RunMessageLoop();
+  NodeIntegration* node_integration = NodeIntegration::Create();
+  node_integration->PrepareMessageLoop();
+  node_integration->RunMessageLoop();
 
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::Local<v8::Context> context = isolate->GetCurrentContext();

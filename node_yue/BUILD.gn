@@ -10,21 +10,21 @@ loadable_module("node_yue") {
   output_prefix_override = true  # do not add "lib" prefix
 
   sources = [
-    "init.cc",
+    "bindings.cc",
     "signal.cc",
     "signal.h",
   ]
 
   if (node_runtime != "electron") {
     sources += [
-      "node_bindings.cc",
-      "node_bindings.h",
-      "node_bindings_linux.cc",
-      "node_bindings_linux.h",
-      "node_bindings_mac.cc",
-      "node_bindings_mac.h",
-      "node_bindings_win.cc",
-      "node_bindings_win.h",
+      "node_integration.cc",
+      "node_integration.h",
+      "node_integration_linux.cc",
+      "node_integration_linux.h",
+      "node_integration_mac.cc",
+      "node_integration_mac.h",
+      "node_integration_win.cc",
+      "node_integration_win.h",
     ]
   }
 
