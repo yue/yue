@@ -2,7 +2,6 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "base/at_exit.h"
 #include "base/command_line.h"
 #include "base/logging.h"
 #include "base/strings/utf_string_conversions.h"
@@ -12,7 +11,6 @@
 
 int main(int argc, const char *argv[]) {
   // Initialize base library.
-  base::AtExitManager exit_manager;
   base::CommandLine::Init(argc, argv);
 
   auto* cmd = base::CommandLine::ForCurrentProcess();

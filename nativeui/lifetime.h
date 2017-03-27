@@ -7,6 +7,7 @@
 
 #include <memory>
 
+#include "base/at_exit.h"
 #include "base/memory/weak_ptr.h"
 #include "base/message_loop/message_loop.h"
 #include "base/run_loop.h"
@@ -51,6 +52,7 @@ class NATIVEUI_EXPORT Lifetime {
   void PlatformInit();
   void PlatformDestroy();
 
+  base::AtExitManager at_exit_;
   base::MessageLoop message_loop_;
   std::unique_ptr<base::RunLoop> run_loop_;
 
