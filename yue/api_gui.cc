@@ -131,17 +131,6 @@ struct Type<nu::Accelerator> {
 };
 
 template<>
-struct Type<nu::App> {
-  static constexpr const char* name = "yue.App";
-  static void BuildMetaTable(State* state, int index) {
-#if defined(OS_MACOSX)
-    RawSet(state, index,
-           "setapplicationmenu", &nu::App::SetApplicationMenu);
-#endif
-  }
-};
-
-template<>
 struct Type<nu::Lifetime> {
   static constexpr const char* name = "yue.Lifetime";
   static void BuildMetaTable(State* state, int index) {
@@ -151,6 +140,17 @@ struct Type<nu::Lifetime> {
            "post", &nu::Lifetime::PostTask,
            "postdelayed", &nu::Lifetime::PostDelayedTask);
     RawSetProperty(state, index, "onready", &nu::Lifetime::on_ready);
+  }
+};
+
+template<>
+struct Type<nu::App> {
+  static constexpr const char* name = "yue.App";
+  static void BuildMetaTable(State* state, int metatable) {
+#if defined(OS_MACOSX)
+    RawSet(state, metatable,
+           "setapplicationmenu", &nu::App::SetApplicationMenu);
+#endif
   }
 };
 
@@ -204,8 +204,8 @@ struct Type<nu::Painter::CombineMode> {
 template<>
 struct Type<nu::Painter> {
   static constexpr const char* name = "yue.Painter";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index,
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
            "save", &nu::Painter::Save,
            "restore", &nu::Painter::Restore,
            "cliprect", &nu::Painter::ClipRect,
@@ -220,11 +220,12 @@ struct Type<nu::Painter> {
 template<>
 struct Type<nu::MenuBase> {
   static constexpr const char* name = "yue.MenuBase";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index, "append", &nu::MenuBase::Append,
-                         "insert", &Insert,
-                         "itemcount", &nu::MenuBase::item_count,
-                         "itemat", &ItemAt);
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "append", &nu::MenuBase::Append,
+           "insert", &Insert,
+           "itemcount", &nu::MenuBase::item_count,
+           "itemat", &ItemAt);
   }
   static inline void Insert(nu::MenuBase* menu, nu::MenuItem* item, int i) {
     menu->Insert(item, i - 1);
@@ -251,8 +252,9 @@ template<>
 struct Type<nu::MenuBar> {
   using base = nu::MenuBase;
   static constexpr const char* name = "yue.MenuBar";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index, "new", &New);
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "new", &New);
   }
   static nu::MenuBar* New(CallContext* context) {
     nu::MenuBar* menu = new nu::MenuBar;
@@ -265,8 +267,10 @@ template<>
 struct Type<nu::Menu> {
   using base = nu::MenuBase;
   static constexpr const char* name = "yue.Menu";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index, "new", &New, "popup", &nu::Menu::Popup);
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "new", &New,
+           "popup", &nu::Menu::Popup);
   }
   static nu::Menu* New(CallContext* context) {
     nu::Menu* menu = new nu::Menu;
@@ -282,24 +286,19 @@ struct Type<nu::MenuItem::Type> {
     std::string type;
     if (!lua::To(state, index, &type))
       return false;
-    if (type == "label") {
+    if (type == "label")
       *out = nu::MenuItem::Label;
-      return true;
-    } else if (type == "checkbox") {
+    else if (type == "checkbox")
       *out = nu::MenuItem::CheckBox;
-      return true;
-    } else if (type == "radio") {
+    else if (type == "radio")
       *out = nu::MenuItem::Radio;
-      return true;
-    } else if (type == "separator") {
+    else if (type == "separator")
       *out = nu::MenuItem::Separator;
-      return true;
-    } else if (type == "submenu") {
+    else if (type == "submenu")
       *out = nu::MenuItem::Submenu;
-      return true;
-    } else {
+    else
       return false;
-    }
+    return true;
   }
 };
 
@@ -320,7 +319,8 @@ struct Type<nu::MenuItem> {
            "setsubmenu", &nu::MenuItem::SetSubmenu,
            "getsubmenu", &nu::MenuItem::GetSubmenu,
            "setaccelerator", &nu::MenuItem::SetAccelerator);
-    RawSetProperty(state, index, "onclick", &nu::MenuItem::on_click);
+    RawSetProperty(state, index,
+                   "onclick", &nu::MenuItem::on_click);
   }
   static nu::MenuItem* New(CallContext* context) {
     nu::MenuItem::Type type = nu::MenuItem::Label;
@@ -623,27 +623,27 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   lua::NewTable(state);
   lua::RawSet(state, -1,
               // Classes.
-              "App", lua::MetaTable<nu::App>(),
-              "Lifetime", lua::MetaTable<nu::Lifetime>(),
-              "Font", lua::MetaTable<nu::Font>(),
-              "Image", lua::MetaTable<nu::Image>(),
-              "Painter", lua::MetaTable<nu::Painter>(),
-              "MenuBar", lua::MetaTable<nu::MenuBar>(),
-              "Menu", lua::MetaTable<nu::Menu>(),
-              "MenuItem", lua::MetaTable<nu::MenuItem>(),
-              "Window", lua::MetaTable<nu::Window>(),
+              "Lifetime",  lua::MetaTable<nu::Lifetime>(),
+              "App",       lua::MetaTable<nu::App>(),
+              "Font",      lua::MetaTable<nu::Font>(),
+              "Image",     lua::MetaTable<nu::Image>(),
+              "Painter",   lua::MetaTable<nu::Painter>(),
+              "MenuBar",   lua::MetaTable<nu::MenuBar>(),
+              "Menu",      lua::MetaTable<nu::Menu>(),
+              "MenuItem",  lua::MetaTable<nu::MenuItem>(),
+              "Window",    lua::MetaTable<nu::Window>(),
               "Container", lua::MetaTable<nu::Container>(),
-              "Button", lua::MetaTable<nu::Button>(),
-              "Entry", lua::MetaTable<nu::Entry>(),
-              "Label", lua::MetaTable<nu::Label>(),
-              "Progress", lua::MetaTable<nu::Progress>(),
-              "Group", lua::MetaTable<nu::Group>(),
-              "Scroll", lua::MetaTable<nu::Scroll>(),
+              "Button",    lua::MetaTable<nu::Button>(),
+              "Entry",     lua::MetaTable<nu::Entry>(),
+              "Label",     lua::MetaTable<nu::Label>(),
+              "Progress",  lua::MetaTable<nu::Progress>(),
+              "Group",     lua::MetaTable<nu::Group>(),
+              "Scroll",    lua::MetaTable<nu::Scroll>(),
 #if defined(OS_MACOSX)
-              "Vibrant", lua::MetaTable<nu::Vibrant>(),
+              "Vibrant",   lua::MetaTable<nu::Vibrant>(),
 #endif
-              // Instances.
-              "app", nu::State::current()->app(),
-              "lifetime", nu::Lifetime::current());
+              // Properties.
+              "lifetime", nu::Lifetime::current(),
+              "app",      nu::State::current()->app());
   return 1;
 }

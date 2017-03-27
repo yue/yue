@@ -156,6 +156,186 @@ struct Type<nu::App> {
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
+#if defined(OS_MACOSX)
+    Set(context, templ,
+        "setApplicationMenu", &nu::App::SetApplicationMenu);
+#endif
+  }
+};
+
+template<>
+struct Type<nu::Font> {
+  static constexpr const char* name = "yue.Font";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+        "create", &NewInstance<nu::Font, const std::string&, int>,
+        "default", &GetDefault);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "getName", &nu::Font::GetName,
+        "getSize", &nu::Font::GetSize);
+  }
+  static nu::Font* GetDefault() {
+    return nu::State::current()->GetDefaultFont();
+  }
+};
+
+template<>
+struct Type<nu::Image> {
+  static constexpr const char* name = "yue.Image";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+        "createFromFile", &NewInstance<nu::Image, const nu::String&>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "getSize", &nu::Image::GetSize);
+  }
+};
+
+template<>
+struct Type<nu::Painter::CombineMode> {
+  static constexpr const char* name = "yue.Painter.CombineMode";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::Painter::CombineMode* out) {
+    std::string mode;
+    if (!vb::FromV8(context, value, &mode))
+      return false;
+    if (mode == "replace")
+      *out = nu::Painter::CombineMode::Replace;
+    else if (mode == "intersect")
+      *out = nu::Painter::CombineMode::Intersect;
+    else if (mode == "union")
+      *out = nu::Painter::CombineMode::Union;
+    else if (mode == "exclude")
+      *out = nu::Painter::CombineMode::Exclude;
+    else
+      return false;
+    return true;
+  }
+};
+
+template<>
+struct Type<nu::Painter> {
+  static constexpr const char* name = "yue.Painter";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "save", &nu::Painter::Save,
+        "restore", &nu::Painter::Restore,
+        "clipRect", &nu::Painter::ClipRect,
+        "translate", &nu::Painter::Translate,
+        "setColor", &nu::Painter::SetColor,
+        "drawRect", &nu::Painter::DrawRect,
+        "fillRect", &nu::Painter::FillRect,
+        "drawText", &nu::Painter::DrawText);
+  }
+};
+
+template<>
+struct Type<nu::MenuBase> {
+  static constexpr const char* name = "yue.MenuBase";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "append", &nu::MenuBase::Append,
+        "insert", &nu::MenuBase::Insert,
+        "itemCount", &nu::MenuBase::item_count,
+        "itemAt", &nu::MenuBase::item_at);
+  }
+};
+
+template<>
+struct Type<nu::MenuBar> {
+  using base = nu::MenuBase;
+  static constexpr const char* name = "yue.MenuBar";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+        "create", &NewInstance<nu::MenuBar>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+  }
+};
+
+template<>
+struct Type<nu::Menu> {
+  using base = nu::MenuBase;
+  static constexpr const char* name = "yue.Menu";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+        "create", &NewInstance<nu::Menu>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "popup", &nu::Menu::Popup);
+  }
+};
+
+template<>
+struct Type<nu::MenuItem::Type> {
+  static constexpr const char* name = "yue.MenuItem.Type";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::MenuItem::Type* out) {
+    std::string type;
+    if (!vb::FromV8(context, value, &type))
+      return false;
+    if (type == "label")
+      *out = nu::MenuItem::Label;
+    else if (type == "checkbox")
+      *out = nu::MenuItem::CheckBox;
+    else if (type == "radio")
+      *out = nu::MenuItem::Radio;
+    else if (type == "separator")
+      *out = nu::MenuItem::Separator;
+    else if (type == "submenu")
+      *out = nu::MenuItem::Submenu;
+    else
+      return false;
+    return true;
+  }
+};
+
+template<>
+struct Type<nu::MenuItem> {
+  static constexpr const char* name = "yue.MenuItem";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+        "create", &NewInstance<nu::MenuItem, nu::MenuItem::Type>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "setLabel", &nu::MenuItem::SetLabel,
+        "getLabel", &nu::MenuItem::GetLabel,
+        "setChecked", &nu::MenuItem::SetChecked,
+        "isChecked", &nu::MenuItem::IsChecked,
+        "setEnabled", &nu::MenuItem::SetEnabled,
+        "isEnabled", &nu::MenuItem::IsEnabled,
+        "setVisible", &nu::MenuItem::SetVisible,
+        "isVisible", &nu::MenuItem::IsVisible,
+        "setSubmenu", &nu::MenuItem::SetSubmenu,
+        "getSubmenu", &nu::MenuItem::GetSubmenu,
+        "setAccelerator", &nu::MenuItem::SetAccelerator);
+    SetProperty(context, templ,
+                "onclick", &nu::MenuItem::on_click);
   }
 };
 
@@ -193,6 +373,10 @@ struct Type<nu::Window> {
         "getContentView", &nu::Window::GetContentView,
         "setVisible", &nu::Window::SetVisible,
         "isVisible", &nu::Window::IsVisible,
+#if defined(OS_WIN) || defined(OS_LINUX)
+        "setMenuBar", &nu::Window::SetMenuBar,
+        "getMenuBar", &nu::Window::GetMenuBar,
+#endif
         "setBackgroundColor", &nu::Window::SetBackgroundColor);
     SetProperty(context, templ,
                 "onClose", &nu::Window::on_close,
@@ -415,6 +599,21 @@ struct Type<nu::Scroll> {
   }
 };
 
+#if defined(OS_MACOSX)
+template<>
+struct Type<nu::Vibrant> {
+  using base = nu::Container;
+  static constexpr const char* name = "yue.Vibrant";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor, "create", &NewInstance<nu::Vibrant>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+  }
+};
+#endif
+
 }  // namespace vb
 
 namespace node_yue {
@@ -431,25 +630,34 @@ void Initialize(v8::Local<v8::Object> exports) {
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::Local<v8::Context> context = isolate->GetCurrentContext();
   vb::Set(context, exports,
-          // GUI classes.
+          // Classes.
 #ifndef ELECTRON_BUILD
-          "Lifetime", vb::GetConstructor<nu::Lifetime>(context),
+          "Lifetime",  vb::GetConstructor<nu::Lifetime>(context),
 #endif
-          "App", vb::GetConstructor<nu::App>(context),
-          "Window", vb::GetConstructor<nu::Window>(context),
-          "View", vb::GetConstructor<nu::View>(context),
+          "App",       vb::GetConstructor<nu::App>(context),
+          "Font",      vb::GetConstructor<nu::Font>(context),
+          "Image",     vb::GetConstructor<nu::Image>(context),
+          "Painter",   vb::GetConstructor<nu::Painter>(context),
+          "MenuBar",   vb::GetConstructor<nu::MenuBar>(context),
+          "Menu",      vb::GetConstructor<nu::Menu>(context),
+          "MenuItem",  vb::GetConstructor<nu::MenuItem>(context),
+          "Window",    vb::GetConstructor<nu::Window>(context),
+          "View",      vb::GetConstructor<nu::View>(context),
           "Container", vb::GetConstructor<nu::Container>(context),
-          "Button", vb::GetConstructor<nu::Button>(context),
-          "Entry", vb::GetConstructor<nu::Entry>(context),
-          "Label", vb::GetConstructor<nu::Label>(context),
-          "Progress", vb::GetConstructor<nu::Progress>(context),
-          "Group", vb::GetConstructor<nu::Group>(context),
-          "Scroll", vb::GetConstructor<nu::Scroll>(context),
-          // Methods.
+          "Button",    vb::GetConstructor<nu::Button>(context),
+          "Entry",     vb::GetConstructor<nu::Entry>(context),
+          "Label",     vb::GetConstructor<nu::Label>(context),
+          "Progress",  vb::GetConstructor<nu::Progress>(context),
+          "Group",     vb::GetConstructor<nu::Group>(context),
+          "Scroll",    vb::GetConstructor<nu::Scroll>(context),
+#if defined(OS_MACOSX)
+          "Vibrant",   vb::GetConstructor<nu::Vibrant>(context),
+#endif
+          // Properties.
 #ifndef ELECTRON_BUILD
           "lifetime", nu::Lifetime::current(),
 #endif
-          "app", nu::State::current()->app());
+          "app",      nu::State::current()->app());
 }
 
 }  // namespace node_yue
