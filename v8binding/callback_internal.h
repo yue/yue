@@ -243,7 +243,10 @@ struct V8FunctionInvoker<v8::Local<v8::Value>(ArgTypes...)> {
     v8::Context::Scope context_scope(context);
     std::vector<v8::Local<v8::Value>> args = { ConvertToV8(isolate, raw)... };
     v8::Local<v8::Value> val;
-    if (func->Call(context, func, args.size(), &args.front()).ToLocal(&val))
+    if (func->Call(context,
+                   func,
+                   static_cast<int>(args.size()),
+                   args.empty() ? nullptr: &args.front()).ToLocal(&val))
       return handle_scope.Escape(val);
     else
       return v8::Undefined(isolate);
@@ -263,7 +266,9 @@ struct V8FunctionInvoker<void(ArgTypes...)> {
     auto context = func->CreationContext();
     v8::Context::Scope context_scope(context);
     std::vector<v8::Local<v8::Value>> args = { ConvertToV8(isolate, raw)... };
-    func->Call(func, static_cast<int>(args.size()), &args.front());
+    func->Call(func,
+               static_cast<int>(args.size()),
+               args.empty() ? nullptr: &args.front());
   }
 };
 
@@ -282,8 +287,10 @@ struct V8FunctionInvoker<ReturnType(ArgTypes...)> {
     v8::Context::Scope context_scope(context);
     std::vector<v8::Local<v8::Value>> args = { ConvertToV8(isolate, raw)... };
     v8::Local<v8::Value> val;
-    if (func->Call(context, func, static_cast<int>(args.size()),
-                   &args.front()).ToLocal(&val))
+    if (func->Call(context,
+                   func,
+                   static_cast<int>(args.size()),
+                   args.empty() ? nullptr : &args.front()).ToLocal(&val))
       FromV8(context, val, &ret);
     return ret;
   }
