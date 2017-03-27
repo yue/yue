@@ -159,7 +159,7 @@ struct Type<nu::Font> {
   static constexpr const char* name = "yue.Font";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
-           "new", &CreateInstance<nu::Font, const std::string&, int>,
+           "create", &CreateInstance<nu::Font, const std::string&, int>,
            "default", &GetDefault,
            "getname", &nu::Font::GetName,
            "getsize", &nu::Font::GetSize);
@@ -174,7 +174,7 @@ struct Type<nu::Image> {
   static constexpr const char* name = "yue.Image";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
-           "newfromfile", &CreateInstance<nu::Image, const nu::String&>,
+           "createfromfile", &CreateInstance<nu::Image, const nu::String&>,
            "getsize", &nu::Image::GetSize);
   }
 };
@@ -254,9 +254,9 @@ struct Type<nu::MenuBar> {
   static constexpr const char* name = "yue.MenuBar";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
-           "new", &New);
+           "create", &Create);
   }
-  static nu::MenuBar* New(CallContext* context) {
+  static nu::MenuBar* Create(CallContext* context) {
     nu::MenuBar* menu = new nu::MenuBar;
     Type<nu::MenuBase>::ReadMembers(context->state, menu);
     return menu;
@@ -269,10 +269,10 @@ struct Type<nu::Menu> {
   static constexpr const char* name = "yue.Menu";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
-           "new", &New,
+           "create", &Create,
            "popup", &nu::Menu::Popup);
   }
-  static nu::Menu* New(CallContext* context) {
+  static nu::Menu* Create(CallContext* context) {
     nu::Menu* menu = new nu::Menu;
     Type<nu::MenuBase>::ReadMembers(context->state, menu);
     return menu;
@@ -307,7 +307,7 @@ struct Type<nu::MenuItem> {
   static constexpr const char* name = "yue.MenuItem";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
-           "new", &New,
+           "create", &Create,
            "setlabel", &nu::MenuItem::SetLabel,
            "getlabel", &nu::MenuItem::GetLabel,
            "setchecked", &nu::MenuItem::SetChecked,
@@ -322,7 +322,7 @@ struct Type<nu::MenuItem> {
     RawSetProperty(state, index,
                    "onclick", &nu::MenuItem::on_click);
   }
-  static nu::MenuItem* New(CallContext* context) {
+  static nu::MenuItem* Create(CallContext* context) {
     nu::MenuItem::Type type = nu::MenuItem::Label;
     if (lua::To(context->state, 1, &type) ||  // 'type'
         GetType(context->state, 1) != LuaType::Table)  // {type='type'}
@@ -373,7 +373,7 @@ struct Type<nu::Window> {
   static constexpr const char* name = "yue.Window";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
-           "new", &CreateInstance<nu::Window, const nu::Window::Options&>,
+           "create", &CreateInstance<nu::Window, const nu::Window::Options&>,
            "close", &nu::Window::Close,
            "setcontentbounds", &nu::Window::SetContentBounds,
            "getcontentbounds", &nu::Window::GetContentBounds,
@@ -433,7 +433,7 @@ struct Type<nu::Container> {
   static constexpr const char* name = "yue.Container";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
-           "new", &CreateInstance<nu::Container>,
+           "create", &CreateInstance<nu::Container>,
            "getpreferredsize", &nu::Container::GetPreferredSize,
            "getpreferredwidthforheight",
            &nu::Container::GetPreferredWidthForHeight,
@@ -481,15 +481,16 @@ template<>
 struct Type<nu::Button> {
   using base = nu::View;
   static constexpr const char* name = "yue.Button";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index, "new", &New,
-                         "settitle", &nu::Button::SetTitle,
-                         "gettitle", &nu::Button::GetTitle,
-                         "setchecked", &nu::Button::SetChecked,
-                         "ischecked", &nu::Button::IsChecked);
-    RawSetProperty(state, index, "onclick", &nu::Button::on_click);
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &Create,
+           "settitle", &nu::Button::SetTitle,
+           "gettitle", &nu::Button::GetTitle,
+           "setchecked", &nu::Button::SetChecked,
+           "ischecked", &nu::Button::IsChecked);
+    RawSetProperty(state, metatable, "onclick", &nu::Button::on_click);
   }
-  static nu::Button* New(CallContext* context) {
+  static nu::Button* Create(CallContext* context) {
     std::string title;
     if (To(context->state, 1, &title)) {
       return new nu::Button(title);
@@ -510,12 +511,12 @@ template<>
 struct Type<nu::Entry> {
   using base = nu::View;
   static constexpr const char* name = "yue.Entry";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index,
-           "new", &CreateInstance<nu::Entry>,
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateInstance<nu::Entry>,
            "settext", &nu::Entry::SetText,
            "gettext", &nu::Entry::GetText);
-    RawSetProperty(state, index,
+    RawSetProperty(state, metatable,
                    "onactivate", &nu::Entry::on_activate,
                    "ontextchange", &nu::Entry::on_text_change);
   }
@@ -525,9 +526,9 @@ template<>
 struct Type<nu::Label> {
   using base = nu::View;
   static constexpr const char* name = "yue.Label";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index,
-           "new", &CreateInstance<nu::Label, const std::string&>,
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateInstance<nu::Label, const std::string&>,
            "settext", &nu::Label::SetText,
            "gettext", &nu::Label::GetText);
   }
@@ -537,12 +538,13 @@ template<>
 struct Type<nu::Progress> {
   using base = nu::View;
   static constexpr const char* name = "yue.Progress";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index, "new", &CreateInstance<nu::Progress>,
-                         "setvalue", &nu::Progress::SetValue,
-                         "getvalue", &nu::Progress::GetValue,
-                         "setindeterminate", &nu::Progress::SetIndeterminate,
-                         "isindeterminate", &nu::Progress::IsIndeterminate);
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateInstance<nu::Progress>,
+           "setvalue", &nu::Progress::SetValue,
+           "getvalue", &nu::Progress::GetValue,
+           "setindeterminate", &nu::Progress::SetIndeterminate,
+           "isindeterminate", &nu::Progress::IsIndeterminate);
   }
 };
 
@@ -550,9 +552,9 @@ template<>
 struct Type<nu::Group> {
   using base = nu::View;
   static constexpr const char* name = "yue.Group";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index,
-           "new", &CreateInstance<nu::Group, const std::string&>,
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateInstance<nu::Group, const std::string&>,
            "setcontentview", &nu::Group::SetContentView,
            "getcontentview", &nu::Group::GetContentView,
            "settitle", &nu::Group::SetTitle,
@@ -594,9 +596,9 @@ template<>
 struct Type<nu::Scroll> {
   using base = nu::View;
   static constexpr const char* name = "yue.Scroll";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index,
-           "new", &CreateInstance<nu::Scroll>,
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateInstance<nu::Scroll>,
            "setscrollbarpolicy", &nu::Scroll::SetScrollBarPolicy,
            "getscrollbarpolicy", &nu::Scroll::GetScrollBarPolicy,
            "setcontentsize", &nu::Scroll::SetContentSize,
@@ -611,8 +613,9 @@ template<>
 struct Type<nu::Vibrant> {
   using base = nu::Container;
   static constexpr const char* name = "yue.Vibrant";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index, "new", &CreateInstance<nu::Vibrant>);
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateInstance<nu::Vibrant>);
   }
 };
 #endif

@@ -11,7 +11,7 @@ class YueSignalTest : public testing::Test {
   void SetUp() override {
     luaL_openlibs(state_);
     yue::InsertBuiltinModuleLoader(state_);
-    luaL_dostring(state_, "win = require('yue.gui').Window.new{}");
+    luaL_dostring(state_, "win = require('yue.gui').Window.create{}");
   }
 
   lua::ManagedState state_;
