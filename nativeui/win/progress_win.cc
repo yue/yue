@@ -6,6 +6,7 @@
 
 #include <commctrl.h>
 
+#include "nativeui/win/screen.h"
 #include "nativeui/win/subwin_view.h"
 
 namespace nu {
@@ -23,7 +24,7 @@ class ProgressImpl : public SubwinView {
 Progress::Progress() {
   TakeOverView(new ProgressImpl());
   SetDefaultStyle(ScaleSize(SizeF(0, GetSystemMetrics(SM_CYVSCROLL)),
-                            1.0f / GetNative()->scale_factor()));
+                            1.0f / GetDPIScale()));
 }
 
 Progress::~Progress() {

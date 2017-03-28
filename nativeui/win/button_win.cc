@@ -13,6 +13,7 @@
 #include "nativeui/gfx/geometry/vector2d_conversions.h"
 #include "nativeui/gfx/win/text_win.h"
 #include "nativeui/state.h"
+#include "nativeui/win/screen.h"
 #include "nativeui/win/util/native_theme.h"
 #include "nativeui/win/view_win.h"
 #include "nativeui/win/window_win.h"

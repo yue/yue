@@ -6,9 +6,13 @@
 
 #include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/label.h"
+#include "nativeui/win/screen.h"
 #include "nativeui/win/scroll_win.h"
 
 namespace nu {
+
+ViewImpl::ViewImpl(ControlType type)
+    : type_(type), scale_factor_(GetDPIScale()) {}
 
 void ViewImpl::SizeAllocate(const Rect& size_allocation) {
   if (size_allocation == size_allocation_)
@@ -20,8 +24,6 @@ void ViewImpl::SizeAllocate(const Rect& size_allocation) {
 }
 
 void ViewImpl::SetParent(ViewImpl* parent) {
-  float old_scale_factor = scale_factor();
-
   window_ = parent ? parent->window_ : nullptr;
 
   if (parent) {
@@ -34,16 +36,14 @@ void ViewImpl::SetParent(ViewImpl* parent) {
     viewport_ = nullptr;
   }
 
-  ParentChanged(old_scale_factor);
+  ParentChanged();
 }
 
 void ViewImpl::BecomeContentView(WindowImpl* parent) {
-  float old_scale_factor = scale_factor();
-
   window_ = parent;
   viewport_ = nullptr;
 
-  ParentChanged(old_scale_factor);
+  ParentChanged();
 }
 
 void ViewImpl::Invalidate(const Rect& dirty) {
@@ -102,13 +102,13 @@ void ViewImpl::Invalidate() {
   Invalidate(size_allocation_);
 }
 
-void ViewImpl::ParentChanged(float old_scale_factor) {
+void ViewImpl::ParentChanged() {
   // Scale the bounds after moving to a new parent.
-  if (old_scale_factor != scale_factor()) {
+  float new_scale_factor = window_ ? window_->scale_factor() : 1.0f;
+  if (new_scale_factor != scale_factor_) {
     size_allocation_ = ScaleToEnclosingRect(size_allocation_,
-                                            scale_factor() / old_scale_factor);
-    preferred_size_ = ScaleToCeiledSize(preferred_size_,
-                                        scale_factor() / old_scale_factor);
+                                            new_scale_factor / scale_factor_);
+    scale_factor_ = new_scale_factor;
   }
 }
 
@@ -124,8 +124,8 @@ void View::TakeOverView(NativeView view) {
 }
 
 void View::SetBounds(const RectF& bounds) {
-  SetPixelBounds(ToEnclosingRect(ScaleRect(bounds,
-                                 GetNative()->scale_factor())));
+  SetPixelBounds(
+      ToEnclosingRect(ScaleRect(bounds, GetNative()->scale_factor())));
 }
 
 RectF View::GetBounds() const {

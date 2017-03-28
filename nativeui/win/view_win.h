@@ -7,7 +7,6 @@
 
 #include "nativeui/view.h"
 #include "nativeui/gfx/win/painter_win.h"
-#include "nativeui/win/screen.h"
 #include "nativeui/win/window_win.h"
 
 namespace nu {
@@ -103,10 +102,6 @@ class ViewImpl {
   void set_size_allocation(const Rect& bounds) { size_allocation_ = bounds; }
   Rect size_allocation() const { return size_allocation_; }
 
-  // Set the preferred size.
-  void set_preferred_size(const Size& size) { preferred_size_ = size; }
-  Size preferred_size() const { return preferred_size_; }
-
   // Whether the view is visible.
   void set_visible(bool visible) { is_visible_ = visible; }
   bool is_visible() const { return is_visible_; }
@@ -116,12 +111,7 @@ class ViewImpl {
   ControlState state() const { return state_; }
 
   // Returns the DPI of current view.
-  float scale_factor() const {
-    if (window_)
-      return window_->scale_factor();
-    static float current_scale_factor = GetDPIScale();
-    return current_scale_factor;
-  }
+  float scale_factor() const { return scale_factor_; }
 
   Color background_color() const { return background_color_; }
 
@@ -129,10 +119,10 @@ class ViewImpl {
   ControlType type() const { return type_; }
 
  protected:
-  explicit ViewImpl(ControlType type) : type_(type) {}
+  explicit ViewImpl(ControlType type);
 
   // Called by SetParent/BecomeContentView when parent view changes.
-  void ParentChanged(float old_scale_factor);
+  void ParentChanged();
 
  private:
   ControlType type_;
@@ -155,11 +145,11 @@ class ViewImpl {
   // The viewport that owns this view.
   ScrollImpl* viewport_ = nullptr;
 
+  // The scale factor this view uses.
+  float scale_factor_;
+
   // The absolute bounds relative to the origin of window.
   Rect size_allocation_;
-
-  // The preferred size of the view.
-  Size preferred_size_;
 
   DISALLOW_COPY_AND_ASSIGN(ViewImpl);
 };

@@ -9,6 +9,7 @@
 #include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/win/text_win.h"
 #include "nativeui/state.h"
+#include "nativeui/win/screen.h"
 #include "nativeui/win/view_win.h"
 
 namespace nu {
@@ -63,7 +64,7 @@ void Label::SetText(const std::string& text) {
   label->SetText(wtext);
 
   SetDefaultStyle(ScaleSize(MeasureText(label, label->font(), wtext),
-                            1.0f / label->scale_factor()));
+                            1.0f / GetDPIScale()));
   label->Invalidate();
 }
 
