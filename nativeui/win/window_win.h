@@ -11,9 +11,9 @@
 
 namespace nu {
 
-class TopLevelWindow : public Win32Window {
+class WindowImpl : public Win32Window {
  public:
-  explicit TopLevelWindow(Window* delegate) : delegate_(delegate) {}
+  explicit WindowImpl(Window* delegate) : delegate_(delegate) {}
 
   void SetPixelBounds(const Rect& bounds);
   Rect GetPixelBounds();
@@ -27,7 +27,7 @@ class TopLevelWindow : public Win32Window {
   FocusManager* focus_manager() { return &focus_manager_; }
 
  protected:
-  CR_BEGIN_MSG_MAP_EX(TopLevelWindow, Win32Window)
+  CR_BEGIN_MSG_MAP_EX(WindowImpl, Win32Window)
     CR_MSG_WM_CAPTURECHANGED(OnCaptureChanged)
     CR_MSG_WM_CLOSE(OnClose)
     CR_MSG_WM_COMMAND(OnCommand)

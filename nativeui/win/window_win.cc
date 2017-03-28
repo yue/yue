@@ -35,19 +35,19 @@ bool IsShiftPressed() {
 
 }  // namespace
 
-void TopLevelWindow::SetPixelBounds(const Rect& bounds) {
+void WindowImpl::SetPixelBounds(const Rect& bounds) {
   SetWindowPos(hwnd(), NULL,
                bounds.x(), bounds.y(), bounds.width(), bounds.height(),
                SWP_NOACTIVATE | SWP_NOZORDER);
 }
 
-Rect TopLevelWindow::GetPixelBounds() {
+Rect WindowImpl::GetPixelBounds() {
   RECT r;
   GetWindowRect(hwnd(), &r);
   return Rect(r);
 }
 
-Rect TopLevelWindow::GetContentPixelBounds() {
+Rect WindowImpl::GetContentPixelBounds() {
   RECT r;
   GetClientRect(hwnd(), &r);
   POINT point = { r.left, r.top };
@@ -55,36 +55,36 @@ Rect TopLevelWindow::GetContentPixelBounds() {
   return Rect(point.x, point.y, r.right - r.left, r.bottom - r.top);
 }
 
-void TopLevelWindow::SetCapture(BaseView* view) {
+void WindowImpl::SetCapture(BaseView* view) {
   capture_view_ = view;
   ::SetCapture(hwnd());
 }
 
-void TopLevelWindow::ReleaseCapture() {
+void WindowImpl::ReleaseCapture() {
   if (::GetCapture() == hwnd())
     ::ReleaseCapture();
 }
 
-void TopLevelWindow::SetBackgroundColor(nu::Color color) {
+void WindowImpl::SetBackgroundColor(nu::Color color) {
   background_color_ = color;
   InvalidateRect(hwnd(), NULL, TRUE);
 }
 
-void TopLevelWindow::OnCaptureChanged(HWND window) {
+void WindowImpl::OnCaptureChanged(HWND window) {
   if (capture_view_) {
     capture_view_->OnCaptureLost();
     capture_view_ = nullptr;
   }
 }
 
-void TopLevelWindow::OnClose() {
+void WindowImpl::OnClose() {
   if (delegate_->should_close.is_null() || delegate_->should_close.Run()) {
     delegate_->on_close.Emit();
     SetMsgHandled(FALSE);
   }
 }
 
-void TopLevelWindow::OnCommand(UINT code, int command, HWND window) {
+void WindowImpl::OnCommand(UINT code, int command, HWND window) {
   if (!code && !window && delegate_->GetMenuBar()) {
     DispatchCommandToItem(delegate_->GetMenuBar(), command);
     return;
@@ -98,21 +98,21 @@ void TopLevelWindow::OnCommand(UINT code, int command, HWND window) {
   control->OnCommand(code, command);
 }
 
-HBRUSH TopLevelWindow::OnCtlColorStatic(HDC dc, HWND window) {
+HBRUSH WindowImpl::OnCtlColorStatic(HDC dc, HWND window) {
   auto* control = reinterpret_cast<SubwinView*>(GetWindowUserData(window));
   HBRUSH brush = NULL;
   SetMsgHandled(control->OnCtlColor(dc, &brush));
   return brush;
 }
 
-void TopLevelWindow::OnSize(UINT param, const Size& size) {
+void WindowImpl::OnSize(UINT param, const Size& size) {
   if (!delegate_->GetContentView())
     return;
   delegate_->GetContentView()->GetNative()->SizeAllocate(Rect(size));
   RedrawWindow(hwnd(), NULL, NULL, RDW_INVALIDATE | RDW_ALLCHILDREN);
 }
 
-void TopLevelWindow::OnMouseMove(UINT flags, const Point& point) {
+void WindowImpl::OnMouseMove(UINT flags, const Point& point) {
   if (!mouse_in_window_) {
     mouse_in_window_ = true;
     delegate_->GetContentView()->GetNative()->OnMouseEnter();
@@ -125,13 +125,13 @@ void TopLevelWindow::OnMouseMove(UINT flags, const Point& point) {
   delegate_->GetContentView()->GetNative()->OnMouseMove(flags, point);
 }
 
-void TopLevelWindow::OnMouseLeave() {
+void WindowImpl::OnMouseLeave() {
   TrackMouse(false);
   mouse_in_window_ = false;
   delegate_->GetContentView()->GetNative()->OnMouseLeave();
 }
 
-BOOL TopLevelWindow::OnMouseWheel(bool vertical, UINT flags, int delta,
+BOOL WindowImpl::OnMouseWheel(bool vertical, UINT flags, int delta,
                                   const Point& point) {
   POINT p = point.ToPOINT();
   ScreenToClient(hwnd(), &p);
@@ -139,7 +139,7 @@ BOOL TopLevelWindow::OnMouseWheel(bool vertical, UINT flags, int delta,
       vertical, flags, delta, Point(p));
 }
 
-LRESULT TopLevelWindow::OnMouseClick(UINT message, WPARAM w_param,
+LRESULT WindowImpl::OnMouseClick(UINT message, WPARAM w_param,
                                      LPARAM l_param) {
   delegate_->GetContentView()->GetNative()->OnMouseClick(
       message, static_cast<UINT>(w_param),
@@ -151,7 +151,7 @@ LRESULT TopLevelWindow::OnMouseClick(UINT message, WPARAM w_param,
   return 0;
 }
 
-void TopLevelWindow::OnKeyDown(UINT ch, UINT repeat, UINT flags) {
+void WindowImpl::OnKeyDown(UINT ch, UINT repeat, UINT flags) {
   if (!delegate_->GetMenuBar())
     return;
   int modifiers = 0;
@@ -170,12 +170,12 @@ void TopLevelWindow::OnKeyDown(UINT ch, UINT repeat, UINT flags) {
     DispatchCommandToItem(delegate_->GetMenuBar(), command);
 }
 
-void TopLevelWindow::OnChar(UINT ch, UINT repeat, UINT flags) {
+void WindowImpl::OnChar(UINT ch, UINT repeat, UINT flags) {
   if (ch == VK_TAB)
     focus_manager_.AdvanceFocus(delegate_->GetContentView(), IsShiftPressed());
 }
 
-void TopLevelWindow::OnPaint(HDC) {
+void WindowImpl::OnPaint(HDC) {
   PAINTSTRUCT ps;
   BeginPaint(hwnd(), &ps);
 
@@ -198,12 +198,12 @@ void TopLevelWindow::OnPaint(HDC) {
   EndPaint(hwnd(), &ps);
 }
 
-LRESULT TopLevelWindow::OnEraseBkgnd(HDC dc) {
+LRESULT WindowImpl::OnEraseBkgnd(HDC dc) {
   // Needed to prevent resize flicker.
   return 1;
 }
 
-void TopLevelWindow::TrackMouse(bool enable) {
+void WindowImpl::TrackMouse(bool enable) {
   TRACKMOUSEEVENT event = {0};
   event.cbSize = sizeof(event);
   event.hwndTrack = hwnd();
@@ -216,7 +216,7 @@ void TopLevelWindow::TrackMouse(bool enable) {
 // Public Window API implementation.
 
 void Window::PlatformInit(const Options& options) {
-  TopLevelWindow* win = new TopLevelWindow(this);
+  WindowImpl* win = new WindowImpl(this);
   window_ = win;
 
   if (!options.bounds.IsEmpty())
@@ -241,25 +241,23 @@ void Window::PlatformSetMenuBar(MenuBar* menu_bar) {
 }
 
 void Window::SetContentBounds(const RectF& bounds) {
-  TopLevelWindow* win = static_cast<TopLevelWindow*>(window_);
-  Rect pixel_bounds(ToEnclosingRect(ScaleRect(bounds, win->scale_factor())));
-  win->SetPixelBounds(ContentToWindowBounds(win, !!menu_bar_, pixel_bounds));
+  Rect pixels = ToEnclosingRect(ScaleRect(bounds, window_->scale_factor()));
+  window_->SetPixelBounds(ContentToWindowBounds(window_, !!menu_bar_, pixels));
 }
 
 RectF Window::GetContentBounds() const {
-  TopLevelWindow* win = static_cast<TopLevelWindow*>(window_);
-  return ScaleRect(RectF(win->GetContentPixelBounds()),
-                   1.0f / win->scale_factor());
+  return ScaleRect(RectF(window_->GetContentPixelBounds()),
+                   1.0f / window_->scale_factor());
 }
 
 void Window::SetBounds(const RectF& bounds) {
-  TopLevelWindow* win = static_cast<TopLevelWindow*>(window_);
-  win->SetPixelBounds(ToEnclosingRect(ScaleRect(bounds, win->scale_factor())));
+  window_->SetPixelBounds(
+      ToEnclosingRect(ScaleRect(bounds, window_->scale_factor())));
 }
 
 RectF Window::GetBounds() const {
-  TopLevelWindow* win = static_cast<TopLevelWindow*>(window_);
-  return ScaleRect(RectF(win->GetPixelBounds()), 1.0f / win->scale_factor());
+  return ScaleRect(RectF(window_->GetPixelBounds()),
+                         1.0f / window_->scale_factor());
 }
 
 void Window::SetVisible(bool visible) {
@@ -271,8 +269,7 @@ bool Window::IsVisible() const {
 }
 
 void Window::SetBackgroundColor(Color color) {
-  TopLevelWindow* win = static_cast<TopLevelWindow*>(window_);
-  win->SetBackgroundColor(color);
+  window_->SetBackgroundColor(color);
 }
 
 }  // namespace nu

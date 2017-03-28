@@ -43,12 +43,12 @@ void SubwinView::SizeAllocate(const Rect& size_allocation) {
 void SubwinView::SetParent(BaseView* parent) {
   BaseView::SetParent(parent);
   ::SetParent(hwnd(),
-              parent && parent->GetNative()
-                  ? parent->GetNative()->hwnd()
+              parent && parent->window()
+                  ? parent->window()->hwnd()
                   : State::GetCurrent()->GetSubwinHolder());
 }
 
-void SubwinView::BecomeContentView(Win32Window* parent) {
+void SubwinView::BecomeContentView(WindowImpl* parent) {
   BaseView::BecomeContentView(parent);
   ::SetParent(hwnd(), parent ? parent->hwnd()
                              : State::GetCurrent()->GetSubwinHolder());

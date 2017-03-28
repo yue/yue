@@ -51,12 +51,11 @@ void ScrollBarThumb::OnMouseLeave() {
 
 bool ScrollBarThumb::OnMouseClick(UINT message, UINT flags,
                                   const Point& point) {
-  auto* toplevel_window = static_cast<TopLevelWindow*>(GetNative());
   if (message == WM_LBUTTONDOWN) {
     is_capturing_ = true;
     pressed_point_ = point;
     last_value_ = scroll_bar_->GetValue();
-    toplevel_window->SetCapture(this);
+    window()->SetCapture(this);
     set_state(ControlState::Pressed);
   } else {
     set_state(ControlState::Hovered);

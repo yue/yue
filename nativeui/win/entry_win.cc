@@ -64,9 +64,8 @@ class EntryView : public SubwinView {
       return 0;
     } else if (message == WM_SETFOCUS) {
       // Notify the window that focus has changed.
-      if (self->GetNative()) {
-        static_cast<TopLevelWindow*>(self->GetNative())->focus_manager()->
-          TakeFocus(self->delegate_);
+      if (self->window()) {
+        self->window()->focus_manager()->TakeFocus(self->delegate_);
       }
     }
     return CallWindowProc(self->proc_, hwnd, message, w_param, l_param);

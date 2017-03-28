@@ -32,10 +32,10 @@ SizeF MeasureText(Font* font, const String& text) {
 }
 
 SizeF MeasureText(const nu::BaseView* view, Font* font, const String& text) {
-  if (!view->GetNative())
+  if (!view->window())
     return MeasureText(font, text);
 
-  base::win::ScopedGetDC dc(view->GetNative()->hwnd());
+  base::win::ScopedGetDC dc(view->window()->hwnd());
   return MeasureText(dc, font, text);
 }
 

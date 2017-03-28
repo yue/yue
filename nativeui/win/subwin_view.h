@@ -7,7 +7,6 @@
 
 #include "base/win/scoped_gdi_object.h"
 #include "nativeui/win/base_view.h"
-#include "nativeui/win/util/win32_window.h"
 
 namespace nu {
 
@@ -21,7 +20,7 @@ class SubwinView : public Win32Window, public BaseView {
 
   void SizeAllocate(const Rect& size_allocation) override;
   void SetParent(BaseView* parent) override;
-  void BecomeContentView(Win32Window* parent) override;
+  void BecomeContentView(WindowImpl* parent) override;
   void Invalidate(const Rect& dirty) override;
   void SetFocus(bool focus) override;
   bool IsFocused() const override;
