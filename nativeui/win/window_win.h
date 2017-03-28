@@ -6,12 +6,12 @@
 #define NATIVEUI_WIN_WINDOW_WIN_H_
 
 #include "nativeui/win/focus_manager.h"
-#include "nativeui/win/window_impl.h"
+#include "nativeui/win/util/win32_window.h"
 #include "nativeui/window.h"
 
 namespace nu {
 
-class TopLevelWindow : public WindowImpl {
+class TopLevelWindow : public Win32Window {
  public:
   explicit TopLevelWindow(Window* delegate) : delegate_(delegate) {}
 
@@ -27,7 +27,7 @@ class TopLevelWindow : public WindowImpl {
   FocusManager* focus_manager() { return &focus_manager_; }
 
  protected:
-  CR_BEGIN_MSG_MAP_EX(TopLevelWindow, WindowImpl)
+  CR_BEGIN_MSG_MAP_EX(TopLevelWindow, Win32Window)
     CR_MSG_WM_CAPTURECHANGED(OnCaptureChanged)
     CR_MSG_WM_CLOSE(OnClose)
     CR_MSG_WM_COMMAND(OnCommand)

@@ -2,7 +2,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/win/window_impl.h"
+#include "nativeui/win/util/win32_window.h"
 
 #include "nativeui/state.h"
 #include "nativeui/win/screen.h"
@@ -12,12 +12,12 @@
 namespace nu {
 
 // static
-const DWORD WindowImpl::kWindowDefaultChildStyle =
+const DWORD Win32Window::kWindowDefaultChildStyle =
     WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
-const DWORD WindowImpl::kWindowDefaultStyle =
+const DWORD Win32Window::kWindowDefaultStyle =
     WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN;
 
-WindowImpl::WindowImpl(base::StringPiece16 class_name, HWND parent,
+Win32Window::Win32Window(base::StringPiece16 class_name, HWND parent,
                        DWORD window_style, DWORD window_ex_style)
     : class_style_(CS_DBLCLKS),
       window_style_(window_style),
@@ -60,7 +60,7 @@ WindowImpl::WindowImpl(base::StringPiece16 class_name, HWND parent,
   scale_factor_ = GetScaleFactorForHWND(hwnd_);
 }
 
-WindowImpl::~WindowImpl() {
+Win32Window::~Win32Window() {
   if (!::IsWindow(hwnd_))  // handle already destroyed.
     return;
 
@@ -71,15 +71,15 @@ WindowImpl::~WindowImpl() {
   ::DestroyWindow(hwnd_);
 }
 
-HICON WindowImpl::GetDefaultWindowIcon() const {
+HICON Win32Window::GetDefaultWindowIcon() const {
   return nullptr;
 }
 
-HICON WindowImpl::GetSmallWindowIcon() const {
+HICON Win32Window::GetSmallWindowIcon() const {
   return nullptr;
 }
 
-LRESULT WindowImpl::OnWndProc(UINT message, WPARAM w_param, LPARAM l_param) {
+LRESULT Win32Window::OnWndProc(UINT message, WPARAM w_param, LPARAM l_param) {
   LRESULT result = 0;
 
   HWND hwnd = hwnd_;
@@ -94,34 +94,34 @@ LRESULT WindowImpl::OnWndProc(UINT message, WPARAM w_param, LPARAM l_param) {
   return result;
 }
 
-BOOL WindowImpl::ProcessWindowMessage(
+BOOL Win32Window::ProcessWindowMessage(
     HWND, UINT, WPARAM, LPARAM, LRESULT&, DWORD dwMsgMapID) {
   return false;
 }
 
 // static
-LRESULT CALLBACK WindowImpl::WndProc(HWND hwnd,
+LRESULT CALLBACK Win32Window::WndProc(HWND hwnd,
                                      UINT message,
                                      WPARAM w_param,
                                      LPARAM l_param) {
   if (message == WM_NCCREATE) {
     CREATESTRUCT* cs = reinterpret_cast<CREATESTRUCT*>(l_param);
-    WindowImpl* window = reinterpret_cast<WindowImpl*>(cs->lpCreateParams);
+    Win32Window* window = reinterpret_cast<Win32Window*>(cs->lpCreateParams);
     DCHECK(window);
     SetWindowUserData(hwnd, window);
     window->hwnd_ = hwnd;
     return TRUE;
   }
 
-  WindowImpl* window =
-      reinterpret_cast<WindowImpl*>(GetWindowUserData(hwnd));
+  Win32Window* window =
+      reinterpret_cast<Win32Window*>(GetWindowUserData(hwnd));
   if (!window)
     return 0;
 
   return window->OnWndProc(message, w_param, l_param);
 }
 
-ATOM WindowImpl::GetWindowClassAtom() {
+ATOM Win32Window::GetWindowClassAtom() {
   HICON icon = GetDefaultWindowIcon();
   HICON small_icon = GetSmallWindowIcon();
   ClassInfo info(CS_DBLCLKS, icon, small_icon);

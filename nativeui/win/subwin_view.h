@@ -7,12 +7,12 @@
 
 #include "base/win/scoped_gdi_object.h"
 #include "nativeui/win/base_view.h"
-#include "nativeui/win/window_impl.h"
+#include "nativeui/win/util/win32_window.h"
 
 namespace nu {
 
 // The base class for implementing sub-window based UI.
-class SubwinView : public WindowImpl, public BaseView {
+class SubwinView : public Win32Window, public BaseView {
  public:
   SubwinView(base::StringPiece16 class_name = L"",
              DWORD window_style = kWindowDefaultChildStyle,
@@ -21,7 +21,7 @@ class SubwinView : public WindowImpl, public BaseView {
 
   void SizeAllocate(const Rect& size_allocation) override;
   void SetParent(BaseView* parent) override;
-  void BecomeContentView(WindowImpl* parent) override;
+  void BecomeContentView(Win32Window* parent) override;
   void Invalidate(const Rect& dirty) override;
   void SetFocus(bool focus) override;
   bool IsFocused() const override;

@@ -7,7 +7,7 @@
 #include "base/strings/string_number_conversions.h"
 #include "base/win/win_util.h"
 #include "base/win/wrapped_window_proc.h"
-#include "nativeui/win/window_impl.h"
+#include "nativeui/win/util/win32_window.h"
 
 namespace nu {
 
@@ -48,7 +48,7 @@ ATOM ClassRegistrar::RetrieveClassAtom(const ClassInfo& class_info) {
 
   WNDCLASSEX window_class;
   base::win::InitializeWindowClass(
-      name.c_str(), &base::win::WrappedWindowProc<WindowImpl::WndProc>,
+      name.c_str(), &base::win::WrappedWindowProc<Win32Window::WndProc>,
       class_info.style, 0, 0, LoadCursorW(NULL, IDC_ARROW),
       reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1), NULL,
       class_info.icon, class_info.small_icon, &window_class);

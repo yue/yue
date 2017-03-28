@@ -5,20 +5,20 @@
 #ifndef NATIVEUI_WIN_SUBWIN_HOLDER_H_
 #define NATIVEUI_WIN_SUBWIN_HOLDER_H_
 
-#include "nativeui/win/window_impl.h"
+#include "nativeui/win/util/win32_window.h"
 
 namespace nu {
 
 // Windows does not allow a child window to created without a parent, so this
 // window becomes the temporary parent for the SubwinView childs that are not
 // added to any parent yet.
-class SubwinHolder : public WindowImpl {
+class SubwinHolder : public Win32Window {
  public:
   SubwinHolder();
   ~SubwinHolder() override;
 
  protected:
-  CR_BEGIN_MSG_MAP_EX(SubwinHolder, WindowImpl)
+  CR_BEGIN_MSG_MAP_EX(SubwinHolder, Win32Window)
     CR_MSG_WM_COMMAND(OnCommand)
   CR_END_MSG_MAP()
 

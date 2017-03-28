@@ -19,10 +19,10 @@
 
 // Note about message maps with cracked handlers:
 // For ATL 3.0, a message map using cracked handlers MUST use BEGIN_MSG_MAP_EX.
-// For ATL 7.0 or higher, you can use BEGIN_MSG_MAP for CWindowImpl/CDialogImpl
+// For ATL 7.0 or higher, you can use BEGIN_MSG_MAP for CWin32Window/CDialogImpl
 // derived classes,
 // but must use BEGIN_MSG_MAP_EX for classes that don't derive from
-// CWindowImpl/CDialogImpl.
+// CWin32Window/CDialogImpl.
 
 #define CR_BEGIN_MSG_MAP_EX(theClass, parent)                     \
  public:                                                          \

@@ -71,7 +71,7 @@ void ContainerView::SetParent(BaseView* parent) {
   RefreshParentTree();
 }
 
-void ContainerView::BecomeContentView(WindowImpl* parent) {
+void ContainerView::BecomeContentView(Win32Window* parent) {
   BaseView::BecomeContentView(parent);
   RefreshParentTree();
 }

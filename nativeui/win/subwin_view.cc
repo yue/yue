@@ -13,7 +13,7 @@ namespace nu {
 
 SubwinView::SubwinView(base::StringPiece16 class_name,
                        DWORD window_style, DWORD window_ex_style)
-    : WindowImpl(class_name, State::GetCurrent()->GetSubwinHolder(),
+    : Win32Window(class_name, State::GetCurrent()->GetSubwinHolder(),
                  window_style, window_ex_style),
       BaseView(ControlType::Subwin) {
   // Create HFONT from default system font.
@@ -48,7 +48,7 @@ void SubwinView::SetParent(BaseView* parent) {
                   : State::GetCurrent()->GetSubwinHolder());
 }
 
-void SubwinView::BecomeContentView(WindowImpl* parent) {
+void SubwinView::BecomeContentView(Win32Window* parent) {
   BaseView::BecomeContentView(parent);
   ::SetParent(hwnd(), parent ? parent->hwnd()
                              : State::GetCurrent()->GetSubwinHolder());

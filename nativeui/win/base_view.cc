@@ -35,7 +35,7 @@ void BaseView::SetParent(BaseView* parent) {
   ParentChanged(old_scale_factor);
 }
 
-void BaseView::BecomeContentView(WindowImpl* parent) {
+void BaseView::BecomeContentView(Win32Window* parent) {
   float old_scale_factor = scale_factor();
 
   window_ = parent;

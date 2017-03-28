@@ -21,7 +21,7 @@ namespace nu {
 namespace {
 
 // Convert between window and client areas.
-Rect ContentToWindowBounds(WindowImpl* window, bool has_menu_bar,
+Rect ContentToWindowBounds(Win32Window* window, bool has_menu_bar,
                            const Rect& bounds) {
   RECT rect = bounds.ToRECT();
   AdjustWindowRectEx(&rect, window->window_style(), has_menu_bar,

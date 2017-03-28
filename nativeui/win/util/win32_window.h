@@ -2,8 +2,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef NATIVEUI_WIN_WINDOW_IMPL_H_
-#define NATIVEUI_WIN_WINDOW_IMPL_H_
+#ifndef NATIVEUI_WIN_UTIL_WIN32_WINDOW_H_
+#define NATIVEUI_WIN_UTIL_WIN32_WINDOW_H_
 
 #include <windows.h>
 
@@ -18,9 +18,9 @@ namespace nu {
 
 // A convenience class that encapsulates the details of creating and destroying
 // a HWND. This class also hosts the windows procedure used by all Windows.
-class WindowImpl {
+class Win32Window {
  public:
-  virtual ~WindowImpl();
+  virtual ~Win32Window();
 
   // Returns the HWND associated with this Window.
   HWND hwnd() const { return hwnd_; }
@@ -36,7 +36,7 @@ class WindowImpl {
   static const DWORD kWindowDefaultChildStyle;
   static const DWORD kWindowDefaultStyle;
 
-  WindowImpl(base::StringPiece16 class_name = L"",
+  Win32Window(base::StringPiece16 class_name = L"",
              HWND parent = NULL,
              DWORD window_style = kWindowDefaultStyle,
              DWORD window_ex_style = 0);
@@ -86,4 +86,4 @@ class WindowImpl {
 
 }  // namespace nu
 
-#endif  // NATIVEUI_WIN_WINDOW_IMPL_H_
+#endif  // NATIVEUI_WIN_UTIL_WIN32_WINDOW_H_

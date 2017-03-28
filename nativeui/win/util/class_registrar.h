@@ -12,7 +12,7 @@
 
 namespace nu {
 
-// WindowImpl class information used for registering unique windows.
+// Win32Window class information used for registering unique windows.
 struct ClassInfo {
   UINT style;
   HICON icon;

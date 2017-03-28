@@ -7,12 +7,12 @@
 
 #include "nativeui/gfx/win/painter_win.h"
 #include "nativeui/win/screen.h"
-#include "nativeui/win/window_impl.h"
+#include "nativeui/win/util/win32_window.h"
 
 namespace nu {
 
 class ScrollView;
-class WindowImpl;
+class Win32Window;
 
 // The state of the control.
 enum class ControlState {
@@ -52,7 +52,7 @@ class BaseView {
 
   // Set the parent view.
   virtual void SetParent(BaseView* parent);
-  virtual void BecomeContentView(WindowImpl* parent);
+  virtual void BecomeContentView(Win32Window* parent);
 
   // Invalidate the |dirty| rect.
   virtual void Invalidate(const Rect& dirty);
@@ -124,7 +124,7 @@ class BaseView {
 
   Color background_color() const { return background_color_; }
 
-  WindowImpl* GetNative() const { return window_; }
+  Win32Window* GetNative() const { return window_; }
   ControlType type() const { return type_; }
 
  protected:
@@ -149,7 +149,7 @@ class BaseView {
   ControlState state_ = ControlState::Normal;
 
   // The window that owns the view.
-  WindowImpl* window_ = nullptr;
+  Win32Window* window_ = nullptr;
 
   // The viewport that owns this view.
   ScrollView* viewport_ = nullptr;
