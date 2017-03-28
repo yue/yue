@@ -2,8 +2,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef NATIVEUI_WIN_SUBWIN_HOLDER_H_
-#define NATIVEUI_WIN_SUBWIN_HOLDER_H_
+#ifndef NATIVEUI_WIN_UTIL_SUBWIN_HOLDER_H_
+#define NATIVEUI_WIN_UTIL_SUBWIN_HOLDER_H_
 
 #include "nativeui/win/util/win32_window.h"
 
@@ -30,4 +30,4 @@ class SubwinHolder : public Win32Window {
 
 }  // namespace nu
 
-#endif  // NATIVEUI_WIN_SUBWIN_HOLDER_H_
+#endif  // NATIVEUI_WIN_UTIL_SUBWIN_HOLDER_H_

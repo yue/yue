@@ -162,12 +162,8 @@ component("nativeui") {
     "win/base_view.h",
     "win/focus_manager.cc",
     "win/focus_manager.h",
-    "win/subwin_holder.cc",
-    "win/subwin_holder.h",
     "win/subwin_view.cc",
     "win/subwin_view.h",
-    "win/util/win32_window.cc",
-    "win/util/win32_window.h",
     "win/lifetime_win.cc",
     "win/accelerator_manager_win.cc",
     "win/button_win.cc",
@@ -206,6 +202,10 @@ component("nativeui") {
     "win/util/hwnd_util.cc",
     "win/util/hwnd_util.h",
     "win/util/msg_util.h",
+    "win/util/subwin_holder.cc",
+    "win/util/subwin_holder.h",
+    "win/util/win32_window.cc",
+    "win/util/win32_window.h",
   ]
 
   deps = [
