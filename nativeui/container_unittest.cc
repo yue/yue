@@ -26,6 +26,7 @@ class ContainerTest : public testing::Test {
  protected:
   void SetUp() override {
     window_ = new nu::Window(nu::Window::Options());
+    window_->SetBounds(nu::RectF(0, 0, 400, 400));
     container_ = new TestContainer;
     window_->SetContentView(container_.get());
   }
