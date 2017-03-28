@@ -31,9 +31,9 @@ class ScrollView : public ContainerView,
 
   // ContainerView::Delegate:
   void Layout() override;
-  std::vector<BaseView*> GetChildren() override;
+  std::vector<ViewImpl*> GetChildren() override;
 
-  // BaseView:
+  // ViewImpl:
   void SizeAllocate(const Rect& size_allocation) override;
   bool OnMouseWheel(bool vertical, UINT flags, int delta,
                     const Point& point) override;

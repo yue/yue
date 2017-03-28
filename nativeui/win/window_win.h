@@ -19,7 +19,7 @@ class WindowImpl : public Win32Window {
   Rect GetPixelBounds();
   Rect GetContentPixelBounds();
 
-  void SetCapture(BaseView* view);
+  void SetCapture(ViewImpl* view);
   void ReleaseCapture();
 
   void SetBackgroundColor(nu::Color color);
@@ -65,7 +65,7 @@ class WindowImpl : public Win32Window {
   bool mouse_in_window_ = false;
 
   // The view that has mouse capture.
-  BaseView* capture_view_ = nullptr;
+  ViewImpl* capture_view_ = nullptr;
 
   // The background color.
   nu::Color background_color_ = nu::Color(0xFF, 0xFF, 0xFF);

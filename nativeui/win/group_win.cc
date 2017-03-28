@@ -55,11 +55,11 @@ class GroupView : public ContainerView,
     delegate_->GetContentView()->GetNative()->SizeAllocate(child_alloc);
   }
 
-  std::vector<BaseView*> GetChildren() override {
-    return std::vector<BaseView*>{delegate_->GetContentView()->GetNative()};
+  std::vector<ViewImpl*> GetChildren() override {
+    return std::vector<ViewImpl*>{delegate_->GetContentView()->GetNative()};
   }
 
-  // BaseView:
+  // ViewImpl:
   void Draw(PainterWin* painter, const Rect& dirty) override {
     // Draw title.
     if (RectF(dirty).Intersects(title_bounds_))

@@ -13,8 +13,8 @@
 #include "nativeui/gfx/geometry/vector2d_conversions.h"
 #include "nativeui/gfx/win/text_win.h"
 #include "nativeui/state.h"
-#include "nativeui/win/base_view.h"
 #include "nativeui/win/util/native_theme.h"
+#include "nativeui/win/view_win.h"
 #include "nativeui/win/window_win.h"
 
 namespace nu {
@@ -24,10 +24,10 @@ namespace {
 const int kButtonPadding = 3;
 const int kCheckBoxPadding = 1;
 
-class ButtonView : public BaseView {
+class ButtonView : public ViewImpl {
  public:
   ButtonView(Button::Type type, Button* delegate)
-      : BaseView(type == Button::Normal ? ControlType::Button
+      : ViewImpl(type == Button::Normal ? ControlType::Button
                     : (type == Button::CheckBox ? ControlType::CheckBox
                                                 : ControlType::Radio)),
         theme_(State::GetCurrent()->GetNativeTheme()),
@@ -152,7 +152,7 @@ class ButtonView : public BaseView {
     // Draw control background as a layer on button background.
     if (has_background_color) {
       painter->ReleaseHDC(dc);
-      BaseView::Draw(painter, dirty);
+      ViewImpl::Draw(painter, dirty);
       dc = painter->GetHDC();
     }
 

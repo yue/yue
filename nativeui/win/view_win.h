@@ -1,10 +1,11 @@
-// Copyright 2016 Cheng Zhao. All rights reserved.
+// Copyright 2017 Cheng Zhao. All rights reserved.
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef NATIVEUI_WIN_BASE_VIEW_H_
-#define NATIVEUI_WIN_BASE_VIEW_H_
+#ifndef NATIVEUI_WIN_VIEW_WIN_H_
+#define NATIVEUI_WIN_VIEW_WIN_H_
 
+#include "nativeui/view.h"
 #include "nativeui/gfx/win/painter_win.h"
 #include "nativeui/win/screen.h"
 #include "nativeui/win/window_win.h"
@@ -40,9 +41,9 @@ enum class ControlType {
 };
 
 // The common base for native window based view and directui view.
-class BaseView {
+class ViewImpl {
  public:
-  virtual ~BaseView() {}
+  virtual ~ViewImpl() {}
 
   /////////////////////////////////////////////////////////////////////////////
   // Core implementations, should be overriden for each kind of view
@@ -51,7 +52,7 @@ class BaseView {
   virtual void SizeAllocate(const Rect& bounds);
 
   // Set the parent view.
-  virtual void SetParent(BaseView* parent);
+  virtual void SetParent(ViewImpl* parent);
   virtual void BecomeContentView(WindowImpl* parent);
 
   // Invalidate the |dirty| rect.
@@ -128,7 +129,7 @@ class BaseView {
   ControlType type() const { return type_; }
 
  protected:
-  explicit BaseView(ControlType type) : type_(type) {}
+  explicit ViewImpl(ControlType type) : type_(type) {}
 
   // Called by SetParent/BecomeContentView when parent view changes.
   void ParentChanged(float old_scale_factor);
@@ -160,9 +161,9 @@ class BaseView {
   // The preferred size of the view.
   Size preferred_size_;
 
-  DISALLOW_COPY_AND_ASSIGN(BaseView);
+  DISALLOW_COPY_AND_ASSIGN(ViewImpl);
 };
 
 }  // namespace nu
 
-#endif  // NATIVEUI_WIN_BASE_VIEW_H_
+#endif  // NATIVEUI_WIN_VIEW_WIN_H_

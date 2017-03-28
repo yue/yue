@@ -8,7 +8,7 @@
 #include "base/win/scoped_hdc.h"
 #include "nativeui/gfx/win/gdiplus.h"
 #include "nativeui/view.h"
-#include "nativeui/win/base_view.h"
+#include "nativeui/win/view_win.h"
 
 namespace nu {
 
@@ -31,7 +31,7 @@ SizeF MeasureText(Font* font, const String& text) {
   return MeasureText(dc.Get(), font, text);
 }
 
-SizeF MeasureText(const nu::BaseView* view, Font* font, const String& text) {
+SizeF MeasureText(const nu::ViewImpl* view, Font* font, const String& text) {
   if (!view->window())
     return MeasureText(font, text);
 

@@ -15,7 +15,7 @@ SubwinView::SubwinView(base::StringPiece16 class_name,
                        DWORD window_style, DWORD window_ex_style)
     : Win32Window(class_name, State::GetCurrent()->GetSubwinHolder(),
                  window_style, window_ex_style),
-      BaseView(ControlType::Subwin) {
+      ViewImpl(ControlType::Subwin) {
   // Create HFONT from default system font.
   base::win::ScopedCreateDC mem_dc(CreateCompatibleDC(NULL));
   Gdiplus::Graphics context(mem_dc.Get());
@@ -31,7 +31,7 @@ SubwinView::~SubwinView() {
 }
 
 void SubwinView::SizeAllocate(const Rect& size_allocation) {
-  BaseView::SizeAllocate(size_allocation);
+  ViewImpl::SizeAllocate(size_allocation);
 
   SetWindowPos(hwnd(), NULL,
                size_allocation.x(), size_allocation.y(),
@@ -40,8 +40,8 @@ void SubwinView::SizeAllocate(const Rect& size_allocation) {
   RedrawWindow(hwnd(), NULL, NULL, RDW_INVALIDATE | RDW_ALLCHILDREN);
 }
 
-void SubwinView::SetParent(BaseView* parent) {
-  BaseView::SetParent(parent);
+void SubwinView::SetParent(ViewImpl* parent) {
+  ViewImpl::SetParent(parent);
   ::SetParent(hwnd(),
               parent && parent->window()
                   ? parent->window()->hwnd()
@@ -49,7 +49,7 @@ void SubwinView::SetParent(BaseView* parent) {
 }
 
 void SubwinView::BecomeContentView(WindowImpl* parent) {
-  BaseView::BecomeContentView(parent);
+  ViewImpl::BecomeContentView(parent);
   ::SetParent(hwnd(), parent ? parent->hwnd()
                              : State::GetCurrent()->GetSubwinHolder());
 }

@@ -11,14 +11,14 @@ namespace nu {
 
 class ScrollBarView;
 
-class ScrollBarThumb : public BaseView {
+class ScrollBarThumb : public ViewImpl {
  public:
   ScrollBarThumb(bool vertical, ScrollBarView* scroll_bar);
   ~ScrollBarThumb() override;
 
   int GetSize() const;
 
-  // BaseView:
+  // ViewImpl:
   void OnMouseEnter() override;
   void OnMouseMove(UINT flags, const Point& point) override;
   void OnMouseLeave() override;

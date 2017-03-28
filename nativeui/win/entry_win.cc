@@ -34,7 +34,7 @@ class EntryView : public SubwinView {
 
   void SetBackgroundColor(Color color) override {
     bg_brush_.reset(CreateSolidBrush(color.ToCOLORREF()));
-    BaseView::SetBackgroundColor(color);
+    ViewImpl::SetBackgroundColor(color);
   }
 
   void OnCommand(UINT code, int command) override {

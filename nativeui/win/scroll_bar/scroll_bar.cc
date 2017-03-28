@@ -112,8 +112,8 @@ void ScrollBarView::Layout() {
   UpdateThumbPosition();
 }
 
-std::vector<BaseView*> ScrollBarView::GetChildren() {
-  return std::vector<BaseView*>{&near_button_, &far_button_, &thumb_};
+std::vector<ViewImpl*> ScrollBarView::GetChildren() {
+  return std::vector<ViewImpl*>{&near_button_, &far_button_, &thumb_};
 }
 
 void ScrollBarView::OnMouseEnter() {
@@ -168,7 +168,7 @@ void ScrollBarView::Draw(PainterWin* painter, const Rect& dirty) {
 
 void ScrollBarView::UpdateThumbPosition() {
   // The size of contents and viewport.
-  BaseView* contents = scroll_->delegate()->GetContentView()->GetNative();
+  ViewImpl* contents = scroll_->delegate()->GetContentView()->GetNative();
   contents_size_ = vertical_ ? contents->size_allocation().height()
                              : contents->size_allocation().width();
   Rect viewport(scroll_->GetViewportRect());

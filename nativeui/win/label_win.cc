@@ -9,15 +9,15 @@
 #include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/win/text_win.h"
 #include "nativeui/state.h"
-#include "nativeui/win/base_view.h"
+#include "nativeui/win/view_win.h"
 
 namespace nu {
 
 namespace {
 
-class LabelView : public BaseView {
+class LabelView : public ViewImpl {
  public:
-  LabelView() : BaseView(ControlType::Label),
+  LabelView() : ViewImpl(ControlType::Label),
                 color_(GetThemeColor(ThemeColor::Text)),
                 font_(State::GetCurrent()->GetDefaultFont()) {
   }
@@ -30,9 +30,9 @@ class LabelView : public BaseView {
     return text_;
   }
 
-  // BaseView:
+  // ViewImpl:
   void Draw(PainterWin* painter, const Rect& dirty) override {
-    BaseView::Draw(painter, dirty);
+    ViewImpl::Draw(painter, dirty);
     painter->DrawPixelStringWithFlags(text_, font(),
                                       RectF(SizeF(size_allocation().size())),
                                       Painter::TextAlignCenter);

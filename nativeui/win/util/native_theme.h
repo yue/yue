@@ -18,7 +18,7 @@
 #include "nativeui/gfx/color.h"
 #include "nativeui/gfx/geometry/rect.h"
 #include "nativeui/gfx/geometry/size.h"
-#include "nativeui/win/base_view.h"
+#include "nativeui/win/view_win.h"
 
 namespace nu {
 

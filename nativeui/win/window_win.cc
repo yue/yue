@@ -55,7 +55,7 @@ Rect WindowImpl::GetContentPixelBounds() {
   return Rect(point.x, point.y, r.right - r.left, r.bottom - r.top);
 }
 
-void WindowImpl::SetCapture(BaseView* view) {
+void WindowImpl::SetCapture(ViewImpl* view) {
   capture_view_ = view;
   ::SetCapture(hwnd());
 }

@@ -10,9 +10,9 @@
 
 namespace nu {
 
-class BaseView;
+class ViewImpl;
 
-SizeF MeasureText(const nu::BaseView* view, Font* font, const String& text);
+SizeF MeasureText(const nu::ViewImpl* view, Font* font, const String& text);
 
 }  // namespace nu
 

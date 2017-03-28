@@ -5,7 +5,7 @@
 #include "nativeui/win/focus_manager.h"
 
 #include "nativeui/group.h"
-#include "nativeui/win/base_view.h"
+#include "nativeui/win/view_win.h"
 
 namespace nu {
 

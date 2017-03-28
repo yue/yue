@@ -60,7 +60,7 @@ class Image;
 namespace nu {
 
 #if defined(OS_WIN)
-class BaseView;
+class ViewImpl;
 struct MenuItemData;
 class WindowImpl;
 #endif
@@ -86,7 +86,7 @@ using NativeFont = PangoFontDescription*;
 using NativeMenu = GtkMenuShell*;
 using NativeMenuItem = GtkMenuItem*;
 #elif defined(OS_WIN)
-using NativeView = BaseView*;
+using NativeView = ViewImpl*;
 using NativeWindow = WindowImpl*;
 using NativeFont = Gdiplus::Font*;
 using NativeImage = Gdiplus::Image*;

@@ -72,8 +72,8 @@ void ScrollView::Layout() {
   }
 }
 
-std::vector<BaseView*> ScrollView::GetChildren() {
-  std::vector<BaseView*> children{delegate_->GetContentView()->GetNative()};
+std::vector<ViewImpl*> ScrollView::GetChildren() {
+  std::vector<ViewImpl*> children{delegate_->GetContentView()->GetNative()};
   if (h_scrollbar_)
     children.push_back(h_scrollbar_.get());
   if (v_scrollbar_)
@@ -82,7 +82,7 @@ std::vector<BaseView*> ScrollView::GetChildren() {
 }
 
 void ScrollView::SizeAllocate(const Rect& size_allocation) {
-  BaseView::SizeAllocate(size_allocation);
+  ViewImpl::SizeAllocate(size_allocation);
   UpdateScrollbar();
   UpdateOrigin(origin_);
   Layout();

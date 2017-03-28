@@ -10,17 +10,17 @@
 namespace nu {
 
 ContainerView::ContainerView(Delegate* delegate, ControlType type)
-    : BaseView(type), delegate_(delegate) {}
+    : ViewImpl(type), delegate_(delegate) {}
 
 void ContainerView::SizeAllocate(const Rect& size_allocation) {
-  BaseView::SizeAllocate(size_allocation);
+  ViewImpl::SizeAllocate(size_allocation);
   if (!size_allocation.size().IsEmpty())
     delegate_->Layout();
 }
 
 void ContainerView::OnMouseMove(UINT flags, const Point& point) {
   // Find the view that has the mouse.
-  BaseView* hover_view = FindChildFromPoint(point);
+  ViewImpl* hover_view = FindChildFromPoint(point);
 
   // Emit mouse enter/leave events
   if (hover_view_ != hover_view) {
@@ -46,37 +46,37 @@ void ContainerView::OnMouseLeave() {
 
 bool ContainerView::OnMouseWheel(bool vertical, UINT flags, int delta,
                                  const Point& point) {
-  BaseView* child = FindChildFromPoint(point);
+  ViewImpl* child = FindChildFromPoint(point);
   if (child)
     return child->OnMouseWheel(vertical, flags, delta, point);
   return false;
 }
 
 bool ContainerView::OnMouseClick(UINT message, UINT flags, const Point& point) {
-  BaseView* child = FindChildFromPoint(point);
+  ViewImpl* child = FindChildFromPoint(point);
   if (child)
     return child->OnMouseClick(message, flags, point);
   return false;
 }
 
 void ContainerView::Draw(PainterWin* painter, const Rect& dirty) {
-  BaseView::Draw(painter, dirty);
+  ViewImpl::Draw(painter, dirty);
   delegate_->OnDraw(painter, dirty);
-  for (BaseView* child : delegate_->GetChildren())
+  for (ViewImpl* child : delegate_->GetChildren())
     DrawChild(child, painter, dirty);
 }
 
-void ContainerView::SetParent(BaseView* parent) {
-  BaseView::SetParent(parent);
+void ContainerView::SetParent(ViewImpl* parent) {
+  ViewImpl::SetParent(parent);
   RefreshParentTree();
 }
 
 void ContainerView::BecomeContentView(WindowImpl* parent) {
-  BaseView::BecomeContentView(parent);
+  ViewImpl::BecomeContentView(parent);
   RefreshParentTree();
 }
 
-void ContainerView::DrawChild(BaseView* child, PainterWin* painter,
+void ContainerView::DrawChild(ViewImpl* child, PainterWin* painter,
                               const Rect& dirty) {
   if (!child->is_visible())
     return;
@@ -99,13 +99,13 @@ void ContainerView::DrawChild(BaseView* child, PainterWin* painter,
 
 void ContainerView::RefreshParentTree() {
   const auto& children = delegate_->GetChildren();
-  for (BaseView* child : children)
+  for (ViewImpl* child : children)
     child->SetParent(this);
 }
 
-BaseView* ContainerView::FindChildFromPoint(const Point& point) {
+ViewImpl* ContainerView::FindChildFromPoint(const Point& point) {
   const auto& children = delegate_->GetChildren();
-  for (BaseView* child : children) {
+  for (ViewImpl* child : children) {
     if (!child->is_visible())
       continue;
     Rect child_rect = child->GetClippedRect();
@@ -131,8 +131,8 @@ class ContainerAdapter : public ContainerView,
     container_->BoundsChanged();
   }
 
-  std::vector<BaseView*> GetChildren() override {
-    std::vector<BaseView*> views(container_->ChildCount());
+  std::vector<ViewImpl*> GetChildren() override {
+    std::vector<ViewImpl*> views(container_->ChildCount());
     for (int i = 0; i < container_->ChildCount(); ++i)
       views[i] = container_->ChildAt(i)->GetNative();
     return views;

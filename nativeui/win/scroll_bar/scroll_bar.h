@@ -30,9 +30,9 @@ class ScrollBarView : public ContainerView,
 
   // ContainerView::Delegate:
   void Layout() override;
-  std::vector<BaseView*> GetChildren() override;
+  std::vector<ViewImpl*> GetChildren() override;
 
-  // BaseView:
+  // ViewImpl:
   void OnMouseEnter() override;
   void OnMouseLeave() override;
   bool OnMouseClick(UINT message, UINT flags, const Point& point) override;

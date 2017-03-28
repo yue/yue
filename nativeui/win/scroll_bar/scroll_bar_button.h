@@ -12,7 +12,7 @@ namespace nu {
 
 class ScrollBarView;
 
-class ScrollBarButton : public BaseView {
+class ScrollBarButton : public ViewImpl {
  public:
   enum Type {
     Up,
@@ -24,7 +24,7 @@ class ScrollBarButton : public BaseView {
   ScrollBarButton(Type type, ScrollBarView* scroll_bar);
   ~ScrollBarButton() override;
 
-  // BaseView:
+  // ViewImpl:
   void OnMouseEnter() override;
   void OnMouseLeave() override;
   bool OnMouseClick(UINT message, UINT flags, const Point& point) override;
