@@ -10,7 +10,7 @@
 
 namespace nu {
 
-class ScrollBarView;
+class ScrollBar;
 
 class ScrollBarButton : public ViewImpl {
  public:
@@ -21,7 +21,7 @@ class ScrollBarButton : public ViewImpl {
     Right,
   };
 
-  ScrollBarButton(Type type, ScrollBarView* scroll_bar);
+  ScrollBarButton(Type type, ScrollBar* scroll_bar);
   ~ScrollBarButton() override;
 
   // ViewImpl:
@@ -43,7 +43,7 @@ class ScrollBarButton : public ViewImpl {
   RepeatController repeater_;
 
   Type type_;
-  ScrollBarView* scroll_bar_;  // weak ref
+  ScrollBar* scroll_bar_;  // weak ref
 };
 
 }  // namespace nu

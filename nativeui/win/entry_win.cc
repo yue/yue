@@ -18,9 +18,9 @@ namespace {
 
 const int kEntryPadding = 1;
 
-class EntryView : public SubwinView {
+class EntryImpl : public SubwinView {
  public:
-  explicit EntryView(Entry* delegate)
+  explicit EntryImpl(Entry* delegate)
       : SubwinView(L"edit",
                    ES_AUTOHSCROLL | WS_CHILD | WS_VISIBLE,
                    WS_EX_CLIENTEDGE),
@@ -53,7 +53,7 @@ class EntryView : public SubwinView {
  protected:
   static LRESULT WndProc(HWND hwnd, UINT message, WPARAM w_param,
                          LPARAM l_param) {
-    auto* self = reinterpret_cast<EntryView*>(GetWindowUserData(hwnd));
+    auto* self = reinterpret_cast<EntryImpl*>(GetWindowUserData(hwnd));
     if (message == WM_CHAR && w_param == VK_RETURN) {
       // Pressing enter means activate.
       self->delegate_->on_activate.Emit();
@@ -81,9 +81,8 @@ class EntryView : public SubwinView {
 
 }  // namespace
 
-
 Entry::Entry() {
-  TakeOverView(new EntryView(this));
+  TakeOverView(new EntryImpl(this));
 
   Font* font = State::GetCurrent()->GetDefaultFont();
   float height = MeasureText(GetNative(), font, L"some text").height() +

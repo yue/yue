@@ -20,11 +20,11 @@ namespace {
 // The offset of title to left of rect.
 const int kTitleLeftMargin = 5;
 
-class GroupView : public ContainerView,
-                  public ContainerView::Delegate {
+class GroupImpl : public ContainerImpl,
+                  public ContainerImpl::Delegate {
  public:
-  explicit GroupView(Group* delegate)
-      : ContainerView(this, ControlType::Group),
+  explicit GroupImpl(Group* delegate)
+      : ContainerImpl(this, ControlType::Group),
         delegate_(delegate),
         color_(GetThemeColor(ThemeColor::Text)),
         font_(State::GetCurrent()->GetDefaultFont()) {}
@@ -48,7 +48,7 @@ class GroupView : public ContainerView,
                   padding * 2, padding * 2);
   }
 
-  // ContainerView:
+  // ContainerImpl:
   void Layout() override {
     Rect child_alloc(size_allocation());
     child_alloc.Inset(GetBorder());
@@ -103,25 +103,25 @@ class GroupView : public ContainerView,
 }  // namespace
 
 void Group::PlatformInit() {
-  TakeOverView(new GroupView(this));
+  TakeOverView(new GroupImpl(this));
 }
 
 void Group::PlatformSetContentView(Container* container) {
   container->GetNative()->SetParent(GetNative());
-  static_cast<GroupView*>(GetNative())->Layout();
+  static_cast<GroupImpl*>(GetNative())->Layout();
 }
 
 void Group::SetTitle(const std::string& title) {
-  static_cast<GroupView*>(GetNative())->SetTitle(base::UTF8ToUTF16(title));
+  static_cast<GroupImpl*>(GetNative())->SetTitle(base::UTF8ToUTF16(title));
   GetNative()->Invalidate();
 }
 
 std::string Group::GetTitle() const {
-  return base::UTF16ToUTF8(static_cast<GroupView*>(GetNative())->GetTitle());
+  return base::UTF16ToUTF8(static_cast<GroupImpl*>(GetNative())->GetTitle());
 }
 
 SizeF Group::GetBorderSize() const {
-  GroupView* group = static_cast<GroupView*>(GetNative());
+  GroupImpl* group = static_cast<GroupImpl*>(GetNative());
   Rect bounds;
   bounds.Inset(-group->GetBorder());
   return ScaleSize(SizeF(bounds.size()), 1.0f / group->scale_factor());

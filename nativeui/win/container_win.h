@@ -13,7 +13,7 @@
 namespace nu {
 
 // The common base for views that have children.
-class ContainerView : public ViewImpl {
+class ContainerImpl : public ViewImpl {
  public:
   class Delegate {
    public:
@@ -24,7 +24,7 @@ class ContainerView : public ViewImpl {
     virtual void OnDraw(PainterWin* painter, const Rect& dirty) {}
   };
 
-  ContainerView(Delegate* delegate, ControlType type);
+  ContainerImpl(Delegate* delegate, ControlType type);
 
   // Baseview:
   void SizeAllocate(const Rect& size_allocation) override;

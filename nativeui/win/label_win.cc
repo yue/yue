@@ -15,9 +15,9 @@ namespace nu {
 
 namespace {
 
-class LabelView : public ViewImpl {
+class LabelImpl : public ViewImpl {
  public:
-  LabelView() : ViewImpl(ControlType::Label),
+  LabelImpl() : ViewImpl(ControlType::Label),
                 color_(GetThemeColor(ThemeColor::Text)),
                 font_(State::GetCurrent()->GetDefaultFont()) {
   }
@@ -50,7 +50,7 @@ class LabelView : public ViewImpl {
 }  // namespace
 
 Label::Label(const std::string& text) {
-  TakeOverView(new LabelView());
+  TakeOverView(new LabelImpl());
   SetText(text);
 }
 
@@ -58,7 +58,7 @@ Label::~Label() {
 }
 
 void Label::SetText(const std::string& text) {
-  LabelView* label = static_cast<LabelView*>(GetNative());
+  LabelImpl* label = static_cast<LabelImpl*>(GetNative());
   base::string16 wtext = base::UTF8ToUTF16(text);
   label->SetText(wtext);
 
@@ -68,7 +68,7 @@ void Label::SetText(const std::string& text) {
 }
 
 std::string Label::GetText() {
-  LabelView* label = static_cast<LabelView*>(GetNative());
+  LabelImpl* label = static_cast<LabelImpl*>(GetNative());
   return base::UTF16ToUTF8(label->GetText());
 }
 

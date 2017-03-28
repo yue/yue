@@ -9,11 +9,11 @@
 
 namespace nu {
 
-class ScrollBarView;
+class ScrollBar;
 
 class ScrollBarThumb : public ViewImpl {
  public:
-  ScrollBarThumb(bool vertical, ScrollBarView* scroll_bar);
+  ScrollBarThumb(bool vertical, ScrollBar* scroll_bar);
   ~ScrollBarThumb() override;
 
   int GetSize() const;
@@ -39,7 +39,7 @@ class ScrollBarThumb : public ViewImpl {
   int last_value_ = 0;
 
   bool vertical_;
-  ScrollBarView* scroll_bar_;  // weak ref
+  ScrollBar* scroll_bar_;  // weak ref
 };
 
 }  // namespace nu

@@ -12,16 +12,16 @@ namespace nu {
 
 namespace {
 
-class ProgressView : public SubwinView {
+class ProgressImpl : public SubwinView {
  public:
-  ProgressView()
+  ProgressImpl()
       : SubwinView(PROGRESS_CLASS, PBS_SMOOTH | WS_CHILD | WS_VISIBLE) {}
 };
 
 }  // namespace
 
 Progress::Progress() {
-  TakeOverView(new ProgressView());
+  TakeOverView(new ProgressImpl());
   SetDefaultStyle(ScaleSize(SizeF(0, GetSystemMetrics(SM_CYVSCROLL)),
                             1.0f / GetNative()->scale_factor()));
 }
@@ -30,7 +30,7 @@ Progress::~Progress() {
 }
 
 void Progress::SetValue(int value) {
-  auto* progress = static_cast<ProgressView*>(GetNative());
+  auto* progress = static_cast<ProgressImpl*>(GetNative());
   SetIndeterminate(false);
   SendMessageW(progress->hwnd(), PBM_SETPOS, value, 0);
 }
@@ -40,7 +40,7 @@ int Progress::GetValue() const {
 }
 
 void Progress::SetIndeterminate(bool indeterminate) {
-  auto* progress = static_cast<ProgressView*>(GetNative());
+  auto* progress = static_cast<ProgressImpl*>(GetNative());
   DWORD style = GetWindowLong(progress->hwnd(), GWL_STYLE);
   if (indeterminate) {
     SetWindowLong(progress->hwnd(), GWL_STYLE, style | PBS_MARQUEE);
@@ -52,7 +52,7 @@ void Progress::SetIndeterminate(bool indeterminate) {
 }
 
 bool Progress::IsIndeterminate() const {
-  auto* progress = static_cast<ProgressView*>(GetNative());
+  auto* progress = static_cast<ProgressImpl*>(GetNative());
   return (GetWindowLong(progress->hwnd(), GWL_STYLE) & PBS_MARQUEE) != 0;
 }
 

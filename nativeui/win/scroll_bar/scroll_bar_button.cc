@@ -10,7 +10,7 @@
 
 namespace nu {
 
-ScrollBarButton::ScrollBarButton(Type type, ScrollBarView* scroll_bar)
+ScrollBarButton::ScrollBarButton(Type type, ScrollBar* scroll_bar)
     : ViewImpl(ControlType::ScrollBarButton),
       theme_(State::GetCurrent()->GetNativeTheme()),
       repeater_(base::Bind(&ScrollBarButton::OnClick, base::Unretained(this))),

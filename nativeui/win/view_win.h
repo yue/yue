@@ -12,7 +12,7 @@
 
 namespace nu {
 
-class ScrollView;
+class ScrollImpl;
 class WindowImpl;
 
 // The state of the control.
@@ -153,7 +153,7 @@ class ViewImpl {
   WindowImpl* window_ = nullptr;
 
   // The viewport that owns this view.
-  ScrollView* viewport_ = nullptr;
+  ScrollImpl* viewport_ = nullptr;
 
   // The absolute bounds relative to the origin of window.
   Rect size_allocation_;

@@ -27,7 +27,7 @@ void ViewImpl::SetParent(ViewImpl* parent) {
   if (parent) {
     if (parent->type() == ControlType::Scroll &&
         type() != ControlType::ScrollBar)
-      viewport_ = static_cast<ScrollView*>(parent);
+      viewport_ = static_cast<ScrollImpl*>(parent);
     else
       viewport_ = parent->viewport_;
   } else {

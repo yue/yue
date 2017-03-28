@@ -14,11 +14,11 @@
 namespace nu {
 
 // Draws the native scroll bar.
-class ScrollBarView : public ContainerView,
-                      public ContainerView::Delegate {
+class ScrollBar : public ContainerImpl,
+                      public ContainerImpl::Delegate {
  public:
-  ScrollBarView(bool vertical, ScrollView* scroll);
-  ~ScrollBarView() override;
+  ScrollBar(bool vertical, ScrollImpl* scroll);
+  ~ScrollBar() override;
 
   void LineUp();
   void LineDown();
@@ -28,7 +28,7 @@ class ScrollBarView : public ContainerView,
   int GetValue() const;
   void SetValue(int value);
 
-  // ContainerView::Delegate:
+  // ContainerImpl::Delegate:
   void Layout() override;
   std::vector<ViewImpl*> GetChildren() override;
 
@@ -61,7 +61,7 @@ class ScrollBarView : public ContainerView,
   RepeatController repeater_;
 
   bool vertical_;
-  ScrollView* scroll_;  // weak ref
+  ScrollImpl* scroll_;  // weak ref
 };
 
 }  // namespace nu

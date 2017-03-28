@@ -24,9 +24,9 @@ namespace {
 const int kButtonPadding = 3;
 const int kCheckBoxPadding = 1;
 
-class ButtonView : public ViewImpl {
+class ButtonImpl : public ViewImpl {
  public:
-  ButtonView(Button::Type type, Button* delegate)
+  ButtonImpl(Button::Type type, Button* delegate)
       : ViewImpl(type == Button::Normal ? ControlType::Button
                     : (type == Button::CheckBox ? ControlType::CheckBox
                                                 : ControlType::Radio)),
@@ -231,7 +231,7 @@ class ButtonView : public ViewImpl {
 }  // namespace
 
 Button::Button(const std::string& title, Type type) {
-  TakeOverView(new ButtonView(type, this));
+  TakeOverView(new ButtonImpl(type, this));
   SetTitle(title);
 }
 
@@ -239,7 +239,7 @@ Button::~Button() {
 }
 
 void Button::SetTitle(const std::string& title) {
-  auto* button = static_cast<ButtonView*>(GetNative());
+  auto* button = static_cast<ButtonImpl*>(GetNative());
   base::string16 wtitle = base::UTF8ToUTF16(title);
   button->SetTitle(wtitle);
 
@@ -249,15 +249,15 @@ void Button::SetTitle(const std::string& title) {
 }
 
 std::string Button::GetTitle() const {
-  return base::UTF16ToUTF8(static_cast<ButtonView*>(GetNative())->GetTitle());
+  return base::UTF16ToUTF8(static_cast<ButtonImpl*>(GetNative())->GetTitle());
 }
 
 void Button::SetChecked(bool checked) {
-  static_cast<ButtonView*>(GetNative())->SetChecked(checked);
+  static_cast<ButtonImpl*>(GetNative())->SetChecked(checked);
 }
 
 bool Button::IsChecked() const {
-  return static_cast<ButtonView*>(GetNative())->IsChecked();
+  return static_cast<ButtonImpl*>(GetNative())->IsChecked();
 }
 
 }  // namespace nu
