@@ -78,6 +78,12 @@ typedef struct YGStyle {
   float aspectRatio;
 } YGStyle;
 
+typedef struct YGConfig {
+  bool experimentalFeatures[YGExperimentalFeatureCount + 1];
+  bool useWebDefaults;
+  float pointScaleFactor;
+} YGConfig;
+
 typedef struct YGNode {
   YGStyle style;
   YGLayout layout;
@@ -91,6 +97,7 @@ typedef struct YGNode {
   YGMeasureFunc measure;
   YGBaselineFunc baseline;
   YGPrintFunc print;
+  YGConfigRef config;
   void *context;
 
   bool isDirty;
@@ -108,7 +115,8 @@ bool YGLayoutNodeInternal(const YGNodeRef node,
                           const float parentWidth,
                           const float parentHeight,
                           const bool performLayout,
-                          const char *reason);
+                          const char *reason,
+                          const YGConfigRef config);
 
 }  // extern "C"
 
@@ -171,7 +179,8 @@ SizeF Container::GetPreferredSize() const {
   float float_max = std::numeric_limits<float>::max();
   YGLayoutNodeInternal(node(), float_max, float_max, YGDirectionLTR,
                        YGMeasureModeAtMost, YGMeasureModeAtMost,
-                       float_max, float_max, false, "GetPreferredSize");
+                       float_max, float_max, false, "GetPreferredSize",
+                       node()->config);
   return SizeF(node()->layout.measuredDimensions[YGDimensionWidth],
                node()->layout.measuredDimensions[YGDimensionHeight]);
 }
@@ -180,7 +189,8 @@ float Container::GetPreferredHeightForWidth(float width) const {
   float float_max = std::numeric_limits<float>::max();
   YGLayoutNodeInternal(node(), width, float_max, YGDirectionLTR,
                        YGMeasureModeExactly, YGMeasureModeAtMost, float_max,
-                       float_max, false, "GetPreferredHeightForWidth");
+                       float_max, false, "GetPreferredHeightForWidth",
+                       node()->config);
   return node()->layout.measuredDimensions[YGDimensionHeight];
 }
 
@@ -188,7 +198,8 @@ float Container::GetPreferredWidthForHeight(float height) const {
   float float_max = std::numeric_limits<float>::max();
   YGLayoutNodeInternal(node(), float_max, height, YGDirectionLTR,
                        YGMeasureModeAtMost, YGMeasureModeExactly, float_max,
-                       float_max, false, "GetPreferredWidthForHeight");
+                       float_max, false, "GetPreferredWidthForHeight",
+                       node()->config);
   return node()->layout.measuredDimensions[YGDimensionWidth];
 }
 
