@@ -82,8 +82,10 @@ void ViewImpl::SetBackgroundColor(Color color) {
 }
 
 void ViewImpl::Draw(PainterWin* painter, const Rect& dirty) {
-  painter->SetColor(background_color_);
-  painter->FillPixelRect(RectF(dirty));
+  if (!background_color_.transparent()) {
+    painter->SetColor(background_color_);
+    painter->FillPixelRect(RectF(dirty));
+  }
 }
 
 Point ViewImpl::GetMousePosition() const {

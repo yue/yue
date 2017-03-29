@@ -53,6 +53,8 @@ class NATIVEUI_EXPORT Color {
   unsigned g() const { return ((value_) >>  8) & 0xFF; }
   unsigned b() const { return ((value_) >>  0) & 0xFF; }
 
+  bool transparent() const { return a() == 0; }
+
   bool operator==(Color other) const {
     return value_ == other.value_;
   }

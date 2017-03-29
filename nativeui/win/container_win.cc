@@ -30,16 +30,19 @@ void ContainerImpl::BecomeContentView(WindowImpl* parent) {
 
 void ContainerImpl::SetVisible(bool visible) {
   ViewImpl::SetVisible(visible);
-  const auto& children = delegate_->GetChildren();
-  for (ViewImpl* child : children)
+  delegate_->ForEach([=](ViewImpl* child) {
     child->SetVisible(visible);
+    return true;
+  });
 }
 
 void ContainerImpl::Draw(PainterWin* painter, const Rect& dirty) {
   ViewImpl::Draw(painter, dirty);
   delegate_->OnDraw(painter, dirty);
-  for (ViewImpl* child : delegate_->GetChildren())
+  delegate_->ForEach([&](ViewImpl* child) {
     DrawChild(child, painter, dirty);
+    return true;
+  });
 }
 
 void ContainerImpl::OnMouseMove(UINT flags, const Point& point) {
@@ -48,8 +51,7 @@ void ContainerImpl::OnMouseMove(UINT flags, const Point& point) {
 
   // Emit mouse enter/leave events
   if (hover_view_ != hover_view) {
-    if (hover_view_ &&
-        base::ContainsValue(delegate_->GetChildren(), hover_view_))
+    if (hover_view_ && delegate_->HasChild(hover_view_))
       hover_view_->OnMouseLeave();
     hover_view_ = hover_view;
     if (hover_view_)
@@ -62,7 +64,7 @@ void ContainerImpl::OnMouseMove(UINT flags, const Point& point) {
 
 void ContainerImpl::OnMouseLeave() {
   if (hover_view_) {
-    if (base::ContainsValue(delegate_->GetChildren(), hover_view_))
+    if (delegate_->HasChild(hover_view_))
       hover_view_->OnMouseLeave();
     hover_view_ = nullptr;
   }
@@ -105,21 +107,25 @@ void ContainerImpl::DrawChild(ViewImpl* child, PainterWin* painter,
 }
 
 void ContainerImpl::RefreshParentTree() {
-  const auto& children = delegate_->GetChildren();
-  for (ViewImpl* child : children)
+  delegate_->ForEach([this](ViewImpl* child) {
     child->SetParent(this);
+    return true;
+  });
 }
 
 ViewImpl* ContainerImpl::FindChildFromPoint(const Point& point) {
-  const auto& children = delegate_->GetChildren();
-  for (ViewImpl* child : children) {
+  ViewImpl* result = nullptr;
+  delegate_->ForEach([&](ViewImpl* child) {
     if (!child->is_visible())
-      continue;
+      return true;
     Rect child_rect = child->GetClippedRect();
-    if (child_rect.Contains(point))
-      return child;
-  }
-  return nullptr;
+    if (child_rect.Contains(point)) {
+      result = child;
+      return false;
+    }
+    return true;
+  });
+  return result;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -138,11 +144,19 @@ class ContainerAdapter : public ContainerImpl,
     container_->BoundsChanged();
   }
 
-  std::vector<ViewImpl*> GetChildren() override {
-    std::vector<ViewImpl*> views(container_->ChildCount());
-    for (int i = 0; i < container_->ChildCount(); ++i)
-      views[i] = container_->ChildAt(i)->GetNative();
-    return views;
+  void ForEach(const std::function<bool(ViewImpl*)>& callback) override {
+    for (int i = 0; i < container_->ChildCount(); ++i) {
+      if (!callback(container_->ChildAt(i)->GetNative()))
+        break;
+    }
+  }
+
+  bool HasChild(ViewImpl* child) override {
+    for (int i = 0; i < container_->ChildCount(); ++i) {
+      if (child == container_->ChildAt(i)->GetNative())
+        return true;
+    }
+    return false;
   }
 
   void OnDraw(PainterWin* painter, const Rect& dirty) override {

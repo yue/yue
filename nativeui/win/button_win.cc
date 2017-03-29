@@ -139,9 +139,6 @@ class ButtonImpl : public ViewImpl {
     Size size = size_allocation().size();
     Size preferred_size = ToCeiledSize(GetPreferredSize());
 
-    // Whether there is a non-transparent background color.
-    bool has_background_color = background_color().a() != 0;
-
     HDC dc = painter->GetHDC();
 
     // Draw the button background,
@@ -151,7 +148,7 @@ class ButtonImpl : public ViewImpl {
                               params_);
 
     // Draw control background as a layer on button background.
-    if (has_background_color) {
+    if (!background_color().transparent()) {
       painter->ReleaseHDC(dc);
       ViewImpl::Draw(painter, dirty);
       dc = painter->GetHDC();

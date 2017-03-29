@@ -112,8 +112,12 @@ void ScrollBar::Layout() {
   UpdateThumbPosition();
 }
 
-std::vector<ViewImpl*> ScrollBar::GetChildren() {
-  return std::vector<ViewImpl*>{&near_button_, &far_button_, &thumb_};
+void ScrollBar::ForEach(const std::function<bool(ViewImpl*)>& callback) {
+  callback(&near_button_) && callback(&far_button_) && callback(&thumb_);
+}
+
+bool ScrollBar::HasChild(ViewImpl* child) {
+  return child == &near_button_ || child == &far_button_ || child == &thumb_;
 }
 
 void ScrollBar::OnMouseEnter() {

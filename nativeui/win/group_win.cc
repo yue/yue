@@ -55,8 +55,12 @@ class GroupImpl : public ContainerImpl,
     delegate_->GetContentView()->GetNative()->SizeAllocate(child_alloc);
   }
 
-  std::vector<ViewImpl*> GetChildren() override {
-    return std::vector<ViewImpl*>{delegate_->GetContentView()->GetNative()};
+  void ForEach(const std::function<bool(ViewImpl*)>& callback) override {
+    callback(delegate_->GetContentView()->GetNative());
+  }
+
+  bool HasChild(ViewImpl* child) override {
+    return child == delegate_->GetContentView()->GetNative();
   }
 
   // ViewImpl:

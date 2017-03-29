@@ -15,7 +15,7 @@ namespace nu {
 
 // Draws the native scroll bar.
 class ScrollBar : public ContainerImpl,
-                      public ContainerImpl::Delegate {
+                  public ContainerImpl::Delegate {
  public:
   ScrollBar(bool vertical, ScrollImpl* scroll);
   ~ScrollBar() override;
@@ -30,7 +30,8 @@ class ScrollBar : public ContainerImpl,
 
   // ContainerImpl::Delegate:
   void Layout() override;
-  std::vector<ViewImpl*> GetChildren() override;
+  void ForEach(const std::function<bool(ViewImpl*)>& callback) override;
+  bool HasChild(ViewImpl* child) override;
 
   // ViewImpl:
   void OnMouseEnter() override;

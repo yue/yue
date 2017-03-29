@@ -72,13 +72,13 @@ void ScrollImpl::Layout() {
   }
 }
 
-std::vector<ViewImpl*> ScrollImpl::GetChildren() {
-  std::vector<ViewImpl*> children{delegate_->GetContentView()->GetNative()};
-  if (h_scrollbar_)
-    children.push_back(h_scrollbar_.get());
-  if (v_scrollbar_)
-    children.push_back(v_scrollbar_.get());
-  return children;
+void ScrollImpl::ForEach(const std::function<bool(ViewImpl*)>& callback) {
+  h_scrollbar_ && callback(h_scrollbar_.get()) &&
+  v_scrollbar_ && callback(v_scrollbar_.get());
+}
+
+bool ScrollImpl::HasChild(ViewImpl* child) {
+  return child == h_scrollbar_.get() || child == v_scrollbar_.get();
 }
 
 void ScrollImpl::SizeAllocate(const Rect& size_allocation) {
@@ -86,15 +86,6 @@ void ScrollImpl::SizeAllocate(const Rect& size_allocation) {
   UpdateScrollbar();
   UpdateOrigin(origin_);
   Layout();
-}
-
-bool ScrollImpl::OnMouseWheel(bool vertical, UINT flags, int delta,
-                              const Point& point) {
-  if (vertical)
-    OnScroll(0, delta);
-  else
-    OnScroll(-delta, 0);
-  return true;
 }
 
 void ScrollImpl::Draw(PainterWin* painter, const Rect& dirty) {
@@ -107,6 +98,15 @@ void ScrollImpl::Draw(PainterWin* painter, const Rect& dirty) {
   RectF clip(GetViewportRect() - size_allocation().OffsetFromOrigin());
   painter->ClipPixelRect(clip, Painter::CombineMode::Replace);
   DrawChild(delegate_->GetContentView()->GetNative(), painter, dirty);
+}
+
+bool ScrollImpl::OnMouseWheel(bool vertical, UINT flags, int delta,
+                              const Point& point) {
+  if (vertical)
+    OnScroll(0, delta);
+  else
+    OnScroll(-delta, 0);
+  return true;
 }
 
 void ScrollImpl::UpdateScrollbar() {

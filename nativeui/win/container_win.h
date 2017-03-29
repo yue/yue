@@ -5,6 +5,7 @@
 #ifndef NATIVEUI_WIN_CONTAINER_WIN_H_
 #define NATIVEUI_WIN_CONTAINER_WIN_H_
 
+#include <functional>
 #include <vector>
 
 #include "nativeui/container.h"
@@ -20,7 +21,8 @@ class ContainerImpl : public ViewImpl {
     virtual ~Delegate() = default;
 
     virtual void Layout() = 0;
-    virtual std::vector<ViewImpl*> GetChildren() = 0;
+    virtual void ForEach(const std::function<bool(ViewImpl*)>& callback) = 0;
+    virtual bool HasChild(ViewImpl* child) = 0;
     virtual void OnDraw(PainterWin* painter, const Rect& dirty) {}
   };
 
