@@ -13,8 +13,10 @@
 #include "nativeui/gfx/win/painter_win.h"
 #include "nativeui/menu_bar.h"
 #include "nativeui/win/menu_base_win.h"
+#include "nativeui/win/screen.h"
 #include "nativeui/win/subwin_view.h"
 #include "nativeui/win/util/hwnd_util.h"
+#include "third_party/yoga/yoga/Yoga.h"
 
 namespace nu {
 
@@ -216,11 +218,12 @@ void WindowImpl::TrackMouse(bool enable) {
 // Public Window API implementation.
 
 void Window::PlatformInit(const Options& options) {
-  WindowImpl* win = new WindowImpl(this);
-  window_ = win;
-
+  window_ = new WindowImpl(this);
   if (!options.bounds.IsEmpty())
     SetBounds(options.bounds);
+
+  YGConfigSetPointScaleFactor(yoga_config_,
+                              GetScaleFactorForHWND(window_->hwnd()));
 }
 
 void Window::PlatformDestroy() {

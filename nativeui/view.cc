@@ -16,9 +16,9 @@ const char View::kClassName[] = "View";
 
 View::View() : view_(nullptr) {
   // Create node with the default yoga config.
-  config_ = YGConfigNew();
-  YGConfigCopy(config_, State::GetCurrent()->yoga_config());
-  node_ = YGNodeNewWithConfig(config_);
+  yoga_config_ = YGConfigNew();
+  YGConfigCopy(yoga_config_, State::GetCurrent()->yoga_config());
+  node_ = YGNodeNewWithConfig(yoga_config_);
 }
 
 View::~View() {
@@ -26,7 +26,7 @@ View::~View() {
 
   // Free yoga config and node.
   YGNodeFree(node_);
-  YGConfigFree(config_);
+  YGConfigFree(yoga_config_);
 }
 
 const char* View::GetClassName() const {
@@ -70,6 +70,12 @@ void View::PrintStyle() const {
   YGNodePrint(node_, static_cast<YGPrintOptions>(YGPrintOptionsLayout |
                                                  YGPrintOptionsStyle |
                                                  YGPrintOptionsChildren));
+}
+
+void View::SetParent(View* parent) {
+  if (parent)
+    YGConfigCopy(yoga_config_, parent->yoga_config_);
+  parent_ = parent;
 }
 
 }  // namespace nu

@@ -7,6 +7,7 @@
 #import <Cocoa/Cocoa.h>
 
 #include "nativeui/gfx/mac/coordinate_conversion.h"
+#include "third_party/yoga/yoga/Yoga.h"
 
 @interface NUWindowDelegate : NSObject<NSWindowDelegate> {
  @private
@@ -66,6 +67,9 @@ void Window::PlatformInit(const Options& options) {
 
   [window_ setDelegate:[[NUWindowDelegate alloc] initWithShell:this]];
   [window_ setReleasedWhenClosed:NO];
+
+  YGConfigSetPointScaleFactor(yoga_config_,
+                              [window_ screen].backingScaleFactor);
 }
 
 void Window::PlatformDestroy() {

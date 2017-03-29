@@ -66,6 +66,9 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
   void PlatformSetMenuBar(MenuBar* menu_bar);
 #endif
 
+  // The yoga config for window's children.
+  YGConfigRef yoga_config_;
+
 #if defined(OS_WIN) || defined(OS_LINUX)
   scoped_refptr<MenuBar> menu_bar_;
 #endif

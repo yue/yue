@@ -5,6 +5,7 @@
 #ifndef V8BINDING_PROTOTYPE_H_
 #define V8BINDING_PROTOTYPE_H_
 
+#include <string>
 #include <type_traits>
 
 #include "v8binding/prototype_internal.h"

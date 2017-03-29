@@ -32,7 +32,7 @@ void Group::Layout() {
 
 void Group::SetContentView(Container* container) {
   content_view_ = container;
-  content_view_->set_parent(this);
+  content_view_->SetParent(this);
   PlatformSetContentView(container);
 
   SetDefaultStyle(GetBorderSize() + container->GetPreferredSize());

@@ -110,8 +110,8 @@ void Container::AddChildViewAt(View* view, int index) {
     return;
   }
 
-  view->set_parent(this);
   YGNodeInsertChild(node(), view->node(), index);
+  view->SetParent(this);
 
   children_.insert(children_.begin() + index, view);
   PlatformAddChildView(view);
@@ -126,7 +126,7 @@ void Container::RemoveChildView(View* view) {
   if (i == children_.end())
     return;
 
-  view->set_parent(nullptr);
+  view->SetParent(nullptr);
   YGNodeRemoveChild(node(), view->node());
 
   PlatformRemoveChildView(view);

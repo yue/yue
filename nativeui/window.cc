@@ -6,10 +6,16 @@
 
 #include "nativeui/container.h"
 #include "nativeui/menu_bar.h"
+#include "nativeui/util/yoga.h"
 
 namespace nu {
 
-Window::Window(const Options& options) {
+Window::Window(const Options& options) : yoga_config_(YGConfigNew()) {
+  // Default yoga config.
+  YGConfigSetExperimentalFeatureEnabled(yoga_config_,
+                                        YGExperimentalFeatureRounding, true);
+
+  // Initialize.
   PlatformInit(options);
   SetContentView(new Container);
 }

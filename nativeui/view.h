@@ -63,7 +63,7 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   NativeView GetNative() const { return view_; }
 
   // Internal: Set parent view.
-  void set_parent(View* parent) { parent_ = parent; }
+  void SetParent(View* parent);
 
   // Internal: Get the CSS node of the view.
   YGNodeRef node() const { return node_; }
@@ -96,7 +96,7 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   NativeView view_;
 
   // The config of its yoga node.
-  YGConfigRef config_;
+  YGConfigRef yoga_config_;
 
   // The node recording CSS styles.
   YGNodeRef node_;
