@@ -76,6 +76,9 @@ class ViewImpl {
   // Draw the content.
   virtual void Draw(PainterWin* painter, const Rect& dirty);
 
+  // The DPI of this view has changed.
+  virtual void OnDPIChanged() {}
+
   // The mouse events.
   virtual void OnMouseEnter() {}
   virtual void OnMouseMove(UINT flags, const Point& point) {}

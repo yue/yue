@@ -61,7 +61,7 @@ class NativeTheme {
     int track_height;
   };
 
-  Size GetThemePartSize(Part part, ControlState state) const;
+  Size GetThemePartSize(HDC hdc, Part part, ControlState state) const;
 
   HRESULT PaintPushButton(HDC hdc,
                           ControlState state,

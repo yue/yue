@@ -110,11 +110,12 @@ void ViewImpl::Invalidate() {
 
 void ViewImpl::ParentChanged() {
   // Scale the bounds after moving to a new parent.
-  float new_scale_factor = window_ ? window_->scale_factor() : 1.0f;
+  float new_scale_factor = window_ ? window_->scale_factor() : scale_factor_;
   if (new_scale_factor != scale_factor_) {
     size_allocation_ = ScaleToEnclosingRect(size_allocation_,
                                             new_scale_factor / scale_factor_);
     scale_factor_ = new_scale_factor;
+    OnDPIChanged();
   }
 }
 

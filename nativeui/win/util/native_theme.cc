@@ -8,7 +8,6 @@
 #include <vsstyle.h>
 #include <vssym32.h>
 
-#include "base/win/scoped_hdc.h"
 #include "nativeui/gfx/painter.h"
 
 // This was removed from Winvers.h but is still used.
@@ -154,14 +153,15 @@ void NativeTheme::UpdateSystemColors() {
     system_colors_[color] = COLORREFToColor(GetSysColor(color));
 }
 
-Size NativeTheme::GetThemePartSize(Part part, ControlState state) const {
-  base::win::ScopedGetDC screen_dc(NULL);
+Size NativeTheme::GetThemePartSize(HDC hdc,
+                                   Part part,
+                                   ControlState state) const {
   HANDLE handle = GetThemeHandle(part);
   if (handle && get_theme_part_size_) {
     SIZE size;
     int part_id = GetWindowsPart(part);
     int state_id = GetWindowsState(part, state);
-    if (SUCCEEDED(get_theme_part_size_(handle, screen_dc, part_id, state_id,
+    if (SUCCEEDED(get_theme_part_size_(handle, hdc, part_id, state_id,
                                        nullptr, TS_TRUE, &size)))
       return Size(size.cx, size.cy);
   }

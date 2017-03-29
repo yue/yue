@@ -7,6 +7,7 @@
 #include <windowsx.h>
 
 #include "base/strings/utf_string_conversions.h"
+#include "base/win/scoped_hdc.h"
 #include "nativeui/container.h"
 #include "nativeui/gfx/geometry/insets.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
@@ -35,10 +36,7 @@ class ButtonImpl : public ViewImpl {
         color_(GetThemeColor(ThemeColor::Text)),
         font_(State::GetCurrent()->GetDefaultFont()),
         delegate_(delegate) {
-    if (type == Button::CheckBox)
-      box_size_ = theme_->GetThemePartSize(NativeTheme::CheckBox, state());
-    else if (type == Button::Radio)
-      box_size_ = theme_->GetThemePartSize(NativeTheme::Radio, state());
+    OnDPIChanged();  // update component size
   }
 
   void SetTitle(const base::string16& title) {
@@ -91,46 +89,7 @@ class ButtonImpl : public ViewImpl {
     return params_.checked;
   }
 
-  void OnMouseEnter() override {
-    is_hovering_ = true;
-    if (!is_capturing_) {
-      set_state(ControlState::Hovered);
-      Invalidate();
-    }
-  }
-
-  void OnMouseLeave() override {
-    is_hovering_ = false;
-    if (!is_capturing_) {
-      set_state(ControlState::Normal);
-      Invalidate();
-    }
-  }
-
-  bool OnMouseClick(UINT message, UINT flags, const Point& point) override {
-    if (message == WM_LBUTTONDOWN) {
-      is_capturing_ = true;
-      window()->SetCapture(this);
-      set_state(ControlState::Pressed);
-      Invalidate();
-    } else if (message == WM_LBUTTONUP) {
-      if (state() == ControlState::Pressed)
-        OnClick();
-      set_state(ControlState::Hovered);
-      Invalidate();
-    }
-
-    // Clicking a button moves the focus to it.
-    window()->focus_manager()->TakeFocus(delegate_);
-    return true;
-  }
-
-  void OnCaptureLost() override {
-    is_capturing_ = false;
-    set_state(is_hovering_ ? ControlState::Hovered : ControlState::Normal);
-    Invalidate();
-  }
-
+  // ViewImpl:
   bool CanHaveFocus() const override {
     return true;
   }
@@ -200,9 +159,59 @@ class ButtonImpl : public ViewImpl {
                                       Painter::TextAlignCenter);
   }
 
+  void OnDPIChanged() override {
+    base::win::ScopedGetDC dc(window() ? window()->hwnd() : NULL);
+    if (type() == ControlType::CheckBox)
+      box_size_ = theme_->GetThemePartSize(dc, NativeTheme::CheckBox, state());
+    else if (type() == ControlType::Radio)
+      box_size_ = theme_->GetThemePartSize(dc, NativeTheme::Radio, state());
+    text_size_ = MeasureText(this, font_.get(), title_);
+  }
+
+  void OnMouseEnter() override {
+    is_hovering_ = true;
+    if (!is_capturing_) {
+      set_state(ControlState::Hovered);
+      Invalidate();
+    }
+  }
+
+  void OnMouseLeave() override {
+    is_hovering_ = false;
+    if (!is_capturing_) {
+      set_state(ControlState::Normal);
+      Invalidate();
+    }
+  }
+
+  bool OnMouseClick(UINT message, UINT flags, const Point& point) override {
+    if (message == WM_LBUTTONDOWN) {
+      is_capturing_ = true;
+      window()->SetCapture(this);
+      set_state(ControlState::Pressed);
+      Invalidate();
+    } else if (message == WM_LBUTTONUP) {
+      if (state() == ControlState::Pressed)
+        OnClick();
+      set_state(ControlState::Hovered);
+      Invalidate();
+    }
+
+    // Clicking a button moves the focus to it.
+    window()->focus_manager()->TakeFocus(delegate_);
+    return true;
+  }
+
+  void OnCaptureLost() override {
+    is_capturing_ = false;
+    set_state(is_hovering_ ? ControlState::Hovered : ControlState::Normal);
+    Invalidate();
+  }
+
   NativeTheme::ButtonExtraParams* params() { return &params_; }
 
  private:
+
   NativeTheme* theme_;
   NativeTheme::ButtonExtraParams params_ = {0};
 
@@ -242,7 +251,7 @@ void Button::SetTitle(const std::string& title) {
   button->SetTitle(wtitle);
 
   SetDefaultStyle(ScaleSize(button->GetPreferredSize(),
-                            1.0f / GetNative()->scale_factor()));
+                            1.0f / button->scale_factor()));
   button->Invalidate();
 }
 
