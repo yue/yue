@@ -69,7 +69,7 @@ void EnableHighDPISupport() {
 void State::PlatformInit() {
   EnableHighDPISupport();
 
-  YGConfigSetPointScaleFactor(yoga_config(), GetDPIScale());
+  YGConfigSetPointScaleFactor(yoga_config(), GetScaleFactor());
 
   Gdiplus::GdiplusStartupInput input;
   Gdiplus::GdiplusStartup(&token_, &input, nullptr);

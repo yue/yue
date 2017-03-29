@@ -64,7 +64,7 @@ void Label::SetText(const std::string& text) {
   label->SetText(wtext);
 
   SetDefaultStyle(ScaleSize(MeasureText(label->font(), wtext),
-                            1.0f / GetDPIScale()));
+                            1.0f / GetScaleFactor()));
   label->Invalidate();
 }
 

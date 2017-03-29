@@ -13,7 +13,7 @@ namespace nu {
 
 class WindowImpl : public Win32Window {
  public:
-  explicit WindowImpl(Window* delegate) : delegate_(delegate) {}
+  explicit WindowImpl(Window* delegate);
 
   void SetPixelBounds(const Rect& bounds);
   Rect GetPixelBounds();
@@ -25,6 +25,7 @@ class WindowImpl : public Win32Window {
   void SetBackgroundColor(nu::Color color);
 
   FocusManager* focus_manager() { return &focus_manager_; }
+  float scale_factor() const { return scale_factor_; }
 
  protected:
   CR_BEGIN_MSG_MAP_EX(WindowImpl, Win32Window)
@@ -70,7 +71,11 @@ class WindowImpl : public Win32Window {
   // The background color.
   nu::Color background_color_ = nu::Color(0xFF, 0xFF, 0xFF);
 
+  // The public Window interface.
   Window* delegate_;
+
+  // The scale factor of current window.
+  float scale_factor_;
 };
 
 }  // namespace nu

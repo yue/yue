@@ -25,9 +25,6 @@ class Win32Window {
   // Returns the HWND associated with this Window.
   HWND hwnd() const { return hwnd_; }
 
-  // Window's scale factor.
-  float scale_factor() const { return scale_factor_; }
-
   // Window styles.
   DWORD window_style() const { return window_style_; }
   DWORD window_ex_style() const { return window_ex_style_; }
@@ -41,14 +38,14 @@ class Win32Window {
              DWORD window_style = kWindowDefaultStyle,
              DWORD window_ex_style = 0);
 
-  // Returns the default window icon to use for windows of this type.
+  // Return the default window icon to use for windows of this type.
   virtual HICON GetDefaultWindowIcon() const;
   virtual HICON GetSmallWindowIcon() const;
 
-  // Handles the WndProc callback for this object.
+  // Handle the WndProc callback for this object.
   virtual LRESULT OnWndProc(UINT message, WPARAM w_param, LPARAM l_param);
 
-  // Processes one message from the window's message queue.
+  // Process one message from the window's message queue.
   virtual BOOL ProcessWindowMessage(HWND window,
                                     UINT message,
                                     WPARAM w_param,
@@ -65,19 +62,15 @@ class Win32Window {
                                   WPARAM w_param,
                                   LPARAM l_param);
 
-  // Gets the window class atom to use when creating the corresponding HWND.
+  // Get the window class atom to use when creating the corresponding HWND.
   // If necessary, this registers the window class.
   ATOM GetWindowClassAtom();
 
   // Style of the class to use.
   UINT class_style_;
 
-  // Our hwnd.
+  // The window handle.
   HWND hwnd_ = NULL;
-
-  // The scale factor of current window.
-  // TODO(zcbenz): Refresh the window when DPI changes.
-  float scale_factor_ = 1.0f;
 
   // Window styles.
   DWORD window_style_;

@@ -13,7 +13,10 @@ namespace nu {
 float GetScaleFactorForHWND(HWND hwnd);
 
 // Returns the default scale factor.
-float GetDPIScale();
+float GetScaleFactor();
+
+// Returns the equivalent scaling factor for |dpi|.
+float GetScalingFactorFromDPI(int dpi);
 
 }  // namespace nu
 

@@ -37,6 +37,11 @@ bool IsShiftPressed() {
 
 }  // namespace
 
+WindowImpl::WindowImpl(Window* delegate)
+    : delegate_(delegate),
+      scale_factor_(GetScaleFactorForHWND(hwnd())) {
+}
+
 void WindowImpl::SetPixelBounds(const Rect& bounds) {
   SetWindowPos(hwnd(), NULL,
                bounds.x(), bounds.y(), bounds.width(), bounds.height(),
@@ -189,7 +194,7 @@ void WindowImpl::OnPaint(HDC) {
     DoubleBuffer buffer(dc, bounds.size(), dirty, dirty.origin());
 
     // Background.
-    PainterWin painter(buffer.dc(), scale_factor());
+    PainterWin painter(buffer.dc(), scale_factor_);
     painter.SetColor(background_color_);
     painter.FillPixelRect(RectF(dirty));
 

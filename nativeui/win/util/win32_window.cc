@@ -5,7 +5,6 @@
 #include "nativeui/win/util/win32_window.h"
 
 #include "nativeui/state.h"
-#include "nativeui/win/screen.h"
 #include "nativeui/win/util/class_registrar.h"
 #include "nativeui/win/util/hwnd_util.h"
 
@@ -56,8 +55,6 @@ Win32Window::Win32Window(base::StringPiece16 class_name, HWND parent,
     hwnd_ = hwnd;
     SetWindowUserData(hwnd, this);
   }
-
-  scale_factor_ = GetScaleFactorForHWND(hwnd_);
 }
 
 Win32Window::~Win32Window() {

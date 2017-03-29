@@ -12,7 +12,7 @@
 namespace nu {
 
 ViewImpl::ViewImpl(ControlType type)
-    : type_(type), scale_factor_(GetDPIScale()) {}
+    : type_(type), scale_factor_(GetScaleFactor()) {}
 
 void ViewImpl::SizeAllocate(const Rect& size_allocation) {
   if (size_allocation == size_allocation_)

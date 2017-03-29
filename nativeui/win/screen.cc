@@ -34,10 +34,6 @@ Size GetDPI() {
   return Size(dpi_x, dpi_y);
 }
 
-float GetScalingFactorFromDPI(int dpi) {
-  return static_cast<float>(dpi) / kDefaultDPI;
-}
-
 }  // namespace
 
 float GetScaleFactorForHWND(HWND hwnd) {
@@ -64,11 +60,15 @@ float GetScaleFactorForHWND(HWND hwnd) {
       return GetScalingFactorFromDPI(dpi_x);
     }
   }
-  return GetDPIScale();
+  return GetScaleFactor();
 }
 
-float GetDPIScale() {
+float GetScaleFactor() {
   return GetScalingFactorFromDPI(GetDPI().width());
+}
+
+float GetScalingFactorFromDPI(int dpi) {
+  return static_cast<float>(dpi) / kDefaultDPI;
 }
 
 }  // namespace nu
