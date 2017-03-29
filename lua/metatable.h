@@ -125,6 +125,9 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
     if (GetType(state, index) != lua::LuaType::UserData ||
         RawLen(state, index) != sizeof(typename UserData<T>::Type))
       return false;
+    // Verify the inheritance chain.
+    if (!GetMetaTable(state, index) || !IsMetaTableInheritedFrom<T>(state))
+      return false;
     // Convert pointer to actual class.
     T* ptr = UserData<T>::From(
         state, static_cast<base::WeakPtr<T>*>(lua_touserdata(state, index)));

@@ -460,6 +460,9 @@ struct Type<nu::Button> {
   static constexpr const char* name = "yue.Button";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+        "create", &CreateInstance<nu::Button,
+                                  const std::string&, nu::Button::Type>);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {

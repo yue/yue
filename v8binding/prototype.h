@@ -50,6 +50,21 @@ v8::Local<v8::Value> CreateInstance(v8::Local<v8::Context> context,
   return obj;
 }
 
+// Check if |obj|'s prototype is inherited from T's prototype.
+template<typename T>
+bool IsPrototypeInheritedFrom(v8::Local<v8::Context> context,
+                              v8::Local<v8::Object> obj) {
+  std::string constructor;
+  if (!FromV8(context, obj->GetConstructorName(), &constructor))
+    return false;
+  if (constructor == "Object")
+    return false;
+  if (constructor == Type<T>::name)
+    return true;
+  return IsPrototypeInheritedFrom<T>(
+      context, obj->GetPrototype().As<v8::Object>());
+}
+
 // The default type information for RefCounted class.
 template<typename T>
 struct Type<T*, typename std::enable_if<std::is_base_of<
@@ -79,6 +94,9 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
       return false;
     v8::Local<v8::Object> obj = v8::Local<v8::Object>::Cast(value);
     if (obj->InternalFieldCount() != 1)
+      return false;
+    // Verify prototype chain.
+    if (!IsPrototypeInheritedFrom<T>(context, obj))
       return false;
     // Convert pointer to actual class.
     *out = static_cast<T*>(obj->GetAlignedPointerFromInternalField(0));
@@ -115,6 +133,9 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
       return false;
     v8::Local<v8::Object> obj = v8::Local<v8::Object>::Cast(value);
     if (obj->InternalFieldCount() != 1)
+      return false;
+    // Verify prototype chain.
+    if (!IsPrototypeInheritedFrom<T>(context, obj))
       return false;
     // Convert pointer to actual class.
     auto* ptr = static_cast<internal::WeakPtrObjectTracker<T>*>(
