@@ -17,10 +17,17 @@ std::string V8TypeAsString(v8::Isolate* isolate, v8::Local<v8::Value> value) {
     return "undefined";
   if (value->IsNull())
     return "null";
+  v8::Local<v8::Context> context = isolate->GetCurrentContext();
   std::string result;
-  if (!FromV8(isolate->GetCurrentContext(), value, &result))
-    return std::string();
-  return result;
+  if (value->IsObject()) {
+    if (FromV8(context, value.As<v8::Object>()->GetConstructorName(), &result))
+      return result;
+  }
+  if (FromV8(context, value, &result))
+    return result;
+  if (FromV8(context, value->TypeOf(isolate), &result))
+    return result;
+  return "<unkown>";
 }
 
 }  // namespace
