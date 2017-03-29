@@ -29,16 +29,7 @@ void View::SetVisible(bool visible) {
   if (visible == IsVisible())
     return;
   PlatformSetVisible(visible);
-  // Yoga doesn't support invisible node, so we just mark the invisible
-  // node as absolute to skip the layout, and restore it after it becomes
-  // visible.
-  if (visible) {
-    YGNodeStyleSetPositionType(node_,
-                                static_cast<YGPositionType>(node_position_));
-  } else {
-    node_position_ = static_cast<int>(YGNodeStyleGetPositionType(node_));
-    YGNodeStyleSetPositionType(node_, YGPositionTypeAbsolute);
-  }
+  YGNodeStyleSetDisplay(node_, visible ? YGDisplayFlex : YGDisplayNone);
   Layout();
 }
 
