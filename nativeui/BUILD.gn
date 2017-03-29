@@ -112,6 +112,7 @@ component("nativeui") {
     "gfx/geometry/vector2d_f.h",
     "util/css.cc",
     "util/css.h",
+    "util/yoga.h",
     "gtk/gtk_event_loop.cc",
     "gtk/gtk_event_loop.h",
     "gtk/container_container.cc",

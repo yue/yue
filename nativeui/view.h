@@ -15,6 +15,7 @@
 #include "nativeui/types.h"
 
 typedef struct YGNode *YGNodeRef;
+typedef struct YGConfig *YGConfigRef;
 
 namespace nu {
 
@@ -93,6 +94,9 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
 
   // The native implementation.
   NativeView view_;
+
+  // The config of its yoga node.
+  YGConfigRef config_;
 
   // The node recording CSS styles.
   YGNodeRef node_;

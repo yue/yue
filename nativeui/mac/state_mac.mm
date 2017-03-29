@@ -5,12 +5,16 @@
 #include "nativeui/state.h"
 
 #include "nativeui/mac/events_handler.h"
+#include "third_party/yoga/yoga/Yoga.h"
 
 namespace nu {
 
 void State::PlatformInit() {
   [NSApplication sharedApplication];
   [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+
+  YGConfigSetPointScaleFactor(yoga_config(),
+                              [NSScreen mainScreen].backingScaleFactor);
 }
 
 void State::PlatformDestroy() {

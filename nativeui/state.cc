@@ -26,17 +26,20 @@ base::LazyInstance<base::ThreadLocalPointer<State>>::Leaky lazy_tls_ptr =
 
 }  // namespace
 
-State::State() {
+State::State() : yoga_config_(YGConfigNew()) {
   DCHECK_EQ(GetCurrent(), nullptr) << "should only have one state per thread";
-
-  // Used rounded value for layout.
-  YGSetExperimentalFeatureEnabled(YGExperimentalFeatureRounding, true);
 
   lazy_tls_ptr.Pointer()->Set(this);
   PlatformInit();
+
+  // Default yoga config.
+  YGConfigSetExperimentalFeatureEnabled(yoga_config_,
+                                        YGExperimentalFeatureRounding, true);
 }
 
 State::~State() {
+  YGConfigFree(yoga_config_);
+
   // The GUI members must be destroyed before we shutdone GUI engine.
   default_font_ = nullptr;
 

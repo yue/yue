@@ -647,6 +647,6 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
 #endif
               // Properties.
               "lifetime", nu::Lifetime::GetCurrent(),
-              "app",      nu::State::GetCurrent()->app());
+              "app",      nu::State::GetCurrent()->GetApp());
   return 1;
 }

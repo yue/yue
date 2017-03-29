@@ -660,7 +660,7 @@ void Initialize(v8::Local<v8::Object> exports) {
 #ifndef ELECTRON_BUILD
           "lifetime", nu::Lifetime::GetCurrent(),
 #endif
-          "app",      nu::State::GetCurrent()->app());
+          "app",      nu::State::GetCurrent()->GetApp());
 }
 
 }  // namespace node_yue

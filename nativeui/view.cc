@@ -5,20 +5,28 @@
 #include "nativeui/view.h"
 
 #include "nativeui/container.h"
+#include "nativeui/state.h"
 #include "nativeui/util/css.h"
-#include "third_party/yoga/yoga/Yoga.h"
+#include "nativeui/util/yoga.h"
 
 namespace nu {
 
 // static
 const char View::kClassName[] = "View";
 
-View::View() : view_(nullptr), node_(YGNodeNew()) {
+View::View() : view_(nullptr) {
+  // Create node with the default yoga config.
+  config_ = YGConfigNew();
+  YGConfigCopy(config_, State::GetCurrent()->yoga_config());
+  node_ = YGNodeNewWithConfig(config_);
 }
 
 View::~View() {
   PlatformDestroy();
+
+  // Free yoga config and node.
   YGNodeFree(node_);
+  YGConfigFree(config_);
 }
 
 const char* View::GetClassName() const {

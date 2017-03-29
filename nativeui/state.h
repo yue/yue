@@ -10,6 +10,8 @@
 #include "base/memory/ref_counted.h"
 #include "nativeui/app.h"
 
+typedef struct YGConfig *YGConfigRef;
+
 namespace nu {
 
 class Font;
@@ -27,11 +29,11 @@ class NATIVEUI_EXPORT State {
 
   static State* GetCurrent();
 
-  // Returns the default GUI font.
+  // Return the default GUI font.
   Font* GetDefaultFont();
 
-  // Returns the instance of App.
-  App* app() { return &app_; }
+  // Return the instance of App.
+  App* GetApp() { return &app_; }
 
   // Internal classes.
 #if defined(OS_WIN)
@@ -41,9 +43,14 @@ class NATIVEUI_EXPORT State {
   UINT GetNextCommandID();
 #endif
 
+  // Return the default yoga config.
+  YGConfigRef yoga_config() const { return yoga_config_; }
+
  private:
   void PlatformInit();
   void PlatformDestroy();
+
+  YGConfigRef yoga_config_;
 
   scoped_refptr<Font> default_font_;
 
