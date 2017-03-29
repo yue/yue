@@ -43,6 +43,7 @@ class WindowImpl : public Win32Window {
     CR_MSG_WM_CHAR(OnChar)
     CR_MSG_WM_PAINT(OnPaint)
     CR_MSG_WM_ERASEBKGND(OnEraseBkgnd)
+    CR_MESSAGE_HANDLER_EX(WM_DPICHANGED, OnDPIChanged)
   CR_END_MSG_MAP()
 
  private:
@@ -59,6 +60,7 @@ class WindowImpl : public Win32Window {
   void OnChar(UINT ch, UINT repeat, UINT flags);
   void OnPaint(HDC dc);
   LRESULT OnEraseBkgnd(HDC dc);
+  LRESULT OnDPIChanged(UINT msg, WPARAM w_param, LPARAM l_param);
 
   void TrackMouse(bool enable);
 

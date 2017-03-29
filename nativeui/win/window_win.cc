@@ -210,6 +210,18 @@ LRESULT WindowImpl::OnEraseBkgnd(HDC dc) {
   return 1;
 }
 
+LRESULT WindowImpl::OnDPIChanged(UINT msg, WPARAM w_param, LPARAM l_param) {
+  float new_scale_factor = GetScalingFactorFromDPI(LOWORD(w_param));
+  if (new_scale_factor != scale_factor_) {
+    scale_factor_ = new_scale_factor;
+    // Notify the content view of DPI change.
+    delegate_->GetContentView()->GetNative()->BecomeContentView(this);
+    // Move to the new window position under new DPI.
+    SetPixelBounds(Rect(*reinterpret_cast<RECT*>(l_param)));
+  }
+  return 1;
+}
+
 void WindowImpl::TrackMouse(bool enable) {
   TRACKMOUSEEVENT event = {0};
   event.cbSize = sizeof(event);
