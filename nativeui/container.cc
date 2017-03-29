@@ -116,14 +116,9 @@ namespace nu {
 
 namespace {
 
-// Whether a view is a Container.
-inline bool IsContainer(View* view) {
-  return view->GetClassName() == Container::kClassName;
-}
-
 // Whether a Container is a root CSS node.
 inline bool IsRootYGNode(Container* view) {
-  return !view->GetParent() || !IsContainer(view->GetParent());
+  return !YGNodeGetParent(view->node()) || !view->GetParent();
 }
 
 // Get bounds from the CSS node.
