@@ -24,6 +24,7 @@ class SubwinView : public Win32Window, public ViewImpl {
   void Invalidate(const Rect& dirty) override;
   void SetFocus(bool focus) override;
   bool IsFocused() const override;
+  void SetVisible(bool visible) override;
   void Draw(PainterWin* painter, const Rect& dirty) override;
 
   // Rerouted from parent window

@@ -69,8 +69,8 @@ void View::SetStyle(const std::string& name, const std::string& value) {
 
 void View::PrintStyle() const {
   YGNodePrint(node_, static_cast<YGPrintOptions>(YGPrintOptionsLayout |
-                                                   YGPrintOptionsStyle |
-                                                   YGPrintOptionsChildren));
+                                                 YGPrintOptionsStyle |
+                                                 YGPrintOptionsChildren));
 }
 
 }  // namespace nu

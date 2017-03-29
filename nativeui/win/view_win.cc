@@ -72,6 +72,10 @@ bool ViewImpl::IsFocused() const {
   return is_focused_;
 }
 
+void ViewImpl::SetVisible(bool visible) {
+  is_visible_ = visible;
+}
+
 void ViewImpl::SetBackgroundColor(Color color) {
   background_color_ = color;
   Invalidate();
@@ -149,7 +153,7 @@ Rect View::GetPixelBounds() const {
 }
 
 void View::PlatformSetVisible(bool visible) {
-  GetNative()->set_visible(visible);
+  GetNative()->SetVisible(visible);
 }
 
 bool View::IsVisible() const {

@@ -28,14 +28,15 @@ class ContainerImpl : public ViewImpl {
 
   // Baseview:
   void SizeAllocate(const Rect& size_allocation) override;
+  void SetParent(ViewImpl* parent) override;
+  void BecomeContentView(WindowImpl* parent) override;
+  void SetVisible(bool visible) override;
+  void Draw(PainterWin* painter, const Rect& dirty) override;
   void OnMouseMove(UINT flags, const Point& point) override;
   void OnMouseLeave() override;
   bool OnMouseWheel(bool vertical, UINT flags, int delta,
                     const Point& point) override;
   bool OnMouseClick(UINT message, UINT flags, const Point& point) override;
-  void Draw(PainterWin* painter, const Rect& dirty) override;
-  void SetParent(ViewImpl* parent) override;
-  void BecomeContentView(WindowImpl* parent) override;
 
  protected:
   void DrawChild(ViewImpl* child, PainterWin* painter, const Rect& dirty);

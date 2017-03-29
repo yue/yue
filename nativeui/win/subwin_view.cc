@@ -68,6 +68,11 @@ bool SubwinView::IsFocused() const {
   return ::GetFocus() == hwnd();
 }
 
+void SubwinView::SetVisible(bool visible) {
+  ViewImpl::SetVisible(visible);
+  ::ShowWindow(hwnd(), visible ? SW_SHOWNOACTIVATE : SW_HIDE);
+}
+
 void SubwinView::Draw(PainterWin* painter, const Rect& dirty) {
   // There is nothing to draw in a sub window.
 }

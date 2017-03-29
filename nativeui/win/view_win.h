@@ -47,7 +47,7 @@ class ViewImpl {
   /////////////////////////////////////////////////////////////////////////////
   // Core implementations, should be overriden for each kind of view
 
-  // Changes view's bounds, relative to window.
+  // Change view's bounds, relative to window.
   virtual void SizeAllocate(const Rect& bounds);
 
   // Set the parent view.
@@ -63,6 +63,9 @@ class ViewImpl {
   // Move focus to the view.
   virtual void SetFocus(bool focus);
   virtual bool IsFocused() const;
+
+  // Show/Hide the view.
+  virtual void SetVisible(bool visible);
 
   // Set the background color.
   virtual void SetBackgroundColor(Color color);
@@ -103,7 +106,6 @@ class ViewImpl {
   Rect size_allocation() const { return size_allocation_; }
 
   // Whether the view is visible.
-  void set_visible(bool visible) { is_visible_ = visible; }
   bool is_visible() const { return is_visible_; }
 
   // Set control's state.

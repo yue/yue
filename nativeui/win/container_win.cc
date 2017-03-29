@@ -18,6 +18,30 @@ void ContainerImpl::SizeAllocate(const Rect& size_allocation) {
     delegate_->Layout();
 }
 
+void ContainerImpl::SetParent(ViewImpl* parent) {
+  ViewImpl::SetParent(parent);
+  RefreshParentTree();
+}
+
+void ContainerImpl::BecomeContentView(WindowImpl* parent) {
+  ViewImpl::BecomeContentView(parent);
+  RefreshParentTree();
+}
+
+void ContainerImpl::SetVisible(bool visible) {
+  ViewImpl::SetVisible(visible);
+  const auto& children = delegate_->GetChildren();
+  for (ViewImpl* child : children)
+    child->SetVisible(visible);
+}
+
+void ContainerImpl::Draw(PainterWin* painter, const Rect& dirty) {
+  ViewImpl::Draw(painter, dirty);
+  delegate_->OnDraw(painter, dirty);
+  for (ViewImpl* child : delegate_->GetChildren())
+    DrawChild(child, painter, dirty);
+}
+
 void ContainerImpl::OnMouseMove(UINT flags, const Point& point) {
   // Find the view that has the mouse.
   ViewImpl* hover_view = FindChildFromPoint(point);
@@ -57,23 +81,6 @@ bool ContainerImpl::OnMouseClick(UINT message, UINT flags, const Point& point) {
   if (child)
     return child->OnMouseClick(message, flags, point);
   return false;
-}
-
-void ContainerImpl::Draw(PainterWin* painter, const Rect& dirty) {
-  ViewImpl::Draw(painter, dirty);
-  delegate_->OnDraw(painter, dirty);
-  for (ViewImpl* child : delegate_->GetChildren())
-    DrawChild(child, painter, dirty);
-}
-
-void ContainerImpl::SetParent(ViewImpl* parent) {
-  ViewImpl::SetParent(parent);
-  RefreshParentTree();
-}
-
-void ContainerImpl::BecomeContentView(WindowImpl* parent) {
-  ViewImpl::BecomeContentView(parent);
-  RefreshParentTree();
 }
 
 void ContainerImpl::DrawChild(ViewImpl* child, PainterWin* painter,
