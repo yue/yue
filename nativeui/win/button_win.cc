@@ -41,7 +41,7 @@ class ButtonImpl : public ViewImpl {
 
   void SetTitle(const base::string16& title) {
     title_ = title;
-    text_size_ = MeasureText(this, font_.get(), title_);
+    OnDPIChanged();  // update component size
   }
 
   base::string16 GetTitle() const {
@@ -165,7 +165,7 @@ class ButtonImpl : public ViewImpl {
       box_size_ = theme_->GetThemePartSize(dc, NativeTheme::CheckBox, state());
     else if (type() == ControlType::Radio)
       box_size_ = theme_->GetThemePartSize(dc, NativeTheme::Radio, state());
-    text_size_ = MeasureText(this, font_.get(), title_);
+    text_size_ = MeasureText(dc, font_.get(), title_);
   }
 
   void OnMouseEnter() override {

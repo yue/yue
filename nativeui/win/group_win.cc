@@ -5,6 +5,7 @@
 #include "nativeui/group.h"
 
 #include "base/strings/utf_string_conversions.h"
+#include "base/win/scoped_hdc.h"
 #include "nativeui/gfx/color.h"
 #include "nativeui/gfx/geometry/insets.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
@@ -32,10 +33,7 @@ class GroupImpl : public ContainerImpl,
 
   void SetTitle(const base::string16& title) {
     title_ = title;
-
-    // Update the rect of the title.
-    title_bounds_ = RectF(PointF(kTitleLeftMargin * scale_factor(), 0),
-                          MeasureText(this, font_.get(), title_));
+    OnDPIChanged();  // update component size
   }
 
   base::string16 GetTitle() const {
@@ -92,6 +90,13 @@ class GroupImpl : public ContainerImpl,
     delegate_->GetContentView()->GetNative()->Draw(
         painter, dirty - child_offset);
     painter->Restore();
+  }
+
+  void OnDPIChanged() override {
+    base::win::ScopedGetDC dc(window() ? window()->hwnd() : NULL);
+    // Update the rect of the title.
+    title_bounds_ = RectF(PointF(kTitleLeftMargin * scale_factor(), 0),
+                          MeasureText(dc, font_.get(), title_));
   }
 
  private:

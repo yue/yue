@@ -12,7 +12,10 @@
 
 namespace nu {
 
-namespace {
+SizeF MeasureText(Font* font, const String& text) {
+  base::win::ScopedGetDC dc(NULL);
+  return MeasureText(dc, font, text);
+}
 
 SizeF MeasureText(HDC dc, Font* font, const String& text) {
   Gdiplus::Graphics graphics(dc);
@@ -22,21 +25,6 @@ SizeF MeasureText(HDC dc, Font* font, const String& text) {
                          font->GetNative(), Gdiplus::PointF(0., 0.),
                          &fomart, &rect);
   return SizeF(rect.Width, rect.Height);
-}
-
-}  // namespace
-
-SizeF MeasureText(Font* font, const String& text) {
-  base::win::ScopedCreateDC dc(CreateCompatibleDC(NULL));
-  return MeasureText(dc.Get(), font, text);
-}
-
-SizeF MeasureText(const nu::ViewImpl* view, Font* font, const String& text) {
-  if (!view->window())
-    return MeasureText(font, text);
-
-  base::win::ScopedGetDC dc(view->window()->hwnd());
-  return MeasureText(dc, font, text);
 }
 
 }  // namespace nu
