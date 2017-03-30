@@ -53,6 +53,9 @@ class NATIVEUI_EXPORT Painter {
   // Sets the color used for drawing or filling.
   virtual void SetColor(Color color) = 0;
 
+  // Sets the width used for drawing lines.
+  virtual void SetLineWidth(float width) = 0;
+
   // Draws a single pixel |rect|.
   virtual void DrawRect(const RectF& rect) = 0;
 

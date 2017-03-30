@@ -61,6 +61,10 @@ void PainterGtk::SetColor(Color color) {
                                   color.b() / 255., color.a() / 255.);
 }
 
+void PainterGtk::SetLineWidth(float width) {
+  cairo_set_line_width(context_, width);
+}
+
 void PainterGtk::DrawRect(const RectF& rect) {
   cairo_rectangle(context_, rect.x(), rect.y(), rect.width(), rect.height());
   cairo_stroke(context_);

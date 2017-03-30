@@ -21,6 +21,7 @@ class PainterGtk : public Painter {
                 CombineMode mode = CombineMode::Replace) override;
   void Translate(const Vector2dF& offset) override;
   void SetColor(Color color) override;
+  void SetLineWidth(float width) override;
   void DrawRect(const RectF& rect) override;
   void FillRect(const RectF& rect) override;
   void DrawTextWithFlags(

@@ -44,6 +44,10 @@ void PainterMac::SetColor(Color color) {
   [color.ToNSColor() set];
 }
 
+void PainterMac::SetLineWidth(float width) {
+  [NSBezierPath setDefaultLineWidth:width];
+}
+
 void PainterMac::DrawRect(const RectF& rect) {
   NSFrameRect(rect.ToCGRect());
 }

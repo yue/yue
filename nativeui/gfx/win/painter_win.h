@@ -27,6 +27,7 @@ class PainterWin : public Painter {
                 CombineMode mode = CombineMode::Replace) override;
   void Translate(const Vector2dF& offset) override;
   void SetColor(Color color) override;
+  void SetLineWidth(float width) override;
   void DrawRect(const RectF& rect) override;
   void FillRect(const RectF& rect) override;
   void DrawTextWithFlags(
@@ -43,6 +44,8 @@ class PainterWin : public Painter {
   // Helper to get current state.
   Color& color() { return states_.empty() ? color_
                                           : states_.top().color; }
+  float& line_width() { return states_.empty() ? line_width_
+                                               : states_.top().line_width; }
   Vector2dF& origin() { return states_.empty() ? origin_
                                                : states_.top().origin; }
 
@@ -54,6 +57,7 @@ class PainterWin : public Painter {
                  Gdiplus::GraphicsContainer&& container);
 
     Color color;
+    float line_width = 1.f;
     Vector2dF origin;
     Gdiplus::GraphicsContainer container;
   };
@@ -63,6 +67,7 @@ class PainterWin : public Painter {
 
   // The root state.
   Color color_;
+  float line_width_ = 1.f;
   Vector2dF origin_;
 
   float scale_factor_;

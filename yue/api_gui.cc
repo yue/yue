@@ -216,6 +216,7 @@ struct Type<nu::Painter> {
            "cliprect", &nu::Painter::ClipRect,
            "translate", &nu::Painter::Translate,
            "setcolor", &nu::Painter::SetColor,
+           "setlinewidth", &nu::Painter::SetLineWidth,
            "drawrect", &nu::Painter::DrawRect,
            "fillrect", &nu::Painter::FillRect,
            "drawtext", &nu::Painter::DrawText,

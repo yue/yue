@@ -63,6 +63,10 @@ void PainterWin::SetColor(Color new_color) {
   color() = new_color;
 }
 
+void PainterWin::SetLineWidth(float width) {
+  line_width() = width;
+}
+
 void PainterWin::DrawRect(const RectF& rect) {
   DrawPixelRect(ScaleRect(rect, scale_factor_));
 }
@@ -93,7 +97,7 @@ void PainterWin::TranslatePixel(const Vector2dF& offset) {
 }
 
 void PainterWin::DrawPixelRect(const RectF& rect) {
-  Gdiplus::Pen pen(ToGdi(color()));
+  Gdiplus::Pen pen(ToGdi(color()), line_width());
   graphics_.DrawRectangle(&pen, ToGdi(rect + origin()));
 }
 
