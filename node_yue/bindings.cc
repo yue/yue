@@ -630,6 +630,10 @@ struct Type<nu::Vibrant> {
 namespace node_yue {
 
 void Initialize(v8::Local<v8::Object> exports) {
+#if defined(OS_WIN) && !defined(ELECTRON_BUILD)
+  // Show system dialog on crash.
+  SetErrorMode(GetErrorMode() & ~SEM_NOGPFAULTERRORBOX);
+#endif
   // Initialize the nativeui and leak it.
   new nu::State;
   new nu::Lifetime;
