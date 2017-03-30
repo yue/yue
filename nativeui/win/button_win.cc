@@ -149,7 +149,7 @@ class ButtonImpl : public ViewImpl {
         bounds.Inset(Insets(padding));
         rect = bounds.ToRECT();
       }
-      DrawFocusRect(dc, &rect);
+      ::DrawFocusRect(dc, &rect);
     }
 
     painter->ReleaseHDC(dc);

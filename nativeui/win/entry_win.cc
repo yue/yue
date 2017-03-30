@@ -55,6 +55,8 @@ class EntryImpl : public SubwinView {
   static LRESULT WndProc(HWND hwnd, UINT message, WPARAM w_param,
                          LPARAM l_param) {
     auto* self = reinterpret_cast<EntryImpl*>(GetWindowUserData(hwnd));
+    if (!self)  // could happen during destruction
+      return 0;
     if (message == WM_CHAR && w_param == VK_RETURN) {
       // Pressing enter means activate.
       self->delegate_->on_activate.Emit();
