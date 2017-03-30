@@ -211,7 +211,6 @@ class ButtonImpl : public ViewImpl {
   NativeTheme::ButtonExtraParams* params() { return &params_; }
 
  private:
-
   NativeTheme* theme_;
   NativeTheme::ButtonExtraParams params_ = {0};
 

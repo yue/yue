@@ -5,6 +5,7 @@
 #include "nativeui/gfx/color.h"
 
 #include <gdk/gdk.h>
+#include <gtk/gtk.h>
 
 #include "nativeui/label.h"
 
@@ -15,8 +16,8 @@ GdkRGBA Color::ToGdkRGBA() const {
   return rgba;
 }
 
-Color GetThemeColor(ThemeColor theme) {
-  if (theme == ThemeColor::Text) {
+Color GetThemeColor(Color::Theme theme) {
+  if (theme == Color::Theme::Text) {
     scoped_refptr<nu::Label> label = new nu::Label;
     gtk_widget_ensure_style(label->GetNative());
     GtkStyle* style = gtk_widget_get_style(label->GetNative());

@@ -10,9 +10,9 @@ COLORREF Color::ToCOLORREF() const {
   return RGB(r(), g(), b());
 }
 
-Color GetThemeColor(ThemeColor theme) {
+Color GetThemeColor(Color::Theme theme) {
   int index = 0;
-  if (theme == ThemeColor::Text)
+  if (theme == Color::Theme::Text)
     index = COLOR_WINDOWTEXT;
   DWORD color = ::GetSysColor(index);
   return Color(GetRValue(color), GetGValue(color), GetBValue(color));

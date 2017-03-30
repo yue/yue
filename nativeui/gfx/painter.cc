@@ -17,7 +17,7 @@ void Painter::DrawText(const String& text, Font* font, const RectF& rect) {
 
 void Painter::DrawTextWithFlags(const String& text, Font* font,
                                 const RectF& rect, int flags) {
-  Color color = GetThemeColor(ThemeColor::Text);
+  Color color = Color::GetTheme(Color::Theme::Text);
   DrawColoredTextWithFlags(text, font, color, rect, flags);
 }
 

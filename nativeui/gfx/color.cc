@@ -4,6 +4,7 @@
 
 #include "nativeui/gfx/color.h"
 
+#include <map>
 #include <vector>
 
 #include "base/strings/string_number_conversions.h"
@@ -11,6 +12,9 @@
 namespace nu {
 
 namespace {
+
+// Cached theme colors.
+std::map<Color::Theme, Color> g_theme_colors;
 
 const uint32_t kColorWhite = 0xFFFFFFFF;
 
@@ -50,6 +54,19 @@ uint32_t ParseHexColor(const std::string& color_string) {
 }
 
 }  // namespace
+
+// The platform implementation to get theme color.
+Color GetThemeColor(Color::Theme theme);
+
+// static
+Color Color::GetTheme(Theme theme) {
+  auto it = g_theme_colors.find(theme);
+  if (it != g_theme_colors.end())
+    return it->second;
+  Color color = GetThemeColor(theme);
+  g_theme_colors[theme] = color;
+  return color;
+}
 
 Color::Color(const std::string& hex) : value_(ParseHexColor(hex)) {}
 
