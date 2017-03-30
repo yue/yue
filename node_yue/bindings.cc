@@ -103,55 +103,6 @@ struct Type<nu::Vector2dF> {
 };
 
 template<>
-struct Type<nu::SystemColor> {
-  static constexpr const char* name = "yue.SystemColor";
-  static bool FromV8(v8::Local<v8::Context> context,
-                     v8::Local<v8::Value> value,
-                     nu::SystemColor* out) {
-    std::string id;
-    if (!vb::FromV8(context, value, &id))
-      return false;
-    if (id == "text")
-      *out = nu::SystemColor::Text;
-    else
-      return false;
-    return true;
-  }
-};
-
-template<>
-struct Type<nu::Color> {
-  static constexpr const char* name = "yue.Color";
-  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
-                                   nu::Color color) {
-    return vb::ToV8(context, color.value());
-  }
-  static bool FromV8(v8::Local<v8::Context> context,
-                     v8::Local<v8::Value> value,
-                     nu::Color* out) {
-    // Direct value.
-    if (value->IsUint32()) {
-      *out = nu::Color(value->Int32Value(context).ToChecked());
-      return true;
-    }
-    // String representation.
-    std::string hex;
-    if (!vb::FromV8(context, value, &hex))
-      return false;
-    *out = nu::Color(hex);
-    return true;
-  }
-  static void BuildConstructor(v8::Local<v8::Context> context,
-                               v8::Local<v8::Object> constructor) {
-    Set(context, constructor,
-        "getSystem", &nu::GetSystemColor);
-  }
-  static void BuildPrototype(v8::Local<v8::Context> context,
-                             v8::Local<v8::ObjectTemplate> templ) {
-  }
-};
-
-template<>
 struct Type<nu::Accelerator> {
   static constexpr const char* name = "yue.Accelerator";
   static bool FromV8(v8::Local<v8::Context> context,
@@ -215,6 +166,59 @@ struct Type<nu::Font> {
   }
   static nu::Font* GetDefault() {
     return nu::State::GetCurrent()->GetDefaultFont();
+  }
+};
+
+template<>
+struct Type<nu::SystemColor> {
+  static constexpr const char* name = "yue.SystemColor";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::SystemColor* out) {
+    std::string id;
+    if (!vb::FromV8(context, value, &id))
+      return false;
+    if (id == "text")
+      *out = nu::SystemColor::Text;
+    else
+      return false;
+    return true;
+  }
+};
+
+template<>
+struct Type<nu::Color> {
+  static constexpr const char* name = "yue.Color";
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   nu::Color color) {
+    return vb::ToV8(context, color.value());
+  }
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::Color* out) {
+    // Direct value.
+    if (value->IsUint32()) {
+      *out = nu::Color(value->Uint32Value(context).ToChecked());
+      return true;
+    }
+    // String representation.
+    std::string hex;
+    if (!vb::FromV8(context, value, &hex))
+      return false;
+    *out = nu::Color(hex);
+    return true;
+  }
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+        "getSystem", &nu::GetSystemColor,
+        "rgb", NativeConstructor<nu::Color,
+                                 unsigned, unsigned, unsigned>(),
+        "argb", NativeConstructor<nu::Color,
+                                  unsigned, unsigned, unsigned, unsigned>());
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
   }
 };
 

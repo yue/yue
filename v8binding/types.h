@@ -48,7 +48,7 @@ struct Type<uint32_t> {
   static constexpr const char* name = "Integer";
   static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                           uint32_t value) {
-    return v8::Integer::New(context->GetIsolate(), value);
+    return v8::Integer::NewFromUnsigned(context->GetIsolate(), value);
   }
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,

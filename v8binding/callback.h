@@ -79,6 +79,20 @@ struct Type<T, typename std::enable_if<
   }
 };
 
+// Helper to push a type directly by invoking its constructor.
+template<typename T, typename... ArgTypes>
+struct NativeConstructor {
+  static T Call(ArgTypes... args) {
+    return std::move(T(args...));
+  }
+};
+template<typename T, typename... ArgTypes>
+inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                 NativeConstructor<T, ArgTypes...>) {
+  auto constructor = base::Bind(&NativeConstructor<T, ArgTypes...>::Call);
+  return CreateFunctionTemplate(context, constructor)->GetFunction();
+}
+
 }  // namespace vb
 
 #endif  // V8BINDING_CALLBACK_H_

@@ -104,49 +104,6 @@ struct Type<nu::Vector2dF> {
 };
 
 template<>
-struct Type<nu::SystemColor> {
-  static constexpr const char* name = "yue.SystemColor";
-  static inline bool To(State* state, int index, nu::SystemColor* out) {
-    std::string id;
-    if (!lua::To(state, index, &id))
-      return false;
-    if (id == "text")
-      *out = nu::SystemColor::Text;
-    else
-      return false;
-    return true;
-  }
-};
-
-template<>
-struct Type<nu::Color> {
-  static constexpr const char* name = "yue.Color";
-  static inline void Push(State* state, nu::Color color) {
-    lua::Push(state, color.value());
-  }
-  static inline bool To(State* state, int index, nu::Color* out) {
-    // Direct value.
-    if (GetType(state, index) == LuaType::Number) {
-      uint32_t value;
-      if (lua::To(state, index, &value)) {
-        *out = nu::Color(value);
-        return true;
-      }
-    }
-    // String representation.
-    std::string hex;
-    if (!lua::To(state, index, &hex))
-      return false;
-    *out = nu::Color(hex);
-    return true;
-  }
-  static void BuildMetaTable(State* state, int metatable) {
-    RawSet(state, metatable,
-           "getsystem", &nu::GetSystemColor);
-  }
-};
-
-template<>
 struct Type<nu::Accelerator> {
   static constexpr const char* name = "yue.Accelerator";
   static inline bool To(State* state, int index, nu::Accelerator* out) {
@@ -197,6 +154,53 @@ struct Type<nu::Font> {
   }
   static nu::Font* GetDefault() {
     return nu::State::GetCurrent()->GetDefaultFont();
+  }
+};
+
+template<>
+struct Type<nu::SystemColor> {
+  static constexpr const char* name = "yue.SystemColor";
+  static inline bool To(State* state, int index, nu::SystemColor* out) {
+    std::string id;
+    if (!lua::To(state, index, &id))
+      return false;
+    if (id == "text")
+      *out = nu::SystemColor::Text;
+    else
+      return false;
+    return true;
+  }
+};
+
+template<>
+struct Type<nu::Color> {
+  static constexpr const char* name = "yue.Color";
+  static inline void Push(State* state, nu::Color color) {
+    lua::Push(state, color.value());
+  }
+  static inline bool To(State* state, int index, nu::Color* out) {
+    // Direct value.
+    if (GetType(state, index) == LuaType::Number) {
+      uint32_t value;
+      if (lua::To(state, index, &value)) {
+        *out = nu::Color(value);
+        return true;
+      }
+    }
+    // String representation.
+    std::string hex;
+    if (!lua::To(state, index, &hex))
+      return false;
+    *out = nu::Color(hex);
+    return true;
+  }
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "getsystem", &nu::GetSystemColor,
+           "rgb", NativeConstructor<nu::Color,
+                                    unsigned, unsigned, unsigned>(),
+           "argb", NativeConstructor<nu::Color,
+                                     unsigned, unsigned, unsigned, unsigned>());
   }
 };
 
