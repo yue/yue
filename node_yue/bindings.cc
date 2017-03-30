@@ -432,6 +432,8 @@ struct Type<nu::Container> {
         "removeChildView", &nu::Container::RemoveChildView,
         "childCount", &nu::Container::ChildCount,
         "childAt", &nu::Container::ChildAt);
+    SetProperty(context, templ,
+                "onDraw", &nu::Container::on_draw);
   }
 };
 

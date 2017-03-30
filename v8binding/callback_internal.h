@@ -233,7 +233,7 @@ template<typename... ArgTypes>
 struct V8FunctionInvoker<v8::Local<v8::Value>(ArgTypes...)> {
   static v8::Local<v8::Value> Go(v8::Isolate* isolate,
                                  V8FunctionWrapper* wrapper,
-                                 const ArgTypes&... raw) {
+                                 ArgTypes... raw) {
     Locker locker(isolate);
     v8::EscapableHandleScope handle_scope(isolate);
     v8::MicrotasksScope script_scope(isolate,
@@ -241,7 +241,7 @@ struct V8FunctionInvoker<v8::Local<v8::Value>(ArgTypes...)> {
     auto func = wrapper->Get(isolate);
     auto context = func->CreationContext();
     v8::Context::Scope context_scope(context);
-    std::vector<v8::Local<v8::Value>> args = { ConvertToV8(isolate, raw)... };
+    std::vector<v8::Local<v8::Value>> args = { ToV8(context, raw)... };
     v8::Local<v8::Value> val;
     if (func->Call(context,
                    func,
@@ -257,7 +257,7 @@ template<typename... ArgTypes>
 struct V8FunctionInvoker<void(ArgTypes...)> {
   static void Go(v8::Isolate* isolate,
                  V8FunctionWrapper* wrapper,
-                 const ArgTypes&... raw) {
+                 ArgTypes... raw) {
     Locker locker(isolate);
     v8::HandleScope handle_scope(isolate);
     v8::MicrotasksScope script_scope(isolate,
@@ -265,7 +265,7 @@ struct V8FunctionInvoker<void(ArgTypes...)> {
     auto func = wrapper->Get(isolate);
     auto context = func->CreationContext();
     v8::Context::Scope context_scope(context);
-    std::vector<v8::Local<v8::Value>> args = { ConvertToV8(isolate, raw)... };
+    std::vector<v8::Local<v8::Value>> args = { ToV8(context, raw)... };
     func->Call(func,
                static_cast<int>(args.size()),
                args.empty() ? nullptr: &args.front());
@@ -276,7 +276,7 @@ template<typename ReturnType, typename... ArgTypes>
 struct V8FunctionInvoker<ReturnType(ArgTypes...)> {
   static ReturnType Go(v8::Isolate* isolate,
                        V8FunctionWrapper* wrapper,
-                       const ArgTypes&... raw) {
+                       ArgTypes... raw) {
     Locker locker(isolate);
     v8::HandleScope handle_scope(isolate);
     ReturnType ret = ReturnType();
@@ -285,7 +285,7 @@ struct V8FunctionInvoker<ReturnType(ArgTypes...)> {
     auto func = wrapper->Get(isolate);
     auto context = func->CreationContext();
     v8::Context::Scope context_scope(context);
-    std::vector<v8::Local<v8::Value>> args = { ConvertToV8(isolate, raw)... };
+    std::vector<v8::Local<v8::Value>> args = { ToV8(context, raw)... };
     v8::Local<v8::Value> val;
     if (func->Call(context,
                    func,
