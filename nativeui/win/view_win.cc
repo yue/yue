@@ -112,8 +112,9 @@ void ViewImpl::ParentChanged() {
   // Scale the bounds after moving to a new parent.
   float new_scale_factor = window_ ? window_->scale_factor() : scale_factor_;
   if (new_scale_factor != scale_factor_) {
-    size_allocation_ = ScaleToEnclosingRect(size_allocation_,
-                                            new_scale_factor / scale_factor_);
+    size_allocation_ =
+        ToNearestRect(ScaleRect(RectF(size_allocation_),
+                                new_scale_factor / scale_factor_));
     scale_factor_ = new_scale_factor;
     OnDPIChanged();
   }
@@ -132,7 +133,7 @@ void View::TakeOverView(NativeView view) {
 
 void View::SetBounds(const RectF& bounds) {
   SetPixelBounds(
-      ToEnclosingRect(ScaleRect(bounds, GetNative()->scale_factor())));
+      ToNearestRect(ScaleRect(bounds, GetNative()->scale_factor())));
 }
 
 RectF View::GetBounds() const {
