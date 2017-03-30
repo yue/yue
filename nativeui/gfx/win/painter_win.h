@@ -37,7 +37,7 @@ class PainterWin : public Painter {
   void TranslatePixel(const Vector2dF& offset);
   void DrawPixelRect(const RectF& rect);
   void FillPixelRect(const RectF& rect);
-  void DrawPixelStringWithFlags(
+  void DrawTextPixelWithFlags(
       const String& text, Font* font, const RectF& rect, int flags);
 
   // Helper to get current state.

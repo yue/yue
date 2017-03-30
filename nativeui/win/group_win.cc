@@ -65,7 +65,7 @@ class GroupImpl : public ContainerImpl,
   void Draw(PainterWin* painter, const Rect& dirty) override {
     // Draw title.
     if (RectF(dirty).Intersects(title_bounds_))
-      painter->DrawPixelStringWithFlags(title_, font_.get(), title_bounds_,
+      painter->DrawTextPixelWithFlags(title_, font_.get(), title_bounds_,
                                         Painter::TextAlignLeft);
 
     // Calculate the border bounds.

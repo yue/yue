@@ -155,7 +155,7 @@ class ButtonImpl : public ViewImpl {
     painter->ReleaseHDC(dc);
 
     // The text.
-    painter->DrawPixelStringWithFlags(title_, font_.get(), RectF(text_bounds),
+    painter->DrawTextPixelWithFlags(title_, font_.get(), RectF(text_bounds),
                                       Painter::TextAlignCenter);
   }
 

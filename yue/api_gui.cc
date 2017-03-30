@@ -206,6 +206,11 @@ struct Type<nu::Painter> {
   static constexpr const char* name = "yue.Painter";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
+           // Flags.
+           "TextAlignLeft",   static_cast<int>(nu::Painter::TextAlignLeft),
+           "TextAlignCenter", static_cast<int>(nu::Painter::TextAlignCenter),
+           "TextAlignRight",  static_cast<int>(nu::Painter::TextAlignRight),
+           // APIs
            "save", &nu::Painter::Save,
            "restore", &nu::Painter::Restore,
            "cliprect", &nu::Painter::ClipRect,
@@ -213,7 +218,8 @@ struct Type<nu::Painter> {
            "setcolor", &nu::Painter::SetColor,
            "drawrect", &nu::Painter::DrawRect,
            "fillrect", &nu::Painter::FillRect,
-           "drawtext", &nu::Painter::DrawText);
+           "drawtext", &nu::Painter::DrawText,
+           "drawtextwithflags", &nu::Painter::DrawTextWithFlags);
   }
 };
 

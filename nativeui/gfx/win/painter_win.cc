@@ -73,7 +73,7 @@ void PainterWin::FillRect(const RectF& rect) {
 
 void PainterWin::DrawTextWithFlags(
     const String& text, Font* font, const RectF& rect, int flags) {
-  DrawPixelStringWithFlags(text, font, ScaleRect(rect, scale_factor_), flags);
+  DrawTextPixelWithFlags(text, font, ScaleRect(rect, scale_factor_), flags);
 }
 
 void PainterWin::ClipPixelRect(const RectF& rect, CombineMode mode) {
@@ -102,7 +102,7 @@ void PainterWin::FillPixelRect(const RectF& rect) {
   graphics_.FillRectangle(&brush, ToGdi(rect + origin()));
 }
 
-void PainterWin::DrawPixelStringWithFlags(
+void PainterWin::DrawTextPixelWithFlags(
     const String& text, Font* font, const RectF& rect, int flags) {
   static DWORD text_color = ::GetSysColor(COLOR_WINDOWTEXT);
   Gdiplus::SolidBrush brush(Gdiplus::Color(GetRValue(text_color),

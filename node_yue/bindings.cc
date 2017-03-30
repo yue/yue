@@ -226,6 +226,10 @@ struct Type<nu::Painter> {
   static constexpr const char* name = "yue.Painter";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+        "TextAlignLeft",   static_cast<int>(nu::Painter::TextAlignLeft),
+        "TextAlignCenter", static_cast<int>(nu::Painter::TextAlignCenter),
+        "TextAlignRight",  static_cast<int>(nu::Painter::TextAlignRight));
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
@@ -237,7 +241,8 @@ struct Type<nu::Painter> {
         "setColor", &nu::Painter::SetColor,
         "drawRect", &nu::Painter::DrawRect,
         "fillRect", &nu::Painter::FillRect,
-        "drawText", &nu::Painter::DrawText);
+        "drawText", &nu::Painter::DrawText,
+        "drawTextWithFlags", &nu::Painter::DrawTextWithFlags);
   }
 };
 
