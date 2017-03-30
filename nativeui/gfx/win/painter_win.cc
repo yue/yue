@@ -64,7 +64,7 @@ void PainterWin::SetColor(Color new_color) {
 }
 
 void PainterWin::SetLineWidth(float width) {
-  line_width() = width;
+  SetPixelLineWidth(width * scale_factor_);
 }
 
 void PainterWin::DrawRect(const RectF& rect) {
@@ -94,6 +94,10 @@ void PainterWin::ClipPixelRect(const RectF& rect, CombineMode mode) {
 
 void PainterWin::TranslatePixel(const Vector2dF& offset) {
   origin() += offset;
+}
+
+void PainterWin::SetPixelLineWidth(float width) {
+  line_width() = width;
 }
 
 void PainterWin::DrawPixelRect(const RectF& rect) {

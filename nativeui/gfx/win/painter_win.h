@@ -36,6 +36,7 @@ class PainterWin : public Painter {
   // The pixel versions.
   void ClipPixelRect(const RectF& rect, CombineMode mode);
   void TranslatePixel(const Vector2dF& offset);
+  void SetPixelLineWidth(float width);
   void DrawPixelRect(const RectF& rect);
   void FillPixelRect(const RectF& rect);
   void DrawTextPixelWithFlags(
