@@ -24,10 +24,7 @@ class ObjectTracker {
   v8::Isolate* GetIsolate() const;
 
  private:
-  static void FirstWeakCallback(
-      const v8::WeakCallbackInfo<ObjectTracker>& data);
-  static void SecondWeakCallback(
-      const v8::WeakCallbackInfo<ObjectTracker>& data);
+  static void WeakCallback(const v8::WeakCallbackInfo<ObjectTracker>& data);
 
   v8::Isolate* isolate_;
   v8::Global<v8::Object> v8_ref_;

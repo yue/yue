@@ -25,12 +25,12 @@ void DefaultConstructor(const v8::FunctionCallbackInfo<v8::Value>& info) {
 
 ObjectTracker::ObjectTracker(v8::Isolate* isolate, v8::Local<v8::Object> obj)
     : isolate_(isolate), v8_ref_(isolate, obj) {
-  v8_ref_.SetWeak(this, &ObjectTracker::FirstWeakCallback,
+  v8_ref_.SetWeak(this, &ObjectTracker::WeakCallback,
                   v8::WeakCallbackType::kParameter);
 }
 
 ObjectTracker::~ObjectTracker() {
-  DCHECK(v8_ref_.IsEmpty());
+  DCHECK(!v8_ref_.IsEmpty());
 }
 
 v8::Local<v8::Object> ObjectTracker::GetHandle() const {
@@ -42,14 +42,7 @@ v8::Isolate* ObjectTracker::GetIsolate() const {
 }
 
 // static
-void ObjectTracker::FirstWeakCallback(
-    const v8::WeakCallbackInfo<ObjectTracker>& data) {
-  data.GetParameter()->v8_ref_.Reset();
-  data.SetSecondPassCallback(SecondWeakCallback);
-}
-
-// static
-void ObjectTracker::SecondWeakCallback(
+void ObjectTracker::WeakCallback(
     const v8::WeakCallbackInfo<ObjectTracker>& data) {
   delete data.GetParameter();
 }
