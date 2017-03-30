@@ -9,6 +9,7 @@
 
 #include "base/bind.h"
 #include "base/callback.h"
+#include "node.h"  // NOLINT(build/include)
 #include "v8binding/arguments.h"
 #include "v8binding/locker.h"
 #include "v8binding/template_util.h"
@@ -240,16 +241,11 @@ struct V8FunctionInvoker<v8::Local<v8::Value>(ArgTypes...)> {
                                      v8::MicrotasksScope::kRunMicrotasks);
     auto func = wrapper->Get(isolate);
     auto context = func->CreationContext();
-    v8::Context::Scope context_scope(context);
     std::vector<v8::Local<v8::Value>> args = { ToV8(context, raw)... };
-    v8::Local<v8::Value> val;
-    if (func->Call(context,
-                   func,
-                   static_cast<int>(args.size()),
-                   args.empty() ? nullptr: &args.front()).ToLocal(&val))
-      return handle_scope.Escape(val);
-    else
-      return v8::Undefined(isolate);
+    return handle_scope.Escape(node::MakeCallback(
+          isolate, func, func,
+          static_cast<int>(args.size()),
+          args.empty() ? nullptr: &args.front()));
   }
 };
 
@@ -264,11 +260,10 @@ struct V8FunctionInvoker<void(ArgTypes...)> {
                                      v8::MicrotasksScope::kRunMicrotasks);
     auto func = wrapper->Get(isolate);
     auto context = func->CreationContext();
-    v8::Context::Scope context_scope(context);
     std::vector<v8::Local<v8::Value>> args = { ToV8(context, raw)... };
-    func->Call(func,
-               static_cast<int>(args.size()),
-               args.empty() ? nullptr: &args.front());
+    node::MakeCallback(isolate, func, func,
+                       static_cast<int>(args.size()),
+                       args.empty() ? nullptr: &args.front());
   }
 };
 
@@ -279,19 +274,17 @@ struct V8FunctionInvoker<ReturnType(ArgTypes...)> {
                        ArgTypes... raw) {
     Locker locker(isolate);
     v8::HandleScope handle_scope(isolate);
-    ReturnType ret = ReturnType();
     v8::MicrotasksScope script_scope(isolate,
                                      v8::MicrotasksScope::kRunMicrotasks);
     auto func = wrapper->Get(isolate);
     auto context = func->CreationContext();
-    v8::Context::Scope context_scope(context);
     std::vector<v8::Local<v8::Value>> args = { ToV8(context, raw)... };
-    v8::Local<v8::Value> val;
-    if (func->Call(context,
-                   func,
-                   static_cast<int>(args.size()),
-                   args.empty() ? nullptr : &args.front()).ToLocal(&val))
-      FromV8(context, val, &ret);
+    v8::Local<v8::Value> val = node::MakeCallback(
+        isolate, func, func,
+        static_cast<int>(args.size()),
+        args.empty() ? nullptr : &args.front());
+    ReturnType ret = ReturnType();
+    FromV8(context, val, &ret);
     return ret;
   }
 };
