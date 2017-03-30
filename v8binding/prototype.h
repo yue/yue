@@ -14,7 +14,11 @@ namespace vb {
 
 // Create constructor for the prototype.
 template<typename T>
-v8::Local<v8::Function> GetConstructor(v8::Local<v8::Context> context) {
+struct Constructor {
+};
+template<typename T>
+inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                 Constructor<T>) {
   v8::Isolate* isolate = context->GetIsolate();
   auto templ = internal::InheritanceChain<T>::Get(context);
   auto constructor = templ->GetFunction(context).ToLocalChecked();
@@ -31,10 +35,10 @@ v8::Local<v8::Function> GetConstructor(v8::Local<v8::Context> context) {
 template<typename T>
 v8::MaybeLocal<v8::Object> CallConstructor(v8::Local<v8::Context> context) {
   // Pass an External to indicate it is called from native code.
-  v8::Local<v8::Function> constructor = GetConstructor<T>(context);
   v8::Local<v8::Value> indicator = v8::External::New(
       context->GetIsolate(), nullptr);
-  return constructor->NewInstance(context, 1, &indicator);
+  return ToV8(context, Constructor<T>()).template As<v8::Function>()->
+      NewInstance(context, 1, &indicator);
 }
 
 // Helper to create a new instance of |T|.
