@@ -9,23 +9,7 @@
 
 #include <gtk/gtk.h>
 
-#include "nativeui/label.h"
-
 namespace nu {
-
-namespace {
-
-Color GetDefaultTextColor() {
-  scoped_refptr<nu::Label> label = new nu::Label;
-  gtk_widget_ensure_style(label->GetNative());
-  GtkStyle* style = gtk_widget_get_style(label->GetNative());
-  GdkColor color;
-  if (!gtk_style_lookup_color(style, "text_color", &color))
-    return Color();
-  return Color(color.red >> 8, color.green >> 8, color.blue >> 8);
-}
-
-}  // namespace
 
 PainterGtk::PainterGtk(cairo_t* context) : context_(context) {
 }
@@ -75,8 +59,8 @@ void PainterGtk::FillRect(const RectF& rect) {
   cairo_fill(context_);
 }
 
-void PainterGtk::DrawTextWithFlags(
-    const String& text, Font* font, const RectF& rect, int flags) {
+void PainterGtk::DrawColoredTextWithFlags(
+    const String& text, Font* font, Color color, const RectF& rect, int flags) {
   PangoLayout* layout = pango_cairo_create_layout(context_);
   pango_layout_set_font_description(layout, font->GetNative());
   cairo_save(context_);
@@ -96,8 +80,7 @@ void PainterGtk::DrawTextWithFlags(
   else if (flags & TextAlignCenter)
     x += (rect.width() - width) / 2;
 
-  // Use default text color.
-  static Color color = GetDefaultTextColor();
+  // Apply the color.
   SetColor(color);
 
   // Draw text.

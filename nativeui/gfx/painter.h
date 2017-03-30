@@ -43,34 +43,43 @@ class NATIVEUI_EXPORT Painter {
   virtual void Save() = 0;
   virtual void Restore() = 0;
 
-  // Applies |rect| to the current clip using the specified region |op|.
+  // Apply |rect| to the current clip using the specified region |op|.
   virtual void ClipRect(const RectF& rect,
                         CombineMode mode = CombineMode::Replace) = 0;
 
   // The origin offset of the painting.
   virtual void Translate(const Vector2dF& offset) = 0;
 
-  // Sets the color used for drawing or filling.
+  // Set the color used for drawing or filling.
   virtual void SetColor(Color color) = 0;
 
-  // Sets the width used for drawing lines.
+  // Set the width used for drawing lines.
   virtual void SetLineWidth(float width) = 0;
 
-  // Draws a single pixel |rect|.
+  // Draw a single pixel |rect|.
   virtual void DrawRect(const RectF& rect) = 0;
 
-  // Fills |rect|.
+  // Fill |rect|.
   virtual void FillRect(const RectF& rect) = 0;
 
-  // Draws text with the specified color, fonts and location. The text is
+  // Draw text with the specified color, fonts and location. The text is
   // aligned to the left, vertically centered, clipped to the region. If the
   // text is too big, it is truncated and '...' is added to the end.
   void DrawText(const String& text, Font* font, const RectF& rect);
 
-  // Draws text with the specified font and location. The last argument
+  // Draw text with the specified font and location. The last argument
   // specifies flags for how the text should be rendered.
-  virtual void DrawTextWithFlags(
-      const String& text, Font* font, const RectF& rect, int flags) = 0;
+  void DrawTextWithFlags(
+      const String& text, Font* font, const RectF& rect, int flags);
+
+  // Draw colored text.
+  void DrawColoredText(
+      const String& text, Font* font, Color color, const RectF& rect);
+
+  // Draw colored text with additional flags.
+  virtual void DrawColoredTextWithFlags(
+      const String& text, Font* font, Color color, const RectF& rect,
+      int flags) = 0;
 
   base::WeakPtr<Painter> GetWeakPtr() { return weak_factory_.GetWeakPtr(); }
 

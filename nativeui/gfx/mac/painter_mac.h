@@ -24,8 +24,9 @@ class PainterMac : public Painter {
   void SetLineWidth(float width) override;
   void DrawRect(const RectF& rect) override;
   void FillRect(const RectF& rect) override;
-  void DrawTextWithFlags(
-      const String& text, Font* font, const RectF& rect, int flags) override;
+  void DrawColoredTextWithFlags(
+      const String& text, Font* font, Color color, const RectF& rect,
+      int flags) override;
 };
 
 }  // namespace nu

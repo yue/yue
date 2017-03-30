@@ -49,20 +49,21 @@ void PainterMac::SetLineWidth(float width) {
 }
 
 void PainterMac::DrawRect(const RectF& rect) {
-  NSFrameRect(rect.ToCGRect());
+  [NSBezierPath strokeRect:rect.ToCGRect()];
 }
 
 void PainterMac::FillRect(const RectF& rect) {
   NSRectFillUsingOperation(rect.ToCGRect(), NSCompositeSourceOver);
 }
 
-void PainterMac::DrawTextWithFlags(
-    const String& utf8text, Font* font, const RectF& rect, int flags) {
+void PainterMac::DrawColoredTextWithFlags(
+    const String& str, Font* font, Color color, const RectF& rect, int flags) {
   NSMutableParagraphStyle* paragraphStyle =
       [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
   NSDictionary* attributes = @{
     NSFontAttributeName: font->GetNative(),
     NSParagraphStyleAttributeName: paragraphStyle,
+    NSForegroundColorAttributeName: color.ToNSColor(),
   };
 
   if (flags & TextAlignRight)
@@ -72,7 +73,7 @@ void PainterMac::DrawTextWithFlags(
   else
     [paragraphStyle setAlignment:NSLeftTextAlignment];
 
-  NSString* text = base::SysUTF8ToNSString(utf8text);
+  NSString* text = base::SysUTF8ToNSString(str);
   NSAttributedString* attribute =
       [[[NSAttributedString alloc] initWithString:text
                                        attributes:attributes] autorelease];

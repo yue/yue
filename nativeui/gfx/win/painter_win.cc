@@ -75,9 +75,10 @@ void PainterWin::FillRect(const RectF& rect) {
   FillPixelRect(ScaleRect(rect, scale_factor_));
 }
 
-void PainterWin::DrawTextWithFlags(
-    const String& text, Font* font, const RectF& rect, int flags) {
-  DrawTextPixelWithFlags(text, font, ScaleRect(rect, scale_factor_), flags);
+void PainterWin::DrawColoredTextWithFlags(
+    const String& text, Font* font, Color color, const RectF& rect, int flags) {
+  DrawColoredTextPixelWithFlags(text, font, color,
+                                ScaleRect(rect, scale_factor_), flags);
 }
 
 void PainterWin::ClipPixelRect(const RectF& rect, CombineMode mode) {
@@ -110,12 +111,9 @@ void PainterWin::FillPixelRect(const RectF& rect) {
   graphics_.FillRectangle(&brush, ToGdi(rect + origin()));
 }
 
-void PainterWin::DrawTextPixelWithFlags(
-    const String& text, Font* font, const RectF& rect, int flags) {
-  static DWORD text_color = ::GetSysColor(COLOR_WINDOWTEXT);
-  Gdiplus::SolidBrush brush(Gdiplus::Color(GetRValue(text_color),
-                                           GetGValue(text_color),
-                                           GetBValue(text_color)));
+void PainterWin::DrawColoredTextPixelWithFlags(
+    const String& text, Font* font, Color color, const RectF& rect, int flags) {
+  Gdiplus::SolidBrush brush(ToGdi(color()));
   Gdiplus::StringFormat format;
   format.SetLineAlignment(Gdiplus::StringAlignmentCenter);
   if (flags & TextAlignLeft)

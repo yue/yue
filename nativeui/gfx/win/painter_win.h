@@ -30,8 +30,9 @@ class PainterWin : public Painter {
   void SetLineWidth(float width) override;
   void DrawRect(const RectF& rect) override;
   void FillRect(const RectF& rect) override;
-  void DrawTextWithFlags(
-      const String& text, Font* font, const RectF& rect, int flags) override;
+  void DrawColoredTextWithFlags(
+      const String& text, Font* font, Color color, const RectF& rect,
+      int flags) override;
 
   // The pixel versions.
   void ClipPixelRect(const RectF& rect, CombineMode mode);
@@ -39,8 +40,9 @@ class PainterWin : public Painter {
   void SetPixelLineWidth(float width);
   void DrawPixelRect(const RectF& rect);
   void FillPixelRect(const RectF& rect);
-  void DrawTextPixelWithFlags(
-      const String& text, Font* font, const RectF& rect, int flags);
+  void DrawColoredTextPixelWithFlags(
+      const String& text, Font* font, Color color, const RectF& rect,
+      int flags) override;
 
   // Helper to get current state.
   Color& color() { return states_.empty() ? color_
