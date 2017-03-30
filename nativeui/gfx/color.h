@@ -33,17 +33,12 @@ namespace nu {
 // A class to represent colors.
 class NATIVEUI_EXPORT Color {
  public:
-  // Get the system theme color.
-  enum class Theme {
-    Text,
-  };
-  static Color GetTheme(Theme theme);
-
   explicit Color(const std::string& hex);
   Color(unsigned a, unsigned r, unsigned g, unsigned b)
       : value_((a << 24) | (r << 16) | (g << 8) | (b << 0)) {}
   Color(unsigned r, unsigned g, unsigned b)
       : Color(0xFF, r, g, b) {}
+  Color(uint32_t value) : value_(value) {}
   Color() : value_(0) {}
 
 #if defined(OS_MACOSX)
@@ -53,6 +48,8 @@ class NATIVEUI_EXPORT Color {
 #elif defined(OS_LINUX)
   GdkRGBA ToGdkRGBA() const;
 #endif
+
+  uint32_t value() const { return value_; }
 
   unsigned a() const { return ((value_) >> 24) & 0xFF; }
   unsigned r() const { return ((value_) >> 16) & 0xFF; }
@@ -77,6 +74,12 @@ class NATIVEUI_EXPORT Color {
  private:
   uint32_t value_;
 };
+
+// Get system theme color.
+enum class SystemColor {
+  Text,
+};
+NATIVEUI_EXPORT Color GetSystemColor(SystemColor color_id);
 
 }  // namespace nu
 

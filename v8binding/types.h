@@ -21,13 +21,13 @@ template<>
 struct Type<std::nullptr_t> {
   static constexpr const char* name = "Null";
   static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
-                                          nullptr_t value) {
+                                          std::nullptr_t value) {
     return v8::Null(context->GetIsolate());
   }
 };
 
 template<>
-struct Type<int> {
+struct Type<int32_t> {
   static constexpr const char* name = "Integer";
   static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                           int32_t value) {
@@ -38,7 +38,24 @@ struct Type<int> {
                      int32_t* out) {
     if (!value->IsInt32())
       return false;
-    *out = value->Int32Value();
+    *out = value->Int32Value(context).ToChecked();
+    return true;
+  }
+};
+
+template<>
+struct Type<uint32_t> {
+  static constexpr const char* name = "Integer";
+  static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                          uint32_t value) {
+    return v8::Integer::New(context->GetIsolate(), value);
+  }
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     uint32_t* out) {
+    if (!value->IsUint32())
+      return false;
+    *out = value->Uint32Value(context).ToChecked();
     return true;
   }
 };
@@ -55,7 +72,7 @@ struct Type<float> {
                      float* out) {
     if (!value->IsNumber())
       return false;
-    *out = static_cast<float>(value->NumberValue());
+    *out = static_cast<float>(value->NumberValue(context).ToChecked());
     return true;
   }
 };
@@ -72,7 +89,7 @@ struct Type<bool> {
                      bool* out) {
     if (!value->IsBoolean())
       return false;
-    *out = value->BooleanValue();
+    *out = value->BooleanValue(context).ToChecked();
     return true;
   }
 };

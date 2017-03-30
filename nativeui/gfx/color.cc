@@ -14,7 +14,7 @@ namespace nu {
 namespace {
 
 // Cached theme colors.
-std::map<Color::Theme, Color> g_theme_colors;
+std::map<SystemColor, Color> g_theme_colors;
 
 const uint32_t kColorWhite = 0xFFFFFFFF;
 
@@ -55,19 +55,18 @@ uint32_t ParseHexColor(const std::string& color_string) {
 
 }  // namespace
 
-// The platform implementation to get theme color.
-Color GetThemeColor(Color::Theme theme);
+Color::Color(const std::string& hex) : value_(ParseHexColor(hex)) {}
 
-// static
-Color Color::GetTheme(Theme theme) {
-  auto it = g_theme_colors.find(theme);
+// The platform implementation to get theme color.
+Color PlatformGetSystemColor(SystemColor id);
+
+Color GetSystemColor(SystemColor id) {
+  auto it = g_theme_colors.find(id);
   if (it != g_theme_colors.end())
     return it->second;
-  Color color = GetThemeColor(theme);
-  g_theme_colors[theme] = color;
+  Color color = PlatformGetSystemColor(id);
+  g_theme_colors[id] = color;
   return color;
 }
-
-Color::Color(const std::string& hex) : value_(ParseHexColor(hex)) {}
 
 }  // namespace nu

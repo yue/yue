@@ -75,6 +75,21 @@ struct Type<int> {
 };
 
 template<>
+struct Type<uint32_t> {
+  static constexpr const char* name = "integer";
+  static inline void Push(State* state, uint32_t number) {
+    lua_pushinteger(state, number);
+  }
+  static inline bool To(State* state, int index, uint32_t* out) {
+    int success = 0;
+    int ret = lua_tointegerx(state, index, &success);
+    if (success)
+      *out = ret;
+    return success != 0;
+  }
+};
+
+template<>
 struct Type<float> {
   static constexpr const char* name = "number";
   static inline void Push(State* state, float number) {

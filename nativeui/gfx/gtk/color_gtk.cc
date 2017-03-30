@@ -16,8 +16,8 @@ GdkRGBA Color::ToGdkRGBA() const {
   return rgba;
 }
 
-Color GetThemeColor(Color::Theme theme) {
-  if (theme == Color::Theme::Text) {
+Color PlatformGetSystemColor(SystemColor id) {
+  if (id == SystemColor::Text) {
     scoped_refptr<nu::Label> label = new nu::Label;
     gtk_widget_ensure_style(label->GetNative());
     GtkStyle* style = gtk_widget_get_style(label->GetNative());

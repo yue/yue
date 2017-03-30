@@ -17,9 +17,9 @@ NSColor* Color::ToNSColor() const {
                                    alpha:a() / 255.0];
 }
 
-Color GetThemeColor(Color::Theme theme) {
+Color PlatformGetSystemColor(SystemColor id) {
   NSColor* color;
-  if (theme == Color::Theme::Text)
+  if (id == SystemColor::Text)
     color = [NSColor textColor];
   else
     color = [NSColor blackColor];

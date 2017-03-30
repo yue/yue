@@ -104,14 +104,45 @@ struct Type<nu::Vector2dF> {
 };
 
 template<>
+struct Type<nu::SystemColor> {
+  static constexpr const char* name = "yue.SystemColor";
+  static inline bool To(State* state, int index, nu::SystemColor* out) {
+    std::string id;
+    if (!lua::To(state, index, &id))
+      return false;
+    if (id == "text")
+      *out = nu::SystemColor::Text;
+    else
+      return false;
+    return true;
+  }
+};
+
+template<>
 struct Type<nu::Color> {
   static constexpr const char* name = "yue.Color";
+  static inline void Push(State* state, nu::Color color) {
+    lua::Push(state, color.value());
+  }
   static inline bool To(State* state, int index, nu::Color* out) {
+    // Direct value.
+    if (GetType(state, index) == LuaType::Number) {
+      uint32_t value;
+      if (lua::To(state, index, &value)) {
+        *out = nu::Color(value);
+        return true;
+      }
+    }
+    // String representation.
     std::string hex;
     if (!lua::To(state, index, &hex))
       return false;
     *out = nu::Color(hex);
     return true;
+  }
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "getsystem", &nu::GetSystemColor);
   }
 };
 
@@ -638,6 +669,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
               "Lifetime",  lua::MetaTable<nu::Lifetime>(),
               "App",       lua::MetaTable<nu::App>(),
               "Font",      lua::MetaTable<nu::Font>(),
+              "Color",     lua::MetaTable<nu::Color>(),
               "Image",     lua::MetaTable<nu::Image>(),
               "Painter",   lua::MetaTable<nu::Painter>(),
               "MenuBar",   lua::MetaTable<nu::MenuBar>(),
