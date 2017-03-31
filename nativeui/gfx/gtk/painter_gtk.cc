@@ -27,7 +27,7 @@ void PainterGtk::Restore() {
 
 void PainterGtk::ClipRect(const RectF& rect, CombineMode mode) {
   if (mode == CombineMode::Union || mode == CombineMode::Exclude) {
-    LOG(ERROR) << "Cairo only supports replacing and intersecting clip region";
+    LOG(ERROR) << "Cairo only supports replacing clip region";
     return;
   } else if (mode == CombineMode::Replace) {
     cairo_reset_clip(context_);

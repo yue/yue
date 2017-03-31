@@ -52,6 +52,13 @@ void PainterWin::DrawNativeTheme(NativeTheme::Part part,
   ReleaseHDC(hdc);
 }
 
+void PainterWin::DrawFocusRect(const Rect& rect) {
+  HDC hdc = GetHDC();
+  RECT r = (rect + ToCeiledVector2d(origin())).ToRECT();
+  ::DrawFocusRect(hdc, &r);
+  ReleaseHDC(hdc);
+}
+
 void PainterWin::Save() {
   states_.emplace(color(), origin(), graphics_.BeginContainer());
 }

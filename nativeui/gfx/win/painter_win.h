@@ -18,16 +18,14 @@ class PainterWin : public Painter {
   PainterWin(HDC hdc, float scale_factor);
   ~PainterWin() override;
 
-  // Receive the HDC that can be painted on.
-  // TODO(zcbenz): Remove all usages of this.
-  HDC GetHDC();
-  void ReleaseHDC(HDC dc);
-
   // Draw a control.
   void DrawNativeTheme(NativeTheme::Part part,
                        ControlState state,
                        const Rect& rect,
                        const NativeTheme::ExtraParams& extra);
+
+  // Draw the focus rect.
+  void DrawFocusRect(const Rect& rect);
 
   // Painter:
   void Save() override;
@@ -65,6 +63,10 @@ class PainterWin : public Painter {
   HDC hdc() const { return hdc_; }
 
  private:
+  // Receive the HDC that can be painted on.
+  HDC GetHDC();
+  void ReleaseHDC(HDC dc);
+
   // The saved state.
   struct PainterState {
     PainterState(Color color,

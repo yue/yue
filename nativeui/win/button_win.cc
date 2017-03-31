@@ -142,19 +142,15 @@ class ButtonImpl : public ViewImpl {
 
     // Draw focused ring.
     if (IsFocused()) {
-      RECT rect;
+      Rect rect;
       if (type() == ControlType::Button) {
-        Rect bounds = Rect(size) + ToCeiledVector2d(painter->origin());
-        bounds.Inset(Insets(std::ceil(1 * scale_factor())));
-        rect = bounds.ToRECT();
+        rect = Rect(size);
+        rect.Inset(Insets(std::ceil(1 * scale_factor())));
       } else {
-        Rect bounds = text_bounds + ToCeiledVector2d(painter->origin());
-        bounds.Inset(Insets(padding));
-        rect = bounds.ToRECT();
+        rect = text_bounds;
+        rect.Inset(Insets(padding));
       }
-      HDC hdc = painter->GetHDC();
-      ::DrawFocusRect(hdc, &rect);
-      painter->ReleaseHDC(hdc);
+      painter->DrawFocusRect(rect);
     }
   }
 
