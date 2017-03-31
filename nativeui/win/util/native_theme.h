@@ -110,9 +110,6 @@ class NativeTheme {
                            int state_id,
                            const Rect& rect) const;
 
-  // Update the locally cached set of system colors.
-  void UpdateSystemColors();
-
   // Returns a handle to the theme data.
   HANDLE GetThemeHandle(Part part) const;
 
@@ -164,24 +161,15 @@ class NativeTheme {
 
   // Function pointers into uxtheme.dll.
   DrawThemeBackgroundPtr draw_theme_;
-  DrawThemeBackgroundExPtr draw_theme_ex_;
-  GetThemeColorPtr get_theme_color_;
-  GetThemeContentRectPtr get_theme_content_rect_;
   GetThemePartSizePtr get_theme_part_size_;
   OpenThemeDataPtr open_theme_;
   CloseThemeDataPtr close_theme_;
-  SetThemeAppPropertiesPtr set_theme_properties_;
-  IsThemeActivePtr is_theme_active_;
-  GetThemeIntPtr get_theme_int_;
 
   // Handle to uxtheme.dll.
   HMODULE theme_dll_;
 
   // A cache of open theme handles.
   mutable HANDLE theme_handles_[NumParts];
-
-  // Cache of system colors.
-  mutable std::map<int, Color> system_colors_;
 
   DISALLOW_COPY_AND_ASSIGN(NativeTheme);
 };

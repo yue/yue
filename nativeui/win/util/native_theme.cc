@@ -8,36 +8,9 @@
 #include <vsstyle.h>
 #include <vssym32.h>
 
-#include "nativeui/gfx/painter.h"
-
-// This was removed from Winvers.h but is still used.
-#if !defined(COLOR_MENUHIGHLIGHT)
-#define COLOR_MENUHIGHLIGHT 29
-#endif
-
 namespace nu {
 
 namespace {
-
-// Windows system color IDs cached and updated by the native theme.
-const int kSystemColors[] = {
-  COLOR_3DFACE,
-  COLOR_BTNFACE,
-  COLOR_BTNTEXT,
-  COLOR_GRAYTEXT,
-  COLOR_HIGHLIGHT,
-  COLOR_HIGHLIGHTTEXT,
-  COLOR_HOTLIGHT,
-  COLOR_MENUHIGHLIGHT,
-  COLOR_SCROLLBAR,
-  COLOR_WINDOW,
-  COLOR_WINDOWTEXT,
-};
-
-// Converts COLORREFs (0BGR) to the nativeui Color.
-Color COLORREFToColor(COLORREF color) {
-  return Color(GetRValue(color), GetGValue(color), GetBValue(color));
-}
 
 int GetWindowsPart(NativeTheme::Part part) {
   if (part == NativeTheme::CheckBox)
@@ -103,42 +76,21 @@ int GetWindowsState(NativeTheme::Part part, ControlState state) {
 
 NativeTheme::NativeTheme()
     : draw_theme_(nullptr),
-      draw_theme_ex_(nullptr),
-      get_theme_color_(nullptr),
-      get_theme_content_rect_(nullptr),
       get_theme_part_size_(nullptr),
       open_theme_(nullptr),
       close_theme_(nullptr),
-      set_theme_properties_(nullptr),
-      is_theme_active_(nullptr),
-      get_theme_int_(nullptr),
       theme_dll_(LoadLibrary(L"uxtheme.dll")) {
   if (theme_dll_) {
     draw_theme_ = reinterpret_cast<DrawThemeBackgroundPtr>(
         GetProcAddress(theme_dll_, "DrawThemeBackground"));
-    draw_theme_ex_ = reinterpret_cast<DrawThemeBackgroundExPtr>(
-        GetProcAddress(theme_dll_, "DrawThemeBackgroundEx"));
-    get_theme_color_ = reinterpret_cast<GetThemeColorPtr>(
-        GetProcAddress(theme_dll_, "GetThemeColor"));
-    get_theme_content_rect_ = reinterpret_cast<GetThemeContentRectPtr>(
-        GetProcAddress(theme_dll_, "GetThemeBackgroundContentRect"));
     get_theme_part_size_ = reinterpret_cast<GetThemePartSizePtr>(
         GetProcAddress(theme_dll_, "GetThemePartSize"));
     open_theme_ = reinterpret_cast<OpenThemeDataPtr>(
         GetProcAddress(theme_dll_, "OpenThemeData"));
     close_theme_ = reinterpret_cast<CloseThemeDataPtr>(
         GetProcAddress(theme_dll_, "CloseThemeData"));
-    set_theme_properties_ = reinterpret_cast<SetThemeAppPropertiesPtr>(
-        GetProcAddress(theme_dll_, "SetThemeAppProperties"));
-    is_theme_active_ = reinterpret_cast<IsThemeActivePtr>(
-        GetProcAddress(theme_dll_, "IsThemeActive"));
-    get_theme_int_ = reinterpret_cast<GetThemeIntPtr>(
-        GetProcAddress(theme_dll_, "GetThemeInt"));
   }
   memset(theme_handles_, 0, sizeof(theme_handles_));
-
-  // Initialize the cached system colors.
-  UpdateSystemColors();
 }
 
 NativeTheme::~NativeTheme() {
@@ -146,11 +98,6 @@ NativeTheme::~NativeTheme() {
     CloseHandles();
     FreeLibrary(theme_dll_);
   }
-}
-
-void NativeTheme::UpdateSystemColors() {
-  for (int color : kSystemColors)
-    system_colors_[color] = COLORREFToColor(GetSysColor(color));
 }
 
 Size NativeTheme::GetThemePartSize(HDC hdc,
