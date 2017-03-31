@@ -7,22 +7,13 @@
 
 #include "nativeui/view.h"
 #include "nativeui/gfx/win/painter_win.h"
+#include "nativeui/win/util/native_theme.h"
 #include "nativeui/win/window_win.h"
 
 namespace nu {
 
 class ScrollImpl;
 class WindowImpl;
-
-// The state of the control.
-enum class ControlState {
-  // IDs defined as specific values for use in arrays.
-  Disabled = 0,
-  Hovered  = 1,
-  Normal   = 2,
-  Pressed  = 3,
-  Size     = Pressed + 1,
-};
 
 // Possible control types.
 enum class ControlType {

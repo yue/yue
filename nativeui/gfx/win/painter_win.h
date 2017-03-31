@@ -9,16 +9,25 @@
 
 #include "nativeui/gfx/painter.h"
 #include "nativeui/gfx/win/gdiplus.h"
+#include "nativeui/win/util/native_theme.h"
 
 namespace nu {
 
 class PainterWin : public Painter {
  public:
-  PainterWin(HDC dc, float scale_factor);
+  PainterWin(HDC hdc, float scale_factor);
   ~PainterWin() override;
 
+  // Receive the HDC that can be painted on.
+  // TODO(zcbenz): Remove all usages of this.
   HDC GetHDC();
   void ReleaseHDC(HDC dc);
+
+  // Draw a control.
+  void DrawNativeTheme(NativeTheme::Part part,
+                       ControlState state,
+                       const Rect& rect,
+                       const NativeTheme::ExtraParams& extra);
 
   // Painter:
   void Save() override;
@@ -52,6 +61,9 @@ class PainterWin : public Painter {
   Vector2dF& origin() { return states_.empty() ? origin_
                                                : states_.top().origin; }
 
+  // The internal HDC handle.
+  HDC hdc() const { return hdc_; }
+
  private:
   // The saved state.
   struct PainterState {
@@ -72,6 +84,9 @@ class PainterWin : public Painter {
   Color color_;
   float line_width_ = 1.f;
   Vector2dF origin_;
+
+  // Weak ref to the original HDC, should only be used internally.
+  HDC hdc_;
 
   float scale_factor_;
   Gdiplus::Graphics graphics_;

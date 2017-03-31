@@ -7,6 +7,8 @@
 #include <memory>
 
 #include "base/win/scoped_gdi_object.h"
+#include "nativeui/gfx/geometry/vector2d_conversions.h"
+#include "nativeui/state.h"
 
 namespace nu {
 
@@ -17,7 +19,7 @@ PainterWin::PainterState::PainterState(Color color,
 }
 
 PainterWin::PainterWin(HDC dc, float scale_factor)
-    : scale_factor_(scale_factor), graphics_(dc) {
+    : hdc_(dc), scale_factor_(scale_factor), graphics_(dc) {
 }
 
 PainterWin::~PainterWin() {
@@ -38,6 +40,16 @@ HDC PainterWin::GetHDC() {
 
 void PainterWin::ReleaseHDC(HDC dc) {
   graphics_.ReleaseHDC(dc);
+}
+
+void PainterWin::DrawNativeTheme(NativeTheme::Part part,
+                                 ControlState state,
+                                 const Rect& rect,
+                                 const NativeTheme::ExtraParams& extra) {
+  HDC hdc = GetHDC();
+  State::GetCurrent()->GetNativeTheme()->Paint(
+      part, hdc, state, rect + ToCeiledVector2d(origin()), extra);
+  ReleaseHDC(hdc);
 }
 
 void PainterWin::Save() {

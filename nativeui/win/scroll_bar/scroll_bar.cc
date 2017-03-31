@@ -6,14 +6,10 @@
 
 #include <algorithm>
 
-#include "nativeui/gfx/geometry/vector2d_conversions.h"
-#include "nativeui/state.h"
-
 namespace nu {
 
 ScrollBar::ScrollBar(bool vertical, ScrollImpl* scroll)
     : ContainerImpl(this, ControlType::ScrollBar),
-      theme_(State::GetCurrent()->GetNativeTheme()),
       near_button_(vertical ? ScrollBarButton::Up : ScrollBarButton::Left,
                    this),
       far_button_(vertical ? ScrollBarButton::Down : ScrollBarButton::Right,
@@ -156,21 +152,18 @@ bool ScrollBar::OnMouseClick(UINT message, UINT flags,
 void ScrollBar::Draw(PainterWin* painter, const Rect& dirty) {
   int track_size = GetTrackSize();
   if (track_size > 0) {
-    HDC dc = painter->GetHDC();
     int box_size = GetBoxSize();
     Rect track_area(vertical_ ? 0 : box_size, vertical_ ? box_size : 0,
                     vertical_ ? box_size : track_size,
                     vertical_ ? track_size : box_size);
     NativeTheme::ExtraParams params;
     params.scrollbar_track = params_;
-    theme_->Paint(
+    painter->DrawNativeTheme(
         (vertical_ ? NativeTheme::Part::ScrollbarVerticalTrack
                    : NativeTheme::Part::ScrollbarHorizontalTrack),
-        dc,
         state(),
-        track_area + ToCeiledVector2d(painter->origin()),
+        track_area,
         params);
-    painter->ReleaseHDC(dc);
   }
 
   ContainerImpl::Draw(painter, dirty);

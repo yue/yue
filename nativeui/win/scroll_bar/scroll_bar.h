@@ -49,7 +49,6 @@ class ScrollBar : public ContainerImpl,
   int GetLineHeight() const;
   int GetPageHeight() const;
 
-  NativeTheme* theme_;
   NativeTheme::ScrollbarTrackExtraParams params_ = {0};
 
   int contents_size_ = 1;

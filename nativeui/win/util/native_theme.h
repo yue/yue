@@ -19,9 +19,18 @@
 #include "nativeui/gfx/color.h"
 #include "nativeui/gfx/geometry/rect.h"
 #include "nativeui/gfx/geometry/size.h"
-#include "nativeui/win/view_win.h"
 
 namespace nu {
+
+// The state of the control.
+enum class ControlState {
+  // IDs defined as specific values for use in arrays.
+  Disabled = 0,
+  Hovered  = 1,
+  Normal   = 2,
+  Pressed  = 3,
+  Size     = Pressed + 1,
+};
 
 class NativeTheme {
  public:

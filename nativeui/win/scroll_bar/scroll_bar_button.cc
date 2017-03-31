@@ -4,15 +4,12 @@
 
 #include "nativeui/win/scroll_bar/scroll_bar_button.h"
 
-#include "nativeui/gfx/geometry/vector2d_conversions.h"
-#include "nativeui/state.h"
 #include "nativeui/win/scroll_bar/scroll_bar.h"
 
 namespace nu {
 
 ScrollBarButton::ScrollBarButton(Type type, ScrollBar* scroll_bar)
     : ViewImpl(ControlType::ScrollBarButton),
-      theme_(State::GetCurrent()->GetNativeTheme()),
       repeater_(base::Bind(&ScrollBarButton::OnClick, base::Unretained(this))),
       type_(type),
       scroll_bar_(scroll_bar) {
@@ -46,7 +43,6 @@ bool ScrollBarButton::OnMouseClick(UINT message, UINT flags, const Point&) {
 }
 
 void ScrollBarButton::Draw(PainterWin* painter, const Rect& dirty) {
-  HDC dc = painter->GetHDC();
   NativeTheme::Part part = NativeTheme::Part::ScrollbarUpArrow;
   switch (type_) {
     case Up:
@@ -64,11 +60,8 @@ void ScrollBarButton::Draw(PainterWin* painter, const Rect& dirty) {
   }
   NativeTheme::ExtraParams params;
   params.scrollbar_arrow = params_;
-  theme_->Paint(
-      part, dc, state(),
-      Rect(size_allocation().size()) + ToCeiledVector2d(painter->origin()),
-      params);
-  painter->ReleaseHDC(dc);
+  painter->DrawNativeTheme(
+      part, state(), Rect(size_allocation().size()), params);
 }
 
 void ScrollBarButton::OnClick() {

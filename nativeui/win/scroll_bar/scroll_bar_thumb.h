@@ -6,6 +6,7 @@
 #define NATIVEUI_WIN_SCROLL_BAR_SCROLL_BAR_THUMB_H_
 
 #include "nativeui/win/util/native_theme.h"
+#include "nativeui/win/view_win.h"
 
 namespace nu {
 
@@ -29,7 +30,6 @@ class ScrollBarThumb : public ViewImpl {
   NativeTheme::ScrollbarThumbExtraParams* params() { return &params_; }
 
  private:
-  NativeTheme* theme_;
   NativeTheme::ScrollbarThumbExtraParams params_ = {0};
 
   bool is_hovering_ = false;

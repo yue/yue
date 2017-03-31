@@ -15,7 +15,6 @@
 #include "nativeui/gfx/win/text_win.h"
 #include "nativeui/state.h"
 #include "nativeui/win/screen.h"
-#include "nativeui/win/util/native_theme.h"
 #include "nativeui/win/view_win.h"
 #include "nativeui/win/window_win.h"
 
@@ -32,7 +31,6 @@ class ButtonImpl : public ViewImpl {
       : ViewImpl(type == Button::Normal ? ControlType::Button
                     : (type == Button::CheckBox ? ControlType::CheckBox
                                                 : ControlType::Radio)),
-        theme_(State::GetCurrent()->GetNativeTheme()),
         color_(GetSystemColor(SystemColor::Text)),
         font_(State::GetCurrent()->GetDefaultFont()),
         delegate_(delegate) {
@@ -98,20 +96,17 @@ class ButtonImpl : public ViewImpl {
     Size size = size_allocation().size();
     Size preferred_size = ToCeiledSize(GetPreferredSize());
 
-    HDC dc = painter->GetHDC();
     NativeTheme::ExtraParams params;
     params.button = params_;
 
     // Draw the button background,
     if (type() == ControlType::Button)
-      theme_->Paint(NativeTheme::Part::Button, dc, state(),
-                    Rect(size) + ToCeiledVector2d(painter->origin()), params);
+      painter->DrawNativeTheme(NativeTheme::Part::Button,
+                               state(), Rect(size), params);
 
     // Draw control background as a layer on button background.
     if (!background_color().transparent()) {
-      painter->ReleaseHDC(dc);
       ViewImpl::Draw(painter, dirty);
-      dc = painter->GetHDC();
     }
 
     // Checkbox and radio are left aligned.
@@ -124,14 +119,14 @@ class ButtonImpl : public ViewImpl {
     }
 
     // Draw the box.
-    Point box_origin = origin + ToCeiledVector2d(painter->origin());
+    Point box_origin = origin;
     box_origin.Offset(0, (preferred_size.height() - box_size_.height()) / 2);
     if (type() == ControlType::CheckBox)
-      theme_->Paint(NativeTheme::Part::CheckBox, dc, state(),
-                            Rect(box_origin, box_size_), params);
+      painter->DrawNativeTheme(NativeTheme::Part::CheckBox,
+                               state(), Rect(box_origin, box_size_), params);
     else if (type() == ControlType::Radio)
-      theme_->Paint(NativeTheme::Part::Radio, dc, state(),
-                    Rect(box_origin, box_size_), params);
+      painter->DrawNativeTheme(NativeTheme::Part::Radio,
+                               state(), Rect(box_origin, box_size_), params);
 
     // The bounds of text.
     int padding = std::ceil(
@@ -139,6 +134,11 @@ class ButtonImpl : public ViewImpl {
         scale_factor());
     Rect text_bounds(origin, preferred_size);
     text_bounds.Inset(box_size_.width() + padding, padding, padding, padding);
+
+    // The text.
+    painter->DrawColoredTextPixelWithFlags(
+        title_, font_.get(), color_, RectF(text_bounds),
+        Painter::TextAlignCenter);
 
     // Draw focused ring.
     if (IsFocused()) {
@@ -152,25 +152,21 @@ class ButtonImpl : public ViewImpl {
         bounds.Inset(Insets(padding));
         rect = bounds.ToRECT();
       }
-      ::DrawFocusRect(dc, &rect);
+      HDC hdc = painter->GetHDC();
+      ::DrawFocusRect(hdc, &rect);
+      painter->ReleaseHDC(hdc);
     }
-
-    painter->ReleaseHDC(dc);
-
-    // The text.
-    painter->DrawColoredTextPixelWithFlags(
-        title_, font_.get(), color_, RectF(text_bounds),
-        Painter::TextAlignCenter);
   }
 
   void OnDPIChanged() override {
+    NativeTheme* theme = State::GetCurrent()->GetNativeTheme();
     base::win::ScopedGetDC dc(window() ? window()->hwnd() : NULL);
     if (type() == ControlType::CheckBox)
-      box_size_ = theme_->GetThemePartSize(dc, NativeTheme::Part::CheckBox,
-                                           state());
+      box_size_ = theme->GetThemePartSize(dc, NativeTheme::Part::CheckBox,
+                                          state());
     else if (type() == ControlType::Radio)
-      box_size_ = theme_->GetThemePartSize(dc, NativeTheme::Part::Radio,
-                                           state());
+      box_size_ = theme->GetThemePartSize(dc, NativeTheme::Part::Radio,
+                                          state());
     text_size_ = MeasureText(dc, font_.get(), title_);
   }
 

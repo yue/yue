@@ -4,17 +4,13 @@
 
 #include "nativeui/win/scroll_bar/scroll_bar_thumb.h"
 
-#include "nativeui/gfx/geometry/vector2d_conversions.h"
-#include "nativeui/state.h"
 #include "nativeui/win/scroll_bar/scroll_bar.h"
-#include "nativeui/win/window_win.h"
 
 namespace nu {
 
 ScrollBarThumb::ScrollBarThumb(bool vertical, ScrollBar* scroll_bar)
     : ViewImpl(ControlType::ScrollBarThumb),
       vertical_(vertical),
-      theme_(State::GetCurrent()->GetNativeTheme()),
       scroll_bar_(scroll_bar) {
 }
 
@@ -72,17 +68,14 @@ void ScrollBarThumb::OnCaptureLost() {
 }
 
 void ScrollBarThumb::Draw(PainterWin* painter, const Rect& dirty) {
-  HDC dc = painter->GetHDC();
   NativeTheme::ExtraParams params;
   params.scrollbar_thumb = params_;
-  theme_->Paint(
+  painter->DrawNativeTheme(
       (vertical_ ? NativeTheme::Part::ScrollbarVerticalThumb
                  : NativeTheme::Part::ScrollbarHorizontalThumb),
-      dc,
       state(),
-      Rect(size_allocation().size()) + ToCeiledVector2d(painter->origin()),
+      Rect(size_allocation().size()),
       params);
-  painter->ReleaseHDC(dc);
 }
 
 }  // namespace nu
