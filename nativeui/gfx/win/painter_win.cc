@@ -12,61 +12,37 @@
 
 namespace nu {
 
-PainterWin::PainterState::PainterState(Color color,
-                                       const Vector2dF& origin,
-                                       Gdiplus::GraphicsContainer&& container)
-    : color(color), origin(origin), container(container) {
-}
-
 PainterWin::PainterWin(HDC dc, float scale_factor)
-    : hdc_(dc), scale_factor_(scale_factor), graphics_(dc) {
+    : hdc_(dc), scale_factor_(scale_factor) {
+  // Initial state.
+  states_.emplace(Vector2dF(), scale_factor, Color());
 }
 
 PainterWin::~PainterWin() {
-}
-
-HDC PainterWin::GetHDC() {
-  // Get the clip region of graphics.
-  Gdiplus::Rect clip;
-  graphics_.GetVisibleClipBounds(&clip);
-  base::win::ScopedRegion region(::CreateRectRgn(
-      clip.GetLeft(), clip.GetTop(), clip.GetRight(), clip.GetBottom()));
-
-  // Apply current clip region to the returned HDC.
-  HDC dc = graphics_.GetHDC();
-  ::SelectClipRgn(dc, region.get());
-  return dc;
-}
-
-void PainterWin::ReleaseHDC(HDC dc) {
-  graphics_.ReleaseHDC(dc);
 }
 
 void PainterWin::DrawNativeTheme(NativeTheme::Part part,
                                  ControlState state,
                                  const Rect& rect,
                                  const NativeTheme::ExtraParams& extra) {
-  HDC hdc = GetHDC();
   State::GetCurrent()->GetNativeTheme()->Paint(
-      part, hdc, state, rect + ToCeiledVector2d(origin()), extra);
-  ReleaseHDC(hdc);
+      part, hdc_, state, Translated(rect), extra);
 }
 
 void PainterWin::DrawFocusRect(const Rect& rect) {
-  HDC hdc = GetHDC();
-  RECT r = (rect + ToCeiledVector2d(origin())).ToRECT();
-  ::DrawFocusRect(hdc, &r);
-  ReleaseHDC(hdc);
+  RECT r = Translated(rect).ToRECT();
+  ::DrawFocusRect(hdc_, &r);
 }
 
 void PainterWin::Save() {
-  states_.emplace(color(), origin(), graphics_.BeginContainer());
+  top().state = ::SaveDC(hdc_);
+  states_.push(top());
 }
 
 void PainterWin::Restore() {
-  if (states_.empty())
+  if (states_.size() == 1)
     return;
-  graphics_.EndContainer(states_.top().container);
+  ::RestoreDC(hdc_, top().state);
   states_.pop();
 }
 
@@ -78,12 +54,12 @@ void PainterWin::Translate(const Vector2dF& offset) {
   TranslatePixel(ScaleVector2d(offset, scale_factor_));
 }
 
-void PainterWin::SetColor(Color new_color) {
-  color() = new_color;
+void PainterWin::SetColor(Color color) {
+  top().color = color;
 }
 
 void PainterWin::SetLineWidth(float width) {
-  SetPixelLineWidth(width * scale_factor_);
+  top().line_width = width;
 }
 
 void PainterWin::DrawRect(const RectF& rect) {
@@ -101,33 +77,31 @@ void PainterWin::DrawColoredTextWithFlags(
 }
 
 void PainterWin::ClipPixelRect(const RectF& rect, CombineMode mode) {
-  Gdiplus::CombineMode cm;
-  switch (mode) {
-    case CombineMode::Replace   : cm = Gdiplus::CombineModeReplace;   break;
-    case CombineMode::Intersect : cm = Gdiplus::CombineModeIntersect; break;
-    case CombineMode::Union     : cm = Gdiplus::CombineModeUnion;     break;
-    case CombineMode::Exclude   : cm = Gdiplus::CombineModeExclude;   break;
-    default: cm = Gdiplus::CombineModeReplace;
-  }
-  graphics_.SetClip(ToGdi(rect + origin()), cm);
+  RectF r(Translated(rect));
+  base::win::ScopedRegion region(
+      ::CreateRectRgn(r.x(), r.y(), r.right(), r.bottom()));
+  int clip_mode = RGN_COPY;
+  if (mode == CombineMode::Intersect)
+    clip_mode = RGN_AND;
+  else if (mode == CombineMode::Union)
+    clip_mode = RGN_OR;
+  else if (mode == CombineMode::Exclude)
+    clip_mode = RGN_DIFF;
+  ::ExtSelectClipRgn(hdc_, region.get(), clip_mode);
 }
 
 void PainterWin::TranslatePixel(const Vector2dF& offset) {
-  origin() += offset;
-}
-
-void PainterWin::SetPixelLineWidth(float width) {
-  line_width() = width;
+  top().origin += offset;
 }
 
 void PainterWin::DrawPixelRect(const RectF& rect) {
-  Gdiplus::Pen pen(ToGdi(color()), line_width());
-  graphics_.DrawRectangle(&pen, ToGdi(rect + origin()));
+  Gdiplus::Pen pen(ToGdi(top().color), top().line_width);
+  Gdiplus::Graphics(hdc_).DrawRectangle(&pen, ToGdi(Translated(rect)));
 }
 
 void PainterWin::FillPixelRect(const RectF& rect) {
-  Gdiplus::SolidBrush brush(ToGdi(color()));
-  graphics_.FillRectangle(&brush, ToGdi(rect + origin()));
+  Gdiplus::SolidBrush brush(ToGdi(top().color));
+  Gdiplus::Graphics(hdc_).FillRectangle(&brush, ToGdi(Translated(rect)));
 }
 
 void PainterWin::DrawColoredTextPixelWithFlags(
@@ -141,9 +115,18 @@ void PainterWin::DrawColoredTextPixelWithFlags(
     format.SetAlignment(Gdiplus::StringAlignmentCenter);
   else if (flags & TextAlignRight)
     format.SetAlignment(Gdiplus::StringAlignmentFar);
-  graphics_.DrawString(text.c_str(), static_cast<int>(text.size()),
-                       font->GetNative(), ToGdi(RectF(rect + origin())),
-                       &format, &brush);
+  Gdiplus::Graphics(hdc_).DrawString(
+      text.c_str(), static_cast<int>(text.size()),
+      font->GetNative(), ToGdi(Translated(rect)),
+      &format, &brush);
+}
+
+Rect PainterWin::Translated(const Rect& rect) {
+  return rect + ToCeiledVector2d(top().origin);
+}
+
+RectF PainterWin::Translated(const RectF& rect) {
+  return rect + top().origin;
 }
 
 }  // namespace nu

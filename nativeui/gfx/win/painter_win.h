@@ -44,7 +44,6 @@ class PainterWin : public Painter {
   // The pixel versions.
   void ClipPixelRect(const RectF& rect, CombineMode mode);
   void TranslatePixel(const Vector2dF& offset);
-  void SetPixelLineWidth(float width);
   void DrawPixelRect(const RectF& rect);
   void FillPixelRect(const RectF& rect);
   void DrawColoredTextPixelWithFlags(
@@ -52,46 +51,33 @@ class PainterWin : public Painter {
       int flags);
 
   // Helper to get current state.
-  Color& color() { return states_.empty() ? color_
-                                          : states_.top().color; }
-  float& line_width() { return states_.empty() ? line_width_
-                                               : states_.top().line_width; }
-  Vector2dF& origin() { return states_.empty() ? origin_
-                                               : states_.top().origin; }
-
-  // The internal HDC handle.
-  HDC hdc() const { return hdc_; }
+  Vector2dF& origin() { return states_.top().origin; }
 
  private:
-  // Receive the HDC that can be painted on.
-  HDC GetHDC();
-  void ReleaseHDC(HDC dc);
+  // Translate a rect from current origin.
+  Rect Translated(const Rect& rect);
+  RectF Translated(const RectF& rect);
 
   // The saved state.
   struct PainterState {
-    PainterState(Color color,
-                 const Vector2dF& origin,
-                 Gdiplus::GraphicsContainer&& container);
-
-    Color color;
-    float line_width = 1.f;
+    PainterState(const Vector2dF& origin, float line_width, Color color)
+        : origin(origin), line_width(line_width), color(color) {}
     Vector2dF origin;
-    Gdiplus::GraphicsContainer container;
+    float line_width;
+    Color color;
+    int state = 0;
   };
+
+  // Return the top state.
+  PainterState& top() { return states_.top(); }
 
   // The stack for all saved states.
   std::stack<PainterState> states_;
-
-  // The root state.
-  Color color_;
-  float line_width_ = 1.f;
-  Vector2dF origin_;
 
   // Weak ref to the original HDC, should only be used internally.
   HDC hdc_;
 
   float scale_factor_;
-  Gdiplus::Graphics graphics_;
 };
 
 }  // namespace nu
