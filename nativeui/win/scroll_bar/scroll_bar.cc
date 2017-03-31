@@ -161,9 +161,15 @@ void ScrollBar::Draw(PainterWin* painter, const Rect& dirty) {
     Rect track_area(vertical_ ? 0 : box_size, vertical_ ? box_size : 0,
                     vertical_ ? box_size : track_size,
                     vertical_ ? track_size : box_size);
-    theme_->PaintScrollbarTrack(
-        dc, vertical_, state(),
-        track_area + ToCeiledVector2d(painter->origin()), params_);
+    NativeTheme::ExtraParams params;
+    params.scrollbar_track = params_;
+    theme_->Paint(
+        (vertical_ ? NativeTheme::Part::ScrollbarVerticalTrack
+                   : NativeTheme::Part::ScrollbarHorizontalTrack),
+        dc,
+        state(),
+        track_area + ToCeiledVector2d(painter->origin()),
+        params);
     painter->ReleaseHDC(dc);
   }
 

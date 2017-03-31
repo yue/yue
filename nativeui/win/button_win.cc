@@ -99,12 +99,13 @@ class ButtonImpl : public ViewImpl {
     Size preferred_size = ToCeiledSize(GetPreferredSize());
 
     HDC dc = painter->GetHDC();
+    NativeTheme::ExtraParams params;
+    params.button = params_;
 
     // Draw the button background,
     if (type() == ControlType::Button)
-      theme_->PaintPushButton(dc, state(),
-                              Rect(size) + ToCeiledVector2d(painter->origin()),
-                              params_);
+      theme_->Paint(NativeTheme::Part::Button, dc, state(),
+                    Rect(size) + ToCeiledVector2d(painter->origin()), params);
 
     // Draw control background as a layer on button background.
     if (!background_color().transparent()) {
@@ -126,9 +127,11 @@ class ButtonImpl : public ViewImpl {
     Point box_origin = origin + ToCeiledVector2d(painter->origin());
     box_origin.Offset(0, (preferred_size.height() - box_size_.height()) / 2);
     if (type() == ControlType::CheckBox)
-      theme_->PaintCheckBox(dc, state(), Rect(box_origin, box_size_), params_);
+      theme_->Paint(NativeTheme::Part::CheckBox, dc, state(),
+                            Rect(box_origin, box_size_), params);
     else if (type() == ControlType::Radio)
-      theme_->PaintRadio(dc, state(), Rect(box_origin, box_size_), params_);
+      theme_->Paint(NativeTheme::Part::Radio, dc, state(),
+                    Rect(box_origin, box_size_), params);
 
     // The bounds of text.
     int padding = std::ceil(
@@ -163,9 +166,11 @@ class ButtonImpl : public ViewImpl {
   void OnDPIChanged() override {
     base::win::ScopedGetDC dc(window() ? window()->hwnd() : NULL);
     if (type() == ControlType::CheckBox)
-      box_size_ = theme_->GetThemePartSize(dc, NativeTheme::CheckBox, state());
+      box_size_ = theme_->GetThemePartSize(dc, NativeTheme::Part::CheckBox,
+                                           state());
     else if (type() == ControlType::Radio)
-      box_size_ = theme_->GetThemePartSize(dc, NativeTheme::Radio, state());
+      box_size_ = theme_->GetThemePartSize(dc, NativeTheme::Part::Radio,
+                                           state());
     text_size_ = MeasureText(dc, font_.get(), title_);
   }
 

@@ -1,4 +1,5 @@
 // Copyright 2016 Cheng Zhao. All rights reserved.
+// Copyright 2012 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
@@ -27,13 +28,24 @@ class NativeTheme {
   NativeTheme();
   ~NativeTheme();
 
-  enum Part {
+  enum class Part {
     CheckBox,
     Radio,
     Button,
-    TextField,
-    ScrollBar,
-    NumParts,
+
+    ScrollbarUpArrow,
+    ScrollbarDownArrow,
+    ScrollbarLeftArrow,
+    ScrollbarRightArrow,
+
+    ScrollbarHorizontalThumb,
+    ScrollbarVerticalThumb,
+    ScrollbarHorizontalGripper,
+    ScrollbarVerticalGripper,
+    ScrollbarHorizontalTrack,
+    ScrollbarVerticalTrack,
+
+    Count,
   };
 
   // Each structure below holds extra information needed when painting a given
@@ -61,8 +73,21 @@ class NativeTheme {
     int track_height;
   };
 
+  union ExtraParams {
+    ButtonExtraParams button;
+    ScrollbarArrowExtraParams scrollbar_arrow;
+    ScrollbarThumbExtraParams scrollbar_thumb;
+    ScrollbarTrackExtraParams scrollbar_track;
+  };
+
+  // Return the size that a control takes.
   Size GetThemePartSize(HDC hdc, Part part, ControlState state) const;
 
+  // Paint the control into |hdc|.
+  void Paint(Part part, HDC hdc, ControlState state, const Rect& rect,
+             const ExtraParams& extra);
+
+ private:
   HRESULT PaintPushButton(HDC hdc,
                           ControlState state,
                           const Rect& rect,
@@ -75,23 +100,22 @@ class NativeTheme {
                         ControlState state,
                         const Rect& rect,
                         const ButtonExtraParams& extra) const;
-  HRESULT PaintScrollbarArrow(HDC hdc,
-                              int type,
+  HRESULT PaintScrollbarArrow(Part part,
+                              HDC hdc,
                               ControlState state,
                               const Rect& rect,
                               const ScrollbarArrowExtraParams& extra) const;
-  HRESULT PaintScrollbarThumb(HDC hdc,
-                              bool vertical,
+  HRESULT PaintScrollbarThumb(Part part,
+                              HDC hdc,
                               ControlState state,
                               const Rect& rect,
                               const ScrollbarThumbExtraParams& extra) const;
-  HRESULT PaintScrollbarTrack(HDC hdc,
-                              bool vertical,
+  HRESULT PaintScrollbarTrack(Part part,
+                              HDC hdc,
                               ControlState state,
                               const Rect& rect,
                               const ScrollbarTrackExtraParams& extra) const;
 
- private:
   HRESULT PaintButton(HDC hdc,
                       ControlState state,
                       const ButtonExtraParams& extra,
@@ -169,7 +193,7 @@ class NativeTheme {
   HMODULE theme_dll_;
 
   // A cache of open theme handles.
-  mutable HANDLE theme_handles_[NumParts];
+  mutable HANDLE theme_handles_[Part::Count];
 
   DISALLOW_COPY_AND_ASSIGN(NativeTheme);
 };

@@ -73,10 +73,15 @@ void ScrollBarThumb::OnCaptureLost() {
 
 void ScrollBarThumb::Draw(PainterWin* painter, const Rect& dirty) {
   HDC dc = painter->GetHDC();
-  theme_->PaintScrollbarThumb(
-      dc, vertical_, state(),
+  NativeTheme::ExtraParams params;
+  params.scrollbar_thumb = params_;
+  theme_->Paint(
+      (vertical_ ? NativeTheme::Part::ScrollbarVerticalThumb
+                 : NativeTheme::Part::ScrollbarHorizontalThumb),
+      dc,
+      state(),
       Rect(size_allocation().size()) + ToCeiledVector2d(painter->origin()),
-      params_);
+      params);
   painter->ReleaseHDC(dc);
 }
 

@@ -55,13 +55,6 @@ Rect ToNearestRect(const RectF& rect) {
   int max_x = ToRoundedInt(float_max_x);
   int max_y = ToRoundedInt(float_max_y);
 
-  // If these DCHECKs fail, you're using the wrong method, consider using
-  // ToEnclosingRect or ToEnclosedRect instead.
-  DCHECK(std::abs(min_x - float_min_x) < 0.01f);
-  DCHECK(std::abs(min_y - float_min_y) < 0.01f);
-  DCHECK(std::abs(max_x - float_max_x) < 0.01f);
-  DCHECK(std::abs(max_y - float_max_y) < 0.01f);
-
   return Rect(min_x, min_y, max_x - min_x, max_y - min_y);
 }
 

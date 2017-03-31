@@ -47,10 +47,27 @@ bool ScrollBarButton::OnMouseClick(UINT message, UINT flags, const Point&) {
 
 void ScrollBarButton::Draw(PainterWin* painter, const Rect& dirty) {
   HDC dc = painter->GetHDC();
-  theme_->PaintScrollbarArrow(
-      dc, static_cast<int>(type_), state(),
+  NativeTheme::Part part = NativeTheme::Part::ScrollbarUpArrow;
+  switch (type_) {
+    case Up:
+      part = NativeTheme::Part::ScrollbarUpArrow;
+      break;
+    case Down:
+      part = NativeTheme::Part::ScrollbarDownArrow;
+      break;
+    case Left:
+      part = NativeTheme::Part::ScrollbarLeftArrow;
+      break;
+    case Right:
+      part = NativeTheme::Part::ScrollbarRightArrow;
+      break;
+  }
+  NativeTheme::ExtraParams params;
+  params.scrollbar_arrow = params_;
+  theme_->Paint(
+      part, dc, state(),
       Rect(size_allocation().size()) + ToCeiledVector2d(painter->origin()),
-      params_);
+      params);
   painter->ReleaseHDC(dc);
 }
 

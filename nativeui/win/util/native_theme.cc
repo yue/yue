@@ -1,4 +1,5 @@
 // Copyright 2016 Cheng Zhao. All rights reserved.
+// Copyright 2012 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
@@ -13,11 +14,11 @@ namespace nu {
 namespace {
 
 int GetWindowsPart(NativeTheme::Part part) {
-  if (part == NativeTheme::CheckBox)
+  if (part == NativeTheme::Part::CheckBox)
     return BP_CHECKBOX;
-  else if (part == NativeTheme::Radio)
+  else if (part == NativeTheme::Part::Radio)
     return BP_RADIOBUTTON;
-  else if (part == NativeTheme::Button)
+  else if (part == NativeTheme::Part::Button)
     return BP_PUSHBUTTON;
   else
     return 0;
@@ -25,7 +26,7 @@ int GetWindowsPart(NativeTheme::Part part) {
 
 int GetWindowsState(NativeTheme::Part part, ControlState state) {
   switch (part) {
-    case NativeTheme::CheckBox:
+    case NativeTheme::Part::CheckBox:
       switch (state) {
         case ControlState::Disabled:
           return CBS_UNCHECKEDDISABLED;
@@ -39,7 +40,7 @@ int GetWindowsState(NativeTheme::Part part, ControlState state) {
           NOTREACHED();
           return 0;
       }
-    case NativeTheme::Button:
+    case NativeTheme::Part::Button:
       switch (state) {
         case ControlState::Disabled:
           return PBS_DISABLED;
@@ -53,7 +54,7 @@ int GetWindowsState(NativeTheme::Part part, ControlState state) {
           NOTREACHED();
           return 0;
       }
-    case NativeTheme::Radio:
+    case NativeTheme::Part::Radio:
       switch (state) {
         case ControlState::Disabled:
           return RBS_UNCHECKEDDISABLED;
@@ -113,7 +114,39 @@ Size NativeTheme::GetThemePartSize(HDC hdc,
       return Size(size.cx, size.cy);
   }
 
-  return (part == CheckBox || part == Radio) ?  Size(13, 13) : Size();
+  return (part == Part::CheckBox || part == Part::Radio) ? Size(13, 13)
+                                                         : Size();
+}
+
+void NativeTheme::Paint(Part part, HDC hdc, ControlState state,
+                        const Rect& rect, const ExtraParams& extra) {
+  switch (part) {
+    case Part::CheckBox:
+      PaintCheckBox(hdc, state, rect, extra.button);
+      break;
+    case Part::Radio:
+      PaintRadio(hdc, state, rect, extra.button);
+      break;
+    case Part::Button:
+      PaintPushButton(hdc, state, rect, extra.button);
+      break;
+    case Part::ScrollbarUpArrow:
+    case Part::ScrollbarDownArrow:
+    case Part::ScrollbarLeftArrow:
+    case Part::ScrollbarRightArrow:
+      PaintScrollbarArrow(part, hdc, state, rect, extra.scrollbar_arrow);
+      break;
+    case Part::ScrollbarHorizontalThumb:
+    case Part::ScrollbarVerticalThumb:
+    case Part::ScrollbarHorizontalGripper:
+    case Part::ScrollbarVerticalGripper:
+      PaintScrollbarThumb(part, hdc, state, rect, extra.scrollbar_thumb);
+      break;
+    case Part::ScrollbarHorizontalTrack:
+    case Part::ScrollbarVerticalTrack:
+      PaintScrollbarTrack(part, hdc, state, rect, extra.scrollbar_track);
+      break;
+  }
 }
 
 HRESULT NativeTheme::PaintPushButton(HDC hdc,
@@ -203,8 +236,8 @@ HRESULT NativeTheme::PaintCheckBox(HDC hdc,
 }
 
 HRESULT NativeTheme::PaintScrollbarArrow(
+    Part part,
     HDC hdc,
-    int type,
     ControlState state,
     const Rect& rect,
     const ScrollbarArrowExtraParams& extra) const {
@@ -214,28 +247,56 @@ HRESULT NativeTheme::PaintScrollbarArrow(
       {ABS_LEFTDISABLED, ABS_LEFTHOT, ABS_LEFTNORMAL, ABS_LEFTPRESSED},
       {ABS_RIGHTDISABLED, ABS_RIGHTHOT, ABS_RIGHTNORMAL, ABS_RIGHTPRESSED},
   };
-  HANDLE handle = GetThemeHandle(ScrollBar);
+  HANDLE handle = GetThemeHandle(part);
   RECT rect_win = rect.ToRECT();
   if (handle && draw_theme_) {
-    DCHECK_GE(type, 0);
-    DCHECK_LT(static_cast<size_t>(type), arraysize(state_id_matrix));
-    int state_id = state_id_matrix[type][static_cast<int>(state)];
+    int index =
+        static_cast<int>(part) - static_cast<int>(Part::ScrollbarUpArrow);
+    DCHECK_GE(index, 0);
+    DCHECK_LT(static_cast<size_t>(index), arraysize(state_id_matrix));
+    int state_id = state_id_matrix[index][static_cast<int>(state)];
 
     // Hovering means that the cursor is over the scrollbar, but not over the
     // specific arrow itself.
     if (state == ControlState::Normal && extra.is_hovering) {
-      static const int hover_states[4] = {
-          ABS_UPHOVER, ABS_DOWNHOVER, ABS_LEFTHOVER, ABS_RIGHTHOVER,
-      };
-      state_id = hover_states[type];
+      switch (part) {
+        case Part::ScrollbarDownArrow:
+          state_id = ABS_DOWNHOVER;
+          break;
+        case Part::ScrollbarLeftArrow:
+          state_id = ABS_LEFTHOVER;
+          break;
+        case Part::ScrollbarRightArrow:
+          state_id = ABS_RIGHTHOVER;
+          break;
+        case Part::ScrollbarUpArrow:
+          state_id = ABS_UPHOVER;
+          break;
+        default:
+          NOTREACHED();
+          break;
+      }
     }
     return PaintScaledTheme(handle, hdc, SBP_ARROWBTN, state_id, rect);
   }
 
-  static const int classic_states[4] = {
-      DFCS_SCROLLUP, DFCS_SCROLLDOWN, DFCS_SCROLLLEFT, DFCS_SCROLLRIGHT
-  };
-  int classic_state = classic_states[type];
+  int classic_state = DFCS_SCROLLDOWN;
+  switch (part) {
+    case Part::ScrollbarDownArrow:
+      break;
+    case Part::ScrollbarLeftArrow:
+      classic_state = DFCS_SCROLLLEFT;
+      break;
+    case Part::ScrollbarRightArrow:
+      classic_state = DFCS_SCROLLRIGHT;
+      break;
+    case Part::ScrollbarUpArrow:
+      classic_state = DFCS_SCROLLUP;
+      break;
+    default:
+      NOTREACHED();
+      break;
+  }
   switch (state) {
     case ControlState::Disabled:
       classic_state |= DFCS_INACTIVE;
@@ -257,15 +318,32 @@ HRESULT NativeTheme::PaintScrollbarArrow(
 }
 
 HRESULT NativeTheme::PaintScrollbarThumb(
+    Part part,
     HDC hdc,
-    bool vertical,
     ControlState state,
     const Rect& rect,
     const ScrollbarThumbExtraParams& extra) const {
-  HANDLE handle = GetThemeHandle(ScrollBar);
+  HANDLE handle = GetThemeHandle(part);
   RECT rect_win = rect.ToRECT();
 
-  int part_id = vertical ? SBP_THUMBBTNVERT : SBP_THUMBBTNHORZ;
+  int part_id = SBP_THUMBBTNVERT;
+  switch (part) {
+    case Part::ScrollbarHorizontalThumb:
+      part_id = SBP_THUMBBTNHORZ;
+      break;
+    case Part::ScrollbarVerticalThumb:
+      break;
+    case Part::ScrollbarHorizontalGripper:
+      part_id = SBP_GRIPPERHORZ;
+      break;
+    case Part::ScrollbarVerticalGripper:
+      part_id = SBP_GRIPPERVERT;
+      break;
+    default:
+      NOTREACHED();
+      break;
+  }
+
   int state_id = SCRBS_NORMAL;
   switch (state) {
     case ControlState::Disabled:
@@ -296,17 +374,19 @@ HRESULT NativeTheme::PaintScrollbarThumb(
 }
 
 HRESULT NativeTheme::PaintScrollbarTrack(
+    Part part,
     HDC hdc,
-    bool vertical,
     ControlState state,
     const Rect& rect,
     const ScrollbarTrackExtraParams& extra) const {
-  HANDLE handle = GetThemeHandle(ScrollBar);
+  HANDLE handle = GetThemeHandle(part);
   RECT rect_win = rect.ToRECT();
 
   const int part_id = extra.is_upper ?
-      (vertical ? SBP_UPPERTRACKVERT : SBP_UPPERTRACKHORZ) :
-      (vertical ? SBP_LOWERTRACKVERT : SBP_LOWERTRACKHORZ);
+      ((part == Part::ScrollbarHorizontalTrack) ?
+          SBP_UPPERTRACKHORZ : SBP_UPPERTRACKVERT) :
+      ((part == Part::ScrollbarHorizontalTrack) ?
+          SBP_LOWERTRACKHORZ : SBP_LOWERTRACKVERT);
 
   int state_id = SCRBS_NORMAL;
   switch (state) {
@@ -342,7 +422,7 @@ HRESULT NativeTheme::PaintButton(HDC hdc,
                                  int part_id,
                                  int state_id,
                                  RECT* rect) const {
-  HANDLE handle = GetThemeHandle(Button);
+  HANDLE handle = GetThemeHandle(Part::Button);
   if (handle && draw_theme_)
     return draw_theme_(handle, hdc, part_id, state_id, rect, NULL);
 
@@ -438,39 +518,46 @@ HRESULT NativeTheme::PaintScaledTheme(HANDLE theme,
 }
 
 HANDLE NativeTheme::GetThemeHandle(Part part) const {
-  if (!open_theme_ || part < 0 || part >= NumParts)
+  if (!open_theme_)
     return 0;
 
   // Translate part to real theme names.
   switch (part) {
-    case CheckBox:
-    case Radio:
-      part = Button;
+    case Part::CheckBox:
+    case Part::Radio:
+      part = Part::Button;
+      break;
+    case Part::ScrollbarDownArrow:
+    case Part::ScrollbarLeftArrow:
+    case Part::ScrollbarRightArrow:
+    case Part::ScrollbarUpArrow:
+    case Part::ScrollbarHorizontalThumb:
+    case Part::ScrollbarVerticalThumb:
+    case Part::ScrollbarHorizontalTrack:
+    case Part::ScrollbarVerticalTrack:
+      part = Part::ScrollbarDownArrow;
       break;
     default:
       break;
   }
 
-  if (theme_handles_[part])
-    return theme_handles_[part];
+  if (theme_handles_[static_cast<int>(part)])
+    return theme_handles_[static_cast<int>(part)];
 
   // Not found, try to load it.
   HANDLE handle = 0;
   switch (part) {
-    case Button:
+    case Part::Button:
       handle = open_theme_(NULL, L"Button");
       break;
-    case TextField:
-      handle = open_theme_(NULL, L"Edit");
-      break;
-    case ScrollBar:
+    case Part::ScrollbarDownArrow:
       handle = open_theme_(NULL, L"Scrollbar");
       break;
     default:
       NOTREACHED();
       break;
   }
-  theme_handles_[part] = handle;
+  theme_handles_[static_cast<int>(part)] = handle;
   return handle;
 }
 
@@ -478,7 +565,7 @@ void NativeTheme::CloseHandles() const {
   if (!close_theme_)
     return;
 
-  for (int i = 0; i < NumParts; ++i) {
+  for (int i = 0; i < static_cast<int>(Part::Count); ++i) {
     if (theme_handles_[i]) {
       close_theme_(theme_handles_[i]);
       theme_handles_[i] = nullptr;
