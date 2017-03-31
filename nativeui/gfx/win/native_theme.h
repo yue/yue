@@ -3,8 +3,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef NATIVEUI_WIN_UTIL_NATIVE_THEME_H_
-#define NATIVEUI_WIN_UTIL_NATIVE_THEME_H_
+#ifndef NATIVEUI_GFX_WIN_NATIVE_THEME_H_
+#define NATIVEUI_GFX_WIN_NATIVE_THEME_H_
 
 // A wrapper class for working with custom XP/Vista themes provided in
 // uxtheme.dll.
@@ -209,4 +209,4 @@ class NativeTheme {
 
 }  // namespace nu
 
-#endif  // NATIVEUI_WIN_UTIL_NATIVE_THEME_H_
+#endif  // NATIVEUI_GFX_WIN_NATIVE_THEME_H_

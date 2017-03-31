@@ -9,7 +9,7 @@
 
 #include "nativeui/gfx/painter.h"
 #include "nativeui/gfx/win/gdiplus.h"
-#include "nativeui/win/util/native_theme.h"
+#include "nativeui/gfx/win/native_theme.h"
 
 namespace nu {
 

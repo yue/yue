@@ -10,8 +10,8 @@
 #include "third_party/yoga/yoga/Yoga.h"
 
 #if defined(OS_WIN)
+#include "nativeui/gfx/win/native_theme.h"
 #include "nativeui/win/util/class_registrar.h"
-#include "nativeui/win/util/native_theme.h"
 #include "nativeui/win/util/subwin_holder.h"
 #endif
 

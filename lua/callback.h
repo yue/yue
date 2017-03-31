@@ -7,6 +7,8 @@
 #ifndef LUA_CALLBACK_H_
 #define LUA_CALLBACK_H_
 
+#include <utility>
+
 #include "base/bind.h"
 #include "lua/callback_internal.h"
 

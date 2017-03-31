@@ -3,7 +3,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/win/util/native_theme.h"
+#include "nativeui/gfx/win/native_theme.h"
 
 #include <stddef.h>
 #include <vsstyle.h>

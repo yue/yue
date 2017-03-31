@@ -34,11 +34,11 @@ namespace nu {
 class NATIVEUI_EXPORT Color {
  public:
   explicit Color(const std::string& hex);
+  explicit Color(uint32_t value) : value_(value) {}
   Color(unsigned a, unsigned r, unsigned g, unsigned b)
       : value_((a << 24) | (r << 16) | (g << 8) | (b << 0)) {}
   Color(unsigned r, unsigned g, unsigned b)
       : Color(0xFF, r, g, b) {}
-  Color(uint32_t value) : value_(value) {}
   Color() : value_(0) {}
 
 #if defined(OS_MACOSX)

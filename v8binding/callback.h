@@ -5,6 +5,8 @@
 #ifndef V8BINDING_CALLBACK_H_
 #define V8BINDING_CALLBACK_H_
 
+#include <utility>
+
 #include "v8binding/callback_internal.h"
 
 namespace vb {

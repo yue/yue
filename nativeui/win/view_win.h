@@ -7,7 +7,6 @@
 
 #include "nativeui/view.h"
 #include "nativeui/gfx/win/painter_win.h"
-#include "nativeui/win/util/native_theme.h"
 #include "nativeui/win/window_win.h"
 
 namespace nu {

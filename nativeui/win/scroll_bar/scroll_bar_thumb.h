@@ -5,7 +5,7 @@
 #ifndef NATIVEUI_WIN_SCROLL_BAR_SCROLL_BAR_THUMB_H_
 #define NATIVEUI_WIN_SCROLL_BAR_SCROLL_BAR_THUMB_H_
 
-#include "nativeui/win/util/native_theme.h"
+#include "nativeui/gfx/win/native_theme.h"
 #include "nativeui/win/view_win.h"
 
 namespace nu {
