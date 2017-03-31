@@ -113,7 +113,7 @@ void PainterWin::FillPixelRect(const RectF& rect) {
 
 void PainterWin::DrawColoredTextPixelWithFlags(
     const String& text, Font* font, Color color, const RectF& rect, int flags) {
-  Gdiplus::SolidBrush brush(ToGdi(color()));
+  Gdiplus::SolidBrush brush(ToGdi(color));
   Gdiplus::StringFormat format;
   format.SetLineAlignment(Gdiplus::StringAlignmentCenter);
   if (flags & TextAlignLeft)

@@ -33,7 +33,7 @@ class ButtonImpl : public ViewImpl {
                     : (type == Button::CheckBox ? ControlType::CheckBox
                                                 : ControlType::Radio)),
         theme_(State::GetCurrent()->GetNativeTheme()),
-        color_(GetThemeColor(ThemeColor::Text)),
+        color_(GetSystemColor(SystemColor::Text)),
         font_(State::GetCurrent()->GetDefaultFont()),
         delegate_(delegate) {
     OnDPIChanged();  // update component size
@@ -155,8 +155,9 @@ class ButtonImpl : public ViewImpl {
     painter->ReleaseHDC(dc);
 
     // The text.
-    painter->DrawTextPixelWithFlags(title_, font_.get(), RectF(text_bounds),
-                                      Painter::TextAlignCenter);
+    painter->DrawColoredTextPixelWithFlags(
+        title_, font_.get(), color_, RectF(text_bounds),
+        Painter::TextAlignCenter);
   }
 
   void OnDPIChanged() override {

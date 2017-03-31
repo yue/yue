@@ -27,7 +27,7 @@ class GroupImpl : public ContainerImpl,
   explicit GroupImpl(Group* delegate)
       : ContainerImpl(this, ControlType::Group),
         delegate_(delegate),
-        color_(GetThemeColor(ThemeColor::Text)),
+        color_(GetSystemColor(SystemColor::Text)),
         font_(State::GetCurrent()->GetDefaultFont()) {}
 
 
@@ -65,8 +65,8 @@ class GroupImpl : public ContainerImpl,
   void Draw(PainterWin* painter, const Rect& dirty) override {
     // Draw title.
     if (RectF(dirty).Intersects(title_bounds_))
-      painter->DrawTextPixelWithFlags(title_, font_.get(), title_bounds_,
-                                        Painter::TextAlignLeft);
+      painter->DrawColoredTextPixelWithFlags(
+          title_, font_.get(), color_, title_bounds_, Painter::TextAlignLeft);
 
     // Calculate the border bounds.
     RectF drawing_bounds(SizeF(size_allocation().size()));

@@ -42,7 +42,7 @@ class PainterWin : public Painter {
   void FillPixelRect(const RectF& rect);
   void DrawColoredTextPixelWithFlags(
       const String& text, Font* font, Color color, const RectF& rect,
-      int flags) override;
+      int flags);
 
   // Helper to get current state.
   Color& color() { return states_.empty() ? color_

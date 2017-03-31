@@ -19,7 +19,7 @@ namespace {
 class LabelImpl : public ViewImpl {
  public:
   LabelImpl() : ViewImpl(ControlType::Label),
-                color_(GetThemeColor(ThemeColor::Text)),
+                color_(GetSystemColor(SystemColor::Text)),
                 font_(State::GetCurrent()->GetDefaultFont()) {
   }
 
@@ -34,9 +34,9 @@ class LabelImpl : public ViewImpl {
   // ViewImpl:
   void Draw(PainterWin* painter, const Rect& dirty) override {
     ViewImpl::Draw(painter, dirty);
-    painter->DrawTextPixelWithFlags(text_, font(),
-                                      RectF(SizeF(size_allocation().size())),
-                                      Painter::TextAlignCenter);
+    painter->DrawColoredTextPixelWithFlags(
+        text_, font(), color_,
+        RectF(SizeF(size_allocation().size())), Painter::TextAlignCenter);
   }
 
   Font* font() const { return font_.get(); }
