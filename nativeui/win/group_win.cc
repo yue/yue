@@ -65,7 +65,7 @@ class GroupImpl : public ContainerImpl,
   void Draw(PainterWin* painter, const Rect& dirty) override {
     // Draw title.
     if (dirty.Intersects(title_bounds_))
-      painter->DrawColoredTextPixelWithFlags(
+      painter->DrawColoredTextWithFlagsPixel(
           title_, font_.get(), color_, title_bounds_, Painter::TextAlignLeft);
 
     // Calculate the border bounds.
@@ -77,10 +77,10 @@ class GroupImpl : public ContainerImpl,
 
     // Draw border.
     painter->Save();
-    painter->ClipPixelRect(drawing_bounds, Painter::CombineMode::Replace);
-    painter->ClipPixelRect(title_bounds_, Painter::CombineMode::Exclude);
+    painter->ClipRectPixel(drawing_bounds, Painter::CombineMode::Replace);
+    painter->ClipRectPixel(title_bounds_, Painter::CombineMode::Exclude);
     painter->SetColor(Color(255, 170, 170, 170));
-    painter->DrawPixelRect(border_bounds);
+    painter->DrawRectPixel(border_bounds);
     painter->Restore();
 
     // Draw child.

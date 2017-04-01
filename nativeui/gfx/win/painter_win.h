@@ -42,11 +42,11 @@ class PainterWin : public Painter {
       int flags) override;
 
   // The pixel versions.
-  void ClipPixelRect(const Rect& rect, CombineMode mode);
+  void ClipRectPixel(const Rect& rect, CombineMode mode);
   void TranslatePixel(const Vector2d& offset);
-  void DrawPixelRect(const Rect& rect);
-  void FillPixelRect(const Rect& rect);
-  void DrawColoredTextPixelWithFlags(
+  void DrawRectPixel(const Rect& rect);
+  void FillRectPixel(const Rect& rect);
+  void DrawColoredTextWithFlagsPixel(
       const String& text, Font* font, Color color, const Rect& rect,
       int flags);
 

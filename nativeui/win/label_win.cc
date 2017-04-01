@@ -34,7 +34,7 @@ class LabelImpl : public ViewImpl {
   // ViewImpl:
   void Draw(PainterWin* painter, const Rect& dirty) override {
     ViewImpl::Draw(painter, dirty);
-    painter->DrawColoredTextPixelWithFlags(
+    painter->DrawColoredTextWithFlagsPixel(
         text_, font(), color_, Rect(size_allocation().size()),
         Painter::TextAlignCenter);
   }

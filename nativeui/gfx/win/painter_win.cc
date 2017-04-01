@@ -50,7 +50,7 @@ void PainterWin::Restore() {
 }
 
 void PainterWin::ClipRect(const RectF& rect, CombineMode mode) {
-  ClipPixelRect(ToEnclosingRect(ScaleRect(rect, scale_factor_)), mode);
+  ClipRectPixel(ToEnclosingRect(ScaleRect(rect, scale_factor_)), mode);
 }
 
 void PainterWin::Translate(const Vector2dF& offset) {
@@ -66,21 +66,21 @@ void PainterWin::SetLineWidth(float width) {
 }
 
 void PainterWin::DrawRect(const RectF& rect) {
-  DrawPixelRect(ToEnclosingRect(ScaleRect(rect, scale_factor_)));
+  DrawRectPixel(ToEnclosingRect(ScaleRect(rect, scale_factor_)));
 }
 
 void PainterWin::FillRect(const RectF& rect) {
-  FillPixelRect(ToEnclosingRect(ScaleRect(rect, scale_factor_)));
+  FillRectPixel(ToEnclosingRect(ScaleRect(rect, scale_factor_)));
 }
 
 void PainterWin::DrawColoredTextWithFlags(
     const String& text, Font* font, Color color, const RectF& rect, int flags) {
-  DrawColoredTextPixelWithFlags(
+  DrawColoredTextWithFlagsPixel(
       text, font, color, ToEnclosingRect(ScaleRect(rect, scale_factor_)),
       flags);
 }
 
-void PainterWin::ClipPixelRect(const Rect& rect, CombineMode mode) {
+void PainterWin::ClipRectPixel(const Rect& rect, CombineMode mode) {
   base::win::ScopedRegion region(CreateRgnWithWorldTransform(rect));
   int clip_mode = RGN_COPY;
   if (mode == CombineMode::Intersect)
@@ -101,17 +101,17 @@ void PainterWin::TranslatePixel(const Vector2d& offset) {
   ::ModifyWorldTransform(hdc_, &xform, MWT_LEFTMULTIPLY);
 }
 
-void PainterWin::DrawPixelRect(const Rect& rect) {
+void PainterWin::DrawRectPixel(const Rect& rect) {
   Gdiplus::Pen pen(ToGdi(top().color), top().line_width);
   Gdiplus::Graphics(hdc_).DrawRectangle(&pen, ToGdi(rect));
 }
 
-void PainterWin::FillPixelRect(const Rect& rect) {
+void PainterWin::FillRectPixel(const Rect& rect) {
   Gdiplus::SolidBrush brush(ToGdi(top().color));
   Gdiplus::Graphics(hdc_).FillRectangle(&brush, ToGdi(rect));
 }
 
-void PainterWin::DrawColoredTextPixelWithFlags(
+void PainterWin::DrawColoredTextWithFlagsPixel(
     const String& text, Font* font, Color color, const Rect& rect, int flags) {
   Gdiplus::SolidBrush brush(ToGdi(color));
   Gdiplus::StringFormat format;

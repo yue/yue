@@ -136,7 +136,7 @@ class ButtonImpl : public ViewImpl {
     text_bounds.Inset(box_size_.width() + padding, padding, padding, padding);
 
     // The text.
-    painter->DrawColoredTextPixelWithFlags(
+    painter->DrawColoredTextWithFlagsPixel(
         title_, font_.get(), color_, text_bounds, Painter::TextAlignCenter);
 
     // Draw focused ring.
