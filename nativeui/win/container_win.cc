@@ -102,8 +102,6 @@ void ContainerImpl::DrawChild(ViewImpl* child, PainterWin* painter,
                           size_allocation().OffsetFromOrigin();
   painter->Save();
   painter->TranslatePixel(child_origin);
-  painter->ClipRectPixel(Rect(child->size_allocation().size()),
-                         Painter::CombineMode::Intersect);
   child->Draw(painter, child_dirty - child_origin);
   painter->Restore();
 }
@@ -162,9 +160,15 @@ class ContainerAdapter : public ContainerImpl,
   }
 
   void OnDraw(PainterWin* painter, const Rect& dirty) override {
+    if (container_->on_draw.IsEmpty())
+      return;
+    painter->Save();
+    painter->ClipRectPixel(Rect(size_allocation().size()),
+                           Painter::CombineMode::Intersect);
     float scale_factor = container_->GetNative()->scale_factor();
     container_->on_draw.Emit(container_, static_cast<Painter*>(painter),
                              ScaleRect(RectF(dirty), 1.0f / scale_factor));
+    painter->Restore();
   }
 
  private:

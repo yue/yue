@@ -38,6 +38,10 @@ class NATIVEUI_EXPORT Signal<void(Args...)> {
     slots_.clear();
   }
 
+  bool IsEmpty() const {
+    return slots_.empty();
+  }
+
   template<typename... RunArgs>
   void Emit(RunArgs&&... args) {
     // Copy the list before iterating, since it is possible that user removes
