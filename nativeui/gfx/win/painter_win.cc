@@ -16,11 +16,9 @@
 namespace nu {
 
 PainterWin::PainterWin(HDC dc, float scale_factor)
-    : hdc_(dc), scale_factor_(scale_factor) {
+    : hdc_(dc), scale_factor_(scale_factor), graphics_(hdc_) {
   // Initial state.
   states_.emplace(scale_factor, Color(), Color());
-  // Enable using world transformation,
-  ::SetGraphicsMode(hdc_, GM_ADVANCED);
 }
 
 PainterWin::~PainterWin() {
@@ -30,59 +28,65 @@ void PainterWin::DrawNativeTheme(NativeTheme::Part part,
                                  ControlState state,
                                  const Rect& rect,
                                  const NativeTheme::ExtraParams& extra) {
+  HDC hdc = GetHDC();
   State::GetCurrent()->GetNativeTheme()->Paint(
-      part, hdc_, state, rect, extra);
+      part, hdc, state, rect, extra);
+  ReleaseHDC(hdc);
 }
 
 void PainterWin::DrawFocusRect(const Rect& rect) {
   RECT r = rect.ToRECT();
-  ::DrawFocusRect(hdc_, &r);
+  HDC hdc = GetHDC();
+  ::DrawFocusRect(hdc, &r);
+  ReleaseHDC(hdc);
 }
 
 void PainterWin::Save() {
   states_.push(top());
-  top().state = ::SaveDC(hdc_);
+  top().state = graphics_.Save();
 }
 
 void PainterWin::Restore() {
   if (states_.size() == 1)
     return;
-  ::RestoreDC(hdc_, top().state);
+  graphics_.Restore(top().state);
   states_.pop();
 }
 
 void PainterWin::BeginPath() {
-  ::BeginPath(hdc_);
+  current_point_.X = current_point_.Y = 0;
+  path_.Reset();
+  path_.StartFigure();
 }
 
 void PainterWin::ClosePath() {
-  ::CloseFigure(hdc_);
-  ::EndPath(hdc_);
+  current_point_.X = current_point_.Y = 0;
+  path_.CloseFigure();
 }
 
 void PainterWin::MoveTo(const PointF& point) {
-  Point p = ToFlooredPoint(ScalePoint(point, scale_factor_));
-  ::MoveToEx(hdc_, p.x(), p.y(), nullptr);
+  current_point_ = ToGdi(ScalePoint(point, scale_factor_));
 }
 
 void PainterWin::LineTo(const PointF& point) {
-  Point p = ToFlooredPoint(ScalePoint(point, scale_factor_));
-  ::LineTo(hdc_, p.x(), p.y());
+  Gdiplus::PointF p = ToGdi(ScalePoint(point, scale_factor_));
+  path_.AddLine(current_point_, p);
+  p = current_point_;
 }
 
 void PainterWin::BezierCurveTo(const PointF& cp1,
                                const PointF& cp2,
-                               const PointF& ep) {
-  POINT ps[3] = {
-      ToFlooredPoint(ScalePoint(cp1, scale_factor_)).ToPOINT(),
-      ToFlooredPoint(ScalePoint(cp2, scale_factor_)).ToPOINT(),
-      ToFlooredPoint(ScalePoint(ep, scale_factor_)).ToPOINT(),
-  };
-  ::PolyBezierTo(hdc_, ps, 3);
+                               const PointF& end_point) {
+  Gdiplus::PointF ep = ToGdi(ScalePoint(end_point, scale_factor_));
+  path_.AddBezier(current_point_,
+                  ToGdi(ScalePoint(cp1, scale_factor_)),
+                  ToGdi(ScalePoint(cp2, scale_factor_)),
+                  ep);
+  current_point_ = ep;
 }
 
 void PainterWin::Clip() {
-  ::SelectClipPath(hdc_, RGN_AND);
+  graphics_.SetClip(&path_, Gdiplus::CombineModeIntersect);
 }
 
 void PainterWin::ClipRect(const RectF& rect, CombineMode mode) {
@@ -132,36 +136,30 @@ void PainterWin::DrawColoredTextWithFlags(
 }
 
 void PainterWin::ClipRectPixel(const Rect& rect, CombineMode mode) {
-  base::win::ScopedRegion region(CreateRgnWithWorldTransform(rect));
-  int clip_mode = RGN_COPY;
-  if (mode == CombineMode::Intersect)
-    clip_mode = RGN_AND;
-  else if (mode == CombineMode::Union)
-    clip_mode = RGN_OR;
-  else if (mode == CombineMode::Exclude)
-    clip_mode = RGN_DIFF;
-  ::ExtSelectClipRgn(hdc_, region.get(), clip_mode);
+  Gdiplus::CombineMode cm;
+  switch (mode) {
+    case CombineMode::Replace   : cm = Gdiplus::CombineModeReplace;   break;
+    case CombineMode::Intersect : cm = Gdiplus::CombineModeIntersect; break;
+    case CombineMode::Union     : cm = Gdiplus::CombineModeUnion;     break;
+    case CombineMode::Exclude   : cm = Gdiplus::CombineModeExclude;   break;
+    default: cm = Gdiplus::CombineModeReplace;
+  }
+  graphics_.SetClip(ToGdi(rect), cm);
 }
 
 void PainterWin::TranslatePixel(const Vector2d& offset) {
-  XFORM xform = {0};
-  xform.eM11 = 1.0;
-  xform.eM22 = 1.0;
-  xform.eDx = offset.x();
-  xform.eDy = offset.y();
-  ::ModifyWorldTransform(hdc_, &xform, MWT_LEFTMULTIPLY);
+  graphics_.TranslateTransform(offset.x(), offset.y(),
+                               Gdiplus::MatrixOrderAppend);
 }
 
 void PainterWin::StrokeRectPixel(const Rect& rect) {
   Gdiplus::Pen pen(ToGdi(top().stroke_color), top().line_width);
-  Gdiplus::Graphics(hdc_).DrawRectangle(&pen, ToGdi(rect));
+  graphics_.DrawRectangle(&pen, ToGdi(rect));
 }
 
 void PainterWin::FillRectPixel(const Rect& rect) {
-  RECT r = rect.ToRECT();
-  base::win::ScopedGDIObject<HBRUSH> brush(
-      ::CreateSolidBrush(top().fill_color.ToCOLORREF()));
-  ::FillRect(hdc_, &r, brush.get());
+  Gdiplus::SolidBrush brush(ToGdi(top().fill_color));
+  graphics_.FillRectangle(&brush, ToGdi(rect));
 }
 
 void PainterWin::DrawColoredTextWithFlagsPixel(
@@ -175,28 +173,40 @@ void PainterWin::DrawColoredTextWithFlagsPixel(
     format.SetAlignment(Gdiplus::StringAlignmentCenter);
   else if (flags & TextAlignRight)
     format.SetAlignment(Gdiplus::StringAlignmentFar);
-  Gdiplus::Graphics(hdc_).DrawString(
+  graphics_.DrawString(
       text.c_str(), static_cast<int>(text.size()),
       font->GetNative(), ToGdi(RectF(rect)), &format, &brush);
 }
 
-HRGN PainterWin::CreateRgnWithWorldTransform(const Rect& rect) {
-  XFORM xform = {0};
-  if (!::GetWorldTransform(hdc_, &xform))
-    LOG(ERROR) << "Unable to get current world transform";
+HDC PainterWin::GetHDC() {
+  // Get the clip region of graphics.
+  Gdiplus::Region clip;
+  graphics_.GetClip(&clip);
+  base::win::ScopedRegion region(clip.GetHRGN(&graphics_));
+  // Get the transform of graphics.
+  Gdiplus::Matrix matrix;
+  graphics_.GetTransform(&matrix);
+  XFORM xform;
+  matrix.GetElements(reinterpret_cast<float*>(&xform));
 
-  struct {
-    RGNDATAHEADER rdh;
-    RECT buffer;
-  } rgn_data;
-  rgn_data.buffer = rect.ToRECT();
-  rgn_data.rdh.dwSize = sizeof(rgn_data.rdh);
-  rgn_data.rdh.iType = RDH_RECTANGLES;
-  rgn_data.rdh.nCount = 1;
-  rgn_data.rdh.nRgnSize = sizeof(rgn_data);
-  rgn_data.rdh.rcBound = rgn_data.buffer;
-  return ::ExtCreateRegion(&xform, sizeof(rgn_data),
-                           reinterpret_cast<RGNDATA*>(&rgn_data));
+  // Apply current clip region to the returned HDC.
+  HDC hdc = graphics_.GetHDC();
+  ::SelectClipRgn(hdc, region.get());
+  // Apply the world transform to HDC.
+  ::SetGraphicsMode(hdc, GM_ADVANCED);
+  ::SetWorldTransform(hdc, &xform);
+  return hdc;
+}
+
+void PainterWin::ReleaseHDC(HDC hdc) {
+  // Change the world transform back, otherwise the world transform of GDI+
+  // would be affected.
+  XFORM xform = {0};
+  xform.eM11 = 1.;
+  xform.eM22 = 1.;
+  ::SetWorldTransform(hdc, &xform);
+  // Return HDC.
+  graphics_.ReleaseHDC(hdc);
 }
 
 }  // namespace nu

@@ -60,8 +60,9 @@ class PainterWin : public Painter {
       int flags);
 
  private:
-  // Create a region by applying current world transform to |rect|.
-  HRGN CreateRgnWithWorldTransform(const Rect& rect);
+  // Receive the HDC that can be painted on.
+  HDC GetHDC();
+  void ReleaseHDC(HDC dc);
 
   // The saved state.
   struct PainterState {
@@ -72,7 +73,7 @@ class PainterWin : public Painter {
     float line_width;
     Color stroke_color;
     Color fill_color;
-    int state = 0;
+    Gdiplus::GraphicsState state = 0;
   };
 
   // Return the top state.
@@ -84,7 +85,13 @@ class PainterWin : public Painter {
   // Weak ref to the original HDC, should only be used internally.
   HDC hdc_;
 
+  // Current path.
+  Gdiplus::GraphicsPath path_;
+  // Current position, used for adding line to path.
+  Gdiplus::PointF current_point_;
+
   float scale_factor_;
+  Gdiplus::Graphics graphics_;
 };
 
 }  // namespace nu
