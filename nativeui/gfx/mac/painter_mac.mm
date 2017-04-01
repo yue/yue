@@ -50,7 +50,7 @@ void PainterMac::SetLineWidth(float width) {
   CGContextSetLineWidth(context_, width);
 }
 
-void PainterMac::DrawRect(const RectF& rect) {
+void PainterMac::StrokeRect(const RectF& rect) {
   CGContextStrokeRect(context_, rect.ToCGRect());
 }
 

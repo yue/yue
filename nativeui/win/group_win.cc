@@ -80,7 +80,7 @@ class GroupImpl : public ContainerImpl,
     painter->ClipRectPixel(drawing_bounds, Painter::CombineMode::Replace);
     painter->ClipRectPixel(title_bounds_, Painter::CombineMode::Exclude);
     painter->SetColor(Color(255, 170, 170, 170));
-    painter->DrawRectPixel(border_bounds);
+    painter->StrokeRectPixel(border_bounds);
     painter->Restore();
 
     // Draw child.

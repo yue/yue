@@ -22,7 +22,7 @@ class PainterGtk : public Painter {
   void Translate(const Vector2dF& offset) override;
   void SetColor(Color color) override;
   void SetLineWidth(float width) override;
-  void DrawRect(const RectF& rect) override;
+  void StrokeRect(const RectF& rect) override;
   void FillRect(const RectF& rect) override;
   void DrawColoredTextWithFlags(
       const String& text, Font* font, Color color, const RectF& rect,

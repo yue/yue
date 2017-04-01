@@ -49,7 +49,7 @@ void PainterGtk::SetLineWidth(float width) {
   cairo_set_line_width(context_, width);
 }
 
-void PainterGtk::DrawRect(const RectF& rect) {
+void PainterGtk::StrokeRect(const RectF& rect) {
   cairo_rectangle(context_, rect.x(), rect.y(), rect.width(), rect.height());
   cairo_stroke(context_);
 }

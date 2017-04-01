@@ -16,7 +16,7 @@ namespace nu {
 PainterWin::PainterWin(HDC dc, float scale_factor)
     : hdc_(dc), scale_factor_(scale_factor) {
   // Initial state.
-  states_.emplace(scale_factor, Color());
+  states_.emplace(scale_factor, Color(), Color());
   // Enable using world transformation,
   ::SetGraphicsMode(hdc_, GM_ADVANCED);
 }
@@ -58,15 +58,16 @@ void PainterWin::Translate(const Vector2dF& offset) {
 }
 
 void PainterWin::SetColor(Color color) {
-  top().color = color;
+  top().stroke_color = color;
+  top().fill_color = color;
 }
 
 void PainterWin::SetLineWidth(float width) {
   top().line_width = width;
 }
 
-void PainterWin::DrawRect(const RectF& rect) {
-  DrawRectPixel(ToEnclosingRect(ScaleRect(rect, scale_factor_)));
+void PainterWin::StrokeRect(const RectF& rect) {
+  StrokeRectPixel(ToEnclosingRect(ScaleRect(rect, scale_factor_)));
 }
 
 void PainterWin::FillRect(const RectF& rect) {
@@ -101,14 +102,16 @@ void PainterWin::TranslatePixel(const Vector2d& offset) {
   ::ModifyWorldTransform(hdc_, &xform, MWT_LEFTMULTIPLY);
 }
 
-void PainterWin::DrawRectPixel(const Rect& rect) {
-  Gdiplus::Pen pen(ToGdi(top().color), top().line_width);
+void PainterWin::StrokeRectPixel(const Rect& rect) {
+  Gdiplus::Pen pen(ToGdi(top().stroke_color), top().line_width);
   Gdiplus::Graphics(hdc_).DrawRectangle(&pen, ToGdi(rect));
 }
 
 void PainterWin::FillRectPixel(const Rect& rect) {
-  Gdiplus::SolidBrush brush(ToGdi(top().color));
-  Gdiplus::Graphics(hdc_).FillRectangle(&brush, ToGdi(rect));
+  RECT r = rect.ToRECT();
+  base::win::ScopedGDIObject<HBRUSH> brush(
+      ::CreateSolidBrush(top().fill_color.ToCOLORREF()));
+  ::FillRect(hdc_, &r, brush.get());
 }
 
 void PainterWin::DrawColoredTextWithFlagsPixel(

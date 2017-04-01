@@ -35,7 +35,7 @@ class PainterWin : public Painter {
   void Translate(const Vector2dF& offset) override;
   void SetColor(Color color) override;
   void SetLineWidth(float width) override;
-  void DrawRect(const RectF& rect) override;
+  void StrokeRect(const RectF& rect) override;
   void FillRect(const RectF& rect) override;
   void DrawColoredTextWithFlags(
       const String& text, Font* font, Color color, const RectF& rect,
@@ -44,7 +44,7 @@ class PainterWin : public Painter {
   // The pixel versions.
   void ClipRectPixel(const Rect& rect, CombineMode mode);
   void TranslatePixel(const Vector2d& offset);
-  void DrawRectPixel(const Rect& rect);
+  void StrokeRectPixel(const Rect& rect);
   void FillRectPixel(const Rect& rect);
   void DrawColoredTextWithFlagsPixel(
       const String& text, Font* font, Color color, const Rect& rect,
@@ -56,10 +56,13 @@ class PainterWin : public Painter {
 
   // The saved state.
   struct PainterState {
-    PainterState(float line_width, Color color)
-        : line_width(line_width), color(color) {}
+    PainterState(float line_width, Color stroke_color, Color fill_color)
+        : line_width(line_width),
+          stroke_color(stroke_color),
+          fill_color(fill_color) {}
     float line_width;
-    Color color;
+    Color stroke_color;
+    Color fill_color;
     int state = 0;
   };
 

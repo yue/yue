@@ -252,7 +252,7 @@ struct Type<nu::Painter> {
            "translate", &nu::Painter::Translate,
            "setcolor", &nu::Painter::SetColor,
            "setlinewidth", &nu::Painter::SetLineWidth,
-           "drawrect", &nu::Painter::DrawRect,
+           "strokerect", &nu::Painter::StrokeRect,
            "fillrect", &nu::Painter::FillRect,
            "drawtext", &nu::Painter::DrawText,
            "drawtextwithflags", &nu::Painter::DrawTextWithFlags,

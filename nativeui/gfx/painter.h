@@ -57,7 +57,7 @@ class NATIVEUI_EXPORT Painter {
   virtual void SetLineWidth(float width) = 0;
 
   // Draw a single pixel |rect|.
-  virtual void DrawRect(const RectF& rect) = 0;
+  virtual void StrokeRect(const RectF& rect) = 0;
 
   // Fill |rect|.
   virtual void FillRect(const RectF& rect) = 0;
