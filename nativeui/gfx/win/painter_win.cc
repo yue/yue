@@ -15,7 +15,9 @@ namespace nu {
 PainterWin::PainterWin(HDC dc, float scale_factor)
     : hdc_(dc), scale_factor_(scale_factor) {
   // Initial state.
-  states_.emplace(Vector2dF(), scale_factor, Color());
+  states_.emplace(scale_factor, Color());
+  // Enable using world transformation,
+  ::SetGraphicsMode(hdc_, GM_ADVANCED);
 }
 
 PainterWin::~PainterWin() {
@@ -26,17 +28,17 @@ void PainterWin::DrawNativeTheme(NativeTheme::Part part,
                                  const Rect& rect,
                                  const NativeTheme::ExtraParams& extra) {
   State::GetCurrent()->GetNativeTheme()->Paint(
-      part, hdc_, state, Translated(rect), extra);
+      part, hdc_, state, rect, extra);
 }
 
 void PainterWin::DrawFocusRect(const Rect& rect) {
-  RECT r = Translated(rect).ToRECT();
+  RECT r = rect.ToRECT();
   ::DrawFocusRect(hdc_, &r);
 }
 
 void PainterWin::Save() {
-  top().state = ::SaveDC(hdc_);
   states_.push(top());
+  top().state = ::SaveDC(hdc_);
 }
 
 void PainterWin::Restore() {
@@ -77,9 +79,8 @@ void PainterWin::DrawColoredTextWithFlags(
 }
 
 void PainterWin::ClipPixelRect(const RectF& rect, CombineMode mode) {
-  RectF r(Translated(rect));
   base::win::ScopedRegion region(
-      ::CreateRectRgn(r.x(), r.y(), r.right(), r.bottom()));
+      ::CreateRectRgn(rect.x(), rect.y(), rect.right(), rect.bottom()));
   int clip_mode = RGN_COPY;
   if (mode == CombineMode::Intersect)
     clip_mode = RGN_AND;
@@ -91,17 +92,23 @@ void PainterWin::ClipPixelRect(const RectF& rect, CombineMode mode) {
 }
 
 void PainterWin::TranslatePixel(const Vector2dF& offset) {
-  top().origin += offset;
+  XFORM xform = {0};
+  xform.eM11 = 1.0;
+  xform.eM22 = 1.0;
+  xform.eDx = offset.x();
+  xform.eDy = offset.y();
+  ::ModifyWorldTransform(hdc_, &xform, MWT_LEFTMULTIPLY);
+  // top().origin += offset;
 }
 
 void PainterWin::DrawPixelRect(const RectF& rect) {
   Gdiplus::Pen pen(ToGdi(top().color), top().line_width);
-  Gdiplus::Graphics(hdc_).DrawRectangle(&pen, ToGdi(Translated(rect)));
+  Gdiplus::Graphics(hdc_).DrawRectangle(&pen, ToGdi(rect));
 }
 
 void PainterWin::FillPixelRect(const RectF& rect) {
   Gdiplus::SolidBrush brush(ToGdi(top().color));
-  Gdiplus::Graphics(hdc_).FillRectangle(&brush, ToGdi(Translated(rect)));
+  Gdiplus::Graphics(hdc_).FillRectangle(&brush, ToGdi(rect));
 }
 
 void PainterWin::DrawColoredTextPixelWithFlags(
@@ -117,16 +124,7 @@ void PainterWin::DrawColoredTextPixelWithFlags(
     format.SetAlignment(Gdiplus::StringAlignmentFar);
   Gdiplus::Graphics(hdc_).DrawString(
       text.c_str(), static_cast<int>(text.size()),
-      font->GetNative(), ToGdi(Translated(rect)),
-      &format, &brush);
-}
-
-Rect PainterWin::Translated(const Rect& rect) {
-  return rect + ToCeiledVector2d(top().origin);
-}
-
-RectF PainterWin::Translated(const RectF& rect) {
-  return rect + top().origin;
+      font->GetNative(), ToGdi(rect), &format, &brush);
 }
 
 }  // namespace nu

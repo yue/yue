@@ -96,8 +96,8 @@ void ScrollImpl::Draw(PainterWin* painter, const Rect& dirty) {
     DrawChild(v_scrollbar_.get(), painter, dirty);
 
   // The scroll view must be clipped.
-  RectF clip(GetViewportRect() - size_allocation().OffsetFromOrigin());
-  painter->ClipPixelRect(clip, Painter::CombineMode::Replace);
+  RectF clip(Rect(size_allocation().size()));
+  painter->ClipPixelRect(clip, Painter::CombineMode::Intersect);
   DrawChild(delegate_->GetContentView()->GetNative(), painter, dirty);
 }
 
@@ -162,20 +162,6 @@ Rect ScrollImpl::GetScrollBarRect(bool vertical) const {
                 size_allocation().width() -
                 (v_scrollbar_ ? scrollbar_height_ : 0),
                 scrollbar_height_);
-}
-
-void ScrollImpl::DrawScrollBar(bool vertical, PainterWin* painter,
-                               const Rect& dirty) {
-  Rect rect = GetScrollBarRect(vertical);
-  if (!rect.Intersects(dirty))
-    return;
-  painter->Save();
-  painter->TranslatePixel(rect.OffsetFromOrigin());
-  if (vertical)
-    v_scrollbar_->Draw(painter, Rect(rect.size()));
-  else
-    h_scrollbar_->Draw(painter, Rect(rect.size()));
-  painter->Restore();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

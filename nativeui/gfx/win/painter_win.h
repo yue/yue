@@ -50,19 +50,11 @@ class PainterWin : public Painter {
       const String& text, Font* font, Color color, const RectF& rect,
       int flags);
 
-  // Helper to get current state.
-  Vector2dF& origin() { return states_.top().origin; }
-
  private:
-  // Translate a rect from current origin.
-  Rect Translated(const Rect& rect);
-  RectF Translated(const RectF& rect);
-
   // The saved state.
   struct PainterState {
-    PainterState(const Vector2dF& origin, float line_width, Color color)
-        : origin(origin), line_width(line_width), color(color) {}
-    Vector2dF origin;
+    PainterState(float line_width, Color color)
+        : line_width(line_width), color(color) {}
     float line_width;
     Color color;
     int state = 0;

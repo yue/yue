@@ -49,7 +49,6 @@ class ScrollImpl : public ContainerImpl,
   void UpdateScrollbar();
   bool UpdateOrigin(Vector2d new_origin);
   Rect GetScrollBarRect(bool vertical) const;
-  void DrawScrollBar(bool vertical, PainterWin* painter, const Rect& dirty);
 
   Size content_size_;
   Vector2d origin_;
