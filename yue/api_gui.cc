@@ -104,6 +104,28 @@ struct Type<nu::Vector2dF> {
 };
 
 template<>
+struct Type<nu::PointF> {
+  static constexpr const char* name = "yue.Point";
+  static inline void Push(State* state, const nu::PointF& p) {
+    lua::NewTable(state);
+    lua::RawSet(state, -1, "x", p.x(), "y", p.y());
+  }
+  static inline bool To(State* state, int index, nu::PointF* out) {
+    float x, y;
+    if (GetTop(state) - index == 1 && lua::To(state, index, &x, &y)) {
+      *out = nu::PointF(x, y);
+      return true;
+    }
+    if (GetType(state, index) != LuaType::Table)
+      return false;
+    if (!RawGetAndPop(state, index, "x", &x, "y", &y))
+      return false;
+    *out = nu::PointF(x, y);
+    return true;
+  }
+};
+
+template<>
 struct Type<nu::Accelerator> {
   static constexpr const char* name = "yue.Accelerator";
   static inline bool To(State* state, int index, nu::Accelerator* out) {
@@ -248,10 +270,18 @@ struct Type<nu::Painter> {
            // APIs
            "save", &nu::Painter::Save,
            "restore", &nu::Painter::Restore,
+           "beginpath", &nu::Painter::BeginPath,
+           "closepath", &nu::Painter::ClosePath,
+           "moveto", &nu::Painter::MoveTo,
+           "lineto", &nu::Painter::LineTo,
+           "beziercurveto", &nu::Painter::BezierCurveTo,
+           "clip", &nu::Painter::Clip,
            "cliprect", &nu::Painter::ClipRect,
            "translate", &nu::Painter::Translate,
            "setcolor", &nu::Painter::SetColor,
            "setlinewidth", &nu::Painter::SetLineWidth,
+           "stroke", &nu::Painter::Stroke,
+           "fill", &nu::Painter::Fill,
            "strokerect", &nu::Painter::StrokeRect,
            "fillrect", &nu::Painter::FillRect,
            "drawtext", &nu::Painter::DrawText,

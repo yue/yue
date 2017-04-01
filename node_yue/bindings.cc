@@ -103,6 +103,28 @@ struct Type<nu::Vector2dF> {
 };
 
 template<>
+struct Type<nu::PointF> {
+  static constexpr const char* name = "yue.Point";
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   const nu::PointF& value) {
+    auto obj = v8::Object::New(context->GetIsolate());
+    Set(context, obj, "x", value.x(), "y", value.y());
+    return obj;
+  }
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::PointF* out) {
+    if (!value->IsObject())
+      return false;
+    float x, y;
+    if (!Get(context, value.As<v8::Object>(), "x", &x, "y", &y))
+      return false;
+    *out = nu::PointF(x, y);
+    return true;
+  }
+};
+
+template<>
 struct Type<nu::Accelerator> {
   static constexpr const char* name = "yue.Accelerator";
   static bool FromV8(v8::Local<v8::Context> context,
@@ -275,10 +297,18 @@ struct Type<nu::Painter> {
     Set(context, templ,
         "save", &nu::Painter::Save,
         "restore", &nu::Painter::Restore,
+        "beginPath", &nu::Painter::BeginPath,
+        "closePath", &nu::Painter::ClosePath,
+        "moveTo", &nu::Painter::MoveTo,
+        "lineTo", &nu::Painter::LineTo,
+        "bezierCurveTo", &nu::Painter::BezierCurveTo,
+        "clip", &nu::Painter::Clip,
         "clipRect", &nu::Painter::ClipRect,
         "translate", &nu::Painter::Translate,
         "setColor", &nu::Painter::SetColor,
         "setLineWidth", &nu::Painter::SetLineWidth,
+        "stroke", &nu::Painter::Stroke,
+        "fill", &nu::Painter::Fill,
         "strokeRect", &nu::Painter::StrokeRect,
         "fillRect", &nu::Painter::FillRect,
         "drawText", &nu::Painter::DrawText,

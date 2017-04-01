@@ -71,7 +71,7 @@ void PainterWin::MoveTo(const PointF& point) {
 void PainterWin::LineTo(const PointF& point) {
   Gdiplus::PointF p = ToGdi(ScalePoint(point, scale_factor_));
   path_.AddLine(current_point_, p);
-  p = current_point_;
+  current_point_ = p;
 }
 
 void PainterWin::BezierCurveTo(const PointF& cp1,
@@ -107,17 +107,13 @@ void PainterWin::SetLineWidth(float width) {
 }
 
 void PainterWin::Stroke() {
-  base::win::ScopedGDIObject<HPEN> pen(
-      ::CreatePen(PS_SOLID, top().line_width, top().stroke_color.ToCOLORREF()));
-  base::win::ScopedSelectObject select_pen(hdc_, pen.get());
-  ::StrokePath(hdc_);
+  Gdiplus::Pen pen(ToGdi(top().stroke_color), top().line_width);
+  graphics_.DrawPath(&pen, &path_);
 }
 
 void PainterWin::Fill() {
-  base::win::ScopedGDIObject<HBRUSH> brush(
-      ::CreateSolidBrush(top().stroke_color.ToCOLORREF()));
-  base::win::ScopedSelectObject select_brush(hdc_, brush.get());
-  ::FillPath(hdc_);
+  Gdiplus::SolidBrush brush(ToGdi(top().fill_color));
+  graphics_.FillPath(&brush, &path_);
 }
 
 void PainterWin::StrokeRect(const RectF& rect) {
