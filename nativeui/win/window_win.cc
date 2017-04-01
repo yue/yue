@@ -196,7 +196,7 @@ void WindowImpl::OnPaint(HDC) {
     // Background.
     PainterWin painter(buffer.dc(), scale_factor_);
     painter.SetColor(background_color_);
-    painter.FillPixelRect(RectF(dirty));
+    painter.FillPixelRect(dirty);
 
     // Draw.
     delegate_->GetContentView()->GetNative()->Draw(&painter, dirty);

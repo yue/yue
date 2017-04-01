@@ -42,15 +42,18 @@ class PainterWin : public Painter {
       int flags) override;
 
   // The pixel versions.
-  void ClipPixelRect(const RectF& rect, CombineMode mode);
-  void TranslatePixel(const Vector2dF& offset);
-  void DrawPixelRect(const RectF& rect);
-  void FillPixelRect(const RectF& rect);
+  void ClipPixelRect(const Rect& rect, CombineMode mode);
+  void TranslatePixel(const Vector2d& offset);
+  void DrawPixelRect(const Rect& rect);
+  void FillPixelRect(const Rect& rect);
   void DrawColoredTextPixelWithFlags(
-      const String& text, Font* font, Color color, const RectF& rect,
+      const String& text, Font* font, Color color, const Rect& rect,
       int flags);
 
  private:
+  // Create a region by applying current world transform to |rect|.
+  // void ApplyWorldTransform(const Rect& rect);
+
   // The saved state.
   struct PainterState {
     PainterState(float line_width, Color color)

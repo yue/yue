@@ -64,14 +64,14 @@ class GroupImpl : public ContainerImpl,
   // ViewImpl:
   void Draw(PainterWin* painter, const Rect& dirty) override {
     // Draw title.
-    if (RectF(dirty).Intersects(title_bounds_))
+    if (dirty.Intersects(title_bounds_))
       painter->DrawColoredTextPixelWithFlags(
           title_, font_.get(), color_, title_bounds_, Painter::TextAlignLeft);
 
     // Calculate the border bounds.
-    RectF drawing_bounds(SizeF(size_allocation().size()));
+    Rect drawing_bounds(size_allocation().size());
     Insets border = GetBorder();
-    RectF border_bounds(drawing_bounds);
+    Rect border_bounds(drawing_bounds);
     border_bounds.Inset(border.left() / 2, border.top() / 2,
                         border.right() / 2, border.bottom() / 2);
 
@@ -95,8 +95,8 @@ class GroupImpl : public ContainerImpl,
   void OnDPIChanged() override {
     base::win::ScopedGetDC dc(window() ? window()->hwnd() : NULL);
     // Update the rect of the title.
-    title_bounds_ = RectF(PointF(kTitleLeftMargin * scale_factor(), 0),
-                          MeasureText(dc, font_.get(), title_));
+    title_bounds_ = Rect(Point(kTitleLeftMargin * scale_factor(), 0),
+                         ToCeiledSize(MeasureText(dc, font_.get(), title_)));
   }
 
  private:
@@ -104,7 +104,7 @@ class GroupImpl : public ContainerImpl,
 
   Color color_;
   scoped_refptr<Font> font_;
-  RectF title_bounds_;
+  Rect title_bounds_;
 
   base::string16 title_;
 };
