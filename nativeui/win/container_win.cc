@@ -102,6 +102,8 @@ void ContainerImpl::DrawChild(ViewImpl* child, PainterWin* painter,
                           size_allocation().OffsetFromOrigin();
   painter->Save();
   painter->TranslatePixel(child_origin);
+  painter->ClipPixelRect(Rect(child->size_allocation().size()),
+                         Painter::CombineMode::Intersect);
   child->Draw(painter, child_dirty - child_origin);
   painter->Restore();
 }
