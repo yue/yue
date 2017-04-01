@@ -43,9 +43,20 @@ class NATIVEUI_EXPORT Painter {
   virtual void Save() = 0;
   virtual void Restore() = 0;
 
+  // Create path.
+  virtual void BeginPath() = 0;
+  virtual void ClosePath() = 0;
+  virtual void MoveTo(const PointF& p) = 0;
+  virtual void LineTo(const PointF& p) = 0;
+  virtual void BezierCurveTo(const PointF& cp1,
+                             const PointF& cp2,
+                             const PointF& ep) = 0;
+
+  // Add current path to clip area by intersection.
+  virtual void Clip() = 0;
+
   // Apply |rect| to the current clip using the specified region |op|.
-  virtual void ClipRect(const RectF& rect,
-                        CombineMode mode = CombineMode::Replace) = 0;
+  virtual void ClipRect(const RectF& rect, CombineMode mode) = 0;
 
   // The origin offset of the painting.
   virtual void Translate(const Vector2dF& offset) = 0;
@@ -55,6 +66,12 @@ class NATIVEUI_EXPORT Painter {
 
   // Set the width used for drawing lines.
   virtual void SetLineWidth(float width) = 0;
+
+  // Stroke current path.
+  virtual void Stroke() = 0;
+
+  // Draw a solid shape by filling current path's content area.
+  virtual void Fill() = 0;
 
   // Draw a single pixel |rect|.
   virtual void StrokeRect(const RectF& rect) = 0;

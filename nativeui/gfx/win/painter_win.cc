@@ -7,6 +7,8 @@
 #include <memory>
 
 #include "base/win/scoped_gdi_object.h"
+#include "base/win/scoped_select_object.h"
+#include "nativeui/gfx/geometry/point_conversions.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/gfx/geometry/vector2d_conversions.h"
 #include "nativeui/state.h"
@@ -49,6 +51,40 @@ void PainterWin::Restore() {
   states_.pop();
 }
 
+void PainterWin::BeginPath() {
+  ::BeginPath(hdc_);
+}
+
+void PainterWin::ClosePath() {
+  ::CloseFigure(hdc_);
+  ::EndPath(hdc_);
+}
+
+void PainterWin::MoveTo(const PointF& point) {
+  Point p = ToFlooredPoint(ScalePoint(point, scale_factor_));
+  ::MoveToEx(hdc_, p.x(), p.y(), nullptr);
+}
+
+void PainterWin::LineTo(const PointF& point) {
+  Point p = ToFlooredPoint(ScalePoint(point, scale_factor_));
+  ::LineTo(hdc_, p.x(), p.y());
+}
+
+void PainterWin::BezierCurveTo(const PointF& cp1,
+                               const PointF& cp2,
+                               const PointF& ep) {
+  POINT ps[3] = {
+      ToFlooredPoint(ScalePoint(cp1, scale_factor_)).ToPOINT(),
+      ToFlooredPoint(ScalePoint(cp2, scale_factor_)).ToPOINT(),
+      ToFlooredPoint(ScalePoint(ep, scale_factor_)).ToPOINT(),
+  };
+  ::PolyBezierTo(hdc_, ps, 3);
+}
+
+void PainterWin::Clip() {
+  ::SelectClipPath(hdc_, RGN_AND);
+}
+
 void PainterWin::ClipRect(const RectF& rect, CombineMode mode) {
   ClipRectPixel(ToEnclosingRect(ScaleRect(rect, scale_factor_)), mode);
 }
@@ -64,6 +100,20 @@ void PainterWin::SetColor(Color color) {
 
 void PainterWin::SetLineWidth(float width) {
   top().line_width = width;
+}
+
+void PainterWin::Stroke() {
+  base::win::ScopedGDIObject<HPEN> pen(
+      ::CreatePen(PS_SOLID, top().line_width, top().stroke_color.ToCOLORREF()));
+  base::win::ScopedSelectObject select_pen(hdc_, pen.get());
+  ::StrokePath(hdc_);
+}
+
+void PainterWin::Fill() {
+  base::win::ScopedGDIObject<HBRUSH> brush(
+      ::CreateSolidBrush(top().stroke_color.ToCOLORREF()));
+  base::win::ScopedSelectObject select_brush(hdc_, brush.get());
+  ::FillPath(hdc_);
 }
 
 void PainterWin::StrokeRect(const RectF& rect) {
