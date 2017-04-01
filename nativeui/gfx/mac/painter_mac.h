@@ -7,6 +7,8 @@
 
 #include "nativeui/gfx/painter.h"
 
+typedef struct CGContext* CGContextRef;
+
 namespace nu {
 
 class PainterMac : public Painter {
@@ -27,6 +29,9 @@ class PainterMac : public Painter {
   void DrawColoredTextWithFlags(
       const String& text, Font* font, Color color, const RectF& rect,
       int flags) override;
+
+ private:
+  CGContextRef context_;
 };
 
 }  // namespace nu

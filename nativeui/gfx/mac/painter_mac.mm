@@ -10,34 +10,36 @@
 
 namespace nu {
 
-PainterMac::PainterMac() {
+PainterMac::PainterMac()
+    : context_(reinterpret_cast<CGContextRef>(
+                   [[NSGraphicsContext currentContext] graphicsPort])) {
 }
 
 PainterMac::~PainterMac() {
 }
 
 void PainterMac::Save() {
-  [NSGraphicsContext saveGraphicsState];
+  CGContextSaveGState(context_);
 }
 
 void PainterMac::Restore() {
-  [NSGraphicsContext restoreGraphicsState];
+  CGContextRestoreGState(context_);
 }
 
 void PainterMac::ClipRect(const RectF& rect, CombineMode mode) {
-  auto* path = [NSBezierPath bezierPathWithRect:rect.ToCGRect()];
-  if (mode == CombineMode::Replace)
-    [path setClip];
-  else if (mode == CombineMode::Intersect)
-    [path addClip];
-  else
+  if (mode == CombineMode::Replace) {
+    CGContextBeginPath(context_);
+    CGContextAddRect(context_, rect.ToCGRect());
+    CGContextClip(context_);
+  } else if (mode == CombineMode::Intersect) {
+    CGContextClipToRect(context_, rect.ToCGRect());
+  } else {
     LOG(ERROR) << "Cocoa only supports replacing and intersecting clip region";
+  }
 }
 
 void PainterMac::Translate(const Vector2dF& offset) {
-  auto* xform = [NSAffineTransform transform];
-  [xform translateXBy:offset.x() yBy:offset.y()];
-  [xform concat];
+  CGContextTranslateCTM(context_, offset.x(), offset.y());
 }
 
 void PainterMac::SetColor(Color color) {
@@ -45,15 +47,15 @@ void PainterMac::SetColor(Color color) {
 }
 
 void PainterMac::SetLineWidth(float width) {
-  [NSBezierPath setDefaultLineWidth:width];
+  CGContextSetLineWidth(context_, width);
 }
 
 void PainterMac::DrawRect(const RectF& rect) {
-  [NSBezierPath strokeRect:rect.ToCGRect()];
+  CGContextStrokeRect(context_, rect.ToCGRect());
 }
 
 void PainterMac::FillRect(const RectF& rect) {
-  NSRectFillUsingOperation(rect.ToCGRect(), NSCompositeSourceOver);
+  CGContextFillRect(context_, rect.ToCGRect());
 }
 
 void PainterMac::DrawColoredTextWithFlags(
@@ -77,8 +79,11 @@ void PainterMac::DrawColoredTextWithFlags(
   NSAttributedString* attribute =
       [[[NSAttributedString alloc] initWithString:text
                                        attributes:attributes] autorelease];
-  NSRect frame = NSMakeRect(0, (rect.height() - attribute.size.height) / 2,
-                            rect.width(), attribute.size.height);
+  NSRect frame = NSMakeRect(
+      rect.x(),
+      rect.y() + (rect.height() - attribute.size.height) / 2,
+      rect.width(),
+       attribute.size.height);
   [text drawInRect:frame withAttributes:attributes];
 }
 
