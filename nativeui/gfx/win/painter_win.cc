@@ -81,8 +81,7 @@ void PainterWin::DrawColoredTextWithFlags(
 }
 
 void PainterWin::ClipPixelRect(const Rect& rect, CombineMode mode) {
-  base::win::ScopedRegion region(
-      ::CreateRectRgn(rect.x(), rect.y(), rect.right(), rect.bottom()));
+  base::win::ScopedRegion region(CreateRgnWithWorldTransform(rect));
   int clip_mode = RGN_COPY;
   if (mode == CombineMode::Intersect)
     clip_mode = RGN_AND;
@@ -126,6 +125,25 @@ void PainterWin::DrawColoredTextPixelWithFlags(
   Gdiplus::Graphics(hdc_).DrawString(
       text.c_str(), static_cast<int>(text.size()),
       font->GetNative(), ToGdi(RectF(rect)), &format, &brush);
+}
+
+HRGN PainterWin::CreateRgnWithWorldTransform(const Rect& rect) {
+  XFORM xform = {0};
+  if (!::GetWorldTransform(hdc_, &xform))
+    LOG(ERROR) << "Unable to get current world transform";
+
+  struct {
+    RGNDATAHEADER rdh;
+    RECT buffer;
+  } rgn_data;
+  rgn_data.buffer = rect.ToRECT();
+  rgn_data.rdh.dwSize = sizeof(rgn_data.rdh);
+  rgn_data.rdh.iType = RDH_RECTANGLES;
+  rgn_data.rdh.nCount = 1;
+  rgn_data.rdh.nRgnSize = sizeof(rgn_data);
+  rgn_data.rdh.rcBound = rgn_data.buffer;
+  return ::ExtCreateRegion(&xform, sizeof(rgn_data),
+                           reinterpret_cast<RGNDATA*>(&rgn_data));
 }
 
 }  // namespace nu

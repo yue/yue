@@ -52,7 +52,7 @@ class PainterWin : public Painter {
 
  private:
   // Create a region by applying current world transform to |rect|.
-  // void ApplyWorldTransform(const Rect& rect);
+  HRGN CreateRgnWithWorldTransform(const Rect& rect);
 
   // The saved state.
   struct PainterState {
