@@ -108,11 +108,13 @@ void PainterWin::SetLineWidth(float width) {
 void PainterWin::Stroke() {
   Gdiplus::Pen pen(ToGdi(top().stroke_color), top().line_width);
   graphics_.DrawPath(&pen, &path_);
+  path_.Reset();
 }
 
 void PainterWin::Fill() {
   Gdiplus::SolidBrush brush(ToGdi(top().fill_color));
   graphics_.FillPath(&brush, &path_);
+  path_.Reset();
 }
 
 void PainterWin::StrokeRect(const RectF& rect) {
@@ -164,11 +166,13 @@ void PainterWin::TranslatePixel(const Vector2d& offset) {
 void PainterWin::StrokeRectPixel(const nu::Rect& rect) {
   Gdiplus::Pen pen(ToGdi(top().stroke_color), top().line_width);
   graphics_.DrawRectangle(&pen, ToGdi(rect));
+  path_.Reset();  // apply to behavior on other platform
 }
 
 void PainterWin::FillRectPixel(const nu::Rect& rect) {
   Gdiplus::SolidBrush brush(ToGdi(top().fill_color));
   graphics_.FillRectangle(&brush, ToGdi(rect));
+  path_.Reset();  // apply to behavior on other platform
 }
 
 void PainterWin::DrawColoredTextWithFlagsPixel(
