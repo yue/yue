@@ -160,7 +160,6 @@ void PainterGtk::ArcTo(const PointF& p1, const PointF& p2, float radius) {
 }
 
 void PainterGtk::Arc(const PointF& point, float radius, float sa, float ea) {
-  cairo_new_sub_path(context_);  // do not connect to last point
   cairo_arc(context_, point.x(), point.y(), radius, sa, ea);
 }
 
