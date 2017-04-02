@@ -17,11 +17,21 @@ class PainterGtk : public Painter {
   // Painter:
   void Save() override;
   void Restore() override;
-  void ClipRect(const RectF& rect,
-                CombineMode mode = CombineMode::Replace) override;
+  void BeginPath() override;
+  void ClosePath() override;
+  void MoveTo(const PointF& point) override;
+  void LineTo(const PointF& point) override;
+  void BezierCurveTo(const PointF& cp1,
+                     const PointF& cp2,
+                     const PointF& ep) override;
+  void Rect(const RectF& rect) override;
+  void Clip() override;
+  void ClipRect(const RectF& rect) override;
   void Translate(const Vector2dF& offset) override;
   void SetColor(Color color) override;
   void SetLineWidth(float width) override;
+  void Stroke() override;
+  void Fill() override;
   void StrokeRect(const RectF& rect) override;
   void FillRect(const RectF& rect) override;
   void DrawColoredTextWithFlags(

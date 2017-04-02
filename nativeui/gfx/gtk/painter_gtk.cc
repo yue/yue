@@ -25,13 +25,39 @@ void PainterGtk::Restore() {
   cairo_restore(context_);
 }
 
-void PainterGtk::ClipRect(const RectF& rect, CombineMode mode) {
-  if (mode == CombineMode::Union || mode == CombineMode::Exclude) {
-    LOG(ERROR) << "Cairo only supports replacing clip region";
-    return;
-  } else if (mode == CombineMode::Replace) {
-    cairo_reset_clip(context_);
-  }
+void PainterGtk::BeginPath() {
+  cairo_new_path(context_);
+}
+
+void PainterGtk::ClosePath() {
+  cairo_close_path(context_);
+}
+
+void PainterGtk::MoveTo(const PointF& point) {
+  cairo_move_to(context_, point.x(), point.y());
+}
+
+void PainterGtk::LineTo(const PointF& point) {
+  cairo_line_to(context_, point.x(), point.y());
+}
+
+void PainterGtk::BezierCurveTo(const PointF& cp1,
+                               const PointF& cp2,
+                               const PointF& ep) {
+  cairo_curve_to(
+      context_, cp1.x(), cp1.y(), cp2.x(), cp2.y(), ep.x(), ep.y());
+}
+
+void PainterGtk::Rect(const RectF& rect) {
+  cairo_rectangle(context_, rect.x(), rect.y(), rect.width(), rect.height());
+}
+
+void PainterGtk::Clip() {
+  cairo_clip(context_);
+}
+
+void PainterGtk::ClipRect(const RectF& rect) {
+  cairo_new_path(context_);
   cairo_rectangle(context_, rect.x(), rect.y(), rect.width(), rect.height());
   cairo_clip(context_);
 }
@@ -47,6 +73,14 @@ void PainterGtk::SetColor(Color color) {
 
 void PainterGtk::SetLineWidth(float width) {
   cairo_set_line_width(context_, width);
+}
+
+void PainterGtk::Stroke() {
+  cairo_stroke(context_);
+}
+
+void PainterGtk::Fill() {
+  cairo_fill(context_);
 }
 
 void PainterGtk::StrokeRect(const RectF& rect) {
