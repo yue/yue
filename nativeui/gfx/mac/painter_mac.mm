@@ -26,16 +26,39 @@ void PainterMac::Restore() {
   CGContextRestoreGState(context_);
 }
 
-void PainterMac::ClipRect(const RectF& rect, CombineMode mode) {
-  if (mode == CombineMode::Replace) {
-    CGContextBeginPath(context_);
-    CGContextAddRect(context_, rect.ToCGRect());
-    CGContextClip(context_);
-  } else if (mode == CombineMode::Intersect) {
-    CGContextClipToRect(context_, rect.ToCGRect());
-  } else {
-    LOG(ERROR) << "Cocoa only supports replacing and intersecting clip region";
-  }
+void PainterMac::BeginPath() {
+  CGContextBeginPath(context_);
+}
+
+void PainterMac::ClosePath() {
+  CGContextClosePath(context_);
+}
+
+void PainterMac::MoveTo(const PointF& point) {
+  CGContextMoveToPoint(context_, point.x(), point.y());
+}
+
+void PainterMac::LineTo(const PointF& point) {
+  CGContextAddLineToPoint(context_, point.x(), point.y());
+}
+
+void PainterMac::BezierCurveTo(const PointF& cp1,
+                               const PointF& cp2,
+                               const PointF& ep) {
+  CGContextAddCurveToPoint(
+      context_, cp1.x(), cp1.y(), cp2.x(), cp2.y(), ep.x(), ep.y());
+}
+
+void PainterMac::Rect(const RectF& rect) {
+  CGContextAddRect(context_, rect.ToCGRect());
+}
+
+void PainterMac::Clip() {
+  CGContextClip(context_);
+}
+
+void PainterMac::ClipRect(const RectF& rect) {
+  CGContextClipToRect(context_, rect.ToCGRect());
 }
 
 void PainterMac::Translate(const Vector2dF& offset) {
@@ -48,6 +71,14 @@ void PainterMac::SetColor(Color color) {
 
 void PainterMac::SetLineWidth(float width) {
   CGContextSetLineWidth(context_, width);
+}
+
+void PainterMac::Stroke() {
+  CGContextStrokePath(context_);
+}
+
+void PainterMac::Fill() {
+  CGContextFillPath(context_);
 }
 
 void PainterMac::StrokeRect(const RectF& rect) {

@@ -86,6 +86,7 @@ void PainterWin::Rect(const RectF& rect) {
 
 void PainterWin::Clip() {
   graphics_.SetClip(&path_, Gdiplus::CombineModeIntersect);
+  path_.Reset();
 }
 
 void PainterWin::ClipRect(const RectF& rect) {
