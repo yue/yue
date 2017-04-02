@@ -656,8 +656,8 @@ struct Type<nu::Scroll> {
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateInstance<nu::Scroll>,
-           "setscrollbarpolicy", &nu::Scroll::SetScrollBarPolicy,
-           "getscrollbarpolicy", &nu::Scroll::GetScrollBarPolicy,
+           "setscrollbarpolicy", &nu::Scroll::SetScrollbarPolicy,
+           "getscrollbarpolicy", &nu::Scroll::GetScrollbarPolicy,
            "setcontentsize", &nu::Scroll::SetContentSize,
            "getcontentsize", &nu::Scroll::GetContentSize,
            "setcontentview", &nu::Scroll::SetContentView,

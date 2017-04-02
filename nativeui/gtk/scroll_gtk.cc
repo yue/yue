@@ -58,12 +58,12 @@ void Scroll::SetContentSize(const SizeF& size) {
                               size.width(), size.height());
 }
 
-void Scroll::SetScrollBarPolicy(Policy h_policy, Policy v_policy) {
+void Scroll::SetScrollbarPolicy(Policy h_policy, Policy v_policy) {
   gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(GetNative()),
                                  PolicyToGTK(h_policy), PolicyToGTK(v_policy));
 }
 
-std::tuple<Scroll::Policy, Scroll::Policy> Scroll::GetScrollBarPolicy() const {
+std::tuple<Scroll::Policy, Scroll::Policy> Scroll::GetScrollbarPolicy() const {
   GtkPolicyType hp, vp;
   gtk_scrolled_window_get_policy(GTK_SCROLLED_WINDOW(GetNative()), &hp, &vp);
   return std::make_tuple(PolicyFromGTK(hp), PolicyFromGTK(vp));

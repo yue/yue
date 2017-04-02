@@ -289,7 +289,7 @@
       return TRUE;                                      \
   }
 
-// HBRUSH OnCtlColorScrollBar(CDCHandle dc, CScrollBar scrollBar)
+// HBRUSH OnCtlColorScrollbar(CDCHandle dc, CScrollbar scrollBar)
 #define CR_MSG_WM_CTLCOLORSCROLLBAR(func)               \
   if (uMsg == WM_CTLCOLORSCROLLBAR) {                   \
     SetMsgHandled(TRUE);                                \
@@ -808,7 +808,7 @@
       return TRUE;            \
   }
 
-// void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar pScrollBar)
+// void OnHScroll(UINT nSBCode, UINT nPos, CScrollbar pScrollbar)
 #define CR_MSG_WM_HSCROLL(func)                                     \
   if (uMsg == WM_HSCROLL) {                                         \
     SetMsgHandled(TRUE);                                            \
@@ -818,7 +818,7 @@
       return TRUE;                                                  \
   }
 
-// void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar pScrollBar)
+// void OnVScroll(UINT nSBCode, UINT nPos, CScrollbar pScrollbar)
 #define CR_MSG_WM_VSCROLL(func)                                     \
   if (uMsg == WM_VSCROLL) {                                         \
     SetMsgHandled(TRUE);                                            \
@@ -1904,7 +1904,7 @@
       return TRUE;                                                 \
   }
 
-// void OnReflectedHScroll(UINT nSBCode, UINT nPos, CScrollBar pScrollBar)
+// void OnReflectedHScroll(UINT nSBCode, UINT nPos, CScrollbar pScrollbar)
 #define MSG_OCM_HSCROLL(func)                                       \
   if (uMsg == OCM_HSCROLL) {                                        \
     SetMsgHandled(TRUE);                                            \
@@ -1914,7 +1914,7 @@
       return TRUE;                                                  \
   }
 
-// void OnReflectedVScroll(UINT nSBCode, UINT nPos, CScrollBar pScrollBar)
+// void OnReflectedVScroll(UINT nSBCode, UINT nPos, CScrollbar pScrollbar)
 #define MSG_OCM_VSCROLL(func)                                       \
   if (uMsg == OCM_VSCROLL) {                                        \
     SetMsgHandled(TRUE);                                            \
@@ -1960,7 +1960,7 @@
       return TRUE;                                      \
   }
 
-// HBRUSH OnReflectedCtlColorScrollBar(CDCHandle dc, CScrollBar scrollBar)
+// HBRUSH OnReflectedCtlColorScrollbar(CDCHandle dc, CScrollbar scrollBar)
 #define MSG_OCM_CTLCOLORSCROLLBAR(func)                 \
   if (uMsg == OCM_CTLCOLORSCROLLBAR) {                  \
     SetMsgHandled(TRUE);                                \

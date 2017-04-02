@@ -14,7 +14,7 @@
 
 namespace nu {
 
-class ScrollBar;
+class Scrollbar;
 
 // The implementation for the Scroll view.
 class ScrollImpl : public ContainerImpl,
@@ -24,7 +24,7 @@ class ScrollImpl : public ContainerImpl,
 
   void SetOrigin(const Vector2d& origin);
   void SetContentSize(const Size& size);
-  void SetScrollBarPolicy(Scroll::Policy h_policy, Scroll::Policy v_policy);
+  void SetScrollbarPolicy(Scroll::Policy h_policy, Scroll::Policy v_policy);
 
   Rect GetViewportRect() const;
   void OnScroll(int x, int y);
@@ -48,7 +48,7 @@ class ScrollImpl : public ContainerImpl,
  private:
   void UpdateScrollbar();
   bool UpdateOrigin(Vector2d new_origin);
-  Rect GetScrollBarRect(bool vertical) const;
+  Rect GetScrollbarRect(bool vertical) const;
 
   Size content_size_;
   Vector2d origin_;
@@ -60,8 +60,8 @@ class ScrollImpl : public ContainerImpl,
   Scroll::Policy h_policy_;
   Scroll::Policy v_policy_;
 
-  std::unique_ptr<ScrollBar> h_scrollbar_;
-  std::unique_ptr<ScrollBar> v_scrollbar_;
+  std::unique_ptr<Scrollbar> h_scrollbar_;
+  std::unique_ptr<Scrollbar> v_scrollbar_;
 
   Scroll* delegate_;
 };

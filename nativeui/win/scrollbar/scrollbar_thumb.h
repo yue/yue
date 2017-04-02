@@ -2,20 +2,20 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef NATIVEUI_WIN_SCROLL_BAR_SCROLL_BAR_THUMB_H_
-#define NATIVEUI_WIN_SCROLL_BAR_SCROLL_BAR_THUMB_H_
+#ifndef NATIVEUI_WIN_SCROLLBAR_SCROLLBAR_THUMB_H_
+#define NATIVEUI_WIN_SCROLLBAR_SCROLLBAR_THUMB_H_
 
 #include "nativeui/gfx/win/native_theme.h"
 #include "nativeui/win/view_win.h"
 
 namespace nu {
 
-class ScrollBar;
+class Scrollbar;
 
-class ScrollBarThumb : public ViewImpl {
+class ScrollbarThumb : public ViewImpl {
  public:
-  ScrollBarThumb(bool vertical, ScrollBar* scroll_bar);
-  ~ScrollBarThumb() override;
+  ScrollbarThumb(bool vertical, Scrollbar* scrollbar);
+  ~ScrollbarThumb() override;
 
   int GetSize() const;
 
@@ -39,9 +39,9 @@ class ScrollBarThumb : public ViewImpl {
   int last_value_ = 0;
 
   bool vertical_;
-  ScrollBar* scroll_bar_;  // weak ref
+  Scrollbar* scrollbar_;  // weak ref
 };
 
 }  // namespace nu
 
-#endif  // NATIVEUI_WIN_SCROLL_BAR_SCROLL_BAR_THUMB_H_
+#endif  // NATIVEUI_WIN_SCROLLBAR_SCROLLBAR_THUMB_H_

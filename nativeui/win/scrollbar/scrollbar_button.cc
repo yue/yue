@@ -2,34 +2,34 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/win/scroll_bar/scroll_bar_button.h"
+#include "nativeui/win/scrollbar/scrollbar_button.h"
 
-#include "nativeui/win/scroll_bar/scroll_bar.h"
+#include "nativeui/win/scrollbar/scrollbar.h"
 
 namespace nu {
 
-ScrollBarButton::ScrollBarButton(Type type, ScrollBar* scroll_bar)
-    : ViewImpl(ControlType::ScrollBarButton),
-      repeater_(base::Bind(&ScrollBarButton::OnClick, base::Unretained(this))),
+ScrollbarButton::ScrollbarButton(Type type, Scrollbar* scrollbar)
+    : ViewImpl(ControlType::ScrollbarButton),
+      repeater_(base::Bind(&ScrollbarButton::OnClick, base::Unretained(this))),
       type_(type),
-      scroll_bar_(scroll_bar) {
+      scrollbar_(scrollbar) {
 }
 
-ScrollBarButton::~ScrollBarButton() {
+ScrollbarButton::~ScrollbarButton() {
 }
 
-void ScrollBarButton::OnMouseEnter() {
+void ScrollbarButton::OnMouseEnter() {
   set_state(ControlState::Hovered);
   Invalidate();
 }
 
-void ScrollBarButton::OnMouseLeave() {
+void ScrollbarButton::OnMouseLeave() {
   set_state(ControlState::Normal);
   repeater_.Stop();
   Invalidate();
 }
 
-bool ScrollBarButton::OnMouseClick(UINT message, UINT flags, const Point&) {
+bool ScrollbarButton::OnMouseClick(UINT message, UINT flags, const Point&) {
   if (message == WM_LBUTTONDOWN) {
     set_state(ControlState::Pressed);
     OnClick();
@@ -42,7 +42,7 @@ bool ScrollBarButton::OnMouseClick(UINT message, UINT flags, const Point&) {
   return true;
 }
 
-void ScrollBarButton::Draw(PainterWin* painter, const Rect& dirty) {
+void ScrollbarButton::Draw(PainterWin* painter, const Rect& dirty) {
   NativeTheme::Part part = NativeTheme::Part::ScrollbarUpArrow;
   switch (type_) {
     case Up:
@@ -64,11 +64,11 @@ void ScrollBarButton::Draw(PainterWin* painter, const Rect& dirty) {
       part, state(), Rect(size_allocation().size()), params);
 }
 
-void ScrollBarButton::OnClick() {
+void ScrollbarButton::OnClick() {
   if (type_ == Up || type_ == Left)
-    scroll_bar_->LineUp();
+    scrollbar_->LineUp();
   else
-    scroll_bar_->LineDown();
+    scrollbar_->LineDown();
 }
 
 }  // namespace nu

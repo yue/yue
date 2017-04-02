@@ -2,26 +2,26 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/win/scroll_bar/scroll_bar_thumb.h"
+#include "nativeui/win/scrollbar/scrollbar_thumb.h"
 
-#include "nativeui/win/scroll_bar/scroll_bar.h"
+#include "nativeui/win/scrollbar/scrollbar.h"
 
 namespace nu {
 
-ScrollBarThumb::ScrollBarThumb(bool vertical, ScrollBar* scroll_bar)
-    : ViewImpl(ControlType::ScrollBarThumb),
+ScrollbarThumb::ScrollbarThumb(bool vertical, Scrollbar* scrollbar)
+    : ViewImpl(ControlType::ScrollbarThumb),
       vertical_(vertical),
-      scroll_bar_(scroll_bar) {
+      scrollbar_(scrollbar) {
 }
 
-ScrollBarThumb::~ScrollBarThumb() {
+ScrollbarThumb::~ScrollbarThumb() {
 }
 
-int ScrollBarThumb::GetSize() const {
+int ScrollbarThumb::GetSize() const {
   return vertical_ ? size_allocation().height() : size_allocation().width();
 }
 
-void ScrollBarThumb::OnMouseEnter() {
+void ScrollbarThumb::OnMouseEnter() {
   is_hovering_ = true;
   if (!is_capturing_) {
     set_state(ControlState::Hovered);
@@ -29,15 +29,15 @@ void ScrollBarThumb::OnMouseEnter() {
   }
 }
 
-void ScrollBarThumb::OnMouseMove(UINT flags, const Point& point) {
+void ScrollbarThumb::OnMouseMove(UINT flags, const Point& point) {
   if (is_capturing_) {
     int offset = vertical_ ? (point.y() - pressed_point_.y())
                            : (point.x() - pressed_point_.x());
-    scroll_bar_->SetValue(last_value_ + offset);
+    scrollbar_->SetValue(last_value_ + offset);
   }
 }
 
-void ScrollBarThumb::OnMouseLeave() {
+void ScrollbarThumb::OnMouseLeave() {
   is_hovering_ = false;
   if (!is_capturing_) {
     set_state(ControlState::Normal);
@@ -45,12 +45,12 @@ void ScrollBarThumb::OnMouseLeave() {
   }
 }
 
-bool ScrollBarThumb::OnMouseClick(UINT message, UINT flags,
+bool ScrollbarThumb::OnMouseClick(UINT message, UINT flags,
                                   const Point& point) {
   if (message == WM_LBUTTONDOWN) {
     is_capturing_ = true;
     pressed_point_ = point;
-    last_value_ = scroll_bar_->GetValue();
+    last_value_ = scrollbar_->GetValue();
     window()->SetCapture(this);
     set_state(ControlState::Pressed);
   } else {
@@ -61,13 +61,13 @@ bool ScrollBarThumb::OnMouseClick(UINT message, UINT flags,
   return true;
 }
 
-void ScrollBarThumb::OnCaptureLost() {
+void ScrollbarThumb::OnCaptureLost() {
   is_capturing_ = false;
   set_state(is_hovering_ ? ControlState::Hovered : ControlState::Normal);
   Invalidate();
 }
 
-void ScrollBarThumb::Draw(PainterWin* painter, const Rect& dirty) {
+void ScrollbarThumb::Draw(PainterWin* painter, const Rect& dirty) {
   NativeTheme::ExtraParams params;
   params.scrollbar_thumb = params_;
   painter->DrawNativeTheme(

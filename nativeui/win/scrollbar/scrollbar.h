@@ -2,23 +2,23 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef NATIVEUI_WIN_SCROLL_BAR_SCROLL_BAR_H_
-#define NATIVEUI_WIN_SCROLL_BAR_SCROLL_BAR_H_
+#ifndef NATIVEUI_WIN_SCROLLBAR_SCROLLBAR_H_
+#define NATIVEUI_WIN_SCROLLBAR_SCROLLBAR_H_
 
 #include <vector>
 
-#include "nativeui/win/scroll_bar/scroll_bar_button.h"
-#include "nativeui/win/scroll_bar/scroll_bar_thumb.h"
 #include "nativeui/win/scroll_win.h"
+#include "nativeui/win/scrollbar/scrollbar_button.h"
+#include "nativeui/win/scrollbar/scrollbar_thumb.h"
 
 namespace nu {
 
 // Draws the native scroll bar.
-class ScrollBar : public ContainerImpl,
+class Scrollbar : public ContainerImpl,
                   public ContainerImpl::Delegate {
  public:
-  ScrollBar(bool vertical, ScrollImpl* scroll);
-  ~ScrollBar() override;
+  Scrollbar(bool vertical, ScrollImpl* scroll);
+  ~Scrollbar() override;
 
   void LineUp();
   void LineDown();
@@ -54,9 +54,9 @@ class ScrollBar : public ContainerImpl,
   int contents_size_ = 1;
   int viewport_size_ = 1;
 
-  ScrollBarButton near_button_;
-  ScrollBarButton far_button_;
-  ScrollBarThumb thumb_;
+  ScrollbarButton near_button_;
+  ScrollbarButton far_button_;
+  ScrollbarThumb thumb_;
 
   RepeatController repeater_;
 
@@ -66,4 +66,4 @@ class ScrollBar : public ContainerImpl,
 
 }  // namespace nu
 
-#endif  // NATIVEUI_WIN_SCROLL_BAR_SCROLL_BAR_H_
+#endif  // NATIVEUI_WIN_SCROLLBAR_SCROLLBAR_H_

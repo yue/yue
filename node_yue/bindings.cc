@@ -654,8 +654,8 @@ struct Type<nu::Scroll> {
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
-        "setScrollBarPolicy", &nu::Scroll::SetScrollBarPolicy,
-        "getScrollBarPolicy", &nu::Scroll::GetScrollBarPolicy,
+        "setScrollbarPolicy", &nu::Scroll::SetScrollbarPolicy,
+        "getScrollbarPolicy", &nu::Scroll::GetScrollbarPolicy,
         "setContentSize", &nu::Scroll::SetContentSize,
         "getContentSize", &nu::Scroll::GetContentSize,
         "setContentView", &nu::Scroll::SetContentView,

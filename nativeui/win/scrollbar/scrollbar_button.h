@@ -2,17 +2,17 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef NATIVEUI_WIN_SCROLL_BAR_SCROLL_BAR_BUTTON_H_
-#define NATIVEUI_WIN_SCROLL_BAR_SCROLL_BAR_BUTTON_H_
+#ifndef NATIVEUI_WIN_SCROLLBAR_SCROLLBAR_BUTTON_H_
+#define NATIVEUI_WIN_SCROLLBAR_SCROLLBAR_BUTTON_H_
 
-#include "nativeui/win/scroll_bar/repeat_controller.h"
+#include "nativeui/win/scrollbar/repeat_controller.h"
 #include "nativeui/win/view_win.h"
 
 namespace nu {
 
-class ScrollBar;
+class Scrollbar;
 
-class ScrollBarButton : public ViewImpl {
+class ScrollbarButton : public ViewImpl {
  public:
   enum Type {
     Up,
@@ -21,8 +21,8 @@ class ScrollBarButton : public ViewImpl {
     Right,
   };
 
-  ScrollBarButton(Type type, ScrollBar* scroll_bar);
-  ~ScrollBarButton() override;
+  ScrollbarButton(Type type, Scrollbar* scrollbar);
+  ~ScrollbarButton() override;
 
   // ViewImpl:
   void OnMouseEnter() override;
@@ -42,9 +42,9 @@ class ScrollBarButton : public ViewImpl {
   RepeatController repeater_;
 
   Type type_;
-  ScrollBar* scroll_bar_;  // weak ref
+  Scrollbar* scrollbar_;  // weak ref
 };
 
 }  // namespace nu
 
-#endif  // NATIVEUI_WIN_SCROLL_BAR_SCROLL_BAR_BUTTON_H_
+#endif  // NATIVEUI_WIN_SCROLLBAR_SCROLLBAR_BUTTON_H_

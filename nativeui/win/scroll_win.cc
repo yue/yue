@@ -7,7 +7,7 @@
 #include <tuple>
 
 #include "nativeui/gfx/geometry/size_conversions.h"
-#include "nativeui/win/scroll_bar/scroll_bar.h"
+#include "nativeui/win/scrollbar/scrollbar.h"
 
 namespace nu {
 
@@ -15,7 +15,7 @@ ScrollImpl::ScrollImpl(Scroll* delegate)
     : ContainerImpl(this, ControlType::Scroll),
       scrollbar_height_(GetSystemMetrics(SM_CXVSCROLL)),
       delegate_(delegate) {
-  SetScrollBarPolicy(Scroll::Policy::Automatic, Scroll::Policy::Automatic);
+  SetScrollbarPolicy(Scroll::Policy::Automatic, Scroll::Policy::Automatic);
 }
 
 void ScrollImpl::SetOrigin(const Vector2d& origin) {
@@ -32,7 +32,7 @@ void ScrollImpl::SetContentSize(const Size& size) {
   Invalidate();
 }
 
-void ScrollImpl::SetScrollBarPolicy(Scroll::Policy h_policy,
+void ScrollImpl::SetScrollbarPolicy(Scroll::Policy h_policy,
                                     Scroll::Policy v_policy) {
   h_policy_ = h_policy;
   v_policy_ = v_policy;
@@ -59,10 +59,10 @@ void ScrollImpl::OnScroll(int x, int y) {
 
 void ScrollImpl::Layout() {
   if (h_scrollbar_)
-    h_scrollbar_->SizeAllocate(GetScrollBarRect(false) +
+    h_scrollbar_->SizeAllocate(GetScrollbarRect(false) +
                                size_allocation().OffsetFromOrigin());
   if (v_scrollbar_)
-    v_scrollbar_->SizeAllocate(GetScrollBarRect(true) +
+    v_scrollbar_->SizeAllocate(GetScrollbarRect(true) +
                                size_allocation().OffsetFromOrigin());
 
   if (delegate_->GetContentView()) {
@@ -119,13 +119,13 @@ void ScrollImpl::UpdateScrollbar() {
                           (v_policy_ == Scroll::Policy::Automatic &&
                            viewport.height() < content_size_.height());
   if (show_h_scrollbar && !h_scrollbar_) {
-    h_scrollbar_.reset(new ScrollBar(false, this));
+    h_scrollbar_.reset(new Scrollbar(false, this));
     h_scrollbar_->SetParent(this);
   } else if (!show_h_scrollbar) {
     h_scrollbar_.reset();
   }
   if (show_v_scrollbar && !v_scrollbar_) {
-    v_scrollbar_.reset(new ScrollBar(true, this));
+    v_scrollbar_.reset(new Scrollbar(true, this));
     v_scrollbar_->SetParent(this);
   } else if (!show_v_scrollbar) {
     v_scrollbar_.reset();
@@ -149,7 +149,7 @@ bool ScrollImpl::UpdateOrigin(Vector2d new_origin) {
   return true;
 }
 
-Rect ScrollImpl::GetScrollBarRect(bool vertical) const {
+Rect ScrollImpl::GetScrollbarRect(bool vertical) const {
   if (vertical)
     return Rect(size_allocation().width() - scrollbar_height_,
                 0,
@@ -182,12 +182,12 @@ void Scroll::SetContentSize(const SizeF& size) {
   scroll->SetContentSize(ToCeiledSize(ScaleSize(size, scroll->scale_factor())));
 }
 
-void Scroll::SetScrollBarPolicy(Policy h_policy, Policy v_policy) {
+void Scroll::SetScrollbarPolicy(Policy h_policy, Policy v_policy) {
   auto* scroll = static_cast<ScrollImpl*>(GetNative());
-  scroll->SetScrollBarPolicy(h_policy, v_policy);
+  scroll->SetScrollbarPolicy(h_policy, v_policy);
 }
 
-std::tuple<Scroll::Policy, Scroll::Policy> Scroll::GetScrollBarPolicy() const {
+std::tuple<Scroll::Policy, Scroll::Policy> Scroll::GetScrollbarPolicy() const {
   auto* scroll = static_cast<ScrollImpl*>(GetNative());
   return std::make_tuple(scroll->h_policy(), scroll->v_policy());
 }

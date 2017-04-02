@@ -2,8 +2,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef NATIVEUI_WIN_SCROLL_BAR_REPEAT_CONTROLLER_H_
-#define NATIVEUI_WIN_SCROLL_BAR_REPEAT_CONTROLLER_H_
+#ifndef NATIVEUI_WIN_SCROLLBAR_REPEAT_CONTROLLER_H_
+#define NATIVEUI_WIN_SCROLLBAR_REPEAT_CONTROLLER_H_
 
 #include "base/callback.h"
 #include "base/macros.h"
@@ -40,4 +40,4 @@ class RepeatController {
 
 }  // namespace nu
 
-#endif  // NATIVEUI_WIN_SCROLL_BAR_REPEAT_CONTROLLER_H_
+#endif  // NATIVEUI_WIN_SCROLLBAR_REPEAT_CONTROLLER_H_

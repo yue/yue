@@ -24,7 +24,7 @@ void Scroll::SetContentSize(const SizeF& size) {
   [scroll.documentView setFrameSize:size.ToCGSize()];
 }
 
-void Scroll::SetScrollBarPolicy(Policy h_policy, Policy v_policy) {
+void Scroll::SetScrollbarPolicy(Policy h_policy, Policy v_policy) {
   auto* scroll = static_cast<NSScrollView*>(GetNative());
   scroll.hasHorizontalScroller = (h_policy == Policy::Always) ||
                                  (h_policy == Policy::Automatic);
@@ -32,7 +32,7 @@ void Scroll::SetScrollBarPolicy(Policy h_policy, Policy v_policy) {
                                (v_policy == Policy::Automatic);
 }
 
-std::tuple<Scroll::Policy, Scroll::Policy> Scroll::GetScrollBarPolicy() const {
+std::tuple<Scroll::Policy, Scroll::Policy> Scroll::GetScrollbarPolicy() const {
   auto* scroll = static_cast<NSScrollView*>(GetNative());
   Policy h_policy = scroll.hasHorizontalScroller ? Policy::Automatic
                                                  : Policy::Never;

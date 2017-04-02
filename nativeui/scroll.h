@@ -29,8 +29,8 @@ class NATIVEUI_EXPORT Scroll : public View {
     Never,
     Automatic,
   };
-  void SetScrollBarPolicy(Policy h_policy, Policy v_policy);
-  std::tuple<Policy, Policy> GetScrollBarPolicy() const;
+  void SetScrollbarPolicy(Policy h_policy, Policy v_policy);
+  std::tuple<Policy, Policy> GetScrollbarPolicy() const;
 
   // View:
   const char* GetClassName() const override;

@@ -23,9 +23,9 @@ enum class ControlType {
   Group,
   Label,
   Scroll,
-  ScrollBar,
-  ScrollBarButton,
-  ScrollBarThumb,
+  Scrollbar,
+  ScrollbarButton,
+  ScrollbarThumb,
   Subwin,
 };
 
