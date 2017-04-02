@@ -37,6 +37,8 @@ class PainterWin : public Painter {
   void BezierCurveTo(const PointF& cp1,
                      const PointF& cp2,
                      const PointF& ep) override;
+  void ArcTo(const PointF& cp1, const PointF& cp2, float radius) override;
+  void Arc(const PointF& point, float radius, float sa, float ea) override;
   void Rect(const RectF& rect) override;
   void Clip() override;
   void ClipRect(const RectF& rect) override;
@@ -54,12 +56,15 @@ class PainterWin : public Painter {
       int flags) override;
 
   // The pixel versions.
-  void MoveToPixel(const Point& point);
-  void LineToPixel(const Point& point);
-  void BezierCurveToPixel(const Point& cp1,
-                          const Point& cp2,
-                          const Point& ep);
-  void RectPixel(const nu::Rect& rect);
+  void MoveToPixel(const PointF& point);
+  void LineToPixel(const PointF& point);
+  void BezierCurveToPixel(const PointF& cp1,
+                          const PointF& cp2,
+                          const PointF& ep);
+  void ArcToPixel(const PointF& cp1, const PointF& cp2, float radius);
+  void ArcPixel(const PointF& point, float r, float sa, float ea,
+                bool anticlockwise);
+  void RectPixel(const RectF& rect);
   void ClipRectPixel(const nu::Rect& rect);
   void TranslatePixel(const Vector2d& offset);
   void StrokeRectPixel(const nu::Rect& rect);
@@ -69,6 +74,9 @@ class PainterWin : public Painter {
       int flags);
 
  private:
+  // Get current point.
+  bool GetCurrentPoint(Gdiplus::PointF* point);
+
   // Receive the HDC that can be painted on.
   HDC GetHDC();
   void ReleaseHDC(HDC dc);
@@ -96,8 +104,10 @@ class PainterWin : public Painter {
 
   // Current path.
   Gdiplus::GraphicsPath path_;
-  // Current position, used for adding line to path.
-  Gdiplus::Point current_point_;
+  // Current position, used when gdi+ does not have one.
+  Gdiplus::PointF current_point_;
+  // Whether gdi+ has a record of current point.
+  bool use_gdi_current_point_;
 
   float scale_factor_;
   Gdiplus::Graphics graphics_;

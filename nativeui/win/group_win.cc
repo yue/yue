@@ -75,18 +75,18 @@ class GroupImpl : public ContainerImpl,
 
     // Draw border.
     painter->BeginPath();
-    painter->MoveToPixel(Point(title_bounds_.x(),
-                               child_bounds.y() - border.top() / 2));
-    painter->LineToPixel(Point(child_bounds.x() - border.left() / 2,
-                               child_bounds.y()  - border.top() / 2));
-    painter->LineToPixel(Point(child_bounds.x()   - border.left() / 2,
-                               child_bounds.bottom() + border.bottom() / 2));
-    painter->LineToPixel(Point(child_bounds.right()  + border.right() / 2,
-                               child_bounds.bottom() + border.bottom() / 2));
-    painter->LineToPixel(Point(child_bounds.right() + border.right() / 2,
-                               child_bounds.y()   - border.top() / 2));
-    painter->LineToPixel(Point(title_bounds_.right(),
-                               child_bounds.y()   - border.top() / 2));
+    painter->MoveToPixel(PointF(title_bounds_.x(),
+                                child_bounds.y() - border.top() / 2.0f));
+    painter->LineToPixel(PointF(child_bounds.x() - border.left() / 2.0f,
+                                child_bounds.y()  - border.top() / 2.0f));
+    painter->LineToPixel(PointF(child_bounds.x()   - border.left() / 2.0f,
+                                child_bounds.bottom() + border.bottom() / 2.f));
+    painter->LineToPixel(PointF(child_bounds.right()  + border.right() / 2,
+                                child_bounds.bottom() + border.bottom() / 2.f));
+    painter->LineToPixel(PointF(child_bounds.right() + border.right() / 2.f,
+                                child_bounds.y()   - border.top() / 2.f));
+    painter->LineToPixel(PointF(title_bounds_.right(),
+                                child_bounds.y()   - border.top() / 2.f));
     painter->SetColor(Color(255, 170, 170, 170));
     painter->Stroke();
 
