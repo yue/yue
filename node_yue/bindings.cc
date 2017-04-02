@@ -283,6 +283,8 @@ struct Type<nu::Painter> {
         "clipRect", &nu::Painter::ClipRect,
         "translate", &nu::Painter::Translate,
         "setColor", &nu::Painter::SetColor,
+        "setStrokeColor", &nu::Painter::SetStrokeColor,
+        "setFillColor", &nu::Painter::SetFillColor,
         "setLineWidth", &nu::Painter::SetLineWidth,
         "stroke", &nu::Painter::Stroke,
         "fill", &nu::Painter::Fill,

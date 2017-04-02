@@ -56,6 +56,8 @@ class NATIVEUI_EXPORT Painter {
 
   // Set the color used for drawing or filling.
   virtual void SetColor(Color color) = 0;
+  virtual void SetStrokeColor(Color color) = 0;
+  virtual void SetFillColor(Color color) = 0;
 
   // Set the width used for drawing lines.
   virtual void SetLineWidth(float width) = 0;

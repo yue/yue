@@ -5,6 +5,8 @@
 #ifndef NATIVEUI_GFX_GTK_PAINTER_GTK_H_
 #define NATIVEUI_GFX_GTK_PAINTER_GTK_H_
 
+#include <stack>
+
 #include "nativeui/gfx/painter.h"
 
 namespace nu {
@@ -29,6 +31,8 @@ class PainterGtk : public Painter {
   void ClipRect(const RectF& rect) override;
   void Translate(const Vector2dF& offset) override;
   void SetColor(Color color) override;
+  void SetStrokeColor(Color color) override;
+  void SetFillColor(Color color) override;
   void SetLineWidth(float width) override;
   void Stroke() override;
   void Fill() override;
@@ -39,7 +43,18 @@ class PainterGtk : public Painter {
       int flags) override;
 
  private:
+  // Set source color from stroke or fill color.
+  void SetSourceColor(bool stroke);
+
   cairo_t* context_;
+
+  // Cairo does not distinguish between stroke color and fill color, we have to
+  // implement our own.
+  struct PainterState {
+    Color stroke_color;
+    Color fill_color;
+  };
+  std::stack<PainterState> states_;
 };
 
 }  // namespace nu

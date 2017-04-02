@@ -106,6 +106,14 @@ void PainterWin::SetColor(Color color) {
   top().fill_color = color;
 }
 
+void PainterWin::SetStrokeColor(Color color) {
+  top().stroke_color = color;
+}
+
+void PainterWin::SetFillColor(Color color) {
+  top().fill_color = color;
+}
+
 void PainterWin::SetLineWidth(float width) {
   top().line_width = width;
 }

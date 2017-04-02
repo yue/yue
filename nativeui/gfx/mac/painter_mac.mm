@@ -69,6 +69,14 @@ void PainterMac::SetColor(Color color) {
   [color.ToNSColor() set];
 }
 
+void PainterMac::SetStrokeColor(Color color) {
+  [color.ToNSColor() setStroke];
+}
+
+void PainterMac::SetFillColor(Color color) {
+  [color.ToNSColor() setFill];
+}
+
 void PainterMac::SetLineWidth(float width) {
   CGContextSetLineWidth(context_, width);
 }

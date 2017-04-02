@@ -12,16 +12,22 @@
 namespace nu {
 
 PainterGtk::PainterGtk(cairo_t* context) : context_(context) {
+  // Initial state.
+  states_.push({Color(), Color()});
 }
 
 PainterGtk::~PainterGtk() {
 }
 
 void PainterGtk::Save() {
+  states_.push(states_.top());
   cairo_save(context_);
 }
 
 void PainterGtk::Restore() {
+  if (states_.empty())
+    return;
+  states_.pop();
   cairo_restore(context_);
 }
 
@@ -67,8 +73,16 @@ void PainterGtk::Translate(const Vector2dF& offset) {
 }
 
 void PainterGtk::SetColor(Color color) {
-  cairo_set_source_rgba(context_, color.r() / 255., color.g() / 255.,
-                                  color.b() / 255., color.a() / 255.);
+  states_.top().stroke_color = color;
+  states_.top().fill_color = color;
+}
+
+void PainterGtk::SetStrokeColor(Color color) {
+  states_.top().stroke_color = color;
+}
+
+void PainterGtk::SetFillColor(Color color) {
+  states_.top().fill_color = color;
 }
 
 void PainterGtk::SetLineWidth(float width) {
@@ -76,20 +90,26 @@ void PainterGtk::SetLineWidth(float width) {
 }
 
 void PainterGtk::Stroke() {
+  SetSourceColor(true);
   cairo_stroke(context_);
 }
 
 void PainterGtk::Fill() {
+  SetSourceColor(false);
   cairo_fill(context_);
 }
 
 void PainterGtk::StrokeRect(const RectF& rect) {
+  cairo_new_path(context_);
   cairo_rectangle(context_, rect.x(), rect.y(), rect.width(), rect.height());
+  SetSourceColor(true);
   cairo_stroke(context_);
 }
 
 void PainterGtk::FillRect(const RectF& rect) {
+  cairo_new_path(context_);
   cairo_rectangle(context_, rect.x(), rect.y(), rect.width(), rect.height());
+  SetSourceColor(false);
   cairo_fill(context_);
 }
 
@@ -123,6 +143,13 @@ void PainterGtk::DrawColoredTextWithFlags(
 
   cairo_restore(context_);
   g_object_unref(layout);
+}
+
+void PainterGtk::SetSourceColor(bool stroke) {
+  Color color = stroke ? states_.top().stroke_color
+                       : states_.top().fill_color;
+  cairo_set_source_rgba(context_, color.r() / 255., color.g() / 255.,
+                                  color.b() / 255., color.a() / 255.);
 }
 
 }  // namespace nu
