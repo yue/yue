@@ -43,6 +43,8 @@ class NATIVEUI_EXPORT Painter {
   virtual void BezierCurveTo(const PointF& cp1,
                              const PointF& cp2,
                              const PointF& ep) = 0;
+  virtual void ArcTo(const PointF& cp1, const PointF& cp2, float radius) = 0;
+  virtual void Arc(const PointF& point, float radius, float sa, float ea) = 0;
   virtual void Rect(const RectF& rect) = 0;
 
   // Add current path to clip area by intersection.

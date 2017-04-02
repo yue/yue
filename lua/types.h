@@ -97,7 +97,7 @@ struct Type<float> {
   }
   static inline bool To(State* state, int index, float* out) {
     int success = 0;
-    int ret = lua_tonumberx(state, index, &success);
+    float ret = lua_tonumberx(state, index, &success);
     if (success)
       *out = ret;
     return success != 0;
