@@ -31,14 +31,6 @@ class NATIVEUI_EXPORT Painter {
     TextAlignRight  = 1 << 2,
   };
 
-  // How the clip rect is combined with current one.
-  enum class CombineMode {
-    Replace,
-    Intersect,
-    Union,
-    Exclude,
-  };
-
   // Save/Restore current state.
   virtual void Save() = 0;
   virtual void Restore() = 0;
@@ -56,7 +48,7 @@ class NATIVEUI_EXPORT Painter {
   virtual void Clip() = 0;
 
   // Apply |rect| to the current clip using the specified region |op|.
-  virtual void ClipRect(const RectF& rect, CombineMode mode) = 0;
+  virtual void ClipRect(const RectF& rect) = 0;
 
   // The origin offset of the painting.
   virtual void Translate(const Vector2dF& offset) = 0;

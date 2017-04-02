@@ -163,8 +163,7 @@ class ContainerAdapter : public ContainerImpl,
     if (container_->on_draw.IsEmpty())
       return;
     painter->Save();
-    painter->ClipRectPixel(Rect(size_allocation().size()),
-                           Painter::CombineMode::Intersect);
+    painter->ClipRectPixel(Rect(size_allocation().size()));
     float scale_factor = container_->GetNative()->scale_factor();
     container_->on_draw.Emit(container_, static_cast<Painter*>(painter),
                              ScaleRect(RectF(dirty), 1.0f / scale_factor));

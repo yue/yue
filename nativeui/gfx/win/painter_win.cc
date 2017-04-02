@@ -65,32 +65,27 @@ void PainterWin::ClosePath() {
 }
 
 void PainterWin::MoveTo(const PointF& point) {
-  current_point_ = ToGdi(ScalePoint(point, scale_factor_));
+  MoveToPixel(ToFlooredPoint(ScalePoint(point, scale_factor_)));
 }
 
 void PainterWin::LineTo(const PointF& point) {
-  Gdiplus::PointF p = ToGdi(ScalePoint(point, scale_factor_));
-  path_.AddLine(current_point_, p);
-  current_point_ = p;
+  LineToPixel(ToFlooredPoint(ScalePoint(point, scale_factor_)));
 }
 
 void PainterWin::BezierCurveTo(const PointF& cp1,
                                const PointF& cp2,
-                               const PointF& end_point) {
-  Gdiplus::PointF ep = ToGdi(ScalePoint(end_point, scale_factor_));
-  path_.AddBezier(current_point_,
-                  ToGdi(ScalePoint(cp1, scale_factor_)),
-                  ToGdi(ScalePoint(cp2, scale_factor_)),
-                  ep);
-  current_point_ = ep;
+                               const PointF& ep) {
+  BezierCurveToPixel(ToFlooredPoint(ScalePoint(cp1, scale_factor_)),
+                     ToFlooredPoint(ScalePoint(cp2, scale_factor_)),
+                     ToFlooredPoint(ScalePoint(ep, scale_factor_)));
 }
 
 void PainterWin::Clip() {
   graphics_.SetClip(&path_, Gdiplus::CombineModeIntersect);
 }
 
-void PainterWin::ClipRect(const RectF& rect, CombineMode mode) {
-  ClipRectPixel(ToEnclosingRect(ScaleRect(rect, scale_factor_)), mode);
+void PainterWin::ClipRect(const RectF& rect) {
+  ClipRectPixel(ToEnclosingRect(ScaleRect(rect, scale_factor_)));
 }
 
 void PainterWin::Translate(const Vector2dF& offset) {
@@ -131,16 +126,26 @@ void PainterWin::DrawColoredTextWithFlags(
       flags);
 }
 
-void PainterWin::ClipRectPixel(const Rect& rect, CombineMode mode) {
-  Gdiplus::CombineMode cm;
-  switch (mode) {
-    case CombineMode::Replace   : cm = Gdiplus::CombineModeReplace;   break;
-    case CombineMode::Intersect : cm = Gdiplus::CombineModeIntersect; break;
-    case CombineMode::Union     : cm = Gdiplus::CombineModeUnion;     break;
-    case CombineMode::Exclude   : cm = Gdiplus::CombineModeExclude;   break;
-    default: cm = Gdiplus::CombineModeReplace;
-  }
-  graphics_.SetClip(ToGdi(rect), cm);
+void PainterWin::MoveToPixel(const Point& point) {
+  current_point_ = ToGdi(point);
+}
+
+void PainterWin::LineToPixel(const Point& point) {
+  Gdiplus::Point p = ToGdi(point);
+  path_.AddLine(current_point_, p);
+  current_point_ = p;
+}
+
+void PainterWin::BezierCurveToPixel(const Point& cp1,
+                                    const Point& cp2,
+                                    const Point& end_point) {
+  Gdiplus::Point ep = ToGdi(end_point);
+  path_.AddBezier(current_point_, ToGdi(cp1), ToGdi(cp2), ep);
+  current_point_ = ep;
+}
+
+void PainterWin::ClipRectPixel(const Rect& rect) {
+  graphics_.SetClip(ToGdi(rect), Gdiplus::CombineModeIntersect);
 }
 
 void PainterWin::TranslatePixel(const Vector2d& offset) {

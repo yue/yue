@@ -260,29 +260,6 @@ struct Type<nu::Image> {
 };
 
 template<>
-struct Type<nu::Painter::CombineMode> {
-  static constexpr const char* name = "yue.Painter.CombineMode";
-  static bool FromV8(v8::Local<v8::Context> context,
-                     v8::Local<v8::Value> value,
-                     nu::Painter::CombineMode* out) {
-    std::string mode;
-    if (!vb::FromV8(context, value, &mode))
-      return false;
-    if (mode == "replace")
-      *out = nu::Painter::CombineMode::Replace;
-    else if (mode == "intersect")
-      *out = nu::Painter::CombineMode::Intersect;
-    else if (mode == "union")
-      *out = nu::Painter::CombineMode::Union;
-    else if (mode == "exclude")
-      *out = nu::Painter::CombineMode::Exclude;
-    else
-      return false;
-    return true;
-  }
-};
-
-template<>
 struct Type<nu::Painter> {
   static constexpr const char* name = "yue.Painter";
   static void BuildConstructor(v8::Local<v8::Context> context,

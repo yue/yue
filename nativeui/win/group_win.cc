@@ -68,27 +68,38 @@ class GroupImpl : public ContainerImpl,
       painter->DrawColoredTextWithFlagsPixel(
           title_, font_.get(), color_, title_bounds_, Painter::TextAlignLeft);
 
-    // Calculate the border bounds.
-    Rect drawing_bounds(size_allocation().size());
+    // Bounds of the content view.
+    Rect child_bounds(size_allocation().size());
     Insets border = GetBorder();
-    Rect border_bounds(drawing_bounds);
-    border_bounds.Inset(border.left() / 2, border.top() / 2,
-                        border.right() / 2, border.bottom() / 2);
+    child_bounds.Inset(border);
 
     // Draw border.
-    painter->Save();
-    painter->ClipRectPixel(drawing_bounds, Painter::CombineMode::Replace);
-    painter->ClipRectPixel(title_bounds_, Painter::CombineMode::Exclude);
+    painter->BeginPath();
+    painter->MoveToPixel(Point(title_bounds_.x(),
+                               child_bounds.y() - border.top() / 2));
+    painter->LineToPixel(Point(child_bounds.x() - border.left() / 2,
+                               child_bounds.y()  - border.top() / 2));
+    painter->LineToPixel(Point(child_bounds.x()   - border.left() / 2,
+                               child_bounds.bottom() + border.bottom() / 2));
+    painter->LineToPixel(Point(child_bounds.right()  + border.right() / 2,
+                               child_bounds.bottom() + border.bottom() / 2));
+    painter->LineToPixel(Point(child_bounds.right() + border.right() / 2,
+                               child_bounds.y()   - border.top() / 2));
+    painter->LineToPixel(Point(title_bounds_.right(),
+                               child_bounds.y()   - border.top() / 2));
     painter->SetColor(Color(255, 170, 170, 170));
-    painter->StrokeRectPixel(border_bounds);
-    painter->Restore();
+    painter->Stroke();
 
     // Draw child.
+    child_bounds.Intersects(dirty);
+    if (child_bounds.IsEmpty())
+      return;
     Vector2d child_offset(border.left(), border.top());
     painter->Save();
+    painter->ClipRectPixel(child_bounds);
     painter->TranslatePixel(child_offset);
     delegate_->GetContentView()->GetNative()->Draw(
-        painter, dirty - child_offset);
+        painter, child_bounds - child_offset);
     painter->Restore();
   }
 

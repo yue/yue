@@ -38,7 +38,7 @@ class PainterWin : public Painter {
                      const PointF& cp2,
                      const PointF& ep) override;
   void Clip() override;
-  void ClipRect(const RectF& rect, CombineMode mode) override;
+  void ClipRect(const RectF& rect) override;
   void Translate(const Vector2dF& offset) override;
   void SetColor(Color color) override;
   void SetLineWidth(float width) override;
@@ -51,7 +51,12 @@ class PainterWin : public Painter {
       int flags) override;
 
   // The pixel versions.
-  void ClipRectPixel(const Rect& rect, CombineMode mode);
+  void MoveToPixel(const Point& point);
+  void LineToPixel(const Point& point);
+  void BezierCurveToPixel(const Point& cp1,
+                          const Point& cp2,
+                          const Point& ep);
+  void ClipRectPixel(const Rect& rect);
   void TranslatePixel(const Vector2d& offset);
   void StrokeRectPixel(const Rect& rect);
   void FillRectPixel(const Rect& rect);
@@ -88,7 +93,7 @@ class PainterWin : public Painter {
   // Current path.
   Gdiplus::GraphicsPath path_;
   // Current position, used for adding line to path.
-  Gdiplus::PointF current_point_;
+  Gdiplus::Point current_point_;
 
   float scale_factor_;
   Gdiplus::Graphics graphics_;
