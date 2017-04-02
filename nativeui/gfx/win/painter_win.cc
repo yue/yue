@@ -17,6 +17,10 @@ namespace nu {
 
 PainterWin::PainterWin(HDC dc, float scale_factor)
     : hdc_(dc), scale_factor_(scale_factor), graphics_(hdc_) {
+  // Use high quality rendering.
+  graphics_.SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
+  graphics_.SetInterpolationMode(Gdiplus::InterpolationModeHighQuality);
+  graphics_.SetPixelOffsetMode(Gdiplus::PixelOffsetModeHighQuality);
   // Initial state.
   states_.emplace(scale_factor, Color(), Color());
 }
