@@ -21,11 +21,11 @@ class PainterWin : public Painter {
   // Draw a control.
   void DrawNativeTheme(NativeTheme::Part part,
                        ControlState state,
-                       const Rect& rect,
+                       const nu::Rect& rect,
                        const NativeTheme::ExtraParams& extra);
 
   // Draw the focus rect.
-  void DrawFocusRect(const Rect& rect);
+  void DrawFocusRect(const nu::Rect& rect);
 
   // Painter:
   void Save() override;
@@ -37,6 +37,7 @@ class PainterWin : public Painter {
   void BezierCurveTo(const PointF& cp1,
                      const PointF& cp2,
                      const PointF& ep) override;
+  void Rect(const RectF& rect) override;
   void Clip() override;
   void ClipRect(const RectF& rect) override;
   void Translate(const Vector2dF& offset) override;
@@ -56,12 +57,13 @@ class PainterWin : public Painter {
   void BezierCurveToPixel(const Point& cp1,
                           const Point& cp2,
                           const Point& ep);
-  void ClipRectPixel(const Rect& rect);
+  void RectPixel(const nu::Rect& rect);
+  void ClipRectPixel(const nu::Rect& rect);
   void TranslatePixel(const Vector2d& offset);
-  void StrokeRectPixel(const Rect& rect);
-  void FillRectPixel(const Rect& rect);
+  void StrokeRectPixel(const nu::Rect& rect);
+  void FillRectPixel(const nu::Rect& rect);
   void DrawColoredTextWithFlagsPixel(
-      const String& text, Font* font, Color color, const Rect& rect,
+      const String& text, Font* font, Color color, const nu::Rect& rect,
       int flags);
 
  private:

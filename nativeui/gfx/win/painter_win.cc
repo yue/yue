@@ -26,7 +26,7 @@ PainterWin::~PainterWin() {
 
 void PainterWin::DrawNativeTheme(NativeTheme::Part part,
                                  ControlState state,
-                                 const Rect& rect,
+                                 const nu::Rect& rect,
                                  const NativeTheme::ExtraParams& extra) {
   HDC hdc = GetHDC();
   State::GetCurrent()->GetNativeTheme()->Paint(
@@ -34,7 +34,7 @@ void PainterWin::DrawNativeTheme(NativeTheme::Part part,
   ReleaseHDC(hdc);
 }
 
-void PainterWin::DrawFocusRect(const Rect& rect) {
+void PainterWin::DrawFocusRect(const nu::Rect& rect) {
   RECT r = rect.ToRECT();
   HDC hdc = GetHDC();
   ::DrawFocusRect(hdc, &r);
@@ -78,6 +78,10 @@ void PainterWin::BezierCurveTo(const PointF& cp1,
   BezierCurveToPixel(ToFlooredPoint(ScalePoint(cp1, scale_factor_)),
                      ToFlooredPoint(ScalePoint(cp2, scale_factor_)),
                      ToFlooredPoint(ScalePoint(ep, scale_factor_)));
+}
+
+void PainterWin::Rect(const RectF& rect) {
+  RectPixel(ToEnclosingRect(ScaleRect(rect, scale_factor_)));
 }
 
 void PainterWin::Clip() {
@@ -144,7 +148,11 @@ void PainterWin::BezierCurveToPixel(const Point& cp1,
   current_point_ = ep;
 }
 
-void PainterWin::ClipRectPixel(const Rect& rect) {
+void PainterWin::RectPixel(const nu::Rect& rect) {
+  path_.AddRectangle(ToGdi(rect));
+}
+
+void PainterWin::ClipRectPixel(const nu::Rect& rect) {
   graphics_.SetClip(ToGdi(rect), Gdiplus::CombineModeIntersect);
 }
 
@@ -153,18 +161,19 @@ void PainterWin::TranslatePixel(const Vector2d& offset) {
                                Gdiplus::MatrixOrderAppend);
 }
 
-void PainterWin::StrokeRectPixel(const Rect& rect) {
+void PainterWin::StrokeRectPixel(const nu::Rect& rect) {
   Gdiplus::Pen pen(ToGdi(top().stroke_color), top().line_width);
   graphics_.DrawRectangle(&pen, ToGdi(rect));
 }
 
-void PainterWin::FillRectPixel(const Rect& rect) {
+void PainterWin::FillRectPixel(const nu::Rect& rect) {
   Gdiplus::SolidBrush brush(ToGdi(top().fill_color));
   graphics_.FillRectangle(&brush, ToGdi(rect));
 }
 
 void PainterWin::DrawColoredTextWithFlagsPixel(
-    const String& text, Font* font, Color color, const Rect& rect, int flags) {
+    const String& text, Font* font, Color color, const nu::Rect& rect,
+    int flags) {
   Gdiplus::SolidBrush brush(ToGdi(color));
   Gdiplus::StringFormat format;
   format.SetLineAlignment(Gdiplus::StringAlignmentCenter);
