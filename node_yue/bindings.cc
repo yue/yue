@@ -293,6 +293,7 @@ struct Type<nu::Painter> {
         "fill", &nu::Painter::Fill,
         "strokeRect", &nu::Painter::StrokeRect,
         "fillRect", &nu::Painter::FillRect,
+        "measureText", &nu::Painter::MeasureText,
         "drawText", &nu::Painter::DrawText,
         "drawTextWithFlags", &nu::Painter::DrawTextWithFlags,
         "drawColoredText", &nu::Painter::DrawColoredText,

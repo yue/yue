@@ -76,6 +76,9 @@ class NATIVEUI_EXPORT Painter {
   // Fill |rect|.
   virtual void FillRect(const RectF& rect) = 0;
 
+  // Return the space taken to paint the full string.
+  virtual SizeF MeasureText(base::StringPiece text, Font* font) = 0;
+
   // Draw text with the specified color, fonts and location. The text is
   // aligned to the left, vertically centered, clipped to the region. If the
   // text is too big, it is truncated and '...' is added to the end.

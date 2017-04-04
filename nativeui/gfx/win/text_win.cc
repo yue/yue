@@ -25,10 +25,8 @@ SizeF MeasureText(Font* font, const base::string16& text) {
 SizeF MeasureText(HDC dc, Font* font, const base::string16& text) {
   Gdiplus::Graphics graphics(dc);
   Gdiplus::RectF rect;
-  Gdiplus::StringFormat fomart(Gdiplus::StringFormat::GenericDefault());
   graphics.MeasureString(text.c_str(), static_cast<int>(text.length()),
-                         font->GetNative(), Gdiplus::PointF(0., 0.),
-                         &fomart, &rect);
+                         font->GetNative(), Gdiplus::PointF(0., 0.), &rect);
   return SizeF(rect.Width, rect.Height);
 }
 

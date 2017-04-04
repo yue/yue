@@ -174,6 +174,14 @@ void PainterWin::FillRect(const RectF& rect) {
   FillRectPixel(ToEnclosingRect(ScaleRect(rect, scale_factor_)));
 }
 
+SizeF PainterWin::MeasureText(base::StringPiece text, Font* font) {
+  Gdiplus::RectF rect;
+  base::string16 wtext(base::UTF8ToUTF16(text));
+  graphics_.MeasureString(wtext.c_str(), static_cast<int>(wtext.length()),
+                          font->GetNative(), Gdiplus::PointF(0., 0.), &rect);
+  return ScaleSize(SizeF(rect.Width, rect.Height), 1.0f / scale_factor_);
+}
+
 void PainterWin::DrawColoredTextWithFlags(
     base::StringPiece text, Font* font, Color color, const RectF& rect, int flags) {
   DrawColoredTextWithFlagsPixel(

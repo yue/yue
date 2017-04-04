@@ -51,6 +51,7 @@ class PainterWin : public Painter {
   void Fill() override;
   void StrokeRect(const RectF& rect) override;
   void FillRect(const RectF& rect) override;
+  SizeF MeasureText(base::StringPiece text, Font* font) override;
   void DrawColoredTextWithFlags(
       base::StringPiece text, Font* font, Color color, const RectF& rect,
       int flags) override;
