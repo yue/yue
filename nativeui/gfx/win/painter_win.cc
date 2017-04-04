@@ -137,6 +137,14 @@ void PainterWin::Translate(const Vector2dF& offset) {
   TranslatePixel(ToFlooredVector2d(ScaleVector2d(offset, scale_factor_)));
 }
 
+void PainterWin::Rotate(float angle) {
+  graphics_.RotateTransform(angle / M_PI * 180.0f);
+}
+
+void PainterWin::Scale(const Vector2dF& scale) {
+  graphics_.ScaleTransform(scale.x(), scale.y());
+}
+
 void PainterWin::SetColor(Color color) {
   top().stroke_color = color;
   top().fill_color = color;

@@ -43,6 +43,8 @@ class PainterWin : public Painter {
   void Clip() override;
   void ClipRect(const RectF& rect) override;
   void Translate(const Vector2dF& offset) override;
+  void Rotate(float angle) override;
+  void Scale(const Vector2dF& scale) override;
   void SetColor(Color color) override;
   void SetStrokeColor(Color color) override;
   void SetFillColor(Color color) override;

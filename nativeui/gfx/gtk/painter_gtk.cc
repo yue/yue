@@ -181,6 +181,14 @@ void PainterGtk::Translate(const Vector2dF& offset) {
   cairo_translate(context_, offset.x(), offset.y());
 }
 
+void PainterGtk::Rotate(float angle) {
+  cairo_rotate(context_, angle);
+}
+
+void PainterGtk::Scale(const Vector2dF& scale) {
+  cairo_scale(context_, scale.x(), scale.y());
+}
+
 void PainterGtk::SetColor(Color color) {
   states_.top().stroke_color = color;
   states_.top().fill_color = color;

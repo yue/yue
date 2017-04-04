@@ -285,6 +285,8 @@ struct Type<nu::Painter> {
         "clip", &nu::Painter::Clip,
         "clipRect", &nu::Painter::ClipRect,
         "translate", &nu::Painter::Translate,
+        "rotate", &nu::Painter::Rotate,
+        "scale", &nu::Painter::Scale,
         "setColor", &nu::Painter::SetColor,
         "setStrokeColor", &nu::Painter::SetStrokeColor,
         "setFillColor", &nu::Painter::SetFillColor,

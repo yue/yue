@@ -35,7 +35,7 @@ class NATIVEUI_EXPORT Painter {
   virtual void Save() = 0;
   virtual void Restore() = 0;
 
-  // Create path.
+  // Path operations.
   virtual void BeginPath() = 0;
   virtual void ClosePath() = 0;
   virtual void MoveTo(const PointF& p) = 0;
@@ -53,8 +53,10 @@ class NATIVEUI_EXPORT Painter {
   // Apply |rect| to the current clip using the specified region |op|.
   virtual void ClipRect(const RectF& rect) = 0;
 
-  // The origin offset of the painting.
+  // Transform operations.
   virtual void Translate(const Vector2dF& offset) = 0;
+  virtual void Rotate(float angle) = 0;
+  virtual void Scale(const Vector2dF& scale) = 0;
 
   // Set the color used for drawing or filling.
   virtual void SetColor(Color color) = 0;

@@ -75,6 +75,14 @@ void PainterMac::Translate(const Vector2dF& offset) {
   CGContextTranslateCTM(context_, offset.x(), offset.y());
 }
 
+void PainterMac::Rotate(float angle) {
+  CGContextRotateCTM(context_, angle);
+}
+
+void PainterMac::Scale(const Vector2dF& scale) {
+  CGContextScaleCTM(context_, scale.x(), scale.y());
+}
+
 void PainterMac::SetColor(Color color) {
   [color.ToNSColor() set];
 }
