@@ -222,15 +222,26 @@ void PainterGtk::FillRect(const RectF& rect) {
   cairo_fill(context_);
 }
 
+SizeF PainterGtk::MeasureText(base::StringPiece text, Font* font) {
+  PangoLayout* layout = pango_cairo_create_layout(context_);
+  pango_layout_set_font_description(layout, font->GetNative());
+  int width, height;
+  pango_layout_set_text(layout, text.data(), text.length());
+  pango_layout_get_pixel_size(layout, &width, &height);
+  g_object_unref(layout);
+  return SizeF(width, height);
+}
+
 void PainterGtk::DrawColoredTextWithFlags(
-    StringPiece text, Font* font, Color color, const RectF& rect, int flags) {
+    base::StringPiece text, Font* font, Color color, const RectF& rect,
+    int flags) {
   PangoLayout* layout = pango_cairo_create_layout(context_);
   pango_layout_set_font_description(layout, font->GetNative());
   cairo_save(context_);
 
   // Text size.
   int width, height;
-  pango_layout_set_text(layout, text.c_str(), text.length());
+  pango_layout_set_text(layout, text.data(), text.length());
   pango_layout_get_pixel_size(layout, &width, &height);
 
   int x = rect.x(), y = rect.y();
