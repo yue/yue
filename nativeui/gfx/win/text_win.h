@@ -11,8 +11,8 @@
 
 namespace nu {
 
-SizeF MeasureText(const base::string16& text, Font* font);
-SizeF MeasureText(HDC dc, const base::string16& text, Font* font);
+SizeF MeasureText(const base::StringPiece16& text, Font* font);
+SizeF MeasureText(HDC dc, const base::StringPiece16& text, Font* font);
 
 }  // namespace nu
 
