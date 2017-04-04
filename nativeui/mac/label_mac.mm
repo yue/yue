@@ -69,7 +69,7 @@ namespace nu {
 namespace {
 
 SizeF GetPreferredSizeForText(const std::string& text) {
-  SizeF size = MeasureText(nu::State::GetCurrent()->GetDefaultFont(), text);
+  SizeF size = MeasureText(text, nu::State::GetCurrent()->GetDefaultFont());
   size.Enlarge(1, 1);  // leave space for border
   return size;
 }

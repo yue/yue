@@ -7,6 +7,7 @@
 #import <Cocoa/Cocoa.h>
 
 #include "base/strings/sys_string_conversions.h"
+#include "nativeui/gfx/text.h"
 
 namespace nu {
 
@@ -106,8 +107,13 @@ void PainterMac::FillRect(const RectF& rect) {
   CGContextFillRect(context_, rect.ToCGRect());
 }
 
+SizeF PainterMac::MeasureText(base::StringPiece text, Font* font) {
+  return nu::MeasureText(text, font);
+}
+
 void PainterMac::DrawColoredTextWithFlags(
-    StringPiece text, Font* font, Color color, const RectF& rect, int flags) {
+    base::StringPiece text, Font* font, Color color, const RectF& rect,
+    int flags) {
   NSMutableParagraphStyle* paragraphStyle =
       [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
   NSDictionary* attributes = @{
@@ -123,7 +129,7 @@ void PainterMac::DrawColoredTextWithFlags(
   else
     [paragraphStyle setAlignment:NSLeftTextAlignment];
 
-  NSString* str = base::SysUTF8ToNSString(text);
+  NSString* str = base::SysUTF8ToNSString(text.as_string());
   NSAttributedString* attribute =
       [[[NSAttributedString alloc] initWithString:str
                                        attributes:attributes] autorelease];

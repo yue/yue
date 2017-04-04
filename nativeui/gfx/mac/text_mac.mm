@@ -10,7 +10,7 @@
 
 namespace nu {
 
-SizeF MeasureText(Font* font, base::StringPiece text) {
+SizeF MeasureText(base::StringPiece text, Font* font) {
   NSMutableParagraphStyle* paragraphStyle =
       [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
   [paragraphStyle setAlignment:NSCenterTextAlignment];
@@ -18,9 +18,9 @@ SizeF MeasureText(Font* font, base::StringPiece text) {
     NSParagraphStyleAttributeName : paragraphStyle,
     NSFontAttributeName : font->GetNative()
   };
-  NSAttributedString* attribute =
-      [[[NSAttributedString alloc] initWithString:base::SysUTF8ToNSString(text)
-                                       attributes:attrs] autorelease];
+  NSAttributedString* attribute = [[[NSAttributedString alloc]
+      initWithString:base::SysUTF8ToNSString(text.as_string())
+          attributes:attrs] autorelease];
   return SizeF(attribute.size.width, attribute.size.height);
 }
 

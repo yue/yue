@@ -162,7 +162,7 @@ class ButtonImpl : public ViewImpl {
     else if (type() == ControlType::Radio)
       box_size_ = theme->GetThemePartSize(dc, NativeTheme::Part::Radio,
                                           state());
-    text_size_ = MeasureText(dc, font_.get(), title_);
+    text_size_ = MeasureText(dc, title_, font_.get());
   }
 
   void OnMouseEnter() override {

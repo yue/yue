@@ -40,8 +40,9 @@ class PainterMac : public Painter {
   void Fill() override;
   void StrokeRect(const RectF& rect) override;
   void FillRect(const RectF& rect) override;
+  SizeF MeasureText(base::StringPiece text, Font* font) override;
   void DrawColoredTextWithFlags(
-      StringPiece text, Font* font, Color color, const RectF& rect,
+      base::StringPiece text, Font* font, Color color, const RectF& rect,
       int flags) override;
 
  private:

@@ -13,16 +13,16 @@
 
 namespace nu {
 
-SizeF MeasureText(Font* font, base::StringPiece text) {
-  return MeasureText(font, base::UTF8ToUTF16(text));
+SizeF MeasureText(base::StringPiece text, Font* font) {
+  return MeasureText(base::UTF8ToUTF16(text), font);
 }
 
-SizeF MeasureText(Font* font, const base::string16& text) {
+SizeF MeasureText(const base::string16& text, Font* font) {
   base::win::ScopedGetDC dc(NULL);
-  return MeasureText(dc, font, text);
+  return MeasureText(dc, text, font);
 }
 
-SizeF MeasureText(HDC dc, Font* font, const base::string16& text) {
+SizeF MeasureText(HDC dc, const base::string16& text, Font* font) {
   Gdiplus::Graphics graphics(dc);
   Gdiplus::RectF rect;
   graphics.MeasureString(text.c_str(), static_cast<int>(text.length()),

@@ -11,7 +11,7 @@
 namespace nu {
 
 // Calculate the size of text.
-SizeF MeasureText(Font* font, base::StringPiece text);
+SizeF MeasureText(base::StringPiece text, Font* font);
 
 }  // namespace nu
 

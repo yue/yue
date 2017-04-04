@@ -107,7 +107,7 @@ class GroupImpl : public ContainerImpl,
     base::win::ScopedGetDC dc(window() ? window()->hwnd() : NULL);
     // Update the rect of the title.
     title_bounds_ = Rect(Point(kTitleLeftMargin * scale_factor(), 0),
-                         ToCeiledSize(MeasureText(dc, font_.get(), title_)));
+                         ToCeiledSize(MeasureText(dc, title_, font_.get())));
   }
 
  private:
