@@ -7,7 +7,7 @@
 #import <Cocoa/Cocoa.h>
 
 #include "base/strings/sys_string_conversions.h"
-#include "nativeui/gfx/text.h"
+#include "nativeui/gfx/mac/text_mac.h"
 
 namespace nu {
 

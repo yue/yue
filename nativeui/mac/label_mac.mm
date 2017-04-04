@@ -7,7 +7,7 @@
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/mac/painter_mac.h"
-#include "nativeui/gfx/text.h"
+#include "nativeui/gfx/mac/text_mac.h"
 #include "nativeui/mac/view_mac.h"
 #include "nativeui/state.h"
 

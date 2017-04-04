@@ -6,7 +6,8 @@
 #ifndef NATIVEUI_GFX_WIN_TEXT_WIN_H_
 #define NATIVEUI_GFX_WIN_TEXT_WIN_H_
 
-#include "nativeui/gfx/text.h"
+#include "nativeui/gfx/font.h"
+#include "nativeui/gfx/geometry/size_f.h"
 
 namespace nu {
 

@@ -2,7 +2,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/gfx/text.h"
+#include "nativeui/gfx/mac/text_mac.h"
 
 #import <Cocoa/Cocoa.h>
 
