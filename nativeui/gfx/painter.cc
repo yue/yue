@@ -10,18 +10,18 @@ Painter::Painter() : weak_factory_(this) {}
 
 Painter::~Painter() {}
 
-void Painter::DrawText(const String& text, Font* font, const RectF& rect) {
+void Painter::DrawText(base::StringPiece text, Font* font, const RectF& rect) {
   // TODO(zcbenz): Support RTL in future.
   DrawTextWithFlags(text, font, rect, TextAlignLeft);
 }
 
-void Painter::DrawTextWithFlags(const String& text, Font* font,
+void Painter::DrawTextWithFlags(base::StringPiece text, Font* font,
                                 const RectF& rect, int flags) {
   DrawColoredTextWithFlags(
       text, font, GetSystemColor(SystemColor::Text), rect, flags);
 }
 
-void Painter::DrawColoredText(const String& text, Font* font, Color color,
+void Painter::DrawColoredText(base::StringPiece text, Font* font, Color color,
                               const RectF& rect) {
   // TODO(zcbenz): Support RTL in future.
   DrawColoredTextWithFlags(text, font, color, rect, TextAlignLeft);

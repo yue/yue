@@ -15,6 +15,7 @@
 
 #include <memory>
 
+#include "base/strings/utf_string_conversions.h"
 #include "base/win/scoped_gdi_object.h"
 #include "base/win/scoped_select_object.h"
 #include "nativeui/gfx/geometry/point_conversions.h"
@@ -174,7 +175,7 @@ void PainterWin::FillRect(const RectF& rect) {
 }
 
 void PainterWin::DrawColoredTextWithFlags(
-    const String& text, Font* font, Color color, const RectF& rect, int flags) {
+    base::StringPiece text, Font* font, Color color, const RectF& rect, int flags) {
   DrawColoredTextWithFlagsPixel(
       text, font, color, ToEnclosingRect(ScaleRect(rect, scale_factor_)),
       flags);
@@ -364,7 +365,14 @@ bool PainterWin::GetCurrentPoint(Gdiplus::PointF* point) {
 }
 
 void PainterWin::DrawColoredTextWithFlagsPixel(
-    const String& text, Font* font, Color color, const nu::Rect& rect,
+    base::StringPiece text, Font* font, Color color, const nu::Rect& rect,
+    int flags) {
+  DrawColoredTextWithFlagsPixel(base::UTF8ToUTF16(text), font, color, rect,
+                                flags);
+}
+
+void PainterWin::DrawColoredTextWithFlagsPixel(
+    const base::string16& text, Font* font, Color color, const nu::Rect& rect,
     int flags) {
   Gdiplus::SolidBrush brush(ToGdi(color));
   Gdiplus::StringFormat format;

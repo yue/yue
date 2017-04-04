@@ -250,7 +250,7 @@ struct Type<nu::Image> {
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
-        "createFromFile", &CreateInstance<nu::Image, const nu::String&>);
+        "createFromFile", &CreateInstance<nu::Image, const nu::FilePath&>);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {

@@ -8,6 +8,7 @@
 #include <string>
 
 #include "base/memory/ref_counted.h"
+#include "base/strings/string_piece.h"
 #include "nativeui/nativeui_export.h"
 #include "nativeui/types.h"
 

@@ -4,6 +4,7 @@
 
 #include "nativeui/gfx/win/text_win.h"
 
+#include "base/strings/utf_string_conversions.h"
 #include "base/win/scoped_gdi_object.h"
 #include "base/win/scoped_hdc.h"
 #include "nativeui/gfx/win/gdiplus.h"
@@ -12,12 +13,16 @@
 
 namespace nu {
 
-SizeF MeasureText(Font* font, const String& text) {
+SizeF MeasureText(Font* font, base::StringPiece text) {
+  return MeasureText(font, base::UTF8ToUTF16(text));
+}
+
+SizeF MeasureText(Font* font, const base::string16& text) {
   base::win::ScopedGetDC dc(NULL);
   return MeasureText(dc, font, text);
 }
 
-SizeF MeasureText(HDC dc, Font* font, const String& text) {
+SizeF MeasureText(HDC dc, Font* font, const base::string16& text) {
   Gdiplus::Graphics graphics(dc);
   Gdiplus::RectF rect;
   Gdiplus::StringFormat fomart(Gdiplus::StringFormat::GenericDefault());

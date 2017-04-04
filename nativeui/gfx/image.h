@@ -14,7 +14,7 @@ namespace nu {
 class NATIVEUI_EXPORT Image : public base::RefCounted<Image> {
  public:
   // Creates an image by reading from |path|.
-  explicit Image(const String& path);
+  explicit Image(const FilePath& path);
 
   // Gets the size of image.
   Size GetSize() const;

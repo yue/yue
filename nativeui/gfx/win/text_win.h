@@ -10,7 +10,8 @@
 
 namespace nu {
 
-SizeF MeasureText(HDC dc, Font* font, const String& text);
+SizeF MeasureText(Font* font, const base::string16& text);
+SizeF MeasureText(HDC dc, Font* font, const base::string16& text);
 
 }  // namespace nu
 

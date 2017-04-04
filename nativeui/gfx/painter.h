@@ -79,20 +79,20 @@ class NATIVEUI_EXPORT Painter {
   // Draw text with the specified color, fonts and location. The text is
   // aligned to the left, vertically centered, clipped to the region. If the
   // text is too big, it is truncated and '...' is added to the end.
-  void DrawText(const String& text, Font* font, const RectF& rect);
+  void DrawText(base::StringPiece text, Font* font, const RectF& rect);
 
   // Draw text with the specified font and location. The last argument
   // specifies flags for how the text should be rendered.
   void DrawTextWithFlags(
-      const String& text, Font* font, const RectF& rect, int flags);
+      base::StringPiece text, Font* font, const RectF& rect, int flags);
 
   // Draw colored text.
   void DrawColoredText(
-      const String& text, Font* font, Color color, const RectF& rect);
+      base::StringPiece text, Font* font, Color color, const RectF& rect);
 
   // Draw colored text with additional flags.
   virtual void DrawColoredTextWithFlags(
-      const String& text, Font* font, Color color, const RectF& rect,
+      base::StringPiece text, Font* font, Color color, const RectF& rect,
       int flags) = 0;
 
   base::WeakPtr<Painter> GetWeakPtr() { return weak_factory_.GetWeakPtr(); }

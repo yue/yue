@@ -88,7 +88,7 @@ Entry::Entry() {
   TakeOverView(new EntryImpl(this));
 
   Font* font = State::GetCurrent()->GetDefaultFont();
-  float height = MeasureText(font, L"some text").height() / GetScaleFactor()+
+  float height = MeasureText(font, "some text").height() / GetScaleFactor()+
                  2 * kEntryPadding;
   SetDefaultStyle(SizeF(0, height));
 }

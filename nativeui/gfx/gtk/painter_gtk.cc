@@ -223,7 +223,7 @@ void PainterGtk::FillRect(const RectF& rect) {
 }
 
 void PainterGtk::DrawColoredTextWithFlags(
-    const String& text, Font* font, Color color, const RectF& rect, int flags) {
+    StringPiece text, Font* font, Color color, const RectF& rect, int flags) {
   PangoLayout* layout = pango_cairo_create_layout(context_);
   pango_layout_set_font_description(layout, font->GetNative());
   cairo_save(context_);

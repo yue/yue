@@ -107,7 +107,7 @@ void PainterMac::FillRect(const RectF& rect) {
 }
 
 void PainterMac::DrawColoredTextWithFlags(
-    const String& str, Font* font, Color color, const RectF& rect, int flags) {
+    StringPiece text, Font* font, Color color, const RectF& rect, int flags) {
   NSMutableParagraphStyle* paragraphStyle =
       [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
   NSDictionary* attributes = @{
@@ -123,16 +123,16 @@ void PainterMac::DrawColoredTextWithFlags(
   else
     [paragraphStyle setAlignment:NSLeftTextAlignment];
 
-  NSString* text = base::SysUTF8ToNSString(str);
+  NSString* str = base::SysUTF8ToNSString(text);
   NSAttributedString* attribute =
-      [[[NSAttributedString alloc] initWithString:text
+      [[[NSAttributedString alloc] initWithString:str
                                        attributes:attributes] autorelease];
   NSRect frame = NSMakeRect(
       rect.x(),
       rect.y() + (rect.height() - attribute.size.height) / 2,
       rect.width(),
        attribute.size.height);
-  [text drawInRect:frame withAttributes:attributes];
+  [str drawInRect:frame withAttributes:attributes];
 }
 
 }  // namespace nu

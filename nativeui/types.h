@@ -65,10 +65,11 @@ struct MenuItemData;
 class WindowImpl;
 #endif
 
+// base::FilePath is not free, use native string as FilePath in nativeui.
 #if defined(OS_WIN)
-using String = base::string16;
+using FilePath = base::string16;
 #else
-using String = std::string;
+using FilePath = std::string;
 #endif
 
 #if defined(OS_MACOSX)

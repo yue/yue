@@ -10,7 +10,7 @@
 
 namespace nu {
 
-SizeF MeasureText(Font* font, const String& text) {
+SizeF MeasureText(Font* font, base::StringPiece text) {
   NSMutableParagraphStyle* paragraphStyle =
       [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
   [paragraphStyle setAlignment:NSCenterTextAlignment];

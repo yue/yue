@@ -41,7 +41,7 @@ class PainterGtk : public Painter {
   void StrokeRect(const RectF& rect) override;
   void FillRect(const RectF& rect) override;
   void DrawColoredTextWithFlags(
-      const String& text, Font* font, Color color, const RectF& rect,
+      StringPiece text, Font* font, Color color, const RectF& rect,
       int flags) override;
 
  private:
