@@ -36,7 +36,12 @@ NSFont* NSFontWithSpec(const std::string& font_name, int font_size) {
     NSFontTraitsAttribute : traits
   };
   descriptor = [NSFontDescriptor fontDescriptorWithFontAttributes:attrs];
-  return [NSFont fontWithDescriptor:descriptor size:font_size];
+  font = [NSFont fontWithDescriptor:descriptor size:font_size];
+  if (font)
+    return font;
+
+  // Otherwise return the default font.
+  return [NSFont systemFontOfSize:font_size];
 }
 
 }  // namespace
