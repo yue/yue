@@ -39,7 +39,7 @@ std::string Font::GetName() const {
   return pango_font_description_get_family(font_);
 }
 
-int Font::GetSize() const {
+float Font::GetSize() const {
   return pango_font_description_get_size(font_);
 }
 

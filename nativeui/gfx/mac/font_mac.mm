@@ -61,7 +61,7 @@ std::string Font::GetName() const {
   return base::SysNSStringToUTF8([font_ familyName]);
 }
 
-int Font::GetSize() const {
+float Font::GetSize() const {
   return [font_ pointSize];
 }
 

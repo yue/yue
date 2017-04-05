@@ -27,17 +27,20 @@ Font::Font() {
   ScopedSetMapMode mode(screen_dc, MM_TEXT);
   base::win::ScopedSelectObject scoped_font(screen_dc, font.get());
   ::GetTextMetrics(screen_dc, &fm);
-  float font_size = std::max<float>(1.0f, fm.tmHeight - fm.tmInternalLeading);
+  float font_size = std::max<float>(1.f, fm.tmHeight - fm.tmInternalLeading);
+
+  // Converting pixel size to point.
+  font_size = font_size / ::GetDeviceCaps(screen_dc, LOGPIXELSX) * 72.f;
 
   // Create default font.
   font_ = new Gdiplus::Font(metrics.lfMessageFont.lfFaceName, font_size,
-                            Gdiplus::FontStyleRegular, Gdiplus::UnitPixel);
+                            Gdiplus::FontStyleRegular, Gdiplus::UnitPoint);
 }
 
 Font::Font(base::StringPiece name, float size)
     : font_(new Gdiplus::Font(base::UTF8ToUTF16(name).c_str(),
                               // Converting DPI-aware pixel size to point.
-                              size * 72.0f / 96.0f,
+                              size * 72.f / 96.f,
                               Gdiplus::FontStyleRegular,
                               Gdiplus::UnitPoint)) {
 }
@@ -53,8 +56,8 @@ std::string Font::GetName() const {
   return base::UTF16ToUTF8(buffer);
 }
 
-int Font::GetSize() const {
-  return font_->GetSize();
+float Font::GetSize() const {
+  return font_->GetSize() / 72.f * 96.f;
 }
 
 NativeFont Font::GetNative() const {

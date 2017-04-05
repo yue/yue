@@ -26,7 +26,7 @@ class NATIVEUI_EXPORT Font : public base::RefCounted<Font> {
   std::string GetName() const;
 
   // Returns the font size in pixels.
-  int GetSize() const;
+  float GetSize() const;
 
   // Returns the native font handle.
   NativeFont GetNative() const;
