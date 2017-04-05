@@ -245,6 +245,12 @@ struct Type<nu::Painter> {
            "TextAlignLeft",   static_cast<int>(nu::Painter::kTextAlignLeft),
            "TextAlignCenter", static_cast<int>(nu::Painter::kTextAlignCenter),
            "TextAlignRight",  static_cast<int>(nu::Painter::kTextAlignRight),
+           "TextAlignVerticalTop",
+           static_cast<int>(nu::Painter::kTextAlignVerticalTop),
+           "TextAlignVerticalCenter",
+           static_cast<int>(nu::Painter::kTextAlignVerticalCenter),
+           "TextAlignVerticalBottom",
+           static_cast<int>(nu::Painter::kTextAlignVerticalBottom),
            // APIs
            "save", &nu::Painter::Save,
            "restore", &nu::Painter::Restore,

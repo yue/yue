@@ -130,6 +130,7 @@ void PainterMac::DrawColoredTextWithFlags(
     NSForegroundColorAttributeName: color.ToNSColor(),
   };
 
+  // Horizontal alignment.
   if (flags & kTextAlignRight)
     [paragraphStyle setAlignment:NSRightTextAlignment];
   else if (flags & kTextAlignCenter)
@@ -137,16 +138,25 @@ void PainterMac::DrawColoredTextWithFlags(
   else
     [paragraphStyle setAlignment:NSLeftTextAlignment];
 
-  NSString* str = base::SysUTF8ToNSString(text.as_string());
-  NSAttributedString* attribute =
-      [[[NSAttributedString alloc] initWithString:str
-                                       attributes:attributes] autorelease];
-  NSRect frame = NSMakeRect(
-      rect.x(),
-      rect.y() + (rect.height() - attribute.size.height) / 2,
-      rect.width(),
-       attribute.size.height);
-  [str drawInRect:frame withAttributes:attributes];
+  // Vertical alignment.
+  RectF frame(rect);
+  if (flags & (kTextAlignVerticalCenter | kTextAlignVerticalBottom)) {
+    // Measure text.
+    NSString* str = base::SysUTF8ToNSString(text.as_string());
+    NSAttributedString* attributed_str =
+        [[[NSAttributedString alloc] initWithString:str
+                                         attributes:attributes] autorelease];
+    CGRect bounds = [attributed_str
+        boundingRectWithSize:rect.size().ToCGSize()
+                     options:NSStringDrawingUsesLineFragmentOrigin];
+    // Adjust the drawing rect.
+    if (flags & kTextAlignVerticalCenter)
+      frame.Inset(0.f, (rect.height() - bounds.size.height) / 2);
+    else
+      frame.Inset(0.f, rect.height() - bounds.size.height, 0.f, 0.f);
+  }
+
+  [str drawInRect:frame.ToCGRect() withAttributes:attributes];
 }
 
 }  // namespace nu

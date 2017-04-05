@@ -66,7 +66,8 @@ class GroupImpl : public ContainerImpl,
     // Draw title.
     if (dirty.Intersects(title_bounds_))
       painter->DrawColoredTextWithFlagsPixel(
-          title_, font_.get(), color_, title_bounds_, Painter::kTextAlignLeft);
+          title_, font_.get(), color_, title_bounds_,
+          Painter::kTextAlignCenter | Painter::kTextAlignVerticalCenter);
 
     // Bounds of the content view.
     Rect child_bounds(size_allocation().size());

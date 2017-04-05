@@ -391,15 +391,19 @@ void PainterWin::DrawColoredTextWithFlagsPixel(
 void PainterWin::DrawColoredTextWithFlagsPixel(
     const base::string16& text, Font* font, Color color, const nu::Rect& rect,
     int flags) {
-  Gdiplus::SolidBrush brush(ToGdi(color));
   Gdiplus::StringFormat format;
-  format.SetLineAlignment(Gdiplus::StringAlignmentCenter);
-  if (flags & kTextAlignLeft)
-    format.SetAlignment(Gdiplus::StringAlignmentNear);
-  else if (flags & kTextAlignCenter)
+  // Horizental alignment.
+  if (flags & kTextAlignCenter)
     format.SetAlignment(Gdiplus::StringAlignmentCenter);
   else if (flags & kTextAlignRight)
     format.SetAlignment(Gdiplus::StringAlignmentFar);
+  // Vertical alignment.
+  if (flags & kTextAlignVerticalCenter)
+    format.SetLineAlignment(Gdiplus::StringAlignmentCenter);
+  else if (flags & kTextAlignVerticalBottom)
+    format.SetLineAlignment(Gdiplus::StringAlignmentFar);
+  // Draw the string.
+  Gdiplus::SolidBrush brush(ToGdi(color));
   graphics_.DrawString(
       text.c_str(), static_cast<int>(text.size()),
       font->GetNative(), ToGdi(RectF(rect)), &format, &brush);

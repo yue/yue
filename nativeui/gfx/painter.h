@@ -29,6 +29,10 @@ class NATIVEUI_EXPORT Painter {
     kTextAlignLeft   = 1 << 0,
     kTextAlignCenter = 1 << 1,
     kTextAlignRight  = 1 << 2,
+    // Vertical alignment.
+    kTextAlignVerticalTop    = 1 << 3,
+    kTextAlignVerticalCenter = 1 << 4,
+    kTextAlignVerticalBottom = 1 << 5,
   };
 
   // Save/Restore current state.

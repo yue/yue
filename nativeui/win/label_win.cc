@@ -36,7 +36,7 @@ class LabelImpl : public ViewImpl {
     ViewImpl::Draw(painter, dirty);
     painter->DrawColoredTextWithFlagsPixel(
         text_, font(), color_, Rect(size_allocation().size()),
-        Painter::kTextAlignCenter);
+        Painter::kTextAlignCenter | Painter::kTextAlignVerticalCenter);
   }
 
   Font* font() const { return font_.get(); }

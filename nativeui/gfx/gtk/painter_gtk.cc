@@ -252,15 +252,18 @@ void PainterGtk::DrawColoredTextWithFlags(
   pango_layout_set_text(layout, text.data(), text.length());
   pango_layout_get_pixel_size(layout, &width, &height);
 
-  int x = rect.x(), y = rect.y();
-  // Vertical center.
-  y += (rect.height() - height) / 2;
-
   // Horizontal alignment.
+  int x = rect.x();
   if (flags & kTextAlignRight)
     x += rect.width() - width;
   else if (flags & kTextAlignCenter)
     x += (rect.width() - width) / 2;
+
+  // Vertical alignment
+  if (flags & kTextAlignVerticalTop)
+    y += (rect.height() - height) / 2;
+  else if (flags & kTextAlignVerticalBottom)
+    y += rect.height() - height;
 
   // Apply the color.
   cairo_set_source_rgba(context_, color.r() / 255., color.g() / 255.,

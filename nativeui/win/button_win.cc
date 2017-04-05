@@ -137,7 +137,8 @@ class ButtonImpl : public ViewImpl {
 
     // The text.
     painter->DrawColoredTextWithFlagsPixel(
-        title_, font_.get(), color_, text_bounds, Painter::kTextAlignCenter);
+        title_, font_.get(), color_, text_bounds,
+        Painter::kTextAlignCenter | Painter::kTextAlignVerticalCenter);
 
     // Draw focused ring.
     if (IsFocused()) {
