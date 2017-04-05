@@ -189,7 +189,7 @@ void PainterWin::FillRect(const RectF& rect) {
   FillRectPixel(ToEnclosingRect(ScaleRect(rect, scale_factor_)));
 }
 
-SizeF PainterWin::MeasureText(base::StringPiece text, Font* font) {
+SizeF PainterWin::MeasureText(const std::string& text, Font* font) {
   Gdiplus::RectF rect;
   base::string16 wtext(base::UTF8ToUTF16(text));
   graphics_.MeasureString(wtext.c_str(), static_cast<int>(wtext.length()),
@@ -198,7 +198,7 @@ SizeF PainterWin::MeasureText(base::StringPiece text, Font* font) {
 }
 
 void PainterWin::DrawTextWithAttributes(
-    base::StringPiece text, const RectF& rect,
+    const std::string& text, const RectF& rect,
     const TextAttributes& attributes) {
   DrawTextWithAttributesPixel(
       text, ToEnclosingRect(ScaleRect(rect, scale_factor_)), attributes);
@@ -388,7 +388,7 @@ bool PainterWin::GetCurrentPoint(Gdiplus::PointF* point) {
 }
 
 void PainterWin::DrawTextWithAttributesPixel(
-    base::StringPiece text, const Rect& rect,
+    const std::string& text, const Rect& rect,
     const TextAttributes& attributes) {
   DrawTextWithAttributesPixel(base::UTF8ToUTF16(text), rect, attributes);
 }

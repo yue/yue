@@ -17,7 +17,7 @@ Painter::Painter() : weak_factory_(this) {}
 
 Painter::~Painter() {}
 
-void Painter::DrawText(base::StringPiece text, const RectF& rect) {
+void Painter::DrawText(const std::string& text, const RectF& rect) {
   // TODO(zcbenz): Support RTL in future.
   DrawTextWithAttributes(text, rect, TextAttributes());
 }

@@ -169,7 +169,7 @@ struct Type<nu::Font> {
   static constexpr const char* name = "yue.Font";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
-           "create", &CreateInstance<nu::Font, base::StringPiece, float>,
+           "create", &CreateInstance<nu::Font, const std::string&, float>,
            "default", &GetDefault,
            "getname", &nu::Font::GetName,
            "getsize", &nu::Font::GetSize);

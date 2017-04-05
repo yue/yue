@@ -116,14 +116,14 @@ void PainterMac::FillRect(const RectF& rect) {
   CGContextFillRect(context_, rect.ToCGRect());
 }
 
-SizeF PainterMac::MeasureText(base::StringPiece text, Font* font) {
+SizeF PainterMac::MeasureText(const std::string& text, Font* font) {
   return nu::MeasureText(text, font);
 }
 
 void PainterMac::DrawTextWithAttributes(
-    base::StringPiece text, const RectF& rect,
+    const std::string& text, const RectF& rect,
     const TextAttributes& attributes) {
-  NSString* str = base::SysUTF8ToNSString(text.as_string());
+  NSString* str = base::SysUTF8ToNSString(text);
 
   // Horizontal alignment.
   base::scoped_nsobject<NSMutableParagraphStyle> paragraph(

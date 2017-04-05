@@ -13,13 +13,13 @@ namespace nu {
 namespace {
 
 // Returns an autoreleased NSFont created with the passed-in specifications.
-NSFont* NSFontWithSpec(base::StringPiece font_name, float font_size) {
+NSFont* NSFontWithSpec(const std::string& font_name, float font_size) {
   NSFontSymbolicTraits trait_bits = 0;
   // The Mac doesn't support underline as a font trait, so just drop it.
   // (Underlines must be added as an attribute on an NSAttributedString.)
   NSDictionary* traits = @{ NSFontSymbolicTrait : @(trait_bits) };
 
-  NSString* family = base::SysUTF8ToNSString(font_name.as_string());
+  NSString* family = base::SysUTF8ToNSString(font_name);
   NSDictionary* attrs = @{
     NSFontFamilyAttribute : family,
     NSFontTraitsAttribute : traits,
@@ -51,7 +51,7 @@ Font::Font()
     : font_([[NSFont systemFontOfSize:[NSFont systemFontSize]] retain]) {
 }
 
-Font::Font(base::StringPiece name, float size)
+Font::Font(const std::string& name, float size)
     : font_([NSFontWithSpec(name, size) retain]) {}
 
 Font::~Font() {

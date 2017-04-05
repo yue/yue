@@ -6,6 +6,7 @@
 #define NATIVEUI_GFX_WIN_PAINTER_WIN_H_
 
 #include <stack>
+#include <string>
 
 #include "nativeui/gfx/painter.h"
 #include "nativeui/gfx/win/gdiplus.h"
@@ -53,8 +54,8 @@ class PainterWin : public Painter {
   void Fill() override;
   void StrokeRect(const RectF& rect) override;
   void FillRect(const RectF& rect) override;
-  SizeF MeasureText(base::StringPiece text, Font* font) override;
-  void DrawTextWithAttributes(base::StringPiece text, const RectF& rect,
+  SizeF MeasureText(const std::string& text, Font* font) override;
+  void DrawTextWithAttributes(const std::string& text, const RectF& rect,
                               const TextAttributes& attributes) override;
 
   // The pixel versions.
@@ -71,7 +72,7 @@ class PainterWin : public Painter {
   void TranslatePixel(const Vector2d& offset);
   void StrokeRectPixel(const nu::Rect& rect);
   void FillRectPixel(const nu::Rect& rect);
-  void DrawTextWithAttributesPixel(base::StringPiece text, const Rect& rect,
+  void DrawTextWithAttributesPixel(const std::string& text, const Rect& rect,
                                    const TextAttributes& attributes);
 
   // Wide string version:

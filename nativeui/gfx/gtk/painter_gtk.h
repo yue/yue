@@ -6,6 +6,7 @@
 #define NATIVEUI_GFX_GTK_PAINTER_GTK_H_
 
 #include <stack>
+#include <string>
 
 #include "nativeui/gfx/painter.h"
 
@@ -42,8 +43,8 @@ class PainterGtk : public Painter {
   void Fill() override;
   void StrokeRect(const RectF& rect) override;
   void FillRect(const RectF& rect) override;
-  SizeF MeasureText(base::StringPiece text, Font* font) override;
-  void DrawTextWithAttributes(base::StringPiece text, const RectF& rect,
+  SizeF MeasureText(const std::string& text, Font* font) override;
+  void DrawTextWithAttributes(const std::string& text, const RectF& rect,
                               const TextAttributes& attributes) override;
 
  private:

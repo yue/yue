@@ -37,7 +37,7 @@ Font::Font() {
                             Gdiplus::FontStyleRegular, Gdiplus::UnitPoint);
 }
 
-Font::Font(base::StringPiece name, float size)
+Font::Font(const std::string& name, float size)
     : font_(new Gdiplus::Font(base::UTF8ToUTF16(name).c_str(),
                               // Converting DPI-aware pixel size to point.
                               size * 72.f / 96.f,

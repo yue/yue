@@ -5,6 +5,8 @@
 #ifndef NATIVEUI_GFX_MAC_PAINTER_MAC_H_
 #define NATIVEUI_GFX_MAC_PAINTER_MAC_H_
 
+#include <string>
+
 #include "nativeui/gfx/painter.h"
 
 typedef struct CGContext* CGContextRef;
@@ -42,8 +44,8 @@ class PainterMac : public Painter {
   void Fill() override;
   void StrokeRect(const RectF& rect) override;
   void FillRect(const RectF& rect) override;
-  SizeF MeasureText(base::StringPiece text, Font* font) override;
-  void DrawTextWithAttributes(base::StringPiece text, const RectF& rect,
+  SizeF MeasureText(const std::string& text, Font* font) override;
+  void DrawTextWithAttributes(const std::string& text, const RectF& rect,
                               const TextAttributes& attributes) override;
 
  private:

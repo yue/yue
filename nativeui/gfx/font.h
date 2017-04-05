@@ -8,7 +8,6 @@
 #include <string>
 
 #include "base/memory/ref_counted.h"
-#include "base/strings/string_piece.h"
 #include "nativeui/nativeui_export.h"
 #include "nativeui/types.h"
 
@@ -20,7 +19,7 @@ class NATIVEUI_EXPORT Font : public base::RefCounted<Font> {
   Font();
   // Creates a Font implementation with the specified |name|
   // (encoded in UTF-8) and |size| in DPI-aware pixel.
-  Font(base::StringPiece name, float size);
+  Font(const std::string& name, float size);
 
   // Returns the specified font name in UTF-8.
   std::string GetName() const;

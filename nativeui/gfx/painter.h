@@ -6,6 +6,7 @@
 #define NATIVEUI_GFX_PAINTER_H_
 
 #include <memory>
+#include <string>
 
 #include "base/memory/weak_ptr.h"
 #include "nativeui/gfx/color.h"
@@ -90,14 +91,15 @@ class NATIVEUI_EXPORT Painter {
   virtual void FillRect(const RectF& rect) = 0;
 
   // Return the space taken to paint the full string.
-  virtual SizeF MeasureText(base::StringPiece text, Font* font) = 0;
+  virtual SizeF MeasureText(const std::string& text, Font* font) = 0;
 
   // Draw |text| within the |rect|.
-  void DrawText(base::StringPiece text, const RectF& rect);
+  void DrawText(const std::string& text, const RectF& rect);
 
   // Draw |text| with additional |attributes|.
-  virtual void DrawTextWithAttributes(base::StringPiece text, const RectF& rect,
-                                      const TextAttributes& attributes) = 0;
+  virtual void DrawTextWithAttributes(
+      const std::string& text, const RectF& rect,
+      const TextAttributes& attributes) = 0;
 
   base::WeakPtr<Painter> GetWeakPtr() { return weak_factory_.GetWeakPtr(); }
 
