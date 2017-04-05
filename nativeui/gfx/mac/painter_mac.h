@@ -43,9 +43,8 @@ class PainterMac : public Painter {
   void StrokeRect(const RectF& rect) override;
   void FillRect(const RectF& rect) override;
   SizeF MeasureText(base::StringPiece text, Font* font) override;
-  void DrawColoredTextWithFlags(
-      base::StringPiece text, Font* font, Color color, const RectF& rect,
-      int flags) override;
+  void DrawTextWithAttributes(base::StringPiece text, const RectF& rect,
+                              const TextAttributes& attributes) override;
 
  private:
   CGContextRef context_;

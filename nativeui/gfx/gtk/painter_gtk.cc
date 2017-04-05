@@ -240,11 +240,11 @@ SizeF PainterGtk::MeasureText(base::StringPiece text, Font* font) {
   return SizeF(width, height);
 }
 
-void PainterGtk::DrawColoredTextWithFlags(
-    base::StringPiece text, Font* font, Color color, const RectF& rect,
-    int flags) {
+void PainterGtk::DrawTextWithAttributes(
+    base::StringPiece text, const RectF& rect,
+    const TextAttributes& attributes) {
   PangoLayout* layout = pango_cairo_create_layout(context_);
-  pango_layout_set_font_description(layout, font->GetNative());
+  pango_layout_set_font_description(layout, attributes.font->GetNative());
   cairo_save(context_);
 
   // Text size.
@@ -255,18 +255,19 @@ void PainterGtk::DrawColoredTextWithFlags(
 
   // Horizontal alignment.
   RectF bounds(rect);
-  if (flags & kTextAlignCenter)
+  if (attributes.align == TextAlign::Center)
     bounds.Inset((rect.width() - width) / 2.f, 0.f);
-  else if (flags & kTextAlignRight)
+  else if (attributes.align == TextAlign::End)
     bounds.Inset(rect.width() - width, 0.f, 0.f, 0.f);
 
   // Vertical alignment
-  if (flags & kTextAlignVerticalCenter)
+  if (attributes.valign == TextAlign::Center)
     bounds.Inset(0.f, (rect.height() - height) / 2);
-  else if (flags & kTextAlignVerticalBottom)
+  else if (attributes.valign == TextAlign::End)
     bounds.Inset(0.f, rect.height() - height, 0.f, 0.f);
 
   // Apply the color.
+  Color color = attributes.color;
   cairo_set_source_rgba(context_, color.r() / 255., color.g() / 255.,
                                   color.b() / 255., color.a() / 255.);
 

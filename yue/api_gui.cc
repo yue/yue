@@ -237,21 +237,43 @@ struct Type<nu::Image> {
 };
 
 template<>
+struct Type<nu::TextAlign> {
+  static constexpr const char* name = "yue.TextAlign";
+  static inline bool To(State* state, int value, nu::TextAlign* out) {
+    base::StringPiece align;
+    if (!lua::To(state, value, &align))
+      return false;
+    if (align == "start")
+      *out = nu::TextAlign::Start;
+    else if (align == "center")
+      *out = nu::TextAlign::Center;
+    else if (align == "end")
+      *out = nu::TextAlign::End;
+    else
+      return false;
+    return true;
+  }
+};
+
+template<>
+struct Type<nu::TextAttributes> {
+  static constexpr const char* name = "yue.TextAttributes";
+  static inline bool To(State* state, int index, nu::TextAttributes* out) {
+    if (GetType(state, index) != LuaType::Table)
+      return false;
+    RawGetAndPop(state, index, "font", &out->font);
+    RawGetAndPop(state, index, "color", &out->color);
+    RawGetAndPop(state, index, "align", &out->align);
+    RawGetAndPop(state, index, "valign", &out->valign);
+    return true;
+  }
+};
+
+template<>
 struct Type<nu::Painter> {
   static constexpr const char* name = "yue.Painter";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
-           // Flags.
-           "TextAlignLeft",   static_cast<int>(nu::Painter::kTextAlignLeft),
-           "TextAlignCenter", static_cast<int>(nu::Painter::kTextAlignCenter),
-           "TextAlignRight",  static_cast<int>(nu::Painter::kTextAlignRight),
-           "TextAlignVerticalTop",
-           static_cast<int>(nu::Painter::kTextAlignVerticalTop),
-           "TextAlignVerticalCenter",
-           static_cast<int>(nu::Painter::kTextAlignVerticalCenter),
-           "TextAlignVerticalBottom",
-           static_cast<int>(nu::Painter::kTextAlignVerticalBottom),
-           // APIs
            "save", &nu::Painter::Save,
            "restore", &nu::Painter::Restore,
            "beginpath", &nu::Painter::BeginPath,
@@ -277,9 +299,7 @@ struct Type<nu::Painter> {
            "fillrect", &nu::Painter::FillRect,
            "measuretext", &nu::Painter::MeasureText,
            "drawtext", &nu::Painter::DrawText,
-           "drawtextwithflags", &nu::Painter::DrawTextWithFlags,
-           "drawcoloredtext", &nu::Painter::DrawColoredText,
-           "drawcoloredtextwithflags", &nu::Painter::DrawColoredTextWithFlags);
+           "drawtextwithattributes", &nu::Painter::DrawTextWithAttributes);
   }
 };
 

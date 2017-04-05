@@ -57,9 +57,9 @@
   nu::PainterMac painter;
   painter.SetColor(background_color_);
   painter.FillRect(nu::RectF(dirtyRect));
-  painter.DrawTextWithFlags(
-      text_, nu::State::GetCurrent()->GetDefaultFont(), nu::RectF([self frame]),
-      nu::Painter::kTextAlignCenter | nu::Painter::kTextAlignVerticalCenter);
+  nu::TextAttributes attributes;
+  attributes.align = attributes.valign = nu::TextAlign::Center;
+  painter.DrawTextWithAttributes(text_, nu::RectF([self frame]), attributes);
 }
 
 @end

@@ -260,20 +260,48 @@ struct Type<nu::Image> {
 };
 
 template<>
+struct Type<nu::TextAlign> {
+  static constexpr const char* name = "yue.TextAlign";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::TextAlign* out) {
+    base::StringPiece align;
+    if (!vb::FromV8(context, value, &align))
+      return false;
+    if (align == "start")
+      *out = nu::TextAlign::Start;
+    else if (align == "center")
+      *out = nu::TextAlign::Center;
+    else if (align == "end")
+      *out = nu::TextAlign::End;
+    else
+      return false;
+    return true;
+  }
+};
+
+template<>
+struct Type<nu::TextAttributes> {
+  static constexpr const char* name = "yue.TextAttributes";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::TextAttributes* out) {
+    if (!value->IsObject())
+      return false;
+    v8::Local<v8::Object> obj = value.As<v8::Object>();
+    Get(context, obj, "font", &out->font);
+    Get(context, obj, "color", &out->font);
+    Get(context, obj, "align", &out->align);
+    Get(context, obj, "valign", &out->valign);
+    return true;
+  }
+};
+
+template<>
 struct Type<nu::Painter> {
   static constexpr const char* name = "yue.Painter";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
-    Set(context, constructor,
-        "TextAlignLeft",   static_cast<int>(nu::Painter::kTextAlignLeft),
-        "TextAlignCenter", static_cast<int>(nu::Painter::kTextAlignCenter),
-        "TextAlignRight",  static_cast<int>(nu::Painter::kTextAlignRight),
-        "TextAlignVerticalTop",
-        static_cast<int>(nu::Painter::kTextAlignVerticalTop),
-        "TextAlignVerticalCenter",
-        static_cast<int>(nu::Painter::kTextAlignVerticalCenter),
-        "TextAlignVerticalBottom",
-        static_cast<int>(nu::Painter::kTextAlignVerticalBottom));
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
@@ -303,9 +331,7 @@ struct Type<nu::Painter> {
         "fillRect", &nu::Painter::FillRect,
         "measureText", &nu::Painter::MeasureText,
         "drawText", &nu::Painter::DrawText,
-        "drawTextWithFlags", &nu::Painter::DrawTextWithFlags,
-        "drawColoredText", &nu::Painter::DrawColoredText,
-        "drawColoredTextWithFlags", &nu::Painter::DrawColoredTextWithFlags);
+        "drawTextWithAttributes", &nu::Painter::DrawTextWithAttributes);
   }
 };
 

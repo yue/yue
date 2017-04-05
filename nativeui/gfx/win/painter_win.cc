@@ -35,8 +35,15 @@ inline float AreaOfTriangleFormedByPoints(const PointF& p1,
          p3.x() * (p1.y() - p2.y());
 }
 
-}  // namespace
+Gdiplus::StringAlignment ToGdi(TextAlign align) {
+  switch (align) {
+    case TextAlign::Start: return Gdiplus::StringAlignmentNear;
+    case TextAlign::Center: return Gdiplus::StringAlignmentCenter;
+    case TextAlign::End: return Gdiplus::StringAlignmentFar;
+  }
+}
 
+}  // namespace
 
 PainterWin::PainterWin(HDC hdc, float scale_factor)
     : use_gdi_current_point_(true),
@@ -190,12 +197,11 @@ SizeF PainterWin::MeasureText(base::StringPiece text, Font* font) {
   return ScaleSize(SizeF(rect.Width, rect.Height), 1.0f / scale_factor_);
 }
 
-void PainterWin::DrawColoredTextWithFlags(
-    base::StringPiece text, Font* font, Color color, const RectF& rect,
-    int flags) {
-  DrawColoredTextWithFlagsPixel(
-      text, font, color, ToEnclosingRect(ScaleRect(rect, scale_factor_)),
-      flags);
+void PainterWin::DrawTextWithAttributes(
+    base::StringPiece text, const RectF& rect,
+    const TextAttributes& attributes) {
+  DrawTextWithAttributesPixel(
+      text, ToEnclosingRect(ScaleRect(rect, scale_factor_)), attributes);
 }
 
 void PainterWin::MoveToPixel(const PointF& point) {
@@ -381,29 +387,19 @@ bool PainterWin::GetCurrentPoint(Gdiplus::PointF* point) {
   return true;
 }
 
-void PainterWin::DrawColoredTextWithFlagsPixel(
-    base::StringPiece text, Font* font, Color color, const nu::Rect& rect,
-    int flags) {
-  DrawColoredTextWithFlagsPixel(base::UTF8ToUTF16(text), font, color, rect,
-                                flags);
+void PainterWin::DrawTextWithAttributesPixel(
+    base::StringPiece text, const Rect& rect,
+    const TextAttributes& attributes) {
+  DrawTextWithAttributesPixel(base::UTF8ToUTF16(text), rect, attributes);
 }
 
-void PainterWin::DrawColoredTextWithFlagsPixel(
-    const base::string16& text, Font* font, Color color, const nu::Rect& rect,
-    int flags) {
-  Gdiplus::StringFormat format;
-  // Horizental alignment.
-  if (flags & kTextAlignCenter)
-    format.SetAlignment(Gdiplus::StringAlignmentCenter);
-  else if (flags & kTextAlignRight)
-    format.SetAlignment(Gdiplus::StringAlignmentFar);
-  // Vertical alignment.
-  if (flags & kTextAlignVerticalCenter)
-    format.SetLineAlignment(Gdiplus::StringAlignmentCenter);
-  else if (flags & kTextAlignVerticalBottom)
-    format.SetLineAlignment(Gdiplus::StringAlignmentFar);
-  // Draw the string.
+void PainterWin::DrawTextWithAttributesPixel(
+    const base::string16& text, const Rect& rect,
+    const TextAttributes& attributes) {
   Gdiplus::SolidBrush brush(ToGdi(color));
+  Gdiplus::StringFormat format;
+  format.SetAlignment(ToGdi(attributes.align));
+  format.SetLineAlignment(ToGdi(attributes.valign));
   graphics_.DrawString(
       text.c_str(), static_cast<int>(text.size()),
       font->GetNative(), ToGdi(RectF(rect)), &format, &brush);

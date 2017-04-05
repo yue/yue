@@ -31,8 +31,6 @@ class ButtonImpl : public ViewImpl {
       : ViewImpl(type == Button::Normal ? ControlType::Button
                     : (type == Button::CheckBox ? ControlType::CheckBox
                                                 : ControlType::Radio)),
-        color_(GetSystemColor(SystemColor::Text)),
-        font_(State::GetCurrent()->GetDefaultFont()),
         delegate_(delegate) {
     OnDPIChanged();  // update component size
   }
@@ -136,9 +134,9 @@ class ButtonImpl : public ViewImpl {
     text_bounds.Inset(box_size_.width() + padding, padding, padding, padding);
 
     // The text.
-    painter->DrawColoredTextWithFlagsPixel(
-        title_, font_.get(), color_, text_bounds,
-        Painter::kTextAlignCenter | Painter::kTextAlignVerticalCenter);
+    TextAttributes attributes;
+    attributes.align = attributes.valign = TextAlign::Center;
+    painter->DrawTextWithAttributesPixel(title_, text_bounds, attributes);
 
     // Draw focused ring.
     if (IsFocused()) {
@@ -163,7 +161,7 @@ class ButtonImpl : public ViewImpl {
     else if (type() == ControlType::Radio)
       box_size_ = theme->GetThemePartSize(dc, NativeTheme::Part::Radio,
                                           state());
-    text_size_ = MeasureText(dc, title_, font_.get());
+    text_size_ = MeasureText(dc, title_, State::GetCurrent()->GetDefaultFont());
   }
 
   void OnMouseEnter() override {
@@ -217,10 +215,6 @@ class ButtonImpl : public ViewImpl {
 
   // The size of text.
   SizeF text_size_;
-
-  // Default text color and font.
-  Color color_;
-  scoped_refptr<Font> font_;
 
   // Whether the button is capturing the mouse.
   bool is_capturing_ = false;

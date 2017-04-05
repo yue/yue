@@ -25,11 +25,7 @@ class GroupImpl : public ContainerImpl,
                   public ContainerImpl::Delegate {
  public:
   explicit GroupImpl(Group* delegate)
-      : ContainerImpl(this, ControlType::Group),
-        delegate_(delegate),
-        color_(GetSystemColor(SystemColor::Text)),
-        font_(State::GetCurrent()->GetDefaultFont()) {}
-
+      : ContainerImpl(this, ControlType::Group), delegate_(delegate) {}
 
   void SetTitle(const base::string16& title) {
     title_ = title;
@@ -64,10 +60,11 @@ class GroupImpl : public ContainerImpl,
   // ViewImpl:
   void Draw(PainterWin* painter, const Rect& dirty) override {
     // Draw title.
-    if (dirty.Intersects(title_bounds_))
-      painter->DrawColoredTextWithFlagsPixel(
-          title_, font_.get(), color_, title_bounds_,
-          Painter::kTextAlignCenter | Painter::kTextAlignVerticalCenter);
+    if (dirty.Intersects(title_bounds_)) {
+      TextAttributes attributes;
+      attributes.align = attributes.valign = TextAlign::Center;
+      painter->DrawTextWithAttributesPixel(title_, title_bounds_, attributes);
+    }
 
     // Bounds of the content view.
     Rect child_bounds(size_allocation().size());
@@ -106,18 +103,15 @@ class GroupImpl : public ContainerImpl,
 
   void OnDPIChanged() override {
     base::win::ScopedGetDC dc(window() ? window()->hwnd() : NULL);
+    Font* font = State::GetCurrent()->GetDefaultFont();
     // Update the rect of the title.
     title_bounds_ = Rect(Point(kTitleLeftMargin * scale_factor(), 0),
-                         ToCeiledSize(MeasureText(dc, title_, font_.get())));
+                         ToCeiledSize(MeasureText(dc, title_, font)));
   }
 
  private:
   Group* delegate_;
-
-  Color color_;
-  scoped_refptr<Font> font_;
   Rect title_bounds_;
-
   base::string16 title_;
 };
 

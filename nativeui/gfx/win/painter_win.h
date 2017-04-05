@@ -54,9 +54,8 @@ class PainterWin : public Painter {
   void StrokeRect(const RectF& rect) override;
   void FillRect(const RectF& rect) override;
   SizeF MeasureText(base::StringPiece text, Font* font) override;
-  void DrawColoredTextWithFlags(
-      base::StringPiece text, Font* font, Color color, const RectF& rect,
-      int flags) override;
+  void DrawTextWithAttributes(base::StringPiece text, const RectF& rect,
+                              const TextAttributes& attributes) override;
 
   // The pixel versions.
   void MoveToPixel(const PointF& point);
@@ -72,14 +71,12 @@ class PainterWin : public Painter {
   void TranslatePixel(const Vector2d& offset);
   void StrokeRectPixel(const nu::Rect& rect);
   void FillRectPixel(const nu::Rect& rect);
-  void DrawColoredTextWithFlagsPixel(
-      base::StringPiece text, Font* font, Color color, const nu::Rect& rect,
-      int flags);
+  void DrawTextWithAttributesPixel(base::StringPiece text, const Rect& rect,
+                                   const TextAttributes& attributes);
 
   // Wide string version:
-  void DrawColoredTextWithFlagsPixel(
-      const base::string16& text, Font* font, Color color,
-      const nu::Rect& rect, int flags);
+  void DrawTextWithAttributesPixel(const base::string16& text, const Rect& rect,
+                                   const TextAttributes& attributes);
 
  private:
   // Get current point.

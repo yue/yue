@@ -11,6 +11,7 @@
 #include "nativeui/gfx/color.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/gfx/geometry/rect_f.h"
+#include "nativeui/state.h"
 #include "nativeui/types.h"
 
 #if defined(OS_WIN)
@@ -19,21 +20,27 @@
 
 namespace nu {
 
+// Text alignment when drawing text.
+enum class TextAlign {
+  Start,
+  Center,
+  End,
+};
+
+// Attributes used for drawing the text.
+struct NATIVEUI_EXPORT TextAttributes {
+  TextAttributes();
+
+  Font* font;
+  Color color;
+  TextAlign align;
+  TextAlign valign;
+};
+
 // The interface for painting on canvas or window.
 class NATIVEUI_EXPORT Painter {
  public:
   virtual ~Painter();
-
-  enum {
-    // Specifies the alignment for text rendered with the DrawText method.
-    kTextAlignLeft   = 1 << 0,
-    kTextAlignCenter = 1 << 1,
-    kTextAlignRight  = 1 << 2,
-    // Vertical alignment.
-    kTextAlignVerticalTop    = 1 << 3,
-    kTextAlignVerticalCenter = 1 << 4,
-    kTextAlignVerticalBottom = 1 << 5,
-  };
 
   // Save/Restore current state.
   virtual void Save() = 0;
@@ -85,24 +92,12 @@ class NATIVEUI_EXPORT Painter {
   // Return the space taken to paint the full string.
   virtual SizeF MeasureText(base::StringPiece text, Font* font) = 0;
 
-  // Draw text with the specified color, fonts and location. The text is
-  // aligned to the left, vertically centered, clipped to the region. If the
-  // text is too big, it is truncated and '...' is added to the end.
-  void DrawText(base::StringPiece text, Font* font, const RectF& rect);
+  // Draw |text| within the |rect|.
+  void DrawText(base::StringPiece text, const RectF& rect);
 
-  // Draw text with the specified font and location. The last argument
-  // specifies flags for how the text should be rendered.
-  void DrawTextWithFlags(
-      base::StringPiece text, Font* font, const RectF& rect, int flags);
-
-  // Draw colored text.
-  void DrawColoredText(
-      base::StringPiece text, Font* font, Color color, const RectF& rect);
-
-  // Draw colored text with additional flags.
-  virtual void DrawColoredTextWithFlags(
-      base::StringPiece text, Font* font, Color color, const RectF& rect,
-      int flags) = 0;
+  // Draw |text| with additional |attributes|.
+  virtual void DrawTextWithAttributes(base::StringPiece text, const RectF& rect,
+                                      const TextAttributes& attributes) = 0;
 
   base::WeakPtr<Painter> GetWeakPtr() { return weak_factory_.GetWeakPtr(); }
 

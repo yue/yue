@@ -19,7 +19,6 @@ namespace {
 class LabelImpl : public ViewImpl {
  public:
   LabelImpl() : ViewImpl(ControlType::Label),
-                color_(GetSystemColor(SystemColor::Text)),
                 font_(State::GetCurrent()->GetDefaultFont()) {
   }
 
@@ -34,17 +33,13 @@ class LabelImpl : public ViewImpl {
   // ViewImpl:
   void Draw(PainterWin* painter, const Rect& dirty) override {
     ViewImpl::Draw(painter, dirty);
-    painter->DrawColoredTextWithFlagsPixel(
-        text_, font(), color_, Rect(size_allocation().size()),
-        Painter::kTextAlignCenter | Painter::kTextAlignVerticalCenter);
+    TextAttributes attributes;
+    attributes.align = attributes.valign = TextAlign::Center;
+    painter->DrawTextWithAttributesPixel(text_, Rect(size_allocation().size()),
+                                         attributes);
   }
 
-  Font* font() const { return font_.get(); }
-
  private:
-  Color color_;
-  scoped_refptr<Font> font_;
-
   base::string16 text_;
 };
 
@@ -63,8 +58,8 @@ void Label::SetText(const std::string& text) {
   base::string16 wtext = base::UTF8ToUTF16(text);
   label->SetText(wtext);
 
-  SetDefaultStyle(ScaleSize(MeasureText(wtext, label->font()),
-                            1.0f / GetScaleFactor()));
+  Font* font = State::GetCurrent()->GetDefaultFont();
+  SetDefaultStyle(ScaleSize(MeasureText(wtext, font), 1.0f / GetScaleFactor()));
   label->Invalidate();
 }
 

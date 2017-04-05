@@ -6,6 +6,7 @@
 
 #import <Cocoa/Cocoa.h>
 
+#include "base/mac/scoped_nsobject.h"
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/gfx/mac/text_mac.h"
 
@@ -119,44 +120,50 @@ SizeF PainterMac::MeasureText(base::StringPiece text, Font* font) {
   return nu::MeasureText(text, font);
 }
 
-void PainterMac::DrawColoredTextWithFlags(
-    base::StringPiece text, Font* font, Color color, const RectF& rect,
-    int flags) {
+void PainterMac::DrawTextWithAttributes(
+    base::StringPiece text, const RectF& rect,
+    const TextAttributes& attributes) {
   NSString* str = base::SysUTF8ToNSString(text.as_string());
-  NSMutableParagraphStyle* paragraphStyle =
-      [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
-  NSDictionary* attributes = @{
-    NSFontAttributeName: font->GetNative(),
-    NSParagraphStyleAttributeName: paragraphStyle,
-    NSForegroundColorAttributeName: color.ToNSColor(),
-  };
 
   // Horizontal alignment.
-  if (flags & kTextAlignRight)
-    [paragraphStyle setAlignment:NSRightTextAlignment];
-  else if (flags & kTextAlignCenter)
-    [paragraphStyle setAlignment:NSCenterTextAlignment];
-  else
-    [paragraphStyle setAlignment:NSLeftTextAlignment];
-
-  // Vertical alignment.
-  RectF frame(rect);
-  if (flags & (kTextAlignVerticalCenter | kTextAlignVerticalBottom)) {
-    // Measure text.
-    NSAttributedString* attributed_str =
-        [[[NSAttributedString alloc] initWithString:str
-                                         attributes:attributes] autorelease];
-    CGRect bounds = [attributed_str
-        boundingRectWithSize:rect.size().ToCGSize()
-                     options:NSStringDrawingUsesLineFragmentOrigin];
-    // Adjust the drawing rect.
-    if (flags & kTextAlignVerticalCenter)
-      frame.Inset(0.f, (rect.height() - bounds.size.height) / 2);
-    else
-      frame.Inset(0.f, rect.height() - bounds.size.height, 0.f, 0.f);
+  base::scoped_nsobject<NSMutableParagraphStyle> paragraph(
+      [[NSParagraphStyle defaultParagraphStyle] mutableCopy]);
+  switch (attributes.align) {
+    case TextAlign::Start:
+      [paragraph setAlignment:NSLeftTextAlignment];
+      break;
+    case TextAlign::Center:
+      [paragraph setAlignment:NSCenterTextAlignment];
+      break;
+    case TextAlign::End:
+      [paragraph setAlignment:NSRightTextAlignment];
+      break;
   }
 
-  [str drawInRect:frame.ToCGRect() withAttributes:attributes];
+  // Attributes passed to Cocoa.
+  NSDictionary* attrs_dict = @{
+    NSFontAttributeName: attributes.font->GetNative(),
+    NSParagraphStyleAttributeName: paragraph.get(),
+    NSForegroundColorAttributeName: attributes.color.ToNSColor(),
+  };
+
+  // Vertical alignment.
+  RectF bounds(rect);
+  if (attributes.valign != TextAlign::Start) {
+    // Measure text.
+    base::scoped_nsobject<NSAttributedString> attributed_str(
+        [[NSAttributedString alloc] initWithString:str attributes:attrs_dict]);
+    CGRect cg_bounds = [attributed_str
+        boundingRectWithSize:rect.size().ToCGSize()
+                     options:NSStringDrawingUsesLineFragmentOrigin];
+    // Compute the drawing bounds.
+    if (attributes.valign == TextAlign::Center)
+      bounds.Inset(0.f, (rect.height() - cg_bounds.size.height) / 2);
+    else if (attributes.valign == TextAlign::End)
+      bounds.Inset(0.f, rect.height() - cg_bounds.size.height, 0.f, 0.f);
+  }
+
+  [str drawInRect:bounds.ToCGRect() withAttributes:attrs_dict];
 }
 
 }  // namespace nu
