@@ -122,6 +122,7 @@ SizeF PainterMac::MeasureText(base::StringPiece text, Font* font) {
 void PainterMac::DrawColoredTextWithFlags(
     base::StringPiece text, Font* font, Color color, const RectF& rect,
     int flags) {
+  NSString* str = base::SysUTF8ToNSString(text.as_string());
   NSMutableParagraphStyle* paragraphStyle =
       [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
   NSDictionary* attributes = @{
@@ -142,7 +143,6 @@ void PainterMac::DrawColoredTextWithFlags(
   RectF frame(rect);
   if (flags & (kTextAlignVerticalCenter | kTextAlignVerticalBottom)) {
     // Measure text.
-    NSString* str = base::SysUTF8ToNSString(text.as_string());
     NSAttributedString* attributed_str =
         [[[NSAttributedString alloc] initWithString:str
                                          attributes:attributes] autorelease];
