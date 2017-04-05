@@ -130,9 +130,9 @@ void PainterMac::DrawColoredTextWithFlags(
     NSForegroundColorAttributeName: color.ToNSColor(),
   };
 
-  if (flags & TextAlignRight)
+  if (flags & kTextAlignRight)
     [paragraphStyle setAlignment:NSRightTextAlignment];
-  else if (flags & TextAlignCenter)
+  else if (flags & kTextAlignCenter)
     [paragraphStyle setAlignment:NSCenterTextAlignment];
   else
     [paragraphStyle setAlignment:NSLeftTextAlignment];

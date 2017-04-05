@@ -257,9 +257,9 @@ void PainterGtk::DrawColoredTextWithFlags(
   y += (rect.height() - height) / 2;
 
   // Horizontal alignment.
-  if (flags & TextAlignRight)
+  if (flags & kTextAlignRight)
     x += rect.width() - width;
-  else if (flags & TextAlignCenter)
+  else if (flags & kTextAlignCenter)
     x += (rect.width() - width) / 2;
 
   // Apply the color.

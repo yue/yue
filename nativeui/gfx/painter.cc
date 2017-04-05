@@ -12,7 +12,7 @@ Painter::~Painter() {}
 
 void Painter::DrawText(base::StringPiece text, Font* font, const RectF& rect) {
   // TODO(zcbenz): Support RTL in future.
-  DrawTextWithFlags(text, font, rect, TextAlignLeft);
+  DrawTextWithFlags(text, font, rect, kTextAlignLeft);
 }
 
 void Painter::DrawTextWithFlags(base::StringPiece text, Font* font,
@@ -24,7 +24,7 @@ void Painter::DrawTextWithFlags(base::StringPiece text, Font* font,
 void Painter::DrawColoredText(base::StringPiece text, Font* font, Color color,
                               const RectF& rect) {
   // TODO(zcbenz): Support RTL in future.
-  DrawColoredTextWithFlags(text, font, color, rect, TextAlignLeft);
+  DrawColoredTextWithFlags(text, font, color, rect, kTextAlignLeft);
 }
 
 }  // namespace nu

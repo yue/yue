@@ -59,7 +59,7 @@
   painter.FillRect(nu::RectF(dirtyRect));
   painter.DrawTextWithFlags(text_, nu::State::GetCurrent()->GetDefaultFont(),
                               nu::RectF([self frame]),
-                              nu::Painter::TextAlignCenter);
+                              nu::Painter::kTextAlignCenter);
 }
 
 @end

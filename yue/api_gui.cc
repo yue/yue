@@ -242,9 +242,9 @@ struct Type<nu::Painter> {
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            // Flags.
-           "TextAlignLeft",   static_cast<int>(nu::Painter::TextAlignLeft),
-           "TextAlignCenter", static_cast<int>(nu::Painter::TextAlignCenter),
-           "TextAlignRight",  static_cast<int>(nu::Painter::TextAlignRight),
+           "TextAlignLeft",   static_cast<int>(nu::Painter::kTextAlignLeft),
+           "TextAlignCenter", static_cast<int>(nu::Painter::kTextAlignCenter),
+           "TextAlignRight",  static_cast<int>(nu::Painter::kTextAlignRight),
            // APIs
            "save", &nu::Painter::Save,
            "restore", &nu::Painter::Restore,

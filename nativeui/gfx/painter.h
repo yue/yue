@@ -26,9 +26,9 @@ class NATIVEUI_EXPORT Painter {
 
   enum {
     // Specifies the alignment for text rendered with the DrawText method.
-    TextAlignLeft   = 1 << 0,
-    TextAlignCenter = 1 << 1,
-    TextAlignRight  = 1 << 2,
+    kTextAlignLeft   = 1 << 0,
+    kTextAlignCenter = 1 << 1,
+    kTextAlignRight  = 1 << 2,
   };
 
   // Save/Restore current state.

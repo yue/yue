@@ -26,10 +26,10 @@ namespace nu {
 enum class ControlState {
   // IDs defined as specific values for use in arrays.
   Disabled = 0,
-  Hovered  = 1,
-  Normal   = 2,
-  Pressed  = 3,
-  Size     = Pressed + 1,
+  Hovered,
+  Normal,
+  Pressed,
+  Size,
 };
 
 class NativeTheme {

@@ -191,7 +191,8 @@ SizeF PainterWin::MeasureText(base::StringPiece text, Font* font) {
 }
 
 void PainterWin::DrawColoredTextWithFlags(
-    base::StringPiece text, Font* font, Color color, const RectF& rect, int flags) {
+    base::StringPiece text, Font* font, Color color, const RectF& rect,
+    int flags) {
   DrawColoredTextWithFlagsPixel(
       text, font, color, ToEnclosingRect(ScaleRect(rect, scale_factor_)),
       flags);
@@ -393,11 +394,11 @@ void PainterWin::DrawColoredTextWithFlagsPixel(
   Gdiplus::SolidBrush brush(ToGdi(color));
   Gdiplus::StringFormat format;
   format.SetLineAlignment(Gdiplus::StringAlignmentCenter);
-  if (flags & TextAlignLeft)
+  if (flags & kTextAlignLeft)
     format.SetAlignment(Gdiplus::StringAlignmentNear);
-  else if (flags & TextAlignCenter)
+  else if (flags & kTextAlignCenter)
     format.SetAlignment(Gdiplus::StringAlignmentCenter);
-  else if (flags & TextAlignRight)
+  else if (flags & kTextAlignRight)
     format.SetAlignment(Gdiplus::StringAlignmentFar);
   graphics_.DrawString(
       text.c_str(), static_cast<int>(text.size()),

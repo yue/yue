@@ -265,9 +265,9 @@ struct Type<nu::Painter> {
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
-        "TextAlignLeft",   static_cast<int>(nu::Painter::TextAlignLeft),
-        "TextAlignCenter", static_cast<int>(nu::Painter::TextAlignCenter),
-        "TextAlignRight",  static_cast<int>(nu::Painter::TextAlignRight));
+        "TextAlignLeft",   static_cast<int>(nu::Painter::kTextAlignLeft),
+        "TextAlignCenter", static_cast<int>(nu::Painter::kTextAlignCenter),
+        "TextAlignRight",  static_cast<int>(nu::Painter::kTextAlignRight));
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
