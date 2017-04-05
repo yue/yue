@@ -40,7 +40,11 @@ std::string Font::GetName() const {
 }
 
 float Font::GetSize() const {
-  return pango_font_description_get_size(font_) / PANGO_SCALE;
+  float size = pango_font_description_get_size(font_) / PANGO_SCALE;
+  // Convert to aboslute size.
+  if (!pango_font_description_get_size_is_absolute(font_))
+    size = size * 96.f / 72.f;
+  return size;
 }
 
 NativeFont Font::GetNative() const {
