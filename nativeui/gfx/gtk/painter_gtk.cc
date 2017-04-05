@@ -254,13 +254,14 @@ void PainterGtk::DrawColoredTextWithFlags(
 
   // Horizontal alignment.
   int x = rect.x();
-  if (flags & kTextAlignRight)
-    x += rect.width() - width;
-  else if (flags & kTextAlignCenter)
+  if (flags & kTextAlignCenter)
     x += (rect.width() - width) / 2;
+  else if (flags & kTextAlignRight)
+    x += rect.width() - width;
 
   // Vertical alignment
-  if (flags & kTextAlignVerticalTop)
+  int y = rect.y();
+  if (flags & kTextAlignVerticalCenter)
     y += (rect.height() - height) / 2;
   else if (flags & kTextAlignVerticalBottom)
     y += rect.height() - height;

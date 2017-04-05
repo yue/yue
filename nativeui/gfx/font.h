@@ -19,7 +19,7 @@ class NATIVEUI_EXPORT Font : public base::RefCounted<Font> {
   // Creates an appropriate Font implementation.
   Font();
   // Creates a Font implementation with the specified |name|
-  // (encoded in UTF-8) and |size| in points.
+  // (encoded in UTF-8) and |size| in DPI-aware pixel.
   Font(base::StringPiece name, float size);
 
   // Returns the specified font name in UTF-8.
