@@ -21,25 +21,25 @@ Font::Font() {
   metrics.cbSize = sizeof(metrics);
   SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, sizeof(metrics), &metrics, 0);
 
-  TEXTMETRIC font_metrics;
+  TEXTMETRIC fm;
   base::win::ScopedHFONT font(CreateFontIndirectW(&(metrics.lfMessageFont)));
   base::win::ScopedGetDC screen_dc(NULL);
   ScopedSetMapMode mode(screen_dc, MM_TEXT);
   base::win::ScopedSelectObject scoped_font(screen_dc, font.get());
-  ::GetTextMetrics(screen_dc, &font_metrics);
-  int font_size =
-      std::max<int>(1, font_metrics.tmHeight - font_metrics.tmInternalLeading);
+  ::GetTextMetrics(screen_dc, &fm);
+  float font_size = std::max<float>(1.0f, fm.tmHeight - fm.tmInternalLeading);
 
   // Create default font.
   font_ = new Gdiplus::Font(metrics.lfMessageFont.lfFaceName, font_size,
                             Gdiplus::FontStyleRegular, Gdiplus::UnitPixel);
 }
 
-Font::Font(const std::string& font_name, int font_size)
-    : font_(new Gdiplus::Font(base::UTF8ToUTF16(font_name).c_str(),
-                              font_size,
+Font::Font(base::StringPiece name, float size)
+    : font_(new Gdiplus::Font(base::UTF8ToUTF16(name).c_str(),
+                              // Converting DPI-aware pixel size to point.
+                              size * 72.0f / 96.0f,
                               Gdiplus::FontStyleRegular,
-                              Gdiplus::UnitPixel)) {
+                              Gdiplus::UnitPoint)) {
 }
 
 Font::~Font() {

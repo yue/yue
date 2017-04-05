@@ -177,7 +177,7 @@ struct Type<nu::Font> {
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
-        "create", &CreateInstance<nu::Font, const std::string&, int>,
+        "create", &CreateInstance<nu::Font, base::StringPiece, float>,
         "default", &GetDefault);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,

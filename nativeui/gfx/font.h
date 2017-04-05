@@ -18,9 +18,9 @@ class NATIVEUI_EXPORT Font : public base::RefCounted<Font> {
  public:
   // Creates an appropriate Font implementation.
   Font();
-  // Creates a Font implementation with the specified |font_name|
-  // (encoded in UTF-8) and |font_size| in pixels.
-  Font(const std::string& font_name, int font_size);
+  // Creates a Font implementation with the specified |name|
+  // (encoded in UTF-8) and |size| in points.
+  Font(base::StringPiece name, float size);
 
   // Returns the specified font name in UTF-8.
   std::string GetName() const;

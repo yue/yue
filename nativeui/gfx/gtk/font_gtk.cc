@@ -25,10 +25,10 @@ PangoFontDescription* GetDefaultFontDescription() {
 Font::Font() : font_(GetDefaultFontDescription()) {
 }
 
-Font::Font(const std::string& font_name, int font_size)
+Font::Font(base::StringPiece name, float size)
     : font_(pango_font_description_new()) {
-  pango_font_description_set_family(font_, font_name.c_str());
-  pango_font_description_set_size(font_, font_size);
+  pango_font_description_set_family(font_, name.data());
+  pango_font_description_set_size(font_, size);
 }
 
 Font::~Font() {
