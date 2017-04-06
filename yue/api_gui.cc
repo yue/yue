@@ -307,7 +307,6 @@ struct Type<nu::Painter> {
            "strokerect", &nu::Painter::StrokeRect,
            "fillrect", &nu::Painter::FillRect,
            "drawimage", &nu::Painter::DrawImage,
-           "drawimageinrect", &nu::Painter::DrawImageInRect,
            "drawimagefromrect", &nu::Painter::DrawImageFromRect,
            "measuretext", &nu::Painter::MeasureText,
            "drawtext", &nu::Painter::DrawText,

@@ -4,9 +4,24 @@
 
 #include "nativeui/gfx/geometry/point_f.h"
 
+#if defined(OS_IOS)
+#include <CoreGraphics/CoreGraphics.h>
+#elif defined(OS_MACOSX)
+#include <ApplicationServices/ApplicationServices.h>
+#endif
+
 #include "base/strings/stringprintf.h"
 
 namespace nu {
+
+#if defined(OS_MACOSX)
+PointF::PointF(const CGPoint& r) : x_(r.x), y_(r.y) {
+}
+
+CGPoint PointF::ToCGPoint() const {
+  return CGPointMake(x(), y());
+}
+#endif
 
 void PointF::SetToMin(const PointF& other) {
   x_ = x_ <= other.x_ ? x_ : other.x_;

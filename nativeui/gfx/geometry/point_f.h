@@ -13,6 +13,10 @@
 #include "nativeui/gfx/geometry/vector2d_f.h"
 #include "nativeui/nativeui_export.h"
 
+#if defined(OS_MACOSX)
+typedef struct CGPoint CGPoint;
+#endif
+
 namespace nu {
 
 // A floating version of gfx::Point.
@@ -24,6 +28,12 @@ class NATIVEUI_EXPORT PointF {
 
   explicit PointF(const Point& p)
       : PointF(static_cast<float>(p.x()), static_cast<float>(p.y())) {}
+
+#if defined(OS_MACOSX)
+  explicit PointF(const CGPoint& r);
+  // Construct an equivalent CoreGraphics object.
+  CGPoint ToCGPoint() const;
+#endif
 
   float x() const { return x_; }
   float y() const { return y_; }

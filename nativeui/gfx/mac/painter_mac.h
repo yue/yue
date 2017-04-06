@@ -44,10 +44,9 @@ class PainterMac : public Painter {
   void Fill() override;
   void StrokeRect(const RectF& rect) override;
   void FillRect(const RectF& rect) override;
-  void DrawImage(Image* image, const PointF& point) override;
-  void DrawImageInRect(Image* image, const RectF& rect) override;
-  void DrawImageFromRect(Image* image, const RectF& rect,
-                         const RectF& src) override;
+  void DrawImage(Image* image, const RectF& rect) override;
+  void DrawImageFromRect(Image* image, const RectF& src,
+                         const RectF& dest) override;
   TextMetrics MeasureText(const std::string& text, float width,
                           const TextAttributes& attributes) override;
   void DrawTextWithAttributes(const std::string& text, const RectF& rect,

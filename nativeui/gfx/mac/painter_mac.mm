@@ -118,26 +118,23 @@ void PainterMac::FillRect(const RectF& rect) {
   CGContextFillRect(context_, rect.ToCGRect());
 }
 
-void PainterMac::DrawImage(Image* image, const PointF& point) {
-  [image->GetNative() drawAtPoint:point.ToCGPoint()
-                         fromRect:NSZeroRect
-                        operation:NSCompositeSourceOver
-                         fraction:1.0];
+void PainterMac::DrawImage(Image* image, const RectF& rect) {
+  [image->GetNative() drawInRect:rect.ToCGRect()
+                        fromRect:NSZeroRect
+                       operation:NSCompositeSourceOver
+                        fraction:1.0
+                  respectFlipped:YES
+                           hints:nil];
 }
 
-void PainterMac::DrawImageInRect(Image* image, const RectF& rect) {
-  [image->GetNative()  drawInRect:rect.ToCGRect()
-                         fromRect:NSZeroRect
-                        operation:NSCompositeSourceOver
-                         fraction:1.0];
-}
-
-void PainterMac::DrawImageFromRect(Image* image, const RectF& rect,
-                                   const RectF& src) {
-  [image->GetNative()  drawInRect:rect.ToCGRect()
-                         fromRect:src.ToCGRect()
-                        operation:NSCompositeSourceOver
-                         fraction:1.0];
+void PainterMac::DrawImageFromRect(Image* image, const RectF& src,
+                                   const RectF& dest) {
+  [image->GetNative() drawInRect:dest.ToCGRect()
+                        fromRect:src.ToCGRect()
+                       operation:NSCompositeSourceOver
+                        fraction:1.0
+                  respectFlipped:YES
+                           hints:nil];
 }
 
 TextMetrics PainterMac::MeasureText(const std::string& text, float width,

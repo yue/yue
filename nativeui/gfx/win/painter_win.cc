@@ -193,20 +193,15 @@ void PainterWin::FillRect(const RectF& rect) {
   FillRectPixel(ToEnclosingRect(ScaleRect(rect, scale_factor_)));
 }
 
-void PainterWin::DrawImage(Image* image, const PointF& point) {
-  graphics_.DrawImage(image->GetNative(),
-                      ToGdi(ScalePoint(point, scale_factor_)));
-}
-
-void PainterWin::DrawImageInRect(Image* image, const RectF& rect) {
+void PainterWin::DrawImage(Image* image, const RectF& rect) {
   graphics_.DrawImage(image->GetNative(),
                       ToGdi(ScaleRect(rect, scale_factor_)));
 }
 
-void PainterWin::DrawImageFromRect(Image* image, const RectF& rect,
-                                   const RectF& src) {
+void PainterWin::DrawImageFromRect(Image* image, const RectF& src,
+                                   const RectF& dest) {
   graphics_.DrawImage(image->GetNative(),
-                      ToGdi(ScaleRect(rect, scale_factor_)),
+                      ToGdi(ScaleRect(dest, scale_factor_)),
                       src.x(), src.y(), src.width(), src.height(),
                       Gdiplus::UnitPixel);
 }

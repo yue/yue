@@ -233,14 +233,11 @@ void PainterGtk::FillRect(const RectF& rect) {
   cairo_fill(context_);
 }
 
-void PainterGtk::DrawImage(Image* image, const PointF& point) {
+void PainterGtk::DrawImage(Image* image, const RectF& rect) {
 }
 
-void PainterGtk::DrawImageInRect(Image* image, const RectF& rect) {
-}
-
-void PainterGtk::DrawImageFromRect(Image* image, const RectF& rect,
-                                   const RectF& src) {
+void PainterGtk::DrawImageFromRect(Image* image, const RectF& src,
+                                   const RectF& dest) {
 }
 
 TextMetrics PainterGtk::MeasureText(const std::string& text, float width,
