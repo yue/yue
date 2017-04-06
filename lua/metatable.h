@@ -71,13 +71,8 @@ bool IsMetaTableInheritedFrom(State* state) {
 
 // A helper for creating a new instance of T.
 template<typename T, typename... ArgTypes>
-T* CreateInstance(State* state, const ArgTypes&... args) {
-  StackAutoReset reset(state);
-  T* ptr = new T(args...);
-  NewUserData(state, ptr);
-  Push(state, MetaTable<T>());
-  SetMetaTable(state, -2);
-  return ptr;
+T* CreateInstance(const ArgTypes&... args) {
+  return new T(args...);
 }
 
 // The default type information for RefCounted class.
