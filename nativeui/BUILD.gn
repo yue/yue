@@ -58,6 +58,8 @@ component("nativeui") {
     "gfx/image.h",
     "gfx/painter.cc",
     "gfx/painter.h",
+    "gfx/text.cc",
+    "gfx/text.h",
     "gfx/gtk/color_gtk.cc",
     "gfx/gtk/image_gtk.cc",
     "gfx/gtk/painter_gtk.cc",

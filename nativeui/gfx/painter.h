@@ -9,10 +9,9 @@
 #include <string>
 
 #include "base/memory/weak_ptr.h"
-#include "nativeui/gfx/color.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/gfx/geometry/rect_f.h"
-#include "nativeui/state.h"
+#include "nativeui/gfx/text.h"
 #include "nativeui/types.h"
 
 #if defined(OS_WIN)
@@ -20,23 +19,6 @@
 #endif
 
 namespace nu {
-
-// Text alignment when drawing text.
-enum class TextAlign {
-  Start,
-  Center,
-  End,
-};
-
-// Attributes used for drawing the text.
-struct NATIVEUI_EXPORT TextAttributes {
-  TextAttributes();
-
-  Font* font;
-  Color color;
-  TextAlign align;
-  TextAlign valign;
-};
 
 // The interface for painting on canvas or window.
 class NATIVEUI_EXPORT Painter {

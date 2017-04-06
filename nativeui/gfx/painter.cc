@@ -6,13 +6,6 @@
 
 namespace nu {
 
-TextAttributes::TextAttributes()
-    : font(nu::State::GetCurrent()->GetDefaultFont()),
-      color(GetSystemColor(SystemColor::Text)),
-      align(TextAlign::Start),
-      valign(TextAlign::Start) {
-}
-
 Painter::Painter() : weak_factory_(this) {}
 
 Painter::~Painter() {}
