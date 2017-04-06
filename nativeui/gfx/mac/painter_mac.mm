@@ -8,6 +8,8 @@
 
 #include "base/mac/scoped_nsobject.h"
 #include "base/strings/sys_string_conversions.h"
+#include "nativeui/gfx/font.h"
+#include "nativeui/gfx/image.h"
 #include "nativeui/gfx/mac/text_mac.h"
 
 namespace nu {
@@ -114,6 +116,28 @@ void PainterMac::StrokeRect(const RectF& rect) {
 
 void PainterMac::FillRect(const RectF& rect) {
   CGContextFillRect(context_, rect.ToCGRect());
+}
+
+void PainterMac::DrawImage(Image* image, const PointF& point) {
+  [image->GetNative() drawAtPoint:point.ToCGPoint()
+                         fromRect:NSZeroRect
+                        operation:NSCompositeSourceOver
+                         fraction:1.0];
+}
+
+void PainterMac::DrawImageInRect(Image* image, const RectF& rect) {
+  [image->GetNative()  drawInRect:rect.ToCGRect()
+                         fromRect:NSZeroRect
+                        operation:NSCompositeSourceOver
+                         fraction:1.0];
+}
+
+void PainterMac::DrawImageFromRect(Image* image, const RectF& rect,
+                                   const RectF& src) {
+  [image->GetNative()  drawInRect:rect.ToCGRect()
+                         fromRect:src.ToCGRect()
+                        operation:NSCompositeSourceOver
+                         fraction:1.0];
 }
 
 TextMetrics PainterMac::MeasureText(const std::string& text, float width,

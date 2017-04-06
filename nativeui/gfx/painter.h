@@ -9,7 +9,6 @@
 #include <string>
 
 #include "base/memory/weak_ptr.h"
-#include "nativeui/gfx/font.h"
 #include "nativeui/gfx/geometry/rect_f.h"
 #include "nativeui/gfx/text.h"
 #include "nativeui/types.h"
@@ -19,6 +18,8 @@
 #endif
 
 namespace nu {
+
+class Image;
 
 // The interface for painting on canvas or window.
 class NATIVEUI_EXPORT Painter {
@@ -71,6 +72,12 @@ class NATIVEUI_EXPORT Painter {
 
   // Fill |rect|.
   virtual void FillRect(const RectF& rect) = 0;
+
+  // Draw image.
+  virtual void DrawImage(Image* image, const PointF& point) = 0;
+  virtual void DrawImageInRect(Image* image, const RectF& rect) = 0;
+  virtual void DrawImageFromRect(Image* image, const RectF& rect,
+                                 const RectF& src) = 0;
 
   // Return the space taken to paint the full string.
   virtual TextMetrics MeasureText(const std::string& text, float width,

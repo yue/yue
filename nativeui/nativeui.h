@@ -8,6 +8,7 @@
 #include "nativeui/app.h"
 #include "nativeui/button.h"
 #include "nativeui/entry.h"
+#include "nativeui/gfx/font.h"
 #include "nativeui/gfx/geometry/insets.h"
 #include "nativeui/gfx/image.h"
 #include "nativeui/gfx/painter.h"

@@ -18,9 +18,11 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/win/scoped_gdi_object.h"
 #include "base/win/scoped_select_object.h"
+#include "nativeui/gfx/font.h"
 #include "nativeui/gfx/geometry/point_conversions.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/gfx/geometry/vector2d_conversions.h"
+#include "nativeui/gfx/image.h"
 #include "nativeui/state.h"
 
 namespace nu {
@@ -189,6 +191,24 @@ void PainterWin::StrokeRect(const RectF& rect) {
 
 void PainterWin::FillRect(const RectF& rect) {
   FillRectPixel(ToEnclosingRect(ScaleRect(rect, scale_factor_)));
+}
+
+void PainterWin::DrawImage(Image* image, const PointF& point) {
+  graphics_.DrawImage(image->GetNative(),
+                      ToGdi(ScalePoint(point, scale_factor_)));
+}
+
+void PainterWin::DrawImageInRect(Image* image, const RectF& rect) {
+  graphics_.DrawImage(image->GetNative(),
+                      ToGdi(ScaleRect(rect, scale_factor_)));
+}
+
+void PainterWin::DrawImageFromRect(Image* image, const RectF& rect,
+                                   const RectF& src) {
+  graphics_.DrawImage(image->GetNative(),
+                      ToGdi(ScaleRect(rect, scale_factor_)),
+                      src.x(), src.y(), src.width(), src.height(),
+                      Gdiplus::UnitPixel);
 }
 
 TextMetrics PainterWin::MeasureText(const std::string& text, float width,

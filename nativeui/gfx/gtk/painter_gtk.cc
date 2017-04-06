@@ -17,6 +17,9 @@
 
 #include <gtk/gtk.h>
 
+#include "nativeui/gfx/font.h"
+#include "nativeui/gfx/image.h"
+
 namespace nu {
 
 namespace {
@@ -228,6 +231,16 @@ void PainterGtk::FillRect(const RectF& rect) {
   cairo_rectangle(context_, rect.x(), rect.y(), rect.width(), rect.height());
   SetSourceColor(false);
   cairo_fill(context_);
+}
+
+void PainterGtk::DrawImage(Image* image, const PointF& point) {
+}
+
+void PainterGtk::DrawImageInRect(Image* image, const RectF& rect) {
+}
+
+void PainterGtk::DrawImageFromRect(Image* image, const RectF& rect,
+                                   const RectF& src) {
 }
 
 TextMetrics PainterGtk::MeasureText(const std::string& text, float width,
