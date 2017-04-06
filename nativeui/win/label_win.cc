@@ -18,9 +18,7 @@ namespace {
 
 class LabelImpl : public ViewImpl {
  public:
-  LabelImpl() : ViewImpl(ControlType::Label),
-                font_(State::GetCurrent()->GetDefaultFont()) {
-  }
+  LabelImpl() : ViewImpl(ControlType::Label) {}
 
   void SetText(const base::string16& text) {
     text_ = text;

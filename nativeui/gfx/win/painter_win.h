@@ -73,12 +73,14 @@ class PainterWin : public Painter {
   void TranslatePixel(const Vector2d& offset);
   void StrokeRectPixel(const nu::Rect& rect);
   void FillRectPixel(const nu::Rect& rect);
-  void DrawTextWithAttributesPixel(const std::string& text, const Rect& rect,
-                                   const TextAttributes& attributes);
+  void DrawTextWithAttributesPixel(
+      const std::string& text, const nu::Rect& rect,
+      const TextAttributes& attributes);
 
   // Wide string version:
-  void DrawTextWithAttributesPixel(const base::string16& text, const Rect& rect,
-                                   const TextAttributes& attributes);
+  void DrawTextWithAttributesPixel(
+      const base::string16& text, const nu::Rect& rect,
+      const TextAttributes& attributes);
 
  private:
   // Get current point.
