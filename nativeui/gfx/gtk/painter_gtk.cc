@@ -234,10 +234,28 @@ void PainterGtk::FillRect(const RectF& rect) {
 }
 
 void PainterGtk::DrawImage(Image* image, const RectF& rect) {
+  nu::Rect src(image->GetSize());
+  DrawImageFromRect(image, RectF(src), rect);
 }
 
 void PainterGtk::DrawImageFromRect(Image* image, const RectF& src,
                                    const RectF& dest) {
+  cairo_save(context_);
+  // Clip the image to |dest|.
+  cairo_translate(context_, dest.x(), dest.y());
+  cairo_new_path(context_);
+  cairo_rectangle(context_, 0, 0, dest.width(), dest.height());
+  cairo_clip(context_);
+  // Scale if needed.
+  Size size = image->GetSize();
+  float x_scale = dest.width() / src.width();
+  float y_scale = dest.height() / src.height();
+  if (x_scale != 1.0f || y_scale != 1.0f)
+    cairo_scale(context_, x_scale, y_scale);
+  // Draw.
+  gdk_cairo_set_source_pixbuf(context_, image->GetNative(), -src.x(), -src.y());
+  cairo_paint(context_);
+  cairo_restore(context_);
 }
 
 TextMetrics PainterGtk::MeasureText(const std::string& text, float width,
