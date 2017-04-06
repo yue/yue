@@ -230,14 +230,17 @@ void PainterGtk::FillRect(const RectF& rect) {
   cairo_fill(context_);
 }
 
-SizeF PainterGtk::MeasureText(const std::string& text, Font* font) {
+TextMetrics PainterGtk::MeasureText(const std::string& text, float width,
+                                    const TextAttributes& attributes) {
   PangoLayout* layout = pango_cairo_create_layout(context_);
-  pango_layout_set_font_description(layout, font->GetNative());
-  int width, height;
+  pango_layout_set_font_description(layout, attributes.font->GetNative());
   pango_layout_set_text(layout, text.data(), text.length());
-  pango_layout_get_pixel_size(layout, &width, &height);
+  if (width >= 0)
+    pango_layout_set_width(layout, width * PANGO_SCALE);
+  int bwidth, bheight;
+  pango_layout_get_pixel_size(layout, &bwidth, &bheight);
   g_object_unref(layout);
-  return SizeF(width, height);
+  return { SizeF(bwidth, bheight) };
 }
 
 void PainterGtk::DrawTextWithAttributes(

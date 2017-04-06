@@ -6,6 +6,7 @@
 #define NATIVEUI_GFX_TEXT_H_
 
 #include "nativeui/gfx/color.h"
+#include "nativeui/gfx/geometry/size_f.h"
 
 namespace nu {
 
@@ -19,13 +20,18 @@ enum class TextAlign {
 };
 
 // Attributes used for drawing the text.
-struct NATIVEUI_EXPORT TextAttributes {
-  TextAttributes();
+struct TextAttributes {
+  NATIVEUI_EXPORT TextAttributes();
 
   Font* font;
   Color color;
   TextAlign align;
   TextAlign valign;
+};
+
+// Result of text measurement.
+struct TextMetrics {
+  SizeF size;
 };
 
 }  // namespace nu

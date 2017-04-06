@@ -116,8 +116,9 @@ void PainterMac::FillRect(const RectF& rect) {
   CGContextFillRect(context_, rect.ToCGRect());
 }
 
-SizeF PainterMac::MeasureText(const std::string& text, Font* font) {
-  return nu::MeasureText(text, font);
+TextMetrics PainterMac::MeasureText(const std::string& text, float width,
+                                    const TextAttributes& attributes) {
+  return nu::MeasureText(text, width, attributes);
 }
 
 void PainterMac::DrawTextWithAttributes(

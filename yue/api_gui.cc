@@ -270,6 +270,15 @@ struct Type<nu::TextAttributes> {
 };
 
 template<>
+struct Type<nu::TextMetrics> {
+  static constexpr const char* name = "yue.TextMetrics";
+  static inline void Push(State* state, const nu::TextMetrics& metrics) {
+    NewTable(state, 0, 1);
+    RawSet(state, -1, "size", metrics.size);
+  }
+};
+
+template<>
 struct Type<nu::Painter> {
   static constexpr const char* name = "yue.Painter";
   static void BuildMetaTable(State* state, int metatable) {

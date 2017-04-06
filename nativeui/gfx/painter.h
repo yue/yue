@@ -73,7 +73,8 @@ class NATIVEUI_EXPORT Painter {
   virtual void FillRect(const RectF& rect) = 0;
 
   // Return the space taken to paint the full string.
-  virtual SizeF MeasureText(const std::string& text, Font* font) = 0;
+  virtual TextMetrics MeasureText(const std::string& text, float width,
+                                  const TextAttributes& attributes) = 0;
 
   // Draw |text| within the |rect|.
   void DrawText(const std::string& text, const RectF& rect);

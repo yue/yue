@@ -6,22 +6,24 @@
 
 #import <Cocoa/Cocoa.h>
 
+#include "base/mac/scoped_nsobject.h"
 #include "base/strings/sys_string_conversions.h"
+#include "nativeui/gfx/font.h"
 
 namespace nu {
 
-SizeF MeasureText(const std::string& text, Font* font) {
-  NSMutableParagraphStyle* paragraphStyle =
-      [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
-  [paragraphStyle setAlignment:NSCenterTextAlignment];
-  NSDictionary* attrs = @{
-    NSParagraphStyleAttributeName : paragraphStyle,
-    NSFontAttributeName : font->GetNative()
+TextMetrics MeasureText(const std::string& text, float width,
+                        const TextAttributes& attributes) {
+  NSDictionary* attrs_dict = @{
+     NSFontAttributeName: attributes.font->GetNative(),
   };
-  NSAttributedString* attribute = [[[NSAttributedString alloc]
-      initWithString:base::SysUTF8ToNSString(text)
-          attributes:attrs] autorelease];
-  return SizeF(attribute.size.width, attribute.size.height);
+  base::scoped_nsobject<NSAttributedString> attributed_str(
+      [[NSAttributedString alloc] initWithString:base::SysUTF8ToNSString(text)
+                                      attributes:attrs_dict]);
+  CGRect bounds = [attributed_str
+      boundingRectWithSize:CGSizeMake(width, -1)
+                   options:NSStringDrawingUsesLineFragmentOrigin];
+  return { SizeF(bounds.size) };
 }
 
 }  // namespace nu

@@ -7,13 +7,13 @@
 
 #include <string>
 
-#include "nativeui/gfx/font.h"
-#include "nativeui/gfx/geometry/size_f.h"
+#include "nativeui/gfx/text.h"
 
 namespace nu {
 
 // Calculate the size of text.
-SizeF MeasureText(const std::string& text, Font* font);
+TextMetrics MeasureText(const std::string& text, float width,
+                        const TextAttributes& attributes);
 
 }  // namespace nu
 
