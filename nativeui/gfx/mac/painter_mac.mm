@@ -129,8 +129,12 @@ void PainterMac::DrawImage(Image* image, const RectF& rect) {
 
 void PainterMac::DrawImageFromRect(Image* image, const RectF& src,
                                    const RectF& dest) {
+  // The src rect needs to be manually flipped.
+  RectF flipped(src);
+  flipped.set_y(image->GetSize().height() - src.height() - src.y());
+
   [image->GetNative() drawInRect:dest.ToCGRect()
-                        fromRect:src.ToCGRect()
+                        fromRect:flipped.ToCGRect()
                        operation:NSCompositeSourceOver
                         fraction:1.0
                   respectFlipped:YES
