@@ -11,16 +11,25 @@
 namespace nu {
 
 Image::Image(const std::string& path)
-    : image_([[NSImage alloc]
+    : scale_factor_(1.f),
+      image_([[NSImage alloc]
                  initWithContentsOfFile:base::SysUTF8ToNSString(path)]) {
+  // Compute the scale factor from actual NSImageRep.
+  NSArray* reps = [image_ representations];
+  if ([reps count] > 0) {
+    float lw = [image_ size].width;
+    float pw = [static_cast<NSImageRep*>([reps objectAtIndex:0]) pixelsWide];
+    if (lw > 0 && pw > 0)
+      scale_factor_ = pw / lw;
+  }
 }
 
 Image::~Image() {
   [image_ release];
 }
 
-Size Image::GetSize() const {
-  return Size([image_ size]);
+SizeF Image::GetSize() const {
+  return SizeF([image_ size]);
 }
 
 NativeImage Image::GetNative() const {

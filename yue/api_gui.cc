@@ -232,7 +232,8 @@ struct Type<nu::Image> {
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
            "createfromfile", &CreateInstance<nu::Image, const nu::FilePath&>,
-           "getsize", &nu::Image::GetSize);
+           "getsize", &nu::Image::GetSize,
+           "getscalefactor", &nu::Image::GetScaleFactor);
   }
 };
 

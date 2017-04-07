@@ -255,7 +255,8 @@ struct Type<nu::Image> {
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
-        "getSize", &nu::Image::GetSize);
+        "getSize", &nu::Image::GetSize,
+        "getScaleFactor", &nu::Image::GetScaleFactor);
   }
 };
 
