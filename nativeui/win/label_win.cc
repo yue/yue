@@ -33,8 +33,7 @@ class LabelImpl : public ViewImpl {
     ViewImpl::Draw(painter, dirty);
     TextAttributes attributes;
     attributes.align = attributes.valign = TextAlign::Center;
-    painter->DrawTextWithAttributesPixel(text_, Rect(size_allocation().size()),
-                                         attributes);
+    painter->DrawTextPixel(text_, Rect(size_allocation().size()), attributes);
   }
 
  private:

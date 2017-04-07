@@ -271,9 +271,8 @@ TextMetrics PainterGtk::MeasureText(const std::string& text, float width,
   return { SizeF(bwidth, bheight) };
 }
 
-void PainterGtk::DrawTextWithAttributes(
-    const std::string& text, const RectF& rect,
-    const TextAttributes& attributes) {
+void PainterGtk::DrawText(const std::string& text, const RectF& rect,
+                          const TextAttributes& attributes) {
   PangoLayout* layout = pango_cairo_create_layout(context_);
   pango_layout_set_font_description(layout, attributes.font->GetNative());
   cairo_save(context_);

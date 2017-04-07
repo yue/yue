@@ -63,7 +63,7 @@ class GroupImpl : public ContainerImpl,
     if (dirty.Intersects(title_bounds_)) {
       TextAttributes attributes;
       attributes.align = attributes.valign = TextAlign::Center;
-      painter->DrawTextWithAttributesPixel(title_, title_bounds_, attributes);
+      painter->DrawTextPixel(title_, title_bounds_, attributes);
     }
 
     // Bounds of the content view.

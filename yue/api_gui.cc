@@ -310,8 +310,7 @@ struct Type<nu::Painter> {
            "drawimage", &nu::Painter::DrawImage,
            "drawimagefromrect", &nu::Painter::DrawImageFromRect,
            "measuretext", &nu::Painter::MeasureText,
-           "drawtext", &nu::Painter::DrawText,
-           "drawtextwithattributes", &nu::Painter::DrawTextWithAttributes);
+           "drawtext", &nu::Painter::DrawText);
   }
 };
 

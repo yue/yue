@@ -82,13 +82,9 @@ class NATIVEUI_EXPORT Painter {
   virtual TextMetrics MeasureText(const std::string& text, float width,
                                   const TextAttributes& attributes) = 0;
 
-  // Draw |text| within the |rect|.
-  void DrawText(const std::string& text, const RectF& rect);
-
   // Draw |text| with additional |attributes|.
-  virtual void DrawTextWithAttributes(
-      const std::string& text, const RectF& rect,
-      const TextAttributes& attributes) = 0;
+  virtual void DrawText(const std::string& text, const RectF& rect,
+                        const TextAttributes& attributes) = 0;
 
   base::WeakPtr<Painter> GetWeakPtr() { return weak_factory_.GetWeakPtr(); }
 

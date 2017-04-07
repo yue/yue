@@ -48,8 +48,8 @@ class PainterGtk : public Painter {
                          const RectF& dest) override;
   TextMetrics MeasureText(const std::string& text, float width,
                           const TextAttributes& attributes) override;
-  void DrawTextWithAttributes(const std::string& text, const RectF& rect,
-                              const TextAttributes& attributes) override;
+  void DrawText(const std::string& text, const RectF& rect,
+                const TextAttributes& attributes) override;
 
  private:
   // Set source color from stroke or fill color.

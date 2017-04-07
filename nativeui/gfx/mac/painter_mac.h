@@ -49,8 +49,8 @@ class PainterMac : public Painter {
                          const RectF& dest) override;
   TextMetrics MeasureText(const std::string& text, float width,
                           const TextAttributes& attributes) override;
-  void DrawTextWithAttributes(const std::string& text, const RectF& rect,
-                              const TextAttributes& attributes) override;
+  void DrawText(const std::string& text, const RectF& rect,
+                const TextAttributes& attributes) override;
 
  private:
   CGContextRef context_;

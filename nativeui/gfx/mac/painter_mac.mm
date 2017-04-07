@@ -146,9 +146,8 @@ TextMetrics PainterMac::MeasureText(const std::string& text, float width,
   return nu::MeasureText(text, width, attributes);
 }
 
-void PainterMac::DrawTextWithAttributes(
-    const std::string& text, const RectF& rect,
-    const TextAttributes& attributes) {
+void PainterMac::DrawText(const std::string& text, const RectF& rect,
+                          const TextAttributes& attributes) {
   NSString* str = base::SysUTF8ToNSString(text);
 
   // Horizontal alignment.

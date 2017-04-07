@@ -223,11 +223,10 @@ TextMetrics PainterWin::MeasureText(const std::string& text, float width,
   return { ScaleSize(SizeF(rect.Width, rect.Height), 1.0f / scale_factor_) };
 }
 
-void PainterWin::DrawTextWithAttributes(
-    const std::string& text, const RectF& rect,
-    const TextAttributes& attributes) {
-  DrawTextWithAttributesPixel(
-      text, ToEnclosingRect(ScaleRect(rect, scale_factor_)), attributes);
+void PainterWin::DrawText(const std::string& text, const RectF& rect,
+                          const TextAttributes& attributes) {
+  DrawTextPixel(text, ToEnclosingRect(ScaleRect(rect, scale_factor_)),
+                attributes);
 }
 
 void PainterWin::MoveToPixel(const PointF& point) {
@@ -413,15 +412,8 @@ bool PainterWin::GetCurrentPoint(Gdiplus::PointF* point) {
   return true;
 }
 
-void PainterWin::DrawTextWithAttributesPixel(
-    const std::string& text, const nu::Rect& rect,
-    const TextAttributes& attributes) {
-  DrawTextWithAttributesPixel(base::UTF8ToUTF16(text), rect, attributes);
-}
-
-void PainterWin::DrawTextWithAttributesPixel(
-    const base::string16& text, const nu::Rect& rect,
-    const TextAttributes& attributes) {
+void PainterWin::DrawTextPixel(const base::string16& text, const nu::Rect& rect,
+                               const TextAttributes& attributes) {
   Gdiplus::SolidBrush brush(ToGdi(attributes.color));
   Gdiplus::StringFormat format;
   format.SetAlignment(ToGdi(attributes.align));

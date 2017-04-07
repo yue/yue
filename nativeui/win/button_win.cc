@@ -136,7 +136,7 @@ class ButtonImpl : public ViewImpl {
     // The text.
     TextAttributes attributes;
     attributes.align = attributes.valign = TextAlign::Center;
-    painter->DrawTextWithAttributesPixel(title_, text_bounds, attributes);
+    painter->DrawTextPixel(title_, text_bounds, attributes);
 
     // Draw focused ring.
     if (IsFocused()) {

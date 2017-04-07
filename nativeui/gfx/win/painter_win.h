@@ -59,8 +59,8 @@ class PainterWin : public Painter {
                          const RectF& dest) override;
   TextMetrics MeasureText(const std::string& text, float width,
                           const TextAttributes& attributes) override;
-  void DrawTextWithAttributes(const std::string& text, const RectF& rect,
-                              const TextAttributes& attributes) override;
+  void DrawText(const std::string& text, const RectF& rect,
+                const TextAttributes& attributes) override;
 
   // The pixel versions.
   void MoveToPixel(const PointF& point);
@@ -76,14 +76,8 @@ class PainterWin : public Painter {
   void TranslatePixel(const Vector2d& offset);
   void StrokeRectPixel(const nu::Rect& rect);
   void FillRectPixel(const nu::Rect& rect);
-  void DrawTextWithAttributesPixel(
-      const std::string& text, const nu::Rect& rect,
-      const TextAttributes& attributes);
-
-  // Wide string version:
-  void DrawTextWithAttributesPixel(
-      const base::string16& text, const nu::Rect& rect,
-      const TextAttributes& attributes);
+  void DrawTextPixel(const base::string16& text, const nu::Rect& rect,
+                     const TextAttributes& attributes);
 
  private:
   // Get current point.

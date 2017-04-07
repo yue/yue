@@ -342,8 +342,7 @@ struct Type<nu::Painter> {
         "strokeRect", &nu::Painter::StrokeRect,
         "fillRect", &nu::Painter::FillRect,
         "measureText", &nu::Painter::MeasureText,
-        "drawText", &nu::Painter::DrawText,
-        "drawTextWithAttributes", &nu::Painter::DrawTextWithAttributes);
+        "drawText", &nu::Painter::DrawText);
   }
 };
 
