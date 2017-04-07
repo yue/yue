@@ -6,20 +6,24 @@
 #define NATIVEUI_GFX_IMAGE_H_
 
 #include "base/memory/ref_counted.h"
-#include "nativeui/gfx/geometry/size.h"
+#include "nativeui/gfx/geometry/size_f.h"
 #include "nativeui/types.h"
 
 namespace nu {
 
 class NATIVEUI_EXPORT Image : public base::RefCounted<Image> {
  public:
-  // Creates an image by reading from |path|.
+  // Create an image by reading from |path|.
+  // The @2x suffix in basename will make the image have scale factor.
   explicit Image(const FilePath& path);
 
-  // Gets the size of image.
-  Size GetSize() const;
+  // Get the size of image.
+  SizeF GetSize() const;
 
-  // Returns the native instance of image object.
+  // Get the scale factor of image.
+  float GetScaleFactor() const { return scale_factor_; }
+
+  // Return the native instance of image object.
   NativeImage GetNative() const;
 
  protected:
@@ -28,6 +32,9 @@ class NATIVEUI_EXPORT Image : public base::RefCounted<Image> {
  private:
   friend class base::RefCounted<Image>;
 
+  static float GetScaleFactorFromFilePath(const FilePath& path);
+
+  float scale_factor_;
   NativeImage image_;
 };
 

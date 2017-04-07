@@ -17,11 +17,11 @@ Image::~Image() {
     g_object_unref(image_);
 }
 
-Size Image::GetSize() const {
+SizeF Image::GetSize() const {
   if (image_)
-    return Size(gdk_pixbuf_get_width(image_), gdk_pixbuf_get_height(image_));
+    return SizeF(gdk_pixbuf_get_width(image_), gdk_pixbuf_get_height(image_));
   else
-    return Size();
+    return SizeF();
 }
 
 NativeImage Image::GetNative() const {

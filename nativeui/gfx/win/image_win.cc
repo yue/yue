@@ -9,16 +9,18 @@
 namespace nu {
 
 Image::Image(const base::string16& path)
-    : image_(new Gdiplus::Image(path.c_str())) {
+    : scale_factor_(GetScaleFactorFromFilePath(path)),
+      image_(new Gdiplus::Image(path.c_str())) {
 }
 
 Image::~Image() {
   delete image_;
 }
 
-Size Image::GetSize() const {
+SizeF Image::GetSize() const {
   Gdiplus::Image* image = const_cast<Gdiplus::Image*>(image_);
-  return Size(image->GetWidth(), image->GetHeight());
+  return ScaleSize(SizeF(image->GetWidth(), image->GetHeight()),
+                   1.f / scale_factor_);
 }
 
 NativeImage Image::GetNative() const {

@@ -55,6 +55,7 @@ component("nativeui") {
     "gfx/color.cc",
     "gfx/color.h",
     "gfx/font.h",
+    "gfx/image.cc",
     "gfx/image.h",
     "gfx/painter.cc",
     "gfx/painter.h",

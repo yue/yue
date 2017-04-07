@@ -200,9 +200,10 @@ void PainterWin::DrawImage(Image* image, const RectF& rect) {
 
 void PainterWin::DrawImageFromRect(Image* image, const RectF& src,
                                    const RectF& dest) {
+  RectF ps = ScaleRect(src, image->GetScaleFactor());
   graphics_.DrawImage(image->GetNative(),
                       ToGdi(ScaleRect(dest, scale_factor_)),
-                      src.x(), src.y(), src.width(), src.height(),
+                      ps.x(), ps.y(), ps.width(), ps.height(),
                       Gdiplus::UnitPixel);
 }
 

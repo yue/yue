@@ -234,8 +234,7 @@ void PainterGtk::FillRect(const RectF& rect) {
 }
 
 void PainterGtk::DrawImage(Image* image, const RectF& rect) {
-  nu::Rect src(image->GetSize());
-  DrawImageFromRect(image, RectF(src), rect);
+  DrawImageFromRect(image, RectF(image->GetSize()), rect);
 }
 
 void PainterGtk::DrawImageFromRect(Image* image, const RectF& src,
