@@ -239,6 +239,7 @@ void PainterGtk::DrawImage(Image* image, const RectF& rect) {
 
 void PainterGtk::DrawImageFromRect(Image* image, const RectF& src,
                                    const RectF& dest) {
+  RectF ps = ScaleRect(src, image->GetScaleFactor());
   cairo_save(context_);
   // Clip the image to |dest|.
   cairo_translate(context_, dest.x(), dest.y());
@@ -247,12 +248,12 @@ void PainterGtk::DrawImageFromRect(Image* image, const RectF& src,
   cairo_clip(context_);
   // Scale if needed.
   SizeF size = image->GetSize();
-  float x_scale = dest.width() / src.width();
-  float y_scale = dest.height() / src.height();
+  float x_scale = dest.width() / ps.width();
+  float y_scale = dest.height() / ps.height();
   if (x_scale != 1.0f || y_scale != 1.0f)
     cairo_scale(context_, x_scale, y_scale);
   // Draw.
-  gdk_cairo_set_source_pixbuf(context_, image->GetNative(), -src.x(), -src.y());
+  gdk_cairo_set_source_pixbuf(context_, image->GetNative(), -ps.x(), -ps.y());
   cairo_paint(context_);
   cairo_restore(context_);
 }
