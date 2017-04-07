@@ -246,7 +246,7 @@ void PainterGtk::DrawImageFromRect(Image* image, const RectF& src,
   cairo_rectangle(context_, 0, 0, dest.width(), dest.height());
   cairo_clip(context_);
   // Scale if needed.
-  Size size = image->GetSize();
+  SizeF size = image->GetSize();
   float x_scale = dest.width() / src.width();
   float y_scale = dest.height() / src.height();
   if (x_scale != 1.0f || y_scale != 1.0f)

@@ -9,19 +9,23 @@
 namespace nu {
 
 Image::Image(const std::string& path)
-    : image_(gdk_pixbuf_new_from_file(path.c_str(), nullptr)) {
+    : scale_factor_(GetScaleFactorFromFilePath(path)),
+      image_(gdk_pixbuf_new_from_file(path.c_str(), nullptr)) {
+  // When file reading failed |image_| could be nullptr, having a null
+  // native image is very dangerous so we create an empty image when it
+  // happens.
+  if (!image_)
+    image_ = gdk_pixbuf_new(GDK_COLORSPACE_RGB, true, 8, 1, 1);
 }
 
 Image::~Image() {
-  if (image_)
-    g_object_unref(image_);
+  g_object_unref(image_);
 }
 
 SizeF Image::GetSize() const {
-  if (image_)
-    return SizeF(gdk_pixbuf_get_width(image_), gdk_pixbuf_get_height(image_));
-  else
-    return SizeF();
+  return ScaleSize(SizeF(gdk_pixbuf_get_width(image_),
+                         gdk_pixbuf_get_height(image_)),
+                   1.f / scale_factor_);
 }
 
 NativeImage Image::GetNative() const {
