@@ -433,6 +433,7 @@ void PainterWin::Initialize(float scale_factor) {
   graphics_.SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
   graphics_.SetInterpolationMode(Gdiplus::InterpolationModeHighQuality);
   graphics_.SetPixelOffsetMode(Gdiplus::PixelOffsetModeHighQuality);
+  graphics_.SetTextRenderingHint(Gdiplus::TextRenderingHintAntiAlias);
   // Initial state.
   states_.emplace(scale_factor, Color(), Color());
 }
