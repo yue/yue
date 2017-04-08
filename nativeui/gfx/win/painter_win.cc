@@ -18,6 +18,7 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/win/scoped_gdi_object.h"
 #include "base/win/scoped_select_object.h"
+#include "nativeui/gfx/canvas.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/gfx/geometry/point_conversions.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
@@ -50,15 +51,13 @@ Gdiplus::StringAlignment ToGdi(TextAlign align) {
 }  // namespace
 
 PainterWin::PainterWin(HDC hdc, float scale_factor)
-    : use_gdi_current_point_(true),
-      scale_factor_(scale_factor),
-      graphics_(hdc) {
-  // Use high quality rendering.
-  graphics_.SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
-  graphics_.SetInterpolationMode(Gdiplus::InterpolationModeHighQuality);
-  graphics_.SetPixelOffsetMode(Gdiplus::PixelOffsetModeHighQuality);
-  // Initial state.
-  states_.emplace(scale_factor, Color(), Color());
+    : graphics_(hdc) {
+  Initialize(scale_factor);
+}
+
+PainterWin::PainterWin(NativeBitmap bitmap, float scale_factor)
+    : graphics_(bitmap) {
+  Initialize(scale_factor);
 }
 
 PainterWin::~PainterWin() {
@@ -207,6 +206,20 @@ void PainterWin::DrawImageFromRect(Image* image, const RectF& src,
                       Gdiplus::UnitPixel);
 }
 
+void PainterWin::DrawCanvas(Canvas* canvas, const RectF& rect) {
+  graphics_.DrawImage(canvas->GetBitmap(),
+                      ToGdi(ScaleRect(rect, scale_factor_)));
+}
+
+void PainterWin::DrawCanvasFromRect(Canvas* canvas, const RectF& src,
+                                    const RectF& dest) {
+  RectF ps = ScaleRect(src, canvas->GetScaleFactor());
+  graphics_.DrawImage(canvas->GetBitmap(),
+                      ToGdi(ScaleRect(dest, scale_factor_)),
+                      ps.x(), ps.y(), ps.width(), ps.height(),
+                      Gdiplus::UnitPixel);
+}
+
 TextMetrics PainterWin::MeasureText(const std::string& text, float width,
                                     const TextAttributes& attributes) {
   if (width >= 0)
@@ -225,8 +238,8 @@ TextMetrics PainterWin::MeasureText(const std::string& text, float width,
 
 void PainterWin::DrawText(const std::string& text, const RectF& rect,
                           const TextAttributes& attributes) {
-  DrawTextPixel(text, ToEnclosingRect(ScaleRect(rect, scale_factor_)),
-                attributes);
+  DrawTextPixel(base::UTF8ToUTF16(text),
+                ToEnclosingRect(ScaleRect(rect, scale_factor_)), attributes);
 }
 
 void PainterWin::MoveToPixel(const PointF& point) {
@@ -401,17 +414,6 @@ void PainterWin::FillRectPixel(const nu::Rect& rect) {
   path_.Reset();
 }
 
-bool PainterWin::GetCurrentPoint(Gdiplus::PointF* point) {
-  if (use_gdi_current_point_) {
-    Gdiplus::Status status = path_.GetLastPoint(point);
-    if (status != Gdiplus::Ok)
-      return false;
-  } else {
-    *point = current_point_;
-  }
-  return true;
-}
-
 void PainterWin::DrawTextPixel(const base::string16& text, const nu::Rect& rect,
                                const TextAttributes& attributes) {
   Gdiplus::SolidBrush brush(ToGdi(attributes.color));
@@ -421,6 +423,29 @@ void PainterWin::DrawTextPixel(const base::string16& text, const nu::Rect& rect,
   graphics_.DrawString(
       text.c_str(), static_cast<int>(text.size()),
       attributes.font->GetNative(), ToGdi(RectF(rect)), &format, &brush);
+}
+
+void PainterWin::Initialize(float scale_factor) {
+  use_gdi_current_point_ = true;
+  scale_factor_ = scale_factor;
+
+  // Use high quality rendering.
+  graphics_.SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
+  graphics_.SetInterpolationMode(Gdiplus::InterpolationModeHighQuality);
+  graphics_.SetPixelOffsetMode(Gdiplus::PixelOffsetModeHighQuality);
+  // Initial state.
+  states_.emplace(scale_factor, Color(), Color());
+}
+
+bool PainterWin::GetCurrentPoint(Gdiplus::PointF* point) {
+  if (use_gdi_current_point_) {
+    Gdiplus::Status status = path_.GetLastPoint(point);
+    if (status != Gdiplus::Ok)
+      return false;
+  } else {
+    *point = current_point_;
+  }
+  return true;
 }
 
 HDC PainterWin::GetHDC() {

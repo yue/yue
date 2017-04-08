@@ -16,7 +16,11 @@ namespace nu {
 
 class PainterWin : public Painter {
  public:
+  // Paint on the HDC.
   PainterWin(HDC hdc, float scale_factor);
+  // Paint on the bitmap.
+  PainterWin(NativeBitmap bitmap, float scale_factor);
+  // PainterWin should be created on stack for best performance.
   ~PainterWin() override;
 
   // Draw a control.
@@ -57,6 +61,9 @@ class PainterWin : public Painter {
   void DrawImage(Image* image, const RectF& rect) override;
   void DrawImageFromRect(Image* image, const RectF& src,
                          const RectF& dest) override;
+  void DrawCanvas(Canvas* canvas, const RectF& rect) override;
+  void DrawCanvasFromRect(Canvas* canvas, const RectF& src,
+                          const RectF& dest) override;
   TextMetrics MeasureText(const std::string& text, float width,
                           const TextAttributes& attributes) override;
   void DrawText(const std::string& text, const RectF& rect,
@@ -80,6 +87,9 @@ class PainterWin : public Painter {
                      const TextAttributes& attributes);
 
  private:
+  // Used for common initialization.
+  void Initialize(float scale_factor);
+
   // Get current point.
   bool GetCurrentPoint(Gdiplus::PointF* point);
 
@@ -105,8 +115,7 @@ class PainterWin : public Painter {
   // The stack for all saved states.
   std::stack<PainterState> states_;
 
-  // Weak ref to the original HDC, should only be used internally.
-  HDC hdc_;
+  Gdiplus::Graphics graphics_;
 
   // Current path.
   Gdiplus::GraphicsPath path_;
@@ -116,7 +125,6 @@ class PainterWin : public Painter {
   bool use_gdi_current_point_;
 
   float scale_factor_;
-  Gdiplus::Graphics graphics_;
 };
 
 }  // namespace nu

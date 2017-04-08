@@ -78,6 +78,7 @@ component("nativeui") {
     "gfx/mac/painter_mac.mm",
     "gfx/mac/text_mac.h",
     "gfx/mac/text_mac.mm",
+    "gfx/win/canvas_win.cc",
     "gfx/win/color_win.cc",
     "gfx/win/double_buffer.h",
     "gfx/win/font_win.cc",
