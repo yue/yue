@@ -87,15 +87,18 @@ void PainterMac::Scale(const Vector2dF& scale) {
 }
 
 void PainterMac::SetColor(Color color) {
-  [color.ToNSColor() set];
+  SetStrokeColor(color);
+  SetFillColor(color);
 }
 
 void PainterMac::SetStrokeColor(Color color) {
-  [color.ToNSColor() setStroke];
+  CGContextSetRGBStrokeColor(context_, color.r() / 255.f, color.g() / 255.f,
+                             color.b() / 255.f, color.a() / 255.f);
 }
 
 void PainterMac::SetFillColor(Color color) {
-  [color.ToNSColor() setFill];
+  CGContextSetRGBFillColor(context_, color.r() / 255.f, color.g() / 255.f,
+                           color.b() / 255.f, color.a() / 255.f);
 }
 
 void PainterMac::SetLineWidth(float width) {
