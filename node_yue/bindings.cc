@@ -192,6 +192,26 @@ struct Type<nu::Font> {
 };
 
 template<>
+struct Type<nu::Canvas> {
+  static constexpr const char* name = "yue.Canvas";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+        "create", &CreateInstance<nu::Canvas, const nu::SizeF&, float>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "getScaleFactor", &nu::Canvas::GetScaleFactor,
+        "getPainter", &nu::Canvas::GetPainter,
+        "getSize", &nu::Canvas::GetSize);
+  }
+  static nu::Font* GetDefault() {
+    return nu::State::GetCurrent()->GetDefaultFont();
+  }
+};
+
+template<>
 struct Type<nu::SystemColor> {
   static constexpr const char* name = "yue.SystemColor";
   static bool FromV8(v8::Local<v8::Context> context,

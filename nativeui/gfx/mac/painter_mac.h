@@ -15,7 +15,11 @@ namespace nu {
 
 class PainterMac : public Painter {
  public:
+  // Create painter for the current context.
   PainterMac();
+  // Create graphics context for |bitmap| and use it for drawing.
+  PainterMac(CGContextRef bitmap, float scale_factor);
+  // PainterMac should be created on stack for best performance.
   ~PainterMac() override;
 
   // Painter:
@@ -47,12 +51,20 @@ class PainterMac : public Painter {
   void DrawImage(Image* image, const RectF& rect) override;
   void DrawImageFromRect(Image* image, const RectF& src,
                          const RectF& dest) override;
+  void DrawCanvas(Canvas* canvas, const RectF& rect) override;
+  void DrawCanvasFromRect(Canvas* canvas, const RectF& src,
+                          const RectF& dest) override;
   TextMetrics MeasureText(const std::string& text, float width,
                           const TextAttributes& attributes) override;
   void DrawText(const std::string& text, const RectF& rect,
                 const TextAttributes& attributes) override;
 
  private:
+  // APIs of Core Graphics operate on current context, while we don't set
+  // current context for memory bitmap. So in order to support Canvas we have
+  // to save the context object and do manual context switching.
+  NSGraphicsContext* target_context_;
+
   CGContextRef context_;
 };
 

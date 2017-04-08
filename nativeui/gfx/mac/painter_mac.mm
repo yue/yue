@@ -6,20 +6,72 @@
 
 #import <Cocoa/Cocoa.h>
 
+#include "base/mac/scoped_cftyperef.h"
 #include "base/mac/scoped_nsobject.h"
 #include "base/strings/sys_string_conversions.h"
+#include "nativeui/gfx/canvas.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/gfx/image.h"
 #include "nativeui/gfx/mac/text_mac.h"
 
 namespace nu {
 
+namespace {
+
+// Create a NSImage from bitmap.
+base::scoped_nsobject<NSImage> CreateNSImageFromCanvas(Canvas* canvas) {
+  base::ScopedCFTypeRef<CGImageRef> cgimage(
+      CGBitmapContextCreateImage(canvas->GetBitmap()));
+  base::scoped_nsobject<NSBitmapImageRep> bitmap(
+      [[NSBitmapImageRep alloc] initWithCGImage:cgimage]);
+  base::scoped_nsobject<NSImage> image(
+      [[NSImage alloc] initWithSize:canvas->GetSize().ToCGSize()]);
+  [image addRepresentation:bitmap.get()];
+  return image;
+}
+
+// Switch to the |context| for current scope.
+class GraphicsContextScope {
+ public:
+  explicit GraphicsContextScope(NSGraphicsContext* context)
+      : needs_switch_(context != nil) {
+    if (needs_switch_) {
+      previous_context_ = [NSGraphicsContext currentContext];
+      [NSGraphicsContext setCurrentContext:context];
+    }
+  }
+
+  ~GraphicsContextScope() {
+    if (needs_switch_)
+      [NSGraphicsContext setCurrentContext:previous_context_];
+  }
+
+ private:
+  bool needs_switch_;
+  NSGraphicsContext* previous_context_;
+
+  DISALLOW_COPY_AND_ASSIGN(GraphicsContextScope);
+};
+
+}  // namespace
+
 PainterMac::PainterMac()
-    : context_(reinterpret_cast<CGContextRef>(
+    : target_context_(nil),  // no context switching
+      context_(reinterpret_cast<CGContextRef>(
                    [[NSGraphicsContext currentContext] graphicsPort])) {
 }
 
+PainterMac::PainterMac(NativeBitmap bitmap, float scale_factor)
+    : target_context_([[NSGraphicsContext
+          graphicsContextWithGraphicsPort:bitmap flipped:YES] retain]),
+      context_(bitmap) {
+  // There is no way to directly set scale factor for NSGraphicsContext, so just
+  // do scaling. The quality of image does not seem to be affected by this.
+  Scale(Vector2dF(scale_factor, scale_factor));
+}
+
 PainterMac::~PainterMac() {
+  [target_context_ release];
 }
 
 void PainterMac::Save() {
@@ -122,6 +174,7 @@ void PainterMac::FillRect(const RectF& rect) {
 }
 
 void PainterMac::DrawImage(Image* image, const RectF& rect) {
+  GraphicsContextScope scoped(target_context_);
   [image->GetNative() drawInRect:rect.ToCGRect()
                         fromRect:NSZeroRect
                        operation:NSCompositeSourceOver
@@ -136,12 +189,36 @@ void PainterMac::DrawImageFromRect(Image* image, const RectF& src,
   RectF flipped(src);
   flipped.set_y(image->GetSize().height() - src.height() - src.y());
 
+  GraphicsContextScope scoped(target_context_);
   [image->GetNative() drawInRect:dest.ToCGRect()
                         fromRect:flipped.ToCGRect()
                        operation:NSCompositeSourceOver
                         fraction:1.0
                   respectFlipped:YES
                            hints:nil];
+}
+
+void PainterMac::DrawCanvas(Canvas* canvas, const RectF& rect) {
+  base::scoped_nsobject<NSImage> image(CreateNSImageFromCanvas(canvas));
+  GraphicsContextScope scoped(target_context_);
+  [image drawInRect:rect.ToCGRect()
+           fromRect:NSZeroRect
+          operation:NSCompositeSourceOver
+           fraction:1.0
+     respectFlipped:NO
+              hints:nil];
+}
+
+void PainterMac::DrawCanvasFromRect(Canvas* canvas, const RectF& src,
+                                    const RectF& dest) {
+  base::scoped_nsobject<NSImage> image(CreateNSImageFromCanvas(canvas));
+  GraphicsContextScope scoped(target_context_);
+  [image drawInRect:dest.ToCGRect()
+           fromRect:src.ToCGRect()
+          operation:NSCompositeSourceOver
+           fraction:1.0
+     respectFlipped:NO
+              hints:nil];
 }
 
 TextMetrics PainterMac::MeasureText(const std::string& text, float width,
@@ -191,6 +268,7 @@ void PainterMac::DrawText(const std::string& text, const RectF& rect,
       bounds.Inset(0.f, rect.height() - cg_bounds.size.height, 0.f, 0.f);
   }
 
+  GraphicsContextScope scoped(target_context_);
   [str drawInRect:bounds.ToCGRect() withAttributes:attrs_dict];
 }
 

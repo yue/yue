@@ -180,6 +180,18 @@ struct Type<nu::Font> {
 };
 
 template<>
+struct Type<nu::Canvas> {
+  static constexpr const char* name = "yue.Canvas";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "create", &CreateInstance<nu::Canvas, const nu::SizeF&, float>,
+           "getscalefactor", &nu::Canvas::GetScaleFactor,
+           "getpainter", &nu::Canvas::GetPainter,
+           "getsize", &nu::Canvas::GetSize);
+  }
+};
+
+template<>
 struct Type<nu::SystemColor> {
   static constexpr const char* name = "yue.SystemColor";
   static inline bool To(State* state, int index, nu::SystemColor* out) {
@@ -309,6 +321,8 @@ struct Type<nu::Painter> {
            "fillrect", &nu::Painter::FillRect,
            "drawimage", &nu::Painter::DrawImage,
            "drawimagefromrect", &nu::Painter::DrawImageFromRect,
+           "drawcanvas", &nu::Painter::DrawCanvas,
+           "drawcanvasfromrect", &nu::Painter::DrawCanvasFromRect,
            "measuretext", &nu::Painter::MeasureText,
            "drawtext", &nu::Painter::DrawText);
   }
@@ -726,6 +740,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
               "Lifetime",  lua::MetaTable<nu::Lifetime>(),
               "App",       lua::MetaTable<nu::App>(),
               "Font",      lua::MetaTable<nu::Font>(),
+              "Canvas",    lua::MetaTable<nu::Canvas>(),
               "Color",     lua::MetaTable<nu::Color>(),
               "Image",     lua::MetaTable<nu::Image>(),
               "Painter",   lua::MetaTable<nu::Painter>(),

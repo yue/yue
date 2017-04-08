@@ -19,6 +19,7 @@
 
 namespace nu {
 
+class Canvas;
 class Image;
 
 // The interface for painting on canvas or window.
@@ -77,6 +78,11 @@ class NATIVEUI_EXPORT Painter {
   virtual void DrawImage(Image* image, const RectF& rect) = 0;
   virtual void DrawImageFromRect(Image* image, const RectF& src,
                                  const RectF& dest) = 0;
+
+  // Copy content from a canvas.
+  virtual void DrawCanvas(Canvas* canvas, const RectF& rect) = 0;
+  virtual void DrawCanvasFromRect(Canvas* canvas, const RectF& src,
+                                  const RectF& dest) = 0;
 
   // Return the space taken to paint the full string.
   virtual TextMetrics MeasureText(const std::string& text, float width,

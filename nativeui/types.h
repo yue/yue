@@ -20,18 +20,25 @@ typedef struct _GtkMenuShell GtkMenuShell;
 typedef struct _GtkWidget GtkWidget;
 typedef struct _GtkWindow GtkWindow;
 typedef struct _PangoFontDescription PangoFontDescription;
+typedef struct _cairo_surface cairo_surface_t;
+typedef struct _cairo_t cairo_t;
 #endif
 
 #if defined(OS_MACOSX)
+typedef struct CGContext* CGContextRef;
 #ifdef __OBJC__
+@class NSBitmapImageRep;
 @class NSFont;
+@class NSGraphicsContext;
 @class NSImage;
 @class NSMenu;
 @class NSMenuItem;
 @class NSView;
 @class NSWindow;
 #else
+class NSBitmapImageRep;
 class NSFont;
+class NSGraphicsContext;
 class NSImage;
 class NSMenu;
 class NSMenuItem;
@@ -52,7 +59,9 @@ class UIWindow;
 
 #if defined(OS_WIN)
 namespace Gdiplus {
+class Bitmap;
 class Font;
+class Graphics;
 class Image;
 }
 #endif
@@ -75,21 +84,27 @@ using FilePath = std::string;
 #if defined(OS_MACOSX)
 using NativeView = NSView*;
 using NativeWindow = NSWindow*;
+using NativeBitmap = CGContextRef;
 using NativeImage = NSImage*;
+using nativeGraphicsContext = NSGraphicsContext*;
 using NativeFont = NSFont*;
 using NativeMenu = NSMenu*;
 using NativeMenuItem = NSMenuItem*;
 #elif defined(OS_LINUX)
 using NativeView = GtkWidget*;
 using NativeWindow = GtkWindow*;
+using NativeBitmap = cairo_surface_t*;
 using NativeImage = GdkPixbuf*;
+using nativeGraphicsContext = cairo_t*;
 using NativeFont = PangoFontDescription*;
 using NativeMenu = GtkMenuShell*;
 using NativeMenuItem = GtkMenuItem*;
 #elif defined(OS_WIN)
 using NativeView = ViewImpl*;
 using NativeWindow = WindowImpl*;
+using NativeBitmap = Gdiplus::Bitmap*;
 using NativeFont = Gdiplus::Font*;
+using nativeGraphicsContext = Gdiplus::Graphics*;
 using NativeImage = Gdiplus::Image*;
 using NativeMenu = HMENU;
 using NativeMenuItem = MenuItemData*;
