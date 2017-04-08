@@ -6,9 +6,9 @@
 
 #include "base/strings/utf_string_conversions.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
+#include "nativeui/gfx/screen.h"
 #include "nativeui/gfx/win/text_win.h"
 #include "nativeui/state.h"
-#include "nativeui/win/screen.h"
 #include "nativeui/win/subwin_view.h"
 #include "nativeui/win/util/hwnd_util.h"
 #include "nativeui/win/window_win.h"
@@ -88,7 +88,7 @@ Entry::Entry() {
   TakeOverView(new EntryImpl(this));
 
   Font* font = State::GetCurrent()->GetDefaultFont();
-  float height = MeasureText(L"some text", font).height() / GetScaleFactor()+
+  float height = MeasureText(L"some text", font).height() / GetScaleFactor() +
                  2 * kEntryPadding;
   SetDefaultStyle(SizeF(0, height));
 }

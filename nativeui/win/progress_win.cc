@@ -6,7 +6,7 @@
 
 #include <commctrl.h>
 
-#include "nativeui/win/screen.h"
+#include "nativeui/gfx/screen.h"
 #include "nativeui/win/subwin_view.h"
 
 namespace nu {

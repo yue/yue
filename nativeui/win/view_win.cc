@@ -5,8 +5,8 @@
 #include "nativeui/win/view_win.h"
 
 #include "nativeui/gfx/geometry/rect_conversions.h"
+#include "nativeui/gfx/screen.h"
 #include "nativeui/label.h"
-#include "nativeui/win/screen.h"
 #include "nativeui/win/scroll_win.h"
 
 namespace nu {

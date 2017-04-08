@@ -2,7 +2,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/win/screen.h"
+#include "nativeui/gfx/win/screen_win.h"
 
 #include <shellscalingapi.h>
 #include <windows.h>
@@ -10,6 +10,7 @@
 #include "base/win/scoped_hdc.h"
 #include "base/win/win_util.h"
 #include "nativeui/gfx/geometry/rect.h"
+#include "nativeui/gfx/screen.h"
 
 namespace nu {
 
