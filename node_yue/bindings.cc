@@ -197,7 +197,8 @@ struct Type<nu::Canvas> {
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
-        "create", &CreateInstance<nu::Canvas, const nu::SizeF&, float>);
+        "create", &CreateInstance<nu::Canvas, const nu::SizeF&, float>,
+        "createForMainScreen", &CreateInstance<nu::Canvas, const nu::SizeF&>);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {

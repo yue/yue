@@ -5,10 +5,12 @@
 #ifndef NATIVEUI_GFX_SCREEN_H_
 #define NATIVEUI_GFX_SCREEN_H_
 
+#include "nativeui/nativeui_export.h"
+
 namespace nu {
 
 // Returns the default scale factor.
-float GetScaleFactor();
+float NATIVEUI_EXPORT GetScaleFactor();
 
 }  // namespace nu
 

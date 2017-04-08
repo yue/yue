@@ -18,6 +18,11 @@ class Painter;
 
 class NATIVEUI_EXPORT Canvas : public base::RefCounted<Canvas> {
  public:
+  // Create a canvas with the default scale factor.
+  // This is strongly discouraged for using, since it does not work well with
+  // multi-monitor setup, but honestly I don't know whether there is a good
+  // way to handle per-monitor DPI for canvas.
+  explicit Canvas(const SizeF& size);
   // Create a canvas with |scale_factor|.
   Canvas(const SizeF& size, float scale_factor);
 

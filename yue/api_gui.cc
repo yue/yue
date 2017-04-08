@@ -185,6 +185,7 @@ struct Type<nu::Canvas> {
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
            "create", &CreateInstance<nu::Canvas, const nu::SizeF&, float>,
+           "createformainscreen", &CreateInstance<nu::Canvas, const nu::SizeF&>,
            "getscalefactor", &nu::Canvas::GetScaleFactor,
            "getpainter", &nu::Canvas::GetPainter,
            "getsize", &nu::Canvas::GetSize);
