@@ -528,6 +528,9 @@ struct Type<nu::View> {
         "setVisible", &nu::View::SetVisible,
         "isVisible", &nu::View::IsVisible,
         "getParent", &nu::View::GetParent);
+    SetProperty(context, templ,
+                "onMouseDown", &nu::View::on_mouse_down,
+                "onMouseUp", &nu::View::on_mouse_up);
   }
 };
 
@@ -756,17 +759,19 @@ void Initialize(v8::Local<v8::Object> exports) {
 #endif
   // Initialize the nativeui and leak it.
   new nu::State;
+#if !defined(ELECTRON_BUILD)
   new nu::Lifetime;
   // Initialize node integration and leak it.
   NodeIntegration* node_integration = NodeIntegration::Create();
   node_integration->PrepareMessageLoop();
   node_integration->RunMessageLoop();
+#endif
 
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::Local<v8::Context> context = isolate->GetCurrentContext();
   vb::Set(context, exports,
           // Classes.
-#ifndef ELECTRON_BUILD
+#if !defined(ELECTRON_BUILD)
           "Lifetime",  vb::Constructor<nu::Lifetime>(),
 #endif
           "App",       vb::Constructor<nu::App>(),
@@ -790,7 +795,7 @@ void Initialize(v8::Local<v8::Object> exports) {
           "Vibrant",   vb::Constructor<nu::Vibrant>(),
 #endif
           // Properties.
-#ifndef ELECTRON_BUILD
+#if !defined(ELECTRON_BUILD)
           "lifetime", nu::Lifetime::GetCurrent(),
 #endif
           "app",      nu::State::GetCurrent()->GetApp());

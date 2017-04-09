@@ -101,7 +101,7 @@ nu::InsetsF GetButtonInsets(NSButton* button) {
 namespace nu {
 
 Button::Button(const std::string& title, Type type) {
-  NSButton* button = [[NUButton alloc] init];
+  NSButton* button = [[NUButton alloc] initWithShell:this];
   if (type == Normal)
     [button setBezelStyle:NSRoundedBezelStyle];
   else if (type == CheckBox)

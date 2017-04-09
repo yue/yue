@@ -7,15 +7,40 @@
 #include <objc/objc-runtime.h>
 
 #include "base/logging.h"
+#include "nativeui/mac/view_mac.h"
 
 namespace nu {
 
 namespace {
 
+bool IsNUView(NSView* self, SEL _cmd) {
+  return true;
+}
+
 void OnMouseEvent(NSView* self, SEL _cmd, NSEvent* event) {
-  if ([self respondsToSelector:@selector(shell)]) {
-    LOG(ERROR) << "OnMouseEvent";
-  } else {
+  DCHECK([self respondsToSelector:@selector(shell)])
+      << "Handler called for view other than NUView";
+  View* view = [self shell];
+  DCHECK(view);
+
+  bool prevent_default = false;
+  switch ([event type]) {
+    case NSLeftMouseDown:
+    case NSRightMouseDown:
+    case NSOtherMouseDown:
+      prevent_default = view->on_mouse_down.Emit();
+      break;
+    case NSLeftMouseUp:
+    case NSRightMouseUp:
+    case NSOtherMouseUp:
+      prevent_default = view->on_mouse_up.Emit();
+      break;
+    default:
+      NOTREACHED() << "Got unexpected event: " << [event type];
+      break;
+  }
+
+  if (!prevent_default) {
     auto super_impl = reinterpret_cast<void (*)(NSView*, SEL, NSEvent*)>(
         [[self superclass] instanceMethodForSelector:_cmd]);
     super_impl(self, _cmd, event);
@@ -23,46 +48,30 @@ void OnMouseEvent(NSView* self, SEL _cmd, NSEvent* event) {
 }
 
 void OnKeyEvent(NSView* self, SEL _cmd, NSEvent* event) {
-  if ([self respondsToSelector:@selector(shell)])
-    LOG(ERROR) << "OnKeyEvent";
-}
-
-void OnInsertText(NSView* self, SEL _cmd, NSString* text) {
-  if ([self respondsToSelector:@selector(shell)])
-    LOG(ERROR) << "OnInsertText";
-}
-
-BOOL OnPerformKeyEquivalent(NSView* self, SEL _cmd, NSEvent* event) {
-  if ([self respondsToSelector:@selector(shell)])
-    LOG(ERROR) << "OnPerformKeyEquivalent";
-  return NO;
 }
 
 }  // namespace
 
-void AddMouseEventMethodsToView(Class cl) {
+bool EventHandlerInstalled(Class cl) {
+  return class_getClassMethod(cl, @selector(IsNUView)) != nullptr;
+}
+
+void AddMouseEventHandlerToClass(Class cl) {
+  class_addMethod(cl, @selector(IsNUView), (IMP)IsNUView, "B@:");
   class_addMethod(cl, @selector(mouseDown:), (IMP)OnMouseEvent, "v@:@");
   class_addMethod(cl, @selector(rightMouseDown:), (IMP)OnMouseEvent, "v@:@");
   class_addMethod(cl, @selector(otherMouseDown:), (IMP)OnMouseEvent, "v@:@");
   class_addMethod(cl, @selector(mouseUp:), (IMP)OnMouseEvent, "v@:@");
   class_addMethod(cl, @selector(rightMouseUp:), (IMP)OnMouseEvent, "v@:@");
   class_addMethod(cl, @selector(otherMouseUp:), (IMP)OnMouseEvent, "v@:@");
-  class_addMethod(cl, @selector(mouseDragged:), (IMP)OnMouseEvent, "v@:@");
-  class_addMethod(cl, @selector(rightMouseDragged:), (IMP)OnMouseEvent, "v@:@");
-  class_addMethod(cl, @selector(otherMouseDragged:), (IMP)OnMouseEvent, "v@:@");
   class_addMethod(cl, @selector(mouseMoved:), (IMP)OnMouseEvent, "v@:@");
-  class_addMethod(cl, @selector(scrollWheel:), (IMP)OnMouseEvent, "v@:@");
   class_addMethod(cl, @selector(mouseEntered:), (IMP)OnMouseEvent, "v@:@");
   class_addMethod(cl, @selector(mouseExited:), (IMP)OnMouseEvent, "v@:@");
-  class_addMethod(cl, @selector(magnifyWithEvent:), (IMP)OnMouseEvent, "v@:@");
 }
 
-void AddKeyEventMethodsToView(Class cl) {
+void AddKeyEventHandlerToClass(Class cl) {
   class_addMethod(cl, @selector(keyDown:), (IMP)OnKeyEvent, "v@:@");
   class_addMethod(cl, @selector(keyUp:), (IMP)OnKeyEvent, "v@:@");
-  class_addMethod(cl, @selector(insertText:), (IMP)OnInsertText, "v@:@");
-  class_addMethod(cl, @selector(performKeyEquivalent:),
-                  (IMP)OnPerformKeyEquivalent, "c@:@");
 }
 
 }  // namespace nu

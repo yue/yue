@@ -519,7 +519,10 @@ struct Type<nu::View> {
            "getbounds", &nu::View::GetBounds,
            "setvisible", &nu::View::SetVisible,
            "isvisible", &nu::View::IsVisible,
-           "getparent", &nu::View::GetParent);
+           "getparent", &nu::View::GetParent,
+    RawSetProperty(state, index,
+                   "onmousedown", &nu::View::on_mouse_down,
+                   "onmouseup", &nu::View::on_mouse_up);
   }
   static void SetStyle(CallContext* context, nu::View* view) {
     if (GetType(context->state, 2) != LuaType::Table) {

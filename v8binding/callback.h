@@ -85,7 +85,7 @@ struct Type<T, typename std::enable_if<
 template<typename T, typename... ArgTypes>
 struct NativeConstructor {
   static T Call(ArgTypes... args) {
-    return std::move(T(args...));
+    return T(args...);
   }
 };
 template<typename T, typename... ArgTypes>

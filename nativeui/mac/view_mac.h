@@ -14,4 +14,7 @@
 - (void)setNUBackgroundColor:(nu::Color)color;
 @end
 
+@interface NSView (NUViewMethods) <NUView>
+@end
+
 #endif  // NATIVEUI_MAC_VIEW_MAC_H_

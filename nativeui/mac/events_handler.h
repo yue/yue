@@ -9,9 +9,12 @@
 
 namespace nu {
 
+// Return whether a class has been added with event handlers.
+bool EventHandlerInstalled(Class cl);
+
 // Dynamically add event methods to a NSView.
-void AddMouseEventMethodsToView(Class cl);
-void AddKeyEventMethodsToView(Class cl);
+void AddMouseEventHandlerToClass(Class cl);
+void AddKeyEventHandlerToClass(Class cl);
 
 }  // namespace nu
 

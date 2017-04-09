@@ -68,6 +68,10 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   // Internal: Get the CSS node of the view.
   YGNodeRef node() const { return node_; }
 
+  // Events.
+  Signal<bool()> on_mouse_down;
+  Signal<bool()> on_mouse_up;
+
  protected:
   View();
   virtual ~View();

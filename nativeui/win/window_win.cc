@@ -147,7 +147,7 @@ BOOL WindowImpl::OnMouseWheel(bool vertical, UINT flags, int delta,
 }
 
 LRESULT WindowImpl::OnMouseClick(UINT message, WPARAM w_param,
-                                     LPARAM l_param) {
+                                 LPARAM l_param) {
   delegate_->GetContentView()->GetNative()->OnMouseClick(
       message, static_cast<UINT>(w_param),
       nu::Point(CR_GET_X_LPARAM(l_param), CR_GET_Y_LPARAM(l_param)));

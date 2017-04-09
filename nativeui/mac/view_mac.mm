@@ -8,9 +8,7 @@
 #include "nativeui/gfx/geometry/point_conversions.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/gfx/mac/painter_mac.h"
-
-@interface NSView (NUViewMethods) <NUView>
-@end
+#include "nativeui/mac/events_handler.h"
 
 namespace nu {
 
@@ -20,6 +18,11 @@ void View::PlatformDestroy() {
 
 void View::TakeOverView(NativeView view) {
   view_ = view;
+
+  // Install events handle for the view's class.
+  if (!EventHandlerInstalled([view class])) {
+    AddMouseEventHandlerToClass([view class]);
+  }
 }
 
 void View::SetBounds(const RectF& bounds) {
