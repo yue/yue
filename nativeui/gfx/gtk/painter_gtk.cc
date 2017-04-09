@@ -17,6 +17,7 @@
 
 #include <gtk/gtk.h>
 
+#include "nativeui/gfx/canvas.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/gfx/image.h"
 
@@ -34,12 +35,21 @@ inline float AreaOfTriangleFormedByPoints(const PointF& p1,
 
 }  // namespace
 
-PainterGtk::PainterGtk(cairo_t* context) : context_(context) {
-  // Initial state.
-  states_.push({Color(), Color()});
+PainterGtk::PainterGtk(cairo_t* context)
+    : context_(context),
+      is_context_managed_(false) {
+  Initialize();
+}
+
+PainterGtk::PainterGtk(cairo_surface_t* surface, float scale_factor)
+    : context_(cairo_create(surface)),
+      is_context_managed_(true) {
+  Initialize();
 }
 
 PainterGtk::~PainterGtk() {
+  if (is_context_managed_)
+    cairo_destroy(context_);
 }
 
 void PainterGtk::Save() {
@@ -258,6 +268,30 @@ void PainterGtk::DrawImageFromRect(Image* image, const RectF& src,
   cairo_restore(context_);
 }
 
+void PainterGtk::DrawCanvas(Canvas* canvas, const RectF& rect) {
+  DrawCanvasFromRect(canvas, RectF(canvas->GetSize()), rect);
+}
+
+void PainterGtk::DrawCanvasFromRect(Canvas* canvas, const RectF& src,
+                                    const RectF& dest) {
+  cairo_save(context_);
+  // Clip the image to |dest|.
+  cairo_translate(context_, dest.x(), dest.y());
+  cairo_new_path(context_);
+  cairo_rectangle(context_, 0, 0, dest.width(), dest.height());
+  cairo_clip(context_);
+  // Scale if needed.
+  SizeF size = canvas->GetSize();
+  float x_scale = dest.width() / src.width();
+  float y_scale = dest.height() / src.height();
+  if (x_scale != 1.0f || y_scale != 1.0f)
+    cairo_scale(context_, x_scale, y_scale);
+  // Draw.
+  cairo_set_source_surface(context_, canvas->GetBitmap(), -src.x(), -src.y());
+  cairo_paint(context_);
+  cairo_restore(context_);
+}
+
 TextMetrics PainterGtk::MeasureText(const std::string& text, float width,
                                     const TextAttributes& attributes) {
   PangoLayout* layout = pango_cairo_create_layout(context_);
@@ -309,6 +343,11 @@ void PainterGtk::DrawText(const std::string& text, const RectF& rect,
 
   cairo_restore(context_);
   g_object_unref(layout);
+}
+
+void PainterGtk::Initialize() {
+  // Initial state.
+  states_.push({Color(), Color()});
 }
 
 void PainterGtk::SetSourceColor(bool stroke) {

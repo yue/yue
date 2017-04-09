@@ -21,7 +21,7 @@ typedef struct _GtkWidget GtkWidget;
 typedef struct _GtkWindow GtkWindow;
 typedef struct _PangoFontDescription PangoFontDescription;
 typedef struct _cairo_surface cairo_surface_t;
-typedef struct _cairo_t cairo_t;
+typedef struct _cairo cairo_t;
 #endif
 
 #if defined(OS_MACOSX)
