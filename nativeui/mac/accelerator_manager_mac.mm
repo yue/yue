@@ -25,8 +25,16 @@ void AcceleratorManager::RegisterAccelerator(MenuItem* item,
                               accelerator.GetModifiers(),
                               &character,
                               &characterIgnoringModifiers);
+
+  // Make some special cases more visual friendly.
+  int modifiers = accelerator.GetModifiers();
+  if (character != characterIgnoringModifiers)
+    modifiers ^= NSShiftKeyMask;
+  if (character == NSDeleteFunctionKey)
+    character = NSDeleteCharacter;
+
   NSMenuItem* menu_item = item->GetNative();
-  menu_item.keyEquivalentModifierMask = accelerator.GetModifiers();
+  menu_item.keyEquivalentModifierMask = modifiers;
   menu_item.keyEquivalent =
       [[[NSString alloc] initWithCharacters:&character length:1] autorelease];
 }
