@@ -13,8 +13,13 @@ namespace nu {
 namespace {
 
 void OnMouseEvent(NSView* self, SEL _cmd, NSEvent* event) {
-  if ([self respondsToSelector:@selector(shell)])
+  if ([self respondsToSelector:@selector(shell)]) {
     LOG(ERROR) << "OnMouseEvent";
+  } else {
+    auto super_impl = reinterpret_cast<void (*)(NSView*, SEL, NSEvent*)>(
+        [[self superclass] instanceMethodForSelector:_cmd]);
+    super_impl(self, _cmd, event);
+  }
 }
 
 void OnKeyEvent(NSView* self, SEL _cmd, NSEvent* event) {
