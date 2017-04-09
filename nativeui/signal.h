@@ -15,12 +15,9 @@
 namespace nu {
 
 // A simple signal/slot implementation.
-template<typename Sig> class Signal;
-
-template<typename... Args>
-class NATIVEUI_EXPORT Signal<void(Args...)> {
+template<typename Sig> class SignalBase {
  public:
-  using Slot = base::Callback<void(Args...)>;
+  using Slot = base::Callback<Sig>;
 
   int Connect(const Slot& slot) {
     slots_.push_back(std::make_pair(++next_id_, slot));
@@ -42,16 +39,7 @@ class NATIVEUI_EXPORT Signal<void(Args...)> {
     return slots_.empty();
   }
 
-  template<typename... RunArgs>
-  void Emit(RunArgs&&... args) {
-    // Copy the list before iterating, since it is possible that user removes
-    // elements from the list when iterating.
-    auto slots = slots_;
-    for (auto& slot : slots)
-      slot.second.Run(std::forward<Args>(args)...);
-  }
-
- private:
+ protected:
   // Use the first element of tuple as comparing key.
   static bool TupleCompare(const std::pair<int, Slot>& element, int key) {
     return element.first < key;
@@ -59,6 +47,36 @@ class NATIVEUI_EXPORT Signal<void(Args...)> {
 
   int next_id_ = 0;
   std::vector<std::pair<int, Slot>> slots_;
+};
+
+template<typename Sig> class Signal;
+
+// Signal type that does not expect return type.
+template<typename... Args>
+class Signal<void(Args...)> : public SignalBase<void(Args...)> {
+ public:
+  void Emit(Args... args) {
+    // Copy the list before iterating, since it is possible that user removes
+    // elements from the list when iterating.
+    auto slots = this->slots_;
+    for (auto& slot : slots)
+      slot.second.Run(std::forward<Args>(args)...);
+  }
+};
+
+// Signal that expects boolean return value.
+template<typename... Args>
+class Signal<bool(Args...)> : public SignalBase<bool(Args...)> {
+ public:
+  bool Emit(Args... args) {
+    bool result = false;
+    // Copy the list before iterating, since it is possible that user removes
+    // elements from the list when iterating.
+    auto slots = this->slots_;
+    for (auto& slot : slots)
+      result |= slot.second.Run(std::forward<Args>(args)...);
+    return result;
+  }
 };
 
 }  // namespace nu

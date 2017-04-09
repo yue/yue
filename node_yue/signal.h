@@ -37,7 +37,8 @@ struct Type<nu::Signal<Sig>> {
     Set(context, templ,
         "connect", &nu::Signal<Sig>::Connect,
         "disconnect", &nu::Signal<Sig>::Disconnect,
-        "disconnectAll", &nu::Signal<Sig>::DisconnectAll);
+        "disconnectAll", &nu::Signal<Sig>::DisconnectAll,
+        "emit", &nu::Signal<Sig>::Emit);
   }
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
@@ -71,6 +72,17 @@ struct Type<nu::Signal<Sig>*> {
       return false;
     *out = ptr;
     return true;
+  }
+};
+
+template<typename Sig>
+struct Type<nu::SignalBase<Sig>*> {
+  static constexpr const char* name = "yue.Signal";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::SignalBase<Sig>** out) {
+    return Type<nu::Signal<Sig>*>::FromV8(
+        context, value, reinterpret_cast<nu::Signal<Sig>**>(out));
   }
 };
 
