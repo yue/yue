@@ -20,6 +20,17 @@ enum CreateFunctionTemplateFlags {
   HolderIsFirstArgument = 1 << 0,
 };
 
+// Extra type name information.
+template<>
+struct Type<v8::Local<v8::Context>> {
+  static constexpr const char* name = "Context";
+};
+
+template<>
+struct Type<Arguments*> {
+  static constexpr const char* name = "Arguments";
+};
+
 namespace internal {
 
 template<typename T>
@@ -101,15 +112,15 @@ inline bool GetNextArgument(Arguments* args, int create_flags, bool is_first,
 }
 
 // It's common for clients to just need the isolate, so we make that easy.
-inline bool GetNextArgument(Arguments* args, int create_flags,
-                            bool is_first, v8::Isolate** result) {
+inline bool GetNextArgument(Arguments* args, int create_flags, bool is_first,
+                            v8::Isolate** result) {
   *result = args->isolate();
   return true;
 }
 
 // Helper to get context.
-inline bool GetNextArgument(Arguments* args, int create_flags,
-                            bool is_first, v8::Local<v8::Context>* result) {
+inline bool GetNextArgument(Arguments* args, int create_flags, bool is_first,
+                            v8::Local<v8::Context>* result) {
   *result = args->isolate()->GetCurrentContext();
   return true;
 }
@@ -125,12 +136,8 @@ struct ArgumentHolder {
 
   ArgumentHolder(Arguments* args, int create_flags)
       : ok(GetNextArgument(args, create_flags, index == 0, &value)) {
-    if (!ok) {
-      // Ideally we would include the expected c++ type in the error
-      // message which we can access via typeid(ArgType).name()
-      // however we compile with no-rtti, which disables typeid.
-      args->ThrowError();
-    }
+    if (!ok)
+      args->ThrowError(Type<ArgLocalType>::name);
   }
 };
 

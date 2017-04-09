@@ -461,7 +461,7 @@ struct Type<nu::MenuItem> {
         "getSubmenu", &nu::MenuItem::GetSubmenu,
         "setAccelerator", &nu::MenuItem::SetAccelerator);
     SetProperty(context, templ,
-                "onclick", &nu::MenuItem::on_click);
+                "onClick", &nu::MenuItem::on_click);
   }
 };
 
@@ -592,8 +592,7 @@ struct Type<nu::Button> {
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
-        "create", &CreateInstance<nu::Button,
-                                  const std::string&, nu::Button::Type>);
+        "create", &Create);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
@@ -604,6 +603,22 @@ struct Type<nu::Button> {
         "isChecked", &nu::Button::IsChecked);
     SetProperty(context, templ,
                 "onClick", &nu::Button::on_click);
+  }
+  static nu::Button* Create(Arguments* args, v8::Local<v8::Context> context,
+                            v8::Local<v8::Value> value) {
+    std::string title;
+    if (FromV8(context, value, &title)) {
+      return new nu::Button(title);
+    } else if (value->IsObject()) {
+      v8::Local<v8::Object> obj = value.As<v8::Object>();
+      Get(context, obj, "title", &title);
+      nu::Button::Type type = nu::Button::Normal;
+      Get(context, obj, "type", &type);
+      return new nu::Button(title, type);
+    } else {
+      args->ThrowError("String or Object");
+      return nullptr;
+    }
   }
 };
 

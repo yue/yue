@@ -187,6 +187,7 @@ struct Type<base::string16> {
 template<typename T>
 struct Type<v8::Local<T>, typename std::enable_if<std::is_base_of<
                               v8::Value, T>::value>::type> {
+  static constexpr const char* name = "Value";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    v8::Local<T> value) {
     return value;
@@ -195,12 +196,13 @@ struct Type<v8::Local<T>, typename std::enable_if<std::is_base_of<
                      v8::Local<v8::Value> value,
                      v8::Local<T>* out) {
     *out = v8::Local<T>::Cast(value);
-    return out->IsEmpty();
+    return !out->IsEmpty();
   }
 };
 
 namespace internal {
 
+// Helpers used to converting tuple to Array.
 inline void SetArray(v8::Local<v8::Context>, v8::Local<v8::Array>, int) {
 }
 

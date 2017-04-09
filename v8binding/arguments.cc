@@ -24,7 +24,7 @@ std::string V8TypeAsString(v8::Isolate* isolate, v8::Local<v8::Value> value) {
       return result;
   }
   if (FromV8(context, value, &result))
-    return result;
+    return '"' + result + '"';
   if (FromV8(context, value->TypeOf(isolate), &result))
     return result;
   return "<unkown>";
@@ -49,14 +49,16 @@ Arguments::Arguments(const v8::FunctionCallbackInfo<v8::Value>& info)
 Arguments::~Arguments() {
 }
 
-void Arguments::ThrowError() const {
+void Arguments::ThrowError(const char* target_type_name) const {
   v8::Local<v8::Context> context = isolate_->GetCurrentContext();
   if (insufficient_arguments_)
     return ThrowTypeError(context, "Insufficient number of arguments.");
 
   ThrowTypeError(context, base::StringPrintf(
-      "Error processing argument at index %d, conversion failure from %s",
-      next_ - 1, V8TypeAsString(isolate_, (*info_)[next_ - 1]).c_str()));
+      "Error processing argument at index %d, conversion failure from %s to %s",
+      next_ - 1,
+      V8TypeAsString(isolate_, (*info_)[next_ - 1]).c_str(),
+      target_type_name));
 }
 
 }  // namespace vb

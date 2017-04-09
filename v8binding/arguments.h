@@ -53,7 +53,12 @@ class Arguments {
   // dereferencing the handle.
   v8::Local<v8::Value> PeekNext() const;
 
-  void ThrowError() const;
+  // Roll the next_ parameter back by 1, used by custom type checking code.
+  void Rollback() {
+    --next_;
+  }
+
+  void ThrowError(const char* target_type_name) const;
 
   v8::Isolate* isolate() const { return isolate_; }
 

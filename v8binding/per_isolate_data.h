@@ -5,7 +5,7 @@
 #ifndef V8BINDING_PER_ISOLATE_DATA_H_
 #define V8BINDING_PER_ISOLATE_DATA_H_
 
-#include <map>
+#include <unordered_map>
 
 #include "base/macros.h"
 #include "v8.h"  // NOLINT(build/include)
@@ -36,9 +36,10 @@ class PerIsolateData {
   ~PerIsolateData();
 
  private:
-  typedef std::map<const char*,
-                   v8::Eternal<v8::FunctionTemplate>> FunctionTemplateMap;
-  typedef std::map<void*, internal::ObjectTracker*> ObjectTrackerMap;
+  using FunctionTemplateMap =
+      std::unordered_map<const char*, v8::Eternal<v8::FunctionTemplate>>;
+  using ObjectTrackerMap =
+      std::unordered_map<void*, internal::ObjectTracker*>;
 
   v8::Isolate* isolate_;
   FunctionTemplateMap function_templates_;
