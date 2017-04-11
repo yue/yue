@@ -111,7 +111,7 @@ template<typename Member>
 void SetMemberHolder(State* state, int table,
                      base::StringPiece key, Member member) {
   StackAutoReset reset(state);
-  NewUserData<MemberHolder<Member>>(state, member);
+  NewUserData<MemberHolder<Member>>(state, member);  // skip prototype
   RawSet(state, table, key, ValueOnStack(state, -1));
 }
 

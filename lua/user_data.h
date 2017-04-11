@@ -20,8 +20,8 @@ struct UserData {
   static inline void Destruct(Type* data) {
     data->~Type();
   }
-  static inline T* From(State* state, Type* data) {
-    return data;
+  static inline T* From(State* state, void* data) {
+    return static_cast<T*>(data);
   }
 };
 

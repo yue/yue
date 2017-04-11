@@ -23,8 +23,8 @@ struct UserData<T, typename std::enable_if<std::is_base_of<
   static inline void Destruct(T** data) {
     (*data)->Release();
   }
-  static inline T* From(State* state, T** data) {
-    return *data;
+  static inline T* From(State* state, void* data) {
+    return *static_cast<T**>(data);
   }
 };
 
@@ -40,8 +40,8 @@ struct UserData<T, typename std::enable_if<std::is_base_of<
   static inline void Destruct(base::WeakPtr<T>* data) {
     data->~Type();
   }
-  static inline T* From(State* state, base::WeakPtr<T>* data) {
-    return data->get();
+  static inline T* From(State* state, void* data) {
+    return static_cast<base::WeakPtr<T>*>(data)->get();
   }
 };
 
@@ -85,8 +85,7 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
     if (!GetMetaTable(state, index) || !IsMetaTableInheritedFrom<T>(state))
       return false;
     // Convert pointer to actual class.
-    *out = UserData<T>::From(
-        state, static_cast<T**>(lua_touserdata(state, index)));
+    *out = UserData<T>::From(state, lua_touserdata(state, index));
     return true;
   }
   static inline void Push(State* state, T* ptr) {
@@ -118,8 +117,7 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
     if (!GetMetaTable(state, index) || !IsMetaTableInheritedFrom<T>(state))
       return false;
     // Convert pointer to actual class.
-    T* ptr = UserData<T>::From(
-        state, static_cast<base::WeakPtr<T>*>(lua_touserdata(state, index)));
+    T* ptr = UserData<T>::From(state, lua_touserdata(state, index));
     // WeakPtr might be invalidated.
     if (!ptr)
       return false;
