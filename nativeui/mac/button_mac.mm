@@ -102,11 +102,11 @@ namespace nu {
 
 Button::Button(const std::string& title, Type type) {
   NSButton* button = [[NUButton alloc] initWithShell:this];
-  if (type == Normal)
+  if (type == Type::Normal)
     [button setBezelStyle:NSRoundedBezelStyle];
-  else if (type == CheckBox)
+  else if (type == Type::CheckBox)
     [button setButtonType:NSSwitchButton];
-  else if (type == Radio)
+  else if (type == Type::Radio)
     [button setButtonType:NSRadioButton];
 
   [button setTarget:[[NUButtonDelegate alloc] initWithShell:this]];

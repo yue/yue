@@ -26,9 +26,9 @@
 }
 
 - (IBAction)onClick:(id)sender {
-  if (shell_->GetType() == nu::MenuItem::CheckBox)
+  if (shell_->GetType() == nu::MenuItem::Type::CheckBox)
     shell_->SetChecked(!shell_->IsChecked());
-  else if (shell_->GetType() == nu::MenuItem::Radio)
+  else if (shell_->GetType() == nu::MenuItem::Type::Radio)
     shell_->SetChecked(true);
   shell_->on_click.Emit();
 }
@@ -51,7 +51,7 @@ std::string MenuItem::GetLabel() const {
 
 void MenuItem::SetChecked(bool checked) {
   menu_item_.state = checked ? NSOnState : NSOffState;
-  if (checked && type_ == nu::MenuItem::Radio && menu_)
+  if (checked && type_ == nu::MenuItem::Type::Radio && menu_)
     FlipRadioMenuItems(menu_, this);
 }
 
@@ -76,7 +76,7 @@ bool MenuItem::IsVisible() const {
 }
 
 void MenuItem::PlatformInit() {
-  if (type_ == Separator)
+  if (type_ == Type::Separator)
     menu_item_ = [[NSMenuItem separatorItem] retain];
   else
     menu_item_ = [[NSMenuItem alloc] init];

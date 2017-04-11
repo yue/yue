@@ -20,7 +20,7 @@ class MenuBase;
 
 class NATIVEUI_EXPORT MenuItem : public base::RefCounted<MenuItem> {
  public:
-  enum Type {
+  enum class Type {
     Label,
     CheckBox,
     Radio,

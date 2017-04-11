@@ -18,7 +18,8 @@ void DispatchCommandToItem(MenuBase* menu, int command) {
     if (item->GetNative()->id == command) {
       item->Click();
       break;
-    } else if (item->GetType() == MenuItem::Submenu && item->GetSubmenu()) {
+    } else if (item->GetType() == MenuItem::Type::Submenu &&
+               item->GetSubmenu()) {
       DispatchCommandToItem(item->GetSubmenu(), command);
     }
   }
@@ -34,18 +35,18 @@ void MenuBase::PlatformDestroy() {
 void MenuBase::PlatformInsert(MenuItem* item, int index) {
   MENUITEMINFO mii = {0};
   mii.cbSize = sizeof(mii);
-  if (item->GetType() == MenuItem::Separator) {
+  if (item->GetType() == MenuItem::Type::Separator) {
     mii.fMask = MIIM_FTYPE;
     mii.fType = MFT_SEPARATOR;
   } else {
     auto* data = item->GetNative();
     mii.fMask = MIIM_FTYPE | MIIM_ID | MIIM_STRING | MIIM_STATE;
     mii.wID = data->id;
-    if (item->GetType() == MenuItem::Submenu && item->GetSubmenu()) {
+    if (item->GetType() == MenuItem::Type::Submenu && item->GetSubmenu()) {
       mii.fMask |= MIIM_SUBMENU;
       mii.hSubMenu = item->GetSubmenu()->GetNative();
     }
-    if (item->GetType() == MenuItem::Radio)
+    if (item->GetType() == MenuItem::Type::Radio)
       mii.fType = MFT_RADIOCHECK;
     else
       mii.fType = MFT_STRING;

@@ -13,12 +13,12 @@ namespace nu {
 
 class NATIVEUI_EXPORT Button : public View {
  public:
-  enum Type {
+  enum class Type {
     Normal,
     CheckBox,
     Radio,
   };
-  explicit Button(const std::string& title, Type type = Normal);
+  explicit Button(const std::string& title, Type type = Type::Normal);
 
   // View class name.
   static const char kClassName[];

@@ -12,9 +12,9 @@
 namespace nu {
 
 void MenuItem::Click() {
-  if (type_ == nu::MenuItem::CheckBox)
+  if (type_ == Type::CheckBox)
     SetChecked(!IsChecked());
-  else if (type_ == nu::MenuItem::Radio)
+  else if (type_ == Type::Radio)
     SetChecked(true);
   on_click.Emit();
 }
@@ -43,7 +43,7 @@ std::string MenuItem::GetLabel() const {
 void MenuItem::SetChecked(bool checked) {
   menu_item_->checked = checked;
   if (menu_) {
-    if (checked && type_ == nu::MenuItem::Radio)
+    if (checked && type_ == Type::Radio)
       FlipRadioMenuItems(menu_, this);
     UINT flags = MF_BYCOMMAND;
     flags |= checked ? MF_CHECKED : MF_UNCHECKED;

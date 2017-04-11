@@ -28,9 +28,9 @@ const int kCheckBoxPadding = 1;
 class ButtonImpl : public ViewImpl {
  public:
   ButtonImpl(Button::Type type, Button* delegate)
-      : ViewImpl(type == Button::Normal ? ControlType::Button
-                    : (type == Button::CheckBox ? ControlType::CheckBox
-                                                : ControlType::Radio)),
+      : ViewImpl(type == Button::Type::Normal ? ControlType::Button
+                    : (type == Button::Type::CheckBox ? ControlType::CheckBox
+                                                      : ControlType::Radio)),
         delegate_(delegate) {
     OnDPIChanged();  // update component size
   }

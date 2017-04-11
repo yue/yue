@@ -438,15 +438,15 @@ struct Type<nu::MenuItem::Type> {
     if (!vb::FromV8(context, value, &type))
       return false;
     if (type == "label")
-      *out = nu::MenuItem::Label;
+      *out = nu::MenuItem::Type::Label;
     else if (type == "checkbox")
-      *out = nu::MenuItem::CheckBox;
+      *out = nu::MenuItem::Type::CheckBox;
     else if (type == "radio")
-      *out = nu::MenuItem::Radio;
+      *out = nu::MenuItem::Type::Radio;
     else if (type == "separator")
-      *out = nu::MenuItem::Separator;
+      *out = nu::MenuItem::Type::Separator;
     else if (type == "submenu")
-      *out = nu::MenuItem::Submenu;
+      *out = nu::MenuItem::Type::Submenu;
     else
       return false;
     return true;
@@ -479,7 +479,7 @@ struct Type<nu::MenuItem> {
   }
   static nu::MenuItem* Create(v8::Local<v8::Context> context,
                               v8::Local<v8::Value> value) {
-    nu::MenuItem::Type type = nu::MenuItem::Label;
+    nu::MenuItem::Type type = nu::MenuItem::Type::Label;
     if (FromV8(context, value, &type) || !value->IsObject())
       return new nu::MenuItem(type);
     v8::Local<v8::Object> obj = value.As<v8::Object>();
@@ -490,16 +490,16 @@ struct Type<nu::MenuItem> {
     // Read table fields and set attributes.
     bool b = false;
     if (Get(context, obj, "checked", &b)) {
-      if (!item) item = new nu::MenuItem(nu::MenuItem::CheckBox);
+      if (!item) item = new nu::MenuItem(nu::MenuItem::Type::CheckBox);
       item->SetChecked(b);
     }
     nu::Menu* submenu = nullptr;
     if (Get(context, obj, "submenu", &submenu)) {
-      if (!item) item = new nu::MenuItem(nu::MenuItem::Submenu);
+      if (!item) item = new nu::MenuItem(nu::MenuItem::Type::Submenu);
       item->SetSubmenu(submenu);
     }
     if (!item)  // can not deduce type from property, assuming Label item.
-      item = new nu::MenuItem(nu::MenuItem::Label);
+      item = new nu::MenuItem(nu::MenuItem::Type::Label);
     if (Get(context, obj, "visible", &b))
       item->SetVisible(b);
     if (Get(context, obj, "enabled", &b))
@@ -621,13 +621,13 @@ struct Type<nu::Button::Type> {
     if (!vb::FromV8(context, value, &type))
       return false;
     if (type.empty() || type == "normal") {
-      *out = nu::Button::Normal;
+      *out = nu::Button::Type::Normal;
       return true;
     } else if (type == "checkbox") {
-      *out = nu::Button::CheckBox;
+      *out = nu::Button::Type::CheckBox;
       return true;
     } else if (type == "radio") {
-      *out = nu::Button::Radio;
+      *out = nu::Button::Type::Radio;
       return true;
     } else {
       return false;
@@ -661,7 +661,7 @@ struct Type<nu::Button> {
     } else if (value->IsObject()) {
       v8::Local<v8::Object> obj = value.As<v8::Object>();
       Get(context, obj, "title", &title);
-      nu::Button::Type type = nu::Button::Normal;
+      nu::Button::Type type = nu::Button::Type::Normal;
       Get(context, obj, "type", &type);
       return new nu::Button(title, type);
     } else {

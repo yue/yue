@@ -19,11 +19,11 @@ void OnClick(GtkButton*, Button* button) {
 }  // namespace
 
 Button::Button(const std::string& title, Type type) {
-  if (type == Normal)
+  if (type == Type::Normal)
     TakeOverView(gtk_button_new_with_label(title.c_str()));
-  else if (type == CheckBox)
+  else if (type == Type::CheckBox)
     TakeOverView(gtk_check_button_new_with_label(title.c_str()));
-  else if (type == Radio)
+  else if (type == Type::Radio)
     TakeOverView(gtk_radio_button_new_with_label(nullptr, title.c_str()));
 
   SetDefaultStyle(SizeF(GetPreferredSizeForWidget(GetNative())));

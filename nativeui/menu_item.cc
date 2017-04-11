@@ -50,13 +50,13 @@ void MenuItem::FlipRadioMenuItems(nu::MenuBase* menu, nu::MenuItem* sender) {
     nu::MenuItem* item = menu->ItemAt(i);
     if (item == sender) {
       found_item = true;  // in the group now
-    } else if (item->GetType() == nu::MenuItem::Separator) {
+    } else if (item->GetType() == Type::Separator) {
       if (found_item)  // end of group
         break;
       // Possible start of a the group.
       radio_count = 0;
       group_start = i;
-    } else if (item->GetType() == nu::MenuItem::Radio) {
+    } else if (item->GetType() == Type::Radio) {
       radio_count++;  // another radio in the group
     }
   }
@@ -68,7 +68,7 @@ void MenuItem::FlipRadioMenuItems(nu::MenuBase* menu, nu::MenuItem* sender) {
   // Flip all other radios in the group.
   for (int i = group_start; i < menu->ItemCount(); ++i) {
     nu::MenuItem* item = menu->ItemAt(i);
-    if (item != sender && item->GetType() == nu::MenuItem::Radio)
+    if (item != sender && item->GetType() == Type::Radio)
       item->SetChecked(false);
   }
 }
