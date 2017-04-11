@@ -381,6 +381,14 @@ struct Type<nu::MenuBase> {
         "itemCount", &nu::MenuBase::ItemCount,
         "itemAt", &nu::MenuBase::ItemAt);
   }
+  // Used by subclasses.
+  static void ReadMembers(Arguments* args, nu::MenuBase* menu) {
+    std::vector<nu::MenuItem*> items;
+    if (args->GetNext(&items)) {
+      for (nu::MenuItem* item : items)
+        menu->Append(item);
+    }
+  }
 };
 
 template<>
@@ -389,11 +397,15 @@ struct Type<nu::MenuBar> {
   static constexpr const char* name = "yue.MenuBar";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
-    Set(context, constructor,
-        "create", &CreateInstance<nu::MenuBar>);
+    Set(context, constructor, "create", &Create);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
+  }
+  static nu::MenuBar* Create(Arguments* args) {
+    nu::MenuBar* menu = new nu::MenuBar;
+    Type<nu::MenuBase>::ReadMembers(args, menu);
+    return menu;
   }
 };
 
@@ -403,13 +415,17 @@ struct Type<nu::Menu> {
   static constexpr const char* name = "yue.Menu";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
-    Set(context, constructor,
-        "create", &CreateInstance<nu::Menu>);
+    Set(context, constructor, "create", &Create);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
         "popup", &nu::Menu::Popup);
+  }
+  static nu::Menu* Create(Arguments* args) {
+    nu::Menu* menu = new nu::Menu;
+    Type<nu::MenuBase>::ReadMembers(args, menu);
+    return menu;
   }
 };
 
@@ -443,8 +459,7 @@ struct Type<nu::MenuItem> {
   static constexpr const char* name = "yue.MenuItem";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
-    Set(context, constructor,
-        "create", &CreateInstance<nu::MenuItem, nu::MenuItem::Type>);
+    Set(context, constructor, "create", &Create);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
@@ -462,6 +477,42 @@ struct Type<nu::MenuItem> {
         "setAccelerator", &nu::MenuItem::SetAccelerator);
     SetProperty(context, templ,
                 "onClick", &nu::MenuItem::on_click);
+  }
+  static nu::MenuItem* Create(v8::Local<v8::Context> context,
+                              v8::Local<v8::Value> value) {
+    nu::MenuItem::Type type = nu::MenuItem::Label;
+    if (FromV8(context, value, &type) || !value->IsObject())
+      return new nu::MenuItem(type);
+    v8::Local<v8::Object> obj = value.As<v8::Object>();
+    // Use label unless "type" is specified.
+    nu::MenuItem* item = nullptr;
+    if (Get(context, obj, "type", &type))
+      item = new nu::MenuItem(type);
+    // Read table fields and set attributes.
+    bool b = false;
+    if (Get(context, obj, "checked", &b)) {
+      if (!item) item = new nu::MenuItem(nu::MenuItem::CheckBox);
+      item->SetChecked(b);
+    }
+    nu::Menu* submenu = nullptr;
+    if (Get(context, obj, "submenu", &submenu)) {
+      if (!item) item = new nu::MenuItem(nu::MenuItem::Submenu);
+      item->SetSubmenu(submenu);
+    }
+    if (!item)  // can not deduce type from property, assuming Label item.
+      item = new nu::MenuItem(nu::MenuItem::Label);
+    if (Get(context, obj, "visible", &b))
+      item->SetVisible(b);
+    if (Get(context, obj, "enabled", &b))
+      item->SetEnabled(b);
+    std::string label;
+    if (Get(context, obj, "label", &label))
+      item->SetLabel(label);
+    nu::Accelerator accelerator;
+    if (Get(context, obj, "accelerator", &accelerator))
+      item->SetAccelerator(accelerator);
+    Get(context, obj, "onClick", &item->on_click);
+    return item;
   }
 };
 
@@ -591,8 +642,7 @@ struct Type<nu::Button> {
   static constexpr const char* name = "yue.Button";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
-    Set(context, constructor,
-        "create", &Create);
+    Set(context, constructor, "create", &Create);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {

@@ -49,15 +49,6 @@ class Arguments {
     info_->GetReturnValue().Set(ToV8(isolate_->GetCurrentContext(), val));
   }
 
-  // Always check the return value whether the handle is empty before
-  // dereferencing the handle.
-  v8::Local<v8::Value> PeekNext() const;
-
-  // Roll the next_ parameter back by 1, used by custom type checking code.
-  void Rollback() {
-    --next_;
-  }
-
   void ThrowError(const char* target_type_name) const;
 
   v8::Isolate* isolate() const { return isolate_; }

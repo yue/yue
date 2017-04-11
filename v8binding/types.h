@@ -7,6 +7,7 @@
 
 #include <string>
 #include <tuple>
+#include <vector>
 
 #include "base/strings/string_piece.h"
 #include "v8.h"  // NOLINT(build/include)
@@ -234,6 +235,34 @@ struct Type<std::tuple<ArgTypes...>> {
     SetArray(context, arr, tup,
              typename internal::IndicesGenerator<sizeof...(ArgTypes)>::type());
     return arr;
+  }
+};
+
+template<typename T>
+struct Type<std::vector<T>> {
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   const std::vector<T>& vec) {
+    auto arr = v8::Array::New(context->GetIsolate(), vec.size());
+    for (size_t i = 0; i< vec.size(); ++i) {
+      if (arr->Set(context, i, Type<T>::ToV8(context, vec[i])).IsNothing())
+        break;
+    }
+    return arr;
+  }
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     std::vector<T>* out) {
+    if (!value->IsArray())
+      return false;
+    v8::Local<v8::Array> arr = value.As<v8::Array>();
+    out->resize(arr->Length());
+    for (uint32_t i = 0; i < arr->Length(); ++i) {
+      v8::MaybeLocal<v8::Value> el = arr->Get(context, i);
+      if (el.IsEmpty() ||
+          !Type<T>::FromV8(context, el.ToLocalChecked(), &(*out)[i]))
+        return false;
+    }
+    return true;
   }
 };
 

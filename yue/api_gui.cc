@@ -466,6 +466,7 @@ struct Type<nu::MenuItem> {
     nu::Accelerator accelerator;
     if (RawGetAndPop(context->state, 1, "accelerator", &accelerator))
       item->SetAccelerator(accelerator);
+    RawGetAndPop(context->state, 1, "onclick", &item->on_click);
     return item;
   }
 };
