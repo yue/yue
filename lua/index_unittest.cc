@@ -33,7 +33,7 @@ template<>
 struct Type<PropertiesClass> {
   static constexpr const char* name = "PropertiesClass";
   static void BuildMetaTable(State* state, int metatable) {
-    RawSet(state, metatable, "new", &CreateInstance<PropertiesClass>);
+    RawSet(state, metatable, "new", &CreateOnHeap<PropertiesClass>);
     RawSetProperty(state, metatable,
                    "property", &PropertiesClass::property,
                    "func", &PropertiesClass::func);

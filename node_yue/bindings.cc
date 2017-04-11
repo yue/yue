@@ -177,7 +177,7 @@ struct Type<nu::Font> {
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
-        "create", &CreateInstance<nu::Font, const std::string&, float>,
+        "create", &CreateOnHeap<nu::Font, const std::string&, float>,
         "default", &GetDefault);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
@@ -197,8 +197,8 @@ struct Type<nu::Canvas> {
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
-        "create", &CreateInstance<nu::Canvas, const nu::SizeF&, float>,
-        "createForMainScreen", &CreateInstance<nu::Canvas, const nu::SizeF&>);
+        "create", &CreateOnHeap<nu::Canvas, const nu::SizeF&, float>,
+        "createForMainScreen", &CreateOnHeap<nu::Canvas, const nu::SizeF&>);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
@@ -255,10 +255,9 @@ struct Type<nu::Color> {
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
         "getSystem", &nu::GetSystemColor,
-        "rgb", NativeConstructor<nu::Color,
-                                 unsigned, unsigned, unsigned>(),
-        "argb", NativeConstructor<nu::Color,
-                                  unsigned, unsigned, unsigned, unsigned>());
+        "rgb", &CreateOnStack<nu::Color, unsigned, unsigned, unsigned>,
+        "argb", &CreateOnStack<nu::Color, unsigned, unsigned, unsigned,
+                               unsigned>);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
@@ -271,7 +270,7 @@ struct Type<nu::Image> {
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
-        "createFromFile", &CreateInstance<nu::Image, const nu::FilePath&>);
+        "createFromFile", &CreateOnHeap<nu::Image, const nu::FilePath&>);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
@@ -536,7 +535,7 @@ struct Type<nu::Window> {
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
-        "create", &CreateInstance<nu::Window, nu::Window::Options>);
+        "create", &CreateOnHeap<nu::Window, nu::Window::Options>);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
@@ -592,7 +591,7 @@ struct Type<nu::Container> {
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
-        "create", &CreateInstance<nu::Container>);
+        "create", &CreateOnHeap<nu::Container>);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
@@ -678,7 +677,7 @@ struct Type<nu::Entry> {
   static constexpr const char* name = "yue.Entry";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
-    Set(context, constructor, "create", &CreateInstance<nu::Entry>);
+    Set(context, constructor, "create", &CreateOnHeap<nu::Entry>);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
@@ -698,7 +697,7 @@ struct Type<nu::Label> {
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
-        "create", &CreateInstance<nu::Label, const std::string&>);
+        "create", &CreateOnHeap<nu::Label, const std::string&>);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
@@ -714,7 +713,7 @@ struct Type<nu::Progress> {
   static constexpr const char* name = "yue.Progress";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
-    Set(context, constructor, "create", &CreateInstance<nu::Progress>);
+    Set(context, constructor, "create", &CreateOnHeap<nu::Progress>);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
@@ -733,7 +732,7 @@ struct Type<nu::Group> {
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
-        "create", &CreateInstance<nu::Group, const std::string&>);
+        "create", &CreateOnHeap<nu::Group, const std::string&>);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
@@ -784,7 +783,7 @@ struct Type<nu::Scroll> {
   static constexpr const char* name = "yue.Scroll";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
-    Set(context, constructor, "create", &CreateInstance<nu::Scroll>);
+    Set(context, constructor, "create", &CreateOnHeap<nu::Scroll>);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
@@ -805,7 +804,7 @@ struct Type<nu::Vibrant> {
   static constexpr const char* name = "yue.Vibrant";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
-    Set(context, constructor, "create", &CreateInstance<nu::Vibrant>);
+    Set(context, constructor, "create", &CreateOnHeap<nu::Vibrant>);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {

@@ -14,6 +14,7 @@ require('./common')
 const blacklist = [
   path.join('nativeui', 'mac', 'container_mac.h'),
   path.join('nativeui', 'mac', 'nu_application_delegate.h'),
+  path.join('nativeui', 'mac', 'view_mac.h'),
   path.join('nativeui', 'win', 'util', 'msg_util.h'),
 ]
 

@@ -52,7 +52,7 @@ struct Type<TestClass> {
   static constexpr const char* name = "TestClass";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
-           "new", &CreateInstance<TestClass>,
+           "new", &CreateOnHeap<TestClass>,
            "method1", &TestClass::Method1,
            "method2", &TestClass::Method2);
   }
@@ -155,7 +155,7 @@ struct Type<DerivedClass> {
   static constexpr const char* name = "DerivedClass";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
-           "new", &CreateInstance<DerivedClass, int, const char*>,
+           "new", &CreateOnHeap<DerivedClass, int, const char*>,
            "a", &DerivedClass::A,
            "b", &DerivedClass::B);
   }
@@ -238,7 +238,7 @@ struct Type<DerivedClass2> {
   using base = DerivedClass;
   static constexpr const char* name = "DerivedClass2";
   static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index, "new", &CreateInstance<DerivedClass2>,
+    RawSet(state, index, "new", &CreateOnHeap<DerivedClass2>,
                          "c", &DerivedClass2::C);
   }
 };
@@ -302,7 +302,7 @@ TEST_F(MetaTableTest, BaseConvertToDerivedClass) {
   ASSERT_FALSE(lua::Pop(state_, &d2));
 }
 
-TEST_F(MetaTableTest, PushWithoutCreateInstance) {
+TEST_F(MetaTableTest, PushWithoutCreateOnHeap) {
   lua::Push(state_, lua::MetaTable<DerivedClass2>());
   DerivedClass2* d2 = new DerivedClass2;
   lua::Push(state_, d2);
@@ -311,7 +311,7 @@ TEST_F(MetaTableTest, PushWithoutCreateInstance) {
   EXPECT_EQ(d2, b);
 }
 
-TEST_F(MetaTableTest, PushWithoutCreateInstanceAfterGC) {
+TEST_F(MetaTableTest, PushWithoutCreateOnHeapAfterGC) {
   lua::Push(state_, lua::MetaTable<DerivedClass2>());
   lua::Push(state_, new DerivedClass2);
 

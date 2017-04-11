@@ -9,5 +9,6 @@
 #include "lua/index.h"
 #include "lua/metatable.h"
 #include "lua/pcall.h"
+#include "lua/util.h"
 
 #endif  // LUA_LUA_H_

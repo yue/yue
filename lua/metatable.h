@@ -69,12 +69,6 @@ bool IsMetaTableInheritedFrom(State* state) {
   return IsMetaTableInheritedFrom<T>(state);
 }
 
-// A helper for creating a new instance of T.
-template<typename T, typename... ArgTypes>
-T* CreateInstance(const ArgTypes&... args) {
-  return new T(args...);
-}
-
 // The default type information for RefCounted class.
 template<typename T>
 struct Type<T*, typename std::enable_if<std::is_base_of<

@@ -26,6 +26,7 @@ source_set("lua") {
     "table_internal.h",
     "types.h",
     "user_data.h",
+    "util.h",
   ]
 
   if (is_win) {

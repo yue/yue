@@ -57,19 +57,6 @@ struct Type<T, typename std::enable_if<
   }
 };
 
-// Helper to push a type directly by invoking its constructor.
-template<typename T, typename... ArgTypes>
-struct NativeConstructor {
-  static T Call(ArgTypes... args) {
-    return std::move(T(args...));
-  }
-};
-template<typename T, typename... ArgTypes>
-inline void Push(State* state, NativeConstructor<T, ArgTypes...>) {
-  internal::PushCFunction(state,
-                          base::Bind(NativeConstructor<T, ArgTypes...>::Call));
-}
-
 }  // namespace lua
 
 #endif  // LUA_CALLBACK_H_

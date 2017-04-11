@@ -41,20 +41,6 @@ v8::MaybeLocal<v8::Object> CallConstructor(v8::Local<v8::Context> context) {
       NewInstance(context, 1, &indicator);
 }
 
-// Helper to create a new instance of |T|.
-template<typename T, typename... ArgTypes>
-v8::Local<v8::Value> CreateInstance(v8::Local<v8::Context> context,
-                                    const ArgTypes&... args) {
-  v8::Isolate* isolate = context->GetIsolate();
-  auto result = CallConstructor<T>(context);
-  if (result.IsEmpty())
-    return v8::Null(isolate);
-  // Store the new instance in the object.
-  v8::Local<v8::Object> obj = result.ToLocalChecked();
-  new internal::RefPtrObjectTracker<T>(isolate, obj, new T(args...));
-  return obj;
-}
-
 // Check if |obj|'s prototype is inherited from T's prototype.
 template<typename T>
 bool IsPrototypeInheritedFrom(v8::Local<v8::Context> context,

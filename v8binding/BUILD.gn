@@ -60,6 +60,7 @@ source_set("v8binding") {
     "prototype_internal.h",
     "template_util.h",
     "types.h",
+    "util.h",
     "v8binding.h",
   ]
 

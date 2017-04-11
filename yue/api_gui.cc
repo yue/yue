@@ -169,7 +169,7 @@ struct Type<nu::Font> {
   static constexpr const char* name = "yue.Font";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
-           "create", &CreateInstance<nu::Font, const std::string&, float>,
+           "create", &CreateOnHeap<nu::Font, const std::string&, float>,
            "default", &GetDefault,
            "getname", &nu::Font::GetName,
            "getsize", &nu::Font::GetSize);
@@ -184,8 +184,8 @@ struct Type<nu::Canvas> {
   static constexpr const char* name = "yue.Canvas";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
-           "create", &CreateInstance<nu::Canvas, const nu::SizeF&, float>,
-           "createformainscreen", &CreateInstance<nu::Canvas, const nu::SizeF&>,
+           "create", &CreateOnHeap<nu::Canvas, const nu::SizeF&, float>,
+           "createformainscreen", &CreateOnHeap<nu::Canvas, const nu::SizeF&>,
            "getscalefactor", &nu::Canvas::GetScaleFactor,
            "getpainter", &nu::Canvas::GetPainter,
            "getsize", &nu::Canvas::GetSize);
@@ -232,10 +232,9 @@ struct Type<nu::Color> {
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "getsystem", &nu::GetSystemColor,
-           "rgb", NativeConstructor<nu::Color,
-                                    unsigned, unsigned, unsigned>(),
-           "argb", NativeConstructor<nu::Color,
-                                     unsigned, unsigned, unsigned, unsigned>());
+           "rgb", &CreateOnStack<nu::Color, unsigned, unsigned, unsigned>,
+           "argb", &CreateOnStack<nu::Color, unsigned, unsigned, unsigned,
+                                  unsigned>);
   }
 };
 
@@ -244,7 +243,7 @@ struct Type<nu::Image> {
   static constexpr const char* name = "yue.Image";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
-           "createfromfile", &CreateInstance<nu::Image, const nu::FilePath&>,
+           "createfromfile", &CreateOnHeap<nu::Image, const nu::FilePath&>,
            "getsize", &nu::Image::GetSize,
            "getscalefactor", &nu::Image::GetScaleFactor);
   }
@@ -486,7 +485,7 @@ struct Type<nu::Window> {
   static constexpr const char* name = "yue.Window";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
-           "create", &CreateInstance<nu::Window, const nu::Window::Options&>,
+           "create", &CreateOnHeap<nu::Window, const nu::Window::Options&>,
            "close", &nu::Window::Close,
            "setcontentbounds", &nu::Window::SetContentBounds,
            "getcontentbounds", &nu::Window::GetContentBounds,
@@ -549,7 +548,7 @@ struct Type<nu::Container> {
   static constexpr const char* name = "yue.Container";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
-           "create", &CreateInstance<nu::Container>,
+           "create", &CreateOnHeap<nu::Container>,
            "getpreferredsize", &nu::Container::GetPreferredSize,
            "getpreferredwidthforheight",
            &nu::Container::GetPreferredWidthForHeight,
@@ -629,7 +628,7 @@ struct Type<nu::Entry> {
   static constexpr const char* name = "yue.Entry";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
-           "create", &CreateInstance<nu::Entry>,
+           "create", &CreateOnHeap<nu::Entry>,
            "settext", &nu::Entry::SetText,
            "gettext", &nu::Entry::GetText);
     RawSetProperty(state, metatable,
@@ -644,7 +643,7 @@ struct Type<nu::Label> {
   static constexpr const char* name = "yue.Label";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
-           "create", &CreateInstance<nu::Label, const std::string&>,
+           "create", &CreateOnHeap<nu::Label, const std::string&>,
            "settext", &nu::Label::SetText,
            "gettext", &nu::Label::GetText);
   }
@@ -656,7 +655,7 @@ struct Type<nu::Progress> {
   static constexpr const char* name = "yue.Progress";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
-           "create", &CreateInstance<nu::Progress>,
+           "create", &CreateOnHeap<nu::Progress>,
            "setvalue", &nu::Progress::SetValue,
            "getvalue", &nu::Progress::GetValue,
            "setindeterminate", &nu::Progress::SetIndeterminate,
@@ -670,7 +669,7 @@ struct Type<nu::Group> {
   static constexpr const char* name = "yue.Group";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
-           "create", &CreateInstance<nu::Group, const std::string&>,
+           "create", &CreateOnHeap<nu::Group, const std::string&>,
            "setcontentview", &nu::Group::SetContentView,
            "getcontentview", &nu::Group::GetContentView,
            "settitle", &nu::Group::SetTitle,
@@ -714,7 +713,7 @@ struct Type<nu::Scroll> {
   static constexpr const char* name = "yue.Scroll";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
-           "create", &CreateInstance<nu::Scroll>,
+           "create", &CreateOnHeap<nu::Scroll>,
            "setscrollbarpolicy", &nu::Scroll::SetScrollbarPolicy,
            "getscrollbarpolicy", &nu::Scroll::GetScrollbarPolicy,
            "setcontentsize", &nu::Scroll::SetContentSize,
@@ -731,7 +730,7 @@ struct Type<nu::Vibrant> {
   static constexpr const char* name = "yue.Vibrant";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
-           "create", &CreateInstance<nu::Vibrant>);
+           "create", &CreateOnHeap<nu::Vibrant>);
   }
 };
 #endif
