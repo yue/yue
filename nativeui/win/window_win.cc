@@ -92,8 +92,8 @@ void WindowImpl::OnClose() {
 }
 
 void WindowImpl::OnCommand(UINT code, int command, HWND window) {
-  if (!code && !window && delegate_->GetMenuBar()) {
-    DispatchCommandToItem(delegate_->GetMenuBar(), command);
+  if (!code && !window && delegate_->GetMenu()) {
+    DispatchCommandToItem(delegate_->GetMenu(), command);
     return;
   } else if (::GetParent(window) != hwnd()) {
     LOG(ERROR) << "Received notification " << code << " " << command
@@ -159,7 +159,7 @@ LRESULT WindowImpl::OnMouseClick(UINT message, WPARAM w_param,
 }
 
 void WindowImpl::OnKeyDown(UINT ch, UINT repeat, UINT flags) {
-  if (!delegate_->GetMenuBar())
+  if (!delegate_->GetMenu())
     return;
   int modifiers = 0;
   if ((::GetKeyState(VK_SHIFT) & 0x8000) == 0x8000)
@@ -172,9 +172,9 @@ void WindowImpl::OnKeyDown(UINT ch, UINT repeat, UINT flags) {
       (::GetKeyState(VK_RWIN) & 0x8000) == 0x8000)
     modifiers |= MASK_COMMAND;
   Accelerator accelerator(static_cast<KeyboardCode>(ch), modifiers);
-  int command = delegate_->GetMenuBar()->accel_manager()->Process(accelerator);
+  int command = delegate_->GetMenu()->accel_manager()->Process(accelerator);
   if (command != -1)
-    DispatchCommandToItem(delegate_->GetMenuBar(), command);
+    DispatchCommandToItem(delegate_->GetMenu(), command);
 }
 
 void WindowImpl::OnChar(UINT ch, UINT repeat, UINT flags) {
@@ -256,7 +256,7 @@ void Window::PlatformSetContentView(Container* container) {
   container->SetPixelBounds(Rect(window_->GetContentPixelBounds().size()));
 }
 
-void Window::PlatformSetMenuBar(MenuBar* menu_bar) {
+void Window::PlatformSetMenu(MenuBar* menu_bar) {
   ::SetMenu(window_->hwnd(), menu_bar ? menu_bar->GetNative() : NULL);
 }
 

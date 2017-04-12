@@ -38,12 +38,12 @@ Container* Window::GetContentView() const {
 }
 
 #if defined(OS_WIN) || defined(OS_LINUX)
-void Window::SetMenuBar(MenuBar* menu_bar) {
-  PlatformSetMenuBar(menu_bar);
+void Window::SetMenu(MenuBar* menu_bar) {
+  PlatformSetMenu(menu_bar);
   menu_bar_ = menu_bar;
 }
 
-MenuBar* Window::GetMenuBar() const {
+MenuBar* Window::GetMenu() const {
   return menu_bar_.get();
 }
 #endif

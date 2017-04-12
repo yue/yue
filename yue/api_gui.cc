@@ -540,8 +540,8 @@ struct Type<nu::Window> {
            "setvisible", &nu::Window::SetVisible,
            "isvisible", &nu::Window::IsVisible,
 #if defined(OS_WIN) || defined(OS_LINUX)
-           "setmenubar", &nu::Window::SetMenuBar,
-           "getmenubar", &nu::Window::GetMenuBar,
+           "setmenu", &nu::Window::SetMenu,
+           "getmenu", &nu::Window::GetMenu,
 #endif
            "setbackgroundcolor", &nu::Window::SetBackgroundColor);
     RawSetProperty(state, metatable,

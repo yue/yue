@@ -597,8 +597,8 @@ struct Type<nu::Window> {
         "setVisible", &nu::Window::SetVisible,
         "isVisible", &nu::Window::IsVisible,
 #if defined(OS_WIN) || defined(OS_LINUX)
-        "setMenuBar", &nu::Window::SetMenuBar,
-        "getMenuBar", &nu::Window::GetMenuBar,
+        "setMenu", &nu::Window::SetMenu,
+        "getMenu", &nu::Window::GetMenu,
 #endif
         "setBackgroundColor", &nu::Window::SetBackgroundColor);
     SetProperty(context, templ,

@@ -37,8 +37,8 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
   bool IsVisible() const;
 
 #if defined(OS_WIN) || defined(OS_LINUX)
-  void SetMenuBar(MenuBar* menu_bar);
-  MenuBar* GetMenuBar() const;
+  void SetMenu(MenuBar* menu_bar);
+  MenuBar* GetMenu() const;
 #endif
 
   void SetBackgroundColor(Color color);
@@ -63,7 +63,7 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
   void PlatformDestroy();
   void PlatformSetContentView(Container* container);
 #if defined(OS_WIN) || defined(OS_LINUX)
-  void PlatformSetMenuBar(MenuBar* menu_bar);
+  void PlatformSetMenu(MenuBar* menu_bar);
 #endif
 
   // The yoga config for window's children.

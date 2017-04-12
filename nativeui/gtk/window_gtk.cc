@@ -74,7 +74,7 @@ void Window::PlatformSetContentView(Container* container) {
   ForceSizeAllocation(window_, container->GetNative());
 }
 
-void Window::PlatformSetMenuBar(MenuBar* menu_bar) {
+void Window::PlatformSetMenu(MenuBar* menu_bar) {
   GtkContainer* vbox = GTK_CONTAINER(gtk_bin_get_child(GTK_BIN(window_)));
   if (menu_bar_)
     gtk_container_remove(vbox, GTK_WIDGET(menu_bar_->GetNative()));
