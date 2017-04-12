@@ -354,7 +354,8 @@ struct Type<nu::Event> {
     RawSet(state, index,
            "type", event->type,
            "positioninscreen", event->position_in_screen,
-           "modifiers", event->modifiers);
+           "modifiers", event->modifiers,
+           "timestamp", event->timestamp);
   }
 };
 

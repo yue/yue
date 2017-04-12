@@ -53,6 +53,7 @@ Event::Event(NativeEvent event)
       position_in_screen(FlipScreenPos([NSEvent mouseLocation],
                                        [[event window] screen])),
       modifiers(EventModifiersFromNS([event modifierFlags])),
+      timestamp([event timestamp] * 1000),
       native_event(event) {
 }
 

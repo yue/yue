@@ -20,6 +20,7 @@ struct NATIVEUI_EXPORT Event {
   EventType type = EventType::Unkown;
   PointF position_in_screen;
   int modifiers = 0;
+  uint32_t timestamp = 0;
 
 #if !defined(OS_WIN)
   NativeEvent native_event = nullptr;

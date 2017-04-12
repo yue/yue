@@ -393,7 +393,8 @@ struct Type<nu::Event> {
     Set(context, obj,
         "type", event->type,
         "positionInScreen", event->position_in_screen,
-        "modifiers", event->modifiers);
+        "modifiers", event->modifiers,
+        "timestamp", event->timestamp);
   }
 };
 
