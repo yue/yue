@@ -15,14 +15,15 @@ namespace {
 
 class ProgressImpl : public SubwinView {
  public:
-  ProgressImpl()
-      : SubwinView(PROGRESS_CLASS, PBS_SMOOTH | WS_CHILD | WS_VISIBLE) {}
+  explicit ProgressImpl(Progress* delegate)
+      : SubwinView(delegate, PROGRESS_CLASS,
+                   PBS_SMOOTH | WS_CHILD | WS_VISIBLE) {}
 };
 
 }  // namespace
 
 Progress::Progress() {
-  TakeOverView(new ProgressImpl());
+  TakeOverView(new ProgressImpl(this));
   SetDefaultStyle(ScaleSize(SizeF(0, GetSystemMetrics(SM_CYVSCROLL)),
                             1.0f / GetScaleFactor()));
 }

@@ -11,8 +11,8 @@
 
 namespace nu {
 
-ViewImpl::ViewImpl(ControlType type)
-    : type_(type), scale_factor_(GetScaleFactor()) {}
+ViewImpl::ViewImpl(ControlType type, View* delegate)
+    : type_(type), scale_factor_(GetScaleFactor()), delegate_(delegate) {}
 
 void ViewImpl::SizeAllocate(const Rect& size_allocation) {
   if (size_allocation == size_allocation_)
@@ -86,6 +86,10 @@ void ViewImpl::Draw(PainterWin* painter, const Rect& dirty) {
     painter->SetColor(background_color_);
     painter->FillRectPixel(dirty);
   }
+}
+
+bool ViewImpl::OnMouseClick(UINT message, UINT flags, const Point& point) {
+  return false;
 }
 
 Point ViewImpl::GetMousePosition() const {

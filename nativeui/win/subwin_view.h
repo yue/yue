@@ -13,7 +13,8 @@ namespace nu {
 // The base class for implementing sub-window based UI.
 class SubwinView : public Win32Window, public ViewImpl {
  public:
-  SubwinView(base::StringPiece16 class_name = L"",
+  SubwinView(View* delegate,
+             base::StringPiece16 class_name = L"",
              DWORD window_style = kWindowDefaultChildStyle,
              DWORD window_ex_style = 0);
   ~SubwinView() override;

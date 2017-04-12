@@ -22,10 +22,10 @@ const int kEntryPadding = 1;
 class EntryImpl : public SubwinView {
  public:
   explicit EntryImpl(Entry* delegate)
-      : SubwinView(L"edit",
+      : SubwinView(delegate,
+                   L"edit",
                    ES_AUTOHSCROLL | WS_CHILD | WS_VISIBLE,
                    WS_EX_CLIENTEDGE),
-        delegate_(delegate),
         proc_(SetWindowProc(hwnd(), &WndProc)) {
   }
 
@@ -40,7 +40,7 @@ class EntryImpl : public SubwinView {
 
   void OnCommand(UINT code, int command) override {
     if (code == EN_CHANGE)
-      delegate_->on_text_change.Emit();
+      static_cast<Entry*>(delegate())->on_text_change.Emit();
   }
 
   bool OnCtlColor(HDC dc, HBRUSH* brush) override {
@@ -59,7 +59,7 @@ class EntryImpl : public SubwinView {
       return 0;
     if (message == WM_CHAR && w_param == VK_RETURN) {
       // Pressing enter means activate.
-      self->delegate_->on_activate.Emit();
+      static_cast<Entry*>(self->delegate())->on_activate.Emit();
       return 0;
     } else if (message == WM_CHAR && w_param == VK_TAB) {
       // Let the parent handle focus switching.
@@ -68,15 +68,13 @@ class EntryImpl : public SubwinView {
     } else if (message == WM_SETFOCUS) {
       // Notify the window that focus has changed.
       if (self->window()) {
-        self->window()->focus_manager()->TakeFocus(self->delegate_);
+        self->window()->focus_manager()->TakeFocus(self->delegate());
       }
     }
     return CallWindowProc(self->proc_, hwnd, message, w_param, l_param);
   }
 
  private:
-  Entry* delegate_;
-
   base::win::ScopedGDIObject<HBRUSH> bg_brush_;
 
   WNDPROC proc_ = nullptr;

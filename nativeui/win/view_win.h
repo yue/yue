@@ -75,9 +75,7 @@ class ViewImpl {
   virtual void OnMouseLeave() {}
   virtual bool OnMouseWheel(bool vertical, UINT flags, int delta,
                             const Point& point) { return false; }
-  virtual bool OnMouseClick(UINT message, UINT flags, const Point& point) {
-      return false;
-  }
+  virtual bool OnMouseClick(UINT message, UINT flags, const Point& point);
 
   // Called when the view lost capture.
   virtual void OnCaptureLost() {}
@@ -112,9 +110,10 @@ class ViewImpl {
 
   WindowImpl* window() const { return window_; }
   ControlType type() const { return type_; }
+  View* delegate() const { return delegate_; }
 
  protected:
-  explicit ViewImpl(ControlType type);
+  ViewImpl(ControlType type, View* delegate);
 
   // Called by SetParent/BecomeContentView when parent view changes.
   void ParentChanged();
@@ -142,6 +141,9 @@ class ViewImpl {
 
   // The scale factor this view uses.
   float scale_factor_;
+
+  // The view which this class implements, this can be nullptr;
+  View* delegate_;
 
   // The absolute bounds relative to the origin of window.
   Rect size_allocation_;

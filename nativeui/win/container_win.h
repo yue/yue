@@ -16,9 +16,9 @@ namespace nu {
 // The common base for views that have children.
 class ContainerImpl : public ViewImpl {
  public:
-  class Delegate {
+  class Adapter {
    public:
-    virtual ~Delegate() = default;
+    virtual ~Adapter() = default;
 
     virtual void Layout() = 0;
     virtual void ForEach(const std::function<bool(ViewImpl*)>& callback) = 0;
@@ -26,7 +26,7 @@ class ContainerImpl : public ViewImpl {
     virtual void OnDraw(PainterWin* painter, const Rect& dirty) {}
   };
 
-  ContainerImpl(Delegate* delegate, ControlType type);
+  ContainerImpl(ControlType type, View* view, Adapter* delegate);
 
   // Baseview:
   void SizeAllocate(const Rect& size_allocation) override;
@@ -47,7 +47,7 @@ class ContainerImpl : public ViewImpl {
   void RefreshParentTree();
   ViewImpl* FindChildFromPoint(const Point& point);
 
-  Delegate* delegate_;
+  Adapter* adapter_;
 
   // The View in which mouse hovers.
   ViewImpl* hover_view_ = nullptr;

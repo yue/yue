@@ -9,13 +9,13 @@
 
 namespace nu {
 
-ContainerImpl::ContainerImpl(Delegate* delegate, ControlType type)
-    : ViewImpl(type), delegate_(delegate) {}
+ContainerImpl::ContainerImpl(ControlType type, View* delegate, Adapter* adapter)
+    : ViewImpl(type, delegate), adapter_(adapter) {}
 
 void ContainerImpl::SizeAllocate(const Rect& size_allocation) {
   ViewImpl::SizeAllocate(size_allocation);
   if (!size_allocation.size().IsEmpty())
-    delegate_->Layout();
+    adapter_->Layout();
 }
 
 void ContainerImpl::SetParent(ViewImpl* parent) {
@@ -30,7 +30,7 @@ void ContainerImpl::BecomeContentView(WindowImpl* parent) {
 
 void ContainerImpl::SetVisible(bool visible) {
   ViewImpl::SetVisible(visible);
-  delegate_->ForEach([=](ViewImpl* child) {
+  adapter_->ForEach([=](ViewImpl* child) {
     child->SetVisible(visible);
     return true;
   });
@@ -38,8 +38,8 @@ void ContainerImpl::SetVisible(bool visible) {
 
 void ContainerImpl::Draw(PainterWin* painter, const Rect& dirty) {
   ViewImpl::Draw(painter, dirty);
-  delegate_->OnDraw(painter, dirty);
-  delegate_->ForEach([&](ViewImpl* child) {
+  adapter_->OnDraw(painter, dirty);
+  adapter_->ForEach([&](ViewImpl* child) {
     DrawChild(child, painter, dirty);
     return true;
   });
@@ -51,7 +51,7 @@ void ContainerImpl::OnMouseMove(UINT flags, const Point& point) {
 
   // Emit mouse enter/leave events
   if (hover_view_ != hover_view) {
-    if (hover_view_ && delegate_->HasChild(hover_view_))
+    if (hover_view_ && adapter_->HasChild(hover_view_))
       hover_view_->OnMouseLeave();
     hover_view_ = hover_view;
     if (hover_view_)
@@ -64,7 +64,7 @@ void ContainerImpl::OnMouseMove(UINT flags, const Point& point) {
 
 void ContainerImpl::OnMouseLeave() {
   if (hover_view_) {
-    if (delegate_->HasChild(hover_view_))
+    if (adapter_->HasChild(hover_view_))
       hover_view_->OnMouseLeave();
     hover_view_ = nullptr;
   }
@@ -107,7 +107,7 @@ void ContainerImpl::DrawChild(ViewImpl* child, PainterWin* painter,
 }
 
 void ContainerImpl::RefreshParentTree() {
-  delegate_->ForEach([this](ViewImpl* child) {
+  adapter_->ForEach([this](ViewImpl* child) {
     child->SetParent(this);
     return true;
   });
@@ -115,7 +115,7 @@ void ContainerImpl::RefreshParentTree() {
 
 ViewImpl* ContainerImpl::FindChildFromPoint(const Point& point) {
   ViewImpl* result = nullptr;
-  delegate_->ForEach([&](ViewImpl* child) {
+  adapter_->ForEach([&](ViewImpl* child) {
     if (!child->is_visible())
       return true;
     Rect child_rect = child->GetClippedRect();
@@ -129,17 +129,18 @@ ViewImpl* ContainerImpl::FindChildFromPoint(const Point& point) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Adapter from Container to Container::Delegate.
+// Adapter from Container to Container::Adapter.
 
 namespace {
 
 class ContainerAdapter : public ContainerImpl,
-                         public ContainerImpl::Delegate {
+                         public ContainerImpl::Adapter {
  public:
   explicit ContainerAdapter(Container* container)
-      : ContainerImpl(this, ControlType::Container), container_(container) {}
+      : ContainerImpl(ControlType::Container, container, this),
+        container_(container) {}
 
-  // ContainerImpl::Delegate:
+  // ContainerImpl::Adapter:
   void Layout() override {
     container_->BoundsChanged();
   }

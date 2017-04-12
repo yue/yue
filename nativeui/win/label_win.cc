@@ -18,7 +18,8 @@ namespace {
 
 class LabelImpl : public ViewImpl {
  public:
-  LabelImpl() : ViewImpl(ControlType::Label) {}
+  explicit LabelImpl(Label* delegate)
+      : ViewImpl(ControlType::Label, delegate) {}
 
   void SetText(const base::string16& text) {
     text_ = text;
@@ -43,7 +44,7 @@ class LabelImpl : public ViewImpl {
 }  // namespace
 
 Label::Label(const std::string& text) {
-  TakeOverView(new LabelImpl());
+  TakeOverView(new LabelImpl(this));
   SetText(text);
 }
 

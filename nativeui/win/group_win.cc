@@ -22,10 +22,11 @@ namespace {
 const int kTitleLeftMargin = 5;
 
 class GroupImpl : public ContainerImpl,
-                  public ContainerImpl::Delegate {
+                  public ContainerImpl::Adapter {
  public:
   explicit GroupImpl(Group* delegate)
-      : ContainerImpl(this, ControlType::Group), delegate_(delegate) {}
+      : ContainerImpl(ControlType::Group, delegate, this),
+        delegate_(delegate) {}
 
   void SetTitle(const base::string16& title) {
     title_ = title;

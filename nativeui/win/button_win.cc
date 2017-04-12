@@ -30,8 +30,8 @@ class ButtonImpl : public ViewImpl {
   ButtonImpl(Button::Type type, Button* delegate)
       : ViewImpl(type == Button::Type::Normal ? ControlType::Button
                     : (type == Button::Type::CheckBox ? ControlType::CheckBox
-                                                      : ControlType::Radio)),
-        delegate_(delegate) {
+                                                      : ControlType::Radio),
+                 delegate) {
     OnDPIChanged();  // update component size
   }
 
@@ -58,7 +58,7 @@ class ButtonImpl : public ViewImpl {
       SetChecked(!IsChecked());
     else if (type() == ControlType::Radio && !IsChecked())
       SetChecked(true);
-    delegate_->on_click.Emit();
+    static_cast<Button*>(delegate())->on_click.Emit();
   }
 
   void SetChecked(bool checked) {
@@ -69,12 +69,13 @@ class ButtonImpl : public ViewImpl {
     Invalidate();
 
     // And flip all other radio buttons' state.
-    if (checked && type() == ControlType::Radio && delegate_->GetParent() &&
-        delegate_->GetParent()->GetNative()->type() == ControlType::Container) {
-      auto* container = static_cast<Container*>(delegate_->GetParent());
+    View* parent = delegate()->GetParent();
+    if (checked && type() == ControlType::Radio && parent &&
+        parent->GetNative()->type() == ControlType::Container) {
+      auto* container = static_cast<Container*>(parent);
       for (int i = 0; i < container->ChildCount(); ++i) {
         View* child = container->ChildAt(i);
-        if (child != delegate_ &&
+        if (child != delegate() &&
             child->GetNative()->type() == ControlType::Radio)
           static_cast<Button*>(child)->SetChecked(false);
       }
@@ -194,7 +195,7 @@ class ButtonImpl : public ViewImpl {
     }
 
     // Clicking a button moves the focus to it.
-    window()->focus_manager()->TakeFocus(delegate_);
+    window()->focus_manager()->TakeFocus(delegate());
     return true;
   }
 
@@ -207,7 +208,6 @@ class ButtonImpl : public ViewImpl {
   NativeTheme::ButtonExtraParams* params() { return &params_; }
 
  private:
-  NativeTheme* theme_;
   NativeTheme::ButtonExtraParams params_ = {0};
 
   // The size of box for radio and checkbox.
@@ -223,7 +223,6 @@ class ButtonImpl : public ViewImpl {
   bool is_hovering_ = false;
 
   base::string16 title_;
-  Button* delegate_;
 };
 
 }  // namespace

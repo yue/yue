@@ -11,11 +11,12 @@
 
 namespace nu {
 
-SubwinView::SubwinView(base::StringPiece16 class_name,
+SubwinView::SubwinView(View* delegate,
+                       base::StringPiece16 class_name,
                        DWORD window_style, DWORD window_ex_style)
     : Win32Window(class_name, State::GetCurrent()->GetSubwinHolder(),
-                 window_style, window_ex_style),
-      ViewImpl(ControlType::Subwin) {
+                  window_style, window_ex_style),
+      ViewImpl(ControlType::Subwin, delegate) {
   // Create HFONT from default system font.
   base::win::ScopedCreateDC mem_dc(CreateCompatibleDC(NULL));
   Gdiplus::Graphics context(mem_dc.Get());

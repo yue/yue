@@ -9,7 +9,7 @@
 namespace nu {
 
 ScrollbarButton::ScrollbarButton(Type type, Scrollbar* scrollbar)
-    : ViewImpl(ControlType::ScrollbarButton),
+    : ViewImpl(ControlType::ScrollbarButton, nullptr),
       repeater_(base::Bind(&ScrollbarButton::OnClick, base::Unretained(this))),
       type_(type),
       scrollbar_(scrollbar) {

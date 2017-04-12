@@ -18,7 +18,7 @@ class Scrollbar;
 
 // The implementation for the Scroll view.
 class ScrollImpl : public ContainerImpl,
-                   public ContainerImpl::Delegate {
+                   public ContainerImpl::Adapter {
  public:
   explicit ScrollImpl(Scroll* delegate);
 
@@ -29,7 +29,7 @@ class ScrollImpl : public ContainerImpl,
   Rect GetViewportRect() const;
   void OnScroll(int x, int y);
 
-  // ContainerImpl::Delegate:
+  // ContainerImpl::Adapter:
   void Layout() override;
   void ForEach(const std::function<bool(ViewImpl*)>& callback) override;
   bool HasChild(ViewImpl* child) override;
