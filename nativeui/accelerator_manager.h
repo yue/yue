@@ -9,9 +9,10 @@
 
 #include "base/macros.h"
 #include "build/build_config.h"
+#include "nativeui/nativeui_export.h"
 
 #if defined(OS_LINUX)
-#include <gtk/gtk.h>  // NOLINT
+typedef struct _GtkAccelGroup GtkAccelGroup;
 #endif
 
 namespace nu {
@@ -19,8 +20,8 @@ namespace nu {
 class Accelerator;
 class MenuItem;
 
-// Internal class reponsible for registering accelerators.
-class AcceleratorManager {
+// Internal: Class reponsible for registering accelerators.
+class NATIVEUI_EXPORT AcceleratorManager {
  public:
   AcceleratorManager();
   ~AcceleratorManager();

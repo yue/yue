@@ -77,7 +77,7 @@ SizeF GetPreferredSizeForText(const std::string& text) {
 }  // namespace
 
 Label::Label(const std::string& text) {
-  TakeOverView([[NULabel alloc] init]);
+  TakeOverView([[NULabel alloc] initWithShell:this]);
   SetText(text);
 }
 

@@ -7,6 +7,7 @@
 #include <objc/objc-runtime.h>
 
 #include "base/logging.h"
+#include "nativeui/events/event.h"
 #include "nativeui/mac/view_mac.h"
 
 namespace nu {
@@ -28,12 +29,12 @@ void OnMouseEvent(NSView* self, SEL _cmd, NSEvent* event) {
     case NSLeftMouseDown:
     case NSRightMouseDown:
     case NSOtherMouseDown:
-      prevent_default = view->on_mouse_down.Emit();
+      prevent_default = view->on_mouse_down.Emit(view, MouseEvent(event, self));
       break;
     case NSLeftMouseUp:
     case NSRightMouseUp:
     case NSOtherMouseUp:
-      prevent_default = view->on_mouse_up.Emit();
+      prevent_default = view->on_mouse_up.Emit(view, MouseEvent(event, self));
       break;
     default:
       NOTREACHED() << "Got unexpected event: " << [event type];

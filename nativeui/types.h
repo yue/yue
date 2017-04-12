@@ -14,6 +14,7 @@
 #endif
 
 #if defined(OS_LINUX)
+typedef struct _GdkEvent GdkEvent;
 typedef struct _GdkPixbuf GdkPixbuf;
 typedef struct _GtkMenuItem GtkMenuItem;
 typedef struct _GtkMenuShell GtkMenuShell;
@@ -28,6 +29,7 @@ typedef struct _cairo cairo_t;
 typedef struct CGContext* CGContextRef;
 #ifdef __OBJC__
 @class NSBitmapImageRep;
+@class NSEvent;
 @class NSFont;
 @class NSGraphicsContext;
 @class NSImage;
@@ -37,6 +39,7 @@ typedef struct CGContext* CGContextRef;
 @class NSWindow;
 #else
 class NSBitmapImageRep;
+class NSEvent;
 class NSFont;
 class NSGraphicsContext;
 class NSImage;
@@ -82,6 +85,7 @@ using FilePath = std::string;
 #endif
 
 #if defined(OS_MACOSX)
+using NativeEvent = NSEvent*;
 using NativeView = NSView*;
 using NativeWindow = NSWindow*;
 using NativeBitmap = CGContextRef;
@@ -91,6 +95,7 @@ using NativeFont = NSFont*;
 using NativeMenu = NSMenu*;
 using NativeMenuItem = NSMenuItem*;
 #elif defined(OS_LINUX)
+using NativeEvent = GdkEvent*;
 using NativeView = GtkWidget*;
 using NativeWindow = GtkWindow*;
 using NativeBitmap = cairo_surface_t*;

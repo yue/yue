@@ -4,6 +4,10 @@
 
 #include "nativeui/accelerator_manager.h"
 
+#if defined(OS_LINUX)
+#include <gtk/gtk.h>
+#endif
+
 #include "nativeui/menu_item.h"
 
 namespace nu {

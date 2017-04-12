@@ -322,7 +322,7 @@ template<>
 struct Type<nu::TextMetrics> {
   static constexpr const char* name = "yue.TextMetrics";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
-                                   const nu::TextMetrics metrics) {
+                                   const nu::TextMetrics& metrics) {
     v8::Local<v8::Object> obj = v8::Object::New(context->GetIsolate());
     Set(context, obj, "size", metrics.size);
     return obj;
@@ -363,6 +363,52 @@ struct Type<nu::Painter> {
         "fillRect", &nu::Painter::FillRect,
         "measureText", &nu::Painter::MeasureText,
         "drawText", &nu::Painter::DrawText);
+  }
+};
+
+template<>
+struct Type<nu::EventType> {
+  static constexpr const char* name = "yue.EventType";
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   nu::EventType type) {
+    switch (type) {
+      case nu::EventType::MouseDown:
+        return vb::ToV8(context, "mouseDown");
+      case nu::EventType::MouseUp:
+        return vb::ToV8(context, "mouseUp");
+      default:
+        NOTREACHED();
+    }
+    return v8::Undefined(context->GetIsolate());
+  }
+};
+
+template<>
+struct Type<nu::Event> {
+  static constexpr const char* name = "yue.Event";
+  // Used by subclasses.
+  static void SetEventProperties(v8::Local<v8::Context> context,
+                                 v8::Local<v8::Object> obj,
+                                 const nu::Event* event) {
+    Set(context, obj,
+        "type", event->type,
+        "positionInScreen", event->position_in_screen,
+        "modifiers", event->modifiers);
+  }
+};
+
+template<>
+struct Type<nu::MouseEvent> {
+  using base = nu::Event;
+  static constexpr const char* name = "yue.MouseEvent";
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   const nu::MouseEvent& event) {
+    v8::Local<v8::Object> obj = v8::Object::New(context->GetIsolate());
+    Type<nu::Event>::SetEventProperties(context, obj, &event);
+    Set(context, obj,
+        "button", event.button,
+        "positionInWindow", event.position_in_window);
+    return obj;
   }
 };
 

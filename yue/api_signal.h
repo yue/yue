@@ -42,8 +42,7 @@ struct Type<nu::Signal<Sig>> {
     RawSet(state, metatable,
            "connect", &nu::Signal<Sig>::Connect,
            "disconnect", &nu::Signal<Sig>::Disconnect,
-           "disconnectall", &nu::Signal<Sig>::DisconnectAll,
-           "emit", &nu::Signal<Sig>::DisconnectAll);
+           "disconnectall", &nu::Signal<Sig>::DisconnectAll);
   }
   static bool To(State* state, int value, nu::Signal<Sig>* out) {
     if (lua::GetType(state, value) != lua::LuaType::Function)

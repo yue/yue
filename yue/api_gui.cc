@@ -329,6 +329,49 @@ struct Type<nu::Painter> {
 };
 
 template<>
+struct Type<nu::EventType> {
+  static constexpr const char* name = "yue.EventType";
+  static inline void Push(State* state, nu::EventType type) {
+    switch (type) {
+      case nu::EventType::MouseDown:
+        lua::Push(state, "mousedown");
+      case nu::EventType::MouseUp:
+        lua::Push(state, "mouseup");
+      default:
+        NOTREACHED();
+        lua::Push(state, nullptr);
+    }
+  }
+};
+
+template<>
+struct Type<nu::Event> {
+  static constexpr const char* name = "yue.Event";
+  // Used by subclasses.
+  static void SetEventProperties(State* state,
+                                 int index,
+                                 const nu::Event* event) {
+    RawSet(state, index,
+           "type", event->type,
+           "positioninscreen", event->position_in_screen,
+           "modifiers", event->modifiers);
+  }
+};
+
+template<>
+struct Type<nu::MouseEvent> {
+  using base = nu::Event;
+  static constexpr const char* name = "yue.MouseEvent";
+  static inline void Push(State* state, const nu::MouseEvent& event) {
+    NewTable(state);
+    Type<nu::Event>::SetEventProperties(state, -1, &event);
+    RawSet(state, -1,
+           "button", event.button,
+           "positioninwindow", event.position_in_window);
+  }
+};
+
+template<>
 struct Type<nu::MenuBase> {
   static constexpr const char* name = "yue.MenuBase";
   static void BuildMetaTable(State* state, int metatable) {

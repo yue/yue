@@ -37,8 +37,7 @@ struct Type<nu::Signal<Sig>> {
     Set(context, templ,
         "connect", &nu::Signal<Sig>::Connect,
         "disconnect", &nu::Signal<Sig>::Disconnect,
-        "disconnectAll", &nu::Signal<Sig>::DisconnectAll,
-        "emit", &nu::Signal<Sig>::Emit);
+        "disconnectAll", &nu::Signal<Sig>::DisconnectAll);
   }
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
