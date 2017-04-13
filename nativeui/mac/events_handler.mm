@@ -24,23 +24,15 @@ void OnMouseEvent(NSView* self, SEL _cmd, NSEvent* event) {
   View* view = [self shell];
   DCHECK(view);
 
+  // Emit the event to View.
   bool prevent_default = false;
-  switch ([event type]) {
-    case NSLeftMouseDown:
-    case NSRightMouseDown:
-    case NSOtherMouseDown:
-      prevent_default = view->on_mouse_down.Emit(view, MouseEvent(event, self));
-      break;
-    case NSLeftMouseUp:
-    case NSRightMouseUp:
-    case NSOtherMouseUp:
-      prevent_default = view->on_mouse_up.Emit(view, MouseEvent(event, self));
-      break;
-    default:
-      NOTREACHED() << "Got unexpected event: " << [event type];
-      break;
-  }
+  MouseEvent mouse_event(event, self);
+  if (mouse_event.type == EventType::MouseDown)
+    prevent_default = view->on_mouse_down.Emit(view, mouse_event);
+  else if (mouse_event.type == EventType::MouseDown)
+    prevent_default = view->on_mouse_up.Emit(view, mouse_event);
 
+  // Transfer the event to super class.
   if (!prevent_default) {
     auto super_impl = reinterpret_cast<void (*)(NSView*, SEL, NSEvent*)>(
         [[self superclass] instanceMethodForSelector:_cmd]);
