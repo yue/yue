@@ -41,9 +41,9 @@ TEST_F(ButtonTest, UpdateStyle) {
 }
 #endif
 
-TEST_F(ButtonTest, CheckBox) {
+TEST_F(ButtonTest, Checkbox) {
   scoped_refptr<nu::Button> button =
-      new nu::Button("title", nu::Button::CheckBox);
+      new nu::Button("title", nu::Button::Checkbox);
   EXPECT_FALSE(button->IsChecked());
   button->SetChecked(true);
   EXPECT_TRUE(button->IsChecked());

@@ -24,13 +24,13 @@ namespace nu {
 namespace {
 
 const int kButtonPadding = 3;
-const int kCheckBoxPadding = 1;
+const int kCheckboxPadding = 1;
 
 class ButtonImpl : public ViewImpl {
  public:
   ButtonImpl(Button::Type type, Button* delegate)
       : ViewImpl(type == Button::Type::Normal ? ControlType::Button
-                    : (type == Button::Type::CheckBox ? ControlType::CheckBox
+                    : (type == Button::Type::Checkbox ? ControlType::Checkbox
                                                       : ControlType::Radio),
                  delegate) {
     OnDPIChanged();  // update component size
@@ -47,7 +47,7 @@ class ButtonImpl : public ViewImpl {
 
   SizeF GetPreferredSize() const {
     float padding =
-        (type() == ControlType::Button ? kButtonPadding : kCheckBoxPadding) *
+        (type() == ControlType::Button ? kButtonPadding : kCheckboxPadding) *
         scale_factor();
     SizeF preferred_size(text_size_);
     preferred_size.Enlarge(box_size_.width() + padding * 2, padding * 2);
@@ -55,7 +55,7 @@ class ButtonImpl : public ViewImpl {
   }
 
   void OnClick() {
-    if (type() == ControlType::CheckBox)
+    if (type() == ControlType::Checkbox)
       SetChecked(!IsChecked());
     else if (type() == ControlType::Radio && !IsChecked())
       SetChecked(true);
@@ -121,8 +121,8 @@ class ButtonImpl : public ViewImpl {
     // Draw the box.
     Point box_origin = origin;
     box_origin.Offset(0, (preferred_size.height() - box_size_.height()) / 2);
-    if (type() == ControlType::CheckBox)
-      painter->DrawNativeTheme(NativeTheme::Part::CheckBox,
+    if (type() == ControlType::Checkbox)
+      painter->DrawNativeTheme(NativeTheme::Part::Checkbox,
                                state(), Rect(box_origin, box_size_), params);
     else if (type() == ControlType::Radio)
       painter->DrawNativeTheme(NativeTheme::Part::Radio,
@@ -130,7 +130,7 @@ class ButtonImpl : public ViewImpl {
 
     // The bounds of text.
     int padding = std::ceil(
-        (type() == ControlType::Button ? kButtonPadding : kCheckBoxPadding) *
+        (type() == ControlType::Button ? kButtonPadding : kCheckboxPadding) *
         scale_factor());
     Rect text_bounds(origin, preferred_size);
     text_bounds.Inset(box_size_.width() + padding, padding, padding, padding);
@@ -157,8 +157,8 @@ class ButtonImpl : public ViewImpl {
   void OnDPIChanged() override {
     NativeTheme* theme = State::GetCurrent()->GetNativeTheme();
     base::win::ScopedGetDC dc(window() ? window()->hwnd() : NULL);
-    if (type() == ControlType::CheckBox)
-      box_size_ = theme->GetThemePartSize(dc, NativeTheme::Part::CheckBox,
+    if (type() == ControlType::Checkbox)
+      box_size_ = theme->GetThemePartSize(dc, NativeTheme::Part::Checkbox,
                                           state());
     else if (type() == ControlType::Radio)
       box_size_ = theme->GetThemePartSize(dc, NativeTheme::Part::Radio,

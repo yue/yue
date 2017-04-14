@@ -14,7 +14,7 @@ namespace nu {
 namespace {
 
 int GetWindowsPart(NativeTheme::Part part) {
-  if (part == NativeTheme::Part::CheckBox)
+  if (part == NativeTheme::Part::Checkbox)
     return BP_CHECKBOX;
   else if (part == NativeTheme::Part::Radio)
     return BP_RADIOBUTTON;
@@ -26,7 +26,7 @@ int GetWindowsPart(NativeTheme::Part part) {
 
 int GetWindowsState(NativeTheme::Part part, ControlState state) {
   switch (part) {
-    case NativeTheme::Part::CheckBox:
+    case NativeTheme::Part::Checkbox:
       switch (state) {
         case ControlState::Disabled:
           return CBS_UNCHECKEDDISABLED;
@@ -114,15 +114,15 @@ Size NativeTheme::GetThemePartSize(HDC hdc,
       return Size(size.cx, size.cy);
   }
 
-  return (part == Part::CheckBox || part == Part::Radio) ? Size(13, 13)
+  return (part == Part::Checkbox || part == Part::Radio) ? Size(13, 13)
                                                          : Size();
 }
 
 void NativeTheme::Paint(Part part, HDC hdc, ControlState state,
                         const Rect& rect, const ExtraParams& extra) {
   switch (part) {
-    case Part::CheckBox:
-      PaintCheckBox(hdc, state, rect, extra.button);
+    case Part::Checkbox:
+      PaintCheckbox(hdc, state, rect, extra.button);
       break;
     case Part::Radio:
       PaintRadio(hdc, state, rect, extra.button);
@@ -201,7 +201,7 @@ HRESULT NativeTheme::PaintRadio(HDC hdc,
   return PaintButton(hdc, state, extra, BP_RADIOBUTTON, state_id, &rect_win);
 }
 
-HRESULT NativeTheme::PaintCheckBox(HDC hdc,
+HRESULT NativeTheme::PaintCheckbox(HDC hdc,
                                    ControlState state,
                                    const Rect& rect,
                                    const ButtonExtraParams& extra) const {
@@ -523,7 +523,7 @@ HANDLE NativeTheme::GetThemeHandle(Part part) const {
 
   // Translate part to real theme names.
   switch (part) {
-    case Part::CheckBox:
+    case Part::Checkbox:
     case Part::Radio:
       part = Part::Button;
       break;

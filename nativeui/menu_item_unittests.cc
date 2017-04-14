@@ -31,7 +31,7 @@ TEST_F(MenuItemTest, Label) {
 }
 
 TEST_F(MenuItemTest, Checkbox) {
-  scoped_refptr<nu::MenuItem> item = new nu::MenuItem(nu::MenuItem::CheckBox);
+  scoped_refptr<nu::MenuItem> item = new nu::MenuItem(nu::MenuItem::Checkbox);
   EXPECT_FALSE(item->IsChecked());
   item->SetChecked(true);
   EXPECT_TRUE(item->IsChecked());

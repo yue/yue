@@ -38,7 +38,7 @@ class NativeTheme {
   ~NativeTheme();
 
   enum class Part {
-    CheckBox,
+    Checkbox,
     Radio,
     Button,
 
@@ -105,7 +105,7 @@ class NativeTheme {
                      ControlState state,
                      const Rect& rect,
                      const ButtonExtraParams& extra) const;
-  HRESULT PaintCheckBox(HDC hdc,
+  HRESULT PaintCheckbox(HDC hdc,
                         ControlState state,
                         const Rect& rect,
                         const ButtonExtraParams& extra) const;

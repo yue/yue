@@ -338,9 +338,9 @@ struct Type<nu::EventType> {
       case nu::EventType::MouseUp:
         lua::Push(state, "mouseup");
       case nu::EventType::KeyDown:
-        lua::Push(state, "keyDown");
+        lua::Push(state, "keydown");
       case nu::EventType::KeyUp:
-        lua::Push(state, "keyUp");
+        lua::Push(state, "keyup");
       default:
         NOTREACHED();
         lua::Push(state, "unknown");
@@ -469,7 +469,7 @@ struct Type<nu::MenuItem::Type> {
     if (type == "label")
       *out = nu::MenuItem::Type::Label;
     else if (type == "checkbox")
-      *out = nu::MenuItem::Type::CheckBox;
+      *out = nu::MenuItem::Type::Checkbox;
     else if (type == "radio")
       *out = nu::MenuItem::Type::Radio;
     else if (type == "separator")
@@ -514,7 +514,7 @@ struct Type<nu::MenuItem> {
     // Read table fields and set attributes.
     bool b = false;
     if (RawGetAndPop(context->state, 1, "checked", &b)) {
-      if (!item) item = new nu::MenuItem(nu::MenuItem::Type::CheckBox);
+      if (!item) item = new nu::MenuItem(nu::MenuItem::Type::Checkbox);
       item->SetChecked(b);
     }
     nu::Menu* submenu = nullptr;
@@ -643,7 +643,7 @@ struct Type<nu::Button::Type> {
       *out = nu::Button::Type::Normal;
       return true;
     } else if (type == "checkbox") {
-      *out = nu::Button::Type::CheckBox;
+      *out = nu::Button::Type::Checkbox;
       return true;
     } else if (type == "radio") {
       *out = nu::Button::Type::Radio;

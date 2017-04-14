@@ -12,7 +12,7 @@
 namespace nu {
 
 void MenuItem::Click() {
-  if (type_ == Type::CheckBox)
+  if (type_ == Type::Checkbox)
     SetChecked(!IsChecked());
   else if (type_ == Type::Radio)
     SetChecked(true);

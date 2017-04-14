@@ -62,7 +62,7 @@ void MenuItem::PlatformInit() {
   switch (type_) {
     case Type::Label: case Type::Submenu: item = gtk_menu_item_new(); break;
     case Type::Radio: item = gtk_radio_menu_item_new(nullptr); break;
-    case Type::CheckBox: item = gtk_check_menu_item_new(); break;
+    case Type::Checkbox: item = gtk_check_menu_item_new(); break;
     case Type::Separator: item = gtk_separator_menu_item_new(); break;
   }
   g_signal_connect(item, "activate", G_CALLBACK(OnClick), this);

@@ -15,7 +15,7 @@ class NATIVEUI_EXPORT Button : public View {
  public:
   enum class Type {
     Normal,
-    CheckBox,
+    Checkbox,
     Radio,
   };
   explicit Button(const std::string& title, Type type = Type::Normal);

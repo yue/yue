@@ -104,7 +104,7 @@ Button::Button(const std::string& title, Type type) {
   NSButton* button = [[NUButton alloc] initWithShell:this];
   if (type == Type::Normal)
     [button setBezelStyle:NSRoundedBezelStyle];
-  else if (type == Type::CheckBox)
+  else if (type == Type::Checkbox)
     [button setButtonType:NSSwitchButton];
   else if (type == Type::Radio)
     [button setButtonType:NSRadioButton];

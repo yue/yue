@@ -524,7 +524,7 @@ struct Type<nu::MenuItem::Type> {
     if (type == "label")
       *out = nu::MenuItem::Type::Label;
     else if (type == "checkbox")
-      *out = nu::MenuItem::Type::CheckBox;
+      *out = nu::MenuItem::Type::Checkbox;
     else if (type == "radio")
       *out = nu::MenuItem::Type::Radio;
     else if (type == "separator")
@@ -574,7 +574,7 @@ struct Type<nu::MenuItem> {
     // Read table fields and set attributes.
     bool b = false;
     if (Get(context, obj, "checked", &b)) {
-      if (!item) item = new nu::MenuItem(nu::MenuItem::Type::CheckBox);
+      if (!item) item = new nu::MenuItem(nu::MenuItem::Type::Checkbox);
       item->SetChecked(b);
     }
     nu::Menu* submenu = nullptr;
@@ -720,7 +720,7 @@ struct Type<nu::Button::Type> {
       *out = nu::Button::Type::Normal;
       return true;
     } else if (type == "checkbox") {
-      *out = nu::Button::Type::CheckBox;
+      *out = nu::Button::Type::Checkbox;
       return true;
     } else if (type == "radio") {
       *out = nu::Button::Type::Radio;
