@@ -2,8 +2,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef NATIVEUI_EVENTS_KEYBOARD_CODES_MAC_H_
-#define NATIVEUI_EVENTS_KEYBOARD_CODES_MAC_H_
+#ifndef NATIVEUI_EVENTS_MAC_KEYBOARD_CODES_MAC_H_
+#define NATIVEUI_EVENTS_MAC_KEYBOARD_CODES_MAC_H_
 
 namespace nu {
 
@@ -172,4 +172,4 @@ enum KeyboardCode {
 
 }  // namespace nu
 
-#endif  // NATIVEUI_EVENTS_KEYBOARD_CODES_MAC_H_
+#endif  // NATIVEUI_EVENTS_MAC_KEYBOARD_CODES_MAC_H_

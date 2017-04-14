@@ -2,12 +2,12 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef NATIVEUI_EVENTS_KEYBOARD_CODE_CONVERSION_MAC_H_
-#define NATIVEUI_EVENTS_KEYBOARD_CODE_CONVERSION_MAC_H_
+#ifndef NATIVEUI_EVENTS_MAC_KEYBOARD_CODE_CONVERSION_MAC_H_
+#define NATIVEUI_EVENTS_MAC_KEYBOARD_CODE_CONVERSION_MAC_H_
 
 #import <Cocoa/Cocoa.h>
 
-#include "nativeui/events/keyboard_codes_mac.h"
+#include "nativeui/events/mac/keyboard_codes_mac.h"
 #include "nativeui/nativeui_export.h"
 
 namespace nu {
@@ -41,4 +41,4 @@ NATIVEUI_EXPORT KeyboardCode KeyboardCodeFromNSEvent(NSEvent* event);
 
 }  // namespace nu
 
-#endif  // NATIVEUI_EVENTS_KEYBOARD_CODE_CONVERSION_MAC_H_
+#endif  // NATIVEUI_EVENTS_MAC_KEYBOARD_CODE_CONVERSION_MAC_H_

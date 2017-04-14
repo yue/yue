@@ -2,8 +2,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef NATIVEUI_EVENTS_KEYBOARD_CODES_GTK_H_
-#define NATIVEUI_EVENTS_KEYBOARD_CODES_GTK_H_
+#ifndef NATIVEUI_EVENTS_GTK_KEYBOARD_CODES_GTK_H_
+#define NATIVEUI_EVENTS_GTK_KEYBOARD_CODES_GTK_H_
 
 namespace nu {
 
@@ -17,38 +17,38 @@ enum KeyboardModifier {
 
 // Code value from gtk/gdk/gdkkeysyms.h.
 enum KeyboardCode {
-  VKEY_CANCEL = 0xff69,   // GDK_KEY_Cancel
-  VKEY_BACK = 0xff08,     // GDK_KEY_BackSpace
-  VKEY_TAB = 0xff09,      // GDK_KEY_Tab
-  VKEY_BACKTAB = 0xfd05,  // GDK_KEY_3270_BackTab
-  VKEY_CLEAR = 0xff0b,    // GDK_KEY_Clear
-  VKEY_RETURN = 0xff0d,   // GDK_KEY_Return
-  VKEY_SHIFT = 0xffe1,    // GDK_KEY_Shift_L
-  VKEY_CONTROL = 0xffe3,  // GDK_KEY_Control_L
-  VKEY_MENU = 0xff67,     // GDK_KEY_Menu
-  VKEY_PAUSE = 0xff13,    // GDK_KEY_Pause
-  VKEY_CAPITAL = 0xffe5,  // GDK_KEY_Caps_Lock
-  VKEY_KANA = 0xff2e,     // GDK_KEY_Kana_Shift
-  VKEY_HANGUL = 0xff31,   // GDK_KEY_Hangul
-  VKEY_HANJA = 0xff34,    // GDK_KEY_Hangul_Hanja
-  VKEY_KANJI = 0xff21,    // GDK_KEY_Kanji
-  VKEY_ESCAPE = 0xff1b,   // GDK_KEY_Escape
-  VKEY_SPACE = 0x020,     // GDK_KEY_space
-  VKEY_PRIOR = 0xff55,    // GDK_KEY_Page_Up
-  VKEY_NEXT = 0xff56,     // GDK_KEY_Page_Down
-  VKEY_END = 0xff57,      // GDK_KEY_End
-  VKEY_HOME = 0xff50,     // GDK_KEY_Home
-  VKEY_LEFT = 0xff51,     // GDK_KEY_Left
-  VKEY_UP = 0xff52,       // GDK_KEY_Up
-  VKEY_RIGHT = 0xff53,    // GDK_KEY_Right
-  VKEY_DOWN = 0xff54,     // GDK_KEY_Down
-  VKEY_SELECT = 0xff60,   // GDK_KEY_Select
-  VKEY_PRINT = 0xff61,    // GDK_KEY_Print
-  VKEY_EXECUTE = 0xff62,  // GDK_KEY_Execute
-  VKEY_SNAPSHOT = 0xfd1d, // GDK_KEY_3270_PrintScreen
-  VKEY_INSERT = 0xff63,   // GDK_KEY_Insert
-  VKEY_DELETE = 0xffff,   // GDK_KEY_Delete
-  VKEY_HELP = 0xff6a,     // GDK_KEY_Help
+  VKEY_CANCEL = 0xff69,    // GDK_KEY_Cancel
+  VKEY_BACK = 0xff08,      // GDK_KEY_BackSpace
+  VKEY_TAB = 0xff09,       // GDK_KEY_Tab
+  VKEY_BACKTAB = 0xfd05,   // GDK_KEY_3270_BackTab
+  VKEY_CLEAR = 0xff0b,     // GDK_KEY_Clear
+  VKEY_RETURN = 0xff0d,    // GDK_KEY_Return
+  VKEY_SHIFT = 0xffe1,     // GDK_KEY_Shift_L
+  VKEY_CONTROL = 0xffe3,   // GDK_KEY_Control_L
+  VKEY_MENU = 0xff67,      // GDK_KEY_Menu
+  VKEY_PAUSE = 0xff13,     // GDK_KEY_Pause
+  VKEY_CAPITAL = 0xffe5,   // GDK_KEY_Caps_Lock
+  VKEY_KANA = 0xff2e,      // GDK_KEY_Kana_Shift
+  VKEY_HANGUL = 0xff31,    // GDK_KEY_Hangul
+  VKEY_HANJA = 0xff34,     // GDK_KEY_Hangul_Hanja
+  VKEY_KANJI = 0xff21,     // GDK_KEY_Kanji
+  VKEY_ESCAPE = 0xff1b,    // GDK_KEY_Escape
+  VKEY_SPACE = 0x020,      // GDK_KEY_space
+  VKEY_PRIOR = 0xff55,     // GDK_KEY_Page_Up
+  VKEY_NEXT = 0xff56,      // GDK_KEY_Page_Down
+  VKEY_END = 0xff57,       // GDK_KEY_End
+  VKEY_HOME = 0xff50,      // GDK_KEY_Home
+  VKEY_LEFT = 0xff51,      // GDK_KEY_Left
+  VKEY_UP = 0xff52,        // GDK_KEY_Up
+  VKEY_RIGHT = 0xff53,     // GDK_KEY_Right
+  VKEY_DOWN = 0xff54,      // GDK_KEY_Down
+  VKEY_SELECT = 0xff60,    // GDK_KEY_Select
+  VKEY_PRINT = 0xff61,     // GDK_KEY_Print
+  VKEY_EXECUTE = 0xff62,   // GDK_KEY_Execute
+  VKEY_SNAPSHOT = 0xfd1d,  // GDK_KEY_3270_PrintScreen
+  VKEY_INSERT = 0xff63,    // GDK_KEY_Insert
+  VKEY_DELETE = 0xffff,    // GDK_KEY_Delete
+  VKEY_HELP = 0xff6a,      // GDK_KEY_Help
   VKEY_0 = 0x030,  // GDK_KEY_0
   VKEY_1 = 0x031,  // GDK_KEY_1
   VKEY_2 = 0x032,  // GDK_KEY_2
@@ -171,4 +171,4 @@ enum KeyboardCode {
 
 }  // namespace nu
 
-#endif  // NATIVEUI_EVENTS_KEYBOARD_CODES_GTK_H_
+#endif  // NATIVEUI_EVENTS_GTK_KEYBOARD_CODES_GTK_H_

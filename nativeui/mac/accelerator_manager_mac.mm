@@ -6,7 +6,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-#include "nativeui/events/keyboard_code_conversion_mac.h"
+#include "nativeui/events/mac/keyboard_code_conversion_mac.h"
 #include "nativeui/menu_item.h"
 
 namespace nu {

@@ -8,11 +8,11 @@
 #include "build/build_config.h"
 
 #if defined(OS_MACOSX)
-#include "nativeui/events/keyboard_codes_mac.h"
+#include "nativeui/events/mac/keyboard_codes_mac.h"
 #elif defined(OS_LINUX)
-#include "nativeui/events/keyboard_codes_gtk.h"
+#include "nativeui/events/gtk/keyboard_codes_gtk.h"
 #elif defined(OS_WIN)
-#include "nativeui/events/keyboard_codes_win.h"
+#include "nativeui/events/win/keyboard_codes_win.h"
 #endif
 
 #endif  // NATIVEUI_EVENTS_KEYBOARD_CODES_H_
