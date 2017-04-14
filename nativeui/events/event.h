@@ -5,6 +5,7 @@
 #ifndef NATIVEUI_EVENTS_EVENT_H_
 #define NATIVEUI_EVENTS_EVENT_H_
 
+#include "nativeui/events/keyboard_codes.h"
 #include "nativeui/gfx/geometry/point_f.h"
 #include "nativeui/types.h"
 
@@ -15,6 +16,8 @@ enum class EventType {
   Unknown,  // should never be used
   MouseDown,
   MouseUp,
+  KeyDown,
+  KeyUp,
 };
 
 // Base event type.

@@ -48,6 +48,8 @@ component("nativeui") {
     "window.h",
     "events/event.h",
     "events/keyboard_codes.h",
+    "events/keyboard_code_conversion.cc",
+    "events/keyboard_code_conversion.h",
     "events/gtk/event_gtk.cc",
     "events/gtk/keyboard_codes_gtk.h",
     "events/mac/event_mac.mm",
