@@ -5,6 +5,7 @@
 #include "nativeui/events/mac/keyboard_code_conversion_mac.h"
 
 #include <algorithm>
+#include <utility>
 
 #import <Carbon/Carbon.h>
 
@@ -440,8 +441,11 @@ int MacKeyCodeForWindowsKeyCode(KeyboardCode keycode,
   KeyCodeMap from;
   from.keycode = keycode;
 
+  DCHECK(std::is_sorted(std::begin(kKeyCodesMap), std::end(kKeyCodesMap)))
+      << "The kKeyCodesMap must be in sorted order";
+
   const KeyCodeMap* ptr = std::lower_bound(
-      kKeyCodesMap, kKeyCodesMap + arraysize(kKeyCodesMap), from);
+      std::begin(kKeyCodesMap), std::end(kKeyCodesMap), from);
 
   if (ptr >= kKeyCodesMap + arraysize(kKeyCodesMap) ||
       ptr->keycode != keycode || ptr->macKeycode == -1)

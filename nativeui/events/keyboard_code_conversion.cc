@@ -4,12 +4,135 @@
 
 #include "nativeui/events/keyboard_code_conversion.h"
 
+#include <algorithm>
+
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/string_util.h"
 
 namespace nu {
 
 namespace {
+
+// A struct to convert key names to key codes.
+struct KeyCodeMap {
+  const char* name;
+  KeyboardCode keycode;
+};
+
+// Customized less operator for using std::lower_bound() on a KeyCodeMap array.
+bool operator<(const KeyCodeMap& a, const KeyCodeMap& b) {
+  return strcmp(a.name, b.name) < 0;
+}
+
+// This array must keep sorted ascending according to the value of |name|,
+// so that we can binary search it.
+const KeyCodeMap kKeyCodesMap[] = {
+  { "add", VKEY_ADD },
+  { "alt", VKEY_MENU },
+  { "arrowdown", VKEY_DOWN },
+  { "arrowleft", VKEY_LEFT },
+  { "arrowright", VKEY_RIGHT },
+  { "arrowup", VKEY_UP },
+  { "audiovolumedown", VKEY_VOLUME_DOWN },
+  { "audiovolumemute", VKEY_VOLUME_MUTE },
+  { "audiovolumeup", VKEY_VOLUME_UP },
+  { "backspace", VKEY_BACK },
+  { "backtab", VKEY_BACKTAB },
+  { "browserback", VKEY_BROWSER_BACK },
+  { "browserfavorites", VKEY_BROWSER_FAVORITES },
+  { "browserforward", VKEY_BROWSER_FORWARD },
+  { "browserhome", VKEY_BROWSER_HOME },
+  { "browserrefresh", VKEY_BROWSER_REFRESH },
+  { "browsersearch", VKEY_BROWSER_SEARCH },
+  { "browserstop", VKEY_BROWSER_STOP },
+  { "cancel", VKEY_CANCEL },
+  { "capslock", VKEY_CAPITAL },
+  { "clear", VKEY_CLEAR },
+  { "cmd", VKEY_COMMAND },
+#if defined(OS_MACOSX)
+  { "cmdorctrl", VKEY_COMMAND },
+#else
+  { "cmdorctrl", VKEY_CONTROL },
+#endif
+  { "command", VKEY_COMMAND },
+#if defined(OS_MACOSX)
+  { "commandorcontrol", VKEY_COMMAND },
+#else
+  { "commandorcontrol", VKEY_CONTROL },
+#endif
+  { "contextmenu", VKEY_APPS },
+  { "control", VKEY_CONTROL },
+  { "ctrl", VKEY_CONTROL },
+  { "decimal", VKEY_DECIMAL },
+  { "delete", VKEY_DELETE },
+  { "divide", VKEY_DIVIDE },
+  { "down", VKEY_DOWN },
+  { "end", VKEY_END },
+  { "enter", VKEY_RETURN },
+  { "esc", VKEY_ESCAPE },
+  { "escape", VKEY_ESCAPE },
+  { "execute", VKEY_EXECUTE },
+  { "f1", VKEY_F1 },
+  { "f10", VKEY_F10 },
+  { "f11", VKEY_F11 },
+  { "f12", VKEY_F12 },
+  { "f13", VKEY_F13 },
+  { "f14", VKEY_F14 },
+  { "f15", VKEY_F15 },
+  { "f16", VKEY_F16 },
+  { "f17", VKEY_F17 },
+  { "f18", VKEY_F18 },
+  { "f19", VKEY_F19 },
+  { "f2", VKEY_F2 },
+  { "f20", VKEY_F20 },
+  { "f21", VKEY_F21 },
+  { "f22", VKEY_F22 },
+  { "f23", VKEY_F23 },
+  { "f24", VKEY_F24 },
+  { "f3", VKEY_F3 },
+  { "f4", VKEY_F4 },
+  { "f5", VKEY_F5 },
+  { "f6", VKEY_F6 },
+  { "f7", VKEY_F7 },
+  { "f8", VKEY_F8 },
+  { "f9", VKEY_F9 },
+  { "hangulmode", VKEY_HANGUL },
+  { "hanjamode", VKEY_HANJA },
+  { "help", VKEY_HELP },
+  { "home", VKEY_HOME },
+  { "insert", VKEY_INSERT },
+  { "kanamode", VKEY_KANA },
+  { "kanjimode", VKEY_KANJI },
+  { "launchapplication1", VKEY_MEDIA_LAUNCH_APP1 },
+  { "launchapplication2", VKEY_MEDIA_LAUNCH_APP2 },
+  { "launchmail", VKEY_MEDIA_LAUNCH_MAIL },
+  { "launchmediaplayer", VKEY_MEDIA_LAUNCH_MEDIA_SELECT },
+  { "left", VKEY_LEFT },
+  { "mediaplaypause", VKEY_MEDIA_PLAY_PAUSE },
+  { "mediastop", VKEY_MEDIA_STOP },
+  { "mediatracknext", VKEY_MEDIA_NEXT_TRACK },
+  { "mediatrackprevious", VKEY_MEDIA_PREV_TRACK },
+  { "meta", VKEY_COMMAND },
+  { "multiply", VKEY_MULTIPLY },
+  { "numlock", VKEY_NUMLOCK },
+  { "option", VKEY_MENU },
+  { "pagedown", VKEY_NEXT },
+  { "pageup", VKEY_PRIOR },
+  { "pause", VKEY_PAUSE },
+  { "plus", VKEY_ADD },
+  { "print", VKEY_PRINT },
+  { "return", VKEY_RETURN },
+  { "right", VKEY_RIGHT },
+  { "scrolllock", VKEY_SCROLL },
+  { "select", VKEY_SELECT },
+  { "shift", VKEY_SHIFT },
+  { "snapshot", VKEY_SNAPSHOT },
+  { "space", VKEY_SPACE },
+  { "subtract", VKEY_SUBTRACT },
+  { "super", VKEY_COMMAND },
+  { "tab", VKEY_TAB },
+  { "up", VKEY_UP },
+};
 
 // Return key code of the char, and also determine whether the SHIFT key is
 // pressed.
@@ -82,84 +205,18 @@ KeyboardCode KeyboardCodeFromCharCode(base::char16 c, bool* shifted) {
 KeyboardCode KeyboardCodeFromKeyIdentifier(const std::string& s,
                                            bool* shifted) {
   std::string str = base::ToLowerASCII(s);
-  if (str == "ctrl" || str == "control") {
-    return VKEY_CONTROL;
-  } else if (str == "super" || str == "cmd" || str == "command" ||
-             str == "meta") {
-    return VKEY_COMMAND;
-  } else if (str == "commandorcontrol" || str == "cmdorctrl") {
-#if defined(OS_MACOSX)
-    return VKEY_COMMAND;
-#else
-    return VKEY_CONTROL;
-#endif
-  } else if (str == "alt" || str == "option") {
-    return VKEY_MENU;
-  } else if (str == "shift") {
-    return VKEY_SHIFT;
-  } else if (str == "plus" || str == "add") {
-    *shifted = true;
-    return VKEY_OEM_PLUS;
-  } else if (str == "tab") {
-    return VKEY_TAB;
-  } else if (str == "space") {
-    return VKEY_SPACE;
-  } else if (str == "backspace") {
-    return VKEY_BACK;
-  } else if (str == "delete") {
-    return VKEY_DELETE;
-  } else if (str == "insert") {
-    return VKEY_INSERT;
-  } else if (str == "enter" || str == "return") {
-    return VKEY_RETURN;
-  } else if (str == "up" || str == "arrowup") {
-    return VKEY_UP;
-  } else if (str == "down" || str == "arrowdown") {
-    return VKEY_DOWN;
-  } else if (str == "left" || str == "arrowleft") {
-    return VKEY_LEFT;
-  } else if (str == "right" || str == "arrowright") {
-    return VKEY_RIGHT;
-  } else if (str == "home") {
-    return VKEY_HOME;
-  } else if (str == "end") {
-    return VKEY_END;
-  } else if (str == "pageup") {
-    return VKEY_PRIOR;
-  } else if (str == "pagedown") {
-    return VKEY_NEXT;
-  } else if (str == "esc" || str == "escape") {
-    return VKEY_ESCAPE;
-  } else if (str == "volumemute") {
-    return VKEY_VOLUME_MUTE;
-  } else if (str == "volumeup") {
-    return VKEY_VOLUME_UP;
-  } else if (str == "volumedown") {
-    return VKEY_VOLUME_DOWN;
-  } else if (str == "medianexttrack") {
-    return VKEY_MEDIA_NEXT_TRACK;
-  } else if (str == "mediaprevioustrack") {
-    return VKEY_MEDIA_PREV_TRACK;
-  } else if (str == "mediastop") {
-    return VKEY_MEDIA_STOP;
-  } else if (str == "mediaplaypause") {
-    return VKEY_MEDIA_PLAY_PAUSE;
-  } else if (str == "printscreen") {
-    return VKEY_SNAPSHOT;
-  } else if (str.size() > 1 && str[0] == 'f') {
-    // F1 - F24.
-    int n;
-    if (base::StringToInt(str.c_str() + 1, &n) && n > 0 && n < 25) {
-      return static_cast<KeyboardCode>(VKEY_F1 + n - 1);
-    } else {
-      LOG(WARNING) << str << "is not available on keyboard";
-      return VKEY_UNKNOWN;
-    }
-  } else {
-    if (str.size() > 2)
-      LOG(WARNING) << "Invalid accelerator token: " << str;
+  KeyCodeMap from;
+  from.name = str.c_str();
+
+  DCHECK(std::is_sorted(std::begin(kKeyCodesMap), std::end(kKeyCodesMap)))
+      << "The kKeyCodesMap must be in sorted order";
+
+  const KeyCodeMap* ptr = std::lower_bound(
+      std::begin(kKeyCodesMap), std::end(kKeyCodesMap), from);
+  if (ptr >= kKeyCodesMap + arraysize(kKeyCodesMap) || ptr->name != str)
     return VKEY_UNKNOWN;
-  }
+
+  return ptr->keycode;
 }
 
 }  // namespace
