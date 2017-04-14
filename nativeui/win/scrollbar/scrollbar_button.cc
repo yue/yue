@@ -4,6 +4,7 @@
 
 #include "nativeui/win/scrollbar/scrollbar_button.h"
 
+#include "nativeui/events/win/event_win.h"
 #include "nativeui/win/scrollbar/scrollbar.h"
 
 namespace nu {
@@ -29,8 +30,11 @@ void ScrollbarButton::OnMouseLeave() {
   Invalidate();
 }
 
-bool ScrollbarButton::OnMouseClick(UINT message, UINT flags, const Point&) {
-  if (message == WM_LBUTTONDOWN) {
+bool ScrollbarButton::OnMouseClick(NativeEvent event) {
+  if (ViewImpl::OnMouseClick(event))
+    return true;
+
+  if (event->message == WM_LBUTTONDOWN) {
     set_state(ControlState::Pressed);
     OnClick();
     repeater_.Start();

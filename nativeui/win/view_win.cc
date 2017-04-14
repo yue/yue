@@ -4,6 +4,8 @@
 
 #include "nativeui/win/view_win.h"
 
+#include "nativeui/events/event.h"
+#include "nativeui/events/win/event_win.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/gfx/screen.h"
 #include "nativeui/label.h"
@@ -88,7 +90,14 @@ void ViewImpl::Draw(PainterWin* painter, const Rect& dirty) {
   }
 }
 
-bool ViewImpl::OnMouseClick(UINT message, UINT flags, const Point& point) {
+bool ViewImpl::OnMouseClick(NativeEvent event) {
+  MouseEvent client_event(event, this);
+  if (client_event.type == EventType::MouseDown &&
+      delegate_->on_mouse_down.Emit(delegate_, client_event))
+    return true;
+  if (client_event.type == EventType::MouseUp &&
+      delegate_->on_mouse_up.Emit(delegate_, client_event))
+    return true;
   return false;
 }
 

@@ -23,7 +23,7 @@ class ScrollbarThumb : public ViewImpl {
   void OnMouseEnter() override;
   void OnMouseMove(UINT flags, const Point& point) override;
   void OnMouseLeave() override;
-  bool OnMouseClick(UINT message, UINT flags, const Point& point) override;
+  bool OnMouseClick(NativeEvent event) override;
   void OnCaptureLost() override;
   void Draw(PainterWin* painter, const Rect& dirty) override;
 

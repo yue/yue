@@ -9,6 +9,7 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/win/scoped_hdc.h"
 #include "nativeui/container.h"
+#include "nativeui/events/win/event_win.h"
 #include "nativeui/gfx/geometry/insets.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/geometry/vector2d_conversions.h"
@@ -181,13 +182,16 @@ class ButtonImpl : public ViewImpl {
     }
   }
 
-  bool OnMouseClick(UINT message, UINT flags, const Point& point) override {
-    if (message == WM_LBUTTONDOWN) {
+  bool OnMouseClick(NativeEvent event) override {
+    if (ViewImpl::OnMouseClick(event))
+      return true;
+
+    if (event->message == WM_LBUTTONDOWN) {
       is_capturing_ = true;
       window()->SetCapture(this);
       set_state(ControlState::Pressed);
       Invalidate();
-    } else if (message == WM_LBUTTONUP) {
+    } else if (event->message == WM_LBUTTONUP) {
       if (state() == ControlState::Pressed)
         OnClick();
       set_state(ControlState::Hovered);

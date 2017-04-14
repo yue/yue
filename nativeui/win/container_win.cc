@@ -5,6 +5,7 @@
 #include "nativeui/win/container_win.h"
 
 #include "base/stl_util.h"
+#include "nativeui/events/win/event_win.h"
 #include "nativeui/gfx/win/painter_win.h"
 
 namespace nu {
@@ -78,10 +79,13 @@ bool ContainerImpl::OnMouseWheel(bool vertical, UINT flags, int delta,
   return false;
 }
 
-bool ContainerImpl::OnMouseClick(UINT message, UINT flags, const Point& point) {
-  ViewImpl* child = FindChildFromPoint(point);
+bool ContainerImpl::OnMouseClick(NativeEvent event) {
+  if (ViewImpl::OnMouseClick(event))
+    return true;
+
+  ViewImpl* child = FindChildFromPoint(Point(event->l_param));
   if (child)
-    return child->OnMouseClick(message, flags, point);
+    return child->OnMouseClick(event);
   return false;
 }
 

@@ -6,6 +6,8 @@
 
 #include <algorithm>
 
+#include "nativeui/events/win/event_win.h"
+
 namespace nu {
 
 Scrollbar::Scrollbar(bool vertical, ScrollImpl* scroll)
@@ -136,12 +138,11 @@ void Scrollbar::OnMouseLeave() {
   Invalidate();
 }
 
-bool Scrollbar::OnMouseClick(UINT message, UINT flags,
-                                 const Point& point) {
+bool Scrollbar::OnMouseClick(NativeEvent event) {
   repeater_.Stop();
-  if (ContainerImpl::OnMouseClick(message, flags, point))
+  if (ContainerImpl::OnMouseClick(event))
     return true;
-  if (message == WM_LBUTTONDOWN) {
+  if (event->message == WM_LBUTTONDOWN) {
     OnClick();
     repeater_.Start();
     return true;

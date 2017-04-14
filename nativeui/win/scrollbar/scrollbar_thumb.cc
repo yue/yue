@@ -4,6 +4,7 @@
 
 #include "nativeui/win/scrollbar/scrollbar_thumb.h"
 
+#include "nativeui/events/win/event_win.h"
 #include "nativeui/win/scrollbar/scrollbar.h"
 
 namespace nu {
@@ -45,11 +46,13 @@ void ScrollbarThumb::OnMouseLeave() {
   }
 }
 
-bool ScrollbarThumb::OnMouseClick(UINT message, UINT flags,
-                                  const Point& point) {
-  if (message == WM_LBUTTONDOWN) {
+bool ScrollbarThumb::OnMouseClick(NativeEvent event) {
+  if (ViewImpl::OnMouseClick(event))
+    return true;
+
+  if (event->message == WM_LBUTTONDOWN) {
     is_capturing_ = true;
-    pressed_point_ = point;
+    pressed_point_ = Point(event->l_param);
     last_value_ = scrollbar_->GetValue();
     window()->SetCapture(this);
     set_state(ControlState::Pressed);

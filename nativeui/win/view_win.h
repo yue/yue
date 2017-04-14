@@ -75,7 +75,7 @@ class ViewImpl {
   virtual void OnMouseLeave() {}
   virtual bool OnMouseWheel(bool vertical, UINT flags, int delta,
                             const Point& point) { return false; }
-  virtual bool OnMouseClick(UINT message, UINT flags, const Point& point);
+  virtual bool OnMouseClick(NativeEvent event);
 
   // Called when the view lost capture.
   virtual void OnCaptureLost() {}

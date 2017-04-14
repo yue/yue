@@ -73,8 +73,9 @@ namespace nu {
 
 #if defined(OS_WIN)
 class ViewImpl;
-struct MenuItemData;
 class WindowImpl;
+struct Win32Message;
+struct MenuItemData;
 #endif
 
 // base::FilePath is not free, use native string as FilePath in nativeui.
@@ -105,6 +106,7 @@ using NativeFont = PangoFontDescription*;
 using NativeMenu = GtkMenuShell*;
 using NativeMenuItem = GtkMenuItem*;
 #elif defined(OS_WIN)
+using NativeEvent = Win32Message*;
 using NativeView = ViewImpl*;
 using NativeWindow = WindowImpl*;
 using NativeBitmap = Gdiplus::Bitmap*;

@@ -98,9 +98,9 @@ BOOL Win32Window::ProcessWindowMessage(
 
 // static
 LRESULT CALLBACK Win32Window::WndProc(HWND hwnd,
-                                     UINT message,
-                                     WPARAM w_param,
-                                     LPARAM l_param) {
+                                      UINT message,
+                                      WPARAM w_param,
+                                      LPARAM l_param) {
   if (message == WM_NCCREATE) {
     CREATESTRUCT* cs = reinterpret_cast<CREATESTRUCT*>(l_param);
     Win32Window* window = reinterpret_cast<Win32Window*>(cs->lpCreateParams);

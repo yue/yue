@@ -36,7 +36,7 @@ class Scrollbar : public ContainerImpl,
   // ViewImpl:
   void OnMouseEnter() override;
   void OnMouseLeave() override;
-  bool OnMouseClick(UINT message, UINT flags, const Point& point) override;
+  bool OnMouseClick(NativeEvent event) override;
   void Draw(PainterWin* painter, const Rect& dirty) override;
 
  private:

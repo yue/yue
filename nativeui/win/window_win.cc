@@ -8,6 +8,7 @@
 
 #include "nativeui/accelerator.h"
 #include "nativeui/accelerator_manager.h"
+#include "nativeui/events/win/event_win.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/gfx/win/double_buffer.h"
 #include "nativeui/gfx/win/painter_win.h"
@@ -146,16 +147,15 @@ BOOL WindowImpl::OnMouseWheel(bool vertical, UINT flags, int delta,
       vertical, flags, delta, Point(p));
 }
 
-LRESULT WindowImpl::OnMouseClick(UINT message, WPARAM w_param,
-                                 LPARAM l_param) {
-  delegate_->GetContentView()->GetNative()->OnMouseClick(
-      message, static_cast<UINT>(w_param),
-      nu::Point(CR_GET_X_LPARAM(l_param), CR_GET_Y_LPARAM(l_param)));
+LRESULT WindowImpl::OnMouseClick(UINT message, WPARAM w_param, LPARAM l_param) {
+  Win32Message event = {message, w_param, l_param};
+  if (delegate_->GetContentView()->GetNative()->OnMouseClick(&event))
+    return TRUE;
 
   // Release the capture on mouse up.
   if (message == WM_LBUTTONUP)
     ReleaseCapture();
-  return 0;
+  return FALSE;
 }
 
 void WindowImpl::OnKeyDown(UINT ch, UINT repeat, UINT flags) {

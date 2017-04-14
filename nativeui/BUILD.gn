@@ -54,6 +54,8 @@ component("nativeui") {
     "events/keyboard_code_conversion_mac.h",
     "events/keyboard_code_conversion_mac.mm",
     "events/mac/event_mac.mm",
+    "events/win/event_win.cc",
+    "events/win/event_win.h",
     "gfx/canvas.cc",
     "gfx/canvas.h",
     "gfx/color.cc",

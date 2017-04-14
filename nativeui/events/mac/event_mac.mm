@@ -48,7 +48,7 @@ PointF FlipScreenPos(NSPoint point, NSScreen* screen) {
 
 }  // namespace
 
-Event::Event(NativeEvent event)
+Event::Event(NativeEvent event, NativeView view)
     : type(EventTypeFromNS([event type])),
       position_in_screen(FlipScreenPos([NSEvent mouseLocation],
                                        [[event window] screen])),
@@ -58,7 +58,7 @@ Event::Event(NativeEvent event)
 }
 
 MouseEvent::MouseEvent(NativeEvent event, NativeView view)
-    : Event(event),
+    : Event(event, view),
       button([event buttonNumber]),
       position_in_window(FlipWindowPos([event locationInWindow],
                                        [event window])) {

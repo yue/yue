@@ -10,42 +10,42 @@
 
 namespace nu {
 
+// Supported event types.
 enum class EventType {
   Unkown,  // should never be used
   MouseDown,
   MouseUp,
 };
 
+// Base event type.
 struct NATIVEUI_EXPORT Event {
-  EventType type = EventType::Unkown;
+  // Event type.
+  EventType type;
+
+  // Mouse position in screen's coordinate.
   PointF position_in_screen;
-  int modifiers = 0;
-  uint32_t timestamp = 0;
 
-#if !defined(OS_WIN)
-  NativeEvent native_event = nullptr;
-#endif
+  // Current keyboard modifiers.
+  int modifiers;
 
-  // Base Event class should not be created by user.
+  // Time when event was created, starts from when machine was booted.
+  uint32_t timestamp;
+
+  // The underlying native event.
+  NativeEvent native_event;
+
  protected:
-#if defined(OS_WIN)
-  explicit Event(EventType type);
-#else
-  explicit Event(NativeEvent event);
-#endif
+  // Base Event class should nenver be created by user.
+  Event(NativeEvent event, NativeView view);
 };
 
+// Mouse click events.
 struct NATIVEUI_EXPORT MouseEvent : public Event {
-  // Initialize from native event.
-#if defined(OS_WIN)
-  MouseEvent(EventType type, const PointF& position_in_window);
-#else
+  // Create from the native event.
   MouseEvent(NativeEvent event, NativeView view);
-#endif
 
-  int button = 0;
+  int button;
   PointF position_in_window;
-  PointF position_in_view;
 };
 
 }  // namespace nu
