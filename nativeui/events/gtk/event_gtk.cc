@@ -17,16 +17,27 @@ EventType EventTypeFromGdk(GdkEventType type) {
       return EventType::MouseDown;
     case GDK_BUTTON_RELEASE:
       return EventType::MouseUp;
+    case GDK_KEY_PRESS:
+      return EventType::KeyDown;
+    case GDK_KEY_RELEASE:
+      return EventType::KeyUp;
     default:
       return EventType::Unknown;
   }
+}
+
+int GetCurrentEventModifiers() {
+  int modifiers = gdk_keymap_get_modifier_state(gdk_keymap_get_default());
+  // KeyboardModifier is mapped from NSEventModifierFlags, so we only need to
+  // filter out the ones we don't support.
+  return flags & (MASK_SHIFT | MASK_CONTROL | MASK_ALT | MASK_META);
 }
 
 }  // namespace
 
 Event::Event(NativeEvent event, NativeView view)
     : type(EventTypeFromGdk(event->any.type)),
-      modifiers(gdk_keymap_get_modifier_state(gdk_keymap_get_default())),
+      modifiers(GetCurrentEventModifiers()),
       timestamp(event->button.time),  // every input event has |time| property
       native_event(event) {
 }

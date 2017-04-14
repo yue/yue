@@ -90,6 +90,7 @@ void AddMouseEventHandlerToClass(Class cl) {
 void AddKeyEventHandlerToClass(Class cl) {
   class_addMethod(cl, @selector(keyDown:), (IMP)OnKeyEvent, "v@:@");
   class_addMethod(cl, @selector(keyUp:), (IMP)OnKeyEvent, "v@:@");
+  class_addMethod(cl, @selector(flagsChanged:), (IMP)OnKeyEvent, "v@:@");
 }
 
 }  // namespace nu
