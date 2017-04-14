@@ -59,7 +59,7 @@
   painter.FillRect(nu::RectF(dirtyRect));
   nu::TextAttributes attributes;
   attributes.align = attributes.valign = nu::TextAlign::Center;
-  painter.DrawText(text_, nu::RectF([self frame]), attributes);
+  painter.DrawText(text_, nu::RectF(nu::SizeF([self frame].size)), attributes);
 }
 
 @end
