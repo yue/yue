@@ -29,7 +29,7 @@ void OnMouseEvent(NSView* self, SEL _cmd, NSEvent* event) {
   MouseEvent mouse_event(event, self);
   if (mouse_event.type == EventType::MouseDown)
     prevent_default = view->on_mouse_down.Emit(view, mouse_event);
-  else if (mouse_event.type == EventType::MouseDown)
+  else if (mouse_event.type == EventType::MouseUp)
     prevent_default = view->on_mouse_up.Emit(view, mouse_event);
 
   // Transfer the event to super class.
