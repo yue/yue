@@ -12,7 +12,7 @@ namespace nu {
 
 // Supported event types.
 enum class EventType {
-  Unkown,  // should never be used
+  Unknown,  // should never be used
   MouseDown,
   MouseUp,
 };
@@ -21,9 +21,6 @@ enum class EventType {
 struct NATIVEUI_EXPORT Event {
   // Event type.
   EventType type;
-
-  // Mouse position in screen's coordinate.
-  PointF position_in_screen;
 
   // Current keyboard modifiers.
   int modifiers;
@@ -45,7 +42,7 @@ struct NATIVEUI_EXPORT MouseEvent : public Event {
   MouseEvent(NativeEvent event, NativeView view);
 
   int button;
-  PointF position_in_window;
+  PointF position;
 };
 
 }  // namespace nu

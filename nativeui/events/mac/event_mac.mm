@@ -26,7 +26,7 @@ EventType EventTypeFromNS(NSEventType type) {
     default:
       NOTREACHED();
   }
-  return EventType::Unkown;
+  return EventType::Unknown;
 }
 
 int EventModifiersFromNS(NSEventModifierFlags flags) {
@@ -41,17 +41,10 @@ PointF FlipWindowPos(NSPoint point, NSWindow* window) {
   return PointF(point.x, NSHeight(rect) - point.y);
 }
 
-PointF FlipScreenPos(NSPoint point, NSScreen* screen) {
-  DCHECK(screen);
-  return PointF(point.x, NSMaxY([screen frame]) - point.y);
-}
-
 }  // namespace
 
 Event::Event(NativeEvent event, NativeView view)
     : type(EventTypeFromNS([event type])),
-      position_in_screen(FlipScreenPos([NSEvent mouseLocation],
-                                       [[event window] screen])),
       modifiers(EventModifiersFromNS([event modifierFlags])),
       timestamp([event timestamp] * 1000),
       native_event(event) {
@@ -59,9 +52,8 @@ Event::Event(NativeEvent event, NativeView view)
 
 MouseEvent::MouseEvent(NativeEvent event, NativeView view)
     : Event(event, view),
-      button([event buttonNumber]),
-      position_in_window(FlipWindowPos([event locationInWindow],
-                                       [event window])) {
+      button([event buttonNumber] + 1),
+      position(FlipWindowPos([event locationInWindow], [event window])) {
 }
 
 }  // namespace nu

@@ -7,24 +7,36 @@
 #include <gtk/gtk.h>
 
 #include "nativeui/container.h"
+#include "nativeui/events/event.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
 
 namespace nu {
 
+namespace {
+
+gboolean OnMouseDown(GtkWidget* widget, GdkEvent* event, View* view) {
+  return view->on_mouse_down.Emit(view, MouseEvent(event, widget));
+}
+
+gboolean OnMouseUp(GtkWidget* widget, GdkEvent* event, View* view) {
+  return view->on_mouse_up.Emit(view, MouseEvent(event, widget));
+}
+
+}  // namespace
+
 void View::PlatformDestroy() {
-  if (view_) {
-    gtk_widget_destroy(view_);
-    g_object_unref(view_);
-    view_ = nullptr;
-  }
+  gtk_widget_destroy(view_);
+  g_object_unref(view_);
 }
 
 void View::TakeOverView(NativeView view) {
   view_ = view;
-  if (view_) {
-    g_object_ref_sink(view);
-    gtk_widget_show(view);
-  }
+  g_object_ref_sink(view);
+  gtk_widget_show(view);  // visible by default
+
+  // Install event hooks.
+  g_signal_connect(view, "button-press-event", G_CALLBACK(OnMouseDown), this);
+  g_signal_connect(view, "button-release-event", G_CALLBACK(OnMouseUp), this);
 }
 
 void View::SetBounds(const RectF& bounds) {

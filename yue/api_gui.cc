@@ -353,7 +353,6 @@ struct Type<nu::Event> {
                                  const nu::Event* event) {
     RawSet(state, index,
            "type", event->type,
-           "positioninscreen", event->position_in_screen,
            "modifiers", event->modifiers,
            "timestamp", event->timestamp);
   }
@@ -368,7 +367,7 @@ struct Type<nu::MouseEvent> {
     Type<nu::Event>::SetEventProperties(state, -1, &event);
     RawSet(state, -1,
            "button", event.button,
-           "positioninwindow", event.position_in_window);
+           "position", event.position);
   }
 };
 

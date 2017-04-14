@@ -392,7 +392,6 @@ struct Type<nu::Event> {
                                  const nu::Event* event) {
     Set(context, obj,
         "type", event->type,
-        "positionInScreen", event->position_in_screen,
         "modifiers", event->modifiers,
         "timestamp", event->timestamp);
   }
@@ -408,7 +407,7 @@ struct Type<nu::MouseEvent> {
     Type<nu::Event>::SetEventProperties(context, obj, &event);
     Set(context, obj,
         "button", event.button,
-        "positionInWindow", event.position_in_window);
+        "position", event.position);
     return obj;
   }
 };
