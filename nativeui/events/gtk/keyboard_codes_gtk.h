@@ -88,7 +88,7 @@ enum KeyboardCode {
   VKEY_LWIN = 0xffe7,  // GDK_KEY_Meta_L
   VKEY_COMMAND = VKEY_LWIN,  // Provide the Mac name for convenience.
   VKEY_RWIN = 0xffe8,  // GDK_KEY_Meta_R
-  VKEY_APPS = 0xffe7,  // GDK_KEY_Meta_L
+  VKEY_APPS = 0xff67,  // GDK_KEY_Menu
   VKEY_NUMPAD0 = 0xffb0,   // GDK_KEY_KP_0
   VKEY_NUMPAD1 = 0xffb1,   // GDK_KEY_KP_1
   VKEY_NUMPAD2 = 0xffb2,   // GDK_KEY_KP_2
