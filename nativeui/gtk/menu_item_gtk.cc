@@ -60,7 +60,7 @@ bool MenuItem::IsVisible() const {
 void MenuItem::PlatformInit() {
   GtkWidget* item;
   switch (type_) {
-    case Type::Label: case Submenu: item = gtk_menu_item_new(); break;
+    case Type::Label: case Type::Submenu: item = gtk_menu_item_new(); break;
     case Type::Radio: item = gtk_radio_menu_item_new(nullptr); break;
     case Type::CheckBox: item = gtk_check_menu_item_new(); break;
     case Type::Separator: item = gtk_separator_menu_item_new(); break;

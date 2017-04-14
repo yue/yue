@@ -14,7 +14,6 @@
 #endif
 
 #if defined(OS_LINUX)
-typedef struct _GdkEvent GdkEvent;
 typedef struct _GdkPixbuf GdkPixbuf;
 typedef struct _GtkMenuItem GtkMenuItem;
 typedef struct _GtkMenuShell GtkMenuShell;
@@ -23,6 +22,7 @@ typedef struct _GtkWindow GtkWindow;
 typedef struct _PangoFontDescription PangoFontDescription;
 typedef struct _cairo_surface cairo_surface_t;
 typedef struct _cairo cairo_t;
+typedef union _GdkEvent GdkEvent;
 #endif
 
 #if defined(OS_MACOSX)

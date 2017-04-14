@@ -18,19 +18,19 @@ GtkRadioMenuItem* SearchRadioInSameGroup(MenuBase* menu, MenuItem* radio,
   // First search backward.
   for (int i = index; i >= 0; --i) {
     nu::MenuItem* item = menu->ItemAt(i);
-    if (item->GetType() == nu::MenuItem::Separator)  // meet boundry
+    if (item->GetType() == nu::MenuItem::Type::Separator)  // meet boundry
       break;
     else if (item != radio &&
-             item->GetType() == nu::MenuItem::Radio)  // found a radio
+             item->GetType() == nu::MenuItem::Type::Radio)  // found a radio
       return GTK_RADIO_MENU_ITEM(item->GetNative());
   }
   // Then search forward.
   for (int i = index + 1; i < menu->ItemCount(); ++i) {
     nu::MenuItem* item = menu->ItemAt(i);
-    if (item->GetType() == nu::MenuItem::Separator)  // meet boundry
+    if (item->GetType() == nu::MenuItem::Type::Separator)  // meet boundry
       break;
     else if (item != radio &&
-             item->GetType() == nu::MenuItem::Radio)  // found a radio
+             item->GetType() == nu::MenuItem::Type::Radio)  // found a radio
       return GTK_RADIO_MENU_ITEM(item->GetNative());
   }
   return nullptr;

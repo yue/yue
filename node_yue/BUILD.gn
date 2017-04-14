@@ -33,4 +33,8 @@ loadable_module("node_yue") {
     "//nativeui",
     "//v8binding",
   ]
+
+  if (is_linux && is_component_build) {
+    configs += [ "//build/config/gcc:rpath_for_built_shared_libraries" ]
+  }
 }
