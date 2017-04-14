@@ -14,7 +14,7 @@ namespace nu {
 
 namespace {
 
-bool IsNUView(NSView* self, SEL _cmd) {
+bool NUInjected(NSView* self, SEL _cmd) {
   return true;
 }
 
@@ -45,12 +45,16 @@ void OnKeyEvent(NSView* self, SEL _cmd, NSEvent* event) {
 
 }  // namespace
 
+bool IsNUView(Class cl) {
+  return class_getClassMethod(cl, @selector(shell)) != nullptr;
+}
+
 bool EventHandlerInstalled(Class cl) {
   return class_getClassMethod(cl, @selector(IsNUView)) != nullptr;
 }
 
 void AddMouseEventHandlerToClass(Class cl) {
-  class_addMethod(cl, @selector(IsNUView), (IMP)IsNUView, "B@:");
+  class_addMethod(cl, @selector(nuInjected), (IMP)NUInjected, "B@:");
   class_addMethod(cl, @selector(mouseDown:), (IMP)OnMouseEvent, "v@:@");
   class_addMethod(cl, @selector(rightMouseDown:), (IMP)OnMouseEvent, "v@:@");
   class_addMethod(cl, @selector(otherMouseDown:), (IMP)OnMouseEvent, "v@:@");
