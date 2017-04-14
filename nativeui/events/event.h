@@ -48,6 +48,14 @@ struct NATIVEUI_EXPORT MouseEvent : public Event {
   PointF position;
 };
 
+// Key events.
+struct NATIVEUI_EXPORT KeyEvent: public Event {
+  // Create from the native event.
+  KeyEvent(NativeEvent event, NativeView view);
+
+  KeyboardCode key;
+};
+
 }  // namespace nu
 
 #endif  // NATIVEUI_EVENTS_EVENT_H_

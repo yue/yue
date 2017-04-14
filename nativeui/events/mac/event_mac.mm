@@ -7,6 +7,7 @@
 #import <Cocoa/Cocoa.h>
 
 #include "base/logging.h"
+#include "nativeui/events/mac/keyboard_code_conversion_mac.h"
 
 namespace nu {
 
@@ -22,10 +23,13 @@ EventType EventTypeFromNS(NSEventType type) {
     case NSRightMouseUp:
     case NSOtherMouseUp:
       return EventType::MouseUp;
+    case NSKeyDown:
+      return EventType::KeyDown;
+    case NSKeyUp:
+      return EventType::KeyUp;
     default:
-      NOTREACHED();
+      return EventType::Unknown;
   }
-  return EventType::Unknown;
 }
 
 int EventModifiersFromNS(NSEventModifierFlags flags) {
@@ -53,6 +57,11 @@ MouseEvent::MouseEvent(NativeEvent event, NativeView view)
     : Event(event, view),
       button([event buttonNumber] + 1),
       position(FlipWindowPos([event locationInWindow], [event window])) {
+}
+
+KeyEvent::KeyEvent(NativeEvent event, NativeView view)
+    : Event(event, view),
+      key(KeyboardCodeFromNSEvent(event)) {
 }
 
 }  // namespace nu

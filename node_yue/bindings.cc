@@ -376,10 +376,14 @@ struct Type<nu::EventType> {
         return vb::ToV8(context, "mouseDown");
       case nu::EventType::MouseUp:
         return vb::ToV8(context, "mouseUp");
+      case nu::EventType::KeyDown:
+        return vb::ToV8(context, "keyDown");
+      case nu::EventType::KeyUp:
+        return vb::ToV8(context, "keyUp");
       default:
         NOTREACHED();
+        return vb::ToV8(context, "unknown");
     }
-    return v8::Undefined(context->GetIsolate());
   }
 };
 
@@ -419,6 +423,29 @@ struct Type<nu::MouseEvent> {
     Set(context, obj,
         "button", event.button,
         "position", event.position);
+    return obj;
+  }
+};
+
+template<>
+struct Type<nu::KeyboardCode> {
+  static constexpr const char* name = "yue.KeyboardCode";
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   nu::KeyboardCode code) {
+    return vb::ToV8(context, nu::KeyboardCodeToStr(code));
+  }
+};
+
+template<>
+struct Type<nu::KeyEvent> {
+  using base = nu::Event;
+  static constexpr const char* name = "yue.KeyEvent";
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   const nu::KeyEvent& event) {
+    v8::Local<v8::Object> obj = v8::Object::New(context->GetIsolate());
+    Type<nu::Event>::SetEventProperties(context, obj, &event);
+    Set(context, obj,
+        "key", event.key);
     return obj;
   }
 };
@@ -637,7 +664,9 @@ struct Type<nu::View> {
         "getParent", &nu::View::GetParent);
     SetProperty(context, templ,
                 "onMouseDown", &nu::View::on_mouse_down,
-                "onMouseUp", &nu::View::on_mouse_up);
+                "onMouseUp", &nu::View::on_mouse_up,
+                "onKeyDown", &nu::View::on_key_down,
+                "onKeyUp", &nu::View::on_key_up);
   }
 };
 

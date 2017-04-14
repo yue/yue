@@ -22,6 +22,14 @@ gboolean OnMouseUp(GtkWidget* widget, GdkEvent* event, View* view) {
   return view->on_mouse_up.Emit(view, MouseEvent(event, widget));
 }
 
+gboolean OnKeyDown(GtkWidget* widget, GdkEvent* event, View* view) {
+  return view->on_key_down.Emit(view, KeyEvent(event, widget));
+}
+
+gboolean OnKeyUp(GtkWidget* widget, GdkEvent* event, View* view) {
+  return view->on_key_up.Emit(view, KeyEvent(event, widget));
+}
+
 }  // namespace
 
 void View::PlatformDestroy() {
@@ -37,6 +45,8 @@ void View::TakeOverView(NativeView view) {
   // Install event hooks.
   g_signal_connect(view, "button-press-event", G_CALLBACK(OnMouseDown), this);
   g_signal_connect(view, "button-release-event", G_CALLBACK(OnMouseUp), this);
+  g_signal_connect(view, "key-press-event", G_CALLBACK(OnKeyDown), this);
+  g_signal_connect(view, "key-release-event", G_CALLBACK(OnKeyUp), this);
 }
 
 void View::SetBounds(const RectF& bounds) {

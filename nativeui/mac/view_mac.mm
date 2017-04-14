@@ -22,6 +22,7 @@ void View::TakeOverView(NativeView view) {
   // Install events handle for the view's class.
   if (IsNUView(view) && !EventHandlerInstalled([view class])) {
     AddMouseEventHandlerToClass([view class]);
+    AddKeyEventHandlerToClass([view class]);
   }
 }
 

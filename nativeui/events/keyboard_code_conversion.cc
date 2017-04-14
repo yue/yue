@@ -164,6 +164,10 @@ KeyboardCode KeyboardCodeFromKeyIdentifier(const std::string& s,
 
 }  // namespace
 
+const char* KeyboardCodeToStr(KeyboardCode code) {
+  return "it";
+}
+
 KeyboardCode KeyboardCodeFromStr(const std::string& str, bool* shifted) {
   if (str.size() == 1)
     return KeyboardCodeFromCharCode(str[0], shifted);

@@ -8,15 +8,17 @@
 #include <string>
 
 #include "nativeui/events/keyboard_codes.h"
+#include "nativeui/nativeui_export.h"
 
 namespace nu {
 
 // Convert a key code to string, using the values of KeyboardEvent.key:
 // https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values
-const char* KeyboardCodeToStr(KeyboardCode code);
+NATIVEUI_EXPORT const char* KeyboardCodeToStr(KeyboardCode code);
 
 // Convert a string to a key code represented by it.
-KeyboardCode KeyboardCodeFromStr(const std::string& str, bool* shifted);
+NATIVEUI_EXPORT KeyboardCode KeyboardCodeFromStr(const std::string& str,
+                                                 bool* shifted);
 
 }  // namespace nu
 

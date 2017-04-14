@@ -20,6 +20,7 @@ typedef struct YGConfig *YGConfigRef;
 namespace nu {
 
 struct MouseEvent;
+struct KeyEvent;
 
 // The base class for all kinds of views.
 class NATIVEUI_EXPORT View : public base::RefCounted<View> {
@@ -73,6 +74,8 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   // Events.
   Signal<bool(View*, const MouseEvent&)> on_mouse_down;
   Signal<bool(View*, const MouseEvent&)> on_mouse_up;
+  Signal<bool(View*, const KeyEvent&)> on_key_down;
+  Signal<bool(View*, const KeyEvent&)> on_key_up;
 
  protected:
   View();

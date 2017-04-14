@@ -37,4 +37,9 @@ MouseEvent::MouseEvent(NativeEvent event, NativeView view)
       position(event->button.x, event->button.y) {
 }
 
+KeyEvent::KeyEvent(NativeEvent event, NativeView view)
+    : KeyEvent(event, view),
+      key(static_cast<KeyboardCode>(event->key.keyval)) {
+}
+
 }  // namespace nu

@@ -337,9 +337,13 @@ struct Type<nu::EventType> {
         lua::Push(state, "mousedown");
       case nu::EventType::MouseUp:
         lua::Push(state, "mouseup");
+      case nu::EventType::KeyDown:
+        lua::Push(state, "keyDown");
+      case nu::EventType::KeyUp:
+        lua::Push(state, "keyUp");
       default:
         NOTREACHED();
-        lua::Push(state, nullptr);
+        lua::Push(state, "unknown");
     }
   }
 };
@@ -375,6 +379,26 @@ struct Type<nu::MouseEvent> {
     RawSet(state, -1,
            "button", event.button,
            "position", event.position);
+  }
+};
+
+template<>
+struct Type<nu::KeyboardCode> {
+  static constexpr const char* name = "yue.KeyboardCode";
+  static inline void Push(State* state, nu::KeyboardCode code) {
+    lua::Push(state, nu::KeyboardCodeToStr(code));
+  }
+};
+
+template<>
+struct Type<nu::KeyEvent> {
+  using base = nu::Event;
+  static constexpr const char* name = "yue.KeyEvent";
+  static inline void Push(State* state, const nu::KeyEvent& event) {
+    NewTable(state);
+    Type<nu::Event>::SetEventProperties(state, -1, &event);
+    RawSet(state, -1,
+           "key", event.key);
   }
 };
 
@@ -572,7 +596,9 @@ struct Type<nu::View> {
            "getparent", &nu::View::GetParent);
     RawSetProperty(state, index,
                    "onmousedown", &nu::View::on_mouse_down,
-                   "onmouseup", &nu::View::on_mouse_up);
+                   "onmouseup", &nu::View::on_mouse_up,
+                   "onkeydown", &nu::View::on_key_down,
+                   "onkeyup", &nu::View::on_key_up);
   }
   static void SetStyle(CallContext* context, nu::View* view) {
     if (GetType(context->state, 2) != LuaType::Table) {
