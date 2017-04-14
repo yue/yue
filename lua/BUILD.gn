@@ -21,6 +21,7 @@ source_set("lua") {
     "metatable_internal.h",
     "pcall.h",
     "stack.h",
+    "stack_auto_reset.h",
     "state.h",
     "table.h",
     "table_internal.h",

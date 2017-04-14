@@ -7,12 +7,14 @@
 #ifndef LUA_TYPES_H_
 #define LUA_TYPES_H_
 
+#include <map>
 #include <string>
 #include <tuple>
+#include <vector>
 
 #include "base/strings/string_piece.h"
 #include "base/strings/utf_string_conversions.h"
-#include "lua/state.h"
+#include "lua/stack_auto_reset.h"
 
 namespace lua {
 
@@ -221,6 +223,58 @@ struct Type<const char[n]> {
 template<typename... ArgTypes>
 struct Type<std::tuple<ArgTypes...>> {
   static constexpr const char* name = "tuple<>";
+};
+
+template<typename T>
+struct Type<std::vector<T>> {
+  static constexpr const char* name = "Table";
+  static inline void Push(State* state, const std::vector<T>& vec) {
+    NewTable(state, vec.size());
+    for (size_t i = 0; i< vec.size(); ++i)
+      RawSet(state, -1, i + 1, vec[i]);
+  }
+  static inline bool To(State* state, int index, std::vector<T>* out) {
+    if (GetType(state, index) != LuaType::Table)
+      return false;
+    StackAutoReset reset(state);
+    lua_pushnil(state);
+    while (lua_next(state, index) != 0) {
+      if (GetType(state, -2) != LuaType::Number ||  // check array type
+          lua_tointeger(state, -2) != static_cast<int>(out->size() - 1))
+        return false;
+      T value;
+      if (!Type<T>::To(state, -1, &value))
+        return false;
+      lua_pop(state, 1);
+      out->push_back(std::move(value));
+    }
+    return true;
+  }
+};
+
+template<typename K, typename V>
+struct Type<std::map<K, V>> {
+  static constexpr const char* name = "Table";
+  static inline void Push(State* state, const std::map<K, V>& dict) {
+    NewTable(state, 0, dict.size());
+    for (const auto& it : dict)
+      RawSet(state, -1, it.first, it.second);
+  }
+  static inline bool To(State* state, int index, std::map<K, V>* out) {
+    if (GetType(state, index) != LuaType::Table)
+      return false;
+    StackAutoReset reset(state);
+    lua_pushnil(state);
+    while (lua_next(state, index) != 0) {
+      K key;
+      V value;
+      if (!Type<K>::To(state, -2, &key) || !Type<V>::To(state, -1, &value))
+        return false;
+      lua_pop(state, 1);
+      (*out)[key] = std::move(value);
+    }
+    return true;
+  }
 };
 
 }  // namespace lua

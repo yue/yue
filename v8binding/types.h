@@ -5,6 +5,7 @@
 #ifndef V8BINDING_TYPES_H_
 #define V8BINDING_TYPES_H_
 
+#include <map>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -229,6 +230,7 @@ inline void SetArray(v8::Local<v8::Context> context,
 
 template<typename... ArgTypes>
 struct Type<std::tuple<ArgTypes...>> {
+  static constexpr const char* name = "Array";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    const std::tuple<ArgTypes...>& tup) {
     auto arr = v8::Array::New(context->GetIsolate(), sizeof...(ArgTypes));
@@ -240,6 +242,7 @@ struct Type<std::tuple<ArgTypes...>> {
 
 template<typename T>
 struct Type<std::vector<T>> {
+  static constexpr const char* name = "Array";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    const std::vector<T>& vec) {
     auto arr = v8::Array::New(context->GetIsolate(), vec.size());
@@ -261,6 +264,47 @@ struct Type<std::vector<T>> {
       if (el.IsEmpty() ||
           !Type<T>::FromV8(context, el.ToLocalChecked(), &(*out)[i]))
         return false;
+    }
+    return true;
+  }
+};
+
+template<typename K, typename V>
+struct Type<std::map<K, V>> {
+  static constexpr const char* name = "Object";
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   const std::map<K, V>& dict) {
+    v8::Local<v8::Object> obj = v8::Object::New(context->GetIsolate());
+    for (const auto& it : dict) {
+      if (obj->Set(context,
+                   ToV8(context, it.first),
+                   ToV8(context, it.second)).IsEmpty())
+        break;
+    }
+    return obj;
+  }
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     std::map<K, V>* out) {
+    if (!value->IsObject())
+      return false;
+    out->clear();
+    v8::Local<v8::Object> obj = value.As<v8::Object>();
+    v8::Local<v8::Array> keys = obj->GetPropertyNames(context).ToLocalChecked();
+    for (uint32_t i = 0; i < keys->Length(); ++i) {
+      v8::MaybeLocal<v8::Value> maybe_v8key = keys->Get(context, i);
+      if (maybe_v8key.IsEmpty())
+        return false;
+      v8::Local<v8::Value> v8key = maybe_v8key.ToLocalChecked();
+      v8::MaybeLocal<v8::Value> maybe_v8value = obj->Get(context, v8key);
+      if (maybe_v8value.IsEmpty())
+        return false;
+      K key;
+      V value;
+      if (!Type<K>::FromV8(context, v8key, &key) ||
+          !Type<V>::FromV8(context, maybe_v8value.ToLocalChecked(), &value))
+        return false;
+      (*out)[key] = std::move(value);
     }
     return true;
   }
