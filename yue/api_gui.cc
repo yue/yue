@@ -420,15 +420,10 @@ struct Type<nu::MenuBase> {
   }
   // Used by subclasses.
   static void ReadMembers(State* state, nu::MenuBase* menu) {
-    if (GetType(state, 1) != LuaType::Table)
-      return;
-    Push(state, nullptr);
-    while (lua_next(state, 1) != 0) {
-      nu::MenuItem* item;
-      if (Pop(state, &item))
+    std::vector<nu::MenuItem*> items;
+    if (lua::To(state, 1, &items)) {
+      for (nu::MenuItem* item : items)
         menu->Append(item);
-      else
-        PopAndIgnore(state, 1);
     }
   }
 };
@@ -593,6 +588,7 @@ struct Type<nu::View> {
            "getbounds", &nu::View::GetBounds,
            "setvisible", &nu::View::SetVisible,
            "isvisible", &nu::View::IsVisible,
+           "focus", &nu::View::Focus,
            "getparent", &nu::View::GetParent);
     RawSetProperty(state, index,
                    "onmousedown", &nu::View::on_mouse_down,
@@ -600,20 +596,10 @@ struct Type<nu::View> {
                    "onkeydown", &nu::View::on_key_down,
                    "onkeyup", &nu::View::on_key_up);
   }
-  static void SetStyle(CallContext* context, nu::View* view) {
-    if (GetType(context->state, 2) != LuaType::Table) {
-      context->has_error = true;
-      Push(context->state, "first arg must be table");
-      return;
-    }
-    Push(context->state, nullptr);
-    while (lua_next(context->state, 2) != 0) {
-      std::string key, value;
-      To(context->state, -2, &key, &value);
-      view->SetStyle(key, value);
-      PopAndIgnore(context->state, 1);
-    }
-    // Refresh the view.
+  static void SetStyle(nu::View* view,
+                       const std::map<std::string, std::string>& styles) {
+    for (const auto& it : styles)
+      view->SetStyle(it.first, it.second);
     view->Layout();
   }
 };

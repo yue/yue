@@ -95,6 +95,10 @@ bool View::IsVisible() const {
   return gtk_widget_get_visible(view_);
 }
 
+void View::Focus() {
+  gtk_widget_grab_focus(view_);
+}
+
 void View::PlatformSetBackgroundColor(Color color) {
   GdkRGBA rgba = color.ToGdkRGBA();
   gtk_widget_override_background_color(view_, GTK_STATE_FLAG_NORMAL, &rgba);

@@ -53,6 +53,11 @@ bool View::IsVisible() const {
   return ![view_ isHidden];
 }
 
+void View::Focus() {
+  if (view_.window)
+    [view_.window makeFirstResponder:view_];
+}
+
 void View::PlatformSetBackgroundColor(Color color) {
   if ([GetNative() respondsToSelector:@selector(setNUBackgroundColor:)])
     [GetNative() setNUBackgroundColor:color];

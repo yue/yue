@@ -227,7 +227,7 @@ struct Type<std::tuple<ArgTypes...>> {
 
 template<typename T>
 struct Type<std::vector<T>> {
-  static constexpr const char* name = "Table";
+  static constexpr const char* name = "table";
   static inline void Push(State* state, const std::vector<T>& vec) {
     NewTable(state, vec.size());
     for (size_t i = 0; i< vec.size(); ++i)
@@ -254,7 +254,7 @@ struct Type<std::vector<T>> {
 
 template<typename K, typename V>
 struct Type<std::map<K, V>> {
-  static constexpr const char* name = "Table";
+  static constexpr const char* name = "table";
   static inline void Push(State* state, const std::map<K, V>& dict) {
     NewTable(state, 0, dict.size());
     for (const auto& it : dict)

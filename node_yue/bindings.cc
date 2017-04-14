@@ -654,19 +654,29 @@ struct Type<nu::View> {
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
         "setBackgroundColor", &nu::View::SetBackgroundColor,
-        "setStyle", &nu::View::SetStyle,
+        "setStyle", &SetStyle,
         "printStyle", &nu::View::PrintStyle,
         "layout", &nu::View::Layout,
         "setBounds", &nu::View::SetBounds,
         "getBounds", &nu::View::GetBounds,
         "setVisible", &nu::View::SetVisible,
         "isVisible", &nu::View::IsVisible,
+        "focus", &nu::View::Focus,
         "getParent", &nu::View::GetParent);
     SetProperty(context, templ,
                 "onMouseDown", &nu::View::on_mouse_down,
                 "onMouseUp", &nu::View::on_mouse_up,
                 "onKeyDown", &nu::View::on_key_down,
                 "onKeyUp", &nu::View::on_key_up);
+  }
+  static void SetStyle(Arguments* args,
+                       const std::map<std::string, std::string>& styles) {
+    nu::View* view;
+    if (!args->GetHolder(&view))
+      return;
+    for (const auto& it : styles)
+      view->SetStyle(it.first, it.second);
+    view->Layout();
   }
 };
 

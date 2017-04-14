@@ -177,6 +177,11 @@ bool View::IsVisible() const {
   return GetNative()->is_visible();
 }
 
+void View::Focus() {
+  if (GetNative()->window())
+    GetNative()->window()->focus_manager()->TakeFocus(this);
+}
+
 void View::PlatformSetBackgroundColor(Color color) {
   GetNative()->SetBackgroundColor(color);
 }

@@ -49,6 +49,9 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   void SetVisible(bool visible);
   bool IsVisible() const;
 
+  // Move the keyboard focus to the view.
+  void Focus();
+
   // Set backgroundcolor.
   void SetBackgroundColor(Color color);
   Color GetBackgroundColor() const;
