@@ -201,7 +201,7 @@ Accelerator::Accelerator(const std::string& description)
         modifiers_ |= MASK_ALT;
         break;
       case VKEY_COMMAND:
-        modifiers_ |= MASK_COMMAND;
+        modifiers_ |= MASK_META;
         break;
       // Or it is a normal key.
       default:
@@ -236,7 +236,7 @@ std::string Accelerator::GetShortcutText() const {
     shortcut += "Control+";
   if (modifiers_ & MASK_ALT)
     shortcut += "Alt+";
-  if (modifiers_ & MASK_COMMAND)
+  if (modifiers_ & MASK_META)
     shortcut += "Super+";
 
   switch (key_code_) {

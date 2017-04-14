@@ -12,7 +12,7 @@ enum KeyboardModifier {
   MASK_SHIFT   = 1 << 1,
   MASK_CONTROL = 1 << 2,
   MASK_ALT     = 1 << 3,
-  MASK_COMMAND = 1 << 4,
+  MASK_META = 1 << 4,
 };
 
 enum KeyboardCode {

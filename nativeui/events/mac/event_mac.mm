@@ -32,7 +32,7 @@ EventType EventTypeFromNS(NSEventType type) {
 int EventModifiersFromNS(NSEventModifierFlags flags) {
   // KeyboardModifier is mapped from NSEventModifierFlags, so we only need to
   // filter out the ones we don't support.
-  return flags & (MASK_SHIFT | MASK_CONTROL | MASK_ALT | MASK_COMMAND);
+  return flags & (MASK_SHIFT | MASK_CONTROL | MASK_ALT | MASK_META);
 }
 
 PointF FlipWindowPos(NSPoint point, NSWindow* window) {

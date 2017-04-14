@@ -45,8 +45,8 @@ void OnKeyEvent(NSView* self, SEL _cmd, NSEvent* event) {
 
 }  // namespace
 
-bool IsNUView(Class cl) {
-  return class_getClassMethod(cl, @selector(shell)) != nullptr;
+bool IsNUView(id view) {
+  return [view respondsToSelector:@selector(shell)];
 }
 
 bool EventHandlerInstalled(Class cl) {

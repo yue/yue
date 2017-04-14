@@ -12,7 +12,7 @@ enum KeyboardModifier {
   MASK_SHIFT   = 1 << 0,
   MASK_CONTROL = 1 << 2,
   MASK_ALT     = 1 << 3,
-  MASK_COMMAND = 1 << 26,
+  MASK_META = 1 << 26,
 };
 
 // Code value from gtk/gdk/gdkkeysyms.h.

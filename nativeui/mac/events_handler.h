@@ -10,7 +10,7 @@
 namespace nu {
 
 // Return whether a class is part of nativeui system.
-bool IsNUView(Class cl);
+bool IsNUView(id view);
 
 // Return whether a class has been added with event handlers.
 bool EventHandlerInstalled(Class cl);

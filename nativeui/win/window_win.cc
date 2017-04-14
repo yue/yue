@@ -170,7 +170,7 @@ void WindowImpl::OnKeyDown(UINT ch, UINT repeat, UINT flags) {
     modifiers |= MASK_ALT;
   if ((::GetKeyState(VK_LWIN) & 0x8000) == 0x8000 ||
       (::GetKeyState(VK_RWIN) & 0x8000) == 0x8000)
-    modifiers |= MASK_COMMAND;
+    modifiers |= MASK_META;
   Accelerator accelerator(static_cast<KeyboardCode>(ch), modifiers);
   int command = delegate_->GetMenu()->accel_manager()->Process(accelerator);
   if (command != -1)

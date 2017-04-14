@@ -42,7 +42,7 @@ int GetCurrentModifiers() {
     modifiers |= MASK_ALT;
   if ((::GetKeyState(VK_LWIN) & 0x8000) == 0x8000 ||
       (::GetKeyState(VK_RWIN) & 0x8000) == 0x8000)
-    modifiers |= MASK_COMMAND;
+    modifiers |= MASK_META;
   return modifiers;
 }
 

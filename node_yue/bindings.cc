@@ -386,6 +386,17 @@ struct Type<nu::EventType> {
 template<>
 struct Type<nu::Event> {
   static constexpr const char* name = "yue.Event";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+        "maskShift", static_cast<int>(nu::MASK_SHIFT),
+        "maskControl", static_cast<int>(nu::MASK_CONTROL),
+        "maskAlt", static_cast<int>(nu::MASK_ALT),
+        "maskMeta", static_cast<int>(nu::MASK_META));
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+  }
   // Used by subclasses.
   static void SetEventProperties(v8::Local<v8::Context> context,
                                  v8::Local<v8::Object> obj,
@@ -889,6 +900,7 @@ void Initialize(v8::Local<v8::Object> exports) {
           "Color",     vb::Constructor<nu::Color>(),
           "Image",     vb::Constructor<nu::Image>(),
           "Painter",   vb::Constructor<nu::Painter>(),
+          "Event",     vb::Constructor<nu::Event>(),
           "MenuBar",   vb::Constructor<nu::MenuBar>(),
           "Menu",      vb::Constructor<nu::Menu>(),
           "MenuItem",  vb::Constructor<nu::MenuItem>(),

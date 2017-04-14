@@ -347,6 +347,13 @@ struct Type<nu::EventType> {
 template<>
 struct Type<nu::Event> {
   static constexpr const char* name = "yue.Event";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "maskshift", static_cast<int>(nu::MASK_SHIFT),
+           "maskcontrol", static_cast<int>(nu::MASK_CONTROL),
+           "maskalt", static_cast<int>(nu::MASK_ALT),
+           "maskmeta", static_cast<int>(nu::MASK_META));
+  }
   // Used by subclasses.
   static void SetEventProperties(State* state,
                                  int index,
@@ -791,6 +798,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
               "Color",     lua::MetaTable<nu::Color>(),
               "Image",     lua::MetaTable<nu::Image>(),
               "Painter",   lua::MetaTable<nu::Painter>(),
+              "Event",     lua::MetaTable<nu::Event>(),
               "MenuBar",   lua::MetaTable<nu::MenuBar>(),
               "Menu",      lua::MetaTable<nu::Menu>(),
               "MenuItem",  lua::MetaTable<nu::MenuItem>(),
