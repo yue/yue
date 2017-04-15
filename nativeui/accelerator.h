@@ -13,15 +13,18 @@
 
 namespace nu {
 
+struct KeyEvent;
+
 class NATIVEUI_EXPORT Accelerator {
  public:
-  explicit Accelerator(KeyboardCode code = VKEY_UNKNOWN, int modifiers = 0);
+  Accelerator();
+  explicit Accelerator(const KeyEvent& event);
   explicit Accelerator(const std::string& description);
   ~Accelerator() = default;
 
-  bool operator <(const Accelerator& rhs) const;
-  bool operator ==(const Accelerator& rhs) const;
-  bool operator !=(const Accelerator& rhs) const;
+  bool operator< (const Accelerator& rhs) const;
+  bool operator== (const Accelerator& rhs) const;
+  bool operator!= (const Accelerator& rhs) const;
 
 #if defined(OS_WIN)
   std::string GetShortcutText() const;

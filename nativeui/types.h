@@ -5,6 +5,10 @@
 #ifndef NATIVEUI_TYPES_H_
 #define NATIVEUI_TYPES_H_
 
+#if defined(OS_WIN)
+#include <windows.h>
+#endif
+
 #include "build/build_config.h"
 
 #if defined(OS_WIN)

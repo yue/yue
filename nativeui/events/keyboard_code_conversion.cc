@@ -37,7 +37,6 @@ const KeyCodeMap kKeyCodesMap[] = {
   { "audiovolumemute", VKEY_VOLUME_MUTE },
   { "audiovolumeup", VKEY_VOLUME_UP },
   { "backspace", VKEY_BACK },
-  { "backtab", VKEY_BACKTAB },
   { "browserback", VKEY_BROWSER_BACK },
   { "browserfavorites", VKEY_BROWSER_FAVORITES },
   { "browserforward", VKEY_BROWSER_FORWARD },
@@ -226,7 +225,6 @@ const char* KeyboardCodeToStr(KeyboardCode code) {
     case VKEY_CANCEL: return "Cancel";
     case VKEY_BACK: return "Backspace";
     case VKEY_TAB: return "Tab";
-    case VKEY_BACKTAB: return "BackTab";
     case VKEY_CLEAR: return "Clear";
     case VKEY_RETURN: return "Enter";
     case VKEY_SHIFT: return "Shift";

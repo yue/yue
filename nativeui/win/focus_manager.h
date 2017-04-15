@@ -22,6 +22,8 @@ class FocusManager {
   // Returns whether a view has been focused.
   void AdvanceFocus(Container* container, bool reverse);
 
+  View* focused_view() const { return focused_view_; }
+
  private:
   bool DoAdvanceFocus(Container* container, bool reverse,
                       bool* focus_on_next_view);

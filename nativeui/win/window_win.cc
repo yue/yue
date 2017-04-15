@@ -8,6 +8,7 @@
 
 #include "nativeui/accelerator.h"
 #include "nativeui/accelerator_manager.h"
+#include "nativeui/events/event.h"
 #include "nativeui/events/win/event_win.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/gfx/win/double_buffer.h"
@@ -148,33 +149,35 @@ BOOL WindowImpl::OnMouseWheel(bool vertical, UINT flags, int delta,
 }
 
 LRESULT WindowImpl::OnMouseClick(UINT message, WPARAM w_param, LPARAM l_param) {
-  Win32Message event = {message, w_param, l_param};
-  if (delegate_->GetContentView()->GetNative()->OnMouseClick(&event))
+  // Pass the event to view.
+  Win32Message msg = {message, w_param, l_param};
+  if (delegate_->GetContentView()->GetNative()->OnMouseClick(&msg))
     return TRUE;
 
-  // Release the capture on mouse up.
+  // If no one handles it then release the capture on mouse up.
   if (message == WM_LBUTTONUP)
     ReleaseCapture();
   return FALSE;
 }
 
-void WindowImpl::OnKeyDown(UINT ch, UINT repeat, UINT flags) {
-  if (!delegate_->GetMenu())
-    return;
-  int modifiers = 0;
-  if ((::GetKeyState(VK_SHIFT) & 0x8000) == 0x8000)
-    modifiers |= MASK_SHIFT;
-  if ((::GetKeyState(VK_CONTROL) & 0x8000) == 0x8000)
-    modifiers |= MASK_CONTROL;
-  if ((::GetKeyState(VK_MENU) & 0x8000) == 0x8000)
-    modifiers |= MASK_ALT;
-  if ((::GetKeyState(VK_LWIN) & 0x8000) == 0x8000 ||
-      (::GetKeyState(VK_RWIN) & 0x8000) == 0x8000)
-    modifiers |= MASK_META;
-  Accelerator accelerator(static_cast<KeyboardCode>(ch), modifiers);
+LRESULT WindowImpl::OnKey(UINT message, WPARAM w_param, LPARAM l_param) {
+  // First pass the event to view.
+  Win32Message msg = {message, w_param, l_param};
+  if (focus_manager()->focused_view() &&
+      focus_manager()->focused_view()->GetNative()->OnKey(&msg))
+    return TRUE;
+
+  // If no one handles it then pass the event to menu.
+  if (message != WM_KEYDOWN || !delegate_->GetMenu())
+    return FALSE;
+  ViewImpl* content_view = delegate_->GetContentView()->GetNative();
+  Accelerator accelerator(KeyEvent(&msg, content_view));
   int command = delegate_->GetMenu()->accel_manager()->Process(accelerator);
-  if (command != -1)
+  if (command != -1) {
     DispatchCommandToItem(delegate_->GetMenu(), command);
+    return TRUE;
+  }
+  return FALSE;
 }
 
 void WindowImpl::OnChar(UINT ch, UINT repeat, UINT flags) {

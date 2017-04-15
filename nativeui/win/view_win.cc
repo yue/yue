@@ -93,11 +93,25 @@ void ViewImpl::Draw(PainterWin* painter, const Rect& dirty) {
 bool ViewImpl::OnMouseClick(NativeEvent event) {
   MouseEvent client_event(event, this);
   if (client_event.type == EventType::MouseDown &&
-      delegate_->on_mouse_down.Emit(delegate_, client_event))
+      delegate()->on_mouse_down.Emit(delegate(), client_event))
     return true;
   if (client_event.type == EventType::MouseUp &&
-      delegate_->on_mouse_up.Emit(delegate_, client_event))
+      delegate()->on_mouse_up.Emit(delegate(), client_event))
     return true;
+  return false;
+}
+
+bool ViewImpl::OnKey(NativeEvent event) {
+  KeyEvent client_event(event, this);
+  if (client_event.type == EventType::KeyDown &&
+      delegate()->on_key_down.Emit(delegate(), client_event))
+    return true;
+  if (client_event.type == EventType::KeyUp &&
+      delegate()->on_key_up.Emit(delegate(), client_event))
+    return true;
+  // Pass to parent if this view ignores the event.
+  if (delegate()->GetParent())
+    return delegate()->GetParent()->GetNative()->OnKey(event);
   return false;
 }
 

@@ -23,7 +23,7 @@ enum KeyboardCode {
   VKEY_RETURN = 0x0D,      // VK_RETURN
   VKEY_SHIFT = 0x10,       // VK_SHIFT
   VKEY_CONTROL = 0x11,     // VK_CONTROL
-  VKEY_MENU = VK_MENU,     // a.k.a. ALT
+  VKEY_MENU = 0x12,        // VK_MENU
   VKEY_PAUSE = 0x13,       // VK_PAUSE
   VKEY_CAPITAL = 0x14,     // VK_CAPITAL
   VKEY_KANA = 0x15,        // VK_KANA

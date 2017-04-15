@@ -26,6 +26,10 @@ EventType EventTypeFromMessage(UINT message) {
     case WM_RBUTTONUP:
     case WM_MBUTTONUP:
       return EventType::MouseUp;
+    case WM_KEYDOWN:
+      return EventType::KeyDown;
+    case WM_KEYUP:
+      return EventType::KeyUp;
     default:
       return EventType::Unknown;
   }
@@ -79,6 +83,11 @@ MouseEvent::MouseEvent(NativeEvent event, NativeView view)
       button(GetButtonNumber(event->message)),
       position(ScalePoint(PointF(Point(event->l_param)),
                           1.f / view->scale_factor())) {
+}
+
+KeyEvent::KeyEvent(NativeEvent event, NativeView view)
+    : Event(event, view),
+      key(static_cast<KeyboardCode>(event->w_param)) {
 }
 
 }  // namespace nu

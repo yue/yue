@@ -6,16 +6,24 @@
 
 #include <vector>
 
+#include "nativeui/events/event.h"
 #include "nativeui/events/keyboard_code_conversion.h"
 #include "base/strings/string_split.h"
 #include "base/strings/string_util.h"
 
+#if defined(OS_WIN)
+#include <windows.h>
+#endif
+
 namespace nu {
 
-namespace {
-}  // namespace
+Accelerator::Accelerator()
+    : key_code_(VKEY_UNKNOWN), modifiers_(0) {
+}
 
-// static
+Accelerator::Accelerator(const KeyEvent& event)
+    : key_code_(event.key), modifiers_(event.modifiers) {}
+
 Accelerator::Accelerator(const std::string& description)
     : key_code_(VKEY_UNKNOWN), modifiers_(0) {
   if (!base::IsStringASCII(description))
@@ -51,22 +59,19 @@ Accelerator::Accelerator(const std::string& description)
   }
 }
 
-bool Accelerator::operator <(const Accelerator& rhs) const {
+bool Accelerator::operator< (const Accelerator& rhs) const {
   if (key_code_ != rhs.key_code_)
     return key_code_ < rhs.key_code_;
   return modifiers_ < rhs.modifiers_;
 }
 
-bool Accelerator::operator ==(const Accelerator& rhs) const {
+bool Accelerator::operator== (const Accelerator& rhs) const {
   return (key_code_ == rhs.key_code_) && (modifiers_ == rhs.modifiers_);
 }
 
-bool Accelerator::operator !=(const Accelerator& rhs) const {
+bool Accelerator::operator!= (const Accelerator& rhs) const {
   return !(*this == rhs);
 }
-
-Accelerator::Accelerator(KeyboardCode code, int modifiers)
-    : key_code_(code), modifiers_(modifiers) {}
 
 #if defined(OS_WIN)
 std::string Accelerator::GetShortcutText() const {

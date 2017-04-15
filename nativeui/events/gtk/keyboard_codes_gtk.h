@@ -20,7 +20,6 @@ enum KeyboardCode {
   VKEY_CANCEL = 0xff69,    // GDK_KEY_Cancel
   VKEY_BACK = 0xff08,      // GDK_KEY_BackSpace
   VKEY_TAB = 0xff09,       // GDK_KEY_Tab
-  VKEY_BACKTAB = 0xfd05,   // GDK_KEY_3270_BackTab
   VKEY_CLEAR = 0xff0b,     // GDK_KEY_Clear
   VKEY_RETURN = 0xff0d,    // GDK_KEY_Return
   VKEY_SHIFT = 0xffe1,     // GDK_KEY_Shift_L
