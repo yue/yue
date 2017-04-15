@@ -7,6 +7,8 @@
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
 
+#include "nativeui/events/gtk/keyboard_code_conversion_gtk.h"
+
 namespace nu {
 
 namespace {
@@ -30,7 +32,7 @@ int GetCurrentEventModifiers() {
   int modifiers = gdk_keymap_get_modifier_state(gdk_keymap_get_default());
   // KeyboardModifier is mapped from NSEventModifierFlags, so we only need to
   // filter out the ones we don't support.
-  return flags & (MASK_SHIFT | MASK_CONTROL | MASK_ALT | MASK_META);
+  return modifiers & (MASK_SHIFT | MASK_CONTROL | MASK_ALT | MASK_META);
 }
 
 }  // namespace
@@ -49,8 +51,8 @@ MouseEvent::MouseEvent(NativeEvent event, NativeView view)
 }
 
 KeyEvent::KeyEvent(NativeEvent event, NativeView view)
-    : KeyEvent(event, view),
-      key(static_cast<KeyboardCode>(event->key.keyval)) {
+    : Event(event, view),
+      key(WindowsKeyCodeForGdkKeyCode(event->key.keyval)) {
 }
 
 }  // namespace nu

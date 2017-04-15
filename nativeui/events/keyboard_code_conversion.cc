@@ -295,7 +295,9 @@ const char* KeyboardCodeToStr(KeyboardCode code) {
     case VKEY_Z: return "z";
     case VKEY_COMMAND: return "Meta";
     case VKEY_RWIN: return "Meta";
+#if !defined(OS_LINUX)
     case VKEY_APPS: return "ContextMenu";
+#endif
     case VKEY_NUMPAD0: return "0";
     case VKEY_NUMPAD1: return "1";
     case VKEY_NUMPAD2: return "2";
@@ -337,12 +339,14 @@ const char* KeyboardCodeToStr(KeyboardCode code) {
     case VKEY_F24: return "F24";
     case VKEY_NUMLOCK: return "NumLock";
     case VKEY_SCROLL: return "ScrollLock";
+#if !defined(OS_LINUX)
     case VKEY_LSHIFT: return "Shift";
     case VKEY_RSHIFT: return "Shift";
     case VKEY_LCONTROL: return "Control";
     case VKEY_RCONTROL: return "Control";
     case VKEY_LMENU: return "Alt";
     case VKEY_RMENU: return "Alt";
+#endif
     case VKEY_BROWSER_BACK: return "BrowserBack";
     case VKEY_BROWSER_FORWARD: return "BrowserForward";
     case VKEY_BROWSER_REFRESH: return "BrowserRefresh";
@@ -372,7 +376,9 @@ const char* KeyboardCodeToStr(KeyboardCode code) {
     case VKEY_OEM_5: return "\\";
     case VKEY_OEM_6: return "]";
     case VKEY_OEM_7: return "'";
+#if !defined(OS_LINUX)
     case VKEY_OEM_CLEAR: return "Clear";
+#endif
     default: return "Unknown";
   }
 }
