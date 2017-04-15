@@ -11,9 +11,13 @@ namespace nu {
 
 struct _NUContainerPrivate {
   Container* delegate;
+  GdkWindow* event_window;
 };
 
 static void nu_container_realize(GtkWidget* widget);
+static void nu_container_unrealize(GtkWidget* widget);
+static void nu_container_map(GtkWidget* widget);
+static void nu_container_unmap(GtkWidget* widget);
 static void nu_container_get_preferred_width(GtkWidget* widget,
                                              gint* minimum,
                                              gint* natural);
@@ -41,6 +45,9 @@ static void nu_container_class_init(NUContainerClass* nu_class) {
       reinterpret_cast<GtkContainerClass*>(nu_class);
 
   widget_class->realize = nu_container_realize;
+  widget_class->unrealize = nu_container_unrealize;
+  widget_class->map = nu_container_map;
+  widget_class->unmap = nu_container_unmap;
   widget_class->get_preferred_width = nu_container_get_preferred_width;
   widget_class->get_preferred_height = nu_container_get_preferred_height;
   widget_class->size_allocate = nu_container_size_allocate;
@@ -55,7 +62,61 @@ static void nu_container_class_init(NUContainerClass* nu_class) {
 }
 
 static void nu_container_realize(GtkWidget* widget) {
+  // Set GDK window.
+  GdkWindow* window = gtk_widget_get_parent_window(widget);
+  gtk_widget_set_window(widget, window);
+  g_object_ref(window);
+
   GTK_WIDGET_CLASS(nu_container_parent_class)->realize(widget);
+
+  // Create invisible input window.
+  GtkAllocation allocation;
+  gtk_widget_get_allocation(widget, &allocation);
+  GdkWindowAttr attributes;
+  attributes.window_type = GDK_WINDOW_CHILD;
+  attributes.x = allocation.x;
+  attributes.y = allocation.x;
+  attributes.width = allocation.width;
+  attributes.height = allocation.height;
+  attributes.wclass = GDK_INPUT_ONLY;
+  attributes.event_mask = gtk_widget_get_events(widget)
+                          | GDK_BUTTON_MOTION_MASK
+                          | GDK_BUTTON_PRESS_MASK
+                          | GDK_BUTTON_RELEASE_MASK
+                          | GDK_ENTER_NOTIFY_MASK
+                          | GDK_LEAVE_NOTIFY_MASK
+                          | GDK_KEY_PRESS_MASK
+                          | GDK_KEY_RELEASE_MASK;
+  NUContainerPrivate* priv = NU_CONTAINER(widget)->priv;
+  priv->event_window = gdk_window_new(window, &attributes, GDK_WA_X | GDK_WA_Y);
+  gtk_widget_register_window(widget, priv->event_window);
+}
+
+static void nu_container_unrealize(GtkWidget* widget) {
+  NUContainerPrivate* priv = NU_CONTAINER(widget)->priv;
+  if (priv->event_window) {
+    gtk_widget_unregister_window(widget, priv->event_window);
+    gdk_window_destroy(priv->event_window);
+    priv->event_window = nullptr;
+  }
+
+  GTK_WIDGET_CLASS(nu_container_parent_class)->unrealize(widget);
+}
+
+static void nu_container_map(GtkWidget* widget) {
+  NUContainerPrivate* priv = NU_CONTAINER(widget)->priv;
+  if (priv->event_window)
+    gdk_window_show(priv->event_window);
+
+  GTK_WIDGET_CLASS(nu_container_parent_class)->map(widget);
+}
+
+static void nu_container_unmap(GtkWidget* widget) {
+  NUContainerPrivate* priv = NU_CONTAINER(widget)->priv;
+  if (priv->event_window)
+    gdk_window_hide(priv->event_window);
+
+  GTK_WIDGET_CLASS(nu_container_parent_class)->unmap(widget);
 }
 
 static void nu_container_get_preferred_width(GtkWidget* widget,
@@ -78,13 +139,19 @@ static void nu_container_size_allocate(GtkWidget* widget,
                                        GtkAllocation* allocation) {
   gtk_widget_set_allocation(widget, allocation);
 
+  NUContainerPrivate* priv = NU_CONTAINER(widget)->priv;
+  if (gtk_widget_get_realized(widget) && priv->event_window) {
+    gdk_window_move_resize(priv->event_window,
+                           allocation->x, allocation->y,
+                           allocation->width, allocation->height);
+  }
+
   // Ignore empty sizes on initialization.
   if (allocation->x == -1 && allocation->y == -1 &&
       allocation->width == 1 && allocation->height == 1)
     return;
 
-  Container* delegate = NU_CONTAINER(widget)->priv->delegate;
-  delegate->BoundsChanged();
+  priv->delegate->BoundsChanged();
 }
 
 static void nu_container_style_updated(GtkWidget* widget) {
@@ -137,6 +204,7 @@ static void nu_container_init(NUContainer* widget) {
 GtkWidget* nu_container_new(Container* delegate) {
   void* widget = g_object_new(NU_TYPE_CONTAINER, NULL);
   NU_CONTAINER(widget)->priv->delegate = delegate;
+  NU_CONTAINER(widget)->priv->event_window = nullptr;
   return GTK_WIDGET(widget);
 }
 
