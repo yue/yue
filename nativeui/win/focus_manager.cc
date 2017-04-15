@@ -46,6 +46,9 @@ bool FocusManager::DoAdvanceFocus(Container* container, bool reverse,
        reverse ? (i >= 0) : (i < container->ChildCount());
        reverse ? --i : ++i) {
     View* child = container->ChildAt(i);
+    if (!child->IsVisible())
+      continue;
+
     if (child->GetNative()->type() == ControlType::Container &&
         DoAdvanceFocus(static_cast<Container*>(child), reverse,
                        focus_on_next_view)) {

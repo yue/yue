@@ -19,14 +19,17 @@ namespace {
 
 const int kEntryPadding = 1;
 
+bool IsShiftPressed() {
+  return (::GetKeyState(VK_SHIFT) & 0x8000) == 0x8000;
+}
+
 class EntryImpl : public SubwinView {
  public:
   explicit EntryImpl(Entry* delegate)
       : SubwinView(delegate,
                    L"edit",
                    ES_AUTOHSCROLL | WS_CHILD | WS_VISIBLE,
-                   WS_EX_CLIENTEDGE),
-        proc_(SetWindowProc(hwnd(), &WndProc)) {
+                   WS_EX_CLIENTEDGE) {
   }
 
   bool CanHaveFocus() const override {
@@ -39,30 +42,27 @@ class EntryImpl : public SubwinView {
   }
 
  protected:
-  static LRESULT WndProc(HWND hwnd, UINT message, WPARAM w_param,
-                         LPARAM l_param) {
-    auto* self = reinterpret_cast<EntryImpl*>(GetWindowUserData(hwnd));
-    if (!self)  // could happen during destruction
-      return 0;
-    if (message == WM_CHAR && w_param == VK_RETURN) {
-      // Pressing enter means activate.
-      static_cast<Entry*>(self->delegate())->on_activate.Emit();
-      return 0;
-    } else if (message == WM_CHAR && w_param == VK_TAB) {
-      // Let the parent handle focus switching.
-      ::SendMessage(::GetParent(hwnd), WM_CHAR, w_param, l_param);
-      return 0;
-    } else if (message == WM_SETFOCUS) {
-      // Notify the window that focus has changed.
-      if (self->window()) {
-        self->window()->focus_manager()->TakeFocus(self->delegate());
-      }
-    }
-    return CallWindowProc(self->proc_, hwnd, message, w_param, l_param);
+  CR_BEGIN_MSG_MAP_EX(EntryImpl, SubwinView)
+    CR_MSG_WM_CHAR(OnChar)
+    CR_MSG_WM_SETFOCUS(OnSetFocus)
+  CR_END_MSG_MAP()
+
+  void OnChar(UINT ch, UINT repeat, UINT flags) {
+    if (ch == VK_RETURN)  // enter means activate.
+      static_cast<Entry*>(delegate())->on_activate.Emit();
+    else if (ch == VK_TAB && window())  // Switching focus.
+      window()->focus_manager()->AdvanceFocus(
+          window()->delegate()->GetContentView(), IsShiftPressed());
+    else
+      SetMsgHandled(FALSE);
   }
 
- private:
-  WNDPROC proc_ = nullptr;
+  void OnSetFocus(HWND hwnd) {
+    // Notify the window that focus has changed.
+    if (window())
+      window()->focus_manager()->TakeFocus(delegate());
+    SetMsgHandled(FALSE);
+  }
 };
 
 }  // namespace

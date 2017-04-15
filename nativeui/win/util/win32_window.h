@@ -46,12 +46,11 @@ class Win32Window {
   virtual LRESULT OnWndProc(UINT message, WPARAM w_param, LPARAM l_param);
 
   // Process one message from the window's message queue.
-  virtual BOOL ProcessWindowMessage(HWND window,
+  virtual bool ProcessWindowMessage(HWND window,
                                     UINT message,
                                     WPARAM w_param,
                                     LPARAM l_param,
-                                    LRESULT& result,  // NOLINT
-                                    DWORD msg_map_id = 0);
+                                    LRESULT* result);
 
  private:
   friend class ClassRegistrar;

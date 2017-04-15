@@ -33,9 +33,26 @@ class SubwinView : public Win32Window, public ViewImpl {
   virtual void OnCommand(UINT code, int command) {}
   virtual bool OnCtlColor(HDC dc, HBRUSH* brush);
 
+ protected:
+  CR_BEGIN_MSG_MAP_EX(SubwinView, Win32Window)
+    CR_MESSAGE_RANGE_HANDLER_EX(WM_LBUTTONDOWN, WM_MBUTTONDBLCLK, OnMouseClick)
+    CR_MESSAGE_RANGE_HANDLER_EX(WM_KEYDOWN, WM_KEYUP, OnKeyEvent)
+    CR_MESSAGE_RANGE_HANDLER_EX(WM_SYSKEYDOWN, WM_SYSKEYUP, OnKeyEvent)
+  CR_END_MSG_MAP()
+
+  LRESULT OnMouseClick(UINT message, WPARAM w_param, LPARAM l_param);
+  LRESULT OnKeyEvent(UINT message, WPARAM w_param, LPARAM l_param);
+
  private:
+  // Subclass-ed window procedure.
+  static LRESULT CALLBACK WndProc(HWND window,
+                                  UINT message,
+                                  WPARAM w_param,
+                                  LPARAM l_param);
+
   base::win::ScopedHFONT font_;
   base::win::ScopedGDIObject<HBRUSH> bg_brush_;
+  WNDPROC proc_;
 };
 
 }  // namespace nu

@@ -85,14 +85,13 @@ LRESULT Win32Window::OnWndProc(UINT message, WPARAM w_param, LPARAM l_param) {
 
   // Handle the message if it's in our message map; otherwise, let the system
   // handle it.
-  if (!ProcessWindowMessage(hwnd, message, w_param, l_param, result))
+  if (!ProcessWindowMessage(hwnd, message, w_param, l_param, &result))
     result = DefWindowProc(hwnd, message, w_param, l_param);
 
   return result;
 }
 
-BOOL Win32Window::ProcessWindowMessage(
-    HWND, UINT, WPARAM, LPARAM, LRESULT&, DWORD dwMsgMapID) {
+bool Win32Window::ProcessWindowMessage(HWND, UINT, WPARAM, LPARAM, LRESULT*) {
   return false;
 }
 

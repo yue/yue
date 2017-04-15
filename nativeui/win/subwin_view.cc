@@ -5,9 +5,11 @@
 #include "nativeui/win/subwin_view.h"
 
 #include "base/win/scoped_hdc.h"
+#include "nativeui/events/win/event_win.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/state.h"
 #include "nativeui/win/scroll_win.h"
+#include "nativeui/win/util/hwnd_util.h"
 
 namespace nu {
 
@@ -16,7 +18,8 @@ SubwinView::SubwinView(View* delegate,
                        DWORD window_style, DWORD window_ex_style)
     : Win32Window(class_name, State::GetCurrent()->GetSubwinHolder(),
                   window_style, window_ex_style),
-      ViewImpl(ControlType::Subwin, delegate) {
+      ViewImpl(ControlType::Subwin, delegate),
+      proc_(SetWindowProc(hwnd(), &WndProc)) {
   // Create HFONT from default system font.
   base::win::ScopedCreateDC mem_dc(CreateCompatibleDC(NULL));
   Gdiplus::Graphics context(mem_dc.Get());
@@ -89,6 +92,36 @@ bool SubwinView::OnCtlColor(HDC dc, HBRUSH* brush) {
   SetBkMode(dc, TRANSPARENT);
   *brush = bg_brush_.get();
   return true;
+}
+
+LRESULT SubwinView::OnMouseClick(UINT message, WPARAM w_param, LPARAM l_param) {
+  Win32Message msg = {message, w_param, l_param};
+  if (ViewImpl::OnMouseClick(&msg))
+    return TRUE;
+  SetMsgHandled(FALSE);
+  return FALSE;
+}
+
+LRESULT SubwinView::OnKeyEvent(UINT message, WPARAM w_param, LPARAM l_param) {
+  Win32Message msg = {message, w_param, l_param};
+  if (ViewImpl::OnKeyEvent(&msg))
+    return TRUE;
+  SetMsgHandled(FALSE);
+  return FALSE;
+}
+
+// static
+LRESULT SubwinView::WndProc(HWND hwnd,
+                            UINT message,
+                            WPARAM w_param,
+                            LPARAM l_param) {
+  auto* self = reinterpret_cast<SubwinView*>(GetWindowUserData(hwnd));
+  if (!self)  // could happen during destruction
+    return 0;
+  LRESULT lresult = 0;
+  if (self->ProcessWindowMessage(hwnd, message, w_param, l_param, &lresult))
+    return lresult;
+  return CallWindowProc(self->proc_, hwnd, message, w_param, l_param);
 }
 
 }  // namespace nu
