@@ -74,12 +74,21 @@ void SubwinView::SetVisible(bool visible) {
   ::ShowWindow(hwnd(), visible ? SW_SHOWNOACTIVATE : SW_HIDE);
 }
 
+void SubwinView::SetBackgroundColor(Color color) {
+  bg_brush_.reset(CreateSolidBrush(color.ToCOLORREF()));
+  ViewImpl::SetBackgroundColor(color);
+}
+
 void SubwinView::Draw(PainterWin* painter, const Rect& dirty) {
   // There is nothing to draw in a sub window.
 }
 
 bool SubwinView::OnCtlColor(HDC dc, HBRUSH* brush) {
-  return false;
+  if (!bg_brush_.get())
+    return false;
+  SetBkMode(dc, TRANSPARENT);
+  *brush = bg_brush_.get();
+  return true;
 }
 
 }  // namespace nu

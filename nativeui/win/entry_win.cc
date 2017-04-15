@@ -33,22 +33,9 @@ class EntryImpl : public SubwinView {
     return true;
   }
 
-  void SetBackgroundColor(Color color) override {
-    bg_brush_.reset(CreateSolidBrush(color.ToCOLORREF()));
-    ViewImpl::SetBackgroundColor(color);
-  }
-
   void OnCommand(UINT code, int command) override {
     if (code == EN_CHANGE)
       static_cast<Entry*>(delegate())->on_text_change.Emit();
-  }
-
-  bool OnCtlColor(HDC dc, HBRUSH* brush) override {
-    if (!bg_brush_.get())
-      return false;
-    SetBkMode(dc, TRANSPARENT);
-    *brush = bg_brush_.get();
-    return true;
   }
 
  protected:
@@ -75,8 +62,6 @@ class EntryImpl : public SubwinView {
   }
 
  private:
-  base::win::ScopedGDIObject<HBRUSH> bg_brush_;
-
   WNDPROC proc_ = nullptr;
 };
 

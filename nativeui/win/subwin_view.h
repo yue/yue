@@ -26,6 +26,7 @@ class SubwinView : public Win32Window, public ViewImpl {
   void SetFocus(bool focus) override;
   bool IsFocused() const override;
   void SetVisible(bool visible) override;
+  void SetBackgroundColor(Color color) override;
   void Draw(PainterWin* painter, const Rect& dirty) override;
 
   // Rerouted from parent window
@@ -34,6 +35,7 @@ class SubwinView : public Win32Window, public ViewImpl {
 
  private:
   base::win::ScopedHFONT font_;
+  base::win::ScopedGDIObject<HBRUSH> bg_brush_;
 };
 
 }  // namespace nu
