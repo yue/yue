@@ -151,12 +151,14 @@ BOOL WindowImpl::OnMouseWheel(bool vertical, UINT flags, int delta,
 LRESULT WindowImpl::OnMouseClick(UINT message, WPARAM w_param, LPARAM l_param) {
   // Pass the event to view.
   Win32Message msg = {message, w_param, l_param};
-  bool r = delegate_->GetContentView()->GetNative()->OnMouseClick(&msg);
+  if (!delegate_->GetContentView()->GetNative()->OnMouseClick(&msg))
+    SetMsgHandled(FALSE);
 
   // Releasing a mouse should always release the capture.
   if (message == WM_LBUTTONUP)
     ReleaseCapture();
-  return r;
+
+  return FALSE;
 }
 
 LRESULT WindowImpl::OnKeyEvent(UINT message, WPARAM w_param, LPARAM l_param) {
@@ -167,15 +169,16 @@ LRESULT WindowImpl::OnKeyEvent(UINT message, WPARAM w_param, LPARAM l_param) {
     return TRUE;
 
   // If no one handles it then pass the event to menu.
-  if (message != WM_KEYDOWN || !delegate_->GetMenu())
-    return FALSE;
-  ViewImpl* content_view = delegate_->GetContentView()->GetNative();
-  Accelerator accelerator(KeyEvent(&msg, content_view));
-  int command = delegate_->GetMenu()->accel_manager()->Process(accelerator);
-  if (command != -1) {
-    DispatchCommandToItem(delegate_->GetMenu(), command);
-    return TRUE;
+  KeyEvent event(&msg, delegate_->GetContentView()->GetNative());
+  if (event.type == EventType::KeyDown && delegate_->GetMenu()) {
+    Accelerator accelerator(event);
+    int command = delegate_->GetMenu()->accel_manager()->Process(accelerator);
+    if (command != -1) {
+      DispatchCommandToItem(delegate_->GetMenu(), command);
+      return TRUE;
+    }
   }
+  SetMsgHandled(FALSE);
   return FALSE;
 }
 

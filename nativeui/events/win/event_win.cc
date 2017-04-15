@@ -27,8 +27,10 @@ EventType EventTypeFromMessage(UINT message) {
     case WM_MBUTTONUP:
       return EventType::MouseUp;
     case WM_KEYDOWN:
+    case WM_SYSKEYDOWN:
       return EventType::KeyDown;
     case WM_KEYUP:
+    case WM_SYSKEYUP:
       return EventType::KeyUp;
     default:
       return EventType::Unknown;
