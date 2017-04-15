@@ -183,6 +183,12 @@ class ButtonImpl : public ViewImpl {
   }
 
   bool OnMouseClick(NativeEvent event) override {
+    // Clicking a button moves the focus to it.
+    // This has to be done before handling the mouse event, because user may
+    // want to move focus to other view later.
+    if (event->message == WM_LBUTTONDOWN)
+      window()->focus_manager()->TakeFocus(delegate());
+
     if (ViewImpl::OnMouseClick(event))
       return true;
 
@@ -197,9 +203,6 @@ class ButtonImpl : public ViewImpl {
       set_state(ControlState::Hovered);
       Invalidate();
     }
-
-    // Clicking a button moves the focus to it.
-    window()->focus_manager()->TakeFocus(delegate());
     return true;
   }
 

@@ -151,13 +151,12 @@ BOOL WindowImpl::OnMouseWheel(bool vertical, UINT flags, int delta,
 LRESULT WindowImpl::OnMouseClick(UINT message, WPARAM w_param, LPARAM l_param) {
   // Pass the event to view.
   Win32Message msg = {message, w_param, l_param};
-  if (delegate_->GetContentView()->GetNative()->OnMouseClick(&msg))
-    return TRUE;
+  bool r = delegate_->GetContentView()->GetNative()->OnMouseClick(&msg);
 
-  // If no one handles it then release the capture on mouse up.
+  // Releasing a mouse should always release the capture.
   if (message == WM_LBUTTONUP)
     ReleaseCapture();
-  return FALSE;
+  return r;
 }
 
 LRESULT WindowImpl::OnKey(UINT message, WPARAM w_param, LPARAM l_param) {
