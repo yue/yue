@@ -15,10 +15,14 @@ namespace nu {
 namespace {
 
 gboolean OnMouseDown(GtkWidget* widget, GdkEvent* event, View* view) {
+  if (event->button.type != GDK_BUTTON_PRESS)
+    return false;
   return view->on_mouse_down.Emit(view, MouseEvent(event, widget));
 }
 
 gboolean OnMouseUp(GtkWidget* widget, GdkEvent* event, View* view) {
+  if (event->button.type != GDK_BUTTON_RELEASE)
+    return false;
   return view->on_mouse_up.Emit(view, MouseEvent(event, widget));
 }
 
