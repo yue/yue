@@ -39,7 +39,7 @@ class WindowImpl : public Win32Window {
     CR_MSG_WM_MOUSELEAVE(OnMouseLeave)
     CR_MSG_WM_MOUSEWHEEL(OnMouseWheel)
     CR_MESSAGE_RANGE_HANDLER_EX(WM_LBUTTONDOWN, WM_MBUTTONDBLCLK, OnMouseClick)
-    CR_MESSAGE_RANGE_HANDLER_EX(WM_KEYDOWN, WM_KEYUP, OnKey)
+    CR_MESSAGE_RANGE_HANDLER_EX(WM_KEYDOWN, WM_KEYUP, OnKeyEvent)
     CR_MSG_WM_CHAR(OnChar)
     CR_MSG_WM_PAINT(OnPaint)
     CR_MSG_WM_ERASEBKGND(OnEraseBkgnd)
@@ -56,7 +56,7 @@ class WindowImpl : public Win32Window {
   void OnMouseLeave();
   BOOL OnMouseWheel(bool vertical, UINT flags, int delta, const Point& point);
   LRESULT OnMouseClick(UINT message, WPARAM w_param, LPARAM l_param);
-  LRESULT OnKey(UINT message, WPARAM w_param, LPARAM l_param);
+  LRESULT OnKeyEvent(UINT message, WPARAM w_param, LPARAM l_param);
   void OnChar(UINT ch, UINT repeat, UINT flags);
   void OnPaint(HDC dc);
   LRESULT OnEraseBkgnd(HDC dc);

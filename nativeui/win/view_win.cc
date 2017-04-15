@@ -101,7 +101,7 @@ bool ViewImpl::OnMouseClick(NativeEvent event) {
   return false;
 }
 
-bool ViewImpl::OnKey(NativeEvent event) {
+bool ViewImpl::OnKeyEvent(NativeEvent event) {
   KeyEvent client_event(event, this);
   if (client_event.type == EventType::KeyDown &&
       delegate()->on_key_down.Emit(delegate(), client_event))
@@ -111,7 +111,7 @@ bool ViewImpl::OnKey(NativeEvent event) {
     return true;
   // Pass to parent if this view ignores the event.
   if (delegate()->GetParent())
-    return delegate()->GetParent()->GetNative()->OnKey(event);
+    return delegate()->GetParent()->GetNative()->OnKeyEvent(event);
   return false;
 }
 

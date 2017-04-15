@@ -76,7 +76,7 @@ class ViewImpl {
   virtual bool OnMouseWheel(bool vertical, UINT flags, int delta,
                             const Point& point) { return false; }
   virtual bool OnMouseClick(NativeEvent event);
-  virtual bool OnKey(NativeEvent event);
+  virtual bool OnKeyEvent(NativeEvent event);
 
   // Called when the view lost capture.
   virtual void OnCaptureLost() {}

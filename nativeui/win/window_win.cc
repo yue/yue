@@ -159,11 +159,11 @@ LRESULT WindowImpl::OnMouseClick(UINT message, WPARAM w_param, LPARAM l_param) {
   return r;
 }
 
-LRESULT WindowImpl::OnKey(UINT message, WPARAM w_param, LPARAM l_param) {
+LRESULT WindowImpl::OnKeyEvent(UINT message, WPARAM w_param, LPARAM l_param) {
   // First pass the event to view.
   Win32Message msg = {message, w_param, l_param};
   if (focus_manager()->focused_view() &&
-      focus_manager()->focused_view()->GetNative()->OnKey(&msg))
+      focus_manager()->focused_view()->GetNative()->OnKeyEvent(&msg))
     return TRUE;
 
   // If no one handles it then pass the event to menu.

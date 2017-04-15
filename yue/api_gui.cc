@@ -4,7 +4,10 @@
 
 #include "yue/api_gui.h"
 
+#include <map>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "nativeui/nativeui.h"
 #include "yue/api_signal.h"

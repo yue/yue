@@ -6,10 +6,10 @@
 
 #include <vector>
 
-#include "nativeui/events/event.h"
-#include "nativeui/events/keyboard_code_conversion.h"
 #include "base/strings/string_split.h"
 #include "base/strings/string_util.h"
+#include "nativeui/events/event.h"
+#include "nativeui/events/keyboard_code_conversion.h"
 
 #if defined(OS_WIN)
 #include <windows.h>
