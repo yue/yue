@@ -23,9 +23,7 @@ typedef struct _NUContainerClass   NUContainerClass;
 
 struct _NUContainer {
   GtkContainer container;
-};
-
-struct _NUContainerPrivate {
+  NUContainerPrivate* priv;
 };
 
 struct _NUContainerClass {

@@ -42,6 +42,10 @@ void View::TakeOverView(NativeView view) {
   g_object_ref_sink(view);
   gtk_widget_show(view);  // visible by default
 
+  // Make the view accepts events.
+  gtk_widget_add_events(view, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
+                              GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK);
+
   // Install event hooks.
   g_signal_connect(view, "button-press-event", G_CALLBACK(OnMouseDown), this);
   g_signal_connect(view, "button-release-event", G_CALLBACK(OnMouseUp), this);

@@ -9,6 +9,10 @@
 
 namespace nu {
 
+struct _NUContainerPrivate {
+  Container* delegate;
+};
+
 static void nu_container_realize(GtkWidget* widget);
 static void nu_container_get_preferred_width(GtkWidget* widget,
                                              gint* minimum,
@@ -79,8 +83,7 @@ static void nu_container_size_allocate(GtkWidget* widget,
       allocation->width == 1 && allocation->height == 1)
     return;
 
-  Container* delegate = static_cast<Container*>(
-      g_object_get_data(G_OBJECT(widget), "delegate"));
+  Container* delegate = NU_CONTAINER(widget)->priv->delegate;
   delegate->BoundsChanged();
 }
 
@@ -94,8 +97,7 @@ static gboolean nu_container_draw(GtkWidget* widget, cairo_t* cr) {
   gtk_render_background(gtk_widget_get_style_context(widget), cr,
                         0, 0, width, height);
 
-  Container* delegate = static_cast<Container*>(
-      g_object_get_data(G_OBJECT(widget), "delegate"));
+  Container* delegate = NU_CONTAINER(widget)->priv->delegate;
   PainterGtk painter(cr);
   delegate->on_draw.Emit(delegate, &painter, nu::RectF(0, 0, width, height));
 
@@ -113,12 +115,11 @@ static void nu_container_remove(GtkContainer* container, GtkWidget* widget) {
   gtk_widget_unparent(widget);
 }
 
-static void nu_container_forall(GtkContainer* container,
+static void nu_container_forall(GtkContainer* widget,
                                 gboolean include_internals,
                                 GtkCallback callback,
                                 gpointer callback_data) {
-  Container* delegate = static_cast<Container*>(
-      g_object_get_data(G_OBJECT(container), "delegate"));
+  Container* delegate = NU_CONTAINER(widget)->priv->delegate;
   for (int i = 0; i < delegate->ChildCount(); ++i)
     (*callback)(delegate->ChildAt(i)->GetNative(), callback_data);
 }
@@ -129,11 +130,13 @@ static GType nu_container_child_type(GtkContainer* container) {
 
 static void nu_container_init(NUContainer* widget) {
   gtk_widget_set_has_window(GTK_WIDGET(widget), FALSE);
+  widget->priv = static_cast<NUContainerPrivate*>(
+      nu_container_get_instance_private(widget));
 }
 
 GtkWidget* nu_container_new(Container* delegate) {
   void* widget = g_object_new(NU_TYPE_CONTAINER, NULL);
-  g_object_set_data_full(G_OBJECT(widget), "delegate", delegate, nullptr);
+  NU_CONTAINER(widget)->priv->delegate = delegate;
   return GTK_WIDGET(widget);
 }
 
