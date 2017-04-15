@@ -89,7 +89,7 @@ void WindowImpl::OnCaptureChanged(HWND window) {
 void WindowImpl::OnClose() {
   if (delegate_->should_close.is_null() || delegate_->should_close.Run()) {
     delegate_->on_close.Emit();
-    SetMsgHandled(FALSE);
+    SetMsgHandled(false);
   }
 }
 
@@ -152,13 +152,13 @@ LRESULT WindowImpl::OnMouseClick(UINT message, WPARAM w_param, LPARAM l_param) {
   // Pass the event to view.
   Win32Message msg = {message, w_param, l_param};
   if (!delegate_->GetContentView()->GetNative()->OnMouseClick(&msg))
-    SetMsgHandled(FALSE);
+    SetMsgHandled(false);
 
   // Releasing a mouse should always release the capture.
   if (message == WM_LBUTTONUP)
     ReleaseCapture();
 
-  return FALSE;
+  return 0;
 }
 
 LRESULT WindowImpl::OnKeyEvent(UINT message, WPARAM w_param, LPARAM l_param) {
@@ -166,7 +166,7 @@ LRESULT WindowImpl::OnKeyEvent(UINT message, WPARAM w_param, LPARAM l_param) {
   Win32Message msg = {message, w_param, l_param};
   if (focus_manager()->focused_view() &&
       focus_manager()->focused_view()->GetNative()->OnKeyEvent(&msg))
-    return TRUE;
+    return 0;
 
   // If no one handles it then pass the event to menu.
   KeyEvent event(&msg, delegate_->GetContentView()->GetNative());
@@ -175,11 +175,11 @@ LRESULT WindowImpl::OnKeyEvent(UINT message, WPARAM w_param, LPARAM l_param) {
     int command = delegate_->GetMenu()->accel_manager()->Process(accelerator);
     if (command != -1) {
       DispatchCommandToItem(delegate_->GetMenu(), command);
-      return TRUE;
+      return 0;
     }
   }
-  SetMsgHandled(FALSE);
-  return FALSE;
+  SetMsgHandled(false);
+  return 0;
 }
 
 void WindowImpl::OnChar(UINT ch, UINT repeat, UINT flags) {

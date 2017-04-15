@@ -24,30 +24,26 @@
 // but must use BEGIN_MSG_MAP_EX for classes that don't derive from
 // CWin32Window/CDialogImpl.
 
-#define CR_BEGIN_MSG_MAP_EX(theClass, parent)                     \
- public:                                                          \
-  bool m_bMsgHandled;                                             \
-  /* "handled" management for cracked handlers */                 \
-  bool IsMsgHandled() const { return m_bMsgHandled; }             \
-  void SetMsgHandled(bool bHandled) { m_bMsgHandled = bHandled; } \
-  bool ProcessWindowMessage(HWND hWnd,                            \
-                            UINT uMsg,                            \
-                            WPARAM wParam,                        \
-                            LPARAM lParam,                        \
-                            LRESULT* result) override {           \
-    bool bOldMsgHandled = m_bMsgHandled;                          \
-    bool ret = _ProcessWindowMessage(                             \
-        hWnd, uMsg, wParam, lParam, result);                      \
-    m_bMsgHandled = bOldMsgHandled;                               \
-    if (ret)                                                      \
-      return ret;                                                 \
-    return parent::ProcessWindowMessage(                          \
-        hWnd, uMsg, wParam, lParam, result);                      \
-  }                                                               \
-  bool _ProcessWindowMessage(HWND hWnd,                           \
-                             UINT uMsg,                           \
-                             WPARAM wParam,                       \
-                             LPARAM lParam,                       \
+#define CR_BEGIN_MSG_MAP_EX(theClass, parent)                      \
+ public:                                                           \
+  bool m_bMsgHandled;                                              \
+  /* "handled" management for cracked handlers */                  \
+  bool IsMsgHandled() const { return m_bMsgHandled; }              \
+  void SetMsgHandled(bool bHandled) { m_bMsgHandled = bHandled; }  \
+  bool ProcessWindowMessage(HWND hWnd,                             \
+                            UINT uMsg,                             \
+                            WPARAM wParam,                         \
+                            LPARAM lParam,                         \
+                            LRESULT* result) override {            \
+    if (_ProcessWindowMessage(hWnd, uMsg, wParam, lParam, result)) \
+      return true;                                                 \
+    return parent::ProcessWindowMessage(                           \
+        hWnd, uMsg, wParam, lParam, result);                       \
+  }                                                                \
+  bool _ProcessWindowMessage(HWND hWnd,                            \
+                             UINT uMsg,                            \
+                             WPARAM wParam,                        \
+                             LPARAM lParam,                        \
                              LRESULT* result) {
 
 // Replacement for atlwin.h's END_MSG_MAP for removing ATL usage.
@@ -64,1456 +60,1456 @@
 // int OnCreate(LPCREATESTRUCT lpCreateStruct)
 #define CR_MSG_WM_CREATE(func)                       \
   if (uMsg == WM_CREATE) {                           \
-    SetMsgHandled(TRUE);                             \
+    SetMsgHandled(true);                             \
     *result = (LRESULT)func((LPCREATESTRUCT)lParam); \
     if (IsMsgHandled())                              \
-      return TRUE;                                   \
+      return true;                                   \
   }
 
 // BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
 #define CR_MSG_WM_INITDIALOG(func)                 \
   if (uMsg == WM_INITDIALOG) {                     \
-    SetMsgHandled(TRUE);                           \
+    SetMsgHandled(true);                           \
     *result = (LRESULT)func((HWND)wParam, lParam); \
     if (IsMsgHandled())                            \
-      return TRUE;                                 \
+      return true;                                 \
   }
 
 // BOOL OnCopyData(CWindow wnd, PCOPYDATASTRUCT pCopyDataStruct)
 #define CR_MSG_WM_COPYDATA(func)                                    \
   if (uMsg == WM_COPYDATA) {                                        \
-    SetMsgHandled(TRUE);                                            \
+    SetMsgHandled(true);                                            \
     *result = (LRESULT)func((HWND)wParam, (PCOPYDATASTRUCT)lParam); \
     if (IsMsgHandled())                                             \
-      return TRUE;                                                  \
+      return true;                                                  \
   }
 
 // void OnDestroy()
 #define CR_MSG_WM_DESTROY(func) \
   if (uMsg == WM_DESTROY) {     \
-    SetMsgHandled(TRUE);        \
+    SetMsgHandled(true);        \
     func();                     \
     *result = 0;                \
     if (IsMsgHandled())         \
-      return TRUE;              \
+      return true;              \
   }
 
 // void OnMove(CPoint ptPos)
 #define CR_MSG_WM_MOVE(func)                                            \
   if (uMsg == WM_MOVE) {                                                \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     func(nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                        \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnSize(UINT nType, nu::Size size)
 #define CR_MSG_WM_SIZE(func)                                           \
   if (uMsg == WM_SIZE) {                                               \
-    SetMsgHandled(TRUE);                                               \
+    SetMsgHandled(true);                                               \
     func((UINT)wParam,                                                 \
          nu::Size(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                       \
     if (IsMsgHandled())                                                \
-      return TRUE;                                                     \
+      return true;                                                     \
   }
 
 // void OnActivate(UINT nState, BOOL bMinimized, CWindow wndOther)
 #define CR_MSG_WM_ACTIVATE(func)                                    \
   if (uMsg == WM_ACTIVATE) {                                        \
-    SetMsgHandled(TRUE);                                            \
+    SetMsgHandled(true);                                            \
     func((UINT)LOWORD(wParam), (BOOL)HIWORD(wParam), (HWND)lParam); \
     *result = 0;                                                    \
     if (IsMsgHandled())                                             \
-      return TRUE;                                                  \
+      return true;                                                  \
   }
 
 // void OnSetFocus(CWindow wndOld)
 #define CR_MSG_WM_SETFOCUS(func) \
   if (uMsg == WM_SETFOCUS) {     \
-    SetMsgHandled(TRUE);         \
+    SetMsgHandled(true);         \
     func((HWND)wParam);          \
     *result = 0;                 \
     if (IsMsgHandled())          \
-      return TRUE;               \
+      return true;               \
   }
 
 // void OnKillFocus(CWindow wndFocus)
 #define CR_MSG_WM_KILLFOCUS(func) \
   if (uMsg == WM_KILLFOCUS) {     \
-    SetMsgHandled(TRUE);          \
+    SetMsgHandled(true);          \
     func((HWND)wParam);           \
     *result = 0;                  \
     if (IsMsgHandled())           \
-      return TRUE;                \
+      return true;                \
   }
 
 // void OnEnable(BOOL bEnable)
 #define CR_MSG_WM_ENABLE(func) \
   if (uMsg == WM_ENABLE) {     \
-    SetMsgHandled(TRUE);       \
+    SetMsgHandled(true);       \
     func((BOOL)wParam);        \
     *result = 0;               \
     if (IsMsgHandled())        \
-      return TRUE;             \
+      return true;             \
   }
 
 // void OnPaint(CDCHandle dc)
 #define CR_MSG_WM_PAINT(func) \
   if (uMsg == WM_PAINT) {     \
-    SetMsgHandled(TRUE);      \
+    SetMsgHandled(true);      \
     func((HDC)wParam);        \
     *result = 0;              \
     if (IsMsgHandled())       \
-      return TRUE;            \
+      return true;            \
   }
 
 // void OnClose()
 #define CR_MSG_WM_CLOSE(func) \
   if (uMsg == WM_CLOSE) {     \
-    SetMsgHandled(TRUE);      \
+    SetMsgHandled(true);      \
     func();                   \
     *result = 0;              \
     if (IsMsgHandled())       \
-      return TRUE;            \
+      return true;            \
   }
 
 // BOOL OnQueryEndSession(UINT nSource, UINT uLogOff)
 #define CR_MSG_WM_QUERYENDSESSION(func)                  \
   if (uMsg == WM_QUERYENDSESSION) {                      \
-    SetMsgHandled(TRUE);                                 \
+    SetMsgHandled(true);                                 \
     *result = (LRESULT)func((UINT)wParam, (UINT)lParam); \
     if (IsMsgHandled())                                  \
-      return TRUE;                                       \
+      return true;                                       \
   }
 
 // BOOL OnQueryOpen()
 #define CR_MSG_WM_QUERYOPEN(func) \
   if (uMsg == WM_QUERYOPEN) {     \
-    SetMsgHandled(TRUE);          \
+    SetMsgHandled(true);          \
     *result = (LRESULT)func();    \
     if (IsMsgHandled())           \
-      return TRUE;                \
+      return true;                \
   }
 
 // BOOL OnEraseBkgnd(CDCHandle dc)
 #define CR_MSG_WM_ERASEBKGND(func)        \
   if (uMsg == WM_ERASEBKGND) {            \
-    SetMsgHandled(TRUE);                  \
+    SetMsgHandled(true);                  \
     *result = (LRESULT)func((HDC)wParam); \
     if (IsMsgHandled())                   \
-      return TRUE;                        \
+      return true;                        \
   }
 
 // void OnSysColorChange()
 #define CR_MSG_WM_SYSCOLORCHANGE(func) \
   if (uMsg == WM_SYSCOLORCHANGE) {     \
-    SetMsgHandled(TRUE);               \
+    SetMsgHandled(true);               \
     func();                            \
     *result = 0;                       \
     if (IsMsgHandled())                \
-      return TRUE;                     \
+      return true;                     \
   }
 
 // void OnEndSession(BOOL bEnding, UINT uLogOff)
 #define CR_MSG_WM_ENDSESSION(func)    \
   if (uMsg == WM_ENDSESSION) {        \
-    SetMsgHandled(TRUE);              \
+    SetMsgHandled(true);              \
     func((BOOL)wParam, (UINT)lParam); \
     *result = 0;                      \
     if (IsMsgHandled())               \
-      return TRUE;                    \
+      return true;                    \
   }
 
 // void OnShowWindow(BOOL bShow, UINT nStatus)
 #define CR_MSG_WM_SHOWWINDOW(func)   \
   if (uMsg == WM_SHOWWINDOW) {       \
-    SetMsgHandled(TRUE);             \
+    SetMsgHandled(true);             \
     func((BOOL)wParam, (int)lParam); \
     *result = 0;                     \
     if (IsMsgHandled())              \
-      return TRUE;                   \
+      return true;                   \
   }
 
 // HBRUSH OnCtlColorEdit(CDCHandle dc, CEdit edit)
 #define CR_MSG_WM_CTLCOLOREDIT(func)                    \
   if (uMsg == WM_CTLCOLOREDIT) {                        \
-    SetMsgHandled(TRUE);                                \
+    SetMsgHandled(true);                                \
     *result = (LRESULT)func((HDC)wParam, (HWND)lParam); \
     if (IsMsgHandled())                                 \
-      return TRUE;                                      \
+      return true;                                      \
   }
 
 // HBRUSH OnCtlColorListBox(CDCHandle dc, CListBox listBox)
 #define CR_MSG_WM_CTLCOLORLISTBOX(func)                 \
   if (uMsg == WM_CTLCOLORLISTBOX) {                     \
-    SetMsgHandled(TRUE);                                \
+    SetMsgHandled(true);                                \
     *result = (LRESULT)func((HDC)wParam, (HWND)lParam); \
     if (IsMsgHandled())                                 \
-      return TRUE;                                      \
+      return true;                                      \
   }
 
 // HBRUSH OnCtlColorBtn(CDCHandle dc, CButton button)
 #define CR_MSG_WM_CTLCOLORBTN(func)                     \
   if (uMsg == WM_CTLCOLORBTN) {                         \
-    SetMsgHandled(TRUE);                                \
+    SetMsgHandled(true);                                \
     *result = (LRESULT)func((HDC)wParam, (HWND)lParam); \
     if (IsMsgHandled())                                 \
-      return TRUE;                                      \
+      return true;                                      \
   }
 
 // HBRUSH OnCtlColorDlg(CDCHandle dc, CWindow wnd)
 #define CR_MSG_WM_CTLCOLORDLG(func)                     \
   if (uMsg == WM_CTLCOLORDLG) {                         \
-    SetMsgHandled(TRUE);                                \
+    SetMsgHandled(true);                                \
     *result = (LRESULT)func((HDC)wParam, (HWND)lParam); \
     if (IsMsgHandled())                                 \
-      return TRUE;                                      \
+      return true;                                      \
   }
 
 // HBRUSH OnCtlColorScrollbar(CDCHandle dc, CScrollbar scrollBar)
 #define CR_MSG_WM_CTLCOLORSCROLLBAR(func)               \
   if (uMsg == WM_CTLCOLORSCROLLBAR) {                   \
-    SetMsgHandled(TRUE);                                \
+    SetMsgHandled(true);                                \
     *result = (LRESULT)func((HDC)wParam, (HWND)lParam); \
     if (IsMsgHandled())                                 \
-      return TRUE;                                      \
+      return true;                                      \
   }
 
 // HBRUSH OnCtlColorStatic(CDCHandle dc, CStatic wndStatic)
 #define CR_MSG_WM_CTLCOLORSTATIC(func)                  \
   if (uMsg == WM_CTLCOLORSTATIC) {                      \
-    SetMsgHandled(TRUE);                                \
+    SetMsgHandled(true);                                \
     *result = (LRESULT)func((HDC)wParam, (HWND)lParam); \
     if (IsMsgHandled())                                 \
-      return TRUE;                                      \
+      return true;                                      \
   }
 
 // void OnSettingChange(UINT uFlags, LPCTSTR lpszSection)
 #define CR_MSG_WM_SETTINGCHANGE(func)    \
   if (uMsg == WM_SETTINGCHANGE) {        \
-    SetMsgHandled(TRUE);                 \
+    SetMsgHandled(true);                 \
     func((UINT)wParam, (LPCTSTR)lParam); \
     *result = 0;                         \
     if (IsMsgHandled())                  \
-      return TRUE;                       \
+      return true;                       \
   }
 
 // void OnDevModeChange(LPCTSTR lpDeviceName)
 #define CR_MSG_WM_DEVMODECHANGE(func) \
   if (uMsg == WM_DEVMODECHANGE) {     \
-    SetMsgHandled(TRUE);              \
+    SetMsgHandled(true);              \
     func((LPCTSTR)lParam);            \
     *result = 0;                      \
     if (IsMsgHandled())               \
-      return TRUE;                    \
+      return true;                    \
   }
 
 // void OnActivateApp(BOOL bActive, DWORD dwThreadID)
 #define CR_MSG_WM_ACTIVATEAPP(func)    \
   if (uMsg == WM_ACTIVATEAPP) {        \
-    SetMsgHandled(TRUE);               \
+    SetMsgHandled(true);               \
     func((BOOL)wParam, (DWORD)lParam); \
     *result = 0;                       \
     if (IsMsgHandled())                \
-      return TRUE;                     \
+      return true;                     \
   }
 
 // void OnFontChange()
 #define CR_MSG_WM_FONTCHANGE(func) \
   if (uMsg == WM_FONTCHANGE) {     \
-    SetMsgHandled(TRUE);           \
+    SetMsgHandled(true);           \
     func();                        \
     *result = 0;                   \
     if (IsMsgHandled())            \
-      return TRUE;                 \
+      return true;                 \
   }
 
 // void OnTimeChange()
 #define CR_MSG_WM_TIMECHANGE(func) \
   if (uMsg == WM_TIMECHANGE) {     \
-    SetMsgHandled(TRUE);           \
+    SetMsgHandled(true);           \
     func();                        \
     *result = 0;                   \
     if (IsMsgHandled())            \
-      return TRUE;                 \
+      return true;                 \
   }
 
 // void OnCancelMode()
 #define CR_MSG_WM_CANCELMODE(func) \
   if (uMsg == WM_CANCELMODE) {     \
-    SetMsgHandled(TRUE);           \
+    SetMsgHandled(true);           \
     func();                        \
     *result = 0;                   \
     if (IsMsgHandled())            \
-      return TRUE;                 \
+      return true;                 \
   }
 
 // BOOL OnSetCursor(CWindow wnd, UINT nHitTest, UINT message)
 #define CR_MSG_WM_SETCURSOR(func)                                  \
   if (uMsg == WM_SETCURSOR) {                                      \
-    SetMsgHandled(TRUE);                                           \
+    SetMsgHandled(true);                                           \
     *result = (LRESULT)func(                                       \
         (HWND)wParam, (UINT)LOWORD(lParam), (UINT)HIWORD(lParam)); \
     if (IsMsgHandled())                                            \
-      return TRUE;                                                 \
+      return true;                                                 \
   }
 
 // int OnMouseActivate(CWindow wndTopLevel, UINT nHitTest, UINT message)
 #define CR_MSG_WM_MOUSEACTIVATE(func)                              \
   if (uMsg == WM_MOUSEACTIVATE) {                                  \
-    SetMsgHandled(TRUE);                                           \
+    SetMsgHandled(true);                                           \
     *result = (LRESULT)func(                                       \
         (HWND)wParam, (UINT)LOWORD(lParam), (UINT)HIWORD(lParam)); \
     if (IsMsgHandled())                                            \
-      return TRUE;                                                 \
+      return true;                                                 \
   }
 
 // void OnChildActivate()
 #define CR_MSG_WM_CHILDACTIVATE(func) \
   if (uMsg == WM_CHILDACTIVATE) {     \
-    SetMsgHandled(TRUE);              \
+    SetMsgHandled(true);              \
     func();                           \
     *result = 0;                      \
     if (IsMsgHandled())               \
-      return TRUE;                    \
+      return true;                    \
   }
 
 // void OnGetMinMaxInfo(LPMINMAXINFO lpMMI)
 #define CR_MSG_WM_GETMINMAXINFO(func) \
   if (uMsg == WM_GETMINMAXINFO) {     \
-    SetMsgHandled(TRUE);              \
+    SetMsgHandled(true);              \
     func((LPMINMAXINFO)lParam);       \
     *result = 0;                      \
     if (IsMsgHandled())               \
-      return TRUE;                    \
+      return true;                    \
   }
 
 // void OnIconEraseBkgnd(CDCHandle dc)
 #define CR_MSG_WM_ICONERASEBKGND(func) \
   if (uMsg == WM_ICONERASEBKGND) {     \
-    SetMsgHandled(TRUE);               \
+    SetMsgHandled(true);               \
     func((HDC)wParam);                 \
     *result = 0;                       \
     if (IsMsgHandled())                \
-      return TRUE;                     \
+      return true;                     \
   }
 
 // void OnSpoolerStatus(UINT nStatus, UINT nJobs)
 #define CR_MSG_WM_SPOOLERSTATUS(func)         \
   if (uMsg == WM_SPOOLERSTATUS) {             \
-    SetMsgHandled(TRUE);                      \
+    SetMsgHandled(true);                      \
     func((UINT)wParam, (UINT)LOWORD(lParam)); \
     *result = 0;                              \
     if (IsMsgHandled())                       \
-      return TRUE;                            \
+      return true;                            \
   }
 
 // void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 #define CR_MSG_WM_DRAWITEM(func)                  \
   if (uMsg == WM_DRAWITEM) {                      \
-    SetMsgHandled(TRUE);                          \
+    SetMsgHandled(true);                          \
     func((UINT)wParam, (LPDRAWITEMSTRUCT)lParam); \
     *result = TRUE;                               \
     if (IsMsgHandled())                           \
-      return TRUE;                                \
+      return true;                                \
   }
 
 // void OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lpMeasureItemStruct)
 #define CR_MSG_WM_MEASUREITEM(func)                  \
   if (uMsg == WM_MEASUREITEM) {                      \
-    SetMsgHandled(TRUE);                             \
+    SetMsgHandled(true);                             \
     func((UINT)wParam, (LPMEASUREITEMSTRUCT)lParam); \
     *result = TRUE;                                  \
     if (IsMsgHandled())                              \
-      return TRUE;                                   \
+      return true;                                   \
   }
 
 // void OnDeleteItem(int nIDCtl, LPDELETEITEMSTRUCT lpDeleteItemStruct)
 #define CR_MSG_WM_DELETEITEM(func)                  \
   if (uMsg == WM_DELETEITEM) {                      \
-    SetMsgHandled(TRUE);                            \
+    SetMsgHandled(true);                            \
     func((UINT)wParam, (LPDELETEITEMSTRUCT)lParam); \
     *result = TRUE;                                 \
     if (IsMsgHandled())                             \
-      return TRUE;                                  \
+      return true;                                  \
   }
 
 // int OnCharToItem(UINT nChar, UINT nIndex, CListBox listBox)
 #define CR_MSG_WM_CHARTOITEM(func)                                 \
   if (uMsg == WM_CHARTOITEM) {                                     \
-    SetMsgHandled(TRUE);                                           \
+    SetMsgHandled(true);                                           \
     *result = (LRESULT)func(                                       \
         (UINT)LOWORD(wParam), (UINT)HIWORD(wParam), (HWND)lParam); \
     if (IsMsgHandled())                                            \
-      return TRUE;                                                 \
+      return true;                                                 \
   }
 
 // int OnVKeyToItem(UINT nKey, UINT nIndex, CListBox listBox)
 #define CR_MSG_WM_VKEYTOITEM(func)                                 \
   if (uMsg == WM_VKEYTOITEM) {                                     \
-    SetMsgHandled(TRUE);                                           \
+    SetMsgHandled(true);                                           \
     *result = (LRESULT)func(                                       \
         (UINT)LOWORD(wParam), (UINT)HIWORD(wParam), (HWND)lParam); \
     if (IsMsgHandled())                                            \
-      return TRUE;                                                 \
+      return true;                                                 \
   }
 
 // HCURSOR OnQueryDragIcon()
 #define CR_MSG_WM_QUERYDRAGICON(func) \
   if (uMsg == WM_QUERYDRAGICON) {     \
-    SetMsgHandled(TRUE);              \
+    SetMsgHandled(true);              \
     *result = (LRESULT)func();        \
     if (IsMsgHandled())               \
-      return TRUE;                    \
+      return true;                    \
   }
 
 // int OnCompareItem(int nIDCtl, LPCOMPAREITEMSTRUCT lpCompareItemStruct)
 #define CR_MSG_WM_COMPAREITEM(func)                                     \
   if (uMsg == WM_COMPAREITEM) {                                         \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     *result = (LRESULT)func((UINT)wParam, (LPCOMPAREITEMSTRUCT)lParam); \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnCompacting(UINT nCpuTime)
 #define CR_MSG_WM_COMPACTING(func) \
   if (uMsg == WM_COMPACTING) {     \
-    SetMsgHandled(TRUE);           \
+    SetMsgHandled(true);           \
     func((UINT)wParam);            \
     *result = 0;                   \
     if (IsMsgHandled())            \
-      return TRUE;                 \
+      return true;                 \
   }
 
 // BOOL OnNcCreate(LPCREATESTRUCT lpCreateStruct)
 #define CR_MSG_WM_NCCREATE(func)                     \
   if (uMsg == WM_NCCREATE) {                         \
-    SetMsgHandled(TRUE);                             \
+    SetMsgHandled(true);                             \
     *result = (LRESULT)func((LPCREATESTRUCT)lParam); \
     if (IsMsgHandled())                              \
-      return TRUE;                                   \
+      return true;                                   \
   }
 
 // void OnNcDestroy()
 #define CR_MSG_WM_NCDESTROY(func) \
   if (uMsg == WM_NCDESTROY) {     \
-    SetMsgHandled(TRUE);          \
+    SetMsgHandled(true);          \
     func();                       \
     *result = 0;                  \
     if (IsMsgHandled())           \
-      return TRUE;                \
+      return true;                \
   }
 
 // LRESULT OnNcCalcSize(BOOL bCalcValidRects, LPARAM lParam)
 #define CR_MSG_WM_NCCALCSIZE(func)        \
   if (uMsg == WM_NCCALCSIZE) {            \
-    SetMsgHandled(TRUE);                  \
+    SetMsgHandled(true);                  \
     *result = func((BOOL)wParam, lParam); \
     if (IsMsgHandled())                   \
-      return TRUE;                        \
+      return true;                        \
   }
 
 // UINT OnNcHitTest(nu::Point point)
 #define CR_MSG_WM_NCHITTEST(func)                                      \
   if (uMsg == WM_NCHITTEST) {                                          \
-    SetMsgHandled(TRUE);                                               \
+    SetMsgHandled(true);                                               \
     *result = (LRESULT)func(                                           \
         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     if (IsMsgHandled())                                                \
-      return TRUE;                                                     \
+      return true;                                                     \
   }
 
 // void OnNcPaint(CRgn rgn)
 #define CR_MSG_WM_NCPAINT(func) \
   if (uMsg == WM_NCPAINT) {     \
-    SetMsgHandled(TRUE);        \
+    SetMsgHandled(true);        \
     func((HRGN)wParam);         \
     *result = 0;                \
     if (IsMsgHandled())         \
-      return TRUE;              \
+      return true;              \
   }
 
 // BOOL OnNcActivate(BOOL bActive)
 #define CR_MSG_WM_NCACTIVATE(func)         \
   if (uMsg == WM_NCACTIVATE) {             \
-    SetMsgHandled(TRUE);                   \
+    SetMsgHandled(true);                   \
     *result = (LRESULT)func((BOOL)wParam); \
     if (IsMsgHandled())                    \
-      return TRUE;                         \
+      return true;                         \
   }
 
 // UINT OnGetDlgCode(LPMSG lpMsg)
 #define CR_MSG_WM_GETDLGCODE(func)          \
   if (uMsg == WM_GETDLGCODE) {              \
-    SetMsgHandled(TRUE);                    \
+    SetMsgHandled(true);                    \
     *result = (LRESULT)func((LPMSG)lParam); \
     if (IsMsgHandled())                     \
-      return TRUE;                          \
+      return true;                          \
   }
 
 // void OnNcMouseMove(UINT nHitTest, nu::Point point)
 #define CR_MSG_WM_NCMOUSEMOVE(func)                                     \
   if (uMsg == WM_NCMOUSEMOVE) {                                         \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     func((UINT)wParam,                                                  \
          nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                        \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnNcLButtonDown(UINT nHitTest, nu::Point point)
 #define CR_MSG_WM_NCLBUTTONDOWN(func)                                   \
   if (uMsg == WM_NCLBUTTONDOWN) {                                       \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     func((UINT)wParam,                                                  \
          nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                        \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnNcLButtonUp(UINT nHitTest, nu::Point point)
 #define CR_MSG_WM_NCLBUTTONUP(func)                                     \
   if (uMsg == WM_NCLBUTTONUP) {                                         \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     func((UINT)wParam,                                                  \
          nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                        \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnNcLButtonDblClk(UINT nHitTest, nu::Point point)
 #define CR_MSG_WM_NCLBUTTONDBLCLK(func)                                 \
   if (uMsg == WM_NCLBUTTONDBLCLK) {                                     \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     func((UINT)wParam,                                                  \
          nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                        \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnNcRButtonDown(UINT nHitTest, nu::Point point)
 #define CR_MSG_WM_NCRBUTTONDOWN(func)                                   \
   if (uMsg == WM_NCRBUTTONDOWN) {                                       \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     func((UINT)wParam,                                                  \
          nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                        \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnNcRButtonUp(UINT nHitTest, nu::Point point)
 #define CR_MSG_WM_NCRBUTTONUP(func)                                     \
   if (uMsg == WM_NCRBUTTONUP) {                                         \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     func((UINT)wParam,                                                  \
          nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                        \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnNcRButtonDblClk(UINT nHitTest, CPoint point)
 #define CR_MSG_WM_NCRBUTTONDBLCLK(func)                                 \
   if (uMsg == WM_NCRBUTTONDBLCLK) {                                     \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     func((UINT)wParam,                                                  \
          nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                        \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnNcMButtonDown(UINT nHitTest, CPoint point)
 #define CR_MSG_WM_NCMBUTTONDOWN(func)                                   \
   if (uMsg == WM_NCMBUTTONDOWN) {                                       \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     func((UINT)wParam,                                                  \
          nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                        \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnNcMButtonUp(UINT nHitTest, CPoint point)
 #define CR_MSG_WM_NCMBUTTONUP(func)                                     \
   if (uMsg == WM_NCMBUTTONUP) {                                         \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     func((UINT)wParam,                                                  \
          nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                        \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnNcMButtonDblClk(UINT nHitTest, CPoint point)
 #define CR_MSG_WM_NCMBUTTONDBLCLK(func)                                 \
   if (uMsg == WM_NCMBUTTONDBLCLK) {                                     \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     func((UINT)wParam,                                                  \
          nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                        \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 #define CR_MSG_WM_KEYDOWN(func)                \
   if (uMsg == WM_KEYDOWN) {                    \
-    SetMsgHandled(TRUE);                       \
+    SetMsgHandled(true);                       \
     func((TCHAR)wParam,                        \
          (UINT)lParam & 0xFFFF,                \
          (UINT)((lParam & 0xFFFF0000) >> 16)); \
     *result = 0;                               \
     if (IsMsgHandled())                        \
-      return TRUE;                             \
+      return true;                             \
   }
 
 // void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 #define CR_MSG_WM_KEYUP(func)                  \
   if (uMsg == WM_KEYUP) {                      \
-    SetMsgHandled(TRUE);                       \
+    SetMsgHandled(true);                       \
     func((TCHAR)wParam,                        \
          (UINT)lParam & 0xFFFF,                \
          (UINT)((lParam & 0xFFFF0000) >> 16)); \
     *result = 0;                               \
     if (IsMsgHandled())                        \
-      return TRUE;                             \
+      return true;                             \
   }
 
 // void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 #define CR_MSG_WM_CHAR(func)                   \
   if (uMsg == WM_CHAR) {                       \
-    SetMsgHandled(TRUE);                       \
+    SetMsgHandled(true);                       \
     func((TCHAR)wParam,                        \
          (UINT)lParam & 0xFFFF,                \
          (UINT)((lParam & 0xFFFF0000) >> 16)); \
     *result = 0;                               \
     if (IsMsgHandled())                        \
-      return TRUE;                             \
+      return true;                             \
   }
 
 // void OnDeadChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 #define CR_MSG_WM_DEADCHAR(func)               \
   if (uMsg == WM_DEADCHAR) {                   \
-    SetMsgHandled(TRUE);                       \
+    SetMsgHandled(true);                       \
     func((TCHAR)wParam,                        \
          (UINT)lParam & 0xFFFF,                \
          (UINT)((lParam & 0xFFFF0000) >> 16)); \
     *result = 0;                               \
     if (IsMsgHandled())                        \
-      return TRUE;                             \
+      return true;                             \
   }
 
 // void OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 #define CR_MSG_WM_SYSKEYDOWN(func)             \
   if (uMsg == WM_SYSKEYDOWN) {                 \
-    SetMsgHandled(TRUE);                       \
+    SetMsgHandled(true);                       \
     func((TCHAR)wParam,                        \
          (UINT)lParam & 0xFFFF,                \
          (UINT)((lParam & 0xFFFF0000) >> 16)); \
     *result = 0;                               \
     if (IsMsgHandled())                        \
-      return TRUE;                             \
+      return true;                             \
   }
 
 // void OnSysKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 #define CR_MSG_WM_SYSKEYUP(func)               \
   if (uMsg == WM_SYSKEYUP) {                   \
-    SetMsgHandled(TRUE);                       \
+    SetMsgHandled(true);                       \
     func((TCHAR)wParam,                        \
          (UINT)lParam & 0xFFFF,                \
          (UINT)((lParam & 0xFFFF0000) >> 16)); \
     *result = 0;                               \
     if (IsMsgHandled())                        \
-      return TRUE;                             \
+      return true;                             \
   }
 
 // void OnSysChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 #define CR_MSG_WM_SYSCHAR(func)                \
   if (uMsg == WM_SYSCHAR) {                    \
-    SetMsgHandled(TRUE);                       \
+    SetMsgHandled(true);                       \
     func((TCHAR)wParam,                        \
          (UINT)lParam & 0xFFFF,                \
          (UINT)((lParam & 0xFFFF0000) >> 16)); \
     *result = 0;                               \
     if (IsMsgHandled())                        \
-      return TRUE;                             \
+      return true;                             \
   }
 
 // void OnSysDeadChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 #define CR_MSG_WM_SYSDEADCHAR(func)            \
   if (uMsg == WM_SYSDEADCHAR) {                \
-    SetMsgHandled(TRUE);                       \
+    SetMsgHandled(true);                       \
     func((TCHAR)wParam,                        \
          (UINT)lParam & 0xFFFF,                \
          (UINT)((lParam & 0xFFFF0000) >> 16)); \
     *result = 0;                               \
     if (IsMsgHandled())                        \
-      return TRUE;                             \
+      return true;                             \
   }
 
 // void OnSysCommand(UINT nID, LPARAM lParam)
 #define CR_MSG_WM_SYSCOMMAND(func)                                      \
   if (uMsg == WM_SYSCOMMAND) {                                          \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     func((UINT)wParam,                                                  \
          nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                        \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnTCard(UINT idAction, DWORD dwActionData)
 #define CR_MSG_WM_TCARD(func)          \
   if (uMsg == WM_TCARD) {              \
-    SetMsgHandled(TRUE);               \
+    SetMsgHandled(true);               \
     func((UINT)wParam, (DWORD)lParam); \
     *result = 0;                       \
     if (IsMsgHandled())                \
-      return TRUE;                     \
+      return true;                     \
   }
 
 // void OnTimer(UINT_PTR nIDEvent)
 #define CR_MSG_WM_TIMER(func) \
   if (uMsg == WM_TIMER) {     \
-    SetMsgHandled(TRUE);      \
+    SetMsgHandled(true);      \
     func((UINT_PTR)wParam);   \
     *result = 0;              \
     if (IsMsgHandled())       \
-      return TRUE;            \
+      return true;            \
   }
 
 // void OnHScroll(UINT nSBCode, UINT nPos, CScrollbar pScrollbar)
 #define CR_MSG_WM_HSCROLL(func)                                     \
   if (uMsg == WM_HSCROLL) {                                         \
-    SetMsgHandled(TRUE);                                            \
+    SetMsgHandled(true);                                            \
     func((int)LOWORD(wParam), (short)HIWORD(wParam), (HWND)lParam); \
     *result = 0;                                                    \
     if (IsMsgHandled())                                             \
-      return TRUE;                                                  \
+      return true;                                                  \
   }
 
 // void OnVScroll(UINT nSBCode, UINT nPos, CScrollbar pScrollbar)
 #define CR_MSG_WM_VSCROLL(func)                                     \
   if (uMsg == WM_VSCROLL) {                                         \
-    SetMsgHandled(TRUE);                                            \
+    SetMsgHandled(true);                                            \
     func((int)LOWORD(wParam), (short)HIWORD(wParam), (HWND)lParam); \
     *result = 0;                                                    \
     if (IsMsgHandled())                                             \
-      return TRUE;                                                  \
+      return true;                                                  \
   }
 
 // void OnInitMenu(CMenu menu)
 #define CR_MSG_WM_INITMENU(func) \
   if (uMsg == WM_INITMENU) {     \
-    SetMsgHandled(TRUE);         \
+    SetMsgHandled(true);         \
     func((HMENU)wParam);         \
     *result = 0;                 \
     if (IsMsgHandled())          \
-      return TRUE;               \
+      return true;               \
   }
 
 // void OnInitMenuPopup(CMenu menuPopup, UINT nIndex, BOOL bSysMenu)
 #define CR_MSG_WM_INITMENUPOPUP(func)                                \
   if (uMsg == WM_INITMENUPOPUP) {                                    \
-    SetMsgHandled(TRUE);                                             \
+    SetMsgHandled(true);                                             \
     func((HMENU)wParam, (UINT)LOWORD(lParam), (BOOL)HIWORD(lParam)); \
     *result = 0;                                                     \
     if (IsMsgHandled())                                              \
-      return TRUE;                                                   \
+      return true;                                                   \
   }
 
 // void OnMenuSelect(UINT nItemID, UINT nFlags, CMenu menu)
 #define CR_MSG_WM_MENUSELECT(func)                                   \
   if (uMsg == WM_MENUSELECT) {                                       \
-    SetMsgHandled(TRUE);                                             \
+    SetMsgHandled(true);                                             \
     func((UINT)LOWORD(wParam), (UINT)HIWORD(wParam), (HMENU)lParam); \
     *result = 0;                                                     \
     if (IsMsgHandled())                                              \
-      return TRUE;                                                   \
+      return true;                                                   \
   }
 
 // LRESULT OnMenuChar(UINT nChar, UINT nFlags, CMenu menu)
 #define CR_MSG_WM_MENUCHAR(func)                                          \
   if (uMsg == WM_MENUCHAR) {                                              \
-    SetMsgHandled(TRUE);                                                  \
+    SetMsgHandled(true);                                                  \
     *result =                                                             \
         func((TCHAR)LOWORD(wParam), (UINT)HIWORD(wParam), (HMENU)lParam); \
     if (IsMsgHandled())                                                   \
-      return TRUE;                                                        \
+      return true;                                                        \
   }
 
 // LRESULT OnNotify(int idCtrl, LPNMHDR pnmh)
 #define CR_MSG_WM_NOTIFY(func)                    \
   if (uMsg == WM_NOTIFY) {                        \
-    SetMsgHandled(TRUE);                          \
+    SetMsgHandled(true);                          \
     *result = func((int)wParam, (LPNMHDR)lParam); \
     if (IsMsgHandled())                           \
-      return TRUE;                                \
+      return true;                                \
   }
 
 // void OnEnterIdle(UINT nWhy, CWindow wndWho)
 #define CR_MSG_WM_ENTERIDLE(func)     \
   if (uMsg == WM_ENTERIDLE) {         \
-    SetMsgHandled(TRUE);              \
+    SetMsgHandled(true);              \
     func((UINT)wParam, (HWND)lParam); \
     *result = 0;                      \
     if (IsMsgHandled())               \
-      return TRUE;                    \
+      return true;                    \
   }
 
 // void OnMouseMove(UINT nFlags, CPoint point)
 #define CR_MSG_WM_MOUSEMOVE(func)                                       \
   if (uMsg == WM_MOUSEMOVE) {                                           \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     func((UINT)wParam,                                                  \
          nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                        \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // BOOL OnMouseWheel(bool vertical, UINT nFlags, short zDelta, CPoint pt)
 #define CR_MSG_WM_MOUSEWHEEL(func)                                     \
   if (uMsg == WM_MOUSEWHEEL || uMsg == WM_MOUSEHWHEEL) {               \
-    SetMsgHandled(TRUE);                                               \
+    SetMsgHandled(true);                                               \
     *result = (LRESULT)func(                                           \
         uMsg == WM_MOUSEWHEEL,                                         \
         (UINT)LOWORD(wParam),                                          \
         (short)HIWORD(wParam),                                         \
         nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     if (IsMsgHandled())                                                \
-      return TRUE;                                                     \
+      return true;                                                     \
   }
 
 // void OnLButtonDown(UINT nFlags, CPoint point)
 #define CR_MSG_WM_LBUTTONDOWN(func)                                     \
   if (uMsg == WM_LBUTTONDOWN) {                                         \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     func((UINT)wParam,                                                  \
          nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                        \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnLButtonUp(UINT nFlags, CPoint point)
 #define CR_MSG_WM_LBUTTONUP(func)                                       \
   if (uMsg == WM_LBUTTONUP) {                                           \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     func((UINT)wParam,                                                  \
          nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                        \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnLButtonDblClk(UINT nFlags, CPoint point)
 #define CR_MSG_WM_LBUTTONDBLCLK(func)                                   \
   if (uMsg == WM_LBUTTONDBLCLK) {                                       \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     func((UINT)wParam,                                                  \
          nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                        \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnRButtonDown(UINT nFlags, CPoint point)
 #define CR_MSG_WM_RBUTTONDOWN(func)                                     \
   if (uMsg == WM_RBUTTONDOWN) {                                         \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     func((UINT)wParam,                                                  \
          nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                        \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnRButtonUp(UINT nFlags, CPoint point)
 #define CR_MSG_WM_RBUTTONUP(func)                                       \
   if (uMsg == WM_RBUTTONUP) {                                           \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     func((UINT)wParam,                                                  \
          nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                        \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnRButtonDblClk(UINT nFlags, CPoint point)
 #define CR_MSG_WM_RBUTTONDBLCLK(func)                                   \
   if (uMsg == WM_RBUTTONDBLCLK) {                                       \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     func((UINT)wParam,                                                  \
          nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                        \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnMButtonDown(UINT nFlags, CPoint point)
 #define CR_MSG_WM_MBUTTONDOWN(func)                                     \
   if (uMsg == WM_MBUTTONDOWN) {                                         \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     func((UINT)wParam,                                                  \
          nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                        \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnMButtonUp(UINT nFlags, CPoint point)
 #define CR_MSG_WM_MBUTTONUP(func)                                       \
   if (uMsg == WM_MBUTTONUP) {                                           \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     func((UINT)wParam,                                                  \
          nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                        \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnMButtonDblClk(UINT nFlags, CPoint point)
 #define CR_MSG_WM_MBUTTONDBLCLK(func)                                   \
   if (uMsg == WM_MBUTTONDBLCLK) {                                       \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     func((UINT)wParam,                                                  \
          nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                        \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnParentNotify(UINT message, UINT nChildID, LPARAM lParam)
 #define CR_MSG_WM_PARENTNOTIFY(func)                          \
   if (uMsg == WM_PARENTNOTIFY) {                              \
-    SetMsgHandled(TRUE);                                      \
+    SetMsgHandled(true);                                      \
     func((UINT)LOWORD(wParam), (UINT)HIWORD(wParam), lParam); \
     *result = 0;                                              \
     if (IsMsgHandled())                                       \
-      return TRUE;                                            \
+      return true;                                            \
   }
 
 // void OnMDIActivate(CWindow wndActivate, CWindow wndDeactivate)
 #define CR_MSG_WM_MDIACTIVATE(func)   \
   if (uMsg == WM_MDIACTIVATE) {       \
-    SetMsgHandled(TRUE);              \
+    SetMsgHandled(true);              \
     func((HWND)wParam, (HWND)lParam); \
     *result = 0;                      \
     if (IsMsgHandled())               \
-      return TRUE;                    \
+      return true;                    \
   }
 
 // void OnRenderFormat(UINT nFormat)
 #define CR_MSG_WM_RENDERFORMAT(func) \
   if (uMsg == WM_RENDERFORMAT) {     \
-    SetMsgHandled(TRUE);             \
+    SetMsgHandled(true);             \
     func((UINT)wParam);              \
     *result = 0;                     \
     if (IsMsgHandled())              \
-      return TRUE;                   \
+      return true;                   \
   }
 
 // void OnRenderAllFormats()
 #define CR_MSG_WM_RENDERALLFORMATS(func) \
   if (uMsg == WM_RENDERALLFORMATS) {     \
-    SetMsgHandled(TRUE);                 \
+    SetMsgHandled(true);                 \
     func();                              \
     *result = 0;                         \
     if (IsMsgHandled())                  \
-      return TRUE;                       \
+      return true;                       \
   }
 
 // void OnDestroyClipboard()
 #define CR_MSG_WM_DESTROYCLIPBOARD(func) \
   if (uMsg == WM_DESTROYCLIPBOARD) {     \
-    SetMsgHandled(TRUE);                 \
+    SetMsgHandled(true);                 \
     func();                              \
     *result = 0;                         \
     if (IsMsgHandled())                  \
-      return TRUE;                       \
+      return true;                       \
   }
 
 // void OnDrawClipboard()
 #define CR_MSG_WM_DRAWCLIPBOARD(func) \
   if (uMsg == WM_DRAWCLIPBOARD) {     \
-    SetMsgHandled(TRUE);              \
+    SetMsgHandled(true);              \
     func();                           \
     *result = 0;                      \
     if (IsMsgHandled())               \
-      return TRUE;                    \
+      return true;                    \
   }
 
 // void OnPaintClipboard(CWindow wndViewer, const LPPAINTSTRUCT lpPaintStruct)
 #define CR_MSG_WM_PAINTCLIPBOARD(func)                                      \
   if (uMsg == WM_PAINTCLIPBOARD) {                                          \
-    SetMsgHandled(TRUE);                                                    \
+    SetMsgHandled(true);                                                    \
     func((HWND)wParam, (const LPPAINTSTRUCT)::GlobalLock((HGLOBAL)lParam)); \
     ::GlobalUnlock((HGLOBAL)lParam);                                        \
     *result = 0;                                                            \
     if (IsMsgHandled())                                                     \
-      return TRUE;                                                          \
+      return true;                                                          \
   }
 
 // void OnVScrollClipboard(CWindow wndViewer, UINT nSBCode, UINT nPos)
 #define CR_MSG_WM_VSCROLLCLIPBOARD(func)                            \
   if (uMsg == WM_VSCROLLCLIPBOARD) {                                \
-    SetMsgHandled(TRUE);                                            \
+    SetMsgHandled(true);                                            \
     func((HWND)wParam, (UINT)LOWORD(lParam), (UINT)HIWORD(lParam)); \
     *result = 0;                                                    \
     if (IsMsgHandled())                                             \
-      return TRUE;                                                  \
+      return true;                                                  \
   }
 
 // void OnContextMenu(CWindow wnd, CPoint point)
 #define CR_MSG_WM_CONTEXTMENU(func)                                     \
   if (uMsg == WM_CONTEXTMENU) {                                         \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     func((HWND)wParam,                                                  \
          nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                        \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnSizeClipboard(CWindow wndViewer, const LPRECT lpRect)
 #define CR_MSG_WM_SIZECLIPBOARD(func)                                \
   if (uMsg == WM_SIZECLIPBOARD) {                                    \
-    SetMsgHandled(TRUE);                                             \
+    SetMsgHandled(true);                                             \
     func((HWND)wParam, (const LPRECT)::GlobalLock((HGLOBAL)lParam)); \
     ::GlobalUnlock((HGLOBAL)lParam);                                 \
     *result = 0;                                                     \
     if (IsMsgHandled())                                              \
-      return TRUE;                                                   \
+      return true;                                                   \
   }
 
 // void OnAskCbFormatName(UINT nMaxCount, LPTSTR lpszString)
 #define CR_MSG_WM_ASKCBFORMATNAME(func)  \
   if (uMsg == WM_ASKCBFORMATNAME) {      \
-    SetMsgHandled(TRUE);                 \
+    SetMsgHandled(true);                 \
     func((DWORD)wParam, (LPTSTR)lParam); \
     *result = 0;                         \
     if (IsMsgHandled())                  \
-      return TRUE;                       \
+      return true;                       \
   }
 
 // void OnChangeCbChain(CWindow wndRemove, CWindow wndAfter)
 #define CR_MSG_WM_CHANGECBCHAIN(func) \
   if (uMsg == WM_CHANGECBCHAIN) {     \
-    SetMsgHandled(TRUE);              \
+    SetMsgHandled(true);              \
     func((HWND)wParam, (HWND)lParam); \
     *result = 0;                      \
     if (IsMsgHandled())               \
-      return TRUE;                    \
+      return true;                    \
   }
 
 // void OnHScrollClipboard(CWindow wndViewer, UINT nSBCode, UINT nPos)
 #define CR_MSG_WM_HSCROLLCLIPBOARD(func)                            \
   if (uMsg == WM_HSCROLLCLIPBOARD) {                                \
-    SetMsgHandled(TRUE);                                            \
+    SetMsgHandled(true);                                            \
     func((HWND)wParam, (UINT)LOWORD(lParam), (UINT)HIWORD(lParam)); \
     *result = 0;                                                    \
     if (IsMsgHandled())                                             \
-      return TRUE;                                                  \
+      return true;                                                  \
   }
 
 // BOOL OnQueryNewPalette()
 #define CR_MSG_WM_QUERYNEWPALETTE(func) \
   if (uMsg == WM_QUERYNEWPALETTE) {     \
-    SetMsgHandled(TRUE);                \
+    SetMsgHandled(true);                \
     *result = (LRESULT)func();          \
     if (IsMsgHandled())                 \
-      return TRUE;                      \
+      return true;                      \
   }
 
 // void OnPaletteChanged(CWindow wndFocus)
 #define CR_MSG_WM_PALETTECHANGED(func) \
   if (uMsg == WM_PALETTECHANGED) {     \
-    SetMsgHandled(TRUE);               \
+    SetMsgHandled(true);               \
     func((HWND)wParam);                \
     *result = 0;                       \
     if (IsMsgHandled())                \
-      return TRUE;                     \
+      return true;                     \
   }
 
 // void OnPaletteIsChanging(CWindow wndPalChg)
 #define CR_MSG_WM_PALETTEISCHANGING(func) \
   if (uMsg == WM_PALETTEISCHANGING) {     \
-    SetMsgHandled(TRUE);                  \
+    SetMsgHandled(true);                  \
     func((HWND)wParam);                   \
     *result = 0;                          \
     if (IsMsgHandled())                   \
-      return TRUE;                        \
+      return true;                        \
   }
 
 // void OnDropFiles(HDROP hDropInfo)
 #define CR_MSG_WM_DROPFILES(func) \
   if (uMsg == WM_DROPFILES) {     \
-    SetMsgHandled(TRUE);          \
+    SetMsgHandled(true);          \
     func((HDROP)wParam);          \
     *result = 0;                  \
     if (IsMsgHandled())           \
-      return TRUE;                \
+      return true;                \
   }
 
 // void OnWindowPosChanging(LPWINDOWPOS lpWndPos)
 #define CR_MSG_WM_WINDOWPOSCHANGING(func) \
   if (uMsg == WM_WINDOWPOSCHANGING) {     \
-    SetMsgHandled(TRUE);                  \
+    SetMsgHandled(true);                  \
     func((LPWINDOWPOS)lParam);            \
     *result = 0;                          \
     if (IsMsgHandled())                   \
-      return TRUE;                        \
+      return true;                        \
   }
 
 // void OnWindowPosChanged(LPWINDOWPOS lpWndPos)
 #define CR_MSG_WM_WINDOWPOSCHANGED(func) \
   if (uMsg == WM_WINDOWPOSCHANGED) {     \
-    SetMsgHandled(TRUE);                 \
+    SetMsgHandled(true);                 \
     func((LPWINDOWPOS)lParam);           \
     *result = 0;                         \
     if (IsMsgHandled())                  \
-      return TRUE;                       \
+      return true;                       \
   }
 
 // void OnExitMenuLoop(BOOL fIsTrackPopupMenu)
 #define CR_MSG_WM_EXITMENULOOP(func) \
   if (uMsg == WM_EXITMENULOOP) {     \
-    SetMsgHandled(TRUE);             \
+    SetMsgHandled(true);             \
     func((BOOL)wParam);              \
     *result = 0;                     \
     if (IsMsgHandled())              \
-      return TRUE;                   \
+      return true;                   \
   }
 
 // void OnEnterMenuLoop(BOOL fIsTrackPopupMenu)
 #define CR_MSG_WM_ENTERMENULOOP(func) \
   if (uMsg == WM_ENTERMENULOOP) {     \
-    SetMsgHandled(TRUE);              \
+    SetMsgHandled(true);              \
     func((BOOL)wParam);               \
     *result = 0;                      \
     if (IsMsgHandled())               \
-      return TRUE;                    \
+      return true;                    \
   }
 
 // void OnStyleChanged(int nStyleType, LPSTYLESTRUCT lpStyleStruct)
 #define CR_MSG_WM_STYLECHANGED(func)           \
   if (uMsg == WM_STYLECHANGED) {               \
-    SetMsgHandled(TRUE);                       \
+    SetMsgHandled(true);                       \
     func((UINT)wParam, (LPSTYLESTRUCT)lParam); \
     *result = 0;                               \
     if (IsMsgHandled())                        \
-      return TRUE;                             \
+      return true;                             \
   }
 
 // void OnStyleChanging(int nStyleType, LPSTYLESTRUCT lpStyleStruct)
 #define CR_MSG_WM_STYLECHANGING(func)          \
   if (uMsg == WM_STYLECHANGING) {              \
-    SetMsgHandled(TRUE);                       \
+    SetMsgHandled(true);                       \
     func((UINT)wParam, (LPSTYLESTRUCT)lParam); \
     *result = 0;                               \
     if (IsMsgHandled())                        \
-      return TRUE;                             \
+      return true;                             \
   }
 
 // void OnSizing(UINT fwSide, LPRECT pRect)
 #define CR_MSG_WM_SIZING(func)          \
   if (uMsg == WM_SIZING) {              \
-    SetMsgHandled(TRUE);                \
+    SetMsgHandled(true);                \
     func((UINT)wParam, (LPRECT)lParam); \
     *result = TRUE;                     \
     if (IsMsgHandled())                 \
-      return TRUE;                      \
+      return true;                      \
   }
 
 // void OnMoving(UINT fwSide, LPRECT pRect)
 #define CR_MSG_WM_MOVING(func)          \
   if (uMsg == WM_MOVING) {              \
-    SetMsgHandled(TRUE);                \
+    SetMsgHandled(true);                \
     func((UINT)wParam, (LPRECT)lParam); \
     *result = TRUE;                     \
     if (IsMsgHandled())                 \
-      return TRUE;                      \
+      return true;                      \
   }
 
 // void OnCaptureChanged(CWindow wnd)
 #define CR_MSG_WM_CAPTURECHANGED(func) \
   if (uMsg == WM_CAPTURECHANGED) {     \
-    SetMsgHandled(TRUE);               \
+    SetMsgHandled(true);               \
     func((HWND)lParam);                \
     *result = 0;                       \
     if (IsMsgHandled())                \
-      return TRUE;                     \
+      return true;                     \
   }
 
 // BOOL OnDeviceChange(UINT nEventType, DWORD dwData)
 #define CR_MSG_WM_DEVICECHANGE(func)                      \
   if (uMsg == WM_DEVICECHANGE) {                          \
-    SetMsgHandled(TRUE);                                  \
+    SetMsgHandled(true);                                  \
     *result = (LRESULT)func((UINT)wParam, (DWORD)lParam); \
     if (IsMsgHandled())                                   \
-      return TRUE;                                        \
+      return true;                                        \
   }
 
 // void OnCommand(UINT uNotifyCode, int nID, CWindow wndCtl)
 #define CR_MSG_WM_COMMAND(func)                                    \
   if (uMsg == WM_COMMAND) {                                        \
-    SetMsgHandled(TRUE);                                           \
+    SetMsgHandled(true);                                           \
     func((UINT)HIWORD(wParam), (int)LOWORD(wParam), (HWND)lParam); \
     *result = 0;                                                   \
     if (IsMsgHandled())                                            \
-      return TRUE;                                                 \
+      return true;                                                 \
   }
 
 // void OnDisplayChange(UINT uBitsPerPixel, nu::Size sizeScreen)
 #define CR_MSG_WM_DISPLAYCHANGE(func)                                  \
   if (uMsg == WM_DISPLAYCHANGE) {                                      \
-    SetMsgHandled(TRUE);                                               \
+    SetMsgHandled(true);                                               \
     func((UINT)wParam,                                                 \
          nu::Size(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                       \
     if (IsMsgHandled())                                                \
-      return TRUE;                                                     \
+      return true;                                                     \
   }
 
 // void OnEnterSizeMove()
 #define CR_MSG_WM_ENTERSIZEMOVE(func) \
   if (uMsg == WM_ENTERSIZEMOVE) {     \
-    SetMsgHandled(TRUE);              \
+    SetMsgHandled(true);              \
     func();                           \
     *result = 0;                      \
     if (IsMsgHandled())               \
-      return TRUE;                    \
+      return true;                    \
   }
 
 // void OnExitSizeMove()
 #define CR_MSG_WM_EXITSIZEMOVE(func) \
   if (uMsg == WM_EXITSIZEMOVE) {     \
-    SetMsgHandled(TRUE);             \
+    SetMsgHandled(true);             \
     func();                          \
     *result = 0;                     \
     if (IsMsgHandled())              \
-      return TRUE;                   \
+      return true;                   \
   }
 
 // HFONT OnGetFont()
 #define CR_MSG_WM_GETFONT(func) \
   if (uMsg == WM_GETFONT) {     \
-    SetMsgHandled(TRUE);        \
+    SetMsgHandled(true);        \
     *result = (LRESULT)func();  \
     if (IsMsgHandled())         \
-      return TRUE;              \
+      return true;              \
   }
 
 // LRESULT OnGetHotKey()
 #define CR_MSG_WM_GETHOTKEY(func) \
   if (uMsg == WM_GETHOTKEY) {     \
-    SetMsgHandled(TRUE);          \
+    SetMsgHandled(true);          \
     *result = func();             \
     if (IsMsgHandled())           \
-      return TRUE;                \
+      return true;                \
   }
 
 // HICON OnGetIcon()
 #define CR_MSG_WM_GETICON(func)            \
   if (uMsg == WM_GETICON) {                \
-    SetMsgHandled(TRUE);                   \
+    SetMsgHandled(true);                   \
     *result = (LRESULT)func((UINT)wParam); \
     if (IsMsgHandled())                    \
-      return TRUE;                         \
+      return true;                         \
   }
 
 // int OnGetText(int cchTextMax, LPTSTR lpszText)
 #define CR_MSG_WM_GETTEXT(func)                           \
   if (uMsg == WM_GETTEXT) {                               \
-    SetMsgHandled(TRUE);                                  \
+    SetMsgHandled(true);                                  \
     *result = (LRESULT)func((int)wParam, (LPTSTR)lParam); \
     if (IsMsgHandled())                                   \
-      return TRUE;                                        \
+      return true;                                        \
   }
 
 // int OnGetTextLength()
 #define CR_MSG_WM_GETTEXTLENGTH(func) \
   if (uMsg == WM_GETTEXTLENGTH) {     \
-    SetMsgHandled(TRUE);              \
+    SetMsgHandled(true);              \
     *result = (LRESULT)func();        \
     if (IsMsgHandled())               \
-      return TRUE;                    \
+      return true;                    \
   }
 
 // void OnHelp(LPHELPINFO lpHelpInfo)
 #define CR_MSG_WM_HELP(func)  \
   if (uMsg == WM_HELP) {      \
-    SetMsgHandled(TRUE);      \
+    SetMsgHandled(true);      \
     func((LPHELPINFO)lParam); \
     *result = TRUE;           \
     if (IsMsgHandled())       \
-      return TRUE;            \
+      return true;            \
   }
 
 // void OnHotKey(int nHotKeyID, UINT uModifiers, UINT uVirtKey)
 #define CR_MSG_WM_HOTKEY(func)                                     \
   if (uMsg == WM_HOTKEY) {                                         \
-    SetMsgHandled(TRUE);                                           \
+    SetMsgHandled(true);                                           \
     func((int)wParam, (UINT)LOWORD(lParam), (UINT)HIWORD(lParam)); \
     *result = 0;                                                   \
     if (IsMsgHandled())                                            \
-      return TRUE;                                                 \
+      return true;                                                 \
   }
 
 // void OnInputLangChange(DWORD dwCharSet, HKL hKbdLayout)
 #define CR_MSG_WM_INPUTLANGCHANGE(func) \
   if (uMsg == WM_INPUTLANGCHANGE) {     \
-    SetMsgHandled(TRUE);                \
+    SetMsgHandled(true);                \
     func((DWORD)wParam, (HKL)lParam);   \
     *result = TRUE;                     \
     if (IsMsgHandled())                 \
-      return TRUE;                      \
+      return true;                      \
   }
 
 // void OnInputLangChangeRequest(BOOL bSysCharSet, HKL hKbdLayout)
 #define CR_MSG_WM_INPUTLANGCHANGEREQUEST(func) \
   if (uMsg == WM_INPUTLANGCHANGEREQUEST) {     \
-    SetMsgHandled(TRUE);                       \
+    SetMsgHandled(true);                       \
     func((BOOL)wParam, (HKL)lParam);           \
     *result = 0;                               \
     if (IsMsgHandled())                        \
-      return TRUE;                             \
+      return true;                             \
   }
 
 // void OnNextDlgCtl(BOOL bHandle, WPARAM wCtlFocus)
 #define CR_MSG_WM_NEXTDLGCTL(func)      \
   if (uMsg == WM_NEXTDLGCTL) {          \
-    SetMsgHandled(TRUE);                \
+    SetMsgHandled(true);                \
     func((BOOL)LOWORD(lParam), wParam); \
     *result = 0;                        \
     if (IsMsgHandled())                 \
-      return TRUE;                      \
+      return true;                      \
   }
 
 // void OnNextMenu(int nVirtKey, LPMDINEXTMENU lpMdiNextMenu)
 #define CR_MSG_WM_NEXTMENU(func)              \
   if (uMsg == WM_NEXTMENU) {                  \
-    SetMsgHandled(TRUE);                      \
+    SetMsgHandled(true);                      \
     func((int)wParam, (LPMDINEXTMENU)lParam); \
     *result = 0;                              \
     if (IsMsgHandled())                       \
-      return TRUE;                            \
+      return true;                            \
   }
 
 // int OnNotifyFormat(CWindow wndFrom, int nCommand)
 #define CR_MSG_WM_NOTIFYFORMAT(func)                    \
   if (uMsg == WM_NOTIFYFORMAT) {                        \
-    SetMsgHandled(TRUE);                                \
+    SetMsgHandled(true);                                \
     *result = (LRESULT)func((HWND)wParam, (int)lParam); \
     if (IsMsgHandled())                                 \
-      return TRUE;                                      \
+      return true;                                      \
   }
 
 // BOOL OnPowerBroadcast(DWORD dwPowerEvent, DWORD dwData)
 #define CR_MSG_WM_POWERBROADCAST(func)                     \
   if (uMsg == WM_POWERBROADCAST) {                         \
-    SetMsgHandled(TRUE);                                   \
+    SetMsgHandled(true);                                   \
     *result = (LRESULT)func((DWORD)wParam, (DWORD)lParam); \
     if (IsMsgHandled())                                    \
-      return TRUE;                                         \
+      return true;                                         \
   }
 
 // void OnPrint(CDCHandle dc, UINT uFlags)
 #define CR_MSG_WM_PRINT(func)        \
   if (uMsg == WM_PRINT) {            \
-    SetMsgHandled(TRUE);             \
+    SetMsgHandled(true);             \
     func((HDC)wParam, (UINT)lParam); \
     *result = 0;                     \
     if (IsMsgHandled())              \
-      return TRUE;                   \
+      return true;                   \
   }
 
 // void OnPrintClient(CDCHandle dc, UINT uFlags)
 #define CR_MSG_WM_PRINTCLIENT(func)  \
   if (uMsg == WM_PRINTCLIENT) {      \
-    SetMsgHandled(TRUE);             \
+    SetMsgHandled(true);             \
     func((HDC)wParam, (UINT)lParam); \
     *result = 0;                     \
     if (IsMsgHandled())              \
-      return TRUE;                   \
+      return true;                   \
   }
 
 // void OnRasDialEvent(RASCONNSTATE rasconnstate, DWORD dwError)
 #define CR_MSG_WM_RASDIALEVENT(func)           \
   if (uMsg == WM_RASDIALEVENT) {               \
-    SetMsgHandled(TRUE);                       \
+    SetMsgHandled(true);                       \
     func((RASCONNSTATE)wParam, (DWORD)lParam); \
     *result = TRUE;                            \
     if (IsMsgHandled())                        \
-      return TRUE;                             \
+      return true;                             \
   }
 
 // void OnSetFont(CFont font, BOOL bRedraw)
 #define CR_MSG_WM_SETFONT(func)                \
   if (uMsg == WM_SETFONT) {                    \
-    SetMsgHandled(TRUE);                       \
+    SetMsgHandled(true);                       \
     func((HFONT)wParam, (BOOL)LOWORD(lParam)); \
     *result = 0;                               \
     if (IsMsgHandled())                        \
-      return TRUE;                             \
+      return true;                             \
   }
 
 // int OnSetHotKey(int nVirtKey, UINT uFlags)
 #define CR_MSG_WM_SETHOTKEY(func)                          \
   if (uMsg == WM_SETHOTKEY) {                              \
-    SetMsgHandled(TRUE);                                   \
+    SetMsgHandled(true);                                   \
     *result = (LRESULT)func((int)LOBYTE(LOWORD(wParam)),   \
                             (UINT)HIBYTE(LOWORD(wParam))); \
     if (IsMsgHandled())                                    \
-      return TRUE;                                         \
+      return true;                                         \
   }
 
 // HICON OnSetIcon(UINT uType, HICON hIcon)
 #define CR_MSG_WM_SETICON(func)                           \
   if (uMsg == WM_SETICON) {                               \
-    SetMsgHandled(TRUE);                                  \
+    SetMsgHandled(true);                                  \
     *result = (LRESULT)func((UINT)wParam, (HICON)lParam); \
     if (IsMsgHandled())                                   \
-      return TRUE;                                        \
+      return true;                                        \
   }
 
 // void OnSetRedraw(BOOL bRedraw)
 #define CR_MSG_WM_SETREDRAW(func) \
   if (uMsg == WM_SETREDRAW) {     \
-    SetMsgHandled(TRUE);          \
+    SetMsgHandled(true);          \
     func((BOOL)wParam);           \
     *result = 0;                  \
     if (IsMsgHandled())           \
-      return TRUE;                \
+      return true;                \
   }
 
 // int OnSetText(LPCTSTR lpstrText)
 #define CR_MSG_WM_SETTEXT(func)               \
   if (uMsg == WM_SETTEXT) {                   \
-    SetMsgHandled(TRUE);                      \
+    SetMsgHandled(true);                      \
     *result = (LRESULT)func((LPCTSTR)lParam); \
     if (IsMsgHandled())                       \
-      return TRUE;                            \
+      return true;                            \
   }
 
 // void OnUserChanged()
 #define CR_MSG_WM_USERCHANGED(func) \
   if (uMsg == WM_USERCHANGED) {     \
-    SetMsgHandled(TRUE);            \
+    SetMsgHandled(true);            \
     func();                         \
     *result = 0;                    \
     if (IsMsgHandled())             \
-      return TRUE;                  \
+      return true;                  \
   }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1524,22 +1520,22 @@
 // void OnMouseHover(WPARAM wParam, CPoint ptPos)
 #define CR_MSG_WM_MOUSEHOVER(func)                                      \
   if (uMsg == WM_MOUSEHOVER) {                                          \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     func(wParam,                                                        \
          nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                        \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnMouseLeave()
 #define CR_MSG_WM_MOUSELEAVE(func) \
   if (uMsg == WM_MOUSELEAVE) {     \
-    SetMsgHandled(TRUE);           \
+    SetMsgHandled(true);           \
     func();                        \
     *result = 0;                   \
     if (IsMsgHandled())            \
-      return TRUE;                 \
+      return true;                 \
   }
 
 #endif /* _WIN32_WINNT >= 0x0400 */
@@ -1549,49 +1545,49 @@
 // void OnMenuRButtonUp(WPARAM wParam, CMenu menu)
 #define CR_MSG_WM_MENURBUTTONUP(func) \
   if (uMsg == WM_MENURBUTTONUP) {     \
-    SetMsgHandled(TRUE);              \
+    SetMsgHandled(true);              \
     func(wParam, (HMENU)lParam);      \
     *result = 0;                      \
     if (IsMsgHandled())               \
-      return TRUE;                    \
+      return true;                    \
   }
 
 // LRESULT OnMenuDrag(WPARAM wParam, CMenu menu)
 #define CR_MSG_WM_MENUDRAG(func)           \
   if (uMsg == WM_MENUDRAG) {               \
-    SetMsgHandled(TRUE);                   \
+    SetMsgHandled(true);                   \
     *result = func(wParam, (HMENU)lParam); \
     if (IsMsgHandled())                    \
-      return TRUE;                         \
+      return true;                         \
   }
 
 // LRESULT OnMenuGetObject(PMENUGETOBJECTINFO info)
 #define CR_MSG_WM_MENUGETOBJECT(func)           \
   if (uMsg == WM_MENUGETOBJECT) {               \
-    SetMsgHandled(TRUE);                        \
+    SetMsgHandled(true);                        \
     *result = func((PMENUGETOBJECTINFO)lParam); \
     if (IsMsgHandled())                         \
-      return TRUE;                              \
+      return true;                              \
   }
 
 // void OnUnInitMenuPopup(UINT nID, CMenu menu)
 #define CR_MSG_WM_UNINITMENUPOPUP(func)        \
   if (uMsg == WM_UNINITMENUPOPUP) {            \
-    SetMsgHandled(TRUE);                       \
+    SetMsgHandled(true);                       \
     func((UINT)HIWORD(lParam), (HMENU)wParam); \
     *result = 0;                               \
     if (IsMsgHandled())                        \
-      return TRUE;                             \
+      return true;                             \
   }
 
 // void OnMenuCommand(WPARAM nIndex, CMenu menu)
 #define CR_MSG_WM_MENUCOMMAND(func) \
   if (uMsg == WM_MENUCOMMAND) {     \
-    SetMsgHandled(TRUE);            \
+    SetMsgHandled(true);            \
     func(wParam, (HMENU)lParam);    \
     *result = 0;                    \
     if (IsMsgHandled())             \
-      return TRUE;                  \
+      return true;                  \
   }
 
 #endif /* WINVER >= 0x0500 */
@@ -1601,114 +1597,114 @@
 // BOOL OnAppCommand(CWindow wndFocus, short cmd, WORD uDevice, int dwKeys)
 #define CR_MSG_WM_APPCOMMAND(func)                         \
   if (uMsg == WM_APPCOMMAND) {                             \
-    SetMsgHandled(TRUE);                                   \
+    SetMsgHandled(true);                                   \
     *result = (LRESULT)func((HWND)wParam,                  \
                             GET_APPCOMMAND_LPARAM(lParam), \
                             GET_DEVICE_LPARAM(lParam),     \
                             GET_KEYSTATE_LPARAM(lParam));  \
     if (IsMsgHandled())                                    \
-      return TRUE;                                         \
+      return true;                                         \
   }
 
 // void OnNCXButtonDown(int fwButton, short nHittest, CPoint ptPos)
 #define CR_MSG_WM_NCXBUTTONDOWN(func)                                   \
   if (uMsg == WM_NCXBUTTONDOWN) {                                       \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     func(GET_XBUTTON_WPARAM(wParam),                                    \
          GET_NCHITTEST_WPARAM(wParam),                                  \
          nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                        \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnNCXButtonUp(int fwButton, short nHittest, CPoint ptPos)
 #define CR_MSG_WM_NCXBUTTONUP(func)                                     \
   if (uMsg == WM_NCXBUTTONUP) {                                         \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     func(GET_XBUTTON_WPARAM(wParam),                                    \
          GET_NCHITTEST_WPARAM(wParam),                                  \
          nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                        \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnNCXButtonDblClk(int fwButton, short nHittest, CPoint ptPos)
 #define CR_MSG_WM_NCXBUTTONDBLCLK(func)                                 \
   if (uMsg == WM_NCXBUTTONDBLCLK) {                                     \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     func(GET_XBUTTON_WPARAM(wParam),                                    \
          GET_NCHITTEST_WPARAM(wParam),                                  \
          nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                        \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnXButtonDown(int fwButton, int dwKeys, CPoint ptPos)
 #define CR_MSG_WM_XBUTTONDOWN(func)                                     \
   if (uMsg == WM_XBUTTONDOWN) {                                         \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     func(GET_XBUTTON_WPARAM(wParam),                                    \
          GET_KEYSTATE_WPARAM(wParam),                                   \
          nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                        \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnXButtonUp(int fwButton, int dwKeys, CPoint ptPos)
 #define CR_MSG_WM_XBUTTONUP(func)                                       \
   if (uMsg == WM_XBUTTONUP) {                                           \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     func(GET_XBUTTON_WPARAM(wParam),                                    \
          GET_KEYSTATE_WPARAM(wParam),                                   \
          nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                        \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnXButtonDblClk(int fwButton, int dwKeys, CPoint ptPos)
 #define CR_MSG_WM_XBUTTONDBLCLK(func)                                   \
   if (uMsg == WM_XBUTTONDBLCLK) {                                       \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     func(GET_XBUTTON_WPARAM(wParam),                                    \
          GET_KEYSTATE_WPARAM(wParam),                                   \
          nu::Point(CR_GET_X_LPARAM(lParam), CR_GET_Y_LPARAM(lParam)));  \
     *result = 0;                                                        \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnChangeUIState(WORD nAction, WORD nState)
 #define CR_MSG_WM_CHANGEUISTATE(func)     \
   if (uMsg == WM_CHANGEUISTATE) {         \
-    SetMsgHandled(TRUE);                  \
+    SetMsgHandled(true);                  \
     func(LOWORD(wParam), HIWORD(wParam)); \
     *result = 0;                          \
     if (IsMsgHandled())                   \
-      return TRUE;                        \
+      return true;                        \
   }
 
 // void OnUpdateUIState(WORD nAction, WORD nState)
 #define CR_MSG_WM_UPDATEUISTATE(func)     \
   if (uMsg == WM_UPDATEUISTATE) {         \
-    SetMsgHandled(TRUE);                  \
+    SetMsgHandled(true);                  \
     func(LOWORD(wParam), HIWORD(wParam)); \
     *result = 0;                          \
     if (IsMsgHandled())                   \
-      return TRUE;                        \
+      return true;                        \
   }
 
 // LRESULT OnQueryUIState()
 #define CR_MSG_WM_QUERYUISTATE(func) \
   if (uMsg == WM_QUERYUISTATE) {     \
-    SetMsgHandled(TRUE);             \
+    SetMsgHandled(true);             \
     *result = func();                \
     if (IsMsgHandled())              \
-      return TRUE;                   \
+      return true;                   \
   }
 
 #endif  // (_WIN32_WINNT >= 0x0500)
@@ -1718,34 +1714,34 @@
 // void OnInput(WPARAM RawInputCode, HRAWINPUT hRawInput)
 #define CR_MSG_WM_INPUT(func)                                  \
   if (uMsg == WM_INPUT) {                                      \
-    SetMsgHandled(TRUE);                                       \
+    SetMsgHandled(true);                                       \
     func(GET_RAWINPUT_CODE_WPARAM(wParam), (HRAWINPUT)lParam); \
     *result = 0;                                               \
     if (IsMsgHandled())                                        \
-      return TRUE;                                             \
+      return true;                                             \
   }
 
 // void OnUniChar(TCHAR nChar, UINT nRepCnt, UINT nFlags)
 #define CR_MSG_WM_UNICHAR(func)                            \
   if (uMsg == WM_UNICHAR) {                                \
-    SetMsgHandled(TRUE);                                   \
+    SetMsgHandled(true);                                   \
     func((TCHAR)wParam,                                    \
          (UINT)lParam & 0xFFFF,                            \
          (UINT)((lParam & 0xFFFF0000) >> 16));             \
     if (IsMsgHandled()) {                                  \
       *result = (wParam == UNICODE_NOCHAR) ? TRUE : FALSE; \
-      return TRUE;                                         \
+      return true;                                         \
     }                                                      \
   }
 
 // OnThemeChanged()
 #define CR_MSG_WM_THEMECHANGED(func) \
   if (uMsg == WM_THEMECHANGED) {     \
-    SetMsgHandled(TRUE);             \
+    SetMsgHandled(true);             \
     func();                          \
     *result = 0;                     \
     if (IsMsgHandled())              \
-      return TRUE;                   \
+      return true;                   \
   }
 
 #endif /* _WIN32_WINNT >= 0x0501 */
@@ -1756,10 +1752,10 @@
 // BOOL OnForwardMsg(LPMSG Msg, DWORD nUserData)
 #define CR_MSG_WM_FORWARDMSG(func)                         \
   if (uMsg == WM_FORWARDMSG) {                             \
-    SetMsgHandled(TRUE);                                   \
+    SetMsgHandled(true);                                   \
     *result = (LRESULT)func((LPMSG)lParam, (DWORD)wParam); \
     if (IsMsgHandled())                                    \
-      return TRUE;                                         \
+      return true;                                         \
   }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1768,30 +1764,30 @@
 // LRESULT OnDMGetDefID()
 #define MSG_DM_GETDEFID(func) \
   if (uMsg == DM_GETDEFID) {  \
-    SetMsgHandled(TRUE);      \
+    SetMsgHandled(true);      \
     *result = func();         \
     if (IsMsgHandled())       \
-      return TRUE;            \
+      return true;            \
   }
 
 // void OnDMSetDefID(UINT DefID)
 #define MSG_DM_SETDEFID(func) \
   if (uMsg == DM_SETDEFID) {  \
-    SetMsgHandled(TRUE);      \
+    SetMsgHandled(true);      \
     func((UINT)wParam);       \
     *result = TRUE;           \
     if (IsMsgHandled())       \
-      return TRUE;            \
+      return true;            \
   }
 
 // void OnDMReposition()
 #define MSG_DM_REPOSITION(func) \
   if (uMsg == DM_REPOSITION) {  \
-    SetMsgHandled(TRUE);        \
+    SetMsgHandled(true);        \
     func();                     \
     *result = 0;                \
     if (IsMsgHandled())         \
-      return TRUE;              \
+      return true;              \
   }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1800,165 +1796,165 @@
 // void OnReflectedCommand(UINT uNotifyCode, int nID, CWindow wndCtl)
 #define MSG_OCM_COMMAND(func)                                      \
   if (uMsg == OCM_COMMAND) {                                       \
-    SetMsgHandled(TRUE);                                           \
+    SetMsgHandled(true);                                           \
     func((UINT)HIWORD(wParam), (int)LOWORD(wParam), (HWND)lParam); \
     *result = 0;                                                   \
     if (IsMsgHandled())                                            \
-      return TRUE;                                                 \
+      return true;                                                 \
   }
 
 // LRESULT OnReflectedNotify(int idCtrl, LPNMHDR pnmh)
 #define MSG_OCM_NOTIFY(func)                      \
   if (uMsg == OCM_NOTIFY) {                       \
-    SetMsgHandled(TRUE);                          \
+    SetMsgHandled(true);                          \
     *result = func((int)wParam, (LPNMHDR)lParam); \
     if (IsMsgHandled())                           \
-      return TRUE;                                \
+      return true;                                \
   }
 
 // void OnReflectedParentNotify(UINT message, UINT nChildID, LPARAM lParam)
 #define MSG_OCM_PARENTNOTIFY(func)                            \
   if (uMsg == OCM_PARENTNOTIFY) {                             \
-    SetMsgHandled(TRUE);                                      \
+    SetMsgHandled(true);                                      \
     func((UINT)LOWORD(wParam), (UINT)HIWORD(wParam), lParam); \
     *result = 0;                                              \
     if (IsMsgHandled())                                       \
-      return TRUE;                                            \
+      return true;                                            \
   }
 
 // void OnReflectedDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 #define MSG_OCM_DRAWITEM(func)                    \
   if (uMsg == OCM_DRAWITEM) {                     \
-    SetMsgHandled(TRUE);                          \
+    SetMsgHandled(true);                          \
     func((UINT)wParam, (LPDRAWITEMSTRUCT)lParam); \
     *result = TRUE;                               \
     if (IsMsgHandled())                           \
-      return TRUE;                                \
+      return true;                                \
   }
 
 // void OnReflectedMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT
 // lpMeasureItemStruct)
 #define MSG_OCM_MEASUREITEM(func)                    \
   if (uMsg == OCM_MEASUREITEM) {                     \
-    SetMsgHandled(TRUE);                             \
+    SetMsgHandled(true);                             \
     func((UINT)wParam, (LPMEASUREITEMSTRUCT)lParam); \
     *result = TRUE;                                  \
     if (IsMsgHandled())                              \
-      return TRUE;                                   \
+      return true;                                   \
   }
 
 // int OnReflectedCompareItem(int nIDCtl, LPCOMPAREITEMSTRUCT
 // lpCompareItemStruct)
 #define MSG_OCM_COMPAREITEM(func)                                       \
   if (uMsg == OCM_COMPAREITEM) {                                        \
-    SetMsgHandled(TRUE);                                                \
+    SetMsgHandled(true);                                                \
     *result = (LRESULT)func((UINT)wParam, (LPCOMPAREITEMSTRUCT)lParam); \
     if (IsMsgHandled())                                                 \
-      return TRUE;                                                      \
+      return true;                                                      \
   }
 
 // void OnReflectedDeleteItem(int nIDCtl, LPDELETEITEMSTRUCT lpDeleteItemStruct)
 #define MSG_OCM_DELETEITEM(func)                    \
   if (uMsg == OCM_DELETEITEM) {                     \
-    SetMsgHandled(TRUE);                            \
+    SetMsgHandled(true);                            \
     func((UINT)wParam, (LPDELETEITEMSTRUCT)lParam); \
     *result = TRUE;                                 \
     if (IsMsgHandled())                             \
-      return TRUE;                                  \
+      return true;                                  \
   }
 
 // int OnReflectedVKeyToItem(UINT nKey, UINT nIndex, CListBox listBox)
 #define MSG_OCM_VKEYTOITEM(func)                                   \
   if (uMsg == OCM_VKEYTOITEM) {                                    \
-    SetMsgHandled(TRUE);                                           \
+    SetMsgHandled(true);                                           \
     *result = (LRESULT)func(                                       \
         (UINT)LOWORD(wParam), (UINT)HIWORD(wParam), (HWND)lParam); \
     if (IsMsgHandled())                                            \
-      return TRUE;                                                 \
+      return true;                                                 \
   }
 
 // int OnReflectedCharToItem(UINT nChar, UINT nIndex, CListBox listBox)
 #define MSG_OCM_CHARTOITEM(func)                                   \
   if (uMsg == OCM_CHARTOITEM) {                                    \
-    SetMsgHandled(TRUE);                                           \
+    SetMsgHandled(true);                                           \
     *result = (LRESULT)func(                                       \
         (UINT)LOWORD(wParam), (UINT)HIWORD(wParam), (HWND)lParam); \
     if (IsMsgHandled())                                            \
-      return TRUE;                                                 \
+      return true;                                                 \
   }
 
 // void OnReflectedHScroll(UINT nSBCode, UINT nPos, CScrollbar pScrollbar)
 #define MSG_OCM_HSCROLL(func)                                       \
   if (uMsg == OCM_HSCROLL) {                                        \
-    SetMsgHandled(TRUE);                                            \
+    SetMsgHandled(true);                                            \
     func((int)LOWORD(wParam), (short)HIWORD(wParam), (HWND)lParam); \
     *result = 0;                                                    \
     if (IsMsgHandled())                                             \
-      return TRUE;                                                  \
+      return true;                                                  \
   }
 
 // void OnReflectedVScroll(UINT nSBCode, UINT nPos, CScrollbar pScrollbar)
 #define MSG_OCM_VSCROLL(func)                                       \
   if (uMsg == OCM_VSCROLL) {                                        \
-    SetMsgHandled(TRUE);                                            \
+    SetMsgHandled(true);                                            \
     func((int)LOWORD(wParam), (short)HIWORD(wParam), (HWND)lParam); \
     *result = 0;                                                    \
     if (IsMsgHandled())                                             \
-      return TRUE;                                                  \
+      return true;                                                  \
   }
 
 // HBRUSH OnReflectedCtlColorEdit(CDCHandle dc, CEdit edit)
 #define MSG_OCM_CTLCOLOREDIT(func)                      \
   if (uMsg == OCM_CTLCOLOREDIT) {                       \
-    SetMsgHandled(TRUE);                                \
+    SetMsgHandled(true);                                \
     *result = (LRESULT)func((HDC)wParam, (HWND)lParam); \
     if (IsMsgHandled())                                 \
-      return TRUE;                                      \
+      return true;                                      \
   }
 
 // HBRUSH OnReflectedCtlColorListBox(CDCHandle dc, CListBox listBox)
 #define MSG_OCM_CTLCOLORLISTBOX(func)                   \
   if (uMsg == OCM_CTLCOLORLISTBOX) {                    \
-    SetMsgHandled(TRUE);                                \
+    SetMsgHandled(true);                                \
     *result = (LRESULT)func((HDC)wParam, (HWND)lParam); \
     if (IsMsgHandled())                                 \
-      return TRUE;                                      \
+      return true;                                      \
   }
 
 // HBRUSH OnReflectedCtlColorBtn(CDCHandle dc, CButton button)
 #define MSG_OCM_CTLCOLORBTN(func)                       \
   if (uMsg == OCM_CTLCOLORBTN) {                        \
-    SetMsgHandled(TRUE);                                \
+    SetMsgHandled(true);                                \
     *result = (LRESULT)func((HDC)wParam, (HWND)lParam); \
     if (IsMsgHandled())                                 \
-      return TRUE;                                      \
+      return true;                                      \
   }
 
 // HBRUSH OnReflectedCtlColorDlg(CDCHandle dc, CWindow wnd)
 #define MSG_OCM_CTLCOLORDLG(func)                       \
   if (uMsg == OCM_CTLCOLORDLG) {                        \
-    SetMsgHandled(TRUE);                                \
+    SetMsgHandled(true);                                \
     *result = (LRESULT)func((HDC)wParam, (HWND)lParam); \
     if (IsMsgHandled())                                 \
-      return TRUE;                                      \
+      return true;                                      \
   }
 
 // HBRUSH OnReflectedCtlColorScrollbar(CDCHandle dc, CScrollbar scrollBar)
 #define MSG_OCM_CTLCOLORSCROLLBAR(func)                 \
   if (uMsg == OCM_CTLCOLORSCROLLBAR) {                  \
-    SetMsgHandled(TRUE);                                \
+    SetMsgHandled(true);                                \
     *result = (LRESULT)func((HDC)wParam, (HWND)lParam); \
     if (IsMsgHandled())                                 \
-      return TRUE;                                      \
+      return true;                                      \
   }
 
 // HBRUSH OnReflectedCtlColorStatic(CDCHandle dc, CStatic wndStatic)
 #define MSG_OCM_CTLCOLORSTATIC(func)                    \
   if (uMsg == OCM_CTLCOLORSTATIC) {                     \
-    SetMsgHandled(TRUE);                                \
+    SetMsgHandled(true);                                \
     *result = (LRESULT)func((HDC)wParam, (HWND)lParam); \
     if (IsMsgHandled())                                 \
-      return TRUE;                                      \
+      return true;                                      \
   }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1967,51 +1963,51 @@
 // void OnClear()
 #define CR_MSG_WM_CLEAR(func) \
   if (uMsg == WM_CLEAR) {     \
-    SetMsgHandled(TRUE);      \
+    SetMsgHandled(true);      \
     func();                   \
     *result = 0;              \
     if (IsMsgHandled())       \
-      return TRUE;            \
+      return true;            \
   }
 
 // void OnCopy()
 #define CR_MSG_WM_COPY(func) \
   if (uMsg == WM_COPY) {     \
-    SetMsgHandled(TRUE);     \
+    SetMsgHandled(true);     \
     func();                  \
     *result = 0;             \
     if (IsMsgHandled())      \
-      return TRUE;           \
+      return true;           \
   }
 
 // void OnCut()
 #define CR_MSG_WM_CUT(func) \
   if (uMsg == WM_CUT) {     \
-    SetMsgHandled(TRUE);    \
+    SetMsgHandled(true);    \
     func();                 \
     *result = 0;            \
     if (IsMsgHandled())     \
-      return TRUE;          \
+      return true;          \
   }
 
 // void OnPaste()
 #define CR_MSG_WM_PASTE(func) \
   if (uMsg == WM_PASTE) {     \
-    SetMsgHandled(TRUE);      \
+    SetMsgHandled(true);      \
     func();                   \
     *result = 0;              \
     if (IsMsgHandled())       \
-      return TRUE;            \
+      return true;            \
   }
 
 // void OnUndo()
 #define CR_MSG_WM_UNDO(func) \
   if (uMsg == WM_UNDO) {     \
-    SetMsgHandled(TRUE);     \
+    SetMsgHandled(true);     \
     func();                  \
     *result = 0;             \
     if (IsMsgHandled())      \
-      return TRUE;           \
+      return true;           \
   }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2020,19 +2016,19 @@
 // LRESULT OnMessageHandlerEX(UINT uMsg, WPARAM wParam, LPARAM lParam)
 #define CR_MESSAGE_HANDLER_EX(msg, func)  \
   if (uMsg == msg) {                      \
-    SetMsgHandled(TRUE);                  \
+    SetMsgHandled(true);                  \
     *result = func(uMsg, wParam, lParam); \
     if (IsMsgHandled())                   \
-      return TRUE;                        \
+      return true;                        \
   }
 
 // LRESULT OnMessageRangeHandlerEX(UINT uMsg, WPARAM wParam, LPARAM lParam)
 #define CR_MESSAGE_RANGE_HANDLER_EX(msgFirst, msgLast, func) \
   if (uMsg >= msgFirst && uMsg <= msgLast) {                 \
-    SetMsgHandled(TRUE);                                     \
+    SetMsgHandled(true);                                     \
     *result = func(uMsg, wParam, lParam);                    \
     if (IsMsgHandled())                                      \
-      return TRUE;                                           \
+      return true;                                           \
   }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2041,91 +2037,91 @@
 // void OnCommandHandlerEX(UINT uNotifyCode, int nID, CWindow wndCtl)
 #define CR_COMMAND_HANDLER_EX(id, code, func)                                 \
   if (uMsg == WM_COMMAND && code == HIWORD(wParam) && id == LOWORD(wParam)) { \
-    SetMsgHandled(TRUE);                                                      \
+    SetMsgHandled(true);                                                      \
     func((UINT)HIWORD(wParam), (int)LOWORD(wParam), (HWND)lParam);            \
     *result = 0;                                                              \
     if (IsMsgHandled())                                                       \
-      return TRUE;                                                            \
+      return true;                                                            \
   }
 
 // void OnCommandIDHandlerEX(UINT uNotifyCode, int nID, CWindow wndCtl)
 #define CR_COMMAND_ID_HANDLER_EX(id, func)                         \
   if (uMsg == WM_COMMAND && id == LOWORD(wParam)) {                \
-    SetMsgHandled(TRUE);                                           \
+    SetMsgHandled(true);                                           \
     func((UINT)HIWORD(wParam), (int)LOWORD(wParam), (HWND)lParam); \
     *result = 0;                                                   \
     if (IsMsgHandled())                                            \
-      return TRUE;                                                 \
+      return true;                                                 \
   }
 
 // void OnCommandCodeHandlerEX(UINT uNotifyCode, int nID, CWindow wndCtl)
 #define CR_COMMAND_CODE_HANDLER_EX(code, func)                     \
   if (uMsg == WM_COMMAND && code == HIWORD(wParam)) {              \
-    SetMsgHandled(TRUE);                                           \
+    SetMsgHandled(true);                                           \
     func((UINT)HIWORD(wParam), (int)LOWORD(wParam), (HWND)lParam); \
     *result = 0;                                                   \
     if (IsMsgHandled())                                            \
-      return TRUE;                                                 \
+      return true;                                                 \
   }
 
 // LRESULT OnNotifyHandlerEX(LPNMHDR pnmh)
 #define CR_NOTIFY_HANDLER_EX(id, cd, func)                  \
   if (uMsg == WM_NOTIFY && cd == ((LPNMHDR)lParam)->code && \
       id == ((LPNMHDR)lParam)->idFrom) {                    \
-    SetMsgHandled(TRUE);                                    \
+    SetMsgHandled(true);                                    \
     *result = func((LPNMHDR)lParam);                        \
     if (IsMsgHandled())                                     \
-      return TRUE;                                          \
+      return true;                                          \
   }
 
 // LRESULT OnNotifyIDHandlerEX(LPNMHDR pnmh)
 #define CR_NOTIFY_ID_HANDLER_EX(id, func)                     \
   if (uMsg == WM_NOTIFY && id == ((LPNMHDR)lParam)->idFrom) { \
-    SetMsgHandled(TRUE);                                      \
+    SetMsgHandled(true);                                      \
     *result = func((LPNMHDR)lParam);                          \
     if (IsMsgHandled())                                       \
-      return TRUE;                                            \
+      return true;                                            \
   }
 
 // LRESULT OnNotifyCodeHandlerEX(LPNMHDR pnmh)
 #define CR_NOTIFY_CODE_HANDLER_EX(cd, func)                 \
   if (uMsg == WM_NOTIFY && cd == ((LPNMHDR)lParam)->code) { \
-    SetMsgHandled(TRUE);                                    \
+    SetMsgHandled(true);                                    \
     *result = func((LPNMHDR)lParam);                        \
     if (IsMsgHandled())                                     \
-      return TRUE;                                          \
+      return true;                                          \
   }
 
 // void OnCommandRangeHandlerEX(UINT uNotifyCode, int nID, CWindow wndCtl)
 #define CR_COMMAND_RANGE_HANDLER_EX(idFirst, idLast, func)         \
   if (uMsg == WM_COMMAND && LOWORD(wParam) >= idFirst &&           \
       LOWORD(wParam) <= idLast) {                                  \
-    SetMsgHandled(TRUE);                                           \
+    SetMsgHandled(true);                                           \
     func((UINT)HIWORD(wParam), (int)LOWORD(wParam), (HWND)lParam); \
     *result = 0;                                                   \
     if (IsMsgHandled())                                            \
-      return TRUE;                                                 \
+      return true;                                                 \
   }
 
 // void OnCommandRangeCodeHandlerEX(UINT uNotifyCode, int nID, CWindow wndCtl)
 #define CR_COMMAND_RANGE_CODE_HANDLER_EX(idFirst, idLast, code, func) \
   if (uMsg == WM_COMMAND && code == HIWORD(wParam) &&                 \
       LOWORD(wParam) >= idFirst && LOWORD(wParam) <= idLast) {        \
-    SetMsgHandled(TRUE);                                              \
+    SetMsgHandled(true);                                              \
     func((UINT)HIWORD(wParam), (int)LOWORD(wParam), (HWND)lParam);    \
     *result = 0;                                                      \
     if (IsMsgHandled())                                               \
-      return TRUE;                                                    \
+      return true;                                                    \
   }
 
 // LRESULT OnNotifyRangeHandlerEX(LPNMHDR pnmh)
 #define CR_NOTIFY_RANGE_HANDLER_EX(idFirst, idLast, func)          \
   if (uMsg == WM_NOTIFY && ((LPNMHDR)lParam)->idFrom >= idFirst && \
       ((LPNMHDR)lParam)->idFrom <= idLast) {                       \
-    SetMsgHandled(TRUE);                                           \
+    SetMsgHandled(true);                                           \
     *result = func((LPNMHDR)lParam);                               \
     if (IsMsgHandled())                                            \
-      return TRUE;                                                 \
+      return true;                                                 \
   }
 
 // LRESULT OnNotifyRangeCodeHandlerEX(LPNMHDR pnmh)
@@ -2133,71 +2129,71 @@
   if (uMsg == WM_NOTIFY && cd == ((LPNMHDR)lParam)->code &&        \
       ((LPNMHDR)lParam)->idFrom >= idFirst &&                      \
       ((LPNMHDR)lParam)->idFrom <= idLast) {                       \
-    SetMsgHandled(TRUE);                                           \
+    SetMsgHandled(true);                                           \
     *result = func((LPNMHDR)lParam);                               \
     if (IsMsgHandled())                                            \
-      return TRUE;                                                 \
+      return true;                                                 \
   }
 
 // LRESULT OnReflectedCommandHandlerEX(UINT uNotifyCode, int nID, CWindow
 // wndCtl)
 #define CR_REFLECTED_COMMAND_HANDLER_EX(id, code, func)                        \
   if (uMsg == OCM_COMMAND && code == HIWORD(wParam) && id == LOWORD(wParam)) { \
-    SetMsgHandled(TRUE);                                                       \
+    SetMsgHandled(true);                                                       \
     func((UINT)HIWORD(wParam), (int)LOWORD(wParam), (HWND)lParam);             \
     *result = 0;                                                               \
     if (IsMsgHandled())                                                        \
-      return TRUE;                                                             \
+      return true;                                                             \
   }
 
 // LRESULT OnReflectedCommandIDHandlerEX(UINT uNotifyCode, int nID, CWindow
 // wndCtl)
 #define CR_REFLECTED_COMMAND_ID_HANDLER_EX(id, func)               \
   if (uMsg == OCM_COMMAND && id == LOWORD(wParam)) {               \
-    SetMsgHandled(TRUE);                                           \
+    SetMsgHandled(true);                                           \
     func((UINT)HIWORD(wParam), (int)LOWORD(wParam), (HWND)lParam); \
     *result = 0;                                                   \
     if (IsMsgHandled())                                            \
-      return TRUE;                                                 \
+      return true;                                                 \
   }
 
 // LRESULT OnReflectedCommandCodeHandlerEX(UINT uNotifyCode, int nID, CWindow
 // wndCtl)
 #define CR_REFLECTED_COMMAND_CODE_HANDLER_EX(code, func)           \
   if (uMsg == OCM_COMMAND && code == HIWORD(wParam)) {             \
-    SetMsgHandled(TRUE);                                           \
+    SetMsgHandled(true);                                           \
     func((UINT)HIWORD(wParam), (int)LOWORD(wParam), (HWND)lParam); \
     *result = 0;                                                   \
     if (IsMsgHandled())                                            \
-      return TRUE;                                                 \
+      return true;                                                 \
   }
 
 // LRESULT OnReflectedNotifyHandlerEX(LPNMHDR pnmh)
 #define CR_REFLECTED_NOTIFY_HANDLER_EX(id, cd, func)         \
   if (uMsg == OCM_NOTIFY && cd == ((LPNMHDR)lParam)->code && \
       id == ((LPNMHDR)lParam)->idFrom) {                     \
-    SetMsgHandled(TRUE);                                     \
+    SetMsgHandled(true);                                     \
     *result = func((LPNMHDR)lParam);                         \
     if (IsMsgHandled())                                      \
-      return TRUE;                                           \
+      return true;                                           \
   }
 
 // LRESULT OnReflectedNotifyIDHandlerEX(LPNMHDR pnmh)
 #define CR_REFLECTED_NOTIFY_ID_HANDLER_EX(id, func)            \
   if (uMsg == OCM_NOTIFY && id == ((LPNMHDR)lParam)->idFrom) { \
-    SetMsgHandled(TRUE);                                       \
+    SetMsgHandled(true);                                       \
     *result = func((LPNMHDR)lParam);                           \
     if (IsMsgHandled())                                        \
-      return TRUE;                                             \
+      return true;                                             \
   }
 
 // LRESULT OnReflectedNotifyCodeHandlerEX(LPNMHDR pnmh)
 #define CR_REFLECTED_NOTIFY_CODE_HANDLER_EX(cd, func)        \
   if (uMsg == OCM_NOTIFY && cd == ((LPNMHDR)lParam)->code) { \
-    SetMsgHandled(TRUE);                                     \
+    SetMsgHandled(true);                                     \
     *result = func((LPNMHDR)lParam);                         \
     if (IsMsgHandled())                                      \
-      return TRUE;                                           \
+      return true;                                           \
   }
 
 // void OnReflectedCommandRangeHandlerEX(UINT uNotifyCode, int nID, CWindow
@@ -2205,11 +2201,11 @@
 #define CR_REFLECTED_COMMAND_RANGE_HANDLER_EX(idFirst, idLast, func) \
   if (uMsg == OCM_COMMAND && LOWORD(wParam) >= idFirst &&            \
       LOWORD(wParam) <= idLast) {                                    \
-    SetMsgHandled(TRUE);                                             \
+    SetMsgHandled(true);                                             \
     func((UINT)HIWORD(wParam), (int)LOWORD(wParam), (HWND)lParam);   \
     *result = 0;                                                     \
     if (IsMsgHandled())                                              \
-      return TRUE;                                                   \
+      return true;                                                   \
   }
 
 // void OnReflectedCommandRangeCodeHandlerEX(UINT uNotifyCode, int nID, CWindow
@@ -2218,21 +2214,21 @@
     idFirst, idLast, code, func)                                   \
   if (uMsg == OCM_COMMAND && code == HIWORD(wParam) &&             \
       LOWORD(wParam) >= idFirst && LOWORD(wParam) <= idLast) {     \
-    SetMsgHandled(TRUE);                                           \
+    SetMsgHandled(true);                                           \
     func((UINT)HIWORD(wParam), (int)LOWORD(wParam), (HWND)lParam); \
     *result = 0;                                                   \
     if (IsMsgHandled())                                            \
-      return TRUE;                                                 \
+      return true;                                                 \
   }
 
 // LRESULT OnReflectedNotifyRangeHandlerEX(LPNMHDR pnmh)
 #define CR_REFLECTED_NOTIFY_RANGE_HANDLER_EX(idFirst, idLast, func) \
   if (uMsg == OCM_NOTIFY && ((LPNMHDR)lParam)->idFrom >= idFirst && \
       ((LPNMHDR)lParam)->idFrom <= idLast) {                        \
-    SetMsgHandled(TRUE);                                            \
+    SetMsgHandled(true);                                            \
     *result = func((LPNMHDR)lParam);                                \
     if (IsMsgHandled())                                             \
-      return TRUE;                                                  \
+      return true;                                                  \
   }
 
 // LRESULT OnReflectedNotifyRangeCodeHandlerEX(LPNMHDR pnmh)
@@ -2240,10 +2236,10 @@
   if (uMsg == OCM_NOTIFY && cd == ((LPNMHDR)lParam)->code &&                 \
       ((LPNMHDR)lParam)->idFrom >= idFirst &&                                \
       ((LPNMHDR)lParam)->idFrom <= idLast) {                                 \
-    SetMsgHandled(TRUE);                                                     \
+    SetMsgHandled(true);                                                     \
     *result = func((LPNMHDR)lParam);                                         \
     if (IsMsgHandled())                                                      \
-      return TRUE;                                                           \
+      return true;                                                           \
   }
 
 #define CR_DEFLATE_RECT(rect, by)   \

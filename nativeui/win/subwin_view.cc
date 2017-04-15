@@ -13,6 +13,14 @@
 
 namespace nu {
 
+namespace {
+
+bool IsShiftPressed() {
+  return (::GetKeyState(VK_SHIFT) & 0x8000) == 0x8000;
+}
+
+}  // namespace
+
 SubwinView::SubwinView(View* delegate,
                        base::StringPiece16 class_name,
                        DWORD window_style, DWORD window_ex_style)
@@ -94,20 +102,33 @@ bool SubwinView::OnCtlColor(HDC dc, HBRUSH* brush) {
   return true;
 }
 
+void SubwinView::OnChar(UINT ch, UINT repeat, UINT flags) {
+  if (ch == VK_TAB && window())  // Switching focus.
+    window()->focus_manager()->AdvanceFocus(
+        window()->delegate()->GetContentView(), IsShiftPressed());
+  else
+    SetMsgHandled(false);
+}
+
+void SubwinView::OnSetFocus(HWND hwnd) {
+  // Notify the window that focus has changed.
+  if (window())
+    window()->focus_manager()->TakeFocus(delegate());
+  SetMsgHandled(false);
+}
+
 LRESULT SubwinView::OnMouseClick(UINT message, WPARAM w_param, LPARAM l_param) {
   Win32Message msg = {message, w_param, l_param};
-  if (ViewImpl::OnMouseClick(&msg))
-    return TRUE;
-  SetMsgHandled(FALSE);
-  return FALSE;
+  if (!ViewImpl::OnMouseClick(&msg))
+    SetMsgHandled(false);
+  return 0;
 }
 
 LRESULT SubwinView::OnKeyEvent(UINT message, WPARAM w_param, LPARAM l_param) {
   Win32Message msg = {message, w_param, l_param};
-  if (ViewImpl::OnKeyEvent(&msg))
-    return TRUE;
-  SetMsgHandled(FALSE);
-  return FALSE;
+  if (!ViewImpl::OnKeyEvent(&msg))
+    SetMsgHandled(false);
+  return 0;
 }
 
 // static

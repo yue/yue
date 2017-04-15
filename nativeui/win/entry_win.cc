@@ -5,23 +5,17 @@
 #include "nativeui/entry.h"
 
 #include "base/strings/utf_string_conversions.h"
-#include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/screen.h"
 #include "nativeui/gfx/win/text_win.h"
 #include "nativeui/state.h"
 #include "nativeui/win/subwin_view.h"
 #include "nativeui/win/util/hwnd_util.h"
-#include "nativeui/win/window_win.h"
 
 namespace nu {
 
 namespace {
 
 const int kEntryPadding = 1;
-
-bool IsShiftPressed() {
-  return (::GetKeyState(VK_SHIFT) & 0x8000) == 0x8000;
-}
 
 class EntryImpl : public SubwinView {
  public:
@@ -44,24 +38,13 @@ class EntryImpl : public SubwinView {
  protected:
   CR_BEGIN_MSG_MAP_EX(EntryImpl, SubwinView)
     CR_MSG_WM_CHAR(OnChar)
-    CR_MSG_WM_SETFOCUS(OnSetFocus)
   CR_END_MSG_MAP()
 
   void OnChar(UINT ch, UINT repeat, UINT flags) {
     if (ch == VK_RETURN)  // enter means activate.
       static_cast<Entry*>(delegate())->on_activate.Emit();
-    else if (ch == VK_TAB && window())  // Switching focus.
-      window()->focus_manager()->AdvanceFocus(
-          window()->delegate()->GetContentView(), IsShiftPressed());
     else
-      SetMsgHandled(FALSE);
-  }
-
-  void OnSetFocus(HWND hwnd) {
-    // Notify the window that focus has changed.
-    if (window())
-      window()->focus_manager()->TakeFocus(delegate());
-    SetMsgHandled(FALSE);
+      SetMsgHandled(false);
   }
 };
 
