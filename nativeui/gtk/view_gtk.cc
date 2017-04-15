@@ -37,8 +37,13 @@ gboolean OnKeyUp(GtkWidget* widget, GdkEvent* event, View* view) {
 }  // namespace
 
 void View::PlatformDestroy() {
-  gtk_widget_destroy(view_);
-  g_object_unref(view_);
+  if (view_) {
+    gtk_widget_destroy(view_);
+    g_object_unref(view_);
+    // The PlatformDestroy might be called for multiple times, see
+    // Container::PlatformDestroy for more about this.
+    view_ = nullptr;
+  }
 }
 
 void View::TakeOverView(NativeView view) {
