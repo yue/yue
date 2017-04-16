@@ -14,7 +14,7 @@
 
 namespace nu {
 
-KeyboardCode WindowsKeyCodeForGdkKeyCode(int keyval) {
+KeyboardCode KeyboardCodeFromGdkKeyCode(int keyval) {
   switch (keyval) {
     case GDK_KEY_ISO_Left_Tab:
     case GDK_KEY_3270_BackTab:

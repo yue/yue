@@ -9,7 +9,7 @@
 
 namespace nu {
 
-KeyboardCode WindowsKeyCodeForGdkKeyCode(int keyval);
+KeyboardCode KeyboardCodeFromGdkKeyCode(int keyval);
 
 }  // namespace nu
 

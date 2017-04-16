@@ -14,16 +14,24 @@ namespace nu {
 
 namespace {
 
-gboolean OnMouseDown(GtkWidget* widget, GdkEvent* event, View* view) {
-  if (event->button.type != GDK_BUTTON_PRESS)
-    return false;
-  return view->on_mouse_down.Emit(view, MouseEvent(event, widget));
-}
-
-gboolean OnMouseUp(GtkWidget* widget, GdkEvent* event, View* view) {
-  if (event->button.type != GDK_BUTTON_RELEASE)
-    return false;
-  return view->on_mouse_up.Emit(view, MouseEvent(event, widget));
+gboolean OnMouseEvent(GtkWidget* widget, GdkEvent* event, View* view) {
+  switch (event->any.type) {
+    case GDK_BUTTON_PRESS:
+      return view->on_mouse_down.Emit(view, MouseEvent(event, widget));
+    case GDK_BUTTON_RELEASE:
+      return view->on_mouse_up.Emit(view, MouseEvent(event, widget));
+    case GDK_MOTION_NOTIFY:
+      view->on_mouse_move.Emit(view, MouseEvent(event, widget));
+      return true;
+    case GDK_ENTER_NOTIFY:
+      view->on_mouse_enter.Emit(view, MouseEvent(event, widget));
+      return true;
+    case GDK_LEAVE_NOTIFY:
+      view->on_mouse_leave.Emit(view, MouseEvent(event, widget));
+      return true;
+    default:
+      return false;
+  }
 }
 
 gboolean OnKeyDown(GtkWidget* widget, GdkEvent* event, View* view) {
@@ -56,8 +64,11 @@ void View::TakeOverView(NativeView view) {
                               GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK);
 
   // Install event hooks.
-  g_signal_connect(view, "button-press-event", G_CALLBACK(OnMouseDown), this);
-  g_signal_connect(view, "button-release-event", G_CALLBACK(OnMouseUp), this);
+  g_signal_connect(view, "button-press-event", G_CALLBACK(OnMouseEvent), this);
+  g_signal_connect(view, "button-release-event", G_CALLBACK(OnMouseEvent), this);  // NOLINT
+  g_signal_connect(view, "motion-notify-event", G_CALLBACK(OnMouseEvent), this);
+  g_signal_connect(view, "enter-notify-event", G_CALLBACK(OnMouseEvent), this);
+  g_signal_connect(view, "leave-notify-event", G_CALLBACK(OnMouseEvent), this);
   g_signal_connect(view, "key-press-event", G_CALLBACK(OnKeyDown), this);
   g_signal_connect(view, "key-release-event", G_CALLBACK(OnKeyUp), this);
 }
