@@ -100,6 +100,10 @@ Rect View::GetPixelBounds() const {
   return bounds;
 }
 
+void View::SchedulePaint() {
+  gtk_widget_queue_draw(view_);
+}
+
 void View::PlatformSetVisible(bool visible) {
   gtk_widget_set_visible(view_, visible);
 }

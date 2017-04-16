@@ -151,10 +151,10 @@ KeyboardCode WindowsKeyCodeForGdkKeyCode(int keyval) {
       return VKEY_Z;  // (5A) Z key case 'z': case 'Z': return 0x5A;
     case GDK_KEY_Meta_L:
     case GDK_KEY_Super_L:
-      return VKEY_LWIN; // (5B) Left Windows key (Microsoft Natural keyboard)
+      return VKEY_LWIN;  // (5B) Left Windows key (Microsoft Natural keyboard)
     case GDK_KEY_Meta_R:
     case GDK_KEY_Super_R:
-      return VKEY_RWIN; // (5C) Right Windows key (Natural keyboard)
+      return VKEY_RWIN;  // (5C) Right Windows key (Natural keyboard)
     case GDK_KEY_semicolon:
     case GDK_KEY_colon:
       return VKEY_OEM_1;  // case ';': case ':': return 0xBA;
@@ -208,7 +208,7 @@ KeyboardCode WindowsKeyCodeForGdkKeyCode(int keyval) {
     case GDK_KEY_quoteright:
     case GDK_KEY_quotedbl:
       return VKEY_OEM_7;  // case '\'': case '"': return 0xDE;
-		default:
+    default:
       return static_cast<KeyboardCode>(keyval);
   }
 }

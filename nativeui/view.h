@@ -45,6 +45,9 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   // Update layout.
   virtual void Layout();
 
+  // Mark the whole view as dirty.
+  void SchedulePaint();
+
   // Show/Hide the view.
   void SetVisible(bool visible);
   bool IsVisible() const;

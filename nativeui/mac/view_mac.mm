@@ -51,6 +51,10 @@ Rect View::GetPixelBounds() const {
   return ToNearestRect(GetBounds());
 }
 
+void View::SchedulePaint() {
+  [view_ setNeedsDisplay:YES];
+}
+
 void View::PlatformSetVisible(bool visible) {
   [view_ setHidden:!visible];
 }

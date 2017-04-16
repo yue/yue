@@ -183,6 +183,10 @@ Rect View::GetPixelBounds() const {
   return bounds;
 }
 
+void View::SchedulePaint() {
+  GetNative()->Invalidate();
+}
+
 void View::PlatformSetVisible(bool visible) {
   GetNative()->SetVisible(visible);
 }

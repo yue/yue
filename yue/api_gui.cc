@@ -583,18 +583,19 @@ struct Type<nu::View> {
   static constexpr const char* name = "yue.View";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
-           "setbackgroundcolor", &nu::View::SetBackgroundColor,
-           "setstyle", &SetStyle,
-           "printstyle", &nu::View::PrintStyle,
-           "layout", &nu::View::Layout,
            "setbounds", &nu::View::SetBounds,
            "getbounds", &nu::View::GetBounds,
+           "layout", &nu::View::Layout,
+           "schedulepaint", &nu::View::SchedulePaint,
            "setvisible", &nu::View::SetVisible,
            "isvisible", &nu::View::IsVisible,
            "focus", &nu::View::Focus,
            "hasfocus", &nu::View::HasFocus,
            "setfocusable", &nu::View::SetFocusable,
            "isfocusable", &nu::View::IsFocusable,
+           "setbackgroundcolor", &nu::View::SetBackgroundColor,
+           "setstyle", &SetStyle,
+           "printstyle", &nu::View::PrintStyle,
            "getparent", &nu::View::GetParent);
     RawSetProperty(state, index,
                    "onmousedown", &nu::View::on_mouse_down,
