@@ -90,7 +90,30 @@ void ViewImpl::Draw(PainterWin* painter, const Rect& dirty) {
   }
 }
 
+void ViewImpl::OnMouseMove(NativeEvent event) {
+  if (!delegate())
+    return;
+  event->w_param = 0;
+  delegate()->on_mouse_move.Emit(delegate(), MouseEvent(event, this));
+}
+
+void ViewImpl::OnMouseEnter(NativeEvent event) {
+  if (!delegate())
+    return;
+  event->w_param = 1;
+  delegate()->on_mouse_enter.Emit(delegate(), MouseEvent(event, this));
+}
+
+void ViewImpl::OnMouseLeave(NativeEvent event) {
+  if (!delegate())
+    return;
+  event->w_param = 2;
+  delegate()->on_mouse_leave.Emit(delegate(), MouseEvent(event, this));
+}
+
 bool ViewImpl::OnMouseClick(NativeEvent event) {
+  if (!delegate())
+    return false;
   MouseEvent client_event(event, this);
   if (client_event.type == EventType::MouseDown &&
       delegate()->on_mouse_down.Emit(delegate(), client_event))
@@ -102,6 +125,8 @@ bool ViewImpl::OnMouseClick(NativeEvent event) {
 }
 
 bool ViewImpl::OnKeyEvent(NativeEvent event) {
+  if (!delegate())
+    return false;
   KeyEvent client_event(event, this);
   if (client_event.type == EventType::KeyDown &&
       delegate()->on_key_down.Emit(delegate(), client_event))

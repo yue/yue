@@ -20,9 +20,9 @@ class ScrollbarThumb : public ViewImpl {
   int GetSize() const;
 
   // ViewImpl:
-  void OnMouseEnter() override;
-  void OnMouseMove(UINT flags, const Point& point) override;
-  void OnMouseLeave() override;
+  void OnMouseEnter(NativeEvent event) override;
+  void OnMouseMove(NativeEvent event) override;
+  void OnMouseLeave(NativeEvent event) override;
   bool OnMouseClick(NativeEvent event) override;
   void OnCaptureLost() override;
   void Draw(PainterWin* painter, const Rect& dirty) override;

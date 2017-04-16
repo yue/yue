@@ -121,23 +121,26 @@ void WindowImpl::OnSize(UINT param, const Size& size) {
   RedrawWindow(hwnd(), NULL, NULL, RDW_INVALIDATE | RDW_ALLCHILDREN);
 }
 
-void WindowImpl::OnMouseMove(UINT flags, const Point& point) {
+LRESULT WindowImpl::OnMouseMove(UINT message, WPARAM w_param, LPARAM l_param) {
+  Win32Message msg = {message, w_param, l_param};
   if (!mouse_in_window_) {
     mouse_in_window_ = true;
-    delegate_->GetContentView()->GetNative()->OnMouseEnter();
+    delegate_->GetContentView()->GetNative()->OnMouseEnter(&msg);
     TrackMouse(true);
   }
   if (capture_view_) {
-    capture_view_->OnMouseMove(flags, point);
-    return;
+    capture_view_->OnMouseMove(&msg);
   }
-  delegate_->GetContentView()->GetNative()->OnMouseMove(flags, point);
+  delegate_->GetContentView()->GetNative()->OnMouseMove(&msg);
+  return 0;
 }
 
-void WindowImpl::OnMouseLeave() {
+LRESULT WindowImpl::OnMouseLeave(UINT message, WPARAM w_param, LPARAM l_param) {
   TrackMouse(false);
   mouse_in_window_ = false;
-  delegate_->GetContentView()->GetNative()->OnMouseLeave();
+  Win32Message msg = {message, w_param, l_param};
+  delegate_->GetContentView()->GetNative()->OnMouseLeave(&msg);
+  return 0;
 }
 
 BOOL WindowImpl::OnMouseWheel(bool vertical, UINT flags, int delta,

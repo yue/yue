@@ -25,8 +25,8 @@ class ScrollbarButton : public ViewImpl {
   ~ScrollbarButton() override;
 
   // ViewImpl:
-  void OnMouseEnter() override;
-  void OnMouseLeave() override;
+  void OnMouseEnter(NativeEvent event) override;
+  void OnMouseLeave(NativeEvent event) override;
   bool OnMouseClick(NativeEvent event) override;
   void Draw(PainterWin* painter, const Rect& dirty) override;
 

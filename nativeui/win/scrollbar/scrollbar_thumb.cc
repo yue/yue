@@ -22,28 +22,32 @@ int ScrollbarThumb::GetSize() const {
   return vertical_ ? size_allocation().height() : size_allocation().width();
 }
 
-void ScrollbarThumb::OnMouseEnter() {
+void ScrollbarThumb::OnMouseEnter(NativeEvent event) {
   is_hovering_ = true;
   if (!is_capturing_) {
     set_state(ControlState::Hovered);
     Invalidate();
   }
+  ViewImpl::OnMouseEnter(event);
 }
 
-void ScrollbarThumb::OnMouseMove(UINT flags, const Point& point) {
+void ScrollbarThumb::OnMouseMove(NativeEvent event) {
   if (is_capturing_) {
+    Point point(event->l_param);
     int offset = vertical_ ? (point.y() - pressed_point_.y())
                            : (point.x() - pressed_point_.x());
     scrollbar_->SetValue(last_value_ + offset);
   }
+  ViewImpl::OnMouseMove(event);
 }
 
-void ScrollbarThumb::OnMouseLeave() {
+void ScrollbarThumb::OnMouseLeave(NativeEvent event) {
   is_hovering_ = false;
   if (!is_capturing_) {
     set_state(ControlState::Normal);
     Invalidate();
   }
+  ViewImpl::OnMouseLeave(event);
 }
 
 bool ScrollbarThumb::OnMouseClick(NativeEvent event) {

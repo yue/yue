@@ -34,8 +34,8 @@ class ContainerImpl : public ViewImpl {
   void BecomeContentView(WindowImpl* parent) override;
   void SetVisible(bool visible) override;
   void Draw(PainterWin* painter, const Rect& dirty) override;
-  void OnMouseMove(UINT flags, const Point& point) override;
-  void OnMouseLeave() override;
+  void OnMouseMove(NativeEvent event) override;
+  void OnMouseLeave(NativeEvent event) override;
   bool OnMouseWheel(bool vertical, UINT flags, int delta,
                     const Point& point) override;
   bool OnMouseClick(NativeEvent event) override;

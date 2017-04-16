@@ -163,20 +163,22 @@ class ButtonImpl : public ViewImpl {
     text_size_ = MeasureText(dc, title_, State::GetCurrent()->GetDefaultFont());
   }
 
-  void OnMouseEnter() override {
+  void OnMouseEnter(NativeEvent event) override {
     is_hovering_ = true;
     if (!is_capturing_) {
       set_state(ControlState::Hovered);
       Invalidate();
     }
+    ViewImpl::OnMouseEnter(event);
   }
 
-  void OnMouseLeave() override {
+  void OnMouseLeave(NativeEvent event) override {
     is_hovering_ = false;
     if (!is_capturing_) {
       set_state(ControlState::Normal);
       Invalidate();
     }
+    ViewImpl::OnMouseLeave(event);
   }
 
   bool OnMouseClick(NativeEvent event) override {

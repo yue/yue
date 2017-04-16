@@ -19,15 +19,17 @@ ScrollbarButton::ScrollbarButton(Type type, Scrollbar* scrollbar)
 ScrollbarButton::~ScrollbarButton() {
 }
 
-void ScrollbarButton::OnMouseEnter() {
+void ScrollbarButton::OnMouseEnter(NativeEvent event) {
   set_state(ControlState::Hovered);
   Invalidate();
+  ViewImpl::OnMouseEnter(event);
 }
 
-void ScrollbarButton::OnMouseLeave() {
+void ScrollbarButton::OnMouseLeave(NativeEvent event) {
   set_state(ControlState::Normal);
   repeater_.Stop();
   Invalidate();
+  ViewImpl::OnMouseLeave(event);
 }
 
 bool ScrollbarButton::OnMouseClick(NativeEvent event) {

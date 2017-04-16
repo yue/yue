@@ -118,23 +118,23 @@ bool Scrollbar::HasChild(ViewImpl* child) {
   return child == &near_button_ || child == &far_button_ || child == &thumb_;
 }
 
-void Scrollbar::OnMouseEnter() {
+void Scrollbar::OnMouseEnter(NativeEvent event) {
   set_state(ControlState::Hovered);
   near_button_.params()->is_hovering = true;
   far_button_.params()->is_hovering = true;
   thumb_.params()->is_hovering = true;
-  ContainerImpl::OnMouseEnter();
+  ContainerImpl::OnMouseEnter(event);
   Invalidate();
 }
 
-void Scrollbar::OnMouseLeave() {
+void Scrollbar::OnMouseLeave(NativeEvent event) {
   repeater_.Stop();
 
   set_state(ControlState::Normal);
   near_button_.params()->is_hovering = false;
   far_button_.params()->is_hovering = false;
   thumb_.params()->is_hovering = false;
-  ContainerImpl::OnMouseLeave();
+  ContainerImpl::OnMouseLeave(event);
   Invalidate();
 }
 

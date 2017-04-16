@@ -46,29 +46,33 @@ void ContainerImpl::Draw(PainterWin* painter, const Rect& dirty) {
   });
 }
 
-void ContainerImpl::OnMouseMove(UINT flags, const Point& point) {
+void ContainerImpl::OnMouseMove(NativeEvent event) {
   // Find the view that has the mouse.
+  Point point(event->l_param);
   ViewImpl* hover_view = FindChildFromPoint(point);
 
   // Emit mouse enter/leave events
   if (hover_view_ != hover_view) {
     if (hover_view_ && adapter_->HasChild(hover_view_))
-      hover_view_->OnMouseLeave();
+      hover_view_->OnMouseLeave(event);
     hover_view_ = hover_view;
     if (hover_view_)
-      hover_view_->OnMouseEnter();
+      hover_view_->OnMouseEnter(event);
   }
   // Emit mouse move events.
   if (hover_view_)
-    hover_view_->OnMouseMove(flags, point);
+    hover_view_->OnMouseMove(event);
+
+  ViewImpl::OnMouseMove(event);
 }
 
-void ContainerImpl::OnMouseLeave() {
+void ContainerImpl::OnMouseLeave(NativeEvent event) {
   if (hover_view_) {
     if (adapter_->HasChild(hover_view_))
-      hover_view_->OnMouseLeave();
+      hover_view_->OnMouseLeave(event);
     hover_view_ = nullptr;
   }
+  ViewImpl::OnMouseLeave(event);
 }
 
 bool ContainerImpl::OnMouseWheel(bool vertical, UINT flags, int delta,

@@ -13,8 +13,8 @@ namespace nu {
 
 namespace {
 
-EventType EventTypeFromMessage(UINT message) {
-  switch (message) {
+EventType EventTypeFromMessage(Win32Message* msg) {
+  switch (msg->message) {
     case WM_LBUTTONDBLCLK:
     case WM_LBUTTONDOWN:
     case WM_RBUTTONDBLCLK:
@@ -26,6 +26,17 @@ EventType EventTypeFromMessage(UINT message) {
     case WM_RBUTTONUP:
     case WM_MBUTTONUP:
       return EventType::MouseUp;
+    case WM_MOUSEMOVE:
+      if (msg->w_param == 0)
+        return EventType::MouseMove;
+      if (msg->w_param == 1)
+        return EventType::MouseEnter;
+      if (msg->w_param == 2)
+        return EventType::MouseLeave;
+      NOTREACHED();
+      return EventType::Unknown;
+    case WM_MOUSELEAVE:
+      return EventType::MouseLeave;
     case WM_KEYDOWN:
     case WM_SYSKEYDOWN:
       return EventType::KeyDown;
@@ -66,7 +77,6 @@ int GetButtonNumber(UINT message) {
     case WM_MBUTTONUP:
       return 3;
     default:
-      NOTREACHED();
       return 0;
   }
 }
@@ -74,7 +84,7 @@ int GetButtonNumber(UINT message) {
 }  // namespace
 
 Event::Event(NativeEvent event, NativeView view)
-    : type(EventTypeFromMessage(event->message)),
+    : type(EventTypeFromMessage(event)),
       modifiers(GetCurrentModifiers()),
       timestamp(::GetTickCount()),
       native_event(event) {

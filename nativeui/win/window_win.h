@@ -36,8 +36,8 @@ class WindowImpl : public Win32Window {
     CR_MSG_WM_CTLCOLOREDIT(OnCtlColorStatic)
     CR_MSG_WM_CTLCOLORSTATIC(OnCtlColorStatic)
     CR_MSG_WM_SIZE(OnSize)
-    CR_MSG_WM_MOUSEMOVE(OnMouseMove)
-    CR_MSG_WM_MOUSELEAVE(OnMouseLeave)
+    CR_MESSAGE_HANDLER_EX(WM_MOUSEMOVE, OnMouseMove)
+    CR_MESSAGE_HANDLER_EX(WM_MOUSELEAVE, OnMouseLeave)
     CR_MSG_WM_MOUSEWHEEL(OnMouseWheel)
     CR_MESSAGE_RANGE_HANDLER_EX(WM_LBUTTONDOWN, WM_MBUTTONDBLCLK, OnMouseClick)
     CR_MESSAGE_RANGE_HANDLER_EX(WM_KEYDOWN, WM_KEYUP, OnKeyEvent)
@@ -54,8 +54,8 @@ class WindowImpl : public Win32Window {
   void OnCommand(UINT code, int command, HWND window);
   HBRUSH OnCtlColorStatic(HDC dc, HWND window);
   void OnSize(UINT param, const Size& size);
-  void OnMouseMove(UINT flags, const Point& point);
-  void OnMouseLeave();
+  LRESULT OnMouseMove(UINT message, WPARAM w_param, LPARAM l_param);
+  LRESULT OnMouseLeave(UINT message, WPARAM w_param, LPARAM l_param);
   BOOL OnMouseWheel(bool vertical, UINT flags, int delta, const Point& point);
   LRESULT OnMouseClick(UINT message, WPARAM w_param, LPARAM l_param);
   LRESULT OnKeyEvent(UINT message, WPARAM w_param, LPARAM l_param);
