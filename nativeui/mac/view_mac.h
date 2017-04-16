@@ -5,16 +5,23 @@
 #ifndef NATIVEUI_MAC_VIEW_MAC_H_
 #define NATIVEUI_MAC_VIEW_MAC_H_
 
-#include "nativeui/view.h"
-
 #import <Cocoa/Cocoa.h>
 
+#include "nativeui/gfx/color.h"
+
+namespace nu {
+class View;
+struct NUPrivate;
+}
+
 @protocol NUView
-- (nu::View*)shell;
+- (nu::NUPrivate*)nuPrivate;
 - (void)setNUBackgroundColor:(nu::Color)color;
 @end
 
 @interface NSView (NUViewMethods) <NUView>
+- (nu::View*)shell;
+- (void)setShell:(nu::View*)shell;
 @end
 
 #endif  // NATIVEUI_MAC_VIEW_MAC_H_

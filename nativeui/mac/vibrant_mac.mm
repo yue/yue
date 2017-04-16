@@ -11,26 +11,16 @@
 
 @interface NUVibrant : NSVisualEffectView<NUView> {
  @private
-  nu::Vibrant* shell_;
+  nu::NUPrivate private_;
 }
-- (id)initWithShell:(nu::Vibrant*)shell;
-- (nu::View*)shell;
+- (nu::NUPrivate*)nuPrivate;
 - (void)setNUBackgroundColor:(nu::Color)color;
 @end
 
 @implementation NUVibrant
 
-- (id)initWithShell:(nu::Vibrant*)shell {
-  self = [super init];
-  if (!self)
-    return nil;
-
-  shell_ = shell;
-  return self;
-}
-
-- (nu::View*)shell {
-  return shell_;
+- (nu::NUPrivate*)nuPrivate {
+  return &private_;
 }
 
 - (void)setNUBackgroundColor:(nu::Color)color {
@@ -71,7 +61,7 @@ const char Vibrant::kClassName[] = "Vibrant";
 
 Vibrant::Vibrant() : Container("an_empty_constructor") {
   InitializeVibrantClass();
-  TakeOverView([[NUVibrant alloc] initWithShell:this]);
+  TakeOverView([[NUVibrant alloc] init]);
 }
 
 Vibrant::~Vibrant() {

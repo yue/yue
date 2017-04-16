@@ -8,17 +8,17 @@
 #include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/mac/painter_mac.h"
 #include "nativeui/gfx/mac/text_mac.h"
+#include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/view_mac.h"
 #include "nativeui/state.h"
 
 @interface NULabel : NSView<NUView> {
  @private
-  nu::Label* shell_;
+  nu::NUPrivate private_;
   std::string text_;
   nu::Color background_color_;
 }
-- (id)initWithShell:(nu::Label*)shell;
-- (nu::View*)shell;
+- (nu::NUPrivate*)nuPrivate;
 - (void)setNUBackgroundColor:(nu::Color)color;
 - (void)setText:(const std::string&)text;
 - (std::string)text;
@@ -26,17 +26,8 @@
 
 @implementation NULabel
 
-- (id)initWithShell:(nu::Label*)shell {
-  self = [super init];
-  if (!self)
-    return nil;
-
-  shell_ = shell;
-  return self;
-}
-
-- (nu::View*)shell {
-  return shell_;
+- (nu::NUPrivate*)nuPrivate {
+  return &private_;
 }
 
 - (void)setNUBackgroundColor:(nu::Color)color {
@@ -77,7 +68,7 @@ SizeF GetPreferredSizeForText(const std::string& text) {
 }  // namespace
 
 Label::Label(const std::string& text) {
-  TakeOverView([[NULabel alloc] initWithShell:this]);
+  TakeOverView([[NULabel alloc] init]);
   SetText(text);
 }
 

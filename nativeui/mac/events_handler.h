@@ -16,6 +16,7 @@ bool IsNUView(id view);
 bool EventHandlerInstalled(Class cl);
 
 // Dynamically add event methods to a NSView.
+void AddNUMethodsToClass(Class cl);
 void AddMouseEventHandlerToClass(Class cl);
 void AddKeyEventHandlerToClass(Class cl);
 void AddViewMethodsToClass(Class cl);

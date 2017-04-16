@@ -5,30 +5,21 @@
 #include "nativeui/entry.h"
 
 #include "base/strings/sys_string_conversions.h"
+#include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/view_mac.h"
 
 @interface NUEntry : NSTextField<NUView> {
  @private
-  nu::Entry* shell_;
+  nu::NUPrivate private_;
 }
-- (id)initWithShell:(nu::Entry*)shell;
-- (nu::View*)shell;
+- (nu::NUPrivate*)nuPrivate;
 - (void)setNUBackgroundColor:(nu::Color)color;
 @end
 
 @implementation NUEntry
 
-- (id)initWithShell:(nu::Entry*)shell {
-  self = [super init];
-  if (!self)
-    return nil;
-
-  shell_ = shell;
-  return self;
-}
-
-- (nu::View*)shell {
-  return shell_;
+- (nu::NUPrivate*)nuPrivate {
+  return &private_;
 }
 
 - (void)setNUBackgroundColor:(nu::Color)color {
@@ -66,7 +57,7 @@
 namespace nu {
 
 Entry::Entry() {
-  NSTextField* entry = [[NUEntry alloc] initWithShell:this];
+  NSTextField* entry = [[NUEntry alloc] init];
   [entry setBezelStyle:NSTextFieldSquareBezel];
   [entry setBezeled:YES];
   [entry setTarget:[[NUEntryDelegate alloc] initWithShell:this]];

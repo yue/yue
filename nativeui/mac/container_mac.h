@@ -6,14 +6,14 @@
 #define NATIVEUI_MAC_CONTAINER_MAC_H_
 
 #include "nativeui/container.h"
+#include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/view_mac.h"
 
 @interface NUContainer : NSView<NUView> {
  @private
-  nu::Container* shell_;
+  nu::NUPrivate private_;
 }
-- (id)initWithShell:(nu::Container*)shell;
-- (nu::View*)shell;
+- (nu::NUPrivate*)nuPrivate;
 - (void)setNUBackgroundColor:(nu::Color)color;
 @end
 

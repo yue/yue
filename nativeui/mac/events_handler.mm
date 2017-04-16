@@ -8,7 +8,9 @@
 
 #include "base/logging.h"
 #include "nativeui/events/event.h"
+#include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/view_mac.h"
+#include "nativeui/view.h"
 
 namespace nu {
 
@@ -16,6 +18,14 @@ namespace {
 
 bool NUInjected(NSView* self, SEL _cmd) {
   return true;
+}
+
+View* GetShell(NSView* self, SEL _cmd) {
+  return [self nuPrivate]->shell;
+}
+
+void SetShell(NSView* self, SEL _cmd, View* shell) {
+  [self nuPrivate]->shell = shell;
 }
 
 void OnMouseEvent(NSView* self, SEL _cmd, NSEvent* event) {
@@ -71,15 +81,20 @@ BOOL AcceptsFirstResponder(NSView* self, SEL _cmd) {
 }  // namespace
 
 bool IsNUView(id view) {
-  return [view respondsToSelector:@selector(shell)];
+  return [view respondsToSelector:@selector(nuPrivate)];
 }
 
 bool EventHandlerInstalled(Class cl) {
-  return class_getClassMethod(cl, @selector(IsNUView)) != nullptr;
+  return class_getClassMethod(cl, @selector(nuInjected)) != nullptr;
+}
+
+void AddNUMethodsToClass(Class cl) {
+  class_addMethod(cl, @selector(nuInjected), (IMP)NUInjected, "B@:");
+  class_addMethod(cl, @selector(shell), (IMP)GetShell, "^v@:");
+  class_addMethod(cl, @selector(setShell:), (IMP)SetShell, "v@:^v");
 }
 
 void AddMouseEventHandlerToClass(Class cl) {
-  class_addMethod(cl, @selector(nuInjected), (IMP)NUInjected, "B@:");
   class_addMethod(cl, @selector(mouseDown:), (IMP)OnMouseEvent, "v@:@");
   class_addMethod(cl, @selector(rightMouseDown:), (IMP)OnMouseEvent, "v@:@");
   class_addMethod(cl, @selector(otherMouseDown:), (IMP)OnMouseEvent, "v@:@");

@@ -9,17 +9,8 @@
 
 @implementation NUContainer
 
-- (id)initWithShell:(nu::Container*)shell {
-  self = [super init];
-  if (!self)
-    return nil;
-
-  shell_ = shell;
-  return self;
-}
-
-- (nu::View*)shell {
-  return shell_;
+- (nu::NUPrivate*)nuPrivate {
+  return &private_;
 }
 
 - (void)setNUBackgroundColor:(nu::Color)color {
@@ -48,7 +39,7 @@
   nu::PainterMac painter;
   painter.SetColor(shell->GetBackgroundColor());
   painter.FillRect(dirty);
-  shell->on_draw.Emit(shell_, &painter, dirty);
+  shell->on_draw.Emit(shell, &painter, dirty);
 }
 
 @end
@@ -56,7 +47,7 @@
 namespace nu {
 
 void Container::PlatformInit() {
-  TakeOverView([[NUContainer alloc] initWithShell:this]);
+  TakeOverView([[NUContainer alloc] init]);
 }
 
 void Container::PlatformDestroy() {

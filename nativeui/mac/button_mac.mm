@@ -6,6 +6,7 @@
 
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/gfx/geometry/insets_f.h"
+#include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/view_mac.h"
 
 namespace {
@@ -30,26 +31,16 @@ nu::InsetsF GetButtonInsets(NSButton* button) {
 
 @interface NUButton : NSButton<NUView> {
  @private
-  nu::Button* shell_;
+  nu::NUPrivate private_;
 }
-- (id)initWithShell:(nu::Button*)shell;
-- (nu::View*)shell;
+- (nu::NUPrivate*)nuPrivate;
 - (void)setNUBackgroundColor:(nu::Color)color;
 @end
 
 @implementation NUButton
 
-- (id)initWithShell:(nu::Button*)shell {
-  self = [super init];
-  if (!self)
-    return nil;
-
-  shell_ = shell;
-  return self;
-}
-
-- (nu::View*)shell {
-  return shell_;
+- (nu::NUPrivate*)nuPrivate {
+  return &private_;
 }
 
 - (void)setNUBackgroundColor:(nu::Color)color {
@@ -101,7 +92,7 @@ nu::InsetsF GetButtonInsets(NSButton* button) {
 namespace nu {
 
 Button::Button(const std::string& title, Type type) {
-  NSButton* button = [[NUButton alloc] initWithShell:this];
+  NSButton* button = [[NUButton alloc] init];
   if (type == Type::Normal)
     [button setBezelStyle:NSRoundedBezelStyle];
   else if (type == Type::Checkbox)

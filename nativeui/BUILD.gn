@@ -163,6 +163,7 @@ component("nativeui") {
     "mac/events_handler.mm",
     "mac/nu_application_delegate.h",
     "mac/nu_application_delegate.mm",
+    "mac/nu_private.h",
     "mac/app_mac.mm",
     "mac/lifetime_mac.mm",
     "mac/accelerator_manager_mac.mm",
