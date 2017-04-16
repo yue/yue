@@ -64,6 +64,10 @@ void OnKeyEvent(NSView* self, SEL _cmd, NSEvent* event) {
   }
 }
 
+BOOL AcceptsFirstResponder(NSView* self, SEL _cmd) {
+  return YES;
+}
+
 }  // namespace
 
 bool IsNUView(id view) {
@@ -91,6 +95,11 @@ void AddKeyEventHandlerToClass(Class cl) {
   class_addMethod(cl, @selector(keyDown:), (IMP)OnKeyEvent, "v@:@");
   class_addMethod(cl, @selector(keyUp:), (IMP)OnKeyEvent, "v@:@");
   class_addMethod(cl, @selector(flagsChanged:), (IMP)OnKeyEvent, "v@:@");
+}
+
+void AddViewMethodsToClass(Class cl) {
+  class_addMethod(cl, @selector(acceptsFirstResponder),
+                  (IMP)AcceptsFirstResponder, "B@:");
 }
 
 }  // namespace nu
