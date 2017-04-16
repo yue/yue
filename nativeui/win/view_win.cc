@@ -91,21 +91,21 @@ void ViewImpl::Draw(PainterWin* painter, const Rect& dirty) {
 }
 
 void ViewImpl::OnMouseMove(NativeEvent event) {
-  if (!delegate())
+  if (!delegate() || delegate()->on_mouse_move.IsEmpty())
     return;
   event->w_param = 0;
   delegate()->on_mouse_move.Emit(delegate(), MouseEvent(event, this));
 }
 
 void ViewImpl::OnMouseEnter(NativeEvent event) {
-  if (!delegate())
+  if (!delegate() || delegate()->on_mouse_enter.IsEmpty())
     return;
   event->w_param = 1;
   delegate()->on_mouse_enter.Emit(delegate(), MouseEvent(event, this));
 }
 
 void ViewImpl::OnMouseLeave(NativeEvent event) {
-  if (!delegate())
+  if (!delegate() || delegate()->on_mouse_leave.IsEmpty())
     return;
   event->w_param = 2;
   delegate()->on_mouse_leave.Emit(delegate(), MouseEvent(event, this));
