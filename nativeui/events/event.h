@@ -16,6 +16,9 @@ enum class EventType {
   Unknown,  // should never be used
   MouseDown,
   MouseUp,
+  MouseMove,
+  MouseEnter,
+  MouseLeave,
   KeyDown,
   KeyUp,
 };

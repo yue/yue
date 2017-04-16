@@ -340,6 +340,12 @@ struct Type<nu::EventType> {
         lua::Push(state, "mousedown");
       case nu::EventType::MouseUp:
         lua::Push(state, "mouseup");
+      case nu::EventType::MouseMove:
+        lua::Push(state, "mousemove");
+      case nu::EventType::MouseEnter:
+        lua::Push(state, "mouseenter");
+      case nu::EventType::MouseLeave:
+        lua::Push(state, "mouseleave");
       case nu::EventType::KeyDown:
         lua::Push(state, "keydown");
       case nu::EventType::KeyUp:
@@ -600,6 +606,9 @@ struct Type<nu::View> {
     RawSetProperty(state, index,
                    "onmousedown", &nu::View::on_mouse_down,
                    "onmouseup", &nu::View::on_mouse_up,
+                   "onmousemove", &nu::View::on_mouse_move,
+                   "onmouseenter", &nu::View::on_mouse_enter,
+                   "onmouseleave", &nu::View::on_mouse_leave,
                    "onkeydown", &nu::View::on_key_down,
                    "onkeyup", &nu::View::on_key_up);
   }

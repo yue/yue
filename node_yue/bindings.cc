@@ -376,6 +376,12 @@ struct Type<nu::EventType> {
         return vb::ToV8(context, "mouseDown");
       case nu::EventType::MouseUp:
         return vb::ToV8(context, "mouseUp");
+      case nu::EventType::MouseMove:
+        return vb::ToV8(context, "mouseMove");
+      case nu::EventType::MouseEnter:
+        return vb::ToV8(context, "mouseEnter");
+      case nu::EventType::MouseLeave:
+        return vb::ToV8(context, "mouseLeave");
       case nu::EventType::KeyDown:
         return vb::ToV8(context, "keyDown");
       case nu::EventType::KeyUp:
@@ -670,6 +676,9 @@ struct Type<nu::View> {
     SetProperty(context, templ,
                 "onMouseDown", &nu::View::on_mouse_down,
                 "onMouseUp", &nu::View::on_mouse_up,
+                "onMouseMove", &nu::View::on_mouse_move,
+                "onMouseEnter", &nu::View::on_mouse_enter,
+                "onMouseLeave", &nu::View::on_mouse_leave,
                 "onKeyDown", &nu::View::on_key_down,
                 "onKeyUp", &nu::View::on_key_up);
   }

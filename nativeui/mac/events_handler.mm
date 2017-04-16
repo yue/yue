@@ -7,6 +7,7 @@
 #include <objc/objc-runtime.h>
 
 #include "base/logging.h"
+#include "base/mac/mac_util.h"
 #include "nativeui/events/event.h"
 #include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/view_mac.h"
@@ -24,17 +25,6 @@ View* GetShell(NSView* self, SEL _cmd) {
   return [self nuPrivate]->shell;
 }
 
-void SetShell(NSView* self, SEL _cmd, View* shell) {
-  NUPrivate* priv = [self nuPrivate];
-  priv->shell = shell;
-
-  // Set the focusable property to the parent class's default one.
-  SEL cmd = @selector(acceptsFirstResponder);
-  auto super_impl = reinterpret_cast<BOOL (*)(NSView*, SEL)>(
-      [[self superclass] instanceMethodForSelector:cmd]);
-  priv->focusable = super_impl(self, cmd);
-}
-
 void OnMouseEvent(NSView* self, SEL _cmd, NSEvent* event) {
   DCHECK([self respondsToSelector:@selector(shell)])
       << "Handler called for view other than NUView";
@@ -44,10 +34,28 @@ void OnMouseEvent(NSView* self, SEL _cmd, NSEvent* event) {
   // Emit the event to View.
   bool prevent_default = false;
   MouseEvent mouse_event(event, self);
-  if (mouse_event.type == EventType::MouseDown)
-    prevent_default = view->on_mouse_down.Emit(view, mouse_event);
-  else if (mouse_event.type == EventType::MouseUp)
-    prevent_default = view->on_mouse_up.Emit(view, mouse_event);
+  switch (mouse_event.type) {
+    case EventType::MouseDown:
+      prevent_default = view->on_mouse_down.Emit(view, mouse_event);
+      break;
+    case EventType::MouseUp:
+      prevent_default = view->on_mouse_up.Emit(view, mouse_event);
+      break;
+    case EventType::MouseMove:
+      view->on_mouse_move.Emit(view, mouse_event);
+      prevent_default = true;
+      break;
+    case EventType::MouseEnter:
+      view->on_mouse_enter.Emit(view, mouse_event);
+      prevent_default = true;
+      break;
+    case EventType::MouseLeave:
+      view->on_mouse_leave.Emit(view, mouse_event);
+      prevent_default = true;
+      break;
+    default:
+      NOTREACHED();
+  }
 
   // Transfer the event to super class.
   if (!prevent_default) {
@@ -89,6 +97,37 @@ void SetAcceptsFirstResponder(NSView* self, SEL _cmd, BOOL yes) {
   [self nuPrivate]->focusable = yes;
 }
 
+void EnableTracking(NSView* self, SEL _cmd) {
+  NUPrivate* priv = [self nuPrivate];
+  NSTrackingAreaOptions trackingOptions = NSTrackingMouseEnteredAndExited |
+                                          NSTrackingMouseMoved |
+                                          NSTrackingActiveAlways |
+                                          NSTrackingInVisibleRect;
+  priv->tracking_area.reset([[NSTrackingArea alloc] initWithRect:NSZeroRect
+                                                         options:trackingOptions
+                                                           owner:self
+                                                        userInfo:nil]);
+  [self addTrackingArea:priv->tracking_area.get()];
+}
+
+void DisableTracking(NSView* self, SEL _cmd) {
+  NUPrivate* priv = [self nuPrivate];
+  if (priv->tracking_area) {
+    [self removeTrackingArea:priv->tracking_area.get()];
+    priv->tracking_area.reset();
+  }
+}
+
+void UpdateTrackingAreas(NSView* self, SEL _cmd) {
+  // [super updateTrackingAreas]
+  auto super_impl = reinterpret_cast<void (*)(NSView*, SEL)>(
+      [[self superclass] instanceMethodForSelector:_cmd]);
+  super_impl(self, _cmd);
+
+  [self disableTracking];
+  [self enableTracking];
+}
+
 }  // namespace
 
 bool IsNUView(id view) {
@@ -102,7 +141,6 @@ bool EventHandlerInstalled(Class cl) {
 void AddNUMethodsToClass(Class cl) {
   class_addMethod(cl, @selector(nuInjected), (IMP)NUInjected, "B@:");
   class_addMethod(cl, @selector(shell), (IMP)GetShell, "^v@:");
-  class_addMethod(cl, @selector(setShell:), (IMP)SetShell, "v@:^v");
 }
 
 void AddMouseEventHandlerToClass(Class cl) {
@@ -128,6 +166,17 @@ void AddViewMethodsToClass(Class cl) {
                   (IMP)AcceptsFirstResponder, "B@:");
   class_addMethod(cl, @selector(setAcceptsFirstResponder:),
                   (IMP)SetAcceptsFirstResponder, "v@:B");
+  class_addMethod(cl, @selector(enableTracking), (IMP)EnableTracking, "v@:");
+  class_addMethod(cl, @selector(disableTracking), (IMP)DisableTracking, "v@:");
+
+  // NSTrackingInVisibleRect doesn't work correctly with Lion's window resizing,
+  // http://crbug.com/176725 / http://openradar.appspot.com/radar?id=2773401 .
+  // Work around it by reinstalling the tracking area after window resize.
+  // This AppKit bug is fixed on Yosemite, so we only apply this workaround on
+  // 10.9.
+  if (base::mac::IsOS10_9())
+    class_addMethod(cl, @selector(updateTrackingAreas),
+                    (IMP)UpdateTrackingAreas, "v@:");
 }
 
 }  // namespace nu

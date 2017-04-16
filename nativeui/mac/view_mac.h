@@ -21,8 +21,9 @@ struct NUPrivate;
 
 @interface NSView (NUViewMethods) <NUView>
 - (nu::View*)shell;
-- (void)setShell:(nu::View*)shell;
 - (void)setAcceptsFirstResponder:(BOOL)yes;
+- (void)enableTracking;
+- (void)disableTracking;
 @end
 
 #endif  // NATIVEUI_MAC_VIEW_MAC_H_

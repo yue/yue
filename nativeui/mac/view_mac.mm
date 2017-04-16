@@ -9,6 +9,7 @@
 #include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/gfx/mac/painter_mac.h"
 #include "nativeui/mac/events_handler.h"
+#include "nativeui/mac/nu_private.h"
 
 namespace nu {
 
@@ -19,17 +20,30 @@ void View::PlatformDestroy() {
 void View::TakeOverView(NativeView view) {
   view_ = view;
 
+  if (!IsNUView(view))
+    return;
+
   // Install events handle for the view's class.
   Class cl = [view class];
-  if (IsNUView(view)) {
-    if (!EventHandlerInstalled(cl)) {
-      AddNUMethodsToClass(cl);
-      AddMouseEventHandlerToClass(cl);
-      AddKeyEventHandlerToClass(cl);
-      AddViewMethodsToClass(cl);
-    }
-    [view setShell:this];
+  if (!EventHandlerInstalled(cl)) {
+    AddNUMethodsToClass(cl);
+    AddMouseEventHandlerToClass(cl);
+    AddKeyEventHandlerToClass(cl);
+    AddViewMethodsToClass(cl);
   }
+
+  // Initialize private bits of the view.
+  NUPrivate* priv = [view nuPrivate];
+  priv->shell = this;
+
+  // Set the focusable property to the parent class's default one.
+  SEL cmd = @selector(acceptsFirstResponder);
+  auto super_impl = reinterpret_cast<BOOL (*)(NSView*, SEL)>(
+      [[view superclass] instanceMethodForSelector:cmd]);
+  priv->focusable = super_impl(view, cmd);
+
+  // Install event tracking area.
+  [view enableTracking];
 }
 
 void View::SetBounds(const RectF& bounds) {
