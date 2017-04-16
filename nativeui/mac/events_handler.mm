@@ -25,7 +25,14 @@ View* GetShell(NSView* self, SEL _cmd) {
 }
 
 void SetShell(NSView* self, SEL _cmd, View* shell) {
-  [self nuPrivate]->shell = shell;
+  NUPrivate* priv = [self nuPrivate];
+  priv->shell = shell;
+
+  // Set the focusable property to the parent class's default one.
+  SEL cmd = @selector(acceptsFirstResponder);
+  auto super_impl = reinterpret_cast<BOOL (*)(NSView*, SEL)>(
+      [[self superclass] instanceMethodForSelector:cmd]);
+  priv->focusable = super_impl(self, cmd);
 }
 
 void OnMouseEvent(NSView* self, SEL _cmd, NSEvent* event) {
@@ -78,7 +85,7 @@ BOOL AcceptsFirstResponder(NSView* self, SEL _cmd) {
   return [self nuPrivate]->focusable;
 }
 
-void SetAcceptsFirstResponder(NSView* self, SEL _cmd, bool yes) {
+void SetAcceptsFirstResponder(NSView* self, SEL _cmd, BOOL yes) {
   [self nuPrivate]->focusable = yes;
 }
 
@@ -119,7 +126,7 @@ void AddKeyEventHandlerToClass(Class cl) {
 void AddViewMethodsToClass(Class cl) {
   class_addMethod(cl, @selector(acceptsFirstResponder),
                   (IMP)AcceptsFirstResponder, "B@:");
-  class_addMethod(cl, @selector(setAcceptsFirstResponder),
+  class_addMethod(cl, @selector(setAcceptsFirstResponder:),
                   (IMP)SetAcceptsFirstResponder, "v@:B");
 }
 
