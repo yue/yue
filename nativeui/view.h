@@ -38,7 +38,7 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   void SetBounds(const RectF& bounds);
   RectF GetBounds() const;
 
-  // The real pixel bounds that depends on the scale factor.
+  // Internal: The real pixel bounds that depends on the scale factor.
   void SetPixelBounds(const Rect& bounds);
   Rect GetPixelBounds() const;
 
@@ -51,6 +51,11 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
 
   // Move the keyboard focus to the view.
   void Focus();
+  bool HasFocus() const;
+
+  // Whether the view can be focused.
+  void SetFocusable(bool focusable);
+  bool IsFocusable() const;
 
   // Set backgroundcolor.
   void SetBackgroundColor(Color color);

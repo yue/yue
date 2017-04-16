@@ -24,10 +24,7 @@ class EntryImpl : public SubwinView {
                    L"edit",
                    ES_AUTOHSCROLL | WS_CHILD | WS_VISIBLE,
                    WS_EX_CLIENTEDGE) {
-  }
-
-  bool CanHaveFocus() const override {
-    return true;
+    set_focusable(true);
   }
 
   void OnCommand(UINT code, int command) override {

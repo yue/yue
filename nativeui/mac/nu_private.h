@@ -15,7 +15,7 @@ class View;
 // this class as member for each view.
 struct NUPrivate {
   View* shell = nullptr;
-  bool can_focus = true;
+  bool focusable = true;
 };
 
 }  // namespace nu

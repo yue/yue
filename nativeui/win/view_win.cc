@@ -70,7 +70,7 @@ void ViewImpl::SetFocus(bool focus) {
   Invalidate();
 }
 
-bool ViewImpl::IsFocused() const {
+bool ViewImpl::HasFocus() const {
   return is_focused_;
 }
 
@@ -194,6 +194,18 @@ bool View::IsVisible() const {
 void View::Focus() {
   if (GetNative()->window())
     GetNative()->window()->focus_manager()->TakeFocus(this);
+}
+
+bool View::HasFocus() const {
+  return GetNative()->HasFocus();
+}
+
+void View::SetFocusable(bool focusable) {
+  GetNative()->set_focusable(focusable);
+}
+
+bool View::IsFocusable() const {
+  return GetNative()->is_focusable();
 }
 
 void View::PlatformSetBackgroundColor(Color color) {

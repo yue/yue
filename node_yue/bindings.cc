@@ -662,6 +662,9 @@ struct Type<nu::View> {
         "setVisible", &nu::View::SetVisible,
         "isVisible", &nu::View::IsVisible,
         "focus", &nu::View::Focus,
+        "hasFocus", &nu::View::HasFocus,
+        "setFocusable", &nu::View::SetFocusable,
+        "isFocusable", &nu::View::IsFocusable,
         "getParent", &nu::View::GetParent);
     SetProperty(context, templ,
                 "onMouseDown", &nu::View::on_mouse_down,

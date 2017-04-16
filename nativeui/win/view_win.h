@@ -47,12 +47,9 @@ class ViewImpl {
   // Invalidate the |dirty| rect.
   virtual void Invalidate(const Rect& dirty);
 
-  // Whether the view can get focus.
-  virtual bool CanHaveFocus() const { return false; }
-
   // Move focus to the view.
   virtual void SetFocus(bool focus);
-  virtual bool IsFocused() const;
+  virtual bool HasFocus() const;
 
   // Show/Hide the view.
   virtual void SetVisible(bool visible);
@@ -100,6 +97,10 @@ class ViewImpl {
   // Whether the view is visible.
   bool is_visible() const { return is_visible_; }
 
+  // Whether the view can get focus.
+  void set_focusable(bool focusable) { focusable_ = focusable; }
+  bool is_focusable() const { return focusable_; }
+
   // Set control's state.
   void set_state(ControlState state) { state_ = state; }
   ControlState state() const { return state_; }
@@ -121,6 +122,9 @@ class ViewImpl {
 
  private:
   ControlType type_;
+
+  // Whether the view can have focus.
+  bool focusable_ = false;
 
   // The background color.
   Color background_color_ = Color(0, 0, 0, 0);  // transparent

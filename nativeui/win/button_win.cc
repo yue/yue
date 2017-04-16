@@ -33,6 +33,7 @@ class ButtonImpl : public ViewImpl {
                     : (type == Button::Type::Checkbox ? ControlType::Checkbox
                                                       : ControlType::Radio),
                  delegate) {
+    set_focusable(true);
     OnDPIChanged();  // update component size
   }
 
@@ -88,10 +89,6 @@ class ButtonImpl : public ViewImpl {
   }
 
   // ViewImpl:
-  bool CanHaveFocus() const override {
-    return true;
-  }
-
   void Draw(PainterWin* painter, const Rect& dirty) override {
     Size size = size_allocation().size();
     Size preferred_size = ToCeiledSize(GetPreferredSize());
@@ -141,7 +138,7 @@ class ButtonImpl : public ViewImpl {
     painter->DrawTextPixel(title_, text_bounds, attributes);
 
     // Draw focused ring.
-    if (IsFocused()) {
+    if (HasFocus()) {
       Rect rect;
       if (type() == ControlType::Button) {
         rect = Rect(size);

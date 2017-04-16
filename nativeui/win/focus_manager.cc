@@ -61,7 +61,7 @@ bool FocusManager::DoAdvanceFocus(Container* container, bool reverse,
 
     if (child == focused_view_) {
       *focus_on_next_view = true;
-    } else if (*focus_on_next_view && child->GetNative()->CanHaveFocus()) {
+    } else if (*focus_on_next_view && child->GetNative()->is_focusable()) {
       if (focused_view_)
         focused_view_->GetNative()->SetFocus(false);
       focused_view_ = child;

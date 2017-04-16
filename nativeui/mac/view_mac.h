@@ -22,6 +22,7 @@ struct NUPrivate;
 @interface NSView (NUViewMethods) <NUView>
 - (nu::View*)shell;
 - (void)setShell:(nu::View*)shell;
+- (void)setAcceptsFirstResponder:(BOOL)yes;
 @end
 
 #endif  // NATIVEUI_MAC_VIEW_MAC_H_

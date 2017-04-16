@@ -75,7 +75,11 @@ void OnKeyEvent(NSView* self, SEL _cmd, NSEvent* event) {
 }
 
 BOOL AcceptsFirstResponder(NSView* self, SEL _cmd) {
-  return YES;
+  return [self nuPrivate]->focusable;
+}
+
+void SetAcceptsFirstResponder(NSView* self, SEL _cmd, bool yes) {
+  [self nuPrivate]->focusable = yes;
 }
 
 }  // namespace
@@ -115,6 +119,8 @@ void AddKeyEventHandlerToClass(Class cl) {
 void AddViewMethodsToClass(Class cl) {
   class_addMethod(cl, @selector(acceptsFirstResponder),
                   (IMP)AcceptsFirstResponder, "B@:");
+  class_addMethod(cl, @selector(setAcceptsFirstResponder),
+                  (IMP)SetAcceptsFirstResponder, "v@:B");
 }
 
 }  // namespace nu

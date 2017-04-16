@@ -112,6 +112,18 @@ void View::Focus() {
   gtk_widget_grab_focus(view_);
 }
 
+bool View::HasFocus() const {
+  return gtk_widget_is_focus(view_);
+}
+
+void View::SetFocusable(bool focusable) {
+  gtk_widget_set_can_focus(view_, focusable);
+}
+
+bool View::IsFocusable() const {
+  return gtk_widget_get_can_focus(view_);
+}
+
 void View::PlatformSetBackgroundColor(Color color) {
   GdkRGBA rgba = color.ToGdkRGBA();
   gtk_widget_override_background_color(view_, GTK_STATE_FLAG_NORMAL, &rgba);

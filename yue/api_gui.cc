@@ -592,6 +592,9 @@ struct Type<nu::View> {
            "setvisible", &nu::View::SetVisible,
            "isvisible", &nu::View::IsVisible,
            "focus", &nu::View::Focus,
+           "hasfocus", &nu::View::HasFocus,
+           "setfocusable", &nu::View::SetFocusable,
+           "isfocusable", &nu::View::IsFocusable,
            "getparent", &nu::View::GetParent);
     RawSetProperty(state, index,
                    "onmousedown", &nu::View::on_mouse_down,

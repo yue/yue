@@ -60,13 +60,28 @@ bool View::IsVisible() const {
 }
 
 void View::Focus() {
-  if (view_.window)
+  if (view_.window && IsFocusable())
     [view_.window makeFirstResponder:view_];
 }
 
+bool View::HasFocus() const {
+  if (view_.window)
+    return view_.window.firstResponder == view_;
+  else
+    return false;
+}
+
+void View::SetFocusable(bool focusable) {
+  [view_ setAcceptsFirstResponder:focusable];
+}
+
+bool View::IsFocusable() const {
+  return [view_ acceptsFirstResponder];
+}
+
 void View::PlatformSetBackgroundColor(Color color) {
-  if ([GetNative() respondsToSelector:@selector(setNUBackgroundColor:)])
-    [GetNative() setNUBackgroundColor:color];
+  if (IsNUView(view_))
+    [view_ setNUBackgroundColor:color];
 }
 
 }  // namespace nu

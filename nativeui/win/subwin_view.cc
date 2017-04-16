@@ -76,7 +76,7 @@ void SubwinView::SetFocus(bool focus) {
     ::SendMessage(hwnd(), WM_KILLFOCUS, NULL, NULL);
 }
 
-bool SubwinView::IsFocused() const {
+bool SubwinView::HasFocus() const {
   return ::GetFocus() == hwnd();
 }
 
