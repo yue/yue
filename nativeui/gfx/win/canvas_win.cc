@@ -8,12 +8,21 @@
 
 namespace nu {
 
+namespace {
+
+const float kDefaultDPI = 96.f;
+
+}  // namespace
+
 // static
 NativeBitmap Canvas::PlatformCreateBitmap(const SizeF& size,
                                           float scale_factor) {
-  return new Gdiplus::Bitmap(size.width() * scale_factor,
-                             size.height() * scale_factor,
-                             PixelFormat32bppARGB);
+  NativeBitmap bitmap = new Gdiplus::Bitmap(size.width() * scale_factor,
+                                            size.height() * scale_factor,
+                                            PixelFormat32bppARGB);
+  float dpi = kDefaultDPI * scale_factor;
+  bitmap->SetResolution(dpi, dpi);
+  return bitmap;
 }
 
 // static
