@@ -30,7 +30,9 @@ struct _NUContainerClass {
   GtkContainerClass parent_class;
 };
 
+GType nu_container_get_type();
 GtkWidget* nu_container_new(Container* delegate);
+GdkWindow* nu_container_get_window(NUContainer* widget);
 
 }  // namespace nu
 

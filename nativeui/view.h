@@ -60,6 +60,11 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   void SetFocusable(bool focusable);
   bool IsFocusable() const;
 
+  // Capture mouse.
+  void SetCapture();
+  void ReleaseCapture();
+  bool HasCapture() const;
+
   // Set backgroundcolor.
   void SetBackgroundColor(Color color);
   Color GetBackgroundColor() const;
@@ -90,6 +95,7 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   Signal<void(View*, const MouseEvent&)> on_mouse_leave;
   Signal<bool(View*, const KeyEvent&)> on_key_down;
   Signal<bool(View*, const KeyEvent&)> on_key_up;
+  Signal<void(View*)> on_capture_lost;
 
  protected:
   View();

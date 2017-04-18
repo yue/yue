@@ -587,8 +587,8 @@ struct Type<nu::Window> {
 template<>
 struct Type<nu::View> {
   static constexpr const char* name = "yue.View";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index,
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
            "setbounds", &nu::View::SetBounds,
            "getbounds", &nu::View::GetBounds,
            "layout", &nu::View::Layout,
@@ -599,18 +599,22 @@ struct Type<nu::View> {
            "hasfocus", &nu::View::HasFocus,
            "setfocusable", &nu::View::SetFocusable,
            "isfocusable", &nu::View::IsFocusable,
+           "setcapture", &nu::View::SetCapture,
+           "releasecapture", &nu::View::ReleaseCapture,
+           "hascapture", &nu::View::HasCapture,
            "setbackgroundcolor", &nu::View::SetBackgroundColor,
            "setstyle", &SetStyle,
            "printstyle", &nu::View::PrintStyle,
            "getparent", &nu::View::GetParent);
-    RawSetProperty(state, index,
+    RawSetProperty(state, metatable,
                    "onmousedown", &nu::View::on_mouse_down,
                    "onmouseup", &nu::View::on_mouse_up,
                    "onmousemove", &nu::View::on_mouse_move,
                    "onmouseenter", &nu::View::on_mouse_enter,
                    "onmouseleave", &nu::View::on_mouse_leave,
                    "onkeydown", &nu::View::on_key_down,
-                   "onkeyup", &nu::View::on_key_up);
+                   "onkeyup", &nu::View::on_key_up,
+                   "oncapturelost", &nu::View::on_capture_lost);
   }
   static void SetStyle(nu::View* view,
                        const std::map<std::string, std::string>& styles) {

@@ -9,10 +9,14 @@
 #include "nativeui/container.h"
 #include "nativeui/events/event.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
+#include "nativeui/gtk/nu_container.h"
 
 namespace nu {
 
 namespace {
+
+// The view that has the capture.
+View* g_grabbed_view = nullptr;
 
 gboolean OnMouseEvent(GtkWidget* widget, GdkEvent* event, View* view) {
   switch (event->any.type) {
@@ -40,6 +44,13 @@ gboolean OnKeyDown(GtkWidget* widget, GdkEvent* event, View* view) {
 
 gboolean OnKeyUp(GtkWidget* widget, GdkEvent* event, View* view) {
   return view->on_key_up.Emit(view, KeyEvent(event, widget));
+}
+
+gboolean OnGrabBroken(GtkWidget* widget, GdkEventGrabBroken* event,
+                      View* view) {
+  if (g_grabbed_view == view)
+    view->on_capture_lost.Emit(view);
+  return false;
 }
 
 }  // namespace
@@ -71,6 +82,7 @@ void View::TakeOverView(NativeView view) {
   g_signal_connect(view, "leave-notify-event", G_CALLBACK(OnMouseEvent), this);
   g_signal_connect(view, "key-press-event", G_CALLBACK(OnKeyDown), this);
   g_signal_connect(view, "key-release-event", G_CALLBACK(OnKeyUp), this);
+  g_signal_connect(view, "grab-broken-event", G_CALLBACK(OnGrabBroken), this);
 }
 
 void View::SetBounds(const RectF& bounds) {
@@ -137,6 +149,32 @@ void View::SetFocusable(bool focusable) {
 
 bool View::IsFocusable() const {
   return gtk_widget_get_can_focus(view_);
+}
+
+void View::SetCapture() {
+  // Get the GDK window.
+  GdkWindow* window;
+  if (GetClassName() == Container::kClassName)
+    window = nu_container_get_window(NU_CONTAINER(view_));
+  else
+    window = gtk_widget_get_window(view_);
+  if (!window)
+    return;
+
+  g_grabbed_view = this;
+  const GdkEventMask mask = GdkEventMask(GDK_BUTTON_PRESS_MASK |
+                                         GDK_BUTTON_RELEASE_MASK |
+                                         GDK_POINTER_MOTION_HINT_MASK |
+                                         GDK_POINTER_MOTION_MASK);
+  gdk_pointer_grab(window, FALSE, mask, NULL, NULL, GDK_CURRENT_TIME);
+}
+
+void View::ReleaseCapture() {
+  gdk_pointer_ungrab(GDK_CURRENT_TIME);
+}
+
+bool View::HasCapture() const {
+  return gdk_pointer_is_grabbed() && g_grabbed_view == this;
 }
 
 void View::PlatformSetBackgroundColor(Color color) {

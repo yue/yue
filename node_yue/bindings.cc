@@ -669,6 +669,9 @@ struct Type<nu::View> {
         "hasFocus", &nu::View::HasFocus,
         "setFocusable", &nu::View::SetFocusable,
         "isFocusable", &nu::View::IsFocusable,
+        "setCapture", &nu::View::SetCapture,
+        "releaseCapture", &nu::View::ReleaseCapture,
+        "hasCapture", &nu::View::HasCapture,
         "setBackgroundColor", &nu::View::SetBackgroundColor,
         "setStyle", &SetStyle,
         "printStyle", &nu::View::PrintStyle,
@@ -680,7 +683,8 @@ struct Type<nu::View> {
                 "onMouseEnter", &nu::View::on_mouse_enter,
                 "onMouseLeave", &nu::View::on_mouse_leave,
                 "onKeyDown", &nu::View::on_key_down,
-                "onKeyUp", &nu::View::on_key_up);
+                "onKeyUp", &nu::View::on_key_up,
+                "onCaptureLost", &nu::View::on_capture_lost);
   }
   static void SetStyle(Arguments* args,
                        const std::map<std::string, std::string>& styles) {

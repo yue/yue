@@ -2,7 +2,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/gtk/container_container.h"
+#include "nativeui/gtk/nu_container.h"
 
 #include "nativeui/container.h"
 #include "nativeui/gfx/gtk/painter_gtk.h"
@@ -207,6 +207,10 @@ GtkWidget* nu_container_new(Container* delegate) {
   NU_CONTAINER(widget)->priv->delegate = delegate;
   NU_CONTAINER(widget)->priv->event_window = nullptr;
   return GTK_WIDGET(widget);
+}
+
+GdkWindow* nu_container_get_window(NUContainer* widget) {
+  return widget->priv->event_window;
 }
 
 }  // namespace nu

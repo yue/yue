@@ -6,7 +6,7 @@
 
 #include <gtk/gtk.h>
 
-#include "nativeui/gtk/container_container.h"
+#include "nativeui/gtk/nu_container.h"
 
 namespace nu {
 
