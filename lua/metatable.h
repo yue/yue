@@ -63,10 +63,9 @@ bool IsMetaTableInheritedFrom(State* state) {
   base::StringPiece name;
   if (RawGetAndPop(state, -1, "__name", &name) && name == Type<T>::name)
     return true;
-  if (!GetMetaTable(state, -1))
-    return false;
-  RawGet(state, -1, "__index");
-  return IsMetaTableInheritedFrom<T>(state);
+  RawGet(state, -1, "__super");
+  return GetType(state, -1) == LuaType::Table &&
+         IsMetaTableInheritedFrom<T>(state);
 }
 
 // The default type information for RefCounted class.

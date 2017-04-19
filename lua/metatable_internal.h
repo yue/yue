@@ -23,6 +23,12 @@ bool WrapperTableGet(State* state, void* key);
 // Save a wrapper at |index| to weak wrapper table with |key|.
 void WrapperTableSet(State* state, void* key, int index);
 
+// A implementation of __index that works as prototype chain.
+int InheritanceChainLookup(State* state);
+
+// A implementation of __newindex that works as prototype chain.
+int InheritanceChainAssign(State* state);
+
 // Create metatable for T, returns true if the metattable has already been
 // created.
 template<typename T>
@@ -32,7 +38,8 @@ bool NewMetaTable(State* state) {
 
   RawSet(state, -1,
          "__gc", CFunction(&OnGC<T>),
-         "__index", ValueOnStack(state, -1));
+         "__index", CClosure(state, &InheritanceChainLookup, 1),
+         "__newindex", CClosure(state, &InheritanceChainAssign, 1));
   Type<T>::BuildMetaTable(state, AbsIndex(state, -1));
   return false;
 }
@@ -54,11 +61,9 @@ struct InheritanceChain<T, typename std::enable_if<std::is_class<
       return;
 
     // Inherit from base type's metatable.
+    StackAutoReset reset(state);
     InheritanceChain<typename Type<T>::base>::Push(state);
-    NewTable(state, 0, 1);
-    RawSet(state, -1, "__index", ValueOnStack(state, -2));
-    SetMetaTable(state, -3);
-    PopAndIgnore(state, 1);
+    RawSet(state, -2, "__super", ValueOnStack(state, -1));
   }
 };
 

@@ -72,7 +72,7 @@ TEST_F(MetaTableTest, PushNewClass) {
   EXPECT_EQ(lua::GetTop(state_), 1);
   EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Table);
   lua::RawGet(state_, -1, "method1", "method2", "__gc", "__index");
-  EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Table);
+  EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Function);
   EXPECT_EQ(lua::GetType(state_, -2), lua::LuaType::Function);
   EXPECT_EQ(lua::GetType(state_, -3), lua::LuaType::Function);
   EXPECT_EQ(lua::GetType(state_, -4), lua::LuaType::Function);
@@ -184,13 +184,10 @@ TEST_F(MetaTableTest, DerivedClassInheritanceChain) {
   std::string name;
   ASSERT_TRUE(lua::RawGetAndPop(state_, 1, "__name", &name));
   ASSERT_EQ(name, "DerivedClass");
-  ASSERT_TRUE(lua::GetMetaTable(state_, -1));
+  lua::RawGet(state_, -1, "__super");
   EXPECT_EQ(lua::GetTop(state_), 2);
   EXPECT_EQ(lua::GetType(state_, 2), lua::LuaType::Table);
-  lua::RawGet(state_, -1, "__index");
-  EXPECT_EQ(lua::GetTop(state_), 3);
-  EXPECT_EQ(lua::GetType(state_, 3), lua::LuaType::Table);
-  ASSERT_TRUE(lua::RawGetAndPop(state_, 3, "__name", &name));
+  ASSERT_TRUE(lua::RawGetAndPop(state_, 2, "__name", &name));
   ASSERT_EQ(name, "TestClass");
 }
 
@@ -251,21 +248,15 @@ TEST_F(MetaTableTest, DeeplyDerivedClassInheritanceChain) {
   std::string name;
   ASSERT_TRUE(lua::RawGetAndPop(state_, 1, "__name", &name));
   ASSERT_EQ(name, "DerivedClass2");
-  ASSERT_TRUE(lua::GetMetaTable(state_, -1));
+  lua::RawGet(state_, -1, "__super");
   EXPECT_EQ(lua::GetTop(state_), 2);
   EXPECT_EQ(lua::GetType(state_, 2), lua::LuaType::Table);
-  lua::RawGet(state_, -1, "__index");
+  ASSERT_TRUE(lua::RawGetAndPop(state_, 2, "__name", &name));
+  ASSERT_EQ(name, "DerivedClass");
+  lua::RawGet(state_, -1, "__super");
   EXPECT_EQ(lua::GetTop(state_), 3);
   EXPECT_EQ(lua::GetType(state_, 3), lua::LuaType::Table);
   ASSERT_TRUE(lua::RawGetAndPop(state_, 3, "__name", &name));
-  ASSERT_EQ(name, "DerivedClass");
-  ASSERT_TRUE(lua::GetMetaTable(state_, -1));
-  EXPECT_EQ(lua::GetTop(state_), 4);
-  EXPECT_EQ(lua::GetType(state_, 4), lua::LuaType::Table);
-  lua::RawGet(state_, -1, "__index");
-  EXPECT_EQ(lua::GetTop(state_), 5);
-  EXPECT_EQ(lua::GetType(state_, 5), lua::LuaType::Table);
-  ASSERT_TRUE(lua::RawGetAndPop(state_, 5, "__name", &name));
   ASSERT_EQ(name, "TestClass");
 }
 
@@ -287,8 +278,9 @@ TEST_F(MetaTableTest, DeeplyDerivedClassGC) {
 }
 
 TEST_F(MetaTableTest, BaseCallDerivedClassMethods) {
-  lua::Push(state_, lua::MetaTable<DerivedClass2>());
+  lua::Push(state_, new DerivedClass2);
   ASSERT_TRUE(lua::PGet(state_, 1, "a"));
+  EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Function);
   ASSERT_FALSE(lua::PCall(state_, nullptr, new TestClass, 123));
   std::string error;
   ASSERT_TRUE(lua::Pop(state_, &error));
@@ -380,16 +372,15 @@ TEST_F(MetaTableTest, PushMultipleBaseClasses) {
 }
 
 TEST_F(MetaTableTest, ConvertedBaseWithoutParentMethods) {
-  lua::Push(state_, lua::MetaTable<DerivedClass2>());
   lua::Push(state_, new DerivedClass2);
 
-  ASSERT_TRUE(lua::PGet(state_, 2, "a", "b", "c"));
+  ASSERT_TRUE(lua::PGet(state_, 1, "a", "b", "c"));
   EXPECT_EQ(lua::GetType(state_, -1), lua::LuaType::Function);
   EXPECT_EQ(lua::GetType(state_, -2), lua::LuaType::Function);
   EXPECT_EQ(lua::GetType(state_, -3), lua::LuaType::Function);
 
   DerivedClass* d1;
-  ASSERT_TRUE(lua::To(state_, 2, &d1));
+  ASSERT_TRUE(lua::To(state_, 1, &d1));
   scoped_refptr<DerivedClass> keep(d1);
   lua::SetTop(state_, 0);
   lua::CollectGarbage(state_);

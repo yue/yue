@@ -33,11 +33,8 @@ struct MemberTraits<T, typename std::enable_if<
 
 namespace internal {
 
-// Look into the members set by RawSetProperty.
-int MemberLookup(State* state);
-
-// Assign to the members set by RawSetProperty.
-int MemberAssign(State* state);
+// Push a table that acts as cache.
+void PushCacheTable(State* state, int key);
 
 // Get type from member pointer.
 template<typename T> struct ExtractMemberPointer;
@@ -47,7 +44,8 @@ struct ExtractMemberPointer<TMember(TType::*)> {
   using MemberType = TMember;
 };
 
-// Provides the virtual interface which will be called by MemberLookup/Assign.
+// Provides the virtual interface which will be called by __index and
+// __newindex handlers.
 class MemberHolderBase {
  public:
   virtual ~MemberHolderBase() {}
@@ -79,7 +77,8 @@ int MemberHolder<T>::Index(State* state) {
   ClassType* owner;
   if (!To(state, 1, &owner))
     return 0;
-  int cache = lua_upvalueindex(3);
+  PushCacheTable(state, 1);
+  int cache = AbsIndex(state, -1);
   if (MemberTraits<MemberType>::kShouldCacheValue) {
     RawGet(state, cache, ValueOnStack(state, 2));
   } else {
@@ -100,8 +99,8 @@ int MemberHolder<T>::NewIndex(State* state) {
     NOTREACHED() << "Code after lua_error() gets called";
   }
   if (MemberTraits<MemberType>::kShouldCacheValue) {
-    int cache = lua_upvalueindex(3);
-    RawSet(state, cache, ValueOnStack(state, 2), ValueOnStack(state, 3));
+    PushCacheTable(state, 1);
+    RawSet(state, -1, ValueOnStack(state, 2), ValueOnStack(state, 3));
   }
   return 1;
 }
@@ -124,24 +123,14 @@ void SetMemberHolder(State* state, int table,
 
 }  // namespace internal
 
-// Define the default __index and __newindex.
-void RawSetDefaultPropertyHandler(State* state, int metatable);
-
 // Define properties for the metatable.
 template<typename... ArgTypes>
 void RawSetProperty(State* state, int metatable, ArgTypes... args) {
   StackAutoReset reset(state);
-  // Upvalue for storing user-added members.
-  NewTable(state, 0, 0);
-  // Upvalue for storing pre-defined members.
+  // Table for storing pre-defined members.
   NewTable(state, 0, sizeof...(args) / 2);
   internal::SetMemberHolder(state, AbsIndex(state, -1), args...);
-  // Upvalue for cache.
-  NewTable(state, 0, sizeof...(args) / 2);
-  // Define the __index and __newindex handlers.
-  RawSet(state, metatable,
-         "__index", CClosure(state, &internal::MemberLookup, 3),
-         "__newindex", CClosure(state, &internal::MemberAssign, 3));
+  RawSet(state, metatable, "__properties", ValueOnStack(state, -1));
 }
 
 }  // namespace lua
