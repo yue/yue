@@ -129,6 +129,10 @@ struct Type<bool> {
     lua_pushboolean(state, b);
   }
   static inline bool To(State* state, int index, bool* out) {
+    if (lua_isnil(state, index)) {
+      *out = false;
+      return true;
+    }
     if (!lua_isboolean(state, index))
       return false;
     *out = lua_toboolean(state, index) != 0;

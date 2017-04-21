@@ -8,7 +8,9 @@
 
 #include "nativeui/container.h"
 #include "nativeui/events/event.h"
+#include "nativeui/gfx/geometry/point_f.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
+#include "nativeui/gfx/geometry/rect_f.h"
 #include "nativeui/gtk/nu_container.h"
 
 namespace nu {
@@ -46,13 +48,6 @@ gboolean OnKeyUp(GtkWidget* widget, GdkEvent* event, View* view) {
   return view->on_key_up.Emit(view, KeyEvent(event, widget));
 }
 
-gboolean OnGrabBroken(GtkWidget* widget, GdkEventGrabBroken* event,
-                      View* view) {
-  if (g_grabbed_view == view)
-    view->on_capture_lost.Emit(view);
-  return false;
-}
-
 }  // namespace
 
 void View::PlatformDestroy() {
@@ -82,7 +77,20 @@ void View::TakeOverView(NativeView view) {
   g_signal_connect(view, "leave-notify-event", G_CALLBACK(OnMouseEvent), this);
   g_signal_connect(view, "key-press-event", G_CALLBACK(OnKeyDown), this);
   g_signal_connect(view, "key-release-event", G_CALLBACK(OnKeyUp), this);
-  g_signal_connect(view, "grab-broken-event", G_CALLBACK(OnGrabBroken), this);
+}
+
+Vector2dF View::OffsetFromView(const View* from) const {
+  GdkRectangle rect_f;
+  gtk_widget_get_allocation(from->GetNative(), &rect_f);
+  GdkRectangle rect_d;
+  gtk_widget_get_allocation(GetNative(), &rect_d);
+  return Vector2dF(rect_d.x - rect_f.x, rect_d.y - rect_f.y);
+}
+
+Vector2dF View::OffsetFromWindow() const {
+  GdkRectangle rect;
+  gtk_widget_get_allocation(GetNative(), &rect);
+  return Vector2dF(rect.x, rect.y);
 }
 
 void View::SetBounds(const RectF& bounds) {
@@ -161,16 +169,24 @@ void View::SetCapture() {
   if (!window)
     return;
 
-  g_grabbed_view = this;
   const GdkEventMask mask = GdkEventMask(GDK_BUTTON_PRESS_MASK |
                                          GDK_BUTTON_RELEASE_MASK |
                                          GDK_POINTER_MOTION_HINT_MASK |
                                          GDK_POINTER_MOTION_MASK);
-  gdk_pointer_grab(window, FALSE, mask, NULL, NULL, GDK_CURRENT_TIME);
+  if (gdk_pointer_grab(window, FALSE, mask, NULL, NULL,
+                       GDK_CURRENT_TIME) == GDK_GRAB_SUCCESS)
+    g_grabbed_view = this;
 }
 
 void View::ReleaseCapture() {
   gdk_pointer_ungrab(GDK_CURRENT_TIME);
+
+  // In X11 the grab can not be hijacked by other applications, so the only
+  // possible case for losing capture is to call this function.
+  if (g_grabbed_view) {
+    g_grabbed_view->on_capture_lost.Emit(g_grabbed_view);
+    g_grabbed_view = nullptr;
+  }
 }
 
 bool View::HasCapture() const {

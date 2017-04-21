@@ -34,6 +34,10 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   // subclass.
   virtual const char* GetClassName() const;
 
+  // Coordiante convertions.
+  Vector2dF OffsetFromView(const View* from) const;
+  Vector2dF OffsetFromWindow() const;
+
   // Change/Get position and size.
   void SetBounds(const RectF& bounds);
   RectF GetBounds() const;

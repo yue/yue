@@ -338,18 +338,25 @@ struct Type<nu::EventType> {
     switch (type) {
       case nu::EventType::MouseDown:
         lua::Push(state, "mousedown");
+        break;
       case nu::EventType::MouseUp:
         lua::Push(state, "mouseup");
+        break;
       case nu::EventType::MouseMove:
         lua::Push(state, "mousemove");
+        break;
       case nu::EventType::MouseEnter:
         lua::Push(state, "mouseenter");
+        break;
       case nu::EventType::MouseLeave:
         lua::Push(state, "mouseleave");
+        break;
       case nu::EventType::KeyDown:
         lua::Push(state, "keydown");
+        break;
       case nu::EventType::KeyUp:
         lua::Push(state, "keyup");
+        break;
       default:
         NOTREACHED();
         lua::Push(state, "unknown");
@@ -387,7 +394,8 @@ struct Type<nu::MouseEvent> {
     Type<nu::Event>::SetEventProperties(state, -1, &event);
     RawSet(state, -1,
            "button", event.button,
-           "position", event.position);
+           "positioninview", event.position_in_view,
+           "positioninwindow", event.position_in_window);
   }
 };
 
@@ -589,6 +597,8 @@ struct Type<nu::View> {
   static constexpr const char* name = "yue.View";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
+           "offsetfromview", &nu::View::OffsetFromView,
+           "offsetfromwindow", &nu::View::OffsetFromWindow,
            "setbounds", &nu::View::SetBounds,
            "getbounds", &nu::View::GetBounds,
            "layout", &nu::View::Layout,

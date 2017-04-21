@@ -48,7 +48,8 @@ struct NATIVEUI_EXPORT MouseEvent : public Event {
   MouseEvent(NativeEvent event, NativeView view);
 
   int button;
-  PointF position;
+  PointF position_in_view;
+  PointF position_in_window;
 };
 
 // Key events.

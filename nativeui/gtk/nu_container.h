@@ -2,8 +2,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef NATIVEUI_GTK_CONTAINER_CONTAINER_H_
-#define NATIVEUI_GTK_CONTAINER_CONTAINER_H_
+#ifndef NATIVEUI_GTK_NU_CONTAINER_H_
+#define NATIVEUI_GTK_NU_CONTAINER_H_
 
 #include <gtk/gtk.h>
 
@@ -36,4 +36,4 @@ GdkWindow* nu_container_get_window(NUContainer* widget);
 
 }  // namespace nu
 
-#endif  // NATIVEUI_GTK_CONTAINER_CONTAINER_H_
+#endif  // NATIVEUI_GTK_NU_CONTAINER_H_

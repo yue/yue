@@ -108,15 +108,15 @@ bool WrapValue(const std::string& value, int* out) {
 }
 
 // Convert the value to pixel value.
-int PixelValue(std::string value) {
+float PixelValue(std::string value) {
   if (base::EndsWith(value, "px", base::CompareCase::SENSITIVE))
     value = value.substr(0, value.length() - 2);
-  int integer;
-  if (!base::StringToInt(value, &integer)) {
+  double out;
+  if (!base::StringToDouble(value, &out)) {
     LOG(WARNING) << "Invalid pixel value: " << value;
     return 0;
   }
-  return integer;
+  return out;
 }
 
 // Convert the value to percent value.

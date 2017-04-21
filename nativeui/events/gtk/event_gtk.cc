@@ -31,6 +31,7 @@ EventType EventTypeFromGdk(GdkEventType type) {
     case GDK_KEY_RELEASE:
       return EventType::KeyUp;
     default:
+      NOTREACHED();
       return EventType::Unknown;
   }
 }
@@ -87,6 +88,12 @@ PointF PositionFromGdkEvent(GdkEvent* event) {
   }
 }
 
+PointF ViewPositionToWindowPosition(const PointF& point, NativeView view) {
+  GdkRectangle rect;
+  gtk_widget_get_allocation(view, &rect);
+  return PointF(point.x() + rect.x, point.y() + rect.y);
+}
+
 }  // namespace
 
 Event::Event(NativeEvent event, NativeView view)
@@ -99,7 +106,8 @@ Event::Event(NativeEvent event, NativeView view)
 MouseEvent::MouseEvent(NativeEvent event, NativeView view)
     : Event(event, view),
       button(ButtonFromGdkEvent(event)),
-      position(PositionFromGdkEvent(event)) {
+      position_in_view(PositionFromGdkEvent(event)),
+      position_in_window(ViewPositionToWindowPosition(position_in_view, view)) {
 }
 
 KeyEvent::KeyEvent(NativeEvent event, NativeView view)

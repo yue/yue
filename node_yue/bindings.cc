@@ -428,7 +428,8 @@ struct Type<nu::MouseEvent> {
     Type<nu::Event>::SetEventProperties(context, obj, &event);
     Set(context, obj,
         "button", event.button,
-        "position", event.position);
+        "positionInView", event.position_in_view,
+        "positionInWindow", event.position_in_window);
     return obj;
   }
 };
@@ -659,6 +660,8 @@ struct Type<nu::View> {
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
+        "offsetFromView", &nu::View::OffsetFromView,
+        "offsetFromWindow", &nu::View::OffsetFromWindow,
         "setBounds", &nu::View::SetBounds,
         "getBounds", &nu::View::GetBounds,
         "layout", &nu::View::Layout,
