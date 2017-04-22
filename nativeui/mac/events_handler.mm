@@ -121,6 +121,9 @@ void AddMouseEventHandlerToClass(Class cl) {
   class_addMethod(cl, @selector(rightMouseUp:), (IMP)OnMouseEvent, "v@:@");
   class_addMethod(cl, @selector(otherMouseUp:), (IMP)OnMouseEvent, "v@:@");
   class_addMethod(cl, @selector(mouseMoved:), (IMP)OnMouseEvent, "v@:@");
+  class_addMethod(cl, @selector(mouseDragged:), (IMP)OnMouseEvent, "v@:@");
+  class_addMethod(cl, @selector(rightMouseDragged:), (IMP)OnMouseEvent, "v@:@");
+  class_addMethod(cl, @selector(otherMouseDragged:), (IMP)OnMouseEvent, "v@:@");
   class_addMethod(cl, @selector(mouseEntered:), (IMP)OnMouseEvent, "v@:@");
   class_addMethod(cl, @selector(mouseExited:), (IMP)OnMouseEvent, "v@:@");
 }

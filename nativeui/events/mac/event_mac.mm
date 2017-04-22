@@ -94,6 +94,9 @@ EventType EventTypeFromNS(NSEvent* event) {
     case NSRightMouseUp:
     case NSOtherMouseUp:
       return EventType::MouseUp;
+    case NSLeftMouseDragged:
+    case NSRightMouseDragged:
+    case NSOtherMouseDragged:
     case NSMouseMoved:
       return EventType::MouseMove;
     case NSMouseEntered:
