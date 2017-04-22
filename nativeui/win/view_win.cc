@@ -140,6 +140,11 @@ bool ViewImpl::OnKeyEvent(NativeEvent event) {
   return false;
 }
 
+void ViewImpl::OnCaptureLost() {
+  if (delegate())
+    delegate()->on_capture_lost.Emit(delegate());
+}
+
 Point ViewImpl::GetMousePosition() const {
   if (!window_)
     return Point();
@@ -181,6 +186,17 @@ void View::PlatformDestroy() {
 
 void View::TakeOverView(NativeView view) {
   view_ = view;
+}
+
+Vector2dF View::OffsetFromView(const View* from) const {
+  Vector2d offset = view_->size_allocation().OffsetFromOrigin() -
+                    from->GetNative()->size_allocation().OffsetFromOrigin();
+  return ScaleVector2d(offset, 1.f / view_->scale_factor());
+}
+
+Vector2dF View::OffsetFromWindow() const {
+  return ScaleVector2d(view_->size_allocation().OffsetFromOrigin(),
+                       1.f / view_->scale_factor());
 }
 
 void View::SetBounds(const RectF& bounds) {
@@ -235,6 +251,21 @@ void View::SetFocusable(bool focusable) {
 
 bool View::IsFocusable() const {
   return GetNative()->is_focusable();
+}
+
+void View::SetCapture() {
+  if (view_->window())
+    view_->window()->SetCapture(GetNative());
+}
+
+void View::ReleaseCapture() {
+  if (view_->window())
+    view_->window()->ReleaseCapture();
+}
+
+bool View::HasCapture() const {
+  return view_->window() &&
+         view_->window()->captured_view() == view_;
 }
 
 void View::PlatformSetBackgroundColor(Color color) {

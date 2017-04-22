@@ -65,7 +65,7 @@ Rect WindowImpl::GetContentPixelBounds() {
 }
 
 void WindowImpl::SetCapture(ViewImpl* view) {
-  capture_view_ = view;
+  captured_view_ = view;
   ::SetCapture(hwnd());
 }
 
@@ -80,9 +80,9 @@ void WindowImpl::SetBackgroundColor(nu::Color color) {
 }
 
 void WindowImpl::OnCaptureChanged(HWND window) {
-  if (capture_view_) {
-    capture_view_->OnCaptureLost();
-    capture_view_ = nullptr;
+  if (captured_view_) {
+    captured_view_->OnCaptureLost();
+    captured_view_ = nullptr;
   }
 }
 
@@ -125,12 +125,16 @@ LRESULT WindowImpl::OnMouseMove(UINT message, WPARAM w_param, LPARAM l_param) {
   Win32Message msg = {message, w_param, l_param};
   if (!mouse_in_window_) {
     mouse_in_window_ = true;
-    delegate_->GetContentView()->GetNative()->OnMouseEnter(&msg);
+    if (!captured_view_)
+      delegate_->GetContentView()->GetNative()->OnMouseEnter(&msg);
     TrackMouse(true);
   }
-  if (capture_view_) {
-    capture_view_->OnMouseMove(&msg);
+
+  if (captured_view_) {
+    captured_view_->OnMouseMove(&msg);
+    return 0;
   }
+
   delegate_->GetContentView()->GetNative()->OnMouseMove(&msg);
   return 0;
 }
@@ -138,7 +142,13 @@ LRESULT WindowImpl::OnMouseMove(UINT message, WPARAM w_param, LPARAM l_param) {
 LRESULT WindowImpl::OnMouseLeave(UINT message, WPARAM w_param, LPARAM l_param) {
   TrackMouse(false);
   mouse_in_window_ = false;
+
   Win32Message msg = {message, w_param, l_param};
+  if (captured_view_) {
+    captured_view_->OnMouseLeave(&msg);
+    return 0;
+  }
+
   delegate_->GetContentView()->GetNative()->OnMouseLeave(&msg);
   return 0;
 }
@@ -152,15 +162,15 @@ BOOL WindowImpl::OnMouseWheel(bool vertical, UINT flags, int delta,
 }
 
 LRESULT WindowImpl::OnMouseClick(UINT message, WPARAM w_param, LPARAM l_param) {
-  // Pass the event to view.
   Win32Message msg = {message, w_param, l_param};
+  if (captured_view_) {
+    captured_view_->OnMouseClick(&msg);
+    return 0;
+  }
+
+  // Pass the event to view.
   if (!delegate_->GetContentView()->GetNative()->OnMouseClick(&msg))
     SetMsgHandled(false);
-
-  // Releasing a mouse should always release the capture.
-  if (message == WM_LBUTTONUP)
-    ReleaseCapture();
-
   return 0;
 }
 

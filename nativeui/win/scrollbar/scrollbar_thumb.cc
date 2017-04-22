@@ -61,6 +61,7 @@ bool ScrollbarThumb::OnMouseClick(NativeEvent event) {
     window()->SetCapture(this);
     set_state(ControlState::Pressed);
   } else {
+    window()->ReleaseCapture();
     set_state(ControlState::Hovered);
   }
 

@@ -87,10 +87,10 @@ bool ContainerImpl::OnMouseClick(NativeEvent event) {
   ViewImpl* child = FindChildFromPoint(Point(event->l_param));
   if (child)
     return child->OnMouseClick(event);
-  return false;
 
   if (ViewImpl::OnMouseClick(event))
     return true;
+  return false;
 }
 
 void ContainerImpl::DrawChild(ViewImpl* child, PainterWin* painter,

@@ -81,6 +81,11 @@ int GetButtonNumber(UINT message) {
   }
 }
 
+PointF GetPosInView(const Point& point, NativeView view) {
+  Point view_point = point - view->size_allocation().OffsetFromOrigin();
+  return ScalePoint(PointF(view_point), 1.f / view->scale_factor());
+}
+
 }  // namespace
 
 Event::Event(NativeEvent event, NativeView view)
@@ -93,8 +98,9 @@ Event::Event(NativeEvent event, NativeView view)
 MouseEvent::MouseEvent(NativeEvent event, NativeView view)
     : Event(event, view),
       button(GetButtonNumber(event->message)),
-      position(ScalePoint(PointF(Point(event->l_param)),
-                          1.f / view->scale_factor())) {
+      position_in_view(GetPosInView(Point(event->l_param), view)),
+      position_in_window(ScalePoint(PointF(Point(event->l_param)),
+                                    1.f / view->scale_factor())) {
 }
 
 KeyEvent::KeyEvent(NativeEvent event, NativeView view)

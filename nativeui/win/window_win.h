@@ -26,6 +26,7 @@ class WindowImpl : public Win32Window {
 
   Window* delegate() { return delegate_; }
   FocusManager* focus_manager() { return &focus_manager_; }
+  ViewImpl* captured_view() const { return captured_view_; }
   float scale_factor() const { return scale_factor_; }
 
  protected:
@@ -70,7 +71,7 @@ class WindowImpl : public Win32Window {
   bool mouse_in_window_ = false;
 
   // The view that has mouse capture.
-  ViewImpl* capture_view_ = nullptr;
+  ViewImpl* captured_view_ = nullptr;
 
   // The background color.
   nu::Color background_color_ = nu::Color(0xFF, 0xFF, 0xFF);

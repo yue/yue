@@ -76,7 +76,7 @@ class ViewImpl {
   virtual bool OnKeyEvent(NativeEvent event);
 
   // Called when the view lost capture.
-  virtual void OnCaptureLost() {}
+  virtual void OnCaptureLost();
 
   /////////////////////////////////////////////////////////////////////////////
   // Helpers
