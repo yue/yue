@@ -9,9 +9,18 @@
 #include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/gfx/mac/painter_mac.h"
 #include "nativeui/mac/events_handler.h"
+#include "nativeui/mac/mouse_capture.h"
 #include "nativeui/mac/nu_private.h"
 
 namespace nu {
+
+namespace {
+
+// There is no way to know when another application has installed an event
+// monitor, we have to assume only current app can capture view.
+View* g_captured_view = nullptr;
+
+}  // namespace
 
 void View::PlatformDestroy() {
   [view_ release];
@@ -26,7 +35,6 @@ void View::TakeOverView(NativeView view) {
   // Install events handle for the view's class.
   Class cl = [view class];
   if (!EventHandlerInstalled(cl)) {
-    AddNUMethodsToClass(cl);
     AddMouseEventHandlerToClass(cl);
     AddKeyEventHandlerToClass(cl);
     AddViewMethodsToClass(cl);
@@ -51,6 +59,16 @@ void View::SetBounds(const RectF& bounds) {
   [view_ setFrame:frame];
   // Calling setFrame manually does not trigger adjustSubviews.
   [view_ resizeSubviewsWithOldSize:frame.size];
+}
+
+Vector2dF View::OffsetFromView(const View* from) const {
+  NSPoint point = [view_ convertPoint:NSZeroPoint toView:from->view_];
+  return Vector2dF(point.x, point.y);
+}
+
+Vector2dF View::OffsetFromWindow() const {
+  NSPoint point = [view_ convertPoint:NSZeroPoint toView:nil];
+  return Vector2dF(point.x, point.y);
 }
 
 RectF View::GetBounds() const {
@@ -90,11 +108,35 @@ bool View::HasFocus() const {
 }
 
 void View::SetFocusable(bool focusable) {
-  [view_ setAcceptsFirstResponder:focusable];
+  NUPrivate* priv = [view_ nuPrivate];
+  priv->focusable = focusable;
 }
 
 bool View::IsFocusable() const {
   return [view_ acceptsFirstResponder];
+}
+
+void View::SetCapture() {
+  if (g_captured_view)
+    g_captured_view->ReleaseCapture();
+
+  NUPrivate* priv = [view_ nuPrivate];
+  priv->mouse_capture.reset(new MouseCapture(this));
+  g_captured_view = this;
+}
+
+void View::ReleaseCapture() {
+  if (g_captured_view != this)
+    return;
+
+  NUPrivate* priv = [view_ nuPrivate];
+  priv->mouse_capture.reset();
+  g_captured_view = nullptr;
+  on_capture_lost.Emit(this);
+}
+
+bool View::HasCapture() const {
+  return g_captured_view == this;
 }
 
 void View::PlatformSetBackgroundColor(Color color) {

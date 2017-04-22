@@ -12,7 +12,7 @@ namespace internal {
 namespace {
 
 // Limit for table inheritance chains (to avoid loops).
-const int kMaxLoop	= 2000;
+const int kMaxLoop  = 2000;
 
 const char* kWrapperTableName = "yue.internal.wrappertable";
 const char* kCustomDataTableName = "yue.internal.customdatatable";

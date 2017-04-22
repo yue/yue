@@ -9,6 +9,8 @@
 
 namespace nu {
 
+class View;
+
 // Return whether a class is part of nativeui system.
 bool IsNUView(id view);
 
@@ -16,10 +18,12 @@ bool IsNUView(id view);
 bool EventHandlerInstalled(Class cl);
 
 // Dynamically add event methods to a NSView.
-void AddNUMethodsToClass(Class cl);
 void AddMouseEventHandlerToClass(Class cl);
 void AddKeyEventHandlerToClass(Class cl);
 void AddViewMethodsToClass(Class cl);
+
+// Dispatch mouse events to a view.
+bool DispatchMouseEvent(View* view, NSEvent* event);
 
 }  // namespace nu
 

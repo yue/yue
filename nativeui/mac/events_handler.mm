@@ -32,33 +32,8 @@ void OnMouseEvent(NSView* self, SEL _cmd, NSEvent* event) {
   DCHECK(view);
 
   // Emit the event to View.
-  bool prevent_default = false;
-  MouseEvent mouse_event(event, self);
-  switch (mouse_event.type) {
-    case EventType::MouseDown:
-      prevent_default = view->on_mouse_down.Emit(view, mouse_event);
-      break;
-    case EventType::MouseUp:
-      prevent_default = view->on_mouse_up.Emit(view, mouse_event);
-      break;
-    case EventType::MouseMove:
-      view->on_mouse_move.Emit(view, mouse_event);
-      prevent_default = true;
-      break;
-    case EventType::MouseEnter:
-      view->on_mouse_enter.Emit(view, mouse_event);
-      prevent_default = true;
-      break;
-    case EventType::MouseLeave:
-      view->on_mouse_leave.Emit(view, mouse_event);
-      prevent_default = true;
-      break;
-    default:
-      NOTREACHED();
-  }
-
-  // Transfer the event to super class.
-  if (!prevent_default) {
+  if (!DispatchMouseEvent(view, event)) {
+    // Transfer the event to super class.
     auto super_impl = reinterpret_cast<void (*)(NSView*, SEL, NSEvent*)>(
         [[self superclass] instanceMethodForSelector:_cmd]);
     super_impl(self, _cmd, event);
@@ -93,8 +68,8 @@ BOOL AcceptsFirstResponder(NSView* self, SEL _cmd) {
   return [self nuPrivate]->focusable;
 }
 
-void SetAcceptsFirstResponder(NSView* self, SEL _cmd, BOOL yes) {
-  [self nuPrivate]->focusable = yes;
+BOOL MouseDownCanMoveWindow(NSView* self, SEL _cmd) {
+  return [self nuPrivate]->draggable;
 }
 
 void EnableTracking(NSView* self, SEL _cmd) {
@@ -138,11 +113,6 @@ bool EventHandlerInstalled(Class cl) {
   return class_getClassMethod(cl, @selector(nuInjected)) != nullptr;
 }
 
-void AddNUMethodsToClass(Class cl) {
-  class_addMethod(cl, @selector(nuInjected), (IMP)NUInjected, "B@:");
-  class_addMethod(cl, @selector(shell), (IMP)GetShell, "^v@:");
-}
-
 void AddMouseEventHandlerToClass(Class cl) {
   class_addMethod(cl, @selector(mouseDown:), (IMP)OnMouseEvent, "v@:@");
   class_addMethod(cl, @selector(rightMouseDown:), (IMP)OnMouseEvent, "v@:@");
@@ -162,10 +132,12 @@ void AddKeyEventHandlerToClass(Class cl) {
 }
 
 void AddViewMethodsToClass(Class cl) {
+  class_addMethod(cl, @selector(nuInjected), (IMP)NUInjected, "B@:");
+  class_addMethod(cl, @selector(shell), (IMP)GetShell, "^v@:");
   class_addMethod(cl, @selector(acceptsFirstResponder),
                   (IMP)AcceptsFirstResponder, "B@:");
-  class_addMethod(cl, @selector(setAcceptsFirstResponder:),
-                  (IMP)SetAcceptsFirstResponder, "v@:B");
+  class_addMethod(cl, @selector(mouseDownCanMoveWindow),
+                  (IMP)MouseDownCanMoveWindow, "B@:");
   class_addMethod(cl, @selector(enableTracking), (IMP)EnableTracking, "v@:");
   class_addMethod(cl, @selector(disableTracking), (IMP)DisableTracking, "v@:");
 
@@ -177,6 +149,34 @@ void AddViewMethodsToClass(Class cl) {
   if (base::mac::IsOS10_9())
     class_addMethod(cl, @selector(updateTrackingAreas),
                     (IMP)UpdateTrackingAreas, "v@:");
+}
+
+bool DispatchMouseEvent(View* view, NSEvent* event) {
+  bool prevent_default = false;
+  MouseEvent mouse_event(event, view->GetNative());
+  switch (mouse_event.type) {
+    case EventType::MouseDown:
+      prevent_default = view->on_mouse_down.Emit(view, mouse_event);
+      break;
+    case EventType::MouseUp:
+      prevent_default = view->on_mouse_up.Emit(view, mouse_event);
+      break;
+    case EventType::MouseMove:
+      view->on_mouse_move.Emit(view, mouse_event);
+      prevent_default = true;
+      break;
+    case EventType::MouseEnter:
+      view->on_mouse_enter.Emit(view, mouse_event);
+      prevent_default = true;
+      break;
+    case EventType::MouseLeave:
+      view->on_mouse_leave.Emit(view, mouse_event);
+      prevent_default = true;
+      break;
+    default:
+      break;
+  }
+  return prevent_default;
 }
 
 }  // namespace nu

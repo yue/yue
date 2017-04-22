@@ -5,12 +5,15 @@
 #ifndef NATIVEUI_MAC_NU_PRIVATE_H_
 #define NATIVEUI_MAC_NU_PRIVATE_H_
 
+#include <memory>
+
 #include "base/mac/scoped_nsobject.h"
 
 @class NSTrackingArea;
 
 namespace nu {
 
+class MouseCapture;
 class View;
 
 // A private class that holds nativeui specific private data.
@@ -23,7 +26,9 @@ struct NUPrivate {
 
   View* shell = nullptr;
   bool focusable = true;
+  bool draggable = false;
   base::scoped_nsobject<NSTrackingArea> tracking_area;
+  std::unique_ptr<MouseCapture> mouse_capture;
 };
 
 }  // namespace nu

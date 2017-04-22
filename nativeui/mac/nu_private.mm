@@ -4,6 +4,8 @@
 
 #include "nativeui/mac/nu_private.h"
 
+#include "nativeui/mac/mouse_capture.h"
+
 namespace nu {
 
 NUPrivate::NUPrivate() {

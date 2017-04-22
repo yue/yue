@@ -117,10 +117,17 @@ int EventModifiersFromNS(NSEventModifierFlags flags) {
   return flags & (MASK_SHIFT | MASK_CONTROL | MASK_ALT | MASK_META);
 }
 
-PointF FlipWindowPos(NSPoint point, NSWindow* window) {
-  DCHECK(window);
-  NSRect rect = [window contentRectForFrameRect:[window frame]];
-  return PointF(point.x, NSHeight(rect) - point.y);
+PointF GetPosInView(NSEvent* event, NSView* view) {
+  NSPoint point = [view convertPoint:[event locationInWindow] fromView:nil];
+  NSRect frame = [view frame];
+  return PointF(point.x, NSHeight(frame) - point.y);
+}
+
+PointF GetPosInWindow(NSEvent* event) {
+  NSWindow* window = [event window];
+  NSPoint point = [event locationInWindow];
+  NSRect frame = [window contentRectForFrameRect:[window frame]];
+  return PointF(point.x, NSHeight(frame) - point.y);
 }
 
 }  // namespace
@@ -135,7 +142,8 @@ Event::Event(NativeEvent event, NativeView view)
 MouseEvent::MouseEvent(NativeEvent event, NativeView view)
     : Event(event, view),
       button([event buttonNumber] + 1),
-      position(FlipWindowPos([event locationInWindow], [event window])) {
+      position_in_view(GetPosInView(event, view)),
+      position_in_window(GetPosInWindow(event)) {
 }
 
 KeyEvent::KeyEvent(NativeEvent event, NativeView view)

@@ -161,6 +161,8 @@ component("nativeui") {
     "gtk/window_gtk.cc",
     "mac/events_handler.h",
     "mac/events_handler.mm",
+    "mac/mouse_capture.h",
+    "mac/mouse_capture.mm",
     "mac/nu_application_delegate.h",
     "mac/nu_application_delegate.mm",
     "mac/nu_private.h",

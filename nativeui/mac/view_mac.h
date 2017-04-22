@@ -14,14 +14,15 @@ class View;
 struct NUPrivate;
 }
 
+// The methods that every View should implemented.
 @protocol NUView
 - (nu::NUPrivate*)nuPrivate;
 - (void)setNUBackgroundColor:(nu::Color)color;
 @end
 
+// Extended methods added automatically.
 @interface NSView (NUViewMethods) <NUView>
 - (nu::View*)shell;
-- (void)setAcceptsFirstResponder:(BOOL)yes;
 - (void)enableTracking;
 - (void)disableTracking;
 @end
