@@ -560,8 +560,10 @@ template<>
 struct Type<nu::Window::Options> {
   static constexpr const char* name = "yue.Window.Options";
   static inline bool To(State* state, int index, nu::Window::Options* out) {
-    if (GetType(state, index) == LuaType::Table)
+    if (GetType(state, index) == LuaType::Table) {
       RawGetAndPop(state, index, "bounds", &out->bounds);
+      RawGetAndPop(state, index, "frame", &out->frame);
+    }
     return true;
   }
 };

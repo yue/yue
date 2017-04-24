@@ -616,6 +616,7 @@ struct Type<nu::Window::Options> {
     if (obj.IsEmpty())
       return false;
     Get(context, obj, "bounds", &out->bounds);
+    Get(context, obj, "frame", &out->frame);
     return true;
   }
 };

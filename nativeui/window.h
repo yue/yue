@@ -17,7 +17,10 @@ class MenuBar;
 class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
  public:
   struct Options {
+    // Initial window size.
     RectF bounds;
+    // Whether the window has a chrome.
+    bool frame = true;
   };
 
   explicit Window(const Options& options);

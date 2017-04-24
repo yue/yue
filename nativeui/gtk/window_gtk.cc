@@ -34,6 +34,26 @@ void Window::PlatformInit(const Options& options) {
   window_ = GTK_WINDOW(gtk_window_new(GTK_WINDOW_TOPLEVEL));
   gtk_window_set_focus_on_map(window_, false);
 
+  if (!options.frame) {
+    // Setting a hidden titlebar to force using CSD rendering.
+    gtk_window_set_titlebar(window_, gtk_label_new("you should not see me"));
+
+    // Since we are not using any titlebar, we have to override the border
+    // radius of the client decoration to avoid having rounded shadow for the
+    // rectange window.
+    GtkCssProvider* provider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(
+        provider,
+        // Using 0 would triger a bug of GTK's shadow rendering code.
+        "decoration { border-radius: 0.01px; }", -1, nullptr);
+    gtk_style_context_add_provider(
+        gtk_widget_get_style_context(GTK_WIDGET(window_)),
+        GTK_STYLE_PROVIDER(provider), G_MAXUINT);
+    // Store the provider inside window, we may need to remove it later when
+    // user sets a custom titlebar.
+    g_object_set_data_full(G_OBJECT(window_), "", provider, g_object_unref);
+  }
+
   // Must use a vbox to pack menubar.
   GtkWidget* vbox = gtk_vbox_new(FALSE, 0);
   gtk_widget_show(vbox);
