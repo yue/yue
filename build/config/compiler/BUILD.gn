@@ -986,6 +986,11 @@ config("default_warnings") {
       cflags += [ "-Wundeclared-selector" ]
     }
 
+    if (is_linux) {
+      # Different versions of system libraries have various deprecated warnings.
+      cflags_cc += [ "-Wno-deprecated-declarations" ]
+    }
+
     # Suppress warnings about ABI changes on ARM (Clang doesn't give this
     # warning).
     if (current_cpu == "arm" && !is_clang) {
