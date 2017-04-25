@@ -66,31 +66,21 @@ void Container::BoundsChanged() {
 }
 
 SizeF Container::GetPreferredSize() const {
-  float float_max = std::numeric_limits<float>::max();
-  YGLayoutNodeInternal(node(), float_max, float_max, YGDirectionLTR,
-                       YGMeasureModeAtMost, YGMeasureModeAtMost,
-                       float_max, float_max, false, "GetPreferredSize",
-                       node()->config);
-  return SizeF(node()->layout.measuredDimensions[YGDimensionWidth],
-               node()->layout.measuredDimensions[YGDimensionHeight]);
+  float nan = std::numeric_limits<float>::quiet_NaN();
+  YGNodeCalculateLayout(node(), nan, nan, YGDirectionLTR);
+  return SizeF(YGNodeLayoutGetWidth(node()), YGNodeLayoutGetHeight(node()));
 }
 
 float Container::GetPreferredHeightForWidth(float width) const {
-  float float_max = std::numeric_limits<float>::max();
-  YGLayoutNodeInternal(node(), width, float_max, YGDirectionLTR,
-                       YGMeasureModeExactly, YGMeasureModeAtMost, float_max,
-                       float_max, false, "GetPreferredHeightForWidth",
-                       node()->config);
-  return node()->layout.measuredDimensions[YGDimensionHeight];
+  float nan = std::numeric_limits<float>::quiet_NaN();
+  YGNodeCalculateLayout(node(), width, nan, YGDirectionLTR);
+  return YGNodeLayoutGetHeight(node());
 }
 
 float Container::GetPreferredWidthForHeight(float height) const {
-  float float_max = std::numeric_limits<float>::max();
-  YGLayoutNodeInternal(node(), float_max, height, YGDirectionLTR,
-                       YGMeasureModeAtMost, YGMeasureModeExactly, float_max,
-                       float_max, false, "GetPreferredWidthForHeight",
-                       node()->config);
-  return node()->layout.measuredDimensions[YGDimensionWidth];
+  float nan = std::numeric_limits<float>::quiet_NaN();
+  YGNodeCalculateLayout(node(), nan, height, YGDirectionLTR);
+  return YGNodeLayoutGetWidth(node());
 }
 
 void Container::AddChildView(View* view) {
