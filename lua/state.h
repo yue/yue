@@ -6,7 +6,12 @@
 #define LUA_STATE_H_
 
 #include "base/macros.h"
-#include "third_party/lua/src/lua.hpp"
+
+extern "C" {
+#include "third_party/lua/lua.h"
+#include "third_party/lua/lualib.h"
+#include "third_party/lua/lauxlib.h"
+}
 
 namespace lua {
 
