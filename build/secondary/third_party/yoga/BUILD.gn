@@ -6,6 +6,7 @@ config("yoga_config") {
 
 source_set("yoga") {
   sources = [
+    "yoga/YGEnums.c",
     "yoga/YGEnums.h",
     "yoga/YGMacros.h",
     "yoga/YGNodeList.c",

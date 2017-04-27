@@ -7,7 +7,7 @@
 #include "nativeui/container.h"
 #include "nativeui/state.h"
 #include "nativeui/util/css.h"
-#include "nativeui/util/yoga.h"
+#include "third_party/yoga/yoga/Yoga.h"
 
 namespace nu {
 
