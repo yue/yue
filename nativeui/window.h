@@ -21,11 +21,18 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
     RectF bounds;
     // Whether the window has a chrome.
     bool frame = true;
+
+#if defined(OS_MACOSX)
+    // Show window buttons for the frameless window.
+    bool show_traffic_lights = false;
+#endif
   };
 
   explicit Window(const Options& options);
 
   void Close();
+
+  bool HasFrame() const { return has_frame_; }
 
   void SetContentView(Container* view);
   Container* GetContentView() const;
@@ -68,6 +75,9 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
 #if defined(OS_WIN) || defined(OS_LINUX)
   void PlatformSetMenu(MenuBar* menu_bar);
 #endif
+
+  // Whether window has a native chrome.
+  bool has_frame_;
 
   // The yoga config for window's children.
   YGConfigRef yoga_config_;

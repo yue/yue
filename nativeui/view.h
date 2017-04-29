@@ -69,6 +69,10 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   void ReleaseCapture();
   bool HasCapture() const;
 
+  // Dragging the view would move the window.
+  void SetMouseDownCanMoveWindow(bool yes);
+  bool IsMouseDownCanMoveWindow() const;
+
   // Set backgroundcolor.
   void SetBackgroundColor(Color color);
   Color GetBackgroundColor() const;

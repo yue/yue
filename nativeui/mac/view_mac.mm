@@ -34,23 +34,31 @@ void View::TakeOverView(NativeView view) {
 
   // Install events handle for the view's class.
   Class cl = [view class];
-  if (!EventHandlerInstalled(cl)) {
+  if (!ViewMethodsInstalled(cl)) {
+    AddViewMethods(cl);
+    // TODO(zcbenz): Lazily install the event hooks.
     AddMouseEventHandlerToClass(cl);
     AddKeyEventHandlerToClass(cl);
-    AddViewMethodsToClass(cl);
   }
 
   // Initialize private bits of the view.
   NUPrivate* priv = [view nuPrivate];
   priv->shell = this;
 
-  // Set the focusable property to the parent class's default one.
+  // Set the |focusable| property to the parent class's default one.
   SEL cmd = @selector(acceptsFirstResponder);
   auto super_impl = reinterpret_cast<BOOL (*)(NSView*, SEL)>(
       [[view superclass] instanceMethodForSelector:cmd]);
   priv->focusable = super_impl(view, cmd);
 
+  // Set the |draggable| property to the parent class's default one.
+  cmd = @selector(mouseDownCanMoveWindow);
+  super_impl = reinterpret_cast<BOOL (*)(NSView*, SEL)>(
+      [[view superclass] instanceMethodForSelector:cmd]);
+  priv->draggable = super_impl(view, cmd);
+
   // Install event tracking area.
+  // TODO(zcbenz): Lazily install the event hooks.
   [view enableTracking];
 }
 
@@ -137,6 +145,20 @@ void View::ReleaseCapture() {
 
 bool View::HasCapture() const {
   return g_captured_view == this;
+}
+
+void View::SetMouseDownCanMoveWindow(bool yes) {
+  NUPrivate* priv = [view_ nuPrivate];
+  priv->draggable = yes;
+
+  // AppKit will not update its cache of mouseDownCanMoveWindow unless something
+  // changes.
+  [[view_ window] setMovableByWindowBackground:NO];
+  [[view_ window] setMovableByWindowBackground:YES];
+}
+
+bool View::IsMouseDownCanMoveWindow() const {
+  return [view_ mouseDownCanMoveWindow];
 }
 
 void View::PlatformSetBackgroundColor(Color color) {

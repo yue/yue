@@ -6,7 +6,10 @@
 
 #import <Cocoa/Cocoa.h>
 
+#include "base/mac/mac_util.h"
 #include "nativeui/gfx/mac/coordinate_conversion.h"
+#include "nativeui/mac/nu_private.h"
+#include "nativeui/mac/view_mac.h"
 #include "third_party/yoga/yoga/Yoga.h"
 
 @interface NUWindowDelegate : NSObject<NSWindowDelegate> {
@@ -70,6 +73,35 @@ void Window::PlatformInit(const Options& options) {
 
   YGConfigSetPointScaleFactor(yoga_config_,
                               [window_ screen].backingScaleFactor);
+
+  if (!options.frame) {
+    // The fullscreen button should always be hidden for frameless window.
+    [[window_ standardWindowButton:NSWindowFullScreenButton] setHidden:YES];
+
+    // Showing traffic lights for macOS 10.9 requires special work.
+    if (options.show_traffic_lights && base::mac::IsOS10_9()) {
+      NSButton* b;
+      b = [window_ standardWindowButton:NSWindowZoomButton];
+      [[b superview] addSubview:b positioned:NSWindowAbove relativeTo:nil];
+      b = [window_ standardWindowButton:NSWindowMiniaturizeButton];
+      [[b superview] addSubview:b positioned:NSWindowAbove relativeTo:nil];
+      b = [window_ standardWindowButton:NSWindowCloseButton];
+      [[b superview] addSubview:b positioned:NSWindowAbove relativeTo:nil];
+      return;
+    }
+
+    if (!options.show_traffic_lights) {
+      // Hide the window buttons.
+      [[window_ standardWindowButton:NSWindowZoomButton] setHidden:YES];
+      [[window_ standardWindowButton:NSWindowMiniaturizeButton] setHidden:YES];
+      [[window_ standardWindowButton:NSWindowCloseButton] setHidden:YES];
+
+      // Some third-party macOS utilities check the zoom button's enabled state
+      // to determine whether to show custom UI on hover, so we disable it here
+      // to prevent them from doing so in a frameless app window.
+      [[window_ standardWindowButton:NSWindowZoomButton] setEnabled:NO];
+    }
+  }
 }
 
 void Window::PlatformDestroy() {
@@ -85,7 +117,21 @@ void Window::Close() {
 }
 
 void Window::PlatformSetContentView(Container* container) {
-  [window_ setContentView:container->GetNative()];
+  if (content_view_) {
+    [content_view_->GetNative() setWantsLayer:NO];
+    [content_view_->GetNative() nuPrivate]->is_content_view = false;
+  }
+
+  // Make sure the bottom corner is rounded for non-modal windows:
+  // http://crbug.com/396264
+  // But do not enable it on OS X 10.9 for transparent window, otherwise a
+  // semi-transparent frame would show.
+  NSView* content_view = container->GetNative();
+  // TODO(zcbenz): if (!(transparent() && base::mac::IsOS10_9()) && !is_modal())
+  [content_view setWantsLayer:YES];
+
+  [content_view nuPrivate]->is_content_view = true;
+  [window_ setContentView:content_view];
   container->Layout();
 }
 

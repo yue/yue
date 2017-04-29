@@ -10,7 +10,9 @@
 
 namespace nu {
 
-Window::Window(const Options& options) : yoga_config_(YGConfigNew()) {
+Window::Window(const Options& options)
+    : has_frame_(options.frame),
+      yoga_config_(YGConfigNew()) {
   // Default yoga config.
   YGConfigSetExperimentalFeatureEnabled(yoga_config_,
                                         YGExperimentalFeatureRounding, true);

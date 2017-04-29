@@ -70,6 +70,7 @@ void View::TakeOverView(NativeView view) {
                               GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK);
 
   // Install event hooks.
+  // TODO(zcbenz): Lazily install the event hooks.
   g_signal_connect(view, "button-press-event", G_CALLBACK(OnMouseEvent), this);
   g_signal_connect(view, "button-release-event", G_CALLBACK(OnMouseEvent), this);  // NOLINT
   g_signal_connect(view, "motion-notify-event", G_CALLBACK(OnMouseEvent), this);

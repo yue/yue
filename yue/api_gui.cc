@@ -563,6 +563,10 @@ struct Type<nu::Window::Options> {
     if (GetType(state, index) == LuaType::Table) {
       RawGetAndPop(state, index, "bounds", &out->bounds);
       RawGetAndPop(state, index, "frame", &out->frame);
+#if defined(OS_MACOSX)
+      RawGetAndPop(state, index,
+                   "showtrafficlights", &out->show_traffic_lights);
+#endif
     }
     return true;
   }
@@ -614,6 +618,8 @@ struct Type<nu::View> {
            "setcapture", &nu::View::SetCapture,
            "releasecapture", &nu::View::ReleaseCapture,
            "hascapture", &nu::View::HasCapture,
+           "setmousedowncanmovewindow", &nu::View::SetMouseDownCanMoveWindow,
+           "ismousedowncanmovewindow", &nu::View::IsMouseDownCanMoveWindow,
            "setbackgroundcolor", &nu::View::SetBackgroundColor,
            "setstyle", &SetStyle,
            "printstyle", &nu::View::PrintStyle,

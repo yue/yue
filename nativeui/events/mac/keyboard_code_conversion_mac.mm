@@ -507,7 +507,6 @@ int MacKeyCodeForWindowsKeyCode(KeyboardCode keycode,
     }
   }
 
-  // TODO(suzhe): Support characters for Option key bindings.
   return macKeycode;
 }
 

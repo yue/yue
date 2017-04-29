@@ -617,6 +617,9 @@ struct Type<nu::Window::Options> {
       return false;
     Get(context, obj, "bounds", &out->bounds);
     Get(context, obj, "frame", &out->frame);
+#if defined(OS_MACOSX)
+    Get(context, obj, "showTrafficLights", &out->show_traffic_lights);
+#endif
     return true;
   }
 };
@@ -676,6 +679,8 @@ struct Type<nu::View> {
         "setCapture", &nu::View::SetCapture,
         "releaseCapture", &nu::View::ReleaseCapture,
         "hasCapture", &nu::View::HasCapture,
+        "setMouseDownCanMoveWindow", &nu::View::SetMouseDownCanMoveWindow,
+        "isMouseDownCanMoveWindow", &nu::View::IsMouseDownCanMoveWindow,
         "setBackgroundColor", &nu::View::SetBackgroundColor,
         "setStyle", &SetStyle,
         "printStyle", &nu::View::PrintStyle,
