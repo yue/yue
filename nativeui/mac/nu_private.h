@@ -32,15 +32,6 @@ struct NUPrivate {
   std::unique_ptr<MouseCapture> mouse_capture;
 };
 
-// Return whether a class is part of nativeui system.
-bool IsNUView(id view);
-
-// Return whether a class has been installed with custom methods.
-bool ViewMethodsInstalled(Class cl);
-
-// Add custom view methods to class.
-void AddViewMethods(Class cl);
-
 }  // namespace nu
 
 #endif  // NATIVEUI_MAC_NU_PRIVATE_H_

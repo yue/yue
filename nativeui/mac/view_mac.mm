@@ -2,7 +2,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/mac/view_mac.h"
+#include "nativeui/mac/nu_view.h"
 
 #include "nativeui/container.h"
 #include "nativeui/gfx/geometry/point_conversions.h"
@@ -34,8 +34,8 @@ void View::TakeOverView(NativeView view) {
 
   // Install events handle for the view's class.
   Class cl = [view class];
-  if (!ViewMethodsInstalled(cl)) {
-    AddViewMethods(cl);
+  if (!NUViewMethodsInstalled(cl)) {
+    InstallNUViewMethods(cl);
     // TODO(zcbenz): Lazily install the event hooks.
     AddMouseEventHandlerToClass(cl);
     AddKeyEventHandlerToClass(cl);

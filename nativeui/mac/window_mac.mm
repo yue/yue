@@ -9,7 +9,8 @@
 #include "base/mac/mac_util.h"
 #include "nativeui/gfx/mac/coordinate_conversion.h"
 #include "nativeui/mac/nu_private.h"
-#include "nativeui/mac/view_mac.h"
+#include "nativeui/mac/nu_view.h"
+#include "nativeui/mac/nu_window.h"
 #include "third_party/yoga/yoga/Yoga.h"
 
 @interface NUWindowDelegate : NSObject<NSWindowDelegate> {
@@ -62,11 +63,13 @@ void Window::PlatformInit(const Options& options) {
   NSUInteger styleMask = NSTitledWindowMask | NSMiniaturizableWindowMask |
                          NSClosableWindowMask | NSResizableWindowMask |
                          NSTexturedBackgroundWindowMask;
-  window_ = [[NSWindow alloc]
+  NUWindow* window = [[NUWindow alloc]
       initWithContentRect:ScreenRectToNSRect(options.bounds)
                 styleMask:styleMask
                   backing:NSBackingStoreBuffered
                     defer:YES];
+  [window setShell:this];
+  window_ = window;
 
   [window_ setDelegate:[[NUWindowDelegate alloc] initWithShell:this]];
   [window_ setReleasedWhenClosed:NO];
@@ -133,6 +136,7 @@ void Window::PlatformSetContentView(View* view) {
 
   [content_view nuPrivate]->is_content_view = true;
   [window_ setContentView:content_view];
+  [content_view setFrame:[[[window_ contentView] superview] bounds]];
 
   if (view->GetClassName() == Container::kClassName)
     static_cast<Container*>(view)->Layout();

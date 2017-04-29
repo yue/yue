@@ -9,7 +9,7 @@
 #include "nativeui/gfx/mac/painter_mac.h"
 #include "nativeui/gfx/mac/text_mac.h"
 #include "nativeui/mac/nu_private.h"
-#include "nativeui/mac/view_mac.h"
+#include "nativeui/mac/nu_view.h"
 #include "nativeui/state.h"
 
 @interface NULabel : NSView<NUView> {

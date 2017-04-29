@@ -6,7 +6,7 @@
 
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/mac/nu_private.h"
-#include "nativeui/mac/view_mac.h"
+#include "nativeui/mac/nu_view.h"
 
 @interface NUEntry : NSTextField<NUView> {
  @private

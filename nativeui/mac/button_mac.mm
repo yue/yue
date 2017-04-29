@@ -7,7 +7,7 @@
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/gfx/geometry/insets_f.h"
 #include "nativeui/mac/nu_private.h"
-#include "nativeui/mac/view_mac.h"
+#include "nativeui/mac/nu_view.h"
 
 namespace {
 

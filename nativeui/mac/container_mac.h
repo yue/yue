@@ -7,7 +7,7 @@
 
 #include "nativeui/container.h"
 #include "nativeui/mac/nu_private.h"
-#include "nativeui/mac/view_mac.h"
+#include "nativeui/mac/nu_view.h"
 
 @interface NUContainer : NSView<NUView> {
  @private
