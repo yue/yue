@@ -91,6 +91,9 @@ static void nu_container_realize(GtkWidget* widget) {
   NUContainerPrivate* priv = NU_CONTAINER(widget)->priv;
   priv->event_window = gdk_window_new(window, &attributes, GDK_WA_X | GDK_WA_Y);
   gtk_widget_register_window(widget, priv->event_window);
+  gdk_window_move_resize(priv->event_window,
+                         allocation.x, allocation.y,
+                         allocation.width, allocation.height);
 }
 
 static void nu_container_unrealize(GtkWidget* widget) {

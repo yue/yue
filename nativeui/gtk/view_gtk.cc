@@ -20,14 +20,36 @@ namespace {
 // The view that has the capture.
 View* g_grabbed_view = nullptr;
 
+gboolean OnMouseMove(GtkWidget* widget, GdkEvent* event, View* view) {
+  // If user is dragging a widget that supports mouseDownMoveWindow, then we
+  // need to move the window.
+  if (event->motion.state & GDK_BUTTON1_MASK &&
+      view->IsMouseDownCanMoveWindow()) {
+    GtkWidget* toplevel = gtk_widget_get_toplevel(widget);
+    if (gtk_widget_is_toplevel(toplevel)) {
+      GdkWindow* window = gtk_widget_get_window(toplevel);
+      gdk_window_begin_move_drag(window, 1,
+                                 event->motion.x_root, event->motion.y_root,
+                                 event->motion.time);
+      return true;
+    }
+  }
+
+  // Otherwise dispatch the event.
+  if (!view->on_mouse_move.IsEmpty()) {
+    view->on_mouse_move.Emit(view, MouseEvent(event, widget));
+    return true;
+  }
+
+  return false;
+}
+
 gboolean OnMouseEvent(GtkWidget* widget, GdkEvent* event, View* view) {
   switch (event->any.type) {
     case GDK_BUTTON_PRESS:
       return view->on_mouse_down.Emit(view, MouseEvent(event, widget));
     case GDK_BUTTON_RELEASE:
       return view->on_mouse_up.Emit(view, MouseEvent(event, widget));
-    case GDK_MOTION_NOTIFY:
-      view->on_mouse_move.Emit(view, MouseEvent(event, widget));
       return true;
     case GDK_ENTER_NOTIFY:
       view->on_mouse_enter.Emit(view, MouseEvent(event, widget));
@@ -70,10 +92,10 @@ void View::TakeOverView(NativeView view) {
                               GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK);
 
   // Install event hooks.
+  g_signal_connect(view, "motion-notify-event", G_CALLBACK(OnMouseMove), this);
   // TODO(zcbenz): Lazily install the event hooks.
   g_signal_connect(view, "button-press-event", G_CALLBACK(OnMouseEvent), this);
   g_signal_connect(view, "button-release-event", G_CALLBACK(OnMouseEvent), this);  // NOLINT
-  g_signal_connect(view, "motion-notify-event", G_CALLBACK(OnMouseEvent), this);
   g_signal_connect(view, "enter-notify-event", G_CALLBACK(OnMouseEvent), this);
   g_signal_connect(view, "leave-notify-event", G_CALLBACK(OnMouseEvent), this);
   g_signal_connect(view, "key-press-event", G_CALLBACK(OnKeyDown), this);
@@ -192,6 +214,14 @@ void View::ReleaseCapture() {
 
 bool View::HasCapture() const {
   return gdk_pointer_is_grabbed() && g_grabbed_view == this;
+}
+
+void View::SetMouseDownCanMoveWindow(bool yes) {
+  g_object_set_data(G_OBJECT(view_), "draggable", yes ? this : nullptr);
+}
+
+bool View::IsMouseDownCanMoveWindow() const {
+  return g_object_get_data(G_OBJECT(view_), "draggable");
 }
 
 void View::PlatformSetBackgroundColor(Color color) {
