@@ -116,8 +116,9 @@ void Window::Close() {
   [window_ performClose:nil];
 }
 
-void Window::PlatformSetContentView(Container* container) {
+void Window::PlatformSetContentView(View* view) {
   if (content_view_) {
+    [content_view_->GetNative() removeFromSuperview];
     [content_view_->GetNative() setWantsLayer:NO];
     [content_view_->GetNative() nuPrivate]->is_content_view = false;
   }
@@ -126,13 +127,15 @@ void Window::PlatformSetContentView(Container* container) {
   // http://crbug.com/396264
   // But do not enable it on OS X 10.9 for transparent window, otherwise a
   // semi-transparent frame would show.
-  NSView* content_view = container->GetNative();
+  NSView* content_view = view->GetNative();
   // TODO(zcbenz): if (!(transparent() && base::mac::IsOS10_9()) && !is_modal())
   [content_view setWantsLayer:YES];
 
   [content_view nuPrivate]->is_content_view = true;
   [window_ setContentView:content_view];
-  container->Layout();
+
+  if (view->GetClassName() == Container::kClassName)
+    static_cast<Container*>(view)->Layout();
 }
 
 void Window::SetContentBounds(const RectF& bounds) {

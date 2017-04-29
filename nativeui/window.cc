@@ -26,16 +26,16 @@ Window::~Window() {
   PlatformDestroy();
 }
 
-void Window::SetContentView(Container* container) {
-  if (!container) {
+void Window::SetContentView(View* view) {
+  if (!view) {
     LOG(ERROR) << "Content view can not be null";
     return;
   }
-  PlatformSetContentView(container);
-  content_view_ = container;
+  PlatformSetContentView(view);
+  content_view_ = view;
 }
 
-Container* Window::GetContentView() const {
+View* Window::GetContentView() const {
   return content_view_.get();
 }
 

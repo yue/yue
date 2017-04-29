@@ -83,15 +83,15 @@ void Window::Close() {
   window_ = nullptr;
 }
 
-void Window::PlatformSetContentView(Container* container) {
+void Window::PlatformSetContentView(View* view) {
   GtkContainer* vbox = GTK_CONTAINER(gtk_bin_get_child(GTK_BIN(window_)));
   if (content_view_)
     gtk_container_remove(vbox, content_view_->GetNative());
-  gtk_container_add(vbox, container->GetNative());
-  gtk_box_set_child_packing(GTK_BOX(vbox), container->GetNative(), TRUE, TRUE,
+  gtk_container_add(vbox, view->GetNative());
+  gtk_box_set_child_packing(GTK_BOX(vbox), view->GetNative(), TRUE, TRUE,
                             0, GTK_PACK_END);
 
-  ForceSizeAllocation(window_, container->GetNative());
+  ForceSizeAllocation(window_, view->GetNative());
 }
 
 void Window::PlatformSetMenu(MenuBar* menu_bar) {

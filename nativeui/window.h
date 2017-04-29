@@ -34,8 +34,8 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
 
   bool HasFrame() const { return has_frame_; }
 
-  void SetContentView(Container* view);
-  Container* GetContentView() const;
+  void SetContentView(View* view);
+  View* GetContentView() const;
 
   void SetContentBounds(const RectF& bounds);
   RectF GetContentBounds() const;
@@ -71,7 +71,7 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
   // Following platform implementations should only be called by wrappers.
   void PlatformInit(const Options& options);
   void PlatformDestroy();
-  void PlatformSetContentView(Container* container);
+  void PlatformSetContentView(View* container);
 #if defined(OS_WIN) || defined(OS_LINUX)
   void PlatformSetMenu(MenuBar* menu_bar);
 #endif
@@ -87,7 +87,7 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
 #endif
 
   NativeWindow window_;
-  scoped_refptr<Container> content_view_;
+  scoped_refptr<View> content_view_;
 };
 
 }  // namespace nu

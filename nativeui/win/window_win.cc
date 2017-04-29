@@ -269,9 +269,9 @@ void Window::Close() {
   ::SendMessage(window_->hwnd(), WM_CLOSE, 0, 0);
 }
 
-void Window::PlatformSetContentView(Container* container) {
-  container->GetNative()->BecomeContentView(window_);
-  container->SetPixelBounds(Rect(window_->GetContentPixelBounds().size()));
+void Window::PlatformSetContentView(View* view) {
+  view->GetNative()->BecomeContentView(window_);
+  view->SetPixelBounds(Rect(window_->GetContentPixelBounds().size()));
 }
 
 void Window::PlatformSetMenu(MenuBar* menu_bar) {
