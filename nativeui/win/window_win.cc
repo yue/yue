@@ -64,6 +64,12 @@ Rect WindowImpl::GetContentPixelBounds() {
   return Rect(point.x, point.y, r.right - r.left, r.bottom - r.top);
 }
 
+void WindowImpl::AdvanceFocus() {
+  if (delegate_->GetContentView()->GetClassName() == Container::kClassName)
+    focus_manager_.AdvanceFocus(
+        static_cast<Container*>(delegate_->GetContentView()), IsShiftPressed());
+}
+
 void WindowImpl::SetCapture(ViewImpl* view) {
   captured_view_ = view;
   ::SetCapture(hwnd());
@@ -197,7 +203,7 @@ LRESULT WindowImpl::OnKeyEvent(UINT message, WPARAM w_param, LPARAM l_param) {
 
 void WindowImpl::OnChar(UINT ch, UINT repeat, UINT flags) {
   if (ch == VK_TAB)
-    focus_manager_.AdvanceFocus(delegate_->GetContentView(), IsShiftPressed());
+    AdvanceFocus();
 }
 
 void WindowImpl::OnPaint(HDC) {

@@ -19,6 +19,8 @@ class WindowImpl : public Win32Window {
   Rect GetPixelBounds();
   Rect GetContentPixelBounds();
 
+  void AdvanceFocus();
+
   void SetCapture(ViewImpl* view);
   void ReleaseCapture();
 

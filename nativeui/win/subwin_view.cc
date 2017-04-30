@@ -13,14 +13,6 @@
 
 namespace nu {
 
-namespace {
-
-bool IsShiftPressed() {
-  return (::GetKeyState(VK_SHIFT) & 0x8000) == 0x8000;
-}
-
-}  // namespace
-
 SubwinView::SubwinView(View* delegate,
                        base::StringPiece16 class_name,
                        DWORD window_style, DWORD window_ex_style)
@@ -104,8 +96,7 @@ bool SubwinView::OnCtlColor(HDC dc, HBRUSH* brush) {
 
 void SubwinView::OnChar(UINT ch, UINT repeat, UINT flags) {
   if (ch == VK_TAB && window())  // Switching focus.
-    window()->focus_manager()->AdvanceFocus(
-        window()->delegate()->GetContentView(), IsShiftPressed());
+    window()->AdvanceFocus();
   else
     SetMsgHandled(false);
 }
