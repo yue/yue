@@ -246,6 +246,26 @@ LRESULT WindowImpl::OnDPIChanged(UINT msg, WPARAM w_param, LPARAM l_param) {
   return 1;
 }
 
+LRESULT WindowImpl::OnNCHitTest(UINT msg, WPARAM w_param, LPARAM l_param) {
+  // Only override this for frameless window.
+  if (delegate_->HasFrame()) {
+    SetMsgHandled(false);
+    return 0;
+  }
+
+  // Do nothing for non-client area for now.
+  LRESULT hit = DefWindowProc(hwnd(), msg, w_param, l_param);
+  if (hit != HTCLIENT)
+    return hit;
+
+  // Convert point to client area.
+  POINT temp = { CR_GET_X_LPARAM(l_param), CR_GET_Y_LPARAM(l_param) };
+  ::MapWindowPoints(HWND_DESKTOP, hwnd(), &temp, 1);
+  Point point(temp);
+
+  return delegate_->GetContentView()->GetNative()->HitTest(point);
+}
+
 void WindowImpl::TrackMouse(bool enable) {
   TRACKMOUSEEVENT event = {0};
   event.cbSize = sizeof(event);

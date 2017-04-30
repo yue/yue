@@ -25,6 +25,10 @@ void ViewImpl::SizeAllocate(const Rect& size_allocation) {
   Invalidate(size_allocation_);  // new
 }
 
+UINT ViewImpl::HitTest(const Point& point) const {
+  return draggable_ ? HTCAPTION : HTCLIENT;
+}
+
 void ViewImpl::SetParent(ViewImpl* parent) {
   window_ = parent ? parent->window_ : nullptr;
 
@@ -266,6 +270,14 @@ void View::ReleaseCapture() {
 bool View::HasCapture() const {
   return view_->window() &&
          view_->window()->captured_view() == view_;
+}
+
+void View::SetMouseDownCanMoveWindow(bool yes) {
+  view_->set_draggable(yes);
+}
+
+bool View::IsMouseDownCanMoveWindow() const {
+  return view_->is_draggable();
 }
 
 void View::PlatformSetBackgroundColor(Color color) {

@@ -19,6 +19,13 @@ void ContainerImpl::SizeAllocate(const Rect& size_allocation) {
     adapter_->Layout();
 }
 
+UINT ContainerImpl::HitTest(const Point& point) const {
+  ViewImpl* child = FindChildFromPoint(point);
+  if (child)
+    return child->HitTest(point);
+  return ViewImpl::HitTest(point);
+}
+
 void ContainerImpl::SetParent(ViewImpl* parent) {
   ViewImpl::SetParent(parent);
   RefreshParentTree();
@@ -121,7 +128,7 @@ void ContainerImpl::RefreshParentTree() {
   });
 }
 
-ViewImpl* ContainerImpl::FindChildFromPoint(const Point& point) {
+ViewImpl* ContainerImpl::FindChildFromPoint(const Point& point) const {
   ViewImpl* result = nullptr;
   adapter_->ForEach([&](ViewImpl* child) {
     if (!child->is_visible())

@@ -30,6 +30,7 @@ class ContainerImpl : public ViewImpl {
 
   // Baseview:
   void SizeAllocate(const Rect& size_allocation) override;
+  UINT HitTest(const Point& point) const override;
   void SetParent(ViewImpl* parent) override;
   void BecomeContentView(WindowImpl* parent) override;
   void SetVisible(bool visible) override;
@@ -45,7 +46,7 @@ class ContainerImpl : public ViewImpl {
 
  private:
   void RefreshParentTree();
-  ViewImpl* FindChildFromPoint(const Point& point);
+  ViewImpl* FindChildFromPoint(const Point& point) const;
 
   Adapter* adapter_;
 

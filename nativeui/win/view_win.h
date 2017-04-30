@@ -40,6 +40,9 @@ class ViewImpl {
   // Change view's bounds, relative to window.
   virtual void SizeAllocate(const Rect& bounds);
 
+  // Return the hittest result for pixel |point|.
+  virtual UINT HitTest(const Point& point) const;
+
   // Set the parent view.
   virtual void SetParent(ViewImpl* parent);
   virtual void BecomeContentView(WindowImpl* parent);
@@ -101,6 +104,9 @@ class ViewImpl {
   void set_focusable(bool focusable) { focusable_ = focusable; }
   bool is_focusable() const { return focusable_; }
 
+  void set_draggable(bool draggable) { draggable_ = draggable; }
+  bool is_draggable() const { return draggable_; }
+
   // Set control's state.
   void set_state(ControlState state) { state_ = state; }
   ControlState state() const { return state_; }
@@ -125,6 +131,9 @@ class ViewImpl {
 
   // Whether the view can have focus.
   bool focusable_ = false;
+
+  // Whether dragging the view can move the window.
+  bool draggable_ = false;
 
   // The background color.
   Color background_color_ = Color(0, 0, 0, 0);  // transparent
