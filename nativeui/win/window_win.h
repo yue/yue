@@ -1,4 +1,5 @@
 // Copyright 2016 Cheng Zhao. All rights reserved.
+// Copyright 2012 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
@@ -13,7 +14,7 @@ namespace nu {
 
 class WindowImpl : public Win32Window {
  public:
-  explicit WindowImpl(Window* delegate);
+  WindowImpl(const Window::Options& options, Window* delegate);
 
   void SetPixelBounds(const Rect& bounds);
   Rect GetPixelBounds();
@@ -25,6 +26,9 @@ class WindowImpl : public Win32Window {
   void ReleaseCapture();
 
   void SetBackgroundColor(nu::Color color);
+
+  bool IsMaximized() const;
+  bool IsFullscreen() const;
 
   Window* delegate() { return delegate_; }
   FocusManager* focus_manager() { return &focus_manager_; }
@@ -50,6 +54,7 @@ class WindowImpl : public Win32Window {
     CR_MSG_WM_ERASEBKGND(OnEraseBkgnd)
     CR_MESSAGE_HANDLER_EX(WM_DPICHANGED, OnDPIChanged)
     CR_MESSAGE_HANDLER_EX(WM_NCHITTEST, OnNCHitTest)
+    CR_MSG_WM_NCCALCSIZE(OnNCCalcSize)
   CR_END_MSG_MAP()
 
  private:
@@ -68,11 +73,16 @@ class WindowImpl : public Win32Window {
   LRESULT OnEraseBkgnd(HDC dc);
   LRESULT OnDPIChanged(UINT msg, WPARAM w_param, LPARAM l_param);
   LRESULT OnNCHitTest(UINT msg, WPARAM w_param, LPARAM l_param);
+  LRESULT OnNCCalcSize(BOOL mode, LPARAM l_param);
 
   void TrackMouse(bool enable);
+  bool GetClientAreaInsets(Insets* insets);
 
   FocusManager focus_manager_;
   bool mouse_in_window_ = false;
+
+  // True the first time nccalc is called on a sizable widget.
+  bool is_first_nccalc_ = true;
 
   // The view that has mouse capture.
   ViewImpl* captured_view_ = nullptr;

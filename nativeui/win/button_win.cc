@@ -5,6 +5,7 @@
 #include "nativeui/button.h"
 
 #include <windowsx.h>
+#undef IsMaximized
 
 #include "base/strings/utf_string_conversions.h"
 #include "base/win/scoped_hdc.h"

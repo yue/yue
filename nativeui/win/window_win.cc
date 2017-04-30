@@ -1,4 +1,5 @@
 // Copyright 2016 Cheng Zhao. All rights reserved.
+// Copyright 2012 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
@@ -10,6 +11,7 @@
 #include "nativeui/accelerator_manager.h"
 #include "nativeui/events/event.h"
 #include "nativeui/events/win/event_win.h"
+#include "nativeui/gfx/geometry/insets.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/gfx/win/double_buffer.h"
 #include "nativeui/gfx/win/painter_win.h"
@@ -23,6 +25,10 @@
 namespace nu {
 
 namespace {
+
+// Default window style for frameless window.
+const DWORD kWindowDefaultFramelessStyle =
+    WS_CAPTION | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
 
 // Convert between window and client areas.
 Rect ContentToWindowBounds(Win32Window* window, bool has_menu_bar,
@@ -39,9 +45,19 @@ bool IsShiftPressed() {
 
 }  // namespace
 
-WindowImpl::WindowImpl(Window* delegate)
-    : delegate_(delegate),
+WindowImpl::WindowImpl(const Window::Options& options, Window* delegate)
+    : Win32Window(L"", NULL, options.frame ? kWindowDefaultStyle
+                                           : kWindowDefaultFramelessStyle),
+      delegate_(delegate),
       scale_factor_(GetScaleFactorForHWND(hwnd())) {
+  if (!options.frame) {
+    // First nccalcszie (during CreateWindow) for captioned windows is
+    // deliberately ignored so force a second one here to get the right
+    // non-client set up.
+    ::SetWindowPos(hwnd(), NULL, 0, 0, 0, 0,
+                   SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE |
+                   SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOREDRAW);
+  }
 }
 
 void WindowImpl::SetPixelBounds(const Rect& bounds) {
@@ -82,7 +98,15 @@ void WindowImpl::ReleaseCapture() {
 
 void WindowImpl::SetBackgroundColor(nu::Color color) {
   background_color_ = color;
-  InvalidateRect(hwnd(), NULL, TRUE);
+  ::InvalidateRect(hwnd(), NULL, TRUE);
+}
+
+bool WindowImpl::IsMaximized() const {
+  return !!::IsZoomed(hwnd()) && !IsFullscreen();
+}
+
+bool WindowImpl::IsFullscreen() const {
+  return false;
 }
 
 void WindowImpl::OnCaptureChanged(HWND window) {
@@ -266,6 +290,46 @@ LRESULT WindowImpl::OnNCHitTest(UINT msg, WPARAM w_param, LPARAM l_param) {
   return delegate_->GetContentView()->GetNative()->HitTest(point);
 }
 
+LRESULT WindowImpl::OnNCCalcSize(BOOL mode, LPARAM l_param) {
+  // Let User32 handle the first nccalcsize for captioned windows
+  // so it updates its internal structures (specifically caption-present)
+  // Without this Tile & Cascade windows won't work.
+  // See http://code.google.com/p/chromium/issues/detail?id=900
+  if (is_first_nccalc_) {
+    is_first_nccalc_ = false;
+    if (::GetWindowLong(hwnd(), GWL_STYLE) & WS_CAPTION) {
+      SetMsgHandled(false);
+      return 0;
+    }
+  }
+
+  Insets insets;
+  bool got_insets = GetClientAreaInsets(&insets);
+  if (!got_insets && !IsFullscreen() && !(mode && !delegate_->HasFrame())) {
+    SetMsgHandled(FALSE);
+    return 0;
+  }
+
+  RECT* client_rect = mode ?
+      &(reinterpret_cast<NCCALCSIZE_PARAMS*>(l_param)->rgrc[0]) :
+      reinterpret_cast<RECT*>(l_param);
+  client_rect->left += insets.left();
+  client_rect->top += insets.top();
+  client_rect->bottom -= insets.bottom();
+  client_rect->right -= insets.right();
+
+  // If the window bounds change, we're going to relayout and repaint anyway.
+  // Returning WVR_REDRAW avoids an extra paint before that of the old client
+  // pixels in the (now wrong) location, and thus makes actions like resizing a
+  // window from the left edge look slightly less broken.
+  // We special case when left or top insets are 0, since these conditions
+  // actually require another repaint to correct the layout after glass gets
+  // turned on and off.
+  if (insets.left() == 0 || insets.top() == 0)
+    return 0;
+  return mode ? WVR_REDRAW : 0;
+}
+
 void WindowImpl::TrackMouse(bool enable) {
   TRACKMOUSEEVENT event = {0};
   event.cbSize = sizeof(event);
@@ -275,11 +339,32 @@ void WindowImpl::TrackMouse(bool enable) {
   TrackMouseEvent(&event);
 }
 
+bool WindowImpl::GetClientAreaInsets(Insets* insets) {
+  // Returning false causes the default handling in OnNCCalcSize() to
+  // be invoked.
+  if (delegate_->HasFrame())
+    return false;
+
+  if (IsMaximized()) {
+    // Windows automatically adds a standard width border to all sides when a
+    // window is maximized.
+    int border_thickness = ::GetSystemMetrics(SM_CXSIZEFRAME);
+    if (!delegate_->HasFrame())
+      border_thickness -= 1;
+    *insets = Insets(border_thickness, border_thickness,
+                     border_thickness, border_thickness);
+    return true;
+  }
+
+  *insets = Insets();
+  return true;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Public Window API implementation.
 
 void Window::PlatformInit(const Options& options) {
-  window_ = new WindowImpl(this);
+  window_ = new WindowImpl(options, this);
   if (!options.bounds.IsEmpty())
     SetBounds(options.bounds);
 

@@ -1,4 +1,5 @@
 // Copyright 2016 Cheng Zhao. All rights reserved.
+// Copyright 2012 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
@@ -37,14 +38,6 @@ Win32Window::Win32Window(base::StringPiece16 class_name, HWND parent,
       class_name.empty() ? reinterpret_cast<wchar_t*>(GetWindowClassAtom())
                          : class_name.data(),
       NULL, window_style, -1, -1, 1, 1, parent, NULL, NULL, this);
-  // First nccalcszie (during CreateWindow) for captioned windows is
-  // deliberately ignored so force a second one here to get the right
-  // non-client set up.
-  if (hwnd && (window_style & WS_CAPTION)) {
-    SetWindowPos(hwnd, NULL, 0, 0, 0, 0,
-                 SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE |
-                 SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOREDRAW);
-  }
 
   // For custom window we the hwnd_ is assigned in WM_NCCREATE.
   if (class_name.empty()) {
