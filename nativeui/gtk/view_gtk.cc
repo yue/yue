@@ -125,14 +125,20 @@ RectF View::GetBounds() const {
 }
 
 void View::SetPixelBounds(const Rect& bounds) {
+  // The size allocation is relative to the window instead of parent.
   GdkRectangle rect = bounds.ToGdkRectangle();
   if (GetParent()) {
-    // The size allocation is relative to the window instead of parent.
     GdkRectangle pb;
     gtk_widget_get_allocation(GetParent()->GetNative(), &pb);
     rect.x += pb.x;
     rect.y += pb.y;
   }
+
+  // Call get_preferred_width before size allocation, otherwise GTK would print
+  // warnings like "How does the code know the size to allocate?".
+  gint width;
+  gtk_widget_get_preferred_width(view_, &width, nullptr);
+
   gtk_widget_size_allocate(view_, &rect);
 }
 
