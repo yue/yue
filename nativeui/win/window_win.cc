@@ -30,6 +30,13 @@ namespace {
 const DWORD kWindowDefaultFramelessStyle =
     WS_CAPTION | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
 
+// Width of the resize handle.
+const int kResizeBorderWidth = 5;
+
+// At the window corners the resize area is not actually bigger, but the 16
+// pixels at the end of the top and bottom edges trigger diagonal resizing.
+const int kResizeCornerWidth = 16;
+
 // Convert between window and client areas.
 Rect ContentToWindowBounds(Win32Window* window, bool has_menu_bar,
                            const Rect& bounds) {
@@ -107,6 +114,10 @@ bool WindowImpl::IsMaximized() const {
 
 bool WindowImpl::IsFullscreen() const {
   return false;
+}
+
+bool WindowImpl::IsResizable() const {
+  return true;
 }
 
 void WindowImpl::OnCaptureChanged(HWND window) {
@@ -278,7 +289,7 @@ LRESULT WindowImpl::OnNCHitTest(UINT msg, WPARAM w_param, LPARAM l_param) {
   }
 
   // Do nothing for non-client area for now.
-  LRESULT hit = DefWindowProc(hwnd(), msg, w_param, l_param);
+  LRESULT hit = ::DefWindowProc(hwnd(), msg, w_param, l_param);
   if (hit != HTCLIENT)
     return hit;
 
@@ -287,6 +298,43 @@ LRESULT WindowImpl::OnNCHitTest(UINT msg, WPARAM w_param, LPARAM l_param) {
   ::MapWindowPoints(HWND_DESKTOP, hwnd(), &temp, 1);
   Point point(temp);
 
+  // Calculate the resize handle.
+  if (IsResizable() && !(IsMaximized() || IsFullscreen())) {
+    Rect bounds = GetPixelBounds();
+    int border_thickness = kResizeBorderWidth * scale_factor();
+    int corner_width = kResizeCornerWidth * scale_factor();
+    if (point.x() < border_thickness) {
+      if (point.y() < corner_width)
+        return HTTOPLEFT;
+      else if (point.y() >= (bounds.height() - border_thickness))
+        return HTBOTTOMLEFT;
+      else
+        return HTLEFT;
+    } else if (point.x() >= (bounds.width() - border_thickness)) {
+      if (point.y() < corner_width)
+        return HTTOPRIGHT;
+      else if (point.y() >= (bounds.height() - border_thickness))
+        return HTBOTTOMRIGHT;
+      else
+        return HTRIGHT;
+    } else if (point.y() < border_thickness) {
+      if (point.x() < corner_width)
+        return HTTOPLEFT;
+      else if (point.x() >= (bounds.width() - corner_width))
+        return HTTOPRIGHT;
+      else
+        return HTTOP;
+    } else if (point.y() >= (bounds.height() - border_thickness)) {
+      if (point.x() < corner_width)
+        return HTBOTTOMLEFT;
+      else if (point.x() >= (bounds.width() - corner_width))
+        return HTBOTTOMRIGHT;
+      else
+        return HTBOTTOM;
+    }
+  }
+
+  // Get result from content view.
   return delegate_->GetContentView()->GetNative()->HitTest(point);
 }
 
@@ -342,7 +390,7 @@ void WindowImpl::TrackMouse(bool enable) {
 bool WindowImpl::GetClientAreaInsets(Insets* insets) {
   // Returning false causes the default handling in OnNCCalcSize() to
   // be invoked.
-  if (delegate_->HasFrame())
+  if (HasSystemFrame())
     return false;
 
   if (IsMaximized()) {
@@ -358,6 +406,11 @@ bool WindowImpl::GetClientAreaInsets(Insets* insets) {
 
   *insets = Insets();
   return true;
+}
+
+bool WindowImpl::HasSystemFrame() const {
+  // In future we may support custom non-client frame.
+  return delegate_->HasFrame();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

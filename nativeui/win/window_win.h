@@ -29,6 +29,7 @@ class WindowImpl : public Win32Window {
 
   bool IsMaximized() const;
   bool IsFullscreen() const;
+  bool IsResizable() const;
 
   Window* delegate() { return delegate_; }
   FocusManager* focus_manager() { return &focus_manager_; }
@@ -77,6 +78,7 @@ class WindowImpl : public Win32Window {
 
   void TrackMouse(bool enable);
   bool GetClientAreaInsets(Insets* insets);
+  bool HasSystemFrame() const;
 
   FocusManager focus_manager_;
   bool mouse_in_window_ = false;
