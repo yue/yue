@@ -19,12 +19,20 @@ inline bool PCall(State* state, ReturnType* result, const ArgTypes&... args) {
                 0 /* no message handler */) != LUA_OK)
     return false;
 
+  // When failed to convert return value.
   if (!Pop(state, result)) {
-    const char* name = GetTypeName(state, -1);
-    PopAndIgnore(state, 1);
-    PushFormatedString(state, "error converting return value from %s to %s",
-                       name, Type<ReturnType>::name);
-    return false;
+    if (GetType(state, -1) == LuaType::Nil) {
+      // Use the type's default value for nil.
+      *result = ReturnType();
+      return true;
+    } else {
+      // Otherwise throw error.
+      const char* name = GetTypeName(state, -1);
+      PopAndIgnore(state, 1);
+      PushFormatedString(state, "error converting return value from %s to %s",
+                         name, Type<ReturnType>::name);
+      return false;
+    }
   }
 
   return true;

@@ -126,17 +126,18 @@ void Window::PlatformSetContentView(View* view) {
     [content_view_->GetNative() nuPrivate]->is_content_view = false;
   }
 
-  // Make sure the bottom corner is rounded for non-modal windows:
-  // http://crbug.com/396264
-  // But do not enable it on OS X 10.9 for transparent window, otherwise a
-  // semi-transparent frame would show.
   NSView* content_view = view->GetNative();
-  // TODO(zcbenz): if (!(transparent() && base::mac::IsOS10_9()) && !is_modal())
-  [content_view setWantsLayer:YES];
-
   [content_view nuPrivate]->is_content_view = true;
   [window_ setContentView:content_view];
-  [content_view setFrame:[[[window_ contentView] superview] bounds]];
+
+  if (!HasFrame()) {
+    [content_view setFrame:[[[window_ contentView] superview] bounds]];
+    // Make sure top corners are rounded:
+    // But do not enable it on OS X 10.9 for transparent window, otherwise a
+    // semi-transparent frame would show.
+    // TODO(zcbenz): if (!(transparent() && base::mac::IsOS10_9()))
+    [content_view setWantsLayer:YES];
+  }
 
   if (view->GetClassName() == Container::kClassName)
     static_cast<Container*>(view)->Layout();
