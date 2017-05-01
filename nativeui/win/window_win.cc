@@ -148,18 +148,23 @@ void WindowImpl::OnCommand(UINT code, int command, HWND window) {
   control->OnCommand(code, command);
 }
 
-HBRUSH WindowImpl::OnCtlColorStatic(HDC dc, HWND window) {
-  auto* control = reinterpret_cast<SubwinView*>(GetWindowUserData(window));
-  HBRUSH brush = NULL;
-  SetMsgHandled(control->OnCtlColor(dc, &brush));
-  return brush;
-}
-
 void WindowImpl::OnSize(UINT param, const Size& size) {
   if (!delegate_->GetContentView())
     return;
   delegate_->GetContentView()->GetNative()->SizeAllocate(Rect(size));
   RedrawWindow(hwnd(), NULL, NULL, RDW_INVALIDATE | RDW_ALLCHILDREN);
+}
+
+LRESULT WindowImpl::OnDPIChanged(UINT msg, WPARAM w_param, LPARAM l_param) {
+  float new_scale_factor = GetScalingFactorFromDPI(LOWORD(w_param));
+  if (new_scale_factor != scale_factor_) {
+    scale_factor_ = new_scale_factor;
+    // Notify the content view of DPI change.
+    delegate_->GetContentView()->GetNative()->BecomeContentView(this);
+    // Move to the new window position under new DPI.
+    SetPixelBounds(Rect(*reinterpret_cast<RECT*>(l_param)));
+  }
+  return 1;
 }
 
 LRESULT WindowImpl::OnMouseMove(UINT message, WPARAM w_param, LPARAM l_param) {
@@ -269,16 +274,11 @@ LRESULT WindowImpl::OnEraseBkgnd(HDC dc) {
   return 1;
 }
 
-LRESULT WindowImpl::OnDPIChanged(UINT msg, WPARAM w_param, LPARAM l_param) {
-  float new_scale_factor = GetScalingFactorFromDPI(LOWORD(w_param));
-  if (new_scale_factor != scale_factor_) {
-    scale_factor_ = new_scale_factor;
-    // Notify the content view of DPI change.
-    delegate_->GetContentView()->GetNative()->BecomeContentView(this);
-    // Move to the new window position under new DPI.
-    SetPixelBounds(Rect(*reinterpret_cast<RECT*>(l_param)));
-  }
-  return 1;
+HBRUSH WindowImpl::OnCtlColorStatic(HDC dc, HWND window) {
+  auto* control = reinterpret_cast<SubwinView*>(GetWindowUserData(window));
+  HBRUSH brush = NULL;
+  SetMsgHandled(control->OnCtlColor(dc, &brush));
+  return brush;
 }
 
 LRESULT WindowImpl::OnNCHitTest(UINT msg, WPARAM w_param, LPARAM l_param) {
@@ -376,6 +376,44 @@ LRESULT WindowImpl::OnNCCalcSize(BOOL mode, LPARAM l_param) {
   if (insets.left() == 0 || insets.top() == 0)
     return 0;
   return mode ? WVR_REDRAW : 0;
+}
+
+LRESULT WindowImpl::OnSetCursor(UINT message, WPARAM w_param, LPARAM l_param) {
+  // Reimplement the necessary default behavior here. Calling DefWindowProc can
+  // trigger weird non-client painting for non-glass windows with custom frames.
+  // Using a ScopedRedrawLock to prevent caption rendering artifacts may allow
+  // content behind this window to incorrectly paint in front of this window.
+  // Invalidating the window to paint over either set of artifacts is not ideal.
+  wchar_t* cursor = IDC_ARROW;
+  switch (LOWORD(l_param)) {
+    case HTSIZE:
+      cursor = IDC_SIZENWSE;
+      break;
+    case HTLEFT:
+    case HTRIGHT:
+      cursor = IDC_SIZEWE;
+      break;
+    case HTTOP:
+    case HTBOTTOM:
+      cursor = IDC_SIZENS;
+      break;
+    case HTTOPLEFT:
+    case HTBOTTOMRIGHT:
+      cursor = IDC_SIZENWSE;
+      break;
+    case HTTOPRIGHT:
+    case HTBOTTOMLEFT:
+      cursor = IDC_SIZENESW;
+      break;
+    case LOWORD(HTERROR):  // Use HTERROR's LOWORD value for valid comparison.
+      SetMsgHandled(false);
+      break;
+    default:
+      // Use the default value, IDC_ARROW.
+      break;
+  }
+  ::SetCursor(::LoadCursor(NULL, cursor));
+  return 1;
 }
 
 void WindowImpl::TrackMouse(bool enable) {

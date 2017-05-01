@@ -38,12 +38,14 @@ class WindowImpl : public Win32Window {
 
  protected:
   CR_BEGIN_MSG_MAP_EX(WindowImpl, Win32Window)
+    // Window events.
     CR_MSG_WM_CAPTURECHANGED(OnCaptureChanged)
     CR_MSG_WM_CLOSE(OnClose)
     CR_MSG_WM_COMMAND(OnCommand)
-    CR_MSG_WM_CTLCOLOREDIT(OnCtlColorStatic)
-    CR_MSG_WM_CTLCOLORSTATIC(OnCtlColorStatic)
     CR_MSG_WM_SIZE(OnSize)
+    CR_MESSAGE_HANDLER_EX(WM_DPICHANGED, OnDPIChanged)
+
+    // Input events.
     CR_MESSAGE_HANDLER_EX(WM_MOUSEMOVE, OnMouseMove)
     CR_MESSAGE_HANDLER_EX(WM_MOUSELEAVE, OnMouseLeave)
     CR_MSG_WM_MOUSEWHEEL(OnMouseWheel)
@@ -51,19 +53,25 @@ class WindowImpl : public Win32Window {
     CR_MESSAGE_RANGE_HANDLER_EX(WM_KEYDOWN, WM_KEYUP, OnKeyEvent)
     CR_MESSAGE_RANGE_HANDLER_EX(WM_SYSKEYDOWN, WM_SYSKEYUP, OnKeyEvent)
     CR_MSG_WM_CHAR(OnChar)
+
+    // Paint events.
     CR_MSG_WM_PAINT(OnPaint)
     CR_MSG_WM_ERASEBKGND(OnEraseBkgnd)
-    CR_MESSAGE_HANDLER_EX(WM_DPICHANGED, OnDPIChanged)
+    CR_MSG_WM_CTLCOLOREDIT(OnCtlColorStatic)
+    CR_MSG_WM_CTLCOLORSTATIC(OnCtlColorStatic)
+
+    // Non-client area.
     CR_MESSAGE_HANDLER_EX(WM_NCHITTEST, OnNCHitTest)
     CR_MSG_WM_NCCALCSIZE(OnNCCalcSize)
+    CR_MESSAGE_HANDLER_EX(WM_SETCURSOR, OnSetCursor);
   CR_END_MSG_MAP()
 
  private:
   void OnCaptureChanged(HWND window);
   void OnClose();
   void OnCommand(UINT code, int command, HWND window);
-  HBRUSH OnCtlColorStatic(HDC dc, HWND window);
   void OnSize(UINT param, const Size& size);
+  LRESULT OnDPIChanged(UINT msg, WPARAM w_param, LPARAM l_param);
   LRESULT OnMouseMove(UINT message, WPARAM w_param, LPARAM l_param);
   LRESULT OnMouseLeave(UINT message, WPARAM w_param, LPARAM l_param);
   BOOL OnMouseWheel(bool vertical, UINT flags, int delta, const Point& point);
@@ -72,9 +80,10 @@ class WindowImpl : public Win32Window {
   void OnChar(UINT ch, UINT repeat, UINT flags);
   void OnPaint(HDC dc);
   LRESULT OnEraseBkgnd(HDC dc);
-  LRESULT OnDPIChanged(UINT msg, WPARAM w_param, LPARAM l_param);
+  HBRUSH OnCtlColorStatic(HDC dc, HWND window);
   LRESULT OnNCHitTest(UINT msg, WPARAM w_param, LPARAM l_param);
   LRESULT OnNCCalcSize(BOOL mode, LPARAM l_param);
+  LRESULT OnSetCursor(UINT message, WPARAM w_param, LPARAM l_param);
 
   void TrackMouse(bool enable);
   bool GetClientAreaInsets(Insets* insets);
