@@ -105,6 +105,11 @@ void Window::PlatformInit(const Options& options) {
       [[window_ standardWindowButton:NSWindowZoomButton] setEnabled:NO];
     }
   }
+
+  if (options.transparent) {
+    [window_ setOpaque:NO];
+    [window_ setBackgroundColor:[NSColor clearColor]];
+  }
 }
 
 void Window::PlatformDestroy() {
@@ -135,8 +140,8 @@ void Window::PlatformSetContentView(View* view) {
     // Make sure top corners are rounded:
     // But do not enable it on OS X 10.9 for transparent window, otherwise a
     // semi-transparent frame would show.
-    // TODO(zcbenz): if (!(transparent() && base::mac::IsOS10_9()))
-    [content_view setWantsLayer:YES];
+    if (!(IsTransparent() && base::mac::IsOS10_9()))
+      [content_view setWantsLayer:YES];
   }
 
   if (view->GetClassName() == Container::kClassName)
@@ -168,6 +173,22 @@ void Window::SetVisible(bool visible) {
 
 bool Window::IsVisible() const {
   return [window_ isVisible];
+}
+
+void Window::SetResizable(bool yes) {
+  [static_cast<NUWindow*>(window_) setWindowStyle:NSResizableWindowMask on:yes];
+}
+
+bool Window::IsResizable() const {
+  return [window_ styleMask] & NSResizableWindowMask;
+}
+
+void Window::SetMaximizable(bool yes) {
+  [[window_ standardWindowButton:NSWindowZoomButton] setEnabled:yes];
+}
+
+bool Window::IsMaximizable() const {
+  return [[window_ standardWindowButton:NSWindowZoomButton] isEnabled];
 }
 
 void Window::SetBackgroundColor(Color color) {

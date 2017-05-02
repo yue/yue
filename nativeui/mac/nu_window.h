@@ -14,9 +14,11 @@ class Window;
 @interface NUWindow : NSWindow {
  @private
   nu::Window* shell_;
+  bool can_resize_;
 }
 - (void)setShell:(nu::Window*)shell;
 - (nu::Window*)shell;
+- (void)setWindowStyle:(NSUInteger)style on:(bool)yes;
 @end
 
 #endif  // NATIVEUI_MAC_NU_WINDOW_H_
