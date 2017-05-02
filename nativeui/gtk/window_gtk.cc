@@ -13,12 +13,21 @@ namespace nu {
 namespace {
 
 // User clicks the close button.
-gboolean OnClose(GtkWidget *widget, GdkEvent *event, Window* window) {
+gboolean OnClose(GtkWidget* widget, GdkEvent* event, Window* window) {
   if (window->should_close.is_null() || window->should_close.Run())
     window->Close();
 
   // We are destroying the window ourselves, so prevent the default behavior.
   return TRUE;
+}
+
+// Resize a window, with same behaviors on other platforms.
+void ResizeWindow(GtkWindow* window, const SizeF& size) {
+  if (gtk_window_get_resizable(window)) {
+    gtk_window_resize(window, size.width(), size.height());
+  } else {
+    gtk_widget_set_size_request(GTK_WIDGET(window), size.width(), size.height());
+  }
 }
 
 // Force window to allocate size for content view.
@@ -131,7 +140,7 @@ void Window::SetContentBounds(const RectF& bounds) {
   gtk_widget_get_allocation(content_view_->GetNative(), &alloc);
   window_bounds.Inset(-alloc.x, -alloc.y, 0, 0);
 
-  gtk_window_resize(window_, window_bounds.width(), window_bounds.height());
+  ResizeWindow(window_, window_bounds.size());
   gtk_window_move(window_, window_bounds.x(), window_bounds.y());
   ForceSizeAllocation(window_, content_view_->GetNative());
 }
@@ -162,14 +171,16 @@ void Window::SetBounds(const RectF& bounds) {
                         -(rect.height - gdk_window_get_height(gdkwindow)));
   }
 
-  gtk_window_resize(window_, window_size.width(), window_size.height());
+  ResizeWindow(window_, window_size);
   gtk_window_move(window_, bounds.x(), bounds.y());
   ForceSizeAllocation(window_, content_view_->GetNative());
 }
 
 RectF Window::GetBounds() const {
   GdkWindow* gdkwindow = gtk_widget_get_window(GTK_WIDGET(window_));
-  if (gdkwindow) {
+  if (gdkwindow && HasFrame()) {
+    // For frameless window using CSD, the window size includes the shadows
+    // so the frame extents can not be used.
     GdkRectangle rect;
     gdk_window_get_frame_extents(gdkwindow, &rect);
     return RectF(Rect(rect));
@@ -189,12 +200,31 @@ bool Window::IsVisible() const {
   return gtk_widget_get_visible(GTK_WIDGET(window_));
 }
 
-void Window::SetResizable(bool yes) {
-  gtk_window_set_resizable(window_, yes);
+void Window::SetResizable(bool resizable) {
+  if (resizable == IsResizable())
+    return;
+
+  // Setting a window non-resizable will resize the window to its size
+  // request, so make sure the size request has been set.
+  if (!resizable) {
+    RectF bounds(GetContentBounds());
+    gtk_widget_set_size_request(GTK_WIDGET(window_),
+                                bounds.width(), bounds.height());
+  } else {
+    gtk_widget_set_size_request(GTK_WIDGET(window_), -1, -1);
+  }
+  gtk_window_set_resizable(window_, resizable);
 }
 
 bool Window::IsResizable() const {
   return gtk_window_get_resizable(window_);
+}
+
+void Window::SetMaximizable(bool yes) {
+}
+
+bool Window::IsMaximizable() const {
+  return IsResizable();
 }
 
 void Window::SetBackgroundColor(Color color) {

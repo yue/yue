@@ -158,6 +158,11 @@ component("nativeui") {
     "gtk/state_gtk.cc",
     "gtk/view_gtk.cc",
     "gtk/window_gtk.cc",
+    "gtk/util/x11_error_tracker.cc",
+    "gtk/util/x11_error_tracker.h",
+    "gtk/util/x11_types.h",
+    "gtk/util/x11_util.cc",
+    "gtk/util/x11_util.h",
     "mac/events_handler.h",
     "mac/events_handler.mm",
     "mac/mouse_capture.h",
@@ -242,7 +247,10 @@ component("nativeui") {
   defines = [ "NATIVEUI_IMPLEMENTATION" ]
 
   if (is_linux) {
-    public_configs = [ "//build/config/linux/gtk3" ]
+    public_configs = [
+      "//build/config/linux:x11",
+      "//build/config/linux/gtk3",
+    ]
 
     # Do not warn on using deprecated GTK APIs.
     cflags_cc = [ "-Wno-deprecated-declarations" ]

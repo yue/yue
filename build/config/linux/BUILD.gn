@@ -37,14 +37,6 @@ config("fontconfig") {
 config("x11") {
   libs = [
     "X11",
-    "Xcomposite",
-    "Xcursor",
-    "Xdamage",
-    "Xext",
-    "Xfixes",
-    "Xi",
-    "Xrender",
-    "Xtst",
   ]
 }
 
