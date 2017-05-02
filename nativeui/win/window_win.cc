@@ -46,7 +46,7 @@ Rect ContentToWindowBounds(Win32Window* window, bool has_menu_bar,
   return Rect(rect);
 }
 
-bool IsShiftPressed() {
+inline bool IsShiftPressed() {
   return (::GetKeyState(VK_SHIFT) & 0x8000) == 0x8000;
 }
 
@@ -122,8 +122,17 @@ bool WindowImpl::IsFullscreen() const {
   return false;
 }
 
-bool WindowImpl::IsResizable() const {
-  return true;
+void WindowImpl::SetWindowStyle(LONG style, bool on) {
+  LONG styles = ::GetWindowLong(hwnd(), GWL_STYLE);
+  if (on)
+    styles |= style;
+  else
+    styles &= ~style;
+  ::SetWindowLong(hwnd(), GWL_STYLE, styles);
+}
+
+bool WindowImpl::HasWindowStyle(LONG style) const {
+  return (::GetWindowLong(hwnd(), GWL_STYLE) & style) != 0;
 }
 
 void WindowImpl::OnCaptureChanged(HWND window) {
@@ -328,7 +337,7 @@ LRESULT WindowImpl::OnNCHitTest(UINT msg, WPARAM w_param, LPARAM l_param) {
   Point point(temp);
 
   // Calculate the resize handle.
-  if (IsResizable() && !(IsMaximized() || IsFullscreen())) {
+  if (delegate_->IsResizable() && !(IsMaximized() || IsFullscreen())) {
     Rect bounds = GetPixelBounds();
     int border_thickness = kResizeBorderWidth * scale_factor();
     int corner_width = kResizeCornerWidth * scale_factor();
@@ -374,7 +383,7 @@ LRESULT WindowImpl::OnNCCalcSize(BOOL mode, LPARAM l_param) {
   // See http://code.google.com/p/chromium/issues/detail?id=900
   if (is_first_nccalc_) {
     is_first_nccalc_ = false;
-    if (::GetWindowLong(hwnd(), GWL_STYLE) & WS_CAPTION) {
+    if (HasWindowStyle(WS_CAPTION)) {
       SetMsgHandled(false);
       return 0;
     }
@@ -535,6 +544,22 @@ void Window::SetVisible(bool visible) {
 
 bool Window::IsVisible() const {
   return !!::IsWindowVisible(window_->hwnd());
+}
+
+void Window::SetResizable(bool yes) {
+  window_->SetWindowStyle(WS_THICKFRAME, yes);
+}
+
+bool Window::IsResizable() const {
+  return window_->HasWindowStyle(WS_THICKFRAME);
+}
+
+void Window::SetMaximizable(bool yes) {
+  window_->SetWindowStyle(WS_MAXIMIZEBOX, yes);
+}
+
+bool Window::IsMaximizable() const {
+  return window_->HasWindowStyle(WS_MAXIMIZEBOX);
 }
 
 void Window::SetBackgroundColor(Color color) {

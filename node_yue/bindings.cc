@@ -645,6 +645,10 @@ struct Type<nu::Window> {
         "getContentView", &nu::Window::GetContentView,
         "setVisible", &nu::Window::SetVisible,
         "isVisible", &nu::Window::IsVisible,
+        "setResizable", &nu::Window::SetResizable,
+        "isResizable", &nu::Window::IsResizable,
+        "setMaximizable", &nu::Window::SetMaximizable,
+        "isMaximizable", &nu::Window::IsMaximizable,
 #if defined(OS_WIN) || defined(OS_LINUX)
         "setMenu", &nu::Window::SetMenu,
         "getMenu", &nu::Window::GetMenu,

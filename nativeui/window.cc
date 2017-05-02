@@ -21,6 +21,12 @@ Window::Window(const Options& options)
   // Initialize.
   PlatformInit(options);
   SetContentView(new Container);
+
+  // Default window abilities.
+  if (options.transparent) {
+    SetResizable(false);
+    SetMaximizable(false);
+  }
 }
 
 Window::~Window() {

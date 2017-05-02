@@ -29,7 +29,9 @@ class WindowImpl : public Win32Window {
 
   bool IsMaximized() const;
   bool IsFullscreen() const;
-  bool IsResizable() const;
+
+  void SetWindowStyle(LONG style, bool on);
+  bool HasWindowStyle(LONG style) const;
 
   Window* delegate() { return delegate_; }
   FocusManager* focus_manager() { return &focus_manager_; }

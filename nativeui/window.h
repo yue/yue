@@ -49,6 +49,11 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
   void SetVisible(bool visible);
   bool IsVisible() const;
 
+  void SetResizable(bool yes);
+  bool IsResizable() const;
+  void SetMaximizable(bool yes);
+  bool IsMaximizable() const;
+
 #if defined(OS_WIN) || defined(OS_LINUX)
   void SetMenu(MenuBar* menu_bar);
   MenuBar* GetMenu() const;

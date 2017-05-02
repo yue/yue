@@ -189,6 +189,14 @@ bool Window::IsVisible() const {
   return gtk_widget_get_visible(GTK_WIDGET(window_));
 }
 
+void Window::SetResizable(bool yes) {
+  gtk_window_set_resizable(window_, yes);
+}
+
+bool Window::IsResizable() const {
+  return gtk_window_get_resizable(window_);
+}
+
 void Window::SetBackgroundColor(Color color) {
   GdkRGBA gcolor = color.ToGdkRGBA();
   gtk_widget_override_background_color(GTK_WIDGET(window_),
