@@ -21,6 +21,8 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
     RectF bounds;
     // Whether the window has a chrome.
     bool frame = true;
+    // Whether the window is transparent.
+    bool transparent = false;
 
 #if defined(OS_MACOSX)
     // Show window buttons for the frameless window.
@@ -33,6 +35,7 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
   void Close();
 
   bool HasFrame() const { return has_frame_; }
+  bool IsTransparent() const { return transparent_; }
 
   void SetContentView(View* view);
   View* GetContentView() const;
@@ -78,6 +81,9 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
 
   // Whether window has a native chrome.
   bool has_frame_;
+
+  // Whether window is transparent.
+  bool transparent_;
 
   // The yoga config for window's children.
   YGConfigRef yoga_config_;

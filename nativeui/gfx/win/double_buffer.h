@@ -23,10 +23,14 @@ class DoubleBuffer {
   }
 
   ~DoubleBuffer() {
-    // Transfer the off-screen DC to the screen.
-    BitBlt(dc_, src_.x(), src_.y(), src_.width(), src_.height(),
-           dc(), dest_.x(), dest_.y(), SRCCOPY);
+    if (copy_on_destruction_) {
+      // Transfer the off-screen DC to the screen.
+      BitBlt(dc_, src_.x(), src_.y(), src_.width(), src_.height(),
+             dc(), dest_.x(), dest_.y(), SRCCOPY);
+    }
   }
+
+  void SetNoCopy() { copy_on_destruction_ = false; }
 
   HDC dc() const { return mem_dc_.Get(); }
 
@@ -37,6 +41,8 @@ class DoubleBuffer {
   base::win::ScopedCreateDC mem_dc_;
   base::win::ScopedBitmap mem_bitmap_;
   base::win::ScopedSelectObject select_bitmap_;
+
+  bool copy_on_destruction_ = true;
 };
 
 }  // namespace nu

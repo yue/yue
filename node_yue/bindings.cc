@@ -617,6 +617,7 @@ struct Type<nu::Window::Options> {
       return false;
     Get(context, obj, "bounds", &out->bounds);
     Get(context, obj, "frame", &out->frame);
+    Get(context, obj, "transparent", &out->transparent);
 #if defined(OS_MACOSX)
     Get(context, obj, "showTrafficLights", &out->show_traffic_lights);
 #endif

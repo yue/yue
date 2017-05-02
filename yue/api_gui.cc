@@ -563,6 +563,7 @@ struct Type<nu::Window::Options> {
     if (GetType(state, index) == LuaType::Table) {
       RawGetAndPop(state, index, "bounds", &out->bounds);
       RawGetAndPop(state, index, "frame", &out->frame);
+      RawGetAndPop(state, index, "transparent", &out->transparent);
 #if defined(OS_MACOSX)
       RawGetAndPop(state, index,
                    "showtrafficlights", &out->show_traffic_lights);

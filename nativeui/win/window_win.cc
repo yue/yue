@@ -53,8 +53,10 @@ bool IsShiftPressed() {
 }  // namespace
 
 WindowImpl::WindowImpl(const Window::Options& options, Window* delegate)
-    : Win32Window(L"", NULL, options.frame ? kWindowDefaultStyle
-                                           : kWindowDefaultFramelessStyle),
+    : Win32Window(L"", NULL,
+                  options.frame ? kWindowDefaultStyle
+                                : kWindowDefaultFramelessStyle,
+                  options.transparent ? WS_EX_LAYERED : 0),
       delegate_(delegate),
       scale_factor_(GetScaleFactorForHWND(hwnd())) {
   if (!options.frame) {
@@ -64,6 +66,10 @@ WindowImpl::WindowImpl(const Window::Options& options, Window* delegate)
     ::SetWindowPos(hwnd(), NULL, 0, 0, 0, 0,
                    SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE |
                    SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOREDRAW);
+  }
+  if (options.transparent) {
+    // Change default background color to transparent.
+    background_color_ = Color(0, 0, 0, 0);
   }
 }
 
@@ -250,20 +256,43 @@ void WindowImpl::OnPaint(HDC) {
   PAINTSTRUCT ps;
   BeginPaint(hwnd(), &ps);
 
+  // Always update the whole buffer for transparent window.
   Rect bounds(GetContentPixelBounds());
-  Rect dirty(ps.rcPaint);
+  Rect dirty;
+  if (delegate_->IsTransparent())
+    dirty = Rect(bounds.size());
+  else
+    dirty = Rect(ps.rcPaint);
+
   base::win::ScopedGetDC dc(hwnd());
   {
     // Double buffering the drawing.
     DoubleBuffer buffer(dc, bounds.size(), dirty, dirty.origin());
 
-    // Background.
-    PainterWin painter(buffer.dc(), scale_factor_);
-    painter.SetColor(background_color_);
-    painter.FillRectPixel(dirty);
-
     // Draw.
-    delegate_->GetContentView()->GetNative()->Draw(&painter, dirty);
+    {
+      // Background.
+      PainterWin painter(buffer.dc(), scale_factor_);
+      painter.SetColor(background_color_);
+      painter.FillRectPixel(dirty);
+
+      // Controls.
+      delegate_->GetContentView()->GetNative()->Draw(&painter, dirty);
+    }
+
+    // Update layered window.
+    if (delegate_->IsTransparent()) {
+      RECT wr;
+      ::GetWindowRect(hwnd(), &wr);
+      SIZE size = {wr.right - wr.left, wr.bottom - wr.top};
+      POINT position = {wr.left, wr.top};
+      POINT zero = {0, 0};
+      BLENDFUNCTION blend = {AC_SRC_OVER, 0, 255, AC_SRC_ALPHA};
+
+      buffer.SetNoCopy();
+      ::UpdateLayeredWindow(hwnd(), NULL, &position, &size, buffer.dc(),
+                            &zero, 0, &blend, ULW_ALPHA);
+    }
   }
 
   EndPaint(hwnd(), &ps);

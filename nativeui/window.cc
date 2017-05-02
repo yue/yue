@@ -12,6 +12,7 @@ namespace nu {
 
 Window::Window(const Options& options)
     : has_frame_(options.frame),
+      transparent_(options.transparent),
       yoga_config_(YGConfigNew()) {
   // Default yoga config.
   YGConfigSetExperimentalFeatureEnabled(yoga_config_,
