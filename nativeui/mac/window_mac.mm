@@ -149,11 +149,17 @@ void Window::PlatformSetContentView(View* view) {
 }
 
 void Window::SetContentBounds(const RectF& bounds) {
-  SetBounds(ContentToWindowBounds(window_, bounds));
+  if (HasFrame())
+    SetBounds(ContentToWindowBounds(window_, bounds));
+  else
+    SetBounds(bounds);
 }
 
 RectF Window::GetContentBounds() const {
-  return WindowToContentBounds(window_, GetBounds());
+  if (HasFrame())
+    return WindowToContentBounds(window_, GetBounds());
+  else
+    return GetBounds();
 }
 
 void Window::SetBounds(const RectF& bounds) {

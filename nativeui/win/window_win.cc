@@ -519,8 +519,11 @@ void Window::PlatformSetMenu(MenuBar* menu_bar) {
 }
 
 void Window::SetContentBounds(const RectF& bounds) {
-  Rect pixels = ToNearestRect(ScaleRect(bounds, window_->scale_factor()));
-  window_->SetPixelBounds(ContentToWindowBounds(window_, !!menu_bar_, pixels));
+  Rect prect = ToNearestRect(ScaleRect(bounds, window_->scale_factor()));
+  if (HasFrame())
+    window_->SetPixelBounds(ContentToWindowBounds(window_, !!menu_bar_, prect));
+  else
+    window_->SetPixelBounds(prect);
 }
 
 RectF Window::GetContentBounds() const {
