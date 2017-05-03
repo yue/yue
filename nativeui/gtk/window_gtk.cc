@@ -21,6 +21,51 @@ gboolean OnClose(GtkWidget* widget, GdkEvent* event, Window* window) {
   return TRUE;
 }
 
+// Make window support alpha channel for the screen.
+void OnScreenChanged(GtkWidget* widget, GdkScreen* old_screen, Window* window) {
+  GdkScreen* screen = gtk_widget_get_screen(widget);
+  GdkVisual* visual = gdk_screen_get_rgba_visual(screen);
+  gtk_widget_set_visual(widget, visual);
+}
+
+// Is client-side decoration enabled in window.
+inline bool IsUsingCSD(GtkWindow* window) {
+  return gtk_window_get_titlebar(window) != nullptr;
+}
+
+// Turn CSD on.
+void EnableCSD(GtkWindow* window) {
+  // Required for CSD to work.
+  gtk_window_set_decorated(window, true);
+
+  // Setting a hidden titlebar to force using CSD rendering.
+  gtk_window_set_titlebar(window, gtk_label_new("you should not see me"));
+
+  if (!g_object_get_data(G_OBJECT(window), "css-provider")) {
+    // Since we are not using any titlebar, we have to override the border
+    // radius of the client decoration to avoid having rounded shadow for the
+    // rectange window.
+    GtkCssProvider* provider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(
+        provider,
+        // Using 0 would triger a bug of GTK's shadow rendering code.
+        "decoration { border-radius: 0.01px; }", -1, nullptr);
+    gtk_style_context_add_provider(
+        gtk_widget_get_style_context(GTK_WIDGET(window)),
+        GTK_STYLE_PROVIDER(provider), G_MAXUINT);
+    // Store the provider inside window, we may need to remove it later when
+    // user sets a custom titlebar.
+    g_object_set_data_full(G_OBJECT(window), "css-provider", provider,
+                           g_object_unref);
+  }
+}
+
+// Turn CSD off and use classic non-decoration.
+void DisableCSD(GtkWindow* window) {
+  gtk_window_set_titlebar(window, nullptr);
+  gtk_window_set_decorated(window, false);
+}
+
 // Force window to allocate size for content view.
 void ForceSizeAllocation(GtkWindow* window, GtkWidget* view) {
   GdkRectangle rect = { 0, 0 };
@@ -63,23 +108,16 @@ void Window::PlatformInit(const Options& options) {
   gtk_window_set_focus_on_map(window_, false);
 
   if (!options.frame) {
-    // Setting a hidden titlebar to force using CSD rendering.
-    gtk_window_set_titlebar(window_, gtk_label_new("you should not see me"));
+    EnableCSD(window_);
+  }
 
-    // Since we are not using any titlebar, we have to override the border
-    // radius of the client decoration to avoid having rounded shadow for the
-    // rectange window.
-    GtkCssProvider* provider = gtk_css_provider_new();
-    gtk_css_provider_load_from_data(
-        provider,
-        // Using 0 would triger a bug of GTK's shadow rendering code.
-        "decoration { border-radius: 0.01px; }", -1, nullptr);
-    gtk_style_context_add_provider(
-        gtk_widget_get_style_context(GTK_WIDGET(window_)),
-        GTK_STYLE_PROVIDER(provider), G_MAXUINT);
-    // Store the provider inside window, we may need to remove it later when
-    // user sets a custom titlebar.
-    g_object_set_data_full(G_OBJECT(window_), "", provider, g_object_unref);
+  if (options.transparent) {
+    // Transparent background.
+    gtk_widget_set_app_paintable(GTK_WIDGET(window_), true);
+    // Set alpha channel in window.
+    OnScreenChanged(GTK_WIDGET(window_), nullptr, this);
+    g_signal_connect(G_OBJECT(window_), "screen-changed",
+                     G_CALLBACK(OnScreenChanged), this);
   }
 
   // Must use a vbox to pack menubar.
@@ -243,6 +281,15 @@ void Window::SetResizable(bool resizable) {
   }
 
   gtk_window_set_resizable(window_, resizable);
+
+  // For transparent window, using CSD means having extra shadow and border, so
+  // we only use CSD when window is not resizable.
+  if (IsTransparent()) {
+    if (IsUsingCSD(window_) && !resizable)
+      DisableCSD(window_);
+    else if (!IsUsingCSD(window_) && resizable)
+      EnableCSD(window_);
+  }
 }
 
 bool Window::IsResizable() const {
