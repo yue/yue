@@ -12,6 +12,20 @@ namespace nu {
 
 namespace {
 
+// Window private data.
+struct NUWindowPrivate {
+  Window* delegate;
+  bool is_input_shape_set;
+  bool is_draw_handler_set;
+  guint draw_handler_id;
+};
+
+// Helper to receive private data.
+inline NUWindowPrivate* GetPrivate(Window* window) {
+  return static_cast<NUWindowPrivate*>(g_object_get_data(
+      G_OBJECT(window->GetNative()), "private"));
+}
+
 // User clicks the close button.
 gboolean OnClose(GtkWidget* widget, GdkEvent* event, Window* window) {
   if (window->should_close.is_null() || window->should_close.Run())
@@ -26,6 +40,19 @@ void OnScreenChanged(GtkWidget* widget, GdkScreen* old_screen, Window* window) {
   GdkScreen* screen = gtk_widget_get_screen(widget);
   GdkVisual* visual = gdk_screen_get_rgba_visual(screen);
   gtk_widget_set_visual(widget, visual);
+}
+
+// Set input shape for frameless transparent window.
+gboolean OnDraw(GtkWidget* widget, cairo_t* cr, NUWindowPrivate* data) {
+  cairo_surface_t* surface = cairo_get_target(cr);
+  cairo_region_t* region = gdk_cairo_region_create_from_surface(surface);
+  gtk_widget_input_shape_combine_region(widget, region);
+  cairo_region_destroy(region);
+  // Only handle once.
+  data->is_draw_handler_set = false;
+  data->is_input_shape_set = true;
+  g_signal_handler_disconnect(widget, data->draw_handler_id);
+  return FALSE;
 }
 
 // Is client-side decoration enabled in window.
@@ -105,9 +132,17 @@ void ResizeWindow(Window* window, bool resizable, int width, int height) {
 
 void Window::PlatformInit(const Options& options) {
   window_ = GTK_WINDOW(gtk_window_new(GTK_WINDOW_TOPLEVEL));
+  g_object_set_data_full(G_OBJECT(window_),
+                         "private",
+                         new NUWindowPrivate{this, false, false, 0},
+                         operator delete);
+
+  // Window is not focused by default.
   gtk_window_set_focus_on_map(window_, false);
 
   if (!options.frame) {
+    // Rely on client-side decoration to provide window features for frameless
+    // window, like resizing and shadows.
     EnableCSD(window_);
   }
 
@@ -158,6 +193,19 @@ void Window::PlatformSetContentView(View* view) {
                             0, GTK_PACK_END);
 
   ForceSizeAllocation(window_, GTK_WIDGET(vbox));
+
+  // For frameless transparent window, we need to set input shape to allow
+  // click-through in transparent areas. For best performance we only set
+  // input shape the first time when content view is drawn, GTK do redraws very
+  // frequently and computing input shape is rather expensive.
+  if (IsTransparent() && !HasFrame()) {
+    NUWindowPrivate* data = GetPrivate(this);
+    if (!data->is_draw_handler_set) {
+      data->is_draw_handler_set = true;
+      data->draw_handler_id = g_signal_connect_after(
+          G_OBJECT(window_), "draw", G_CALLBACK(OnDraw), data);
+    }
+  }
 }
 
 void Window::PlatformSetMenu(MenuBar* menu_bar) {
