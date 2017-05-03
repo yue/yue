@@ -26,6 +26,26 @@ TEST_F(WindowTest, Bounds) {
   EXPECT_EQ(window_->GetBounds(), window_bounds);
 }
 
+TEST_F(WindowTest, FramelessWindowBounds) {
+  nu::Window::Options options;
+  options.frame = false;
+  window_ = new nu::Window(options);
+  nu::RectF bounds(123, 456, 789, 10);
+  window_->SetContentBounds(bounds);
+  EXPECT_EQ(window_->GetContentBounds(), bounds);
+  window_->SetBounds(bounds);
+  EXPECT_EQ(window_->GetBounds(), bounds);
+}
+
+TEST_F(WindowTest, TransparentWindow) {
+  nu::Window::Options options;
+  options.frame = false;
+  options.transparent = true;
+  window_ = new nu::Window(options);
+  EXPECT_EQ(window_->IsResizable(), false);
+  EXPECT_EQ(window_->IsMaximizable(), false);
+}
+
 TEST_F(WindowTest, ContentView) {
   EXPECT_NE(window_->GetContentView(), nullptr);
   scoped_refptr<nu::Container> view(new nu::Container);
@@ -64,4 +84,52 @@ TEST_F(WindowTest, ShouldClose) {
   window_->should_close.Reset();
   window_->Close();
   EXPECT_EQ(closed, true);
+}
+
+TEST_F(WindowTest, Resizable) {
+  nu::RectF bounds(123, 456, 789, 10);
+  window_->SetContentBounds(bounds);
+  EXPECT_EQ(window_->IsResizable(), true);
+  window_->SetResizable(false);
+  EXPECT_EQ(window_->IsResizable(), false);
+  EXPECT_EQ(window_->GetContentBounds(), bounds);
+  window_->SetResizable(true);
+  EXPECT_EQ(window_->GetContentBounds(), bounds);
+}
+
+TEST_F(WindowTest, VisibleWindowResizable) {
+  nu::RectF bounds(123, 456, 789, 10);
+  window_->SetContentBounds(bounds);
+  EXPECT_EQ(window_->GetContentBounds().size(), bounds.size());
+  window_->SetResizable(false);
+  EXPECT_EQ(window_->GetContentBounds().size(), bounds.size());
+  window_->SetResizable(true);
+  EXPECT_EQ(window_->GetContentBounds().size(), bounds.size());
+}
+
+TEST_F(WindowTest, FramelessWindowResizable) {
+  nu::Window::Options options;
+  options.frame = false;
+  window_ = new nu::Window(options);
+  nu::RectF bounds(123, 456, 789, 10);
+  window_->SetContentBounds(bounds);
+  EXPECT_EQ(window_->GetContentBounds().size(), bounds.size());
+  window_->SetResizable(false);
+  EXPECT_EQ(window_->GetContentBounds().size(), bounds.size());
+  window_->SetResizable(true);
+  EXPECT_EQ(window_->GetContentBounds().size(), bounds.size());
+}
+
+TEST_F(WindowTest, TransparentWindowResizable) {
+  nu::Window::Options options;
+  options.frame = false;
+  options.transparent = true;
+  window_ = new nu::Window(options);
+  nu::RectF bounds(123, 456, 789, 10);
+  window_->SetContentBounds(bounds);
+  EXPECT_EQ(window_->GetContentBounds().size(), bounds.size());
+  window_->SetResizable(false);
+  EXPECT_EQ(window_->GetContentBounds().size(), bounds.size());
+  window_->SetResizable(true);
+  EXPECT_EQ(window_->GetContentBounds().size(), bounds.size());
 }
