@@ -138,9 +138,7 @@ void Window::PlatformSetContentView(View* view) {
   if (!HasFrame()) {
     [content_view setFrame:[[[window_ contentView] superview] bounds]];
     // Make sure top corners are rounded:
-    // But do not enable it on OS X 10.9 for transparent window, otherwise a
-    // semi-transparent frame would show.
-    if (!(IsTransparent() && base::mac::IsOS10_9()))
+    if (!IsTransparent())
       [content_view setWantsLayer:YES];
   }
 
