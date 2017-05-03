@@ -23,7 +23,7 @@ Window::Window(const Options& options)
   SetContentView(new Container);
 
   // Default window abilities.
-  if (options.transparent) {
+  if (!options.frame && options.transparent) {
     SetResizable(false);
     SetMaximizable(false);
   }

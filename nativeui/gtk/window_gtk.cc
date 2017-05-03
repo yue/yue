@@ -284,7 +284,7 @@ void Window::SetResizable(bool resizable) {
 
   // For transparent window, using CSD means having extra shadow and border, so
   // we only use CSD when window is not resizable.
-  if (IsTransparent()) {
+  if (!HasFrame() && IsTransparent()) {
     if (IsUsingCSD(window_) && !resizable)
       DisableCSD(window_);
     else if (!IsUsingCSD(window_) && resizable)
