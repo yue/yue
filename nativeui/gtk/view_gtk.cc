@@ -38,7 +38,7 @@ gboolean OnMouseMove(GtkWidget* widget, GdkEvent* event, View* view) {
   // Otherwise dispatch the event.
   if (!view->on_mouse_move.IsEmpty()) {
     view->on_mouse_move.Emit(view, MouseEvent(event, widget));
-    return true;
+    return false;
   }
 
   return false;
@@ -50,13 +50,12 @@ gboolean OnMouseEvent(GtkWidget* widget, GdkEvent* event, View* view) {
       return view->on_mouse_down.Emit(view, MouseEvent(event, widget));
     case GDK_BUTTON_RELEASE:
       return view->on_mouse_up.Emit(view, MouseEvent(event, widget));
-      return true;
     case GDK_ENTER_NOTIFY:
       view->on_mouse_enter.Emit(view, MouseEvent(event, widget));
-      return true;
+      return false;
     case GDK_LEAVE_NOTIFY:
       view->on_mouse_leave.Emit(view, MouseEvent(event, widget));
-      return true;
+      return false;
     default:
       return false;
   }
