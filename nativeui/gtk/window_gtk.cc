@@ -21,20 +21,39 @@ gboolean OnClose(GtkWidget* widget, GdkEvent* event, Window* window) {
   return TRUE;
 }
 
-// Resize a window, with same behaviors on other platforms.
-void ResizeWindow(GtkWindow* window, const SizeF& size) {
-  if (gtk_window_get_resizable(window)) {
-    gtk_window_resize(window, size.width(), size.height());
-  } else {
-    gtk_widget_set_size_request(GTK_WIDGET(window), size.width(), size.height());
-  }
-}
-
 // Force window to allocate size for content view.
 void ForceSizeAllocation(GtkWindow* window, GtkWidget* view) {
   GdkRectangle rect = { 0, 0 };
   gtk_window_get_size(window, &rect.width, &rect.height);
   gtk_widget_size_allocate(view, &rect);
+}
+
+// Resize a window ignoring the size request.
+void ResizeWindow(Window* window, bool resizable, int width, int height) {
+  // Clear current size requests.
+  GtkWindow* gwin = window->GetNative();
+  GtkWidget* vbox = gtk_bin_get_child(GTK_BIN(gwin));
+  gtk_widget_set_size_request(GTK_WIDGET(gwin), -1, -1);
+  gtk_widget_set_size_request(vbox, -1, -1);
+
+  if (resizable || window->HasFrame()) {
+    // gtk_window_resize only works for resizable window.
+    if (resizable)
+      gtk_window_resize(gwin, width, height);
+    else
+      gtk_widget_set_size_request(GTK_WIDGET(gwin), width, height);
+  } else {
+    // Setting size request on the window results in weird behavior for
+    // unresizable CSD windows, probably related to size of shadows.
+    gtk_widget_set_size_request(vbox, width, height);
+  }
+
+  // Set default size otherwise GTK may do weird things when setting size
+  // request or changing resizable property.
+  gtk_window_set_default_size(gwin, width, height);
+
+  // Notify the content view of the resize.
+  ForceSizeAllocation(gwin, vbox);
 }
 
 }  // namespace
@@ -100,7 +119,7 @@ void Window::PlatformSetContentView(View* view) {
   gtk_box_set_child_packing(GTK_BOX(vbox), view->GetNative(), TRUE, TRUE,
                             0, GTK_PACK_END);
 
-  ForceSizeAllocation(window_, view->GetNative());
+  ForceSizeAllocation(window_, GTK_WIDGET(vbox));
 }
 
 void Window::PlatformSetMenu(MenuBar* menu_bar) {
@@ -120,7 +139,7 @@ void Window::PlatformSetMenu(MenuBar* menu_bar) {
     gtk_window_add_accel_group(window_,
                                menu_bar->accel_manager()->accel_group());
 
-  ForceSizeAllocation(window_, content_view_->GetNative());
+  ForceSizeAllocation(window_, GTK_WIDGET(vbox));
 }
 
 void Window::SetContentBounds(const RectF& bounds) {
@@ -140,9 +159,9 @@ void Window::SetContentBounds(const RectF& bounds) {
   gtk_widget_get_allocation(content_view_->GetNative(), &alloc);
   window_bounds.Inset(-alloc.x, -alloc.y, 0, 0);
 
-  ResizeWindow(window_, window_bounds.size());
+  ResizeWindow(this, IsResizable(),
+               window_bounds.width(), window_bounds.height());
   gtk_window_move(window_, window_bounds.x(), window_bounds.y());
-  ForceSizeAllocation(window_, content_view_->GetNative());
 }
 
 RectF Window::GetContentBounds() const {
@@ -171,9 +190,8 @@ void Window::SetBounds(const RectF& bounds) {
                         -(rect.height - gdk_window_get_height(gdkwindow)));
   }
 
-  ResizeWindow(window_, window_size);
+  ResizeWindow(this, IsResizable(), window_size.width(), window_size.height());
   gtk_window_move(window_, bounds.x(), bounds.y());
-  ForceSizeAllocation(window_, content_view_->GetNative());
 }
 
 RectF Window::GetBounds() const {
@@ -204,15 +222,26 @@ void Window::SetResizable(bool resizable) {
   if (resizable == IsResizable())
     return;
 
-  // Setting a window non-resizable will resize the window to its size
-  // request, so make sure the size request has been set.
-  if (!resizable) {
-    RectF bounds(GetContentBounds());
-    gtk_widget_set_size_request(GTK_WIDGET(window_),
-                                bounds.width(), bounds.height());
-  } else {
+  // Current size of content view (gtk_window_get_size is not reliable when
+  // window is not realized).
+  GdkRectangle alloc;
+  GtkWidget* vbox = gtk_bin_get_child(GTK_BIN(window_));
+  gtk_widget_get_allocation(vbox, &alloc);
+
+  // Prevent window from changing size when calling gtk_window_set_resizable.
+  if (resizable) {
+    // Clear the size requests for resizable window, otherwise window would have
+    // a minimum size.
     gtk_widget_set_size_request(GTK_WIDGET(window_), -1, -1);
+    gtk_widget_set_size_request(gtk_bin_get_child(GTK_BIN(window_)), -1, -1);
+    // Window would be resized to default size for resizable window.
+    gtk_window_set_default_size(window_, alloc.width, alloc.height);
+  } else {
+    // Set size requests for unresizable window, otherwise window would be
+    // resize to whatever current size request is.
+    ResizeWindow(this, resizable, alloc.width, alloc.height);
   }
+
   gtk_window_set_resizable(window_, resizable);
 }
 
@@ -221,6 +250,9 @@ bool Window::IsResizable() const {
 }
 
 void Window::SetMaximizable(bool yes) {
+  // In theory it is possible to set _NET_WM_ALLOWED_ACTIONS WM hint to
+  // implement this, but as I have tried non major desktop environment supports
+  // this hint, so on Linux this is simply impossible to implement.
 }
 
 bool Window::IsMaximizable() const {
