@@ -6,6 +6,7 @@
 
 #include <gtk/gtk.h>
 
+#include "nativeui/gtk/widget_util.h"
 #include "nativeui/menu_bar.h"
 
 namespace nu {
@@ -45,7 +46,7 @@ void OnScreenChanged(GtkWidget* widget, GdkScreen* old_screen, Window* window) {
 // Set input shape for frameless transparent window.
 gboolean OnDraw(GtkWidget* widget, cairo_t* cr, NUWindowPrivate* data) {
   cairo_surface_t* surface = cairo_get_target(cr);
-  cairo_region_t* region = gdk_cairo_region_create_from_surface(surface);
+  cairo_region_t* region = CreateRegionFromSurface(surface);
   gtk_widget_input_shape_combine_region(widget, region);
   cairo_region_destroy(region);
   // Only handle once.
