@@ -43,7 +43,7 @@ TEST_F(ButtonTest, UpdateStyle) {
 
 TEST_F(ButtonTest, Checkbox) {
   scoped_refptr<nu::Button> button =
-      new nu::Button("title", nu::Button::Checkbox);
+      new nu::Button("title", nu::Button::Type::Checkbox);
   EXPECT_FALSE(button->IsChecked());
   button->SetChecked(true);
   EXPECT_TRUE(button->IsChecked());
@@ -51,7 +51,7 @@ TEST_F(ButtonTest, Checkbox) {
 
 TEST_F(ButtonTest, Radio) {
   scoped_refptr<nu::Button> button =
-      new nu::Button("title", nu::Button::Radio);
+      new nu::Button("title", nu::Button::Type::Radio);
   button->SetChecked(true);
   EXPECT_TRUE(button->IsChecked());
 }
@@ -59,9 +59,9 @@ TEST_F(ButtonTest, Radio) {
 TEST_F(ButtonTest, RadioGroup) {
   scoped_refptr<nu::Container> container = new nu::Container;
   container->SetBounds(nu::RectF(0, 0, 100, 100));
-  auto* r1 = new nu::Button("r1", nu::Button::Radio);
-  auto* r2 = new nu::Button("r2", nu::Button::Radio);
-  auto* r3 = new nu::Button("r3", nu::Button::Radio);
+  auto* r1 = new nu::Button("r1", nu::Button::Type::Radio);
+  auto* r2 = new nu::Button("r2", nu::Button::Type::Radio);
+  auto* r3 = new nu::Button("r3", nu::Button::Type::Radio);
   container->AddChildView(r1);
   container->AddChildView(r2);
   container->AddChildView(r3);

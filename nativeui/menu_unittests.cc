@@ -18,7 +18,7 @@ class MenuTest : public testing::Test {
 
 TEST_F(MenuTest, ItemCount) {
   EXPECT_EQ(menu_->ItemCount(), 0);
-  menu_->Append(new nu::MenuItem(nu::MenuItem::Label));
+  menu_->Append(new nu::MenuItem(nu::MenuItem::Type::Label));
   EXPECT_EQ(menu_->ItemCount(), 1);
   menu_->Remove(menu_->ItemAt(1));
   EXPECT_EQ(menu_->ItemCount(), 1);

@@ -27,13 +27,12 @@ TEST_F(ViewTest, Bounds) {
   EXPECT_EQ(view_->GetBounds(), bounds);
 }
 
-TEST_F(ViewTest, AddToChildView) {
+TEST_F(ViewTest, SetContentView) {
   scoped_refptr<nu::Window> window(new nu::Window(nu::Window::Options()));
-  window->GetContentView()->AddChildView(view_.get());
-  float height = view_->GetBounds().height();
+  window->SetContentView(view_.get());
   nu::RectF bounds(100, 100, 200, 200);
   window->SetContentBounds(bounds);
-  EXPECT_EQ(view_->GetBounds(), nu::RectF(0, 0, 200, height));
+  EXPECT_EQ(view_->GetBounds(), nu::RectF(0, 0, 200, 200));
 }
 
 TEST_F(ViewTest, SetVisible) {

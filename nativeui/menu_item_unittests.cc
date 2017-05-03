@@ -17,7 +17,8 @@ void OnClick(bool* ptr) {
 }
 
 TEST_F(MenuItemTest, Click) {
-  scoped_refptr<nu::MenuItem> item = new nu::MenuItem(nu::MenuItem::Label);
+  scoped_refptr<nu::MenuItem> item =
+      new nu::MenuItem(nu::MenuItem::Type::Label);
   bool clicked = false;
   item->on_click.Connect(base::Bind(&OnClick, &clicked));
   item->Click();
@@ -25,13 +26,15 @@ TEST_F(MenuItemTest, Click) {
 }
 
 TEST_F(MenuItemTest, Label) {
-  scoped_refptr<nu::MenuItem> item = new nu::MenuItem(nu::MenuItem::Label);
+  scoped_refptr<nu::MenuItem> item =
+      new nu::MenuItem(nu::MenuItem::Type::Label);
   item->SetLabel("test");
   EXPECT_EQ(item->GetLabel(), "test");
 }
 
 TEST_F(MenuItemTest, Checkbox) {
-  scoped_refptr<nu::MenuItem> item = new nu::MenuItem(nu::MenuItem::Checkbox);
+  scoped_refptr<nu::MenuItem> item =
+      new nu::MenuItem(nu::MenuItem::Type::Checkbox);
   EXPECT_FALSE(item->IsChecked());
   item->SetChecked(true);
   EXPECT_TRUE(item->IsChecked());
@@ -40,24 +43,26 @@ TEST_F(MenuItemTest, Checkbox) {
 }
 
 TEST_F(MenuItemTest, Visible) {
-  scoped_refptr<nu::MenuItem> item = new nu::MenuItem(nu::MenuItem::Label);
+  scoped_refptr<nu::MenuItem> item =
+      new nu::MenuItem(nu::MenuItem::Type::Label);
   EXPECT_TRUE(item->IsVisible());
   item->SetVisible(false);
   EXPECT_FALSE(item->IsVisible());
 }
 
 TEST_F(MenuItemTest, Radio) {
-  scoped_refptr<nu::MenuItem> item = new nu::MenuItem(nu::MenuItem::Radio);
+  scoped_refptr<nu::MenuItem> item =
+      new nu::MenuItem(nu::MenuItem::Type::Radio);
   item->Click();
   EXPECT_TRUE(item->IsChecked());
 }
 
 TEST_F(MenuItemTest, RadioGroup) {
   scoped_refptr<nu::Menu> menu = new nu::Menu;
-  menu->Append(new nu::MenuItem(nu::MenuItem::Radio));
-  menu->Append(new nu::MenuItem(nu::MenuItem::Separator));
-  menu->Append(new nu::MenuItem(nu::MenuItem::Radio));
-  menu->Append(new nu::MenuItem(nu::MenuItem::Radio));
+  menu->Append(new nu::MenuItem(nu::MenuItem::Type::Radio));
+  menu->Append(new nu::MenuItem(nu::MenuItem::Type::Separator));
+  menu->Append(new nu::MenuItem(nu::MenuItem::Type::Radio));
+  menu->Append(new nu::MenuItem(nu::MenuItem::Type::Radio));
   menu->ItemAt(0)->Click();
   menu->ItemAt(2)->Click();
   EXPECT_TRUE(menu->ItemAt(0)->IsChecked());
