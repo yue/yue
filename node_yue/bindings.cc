@@ -689,7 +689,8 @@ struct Type<nu::View> {
         "setBackgroundColor", &nu::View::SetBackgroundColor,
         "setStyle", &SetStyle,
         "printStyle", &nu::View::PrintStyle,
-        "getParent", &nu::View::GetParent);
+        "getParent", &nu::View::GetParent,
+        "getWindow", &nu::View::GetWindow);
     SetProperty(context, templ,
                 "onMouseDown", &nu::View::on_mouse_down,
                 "onMouseUp", &nu::View::on_mouse_up,

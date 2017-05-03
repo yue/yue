@@ -20,6 +20,8 @@ Scroll::~Scroll() {
 }
 
 void Scroll::SetContentView(Container* container) {
+  if (content_view_)
+    content_view_->SetParent(nullptr);
   content_view_ = container;
   content_view_->SetParent(this);
 

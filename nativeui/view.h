@@ -19,6 +19,7 @@ typedef struct YGConfig *YGConfigRef;
 
 namespace nu {
 
+class Window;
 struct MouseEvent;
 struct KeyEvent;
 
@@ -86,11 +87,15 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   // Get parent.
   View* GetParent() const { return parent_; }
 
+  // Get window.
+  Window* GetWindow() const { return window_; }
+
   // Get the native View object.
   NativeView GetNative() const { return view_; }
 
   // Internal: Set parent view.
   void SetParent(View* parent);
+  void BecomeContentView(Window* window);
 
   // Internal: Get the CSS node of the view.
   YGNodeRef node() const { return node_; }
@@ -128,6 +133,7 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
 
   // Relationships.
   View* parent_ = nullptr;
+  Window* window_ = nullptr;
 
   // The native implementation.
   NativeView view_;

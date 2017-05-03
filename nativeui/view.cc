@@ -7,6 +7,7 @@
 #include "nativeui/container.h"
 #include "nativeui/state.h"
 #include "nativeui/util/css.h"
+#include "nativeui/window.h"
 #include "third_party/yoga/yoga/Yoga.h"
 
 namespace nu {
@@ -73,9 +74,23 @@ void View::PrintStyle() const {
 }
 
 void View::SetParent(View* parent) {
-  if (parent)
+  if (parent) {
+    window_ = parent->window_;
     YGConfigCopy(yoga_config_, parent->yoga_config_);
+  } else {
+    window_ = nullptr;
+  }
   parent_ = parent;
+}
+
+void View::BecomeContentView(Window* window) {
+  if (window) {
+    window_ = window;
+    YGConfigCopy(yoga_config_, window->GetYogaConfig());
+  } else {
+    window_ = nullptr;
+  }
+  parent_ = nullptr;
 }
 
 }  // namespace nu

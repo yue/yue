@@ -38,8 +38,11 @@ void Window::SetContentView(View* view) {
     LOG(ERROR) << "Content view can not be null";
     return;
   }
+  if (content_view_)
+    content_view_->BecomeContentView(nullptr);
   PlatformSetContentView(view);
   content_view_ = view;
+  content_view_->BecomeContentView(this);
 }
 
 View* Window::GetContentView() const {

@@ -64,6 +64,9 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
   // Get the native window object.
   NativeWindow GetNative() const { return window_; }
 
+  // Internal: Get the yogo config object.
+  YGConfigRef GetYogaConfig() const { return yoga_config_; }
+
   // Events.
   Signal<void()> on_close;
 

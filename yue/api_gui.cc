@@ -628,7 +628,8 @@ struct Type<nu::View> {
            "setbackgroundcolor", &nu::View::SetBackgroundColor,
            "setstyle", &SetStyle,
            "printstyle", &nu::View::PrintStyle,
-           "getparent", &nu::View::GetParent);
+           "getparent", &nu::View::GetParent,
+           "getwindow", &nu::View::GetWindow);
     RawSetProperty(state, metatable,
                    "onmousedown", &nu::View::on_mouse_down,
                    "onmouseup", &nu::View::on_mouse_up,
