@@ -561,7 +561,6 @@ struct Type<nu::Window::Options> {
   static constexpr const char* name = "yue.Window.Options";
   static inline bool To(State* state, int index, nu::Window::Options* out) {
     if (GetType(state, index) == LuaType::Table) {
-      RawGetAndPop(state, index, "bounds", &out->bounds);
       RawGetAndPop(state, index, "frame", &out->frame);
       RawGetAndPop(state, index, "transparent", &out->transparent);
 #if defined(OS_MACOSX)
@@ -580,12 +579,12 @@ struct Type<nu::Window> {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::Window, const nu::Window::Options&>,
            "close", &nu::Window::Close,
-           "setcontentbounds", &nu::Window::SetContentBounds,
-           "getcontentbounds", &nu::Window::GetContentBounds,
-           "setbounds", &nu::Window::SetBounds,
-           "getbounds", &nu::Window::GetBounds,
            "setcontentview", &nu::Window::SetContentView,
            "getcontentview", &nu::Window::GetContentView,
+           "setcontentsize", &nu::Window::SetContentSize,
+           "getcontentsize", &nu::Window::GetContentSize,
+           "setbounds", &nu::Window::SetBounds,
+           "getbounds", &nu::Window::GetBounds,
            "setvisible", &nu::Window::SetVisible,
            "isvisible", &nu::Window::IsVisible,
            "setresizable", &nu::Window::SetResizable,

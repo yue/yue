@@ -141,6 +141,9 @@ void Window::PlatformInit(const Options& options) {
   // Window is not focused by default.
   gtk_window_set_focus_on_map(window_, false);
 
+  // Window events.
+  g_signal_connect(window_, "delete-event", G_CALLBACK(OnClose), this);
+
   if (!options.frame) {
     // Rely on client-side decoration to provide window features for frameless
     // window, like resizing and shadows.
@@ -160,14 +163,6 @@ void Window::PlatformInit(const Options& options) {
   GtkWidget* vbox = gtk_vbox_new(FALSE, 0);
   gtk_widget_show(vbox);
   gtk_container_add(GTK_CONTAINER(window_), vbox);
-
-  if (!options.bounds.IsEmpty()) {
-    gtk_window_set_default_size(window_, options.bounds.width(),
-                                         options.bounds.height());
-    gtk_window_move(window_, options.bounds.x(), options.bounds.y());
-  }
-
-  g_signal_connect(window_, "delete-event", G_CALLBACK(OnClose), this);
 }
 
 void Window::PlatformDestroy() {
@@ -229,40 +224,10 @@ void Window::PlatformSetMenu(MenuBar* menu_bar) {
   ForceSizeAllocation(window_, GTK_WIDGET(vbox));
 }
 
-void Window::SetContentBounds(const RectF& bounds) {
-  RectF window_bounds(bounds);
-  GdkWindow* gdkwindow = gtk_widget_get_window(GTK_WIDGET(window_));
-  if (gdkwindow) {
-    // Get frame size.
-    GdkRectangle rect;
-    gdk_window_get_frame_extents(gdkwindow, &rect);
-    // The position of window without frame, which includes menubar.
-    int x, y;
-    gdk_window_get_position(gdkwindow, &x, &y);
-    window_bounds.Offset(rect.x - x, rect.y - y);
-  }
-  // The position of menubar.
-  GdkRectangle alloc;
-  gtk_widget_get_allocation(content_view_->GetNative(), &alloc);
-  window_bounds.Inset(-alloc.x, -alloc.y, 0, 0);
-
-  ResizeWindow(this, IsResizable(),
-               window_bounds.width(), window_bounds.height());
-  gtk_window_move(window_, window_bounds.x(), window_bounds.y());
-}
-
-RectF Window::GetContentBounds() const {
-  GdkWindow* gdkwindow = gtk_widget_get_window(GTK_WIDGET(window_));
-  // The position of window without frame, which includes menubar.
-  int x, y;
-  if (gdkwindow)
-    gdk_window_get_position(gdkwindow, &x, &y);
-  else
-    gtk_window_get_position(window_, &x, &y);
-  // The relative position of content view.
-  GdkRectangle alloc;
-  gtk_widget_get_allocation(content_view_->GetNative(), &alloc);
-  return RectF(x + alloc.x, y + alloc.y, alloc.width, alloc.height);
+void Window::SetContentSize(const SizeF& size) {
+  // Content view may have offset (headerbar, menubar).
+  PointF offset(content_view_->GetBounds().origin());
+  ResizeWindow(this, IsResizable(), size.width(), size.height() + offset.y());
 }
 
 void Window::SetBounds(const RectF& bounds) {

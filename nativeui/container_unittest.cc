@@ -106,7 +106,7 @@ TEST_F(ContainerTest, RemoveAndAddBack) {
 }
 
 TEST_F(ContainerTest, MoveBetweenContainers) {
-  window_->SetContentBounds(nu::RectF(0, 0, 200, 400));
+  window_->SetContentSize(nu::SizeF(200, 400));
 
   nu::Container* c1 = new nu::Container;
   c1->SetStyle("flex", "1");

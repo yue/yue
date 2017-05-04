@@ -40,25 +40,6 @@
 
 namespace nu {
 
-namespace {
-
-// Converting between window and content bounds.
-RectF ContentToWindowBounds(NSWindow* window, const RectF& bounds) {
-  RectF window_bounds([window frameRectForContentRect:bounds.ToCGRect()]);
-  int frame_height = window_bounds.height() - bounds.height();
-  window_bounds.set_y(window_bounds.y() - frame_height);
-  return window_bounds;
-}
-
-RectF WindowToContentBounds(NSWindow* window, const RectF& bounds) {
-  RectF content_bounds([window contentRectForFrameRect:bounds.ToCGRect()]);
-  int frame_height = bounds.height() - content_bounds.height();
-  content_bounds.set_y(content_bounds.y() + frame_height);
-  return content_bounds;
-}
-
-}  // namespace
-
 void Window::PlatformInit(const Options& options) {
   NSUInteger styleMask = NSTitledWindowMask | NSMiniaturizableWindowMask |
                          NSClosableWindowMask | NSResizableWindowMask |
@@ -146,18 +127,8 @@ void Window::PlatformSetContentView(View* view) {
     static_cast<Container*>(view)->Layout();
 }
 
-void Window::SetContentBounds(const RectF& bounds) {
-  if (HasFrame())
-    SetBounds(ContentToWindowBounds(window_, bounds));
-  else
-    SetBounds(bounds);
-}
-
-RectF Window::GetContentBounds() const {
-  if (HasFrame())
-    return WindowToContentBounds(window_, GetBounds());
-  else
-    return GetBounds();
+void Window::SetContentSize(const SizeF& size) {
+  [window_ setContentSize:size.ToCGSize()];
 }
 
 void Window::SetBounds(const RectF& bounds) {

@@ -38,12 +38,14 @@ const int kResizeBorderWidth = 5;
 const int kResizeCornerWidth = 16;
 
 // Convert between window and client areas.
-Rect ContentToWindowBounds(Win32Window* window, bool has_menu_bar,
-                           const Rect& bounds) {
-  RECT rect = bounds.ToRECT();
+Size ContentToWindowSize(Win32Window* window, bool has_menu_bar,
+                         const Size& size) {
+  if (!window->HasFrame())
+    return size;
+  RECT rect = Rect(size).ToRECT();
   AdjustWindowRectEx(&rect, window->window_style(), has_menu_bar,
                      window->window_ex_style());
-  return Rect(rect);
+  return Rect(rect).size();
 }
 
 inline bool IsShiftPressed() {
@@ -494,8 +496,6 @@ bool WindowImpl::HasSystemFrame() const {
 
 void Window::PlatformInit(const Options& options) {
   window_ = new WindowImpl(options, this);
-  if (!options.bounds.IsEmpty())
-    SetBounds(options.bounds);
 
   YGConfigSetPointScaleFactor(yoga_config_,
                               GetScaleFactorForHWND(window_->hwnd()));
@@ -518,17 +518,10 @@ void Window::PlatformSetMenu(MenuBar* menu_bar) {
   ::SetMenu(window_->hwnd(), menu_bar ? menu_bar->GetNative() : NULL);
 }
 
-void Window::SetContentBounds(const RectF& bounds) {
-  Rect prect = ToNearestRect(ScaleRect(bounds, window_->scale_factor()));
-  if (HasFrame())
-    window_->SetPixelBounds(ContentToWindowBounds(window_, !!menu_bar_, prect));
-  else
-    window_->SetPixelBounds(prect);
-}
-
-RectF Window::GetContentBounds() const {
-  return ScaleRect(RectF(window_->GetContentPixelBounds()),
-                   1.0f / window_->scale_factor());
+void Window::SetContentSize(const SizeF& size) {
+  Size psize = ToRoundedSize(ScaleSize(size, window_->scale_factor()));
+  window_->SetPixelBounds(Rect(window_->GetPixelBounds().origin(),
+                          ContentToWindowSize(window_, !!menu_bar_, psize)));
 }
 
 void Window::SetBounds(const RectF& bounds) {

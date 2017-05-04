@@ -18,21 +18,22 @@ class WindowTest : public testing::Test {
 };
 
 TEST_F(WindowTest, Bounds) {
-  nu::RectF bounds(123, 456, 789, 10);
-  window_->SetContentBounds(bounds);
-  nu::RectF window_bounds = window_->GetBounds();
-  EXPECT_EQ(window_->GetContentBounds(), bounds);
-  window_->SetBounds(window_bounds);
-  EXPECT_EQ(window_->GetBounds(), window_bounds);
+  nu::SizeF size(123, 456);
+  window_->SetContentSize(size);
+  EXPECT_EQ(window_->GetContentSize(), size);
+  nu::RectF bounds = window_->GetBounds();
+  window_->SetBounds(bounds);
+  EXPECT_EQ(window_->GetBounds(), bounds);
 }
 
 TEST_F(WindowTest, FramelessWindowBounds) {
   nu::Window::Options options;
   options.frame = false;
   window_ = new nu::Window(options);
-  nu::RectF bounds(123, 456, 789, 10);
-  window_->SetContentBounds(bounds);
-  EXPECT_EQ(window_->GetContentBounds(), bounds);
+  nu::SizeF size(123, 456);
+  window_->SetContentSize(size);
+  EXPECT_EQ(window_->GetContentSize(), size);
+  nu::RectF bounds = window_->GetBounds();
   window_->SetBounds(bounds);
   EXPECT_EQ(window_->GetBounds(), bounds);
 }
@@ -87,37 +88,40 @@ TEST_F(WindowTest, ShouldClose) {
 }
 
 TEST_F(WindowTest, Resizable) {
-  nu::RectF bounds(123, 456, 789, 10);
-  window_->SetContentBounds(bounds);
+  nu::SizeF size(123, 456);
+  window_->SetContentSize(size);
+  nu::RectF bounds = window_->GetBounds();
   EXPECT_EQ(window_->IsResizable(), true);
   window_->SetResizable(false);
   EXPECT_EQ(window_->IsResizable(), false);
-  EXPECT_EQ(window_->GetContentBounds(), bounds);
+  EXPECT_EQ(window_->GetBounds(), bounds);
+  EXPECT_EQ(window_->GetContentSize(), size);
   window_->SetResizable(true);
-  EXPECT_EQ(window_->GetContentBounds(), bounds);
+  EXPECT_EQ(window_->GetBounds(), bounds);
+  EXPECT_EQ(window_->GetContentSize(), size);
 }
 
 TEST_F(WindowTest, VisibleWindowResizable) {
-  nu::RectF bounds(123, 456, 789, 10);
-  window_->SetContentBounds(bounds);
-  EXPECT_EQ(window_->GetContentBounds().size(), bounds.size());
+  nu::SizeF size(123, 456);
+  window_->SetContentSize(size);
+  EXPECT_EQ(window_->GetContentSize(), size);
   window_->SetResizable(false);
-  EXPECT_EQ(window_->GetContentBounds().size(), bounds.size());
+  EXPECT_EQ(window_->GetContentSize(), size);
   window_->SetResizable(true);
-  EXPECT_EQ(window_->GetContentBounds().size(), bounds.size());
+  EXPECT_EQ(window_->GetContentSize(), size);
 }
 
 TEST_F(WindowTest, FramelessWindowResizable) {
   nu::Window::Options options;
   options.frame = false;
   window_ = new nu::Window(options);
-  nu::RectF bounds(123, 456, 789, 10);
-  window_->SetContentBounds(bounds);
-  EXPECT_EQ(window_->GetContentBounds().size(), bounds.size());
+  nu::SizeF size(123, 456);
+  window_->SetContentSize(size);
+  EXPECT_EQ(window_->GetContentSize(), size);
   window_->SetResizable(false);
-  EXPECT_EQ(window_->GetContentBounds().size(), bounds.size());
+  EXPECT_EQ(window_->GetContentSize(), size);
   window_->SetResizable(true);
-  EXPECT_EQ(window_->GetContentBounds().size(), bounds.size());
+  EXPECT_EQ(window_->GetContentSize(), size);
 }
 
 TEST_F(WindowTest, TransparentWindowResizable) {
@@ -125,11 +129,11 @@ TEST_F(WindowTest, TransparentWindowResizable) {
   options.frame = false;
   options.transparent = true;
   window_ = new nu::Window(options);
-  nu::RectF bounds(123, 456, 789, 10);
-  window_->SetContentBounds(bounds);
-  EXPECT_EQ(window_->GetContentBounds().size(), bounds.size());
+  nu::SizeF size(123, 456);
+  window_->SetContentSize(size);
+  EXPECT_EQ(window_->GetContentSize(), size);
   window_->SetResizable(false);
-  EXPECT_EQ(window_->GetContentBounds().size(), bounds.size());
+  EXPECT_EQ(window_->GetContentSize(), size);
   window_->SetResizable(true);
-  EXPECT_EQ(window_->GetContentBounds().size(), bounds.size());
+  EXPECT_EQ(window_->GetContentSize(), size);
 }

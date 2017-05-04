@@ -49,6 +49,10 @@ View* Window::GetContentView() const {
   return content_view_.get();
 }
 
+SizeF Window::GetContentSize() const {
+  return content_view_->GetBounds().size();
+}
+
 #if defined(OS_WIN) || defined(OS_LINUX)
 void Window::SetMenu(MenuBar* menu_bar) {
   PlatformSetMenu(menu_bar);

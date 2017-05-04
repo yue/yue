@@ -17,8 +17,6 @@ class MenuBar;
 class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
  public:
   struct Options {
-    // Initial window size.
-    RectF bounds;
     // Whether the window has a chrome.
     bool frame = true;
     // Whether the window is transparent.
@@ -40,9 +38,8 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
   void SetContentView(View* view);
   View* GetContentView() const;
 
-  void SetContentBounds(const RectF& bounds);
-  RectF GetContentBounds() const;
-
+  void SetContentSize(const SizeF& size);
+  SizeF GetContentSize() const;
   void SetBounds(const RectF& bounds);
   RectF GetBounds() const;
 

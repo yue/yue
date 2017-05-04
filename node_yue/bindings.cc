@@ -615,7 +615,6 @@ struct Type<nu::Window::Options> {
     auto obj = value.As<v8::Object>();
     if (obj.IsEmpty())
       return false;
-    Get(context, obj, "bounds", &out->bounds);
     Get(context, obj, "frame", &out->frame);
     Get(context, obj, "transparent", &out->transparent);
 #if defined(OS_MACOSX)
@@ -637,12 +636,12 @@ struct Type<nu::Window> {
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
         "close", &nu::Window::Close,
-        "setContentBounds", &nu::Window::SetContentBounds,
-        "getContentBounds", &nu::Window::GetContentBounds,
-        "setBounds", &nu::Window::SetBounds,
-        "getBounds", &nu::Window::GetBounds,
         "setContentView", &nu::Window::SetContentView,
         "getContentView", &nu::Window::GetContentView,
+        "setContentSize", &nu::Window::SetContentSize,
+        "getContentSize", &nu::Window::GetContentSize,
+        "setBounds", &nu::Window::SetBounds,
+        "getBounds", &nu::Window::GetBounds,
         "setVisible", &nu::Window::SetVisible,
         "isVisible", &nu::Window::IsVisible,
         "setResizable", &nu::Window::SetResizable,

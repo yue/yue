@@ -30,8 +30,7 @@ TEST_F(ViewTest, Bounds) {
 TEST_F(ViewTest, SetContentView) {
   scoped_refptr<nu::Window> window(new nu::Window(nu::Window::Options()));
   window->SetContentView(view_.get());
-  nu::RectF bounds(100, 100, 200, 200);
-  window->SetContentBounds(bounds);
+  window->SetContentSize(nu::SizeF(200, 200));
   EXPECT_EQ(view_->GetBounds(), nu::RectF(0, 0, 200, 200));
 }
 
