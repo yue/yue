@@ -16,13 +16,16 @@ namespace {
 // Window private data.
 struct NUWindowPrivate {
   Window* delegate;
+  // Window state.
+  int window_state;
+  // Input shape fields.
   bool is_input_shape_set;
   bool is_draw_handler_set;
   guint draw_handler_id;
 };
 
 // Helper to receive private data.
-inline NUWindowPrivate* GetPrivate(Window* window) {
+inline NUWindowPrivate* GetPrivate(const Window* window) {
   return static_cast<NUWindowPrivate*>(g_object_get_data(
       G_OBJECT(window->GetNative()), "private"));
 }
@@ -36,6 +39,13 @@ gboolean OnClose(GtkWidget* widget, GdkEvent* event, Window* window) {
   return TRUE;
 }
 
+// Window state has changed.
+gboolean OnWindowState(GtkWidget* widget, GdkEvent* event,
+                       NUWindowPrivate* priv) {
+  priv->window_state = event->window_state.new_window_state;
+  return FALSE;
+}
+
 // Make window support alpha channel for the screen.
 void OnScreenChanged(GtkWidget* widget, GdkScreen* old_screen, Window* window) {
   GdkScreen* screen = gtk_widget_get_screen(widget);
@@ -44,15 +54,15 @@ void OnScreenChanged(GtkWidget* widget, GdkScreen* old_screen, Window* window) {
 }
 
 // Set input shape for frameless transparent window.
-gboolean OnDraw(GtkWidget* widget, cairo_t* cr, NUWindowPrivate* data) {
+gboolean OnDraw(GtkWidget* widget, cairo_t* cr, NUWindowPrivate* priv) {
   cairo_surface_t* surface = cairo_get_target(cr);
   cairo_region_t* region = CreateRegionFromSurface(surface);
   gtk_widget_input_shape_combine_region(widget, region);
   cairo_region_destroy(region);
   // Only handle once.
-  data->is_draw_handler_set = false;
-  data->is_input_shape_set = true;
-  g_signal_handler_disconnect(widget, data->draw_handler_id);
+  priv->is_draw_handler_set = false;
+  priv->is_input_shape_set = true;
+  g_signal_handler_disconnect(widget, priv->draw_handler_id);
   return FALSE;
 }
 
@@ -133,16 +143,17 @@ void ResizeWindow(Window* window, bool resizable, int width, int height) {
 
 void Window::PlatformInit(const Options& options) {
   window_ = GTK_WINDOW(gtk_window_new(GTK_WINDOW_TOPLEVEL));
-  g_object_set_data_full(G_OBJECT(window_),
-                         "private",
-                         new NUWindowPrivate{this, false, false, 0},
-                         operator delete);
+
+  NUWindowPrivate* priv = new NUWindowPrivate{this, 0, false, false, 0};
+  g_object_set_data_full(G_OBJECT(window_), "private", priv, operator delete);
 
   // Window is not focused by default.
   gtk_window_set_focus_on_map(window_, false);
 
   // Window events.
   g_signal_connect(window_, "delete-event", G_CALLBACK(OnClose), this);
+  g_signal_connect(window_, "window-state-event",
+                   G_CALLBACK(OnWindowState), priv);
 
   if (!options.frame) {
     // Rely on client-side decoration to provide window features for frameless
@@ -155,7 +166,7 @@ void Window::PlatformInit(const Options& options) {
     gtk_widget_set_app_paintable(GTK_WIDGET(window_), true);
     // Set alpha channel in window.
     OnScreenChanged(GTK_WIDGET(window_), nullptr, this);
-    g_signal_connect(G_OBJECT(window_), "screen-changed",
+    g_signal_connect(window_, "screen-changed",
                      G_CALLBACK(OnScreenChanged), this);
   }
 
@@ -195,33 +206,17 @@ void Window::PlatformSetContentView(View* view) {
   // input shape the first time when content view is drawn, GTK do redraws very
   // frequently and computing input shape is rather expensive.
   if (IsTransparent() && !HasFrame()) {
-    NUWindowPrivate* data = GetPrivate(this);
-    if (!data->is_draw_handler_set) {
-      data->is_draw_handler_set = true;
-      data->draw_handler_id = g_signal_connect_after(
-          G_OBJECT(window_), "draw", G_CALLBACK(OnDraw), data);
+    NUWindowPrivate* priv = GetPrivate(this);
+    if (!priv->is_draw_handler_set) {
+      priv->is_draw_handler_set = true;
+      priv->draw_handler_id = g_signal_connect_after(
+          G_OBJECT(window_), "draw", G_CALLBACK(OnDraw), priv);
     }
   }
 }
 
-void Window::PlatformSetMenu(MenuBar* menu_bar) {
-  GtkContainer* vbox = GTK_CONTAINER(gtk_bin_get_child(GTK_BIN(window_)));
-  if (menu_bar_)
-    gtk_container_remove(vbox, GTK_WIDGET(menu_bar_->GetNative()));
-  GtkWidget* menu = GTK_WIDGET(menu_bar->GetNative());
-  gtk_container_add(vbox, menu);
-  gtk_box_set_child_packing(GTK_BOX(vbox), menu, FALSE, FALSE, 0,
-                            GTK_PACK_START);
-
-  // Update the accelerator group.
-  if (menu_bar_)
-    gtk_window_remove_accel_group(window_,
-                                  menu_bar_->accel_manager()->accel_group());
-  if (menu_bar)
-    gtk_window_add_accel_group(window_,
-                               menu_bar->accel_manager()->accel_group());
-
-  ForceSizeAllocation(window_, GTK_WIDGET(vbox));
+void Window::Center() {
+  gtk_window_set_position(window_, GTK_WIN_POS_CENTER);
 }
 
 void Window::SetContentSize(const SizeF& size) {
@@ -262,12 +257,58 @@ RectF Window::GetBounds() const {
   }
 }
 
+void Window::Activate() {
+  // Calling gtk_window_present on a hidden window does not focus it.
+  gtk_widget_set_visible(GTK_WIDGET(window_), true);
+  gtk_window_present(window_);
+}
+
+void Window::Deactivate() {
+  gdk_window_lower(gtk_widget_get_window(GTK_WIDGET(window_)));
+}
+
+bool Window::IsActive() const {
+  return gtk_window_is_active(window_);
+}
+
 void Window::SetVisible(bool visible) {
   gtk_widget_set_visible(GTK_WIDGET(window_), visible);
 }
 
 bool Window::IsVisible() const {
   return gtk_widget_get_visible(GTK_WIDGET(window_));
+}
+
+void Window::SetAlwaysOnTop(bool top) {
+  gtk_window_set_keep_above(window_, top);
+}
+
+bool Window::IsAlwaysOnTop() const {
+  return GetPrivate(this)->window_state & GDK_WINDOW_STATE_ABOVE;
+}
+
+void Window::Maximize() {
+  gtk_window_maximize(window_);
+}
+
+void Window::Unmaximize() {
+  gtk_window_unmaximize(window_);
+}
+
+bool Window::IsMaximized() const {
+  return gtk_window_is_maximized(window_);
+}
+
+void Window::Minimize() {
+  gtk_window_iconify(window_);
+}
+
+void Window::Restore() {
+  gtk_window_deiconify(window_);
+}
+
+bool Window::IsMinimized() const {
+  return GetPrivate(this)->window_state & GDK_WINDOW_STATE_ICONIFIED;
 }
 
 void Window::SetResizable(bool resizable) {
@@ -320,10 +361,46 @@ bool Window::IsMaximizable() const {
   return IsResizable();
 }
 
+void Window::SetMinimizable(bool minimizable) {
+  // See SetMaximizable for why this is not implemented.
+}
+
+bool Window::IsMinimizable() const {
+  return true;
+}
+
+void Window::SetMovable(bool movable) {
+  // See SetMaximizable for why this is not implemented.
+}
+
+bool Window::IsMovable() const {
+  return true;
+}
+
 void Window::SetBackgroundColor(Color color) {
   GdkRGBA gcolor = color.ToGdkRGBA();
   gtk_widget_override_background_color(GTK_WIDGET(window_),
                                        GTK_STATE_FLAG_NORMAL, &gcolor);
+}
+
+void Window::PlatformSetMenu(MenuBar* menu_bar) {
+  GtkContainer* vbox = GTK_CONTAINER(gtk_bin_get_child(GTK_BIN(window_)));
+  if (menu_bar_)
+    gtk_container_remove(vbox, GTK_WIDGET(menu_bar_->GetNative()));
+  GtkWidget* menu = GTK_WIDGET(menu_bar->GetNative());
+  gtk_container_add(vbox, menu);
+  gtk_box_set_child_packing(GTK_BOX(vbox), menu, FALSE, FALSE, 0,
+                            GTK_PACK_START);
+
+  // Update the accelerator group.
+  if (menu_bar_)
+    gtk_window_remove_accel_group(window_,
+                                  menu_bar_->accel_manager()->accel_group());
+  if (menu_bar)
+    gtk_window_add_accel_group(window_,
+                               menu_bar->accel_manager()->accel_group());
+
+  ForceSizeAllocation(window_, GTK_WIDGET(vbox));
 }
 
 }  // namespace nu

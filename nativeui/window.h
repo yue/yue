@@ -9,6 +9,16 @@
 #include "nativeui/gfx/color.h"
 #include "nativeui/gfx/geometry/rect_f.h"
 
+#if defined(OS_WIN)
+// Windows headers define macros for these function names which screw with us.
+#if defined(IsMaximized)
+#undef IsMaximized
+#endif
+#if defined(IsMinimized)
+#undef IsMinimized
+#endif
+#endif
+
 namespace nu {
 
 class MenuBar;
@@ -38,25 +48,41 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
   void SetContentView(View* view);
   View* GetContentView() const;
 
+  void Center();
   void SetContentSize(const SizeF& size);
   SizeF GetContentSize() const;
   void SetBounds(const RectF& bounds);
   RectF GetBounds() const;
 
+  void Activate();
+  void Deactivate();
+  bool IsActive() const;
   void SetVisible(bool visible);
   bool IsVisible() const;
+  void SetAlwaysOnTop(bool top);
+  bool IsAlwaysOnTop() const;
+  void Maximize();
+  void Unmaximize();
+  bool IsMaximized() const;
+  void Minimize();
+  void Restore();
+  bool IsMinimized() const;
 
-  void SetResizable(bool yes);
+  void SetResizable(bool resizable);
   bool IsResizable() const;
-  void SetMaximizable(bool yes);
+  void SetMaximizable(bool maximizable);
   bool IsMaximizable() const;
+  void SetMinimizable(bool minimizable);
+  bool IsMinimizable() const;
+  void SetMovable(bool movable);
+  bool IsMovable() const;
+
+  void SetBackgroundColor(Color color);
 
 #if defined(OS_WIN) || defined(OS_LINUX)
   void SetMenu(MenuBar* menu_bar);
   MenuBar* GetMenu() const;
 #endif
-
-  void SetBackgroundColor(Color color);
 
   // Get the native window object.
   NativeWindow GetNative() const { return window_; }

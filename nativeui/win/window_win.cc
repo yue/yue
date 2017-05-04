@@ -137,6 +137,10 @@ bool WindowImpl::HasWindowStyle(LONG style) const {
   return (::GetWindowLong(hwnd(), GWL_STYLE) & style) != 0;
 }
 
+void WindowImpl::ExecuteSystemMenuCommand(int command) {
+  SendMessage(hwnd(), WM_SYSCOMMAND, command, 0);
+}
+
 void WindowImpl::OnCaptureChanged(HWND window) {
   if (captured_view_) {
     captured_view_->OnCaptureLost();
@@ -514,8 +518,12 @@ void Window::PlatformSetContentView(View* view) {
   view->SetPixelBounds(Rect(window_->GetContentPixelBounds().size()));
 }
 
-void Window::PlatformSetMenu(MenuBar* menu_bar) {
-  ::SetMenu(window_->hwnd(), menu_bar ? menu_bar->GetNative() : NULL);
+void Window::Center() {
+  Rect bounds = window_->GetPixelBounds();
+  int x = (::GetSystemMetrics(SM_CXSCREEN) - bounds.width()) / 2;
+  int y = (::GetSystemMetrics(SM_CYSCREEN) - bounds.height()) / 2;
+  ::SetWindowPos(hwnd(), NULL, x, y, 0, 0,
+                 SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOREDRAW);
 }
 
 void Window::SetContentSize(const SizeF& size) {
@@ -534,12 +542,63 @@ RectF Window::GetBounds() const {
                          1.0f / window_->scale_factor());
 }
 
+void Window::Activate() {
+  HWND hwnd = window_->hwnd();
+  if (IsMinimized())
+    ::ShowWindow(hwnd, SW_RESTORE);
+  ::SetWindowPos(hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+  ::SetForegroundWindow(hwnd);
+}
+
+void Window::Deactivate() {
+  HWND hwnd = ::GetNextWindow(window_->hwnd(), GW_HWNDNEXT);
+  if (hwnd)
+    ::SetForegroundWindow(hwnd);
+}
+
+bool Window::IsActive() const {
+  return ::GetActiveWindow() == window_->hwnd();
+}
+
 void Window::SetVisible(bool visible) {
   ShowWindow(window_->hwnd(), visible ? SW_SHOWNOACTIVATE : SW_HIDE);
 }
 
 bool Window::IsVisible() const {
   return !!::IsWindowVisible(window_->hwnd());
+}
+
+void Window::SetAlwaysOnTop(bool top) {
+  ::SetWindowPos(window_->hwnd(), top ? HWND_TOPMOST : HWND_NOTOPMOST,
+                 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+}
+
+bool Window::IsAlwaysOnTop() const {
+  return (::GetWindowLong(hwnd, GWL_EXSTYLE) & WS_EX_TOPMOST) != 0;
+}
+
+void Window::Maximize() {
+  ExecuteSystemMenuCommand(SC_MAXIMIZE);
+}
+
+void Window::Unmaximize() {
+  ExecuteSystemMenuCommand(SC_RESTORE);
+}
+
+bool Window::IsMaximized() const {
+  return !!::IsZoomed(window_->hwnd());
+}
+
+void Window::Minimize() {
+  ExecuteSystemMenuCommand(SC_MINIMIZE);
+}
+
+void Window::Restore() {
+  ExecuteSystemMenuCommand(SC_RESTORE);
+}
+
+bool Window::IsMinimized() const {
+  return !!::IsIconic(window_->hwnd());
 }
 
 void Window::SetResizable(bool yes) {
@@ -558,8 +617,33 @@ bool Window::IsMaximizable() const {
   return window_->HasWindowStyle(WS_MAXIMIZEBOX);
 }
 
+void Window::SetMinimizable(bool minimizable) {
+  window_->SetWindowStyle(WS_MINIMIZEBOX, yes);
+}
+
+bool Window::IsMinimizable() const {
+  return window_->HasWindowStyle(WS_MINIMIZEBOX);
+}
+
+void Window::SetMovable(bool movable) {
+  UINT flags = MF_BYCOMMAND | (movable ? MF_ENABLED : MF_DISABLED | MF_GRAYED);
+  ::EnableMenuItem(::GetSystemMenu(window_->hwnd(), FALSE), SC_MOVE, flags);
+}
+
+bool Window::IsMovable() const {
+  MENUITEMINFO mii = {0};
+  mii.cbSize = sizeof(MENUITEMINFO);
+  HMENU menu = ::GetSystemMenu(window_->hwnd(), FALSE);
+  ::GetMenuItemInfo(menu, SC_MOVE, FALSE, &mii);
+  return (mii.fState & MFS_DISABLED) == 0;
+}
+
 void Window::SetBackgroundColor(Color color) {
   window_->SetBackgroundColor(color);
+}
+
+void Window::PlatformSetMenu(MenuBar* menu_bar) {
+  ::SetMenu(window_->hwnd(), menu_bar ? menu_bar->GetNative() : NULL);
 }
 
 }  // namespace nu

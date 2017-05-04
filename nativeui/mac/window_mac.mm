@@ -127,6 +127,10 @@ void Window::PlatformSetContentView(View* view) {
     static_cast<Container*>(view)->Layout();
 }
 
+void Window::Center() {
+  [window_ center];
+}
+
 void Window::SetContentSize(const SizeF& size) {
   [window_ setContentSize:size.ToCGSize()];
 }
@@ -139,6 +143,19 @@ RectF Window::GetBounds() const {
   return ScreenRectFromNSRect([window_ frame]);
 }
 
+void Window::Activate() {
+  [NSApp activateIgnoringOtherApps:YES];
+  [window_ makeKeyAndOrderFront:nil];
+}
+
+void Window::Deactivate() {
+  [window_ orderBack:nil];
+}
+
+bool Window::IsActive() const {
+  return [window_ isKeyWindow];
+}
+
 void Window::SetVisible(bool visible) {
   if (visible)
     [window_ orderFrontRegardless];
@@ -148,6 +165,49 @@ void Window::SetVisible(bool visible) {
 
 bool Window::IsVisible() const {
   return [window_ isVisible];
+}
+
+void Window::SetAlwaysOnTop(bool top) {
+  [window_ setLevel:(top ? NSFloatingWindowLevel : NSNormalWindowLevel)];
+}
+
+bool Window::IsAlwaysOnTop() const {
+  return [window_ level] != NSNormalWindowLevel;
+}
+
+void Window::Maximize() {
+  if (!IsMaximized())
+    [window_ zoom:nil];
+}
+
+void Window::Unmaximize() {
+  if (IsMaximized())
+    [window_ zoom:nil];
+}
+
+bool Window::IsMaximized() const {
+  if (IsResizable()) {
+    return [window_ isZoomed];
+  } else {
+    NSRect rectScreen = [[NSScreen mainScreen] visibleFrame];
+    NSRect rectWindow = [window_ frame];
+    return (rectScreen.origin.x == rectWindow.origin.x &&
+            rectScreen.origin.y == rectWindow.origin.y &&
+            rectScreen.size.width == rectWindow.size.width &&
+            rectScreen.size.height == rectWindow.size.height);
+  }
+}
+
+void Window::Minimize() {
+  [window_ miniaturize:nil];
+}
+
+void Window::Restore() {
+  [window_ deminiaturize:nil];
+}
+
+bool Window::IsMinimized() const {
+  return [window_ isMiniaturized];
 }
 
 void Window::SetResizable(bool yes) {
@@ -164,6 +224,23 @@ void Window::SetMaximizable(bool yes) {
 
 bool Window::IsMaximizable() const {
   return [[window_ standardWindowButton:NSWindowZoomButton] isEnabled];
+}
+
+void Window::SetMinimizable(bool minimizable) {
+  [static_cast<NUWindow*>(window_) setWindowStyle:NSMiniaturizableWindowMask
+                                               on:minimizable];
+}
+
+bool Window::IsMinimizable() const {
+  return [window_ styleMask] & NSMiniaturizableWindowMask;
+}
+
+void Window::SetMovable(bool movable) {
+  [window_ setMovable:movable];
+}
+
+bool Window::IsMovable() const {
+  return [window_ isMovable];
 }
 
 void Window::SetBackgroundColor(Color color) {

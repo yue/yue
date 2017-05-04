@@ -32,6 +32,7 @@ class WindowImpl : public Win32Window {
 
   void SetWindowStyle(LONG style, bool on);
   bool HasWindowStyle(LONG style) const;
+  void ExecuteSystemMenuCommand(int command);
 
   Window* delegate() { return delegate_; }
   FocusManager* focus_manager() { return &focus_manager_; }
