@@ -154,15 +154,6 @@ struct Type<base::StringPiece> {
         v8::NewStringType::kNormal,
         static_cast<uint32_t>(value.length())).ToLocalChecked();
   }
-  static bool FromV8(v8::Local<v8::Context> context,
-                     v8::Local<v8::Value> value,
-                     base::StringPiece* out) {
-    if (!value->IsString())
-      return false;
-    v8::String::Utf8Value s(value);
-    *out = base::StringPiece(*s, s.length());
-    return true;
-  }
 };
 
 template<>
