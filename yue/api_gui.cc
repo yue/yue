@@ -22,15 +22,14 @@ struct Type<nu::Size> {
     lua::RawSet(state, -1, "width", size.width(), "height", size.height());
   }
   static inline bool To(State* state, int index, nu::Size* out) {
-    float width, height;
+    float width = 0, height = 0;
     if (GetTop(state) - index == 1 && lua::To(state, index, &width, &height)) {
       *out = nu::Size(width, height);
       return true;
     }
     if (GetType(state, index) != LuaType::Table)
       return false;
-    if (!RawGetAndPop(state, index, "width", &width, "height", &height))
-      return false;
+    RawGetAndPop(state, index, "width", &width, "height", &height);
     *out = nu::Size(width, height);
     return true;
   }
@@ -44,15 +43,14 @@ struct Type<nu::SizeF> {
     lua::RawSet(state, -1, "width", size.width(), "height", size.height());
   }
   static inline bool To(State* state, int index, nu::SizeF* out) {
-    float width, height;
+    float width = 0, height = 0;
     if (GetTop(state) - index == 1 && lua::To(state, index, &width, &height)) {
       *out = nu::SizeF(width, height);
       return true;
     }
     if (GetType(state, index) != LuaType::Table)
       return false;
-    if (!RawGetAndPop(state, index, "width", &width, "height", &height))
-      return false;
+    RawGetAndPop(state, index, "width", &width, "height", &height);
     *out = nu::SizeF(width, height);
     return true;
   }
@@ -68,7 +66,7 @@ struct Type<nu::RectF> {
                 "width", rect.width(), "height", rect.height());
   }
   static inline bool To(State* state, int index, nu::RectF* out) {
-    float x, y, width, height;
+    float x = 0, y = 0, width = 0, height = 0;
     if (GetTop(state) - index == 3 &&
         lua::To(state, index, &x, &y, &width, &height)) {
       *out = nu::RectF(x, y, width, height);
@@ -76,9 +74,8 @@ struct Type<nu::RectF> {
     }
     if (GetType(state, index) != LuaType::Table)
       return false;
-    if (!RawGetAndPop(state, index,
-                      "x", &x, "y", &y, "width", &width, "height", &height))
-      return false;
+    RawGetAndPop(state, index, "x", &x, "y", &y);
+    RawGetAndPop(state, index, "width", &width, "height", &height);
     *out = nu::RectF(x, y, width, height);
     return true;
   }
@@ -92,15 +89,14 @@ struct Type<nu::Vector2dF> {
     lua::RawSet(state, -1, "x", vec.x(), "y", vec.y());
   }
   static inline bool To(State* state, int index, nu::Vector2dF* out) {
-    float x, y;
+    float x = 0, y = 0;
     if (GetTop(state) - index == 1 && lua::To(state, index, &x, &y)) {
       *out = nu::Vector2dF(x, y);
       return true;
     }
     if (GetType(state, index) != LuaType::Table)
       return false;
-    if (!RawGetAndPop(state, index, "x", &x, "y", &y))
-      return false;
+    RawGetAndPop(state, index, "x", &x, "y", &y);
     *out = nu::Vector2dF(x, y);
     return true;
   }
@@ -114,15 +110,14 @@ struct Type<nu::PointF> {
     lua::RawSet(state, -1, "x", p.x(), "y", p.y());
   }
   static inline bool To(State* state, int index, nu::PointF* out) {
-    float x, y;
+    float x = 0, y = 0;
     if (GetTop(state) - index == 1 && lua::To(state, index, &x, &y)) {
       *out = nu::PointF(x, y);
       return true;
     }
     if (GetType(state, index) != LuaType::Table)
       return false;
-    if (!RawGetAndPop(state, index, "x", &x, "y", &y))
-      return false;
+    RawGetAndPop(state, index, "x", &x, "y", &y);
     *out = nu::PointF(x, y);
     return true;
   }
@@ -586,6 +581,14 @@ struct Type<nu::Window> {
            "getcontentsize", &nu::Window::GetContentSize,
            "setbounds", &nu::Window::SetBounds,
            "getbounds", &nu::Window::GetBounds,
+           "setminsize", &nu::Window::SetMinSize,
+           "getminsize", &nu::Window::GetMinSize,
+           "setmaxsize", &nu::Window::SetMaxSize,
+           "getmaxsize", &nu::Window::GetMaxSize,
+           "setcontentminsize", &nu::Window::SetContentMinSize,
+           "getcontentminsize", &nu::Window::GetContentMinSize,
+           "setcontentmaxsize", &nu::Window::SetContentMaxSize,
+           "getcontentmaxsize", &nu::Window::GetContentMaxSize,
            "activate", &nu::Window::Activate,
            "deactivate", &nu::Window::Deactivate,
            "isActive", &nu::Window::IsActive,

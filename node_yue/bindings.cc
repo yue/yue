@@ -24,10 +24,8 @@ struct Type<nu::Size> {
                      nu::Size* out) {
     if (!value->IsObject())
       return false;
-    int width, height;
-    if (!Get(context, value.As<v8::Object>(),
-             "width", &width, "height", &height))
-      return false;
+    int width = 0, height = 0;
+    Get(context, value.As<v8::Object>(), "width", &width, "height", &height);
     *out = nu::Size(width, height);
     return true;
   }
@@ -47,10 +45,8 @@ struct Type<nu::SizeF> {
                      nu::SizeF* out) {
     if (!value->IsObject())
       return false;
-    float width, height;
-    if (!Get(context, value.As<v8::Object>(),
-             "width", &width, "height", &height))
-      return false;
+    float width = 0, height = 0;
+    Get(context, value.As<v8::Object>(), "width", &width, "height", &height);
     *out = nu::SizeF(width, height);
     return true;
   }
@@ -71,10 +67,9 @@ struct Type<nu::RectF> {
                      nu::RectF* out) {
     if (!value->IsObject())
       return false;
-    float x, y, width, height;
-    if (!Get(context, value.As<v8::Object>(),
-             "x", &x, "y", &y, "width", &width, "height", &height))
-      return false;
+    float x = 0, y = 0, width = 0, height = 0;
+    Get(context, value.As<v8::Object>(), "x", &x, "y", &y);
+    Get(context, value.As<v8::Object>(), "width", &width, "height", &height);
     *out = nu::RectF(x, y, width, height);
     return true;
   }
@@ -94,9 +89,8 @@ struct Type<nu::Vector2dF> {
                      nu::Vector2dF* out) {
     if (!value->IsObject())
       return false;
-    float x, y;
-    if (!Get(context, value.As<v8::Object>(), "x", &x, "y", &y))
-      return false;
+    float x = 0, y = 0;
+    Get(context, value.As<v8::Object>(), "x", &x, "y", &y);
     *out = nu::Vector2dF(x, y);
     return true;
   }
@@ -116,9 +110,8 @@ struct Type<nu::PointF> {
                      nu::PointF* out) {
     if (!value->IsObject())
       return false;
-    float x, y;
-    if (!Get(context, value.As<v8::Object>(), "x", &x, "y", &y))
-      return false;
+    float x = 0, y = 0;
+    Get(context, value.As<v8::Object>(), "x", &x, "y", &y);
     *out = nu::PointF(x, y);
     return true;
   }
@@ -286,7 +279,7 @@ struct Type<nu::TextAlign> {
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::TextAlign* out) {
-    base::StringPiece align;
+    std::string align;
     if (!vb::FromV8(context, value, &align))
       return false;
     if (align == "start")
@@ -643,6 +636,14 @@ struct Type<nu::Window> {
         "getContentSize", &nu::Window::GetContentSize,
         "setBounds", &nu::Window::SetBounds,
         "getBounds", &nu::Window::GetBounds,
+        "setMinSize", &nu::Window::SetMinSize,
+        "getMinSize", &nu::Window::GetMinSize,
+        "setMaxSize", &nu::Window::SetMaxSize,
+        "getMaxSize", &nu::Window::GetMaxSize,
+        "setContentMinSize", &nu::Window::SetContentMinSize,
+        "getContentMinSize", &nu::Window::GetContentMinSize,
+        "setContentMaxSize", &nu::Window::SetContentMaxSize,
+        "getContentMaxSize", &nu::Window::GetContentMaxSize,
         "activate", &nu::Window::Activate,
         "deactivate", &nu::Window::Deactivate,
         "isactive", &nu::Window::IsActive,
