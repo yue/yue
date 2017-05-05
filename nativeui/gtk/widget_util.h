@@ -30,6 +30,10 @@ void EnableCSD(GtkWindow* window);
 // Turn CSD off and use classic non-decoration.
 void DisableCSD(GtkWindow* window);
 
+// Return the insets of native window frame.
+// Due to limitations of GTK, this only works for realized window.
+bool GetNativeFrameInsets(GtkWidget* window, InsetsF* insets);
+
 // Return the insets of client shadow when using CSD.
 // Due to limitations of GTK, this only works for configured window.
 InsetsF GetClientShadow(GtkWindow* window);

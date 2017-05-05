@@ -8,6 +8,11 @@
 #include "base/logging.h"
 #include "nativeui/gfx/color.h"
 
+#ifdef GDK_WINDOWING_X11
+#include <gdk/gdkx.h>
+#include <X11/Xatom.h>  // XA_CARDINAL
+#endif
+
 namespace nu {
 
 namespace {
@@ -145,9 +150,41 @@ void DisableCSD(GtkWindow* window) {
   gtk_window_set_decorated(window, false);
 }
 
+bool GetNativeFrameInsets(GtkWidget* window, InsetsF* insets) {
+#ifdef GDK_WINDOWING_X11
+  GdkWindow* gdkwindow = gtk_widget_get_window(window);
+  DCHECK(gdkwindow) << "Can only get native frame from realized window.";
+
+  GdkDisplay* display = gdk_window_get_display(gdkwindow);
+  if (!GDK_IS_X11_DISPLAY(display))
+    return false;
+
+  Atom type;
+  int format;
+  unsigned long nitems, bytes_after;
+  unsigned char* data;
+  Status status = XGetWindowProperty(
+      GDK_DISPLAY_XDISPLAY(display),
+      GDK_WINDOW_XID(gdkwindow),
+      gdk_x11_get_xatom_by_name_for_display(display, "_NET_FRAME_EXTENTS"),
+      0, 4, false, XA_CARDINAL, &type, &format, &nitems, &bytes_after, &data);
+  if (status != Success || !data || nitems != 4)
+    return false;
+
+  float s = gtk_widget_get_scale_factor(window);
+  long* p = reinterpret_cast<long*>(data);
+  *insets = InsetsF(p[2] / s, p[0] / s, p[3] / s, p[1] / s);
+  if (data)
+    XFree(data);
+  return true;
+#else
+  return false;
+#endif
+}
+
 InsetsF GetClientShadow(GtkWindow* window) {
   GdkWindow* gdkwindow = gtk_widget_get_window(GTK_WIDGET(window));
-  DCHECK(gdkwindow) << "Can only get client shadow from mapped window.";
+  DCHECK(gdkwindow) << "Can only get client shadow from realized window.";
   // Bounds without client shadow.
   int x, y, width, height;
   gtk_window_get_position(window, &x, &y);
