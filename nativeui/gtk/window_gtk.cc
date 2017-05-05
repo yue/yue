@@ -49,7 +49,7 @@ gboolean OnClose(GtkWidget* widget, GdkEvent* event, Window* window) {
 }
 
 // Window is mapped.
-void OnMap(GtkWidget* widget, NUWindowPrivate* priv) {
+gboolean OnMap(GtkWidget* widget, GdkEvent* event, NUWindowPrivate* priv) {
   // Calculate the native window frame.
   GetNativeFrameInsets(widget, &priv->native_frame);
   // Calculate the client shadow for CSD window.
@@ -62,6 +62,7 @@ void OnMap(GtkWidget* widget, NUWindowPrivate* priv) {
     else
       priv->delegate->SetSizeConstraints(priv->min_size, priv->max_size);
   }
+  return FALSE;
 }
 
 // Window state has changed.
@@ -115,7 +116,7 @@ void Window::PlatformInit(const Options& options) {
 
   // Window events.
   g_signal_connect(window_, "delete-event", G_CALLBACK(OnClose), this);
-  g_signal_connect(window_, "map", G_CALLBACK(OnMap), priv);
+  g_signal_connect(window_, "map-event", G_CALLBACK(OnMap), priv);
   g_signal_connect(window_, "window-state-event",
                    G_CALLBACK(OnWindowState), priv);
 
