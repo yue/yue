@@ -296,7 +296,8 @@ void WindowImpl::OnPaint(HDC) {
   base::win::ScopedGetDC dc(hwnd());
   {
     // Double buffering the drawing.
-    DoubleBuffer buffer(dc, bounds.size(), dirty, dirty.origin());
+    DoubleBuffer buffer(dc, bounds.size(), dirty, dirty.origin(),
+                        delegate_->IsTransparent());
 
     // Draw.
     {

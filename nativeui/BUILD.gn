@@ -93,6 +93,7 @@ component("nativeui") {
     "gfx/mac/text_mac.mm",
     "gfx/win/canvas_win.cc",
     "gfx/win/color_win.cc",
+    "gfx/win/double_buffer.cc",
     "gfx/win/double_buffer.h",
     "gfx/win/font_win.cc",
     "gfx/win/image_win.cc",
