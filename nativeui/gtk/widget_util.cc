@@ -161,7 +161,7 @@ bool GetNativeFrameInsets(GtkWidget* window, InsetsF* insets) {
 
   Atom type;
   int format;
-  unsigned long nitems, bytes_after;
+  unsigned long nitems, bytes_after;  // NOLINT(runtime/int)
   unsigned char* data;
   Status status = XGetWindowProperty(
       GDK_DISPLAY_XDISPLAY(display),
@@ -172,7 +172,7 @@ bool GetNativeFrameInsets(GtkWidget* window, InsetsF* insets) {
     return false;
 
   float s = gtk_widget_get_scale_factor(window);
-  long* p = reinterpret_cast<long*>(data);
+  long* p = reinterpret_cast<long*>(data);  // NOLINT(runtime/int)
   *insets = InsetsF(p[2] / s, p[0] / s, p[3] / s, p[1] / s);
   if (data)
     XFree(data);

@@ -5,6 +5,8 @@
 #ifndef NATIVEUI_WINDOW_H_
 #define NATIVEUI_WINDOW_H_
 
+#include <tuple>
+
 #include "nativeui/container.h"
 #include "nativeui/gfx/color.h"
 #include "nativeui/gfx/geometry/rect_f.h"

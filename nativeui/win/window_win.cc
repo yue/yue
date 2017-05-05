@@ -5,7 +5,9 @@
 
 #include "nativeui/win/window_win.h"
 
+#include <limits>
 #include <memory>
+#include <tuple>
 
 #include "nativeui/accelerator.h"
 #include "nativeui/accelerator_manager.h"
@@ -13,6 +15,7 @@
 #include "nativeui/events/win/event_win.h"
 #include "nativeui/gfx/geometry/insets.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
+#include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/win/double_buffer.h"
 #include "nativeui/gfx/win/painter_win.h"
 #include "nativeui/gfx/win/screen_win.h"
@@ -40,12 +43,19 @@ const int kResizeCornerWidth = 16;
 // Convert between window and client areas.
 Size ContentToWindowSize(Win32Window* window, bool has_menu_bar,
                          const Size& size) {
-  if (!window->HasFrame())
-    return size;
   RECT rect = Rect(size).ToRECT();
   AdjustWindowRectEx(&rect, window->window_style(), has_menu_bar,
                      window->window_ex_style());
   return Rect(rect).size();
+}
+
+SizeF WindowToContentSize(Win32Window* window, bool has_menu_bar,
+                          const SizeF& size) {
+  RECT rect = { 0 };
+  AdjustWindowRectEx(&rect, window->window_style(), has_menu_bar,
+                     window->window_ex_style());
+  Rect p(rect);
+  return SizeF(size.width() - p.width(), size.height() - p.height());
 }
 
 inline bool IsShiftPressed() {
@@ -326,6 +336,20 @@ HBRUSH WindowImpl::OnCtlColorStatic(HDC dc, HWND window) {
   return brush;
 }
 
+void WindowImpl::OnGetMinMaxInfo(MINMAXINFO* minmax_info) {
+  minmax_info->ptMinTrackSize.x = min_size_.width();
+  minmax_info->ptMinTrackSize.y = min_size_.height();
+  if (max_size_.IsEmpty()) {
+    LONG v = std::numeric_limits<LONG>::max();
+    minmax_info->ptMaxTrackSize.x = v;
+    minmax_info->ptMaxTrackSize.y = v;
+  } else {
+    minmax_info->ptMaxTrackSize.x = max_size_.width();
+    minmax_info->ptMaxTrackSize.y = max_size_.height();
+  }
+  SetMsgHandled(false);
+}
+
 LRESULT WindowImpl::OnNCHitTest(UINT msg, WPARAM w_param, LPARAM l_param) {
   // Only override this for frameless window.
   if (delegate_->HasFrame()) {
@@ -523,14 +547,16 @@ void Window::Center() {
   Rect bounds = window_->GetPixelBounds();
   int x = (::GetSystemMetrics(SM_CXSCREEN) - bounds.width()) / 2;
   int y = (::GetSystemMetrics(SM_CYSCREEN) - bounds.height()) / 2;
-  ::SetWindowPos(hwnd(), NULL, x, y, 0, 0,
+  ::SetWindowPos(window_->hwnd(), NULL, x, y, 0, 0,
                  SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOREDRAW);
 }
 
 void Window::SetContentSize(const SizeF& size) {
   Size psize = ToRoundedSize(ScaleSize(size, window_->scale_factor()));
-  window_->SetPixelBounds(Rect(window_->GetPixelBounds().origin(),
-                          ContentToWindowSize(window_, !!menu_bar_, psize)));
+  window_->SetPixelBounds(Rect(
+      window_->GetPixelBounds().origin(),
+      HasFrame() ? ContentToWindowSize(window_, !!menu_bar_, psize)
+                 : psize));
 }
 
 void Window::SetBounds(const RectF& bounds) {
@@ -541,6 +567,56 @@ void Window::SetBounds(const RectF& bounds) {
 RectF Window::GetBounds() const {
   return ScaleRect(RectF(window_->GetPixelBounds()),
                          1.0f / window_->scale_factor());
+}
+
+void Window::SetSizeConstraints(const SizeF& min_size, const SizeF& max_size) {
+  window_->set_min_size(ToRoundedSize(ScaleSize(min_size,
+                                                window_->scale_factor())));
+  window_->set_max_size(ToRoundedSize(ScaleSize(max_size,
+                                                window_->scale_factor())));
+}
+
+std::tuple<SizeF, SizeF> Window::GetSizeConstraints() const {
+  return std::make_tuple(ScaleSize(SizeF(window_->min_size()),
+                                   1.f / window_->scale_factor()),
+                         ScaleSize(SizeF(window_->max_size()),
+                                   1.f / window_->scale_factor()));
+}
+
+void Window::SetContentSizeConstraints(const SizeF& min_size,
+                                       const SizeF& max_size) {
+  if (!HasFrame()) {
+    SetSizeConstraints(min_size, max_size);
+    return;
+  }
+  if (min_size.IsEmpty())
+    window_->set_min_size(Size());
+  else
+    window_->set_min_size(ContentToWindowSize(
+        window_,  !!menu_bar_,
+        ToRoundedSize(ScaleSize(min_size, window_->scale_factor()))));
+  if (max_size.IsEmpty())
+    window_->set_max_size(Size());
+  else
+    window_->set_max_size(ContentToWindowSize(
+        window_,  !!menu_bar_,
+        ToRoundedSize(ScaleSize(max_size, window_->scale_factor()))));
+}
+
+std::tuple<SizeF, SizeF> Window::GetContentSizeConstraints() const {
+  if (!HasFrame())
+    return GetSizeConstraints();
+  return std::make_tuple(
+      window_->min_size().IsEmpty() ?
+          SizeF() :
+          WindowToContentSize(window_, !!menu_bar_,
+                              ScaleSize(SizeF(window_->min_size()),
+                                        1.f / window_->scale_factor())),
+      window_->max_size().IsEmpty() ?
+          SizeF() :
+          WindowToContentSize(window_, !!menu_bar_,
+                              ScaleSize(SizeF(window_->max_size()),
+                                        1.f / window_->scale_factor())));
 }
 
 void Window::Activate() {
@@ -575,15 +651,15 @@ void Window::SetAlwaysOnTop(bool top) {
 }
 
 bool Window::IsAlwaysOnTop() const {
-  return (::GetWindowLong(hwnd, GWL_EXSTYLE) & WS_EX_TOPMOST) != 0;
+  return (::GetWindowLong(window_->hwnd(), GWL_EXSTYLE) & WS_EX_TOPMOST) != 0;
 }
 
 void Window::Maximize() {
-  ExecuteSystemMenuCommand(SC_MAXIMIZE);
+  window_->ExecuteSystemMenuCommand(SC_MAXIMIZE);
 }
 
 void Window::Unmaximize() {
-  ExecuteSystemMenuCommand(SC_RESTORE);
+  window_->ExecuteSystemMenuCommand(SC_RESTORE);
 }
 
 bool Window::IsMaximized() const {
@@ -591,12 +667,11 @@ bool Window::IsMaximized() const {
 }
 
 void Window::Minimize() {
-  ExecuteSystemMenuCommand(SC_MINIMIZE);
+  window_->ExecuteSystemMenuCommand(SC_MINIMIZE);
 }
 
 void Window::Restore() {
-  ExecuteSystemMenuCommand(SC_RESTORE);
-}
+  window_->ExecuteSystemMenuCommand(SC_RESTORE); }
 
 bool Window::IsMinimized() const {
   return !!::IsIconic(window_->hwnd());
@@ -619,7 +694,7 @@ bool Window::IsMaximizable() const {
 }
 
 void Window::SetMinimizable(bool minimizable) {
-  window_->SetWindowStyle(WS_MINIMIZEBOX, yes);
+  window_->SetWindowStyle(WS_MINIMIZEBOX, minimizable);
 }
 
 bool Window::IsMinimizable() const {

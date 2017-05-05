@@ -34,6 +34,12 @@ class WindowImpl : public Win32Window {
   bool HasWindowStyle(LONG style) const;
   void ExecuteSystemMenuCommand(int command);
 
+  // Min/max sizes.
+  void set_min_size(const Size& min_size) { min_size_ = min_size; }
+  Size min_size() const { return min_size_; }
+  void set_max_size(const Size& max_size) { max_size_ = max_size; }
+  Size max_size() const { return max_size_; }
+
   Window* delegate() { return delegate_; }
   FocusManager* focus_manager() { return &focus_manager_; }
   ViewImpl* captured_view() const { return captured_view_; }
@@ -64,6 +70,7 @@ class WindowImpl : public Win32Window {
     CR_MSG_WM_CTLCOLORSTATIC(OnCtlColorStatic)
 
     // Non-client area.
+    CR_MSG_WM_GETMINMAXINFO(OnGetMinMaxInfo)
     CR_MESSAGE_HANDLER_EX(WM_NCHITTEST, OnNCHitTest)
     CR_MSG_WM_NCCALCSIZE(OnNCCalcSize)
     CR_MESSAGE_HANDLER_EX(WM_SETCURSOR, OnSetCursor);
@@ -84,6 +91,7 @@ class WindowImpl : public Win32Window {
   void OnPaint(HDC dc);
   LRESULT OnEraseBkgnd(HDC dc);
   HBRUSH OnCtlColorStatic(HDC dc, HWND window);
+  void OnGetMinMaxInfo(MINMAXINFO* minmax_info);
   LRESULT OnNCHitTest(UINT msg, WPARAM w_param, LPARAM l_param);
   LRESULT OnNCCalcSize(BOOL mode, LPARAM l_param);
   LRESULT OnSetCursor(UINT message, WPARAM w_param, LPARAM l_param);
@@ -100,6 +108,10 @@ class WindowImpl : public Win32Window {
 
   // The view that has mouse capture.
   ViewImpl* captured_view_ = nullptr;
+
+  // Min/max size.
+  Size min_size_;
+  Size max_size_;
 
   // The background color.
   nu::Color background_color_ = nu::Color(0xFF, 0xFF, 0xFF);
