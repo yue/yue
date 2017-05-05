@@ -49,11 +49,11 @@ gboolean OnClose(GtkWidget* widget, GdkEvent* event, Window* window) {
 }
 
 // Window is mapped.
-gboolean OnMap(GtkWidget* widget, GdkEvent* event, NUWindowPrivate* priv) {
+void OnMap(GtkWidget* widget, NUWindowPrivate* priv) {
   // Calculate the native window frame.
   GetNativeFrameInsets(widget, &priv->native_frame);
   // Calculate the client shadow for CSD window.
-  if (IsUsingCSD(widget)
+  if (IsUsingCSD(GTK_WINDOW(widget)))
     priv->client_shadow = GetClientShadow(GTK_WINDOW(widget));
   // Set size constraints if needed.
   if (priv->needs_to_update_minmax_size) {
@@ -62,7 +62,6 @@ gboolean OnMap(GtkWidget* widget, GdkEvent* event, NUWindowPrivate* priv) {
     else
       priv->delegate->SetSizeConstraints(priv->min_size, priv->max_size);
   }
-  return FALSE;
 }
 
 // Window state has changed.
@@ -116,7 +115,7 @@ void Window::PlatformInit(const Options& options) {
 
   // Window events.
   g_signal_connect(window_, "delete-event", G_CALLBACK(OnClose), this);
-  g_signal_connect(window_, "map-event", G_CALLBACK(OnMap), priv);
+  g_signal_connect(window_, "map", G_CALLBACK(OnMap), priv);
   g_signal_connect(window_, "window-state-event",
                    G_CALLBACK(OnWindowState), priv);
 
@@ -181,7 +180,27 @@ void Window::PlatformSetContentView(View* view) {
 }
 
 void Window::Center() {
-  gtk_window_set_position(window_, GTK_WIN_POS_CENTER);
+  // gtk_window_set_position can not be used together with gtk_window_move,
+  // the latter always takes priority no mater which one is called later.
+  GdkScreen* screen = gtk_window_get_screen(window_);
+  if (!screen)
+    screen = gdk_screen_get_default();
+  if (!screen)
+    return;
+
+  int monitor = gdk_screen_get_primary_monitor(screen);
+  GdkRectangle area;
+  gdk_screen_get_monitor_geometry(screen, monitor, &area);
+
+  RectF bounds(GetBounds());
+  bounds.set_x((area.width - bounds.width()) / 2 + area.x);
+  bounds.set_y((area.height - bounds.height()) / 2 + area.y);
+  if (bounds.x() < area.x)
+    bounds.set_x(area.x);
+  if (bounds.y() < area.y)
+    bounds.set_y(area.y);
+
+  SetBounds(bounds);
 }
 
 void Window::SetContentSize(const SizeF& size) {
