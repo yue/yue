@@ -293,6 +293,10 @@ void WindowImpl::OnPaint(HDC) {
   else
     dirty = Rect(ps.rcPaint);
 
+  // Window may be resized to no content.
+  if (dirty.IsEmpty())
+    return;
+
   base::win::ScopedGetDC dc(hwnd());
   {
     // Double buffering the drawing.
