@@ -532,10 +532,6 @@ void Window::PlatformInit(const Options& options) {
 
   YGConfigSetPointScaleFactor(yoga_config_,
                               GetScaleFactorForHWND(window_->hwnd()));
-
-  // Non-transparent frameless window should have shadow.
-  if (!options.frame && !options.transparent)
-    SetHasShadow(true);
 }
 
 void Window::PlatformDestroy() {
