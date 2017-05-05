@@ -92,12 +92,9 @@ bool ContainerImpl::OnMouseWheel(bool vertical, UINT flags, int delta,
 
 bool ContainerImpl::OnMouseClick(NativeEvent event) {
   ViewImpl* child = FindChildFromPoint(Point(event->l_param));
-  if (child)
-    return child->OnMouseClick(event);
-
-  if (ViewImpl::OnMouseClick(event))
+  if (child && child->OnMouseClick(event))
     return true;
-  return false;
+  return ViewImpl::OnMouseClick(event);
 }
 
 void ContainerImpl::DrawChild(ViewImpl* child, PainterWin* painter,
