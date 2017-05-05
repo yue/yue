@@ -5,11 +5,11 @@
 
 #include "nativeui/win/window_win.h"
 
+#include <dwmapi.h>
+
 #include <limits>
 #include <memory>
 #include <tuple>
-
-#include <dwmapi.h>
 
 #include "base/win/windows_version.h"
 #include "nativeui/accelerator.h"
@@ -296,8 +296,7 @@ void WindowImpl::OnPaint(HDC) {
   base::win::ScopedGetDC dc(hwnd());
   {
     // Double buffering the drawing.
-    DoubleBuffer buffer(dc, bounds.size(), dirty, dirty.origin(),
-                        delegate_->IsTransparent());
+    DoubleBuffer buffer(dc, bounds.size(), dirty, dirty.origin());
 
     // Draw.
     {

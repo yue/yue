@@ -8,31 +8,27 @@ namespace nu {
 
 namespace {
 
-HBITMAP CreateBitmap(HDC dc, const Size& size, bool use_dib_bitmap) {
-  if (use_dib_bitmap) {
-    BITMAPINFOHEADER bih = { 0 };
-    bih.biBitCount = 32;
-    bih.biSize = sizeof(BITMAPINFOHEADER);
-    bih.biWidth = size.width();
-    bih.biHeight = size.height();
-    bih.biPlanes = 1;
-    bih.biSizeImage = size.width() * size.height() * 4;
-    bih.biCompression = BI_RGB;
-    RGBQUAD* bits = nullptr;
-    return ::CreateDIBSection(dc, reinterpret_cast<BITMAPINFO*>(&bih), 0,
-                              reinterpret_cast<void**>(&bits), NULL, 0);
-  } else {
-    return ::CreateCompatibleBitmap(dc, size.width(), size.height());
-  }
+HBITMAP CreateBitmap(HDC dc, const Size& size) {
+  BITMAPINFOHEADER bih = { 0 };
+  bih.biBitCount = 32;
+  bih.biSize = sizeof(BITMAPINFOHEADER);
+  bih.biWidth = size.width();
+  bih.biHeight = size.height();
+  bih.biPlanes = 1;
+  bih.biSizeImage = size.width() * size.height() * 4;
+  bih.biCompression = BI_RGB;
+  RGBQUAD* bits = nullptr;
+  return ::CreateDIBSection(dc, reinterpret_cast<BITMAPINFO*>(&bih), 0,
+                            reinterpret_cast<void**>(&bits), NULL, 0);
 }
 
 }  // namespace
 
 DoubleBuffer::DoubleBuffer(HDC dc, const Size& size, const Rect& src,
-                         const Point& dest, bool use_dib_bitmap)
+                           const Point& dest)
     : dc_(dc), src_(src), dest_(dest),
       mem_dc_(::CreateCompatibleDC(dc)),
-      mem_bitmap_(CreateBitmap(dc, size, use_dib_bitmap)),
+      mem_bitmap_(CreateBitmap(dc, size)),
       select_bitmap_(mem_dc_.Get(), mem_bitmap_.get()) {
 }
 

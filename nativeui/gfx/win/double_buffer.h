@@ -15,8 +15,7 @@ namespace nu {
 // Create a memory buffer for |dc| and copy the result back in destructor.
 class DoubleBuffer {
  public:
-  DoubleBuffer(HDC dc, const Size& size, const Rect& src, const Point& dest,
-               bool use_dib_bitmap);
+  DoubleBuffer(HDC dc, const Size& size, const Rect& src, const Point& dest);
   ~DoubleBuffer();
 
   void SetNoCopy() { copy_on_destruction_ = false; }
