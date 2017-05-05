@@ -37,6 +37,21 @@ SubwinView::~SubwinView() {
 void SubwinView::SizeAllocate(const Rect& size_allocation) {
   ViewImpl::SizeAllocate(size_allocation);
 
+  // Manually hide the control if it is not visible, this is necessary because
+  // the control may be inside a Scroll.
+  Rect clipped = GetClippedRect();
+  if (clipped.IsEmpty()) {
+    ::ShowWindow(hwnd(), SW_HIDE);
+    return;
+  }
+
+  // Implement clipping by setting window region.
+  clipped.Offset(-size_allocation.x(), -size_allocation.y());
+  HRGN region = ::CreateRectRgn(clipped.x(), clipped.y(),
+                                clipped.right(), clipped.bottom());
+  ::SetWindowRgn(hwnd(), region, FALSE);  // SetWindowRgn takes ownership
+
+  ::ShowWindow(hwnd(), SW_SHOWNOACTIVATE);
   SetWindowPos(hwnd(), NULL,
                size_allocation.x(), size_allocation.y(),
                size_allocation.width(), size_allocation.height(),

@@ -11,7 +11,7 @@
 
 namespace nu {
 
-class NATIVEUI_EXPORT Entry : public View{
+class NATIVEUI_EXPORT Entry : public View {
  public:
   Entry();
 
