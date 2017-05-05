@@ -143,6 +143,50 @@ RectF Window::GetBounds() const {
   return ScreenRectFromNSRect([window_ frame]);
 }
 
+void Window::SetSizeConstraints(const SizeF& min_size, const SizeF& max_size) {
+  [window_ setMinSize:min_size.ToCGSize()];
+  if (max_size.IsEmpty())
+    [window_ setMaxSize:NSMakeSize(CGFLOAT_MAX, CGFLOAT_MAX)];
+  else
+    [window_ setMaxSize:max_size.ToCGSize()];
+}
+
+std::tuple<SizeF, SizeF> Window::GetSizeConstraints() const {
+  SizeF max_size([window_ maxSize]);
+  if ((isinf(max_size.width()) && isinf(max_size.height())) ||
+      (max_size.width() == FLT_MAX && max_size.height() == FLT_MAX))
+    max_size = SizeF();
+  return std::make_tuple(SizeF([window_ minSize]), max_size);
+}
+
+void Window::SetContentSizeConstraints(const SizeF& min_size,
+                                       const SizeF& max_size) {
+  if (!HasFrame()) {
+    // setContentMinSize always adds height of titlebar.
+    SetSizeConstraints(min_size, max_size);
+    return;
+  }
+
+  [window_ setContentMinSize:min_size.ToCGSize()];
+  if (max_size.IsEmpty())
+    [window_ setContentMaxSize:NSMakeSize(CGFLOAT_MAX, CGFLOAT_MAX)];
+  else
+    [window_ setContentMaxSize:max_size.ToCGSize()];
+}
+
+std::tuple<SizeF, SizeF> Window::GetContentSizeConstraints() const {
+  if (!HasFrame()) {
+    // setContentMinSize always adds height of titlebar.
+    return GetSizeConstraints();
+  }
+
+  SizeF max_size([window_ maxSize]);
+  if ((isinf(max_size.width()) && isinf(max_size.height())) ||
+      (max_size.width() == FLT_MAX && max_size.height() == FLT_MAX))
+    max_size = SizeF();
+  return std::make_tuple(SizeF([window_ contentMinSize]), max_size);
+}
+
 void Window::Activate() {
   [NSApp activateIgnoringOtherApps:YES];
   [window_ makeKeyAndOrderFront:nil];
