@@ -54,6 +54,11 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
   void SetBounds(const RectF& bounds);
   RectF GetBounds() const;
 
+  void SetSizeConstraints(const SizeF& min_size, const SizeF& max_size);
+  std::tuple<SizeF, SizeF> GetSizeConstraints() const;
+  void SetContentSizeConstraints(const SizeF& min_size, const SizeF& max_size);
+  std::tuple<SizeF, SizeF> GetContentSizeConstraints() const;
+
   void Activate();
   void Deactivate();
   bool IsActive() const;
@@ -91,10 +96,10 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
   YGConfigRef GetYogaConfig() const { return yoga_config_; }
 
   // Events.
-  Signal<void()> on_close;
+  Signal<void(Window*)> on_close;
 
   // Delegate methods.
-  base::Callback<bool()> should_close;
+  base::Callback<bool(Window*)> should_close;
 
  protected:
   virtual ~Window();

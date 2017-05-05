@@ -3,6 +3,7 @@
 // LICENSE file.
 
 #include "base/bind.h"
+#include "base/run_loop.h"
 #include "nativeui/nativeui.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
@@ -54,14 +55,7 @@ TEST_F(WindowTest, ContentView) {
   EXPECT_EQ(window_->GetContentView(), view.get());
 }
 
-TEST_F(WindowTest, Visible) {
-  window_->SetVisible(true);
-  ASSERT_TRUE(window_->IsVisible());
-  window_->SetVisible(false);
-  ASSERT_FALSE(window_->IsVisible());
-}
-
-void OnClose(bool* ptr) {
+void OnClose(bool* ptr, nu::Window*) {
   *ptr = true;
 }
 
@@ -72,7 +66,7 @@ TEST_F(WindowTest, OnClose) {
   EXPECT_EQ(closed, true);
 }
 
-bool ShouldClose() {
+bool ShouldClose(nu::Window*) {
   return false;
 }
 
@@ -85,6 +79,13 @@ TEST_F(WindowTest, ShouldClose) {
   window_->should_close.Reset();
   window_->Close();
   EXPECT_EQ(closed, true);
+}
+
+TEST_F(WindowTest, Visible) {
+  window_->SetVisible(true);
+  ASSERT_TRUE(window_->IsVisible());
+  window_->SetVisible(false);
+  ASSERT_FALSE(window_->IsVisible());
 }
 
 TEST_F(WindowTest, Resizable) {

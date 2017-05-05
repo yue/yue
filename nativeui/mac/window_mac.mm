@@ -29,11 +29,11 @@
 }
 
 - (BOOL)windowShouldClose:(id)sender {
-  return shell_->should_close.is_null() || shell_->should_close.Run();
+  return shell_->should_close.is_null() || shell_->should_close.Run(shell_);
 }
 
 - (void)windowWillClose:(NSNotification*)notification {
-  shell_->on_close.Emit();
+  shell_->on_close.Emit(shell_);
 }
 
 @end
@@ -45,7 +45,7 @@ void Window::PlatformInit(const Options& options) {
                          NSClosableWindowMask | NSResizableWindowMask |
                          NSTexturedBackgroundWindowMask;
   NUWindow* window = [[NUWindow alloc]
-      initWithContentRect:ScreenRectToNSRect(options.bounds)
+      initWithContentRect:NSZeroRect
                 styleMask:styleMask
                   backing:NSBackingStoreBuffered
                     defer:YES];

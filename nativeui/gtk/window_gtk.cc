@@ -15,13 +15,20 @@ namespace {
 
 // Window private data.
 struct NUWindowPrivate {
-  Window* delegate;
+  Window* delegate = nullptr;
+  // Whether window is configured.
+  bool is_configured = false;
   // Window state.
-  int window_state;
+  int window_state = 0;
+  // Min/max sizes.
+  bool needs_to_update_minmax_size = false;
+  bool use_content_minmax_size = false;
+  SizeF min_size;
+  SizeF max_size;
   // Input shape fields.
-  bool is_input_shape_set;
-  bool is_draw_handler_set;
-  guint draw_handler_id;
+  bool is_input_shape_set = false;
+  bool is_draw_handler_set = false;
+  guint draw_handler_id = 0;
 };
 
 // Helper to receive private data.
@@ -32,7 +39,7 @@ inline NUWindowPrivate* GetPrivate(const Window* window) {
 
 // User clicks the close button.
 gboolean OnClose(GtkWidget* widget, GdkEvent* event, Window* window) {
-  if (window->should_close.is_null() || window->should_close.Run())
+  if (window->should_close.is_null() || window->should_close.Run(window))
     window->Close();
 
   // We are destroying the window ourselves, so prevent the default behavior.
@@ -43,6 +50,24 @@ gboolean OnClose(GtkWidget* widget, GdkEvent* event, Window* window) {
 gboolean OnWindowState(GtkWidget* widget, GdkEvent* event,
                        NUWindowPrivate* priv) {
   priv->window_state = event->window_state.new_window_state;
+  return FALSE;
+}
+
+// Window is unrealized, this is not expected but may happen.
+void OnUnrealize(GtkWidget* widget, NUWindowPrivate* priv) {
+  priv->is_configured = false;
+}
+
+// Window is configured.
+gboolean OnConfigure(GtkWidget* widget, GdkEvent* event,
+                     NUWindowPrivate* priv) {
+  priv->is_configured = true;
+  if (priv->needs_to_update_minmax_size) {
+    if (priv->use_content_minmax_size)
+      priv->delegate->SetContentSizeConstraints(priv->min_size, priv->max_size);
+    else
+      priv->delegate->SetSizeConstraints(priv->min_size, priv->max_size);
+  }
   return FALSE;
 }
 
@@ -66,77 +91,39 @@ gboolean OnDraw(GtkWidget* widget, cairo_t* cr, NUWindowPrivate* priv) {
   return FALSE;
 }
 
-// Is client-side decoration enabled in window.
-inline bool IsUsingCSD(GtkWindow* window) {
-  return gtk_window_get_titlebar(window) != nullptr;
-}
-
-// Turn CSD on.
-void EnableCSD(GtkWindow* window) {
-  // Required for CSD to work.
-  gtk_window_set_decorated(window, true);
-
-  // Setting a hidden titlebar to force using CSD rendering.
-  gtk_window_set_titlebar(window, gtk_label_new("you should not see me"));
-
-  if (!g_object_get_data(G_OBJECT(window), "css-provider")) {
-    // Since we are not using any titlebar, we have to override the border
-    // radius of the client decoration to avoid having rounded shadow for the
-    // rectange window.
-    GtkCssProvider* provider = gtk_css_provider_new();
-    gtk_css_provider_load_from_data(
-        provider,
-        // Using 0 would triger a bug of GTK's shadow rendering code.
-        "decoration { border-radius: 0.01px; }", -1, nullptr);
-    gtk_style_context_add_provider(
-        gtk_widget_get_style_context(GTK_WIDGET(window)),
-        GTK_STYLE_PROVIDER(provider), G_MAXUINT);
-    // Store the provider inside window, we may need to remove it later when
-    // user sets a custom titlebar.
-    g_object_set_data_full(G_OBJECT(window), "css-provider", provider,
-                           g_object_unref);
+// Get the height of menubar.
+inline int GetMenuBarHeight(const Window* window) {
+  int menu_bar_height = 0;
+  if (window->GetMenu()) {
+    gtk_widget_get_preferred_height(GTK_WIDGET(window->GetMenu()->GetNative()),
+                                    &menu_bar_height, nullptr);
   }
+  return menu_bar_height;
 }
 
-// Turn CSD off and use classic non-decoration.
-void DisableCSD(GtkWindow* window) {
-  gtk_window_set_titlebar(window, nullptr);
-  gtk_window_set_decorated(window, false);
-}
+// Return the insets of native window frame.
+InsetsF GetNativeFrameInsets(const Window* window, bool include_menu_bar) {
+  if (!window->HasFrame())
+    return InsetsF();
 
-// Force window to allocate size for content view.
-void ForceSizeAllocation(GtkWindow* window, GtkWidget* view) {
-  GdkRectangle rect = { 0, 0 };
-  gtk_window_get_size(window, &rect.width, &rect.height);
-  gtk_widget_size_allocate(view, &rect);
-}
+  // Take menubar as non-client area.
+  int menu_bar_height = include_menu_bar ? GetMenuBarHeight(window) : 0;
 
-// Resize a window ignoring the size request.
-void ResizeWindow(Window* window, bool resizable, int width, int height) {
-  // Clear current size requests.
-  GtkWindow* gwin = window->GetNative();
-  GtkWidget* vbox = gtk_bin_get_child(GTK_BIN(gwin));
-  gtk_widget_set_size_request(GTK_WIDGET(gwin), -1, -1);
-  gtk_widget_set_size_request(vbox, -1, -1);
+  // There is no way to know frame size when window is not mapped.
+  GdkWindow* gdkwindow = gtk_widget_get_window(GTK_WIDGET(window->GetNative()));
+  if (!gdkwindow)
+    return InsetsF(menu_bar_height, 0, 0, 0);
 
-  if (resizable || window->HasFrame()) {
-    // gtk_window_resize only works for resizable window.
-    if (resizable)
-      gtk_window_resize(gwin, width, height);
-    else
-      gtk_widget_set_size_request(GTK_WIDGET(gwin), width, height);
-  } else {
-    // Setting size request on the window results in weird behavior for
-    // unresizable CSD windows, probably related to size of shadows.
-    gtk_widget_set_size_request(vbox, width, height);
-  }
-
-  // Set default size otherwise GTK may do weird things when setting size
-  // request or changing resizable property.
-  gtk_window_set_default_size(gwin, width, height);
-
-  // Notify the content view of the resize.
-  ForceSizeAllocation(gwin, vbox);
+  // Get frame size.
+  GdkRectangle rect;
+  gdk_window_get_frame_extents(gdkwindow, &rect);
+  // Subtract gdk window size to get frame insets.
+  int x, y, width, height;
+  gdk_window_get_geometry(gdkwindow, &x, &y, &width, &height);
+  return InsetsF(y - rect.y + menu_bar_height,
+                 x - rect.x,
+                 (rect.y + rect.height) - (y + height),
+                 (rect.x + rect.width) - (x + width));
 }
 
 }  // namespace
@@ -144,7 +131,8 @@ void ResizeWindow(Window* window, bool resizable, int width, int height) {
 void Window::PlatformInit(const Options& options) {
   window_ = GTK_WINDOW(gtk_window_new(GTK_WINDOW_TOPLEVEL));
 
-  NUWindowPrivate* priv = new NUWindowPrivate{this, 0, false, false, 0};
+  NUWindowPrivate* priv = new NUWindowPrivate;
+  priv->delegate = this;
   g_object_set_data_full(G_OBJECT(window_), "private", priv, operator delete);
 
   // Window is not focused by default.
@@ -154,6 +142,8 @@ void Window::PlatformInit(const Options& options) {
   g_signal_connect(window_, "delete-event", G_CALLBACK(OnClose), this);
   g_signal_connect(window_, "window-state-event",
                    G_CALLBACK(OnWindowState), priv);
+  g_signal_connect(window_, "unrealize", G_CALLBACK(OnUnrealize), priv);
+  g_signal_connect(window_, "configure-event", G_CALLBACK(OnConfigure), priv);
 
   if (!options.frame) {
     // Rely on client-side decoration to provide window features for frameless
@@ -182,10 +172,10 @@ void Window::PlatformDestroy() {
 }
 
 void Window::Close() {
-  if (!should_close.is_null() && !should_close.Run())
+  if (!should_close.is_null() && !should_close.Run(this))
     return;
 
-  on_close.Emit();
+  on_close.Emit(this);
   gtk_widget_destroy(GTK_WIDGET(window_));
 
   window_ = nullptr;
@@ -220,30 +210,21 @@ void Window::Center() {
 }
 
 void Window::SetContentSize(const SizeF& size) {
-  // Content view may have offset (headerbar, menubar).
-  PointF offset(content_view_->GetBounds().origin());
-  ResizeWindow(this, IsResizable(), size.width(), size.height() + offset.y());
+  // Menubar is part of client area in GTK.
+  ResizeWindow(window_, IsResizable(),
+               size.width(), size.height() + GetMenuBarHeight(this));
 }
 
 void Window::SetBounds(const RectF& bounds) {
-  SizeF window_size(bounds.size());
-  GdkWindow* gdkwindow = gtk_widget_get_window(GTK_WIDGET(window_));
-  if (gdkwindow) {
-    // Get frame size.
-    GdkRectangle rect;
-    gdk_window_get_frame_extents(gdkwindow, &rect);
-    // Subtract gdk window size to get frame insets.
-    window_size.Enlarge(-(rect.width - gdk_window_get_width(gdkwindow)),
-                        -(rect.height - gdk_window_get_height(gdkwindow)));
-  }
-
-  ResizeWindow(this, IsResizable(), window_size.width(), window_size.height());
-  gtk_window_move(window_, bounds.x(), bounds.y());
+  RectF cbounds(bounds);
+  cbounds.Inset(GetNativeFrameInsets(this, false));
+  ResizeWindow(window_, IsResizable(), cbounds.width(), cbounds.height());
+  gtk_window_move(window_, cbounds.x(), cbounds.y());
 }
 
 RectF Window::GetBounds() const {
   GdkWindow* gdkwindow = gtk_widget_get_window(GTK_WIDGET(window_));
-  if (gdkwindow && HasFrame()) {
+  if (gdkwindow && !IsUsingCSD(window_)) {
     // For frameless window using CSD, the window size includes the shadows
     // so the frame extents can not be used.
     GdkRectangle rect;
@@ -257,9 +238,96 @@ RectF Window::GetBounds() const {
   }
 }
 
+void Window::SetSizeConstraints(const SizeF& min_size, const SizeF& max_size) {
+  NUWindowPrivate* priv = GetPrivate(this);
+  priv->use_content_minmax_size = false;
+  priv->min_size = min_size;
+  priv->max_size = max_size;
+
+  // We can not defer the window frame if window is not configured, so update
+  // size constraints when window is configured.
+  priv->needs_to_update_minmax_size = !priv->is_configured;
+  if (!priv->is_configured)
+    return;
+
+  GdkGeometry hints = { 0 };
+  int flags = 0;
+  if (!min_size.IsEmpty()) {
+    RectF bounds(min_size);
+    if (IsUsingCSD(window_))
+      bounds.Inset(-GetClientShadow(window_));
+    else
+      bounds.Inset(GetNativeFrameInsets(this, false));
+    flags |= GDK_HINT_MIN_SIZE;
+    hints.min_width = bounds.width();
+    hints.min_height = bounds.height();
+  }
+  if (!max_size.IsEmpty()) {
+    RectF bounds(max_size);
+    if (IsUsingCSD(window_))
+      bounds.Inset(-GetClientShadow(window_));
+    else
+      bounds.Inset(GetNativeFrameInsets(this, false));
+    flags |= GDK_HINT_MAX_SIZE;
+    hints.max_width = bounds.width();
+    hints.max_height = bounds.height();
+  }
+  gtk_window_set_geometry_hints(window_, NULL, &hints, GdkWindowHints(flags));
+}
+
+std::tuple<SizeF, SizeF> Window::GetSizeConstraints() const {
+  NUWindowPrivate* priv = GetPrivate(this);
+  if (!priv->use_content_minmax_size)
+    return std::make_tuple(priv->min_size, priv->max_size);
+  return std::tuple<SizeF, SizeF>();
+}
+
+void Window::SetContentSizeConstraints(const SizeF& min_size,
+                                       const SizeF& max_size) {
+  NUWindowPrivate* priv = GetPrivate(this);
+  priv->use_content_minmax_size = true;
+  priv->min_size = min_size;
+  priv->max_size = max_size;
+
+  // We can not defer the window frame if window is not configured, so update
+  // size constraints when window is configured.
+  priv->needs_to_update_minmax_size = !priv->is_configured;
+  if (!priv->is_configured)
+    return;
+
+  GdkGeometry hints = { 0 };
+  int flags = 0;
+  if (!min_size.IsEmpty()) {
+    RectF bounds(min_size);
+    bounds.set_height(bounds.height() + GetMenuBarHeight(this));
+    if (IsUsingCSD(window_))
+      bounds.Inset(-GetClientShadow(window_));
+    priv->min_size = bounds.size();
+    flags |= GDK_HINT_MIN_SIZE;
+    hints.min_width = bounds.width();
+    hints.min_height = bounds.height();
+  }
+  if (!max_size.IsEmpty()) {
+    RectF bounds(max_size);
+    bounds.set_height(bounds.height() + GetMenuBarHeight(this));
+    if (IsUsingCSD(window_))
+      bounds.Inset(-GetClientShadow(window_));
+    priv->max_size = bounds.size();
+    flags |= GDK_HINT_MAX_SIZE;
+    hints.max_width = bounds.width();
+    hints.max_height = bounds.height();
+  }
+  gtk_window_set_geometry_hints(window_, NULL, &hints, GdkWindowHints(flags));
+}
+
+std::tuple<SizeF, SizeF> Window::GetContentSizeConstraints() const {
+  NUWindowPrivate* priv = GetPrivate(this);
+  if (priv->use_content_minmax_size)
+    return std::make_tuple(priv->min_size, priv->max_size);
+  return std::tuple<SizeF, SizeF>();
+}
+
 void Window::Activate() {
-  // Calling gtk_window_present on a hidden window does not focus it.
-  gtk_widget_set_visible(GTK_WIDGET(window_), true);
   gtk_window_present(window_);
 }
 
@@ -332,7 +400,7 @@ void Window::SetResizable(bool resizable) {
   } else {
     // Set size requests for unresizable window, otherwise window would be
     // resize to whatever current size request is.
-    ResizeWindow(this, resizable, alloc.width, alloc.height);
+    ResizeWindow(window_, resizable, alloc.width, alloc.height);
   }
 
   gtk_window_set_resizable(window_, resizable);
