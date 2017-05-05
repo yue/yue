@@ -89,6 +89,7 @@ void Window::PlatformInit(const Options& options) {
 
   if (options.transparent) {
     [window_ setOpaque:NO];
+    [window_ setHasShadow:NO];  // to follow other platforms
     [window_ setBackgroundColor:[NSColor clearColor]];
   }
 }
@@ -103,6 +104,14 @@ void Window::PlatformDestroy() {
 
 void Window::Close() {
   [window_ performClose:nil];
+}
+
+void Window::SetHasShadow(bool has) {
+  [window_ setHasShadow:has];
+}
+
+bool Window::HasShadow() const {
+  return [window_ hasShadow];
 }
 
 void Window::PlatformSetContentView(View* view) {

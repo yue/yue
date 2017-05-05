@@ -9,6 +9,9 @@
 #include <memory>
 #include <tuple>
 
+#include <dwmapi.h>
+
+#include "base/win/windows_version.h"
 #include "nativeui/accelerator.h"
 #include "nativeui/accelerator_manager.h"
 #include "nativeui/events/event.h"
@@ -528,6 +531,10 @@ void Window::PlatformInit(const Options& options) {
 
   YGConfigSetPointScaleFactor(yoga_config_,
                               GetScaleFactorForHWND(window_->hwnd()));
+
+  // Non-transparent frameless window should have shadow.
+  if (!options.frame && !options.transparent)
+    SetHasShadow(true);
 }
 
 void Window::PlatformDestroy() {
@@ -536,6 +543,23 @@ void Window::PlatformDestroy() {
 
 void Window::Close() {
   ::SendMessage(window_->hwnd(), WM_CLOSE, 0, 0);
+}
+
+void Window::SetHasShadow(bool has) {
+  if (!HasFrame() && base::win::GetVersion() >= base::win::VERSION_WIN7) {
+    BOOL enabled = FALSE;
+    if (SUCCEEDED(DwmIsCompositionEnabled(&enabled)) && enabled) {
+      has_shadow_ = has;
+      MARGINS shadow = { 0 };
+      if (has)
+        shadow = { 1, 1, 1, 1 };
+      ::DwmExtendFrameIntoClientArea(window_->hwnd(), &shadow);
+    }
+  }
+}
+
+bool Window::HasShadow() const {
+  return has_shadow_;
 }
 
 void Window::PlatformSetContentView(View* view) {

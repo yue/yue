@@ -156,6 +156,13 @@ void Window::Close() {
   window_ = nullptr;
 }
 
+void Window::SetHasShadow(bool has) {
+}
+
+bool Window::HasShadow() const {
+  return IsUsingCSD(window_);
+}
+
 void Window::PlatformSetContentView(View* view) {
   GtkContainer* vbox = GTK_CONTAINER(gtk_bin_get_child(GTK_BIN(window_)));
   if (content_view_)

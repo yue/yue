@@ -46,6 +46,8 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
 
   bool HasFrame() const { return has_frame_; }
   bool IsTransparent() const { return transparent_; }
+  void SetHasShadow(bool has);
+  bool HasShadow() const;
 
   void SetContentView(View* view);
   View* GetContentView() const;
@@ -122,6 +124,9 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
 
   // Whether window is transparent.
   bool transparent_;
+
+  // Whether there is native shadow.
+  bool has_shadow_ = false;
 
   // The yoga config for window's children.
   YGConfigRef yoga_config_;

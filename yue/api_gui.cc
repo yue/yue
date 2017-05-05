@@ -574,6 +574,8 @@ struct Type<nu::Window> {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::Window, const nu::Window::Options&>,
            "close", &nu::Window::Close,
+           "sethasshadow", &nu::Window::SetHasShadow,
+           "hasshadow", &nu::Window::HasShadow,
            "center", &nu::Window::Center,
            "setcontentview", &nu::Window::SetContentView,
            "getcontentview", &nu::Window::GetContentView,

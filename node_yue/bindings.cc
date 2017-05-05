@@ -629,6 +629,8 @@ struct Type<nu::Window> {
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
         "close", &nu::Window::Close,
+        "setHasShadow", &nu::Window::SetHasShadow,
+        "hasShadow", &nu::Window::HasShadow,
         "center", &nu::Window::Center,
         "setContentView", &nu::Window::SetContentView,
         "getContentView", &nu::Window::GetContentView,

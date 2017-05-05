@@ -255,8 +255,12 @@ component("nativeui") {
     ]
   } else if (is_win) {
     libs = [
+      "dwmapi.lib",
       "gdi32.lib",
       "gdiplus.lib",
+    ]
+    ldflags = [
+      "/DELAYLOAD:dwmapi.dll",
     ]
     deps += [
       "//build/win:default_exe_manifest",
