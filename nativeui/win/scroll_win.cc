@@ -79,7 +79,8 @@ void ScrollImpl::ForEach(const std::function<bool(ViewImpl*)>& callback) {
 }
 
 bool ScrollImpl::HasChild(ViewImpl* child) {
-  return child == h_scrollbar_.get() || child == v_scrollbar_.get();
+  return delegate_->GetContentView()->GetNative() == child ||
+         child == h_scrollbar_.get() || child == v_scrollbar_.get();
 }
 
 void ScrollImpl::SizeAllocate(const Rect& size_allocation) {
