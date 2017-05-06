@@ -239,7 +239,7 @@ bool View::IsMouseDownCanMoveWindow() const {
   return g_object_get_data(G_OBJECT(view_), "draggable");
 }
 
-void View::PlatformSetBackgroundColor(Color color) {
+void View::SetBackgroundColor(Color color) {
   GdkRGBA rgba = color.ToGdkRGBA();
   gtk_widget_override_background_color(view_, GTK_STATE_FLAG_NORMAL, &rgba);
 }

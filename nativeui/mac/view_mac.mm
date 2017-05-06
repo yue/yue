@@ -161,7 +161,7 @@ bool View::IsMouseDownCanMoveWindow() const {
   return [view_ mouseDownCanMoveWindow];
 }
 
-void View::PlatformSetBackgroundColor(Color color) {
+void View::SetBackgroundColor(Color color) {
   if (IsNUView(view_))
     [view_ setNUBackgroundColor:color];
 }

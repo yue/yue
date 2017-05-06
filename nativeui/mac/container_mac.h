@@ -12,6 +12,7 @@
 @interface NUContainer : NSView<NUView> {
  @private
   nu::NUPrivate private_;
+  nu::Color background_color_;
 }
 - (nu::NUPrivate*)nuPrivate;
 - (void)setNUBackgroundColor:(nu::Color)color;

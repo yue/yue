@@ -285,8 +285,8 @@ bool View::IsMouseDownCanMoveWindow() const {
   return view_->is_draggable();
 }
 
-void View::PlatformSetBackgroundColor(Color color) {
-  GetNative()->SetBackgroundColor(color);
+void View::SetBackgroundColor(Color color) {
+  view_->SetBackgroundColor(color);
 }
 
 }  // namespace nu

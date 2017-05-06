@@ -48,15 +48,6 @@ void View::Layout() {
     static_cast<Container*>(GetParent())->Layout();
 }
 
-void View::SetBackgroundColor(Color color) {
-  background_color_ = color;
-  PlatformSetBackgroundColor(color);
-}
-
-Color View::GetBackgroundColor() const {
-  return background_color_;
-}
-
 void View::SetDefaultStyle(const SizeF& minimum) {
   YGNodeStyleSetMinWidth(node_, minimum.width());
   YGNodeStyleSetMinHeight(node_, minimum.height());

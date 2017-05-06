@@ -76,9 +76,8 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   void SetMouseDownCanMoveWindow(bool yes);
   bool IsMouseDownCanMoveWindow() const;
 
-  // Set backgroundcolor.
+  // Set background color.
   void SetBackgroundColor(Color color);
-  Color GetBackgroundColor() const;
 
   // Set CSS style for the node.
   void SetStyle(const std::string& name, const std::string& value);
@@ -130,13 +129,9 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   void PlatformInit();
   void PlatformDestroy();
   void PlatformSetVisible(bool visible);
-  void PlatformSetBackgroundColor(Color color);
 
  private:
   friend class base::RefCounted<View>;
-
-  // Background color of View.
-  Color background_color_;
 
   // Relationships.
   View* parent_ = nullptr;

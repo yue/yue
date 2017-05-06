@@ -14,6 +14,7 @@
 }
 
 - (void)setNUBackgroundColor:(nu::Color)color {
+  background_color_ = color;
   [self setNeedsDisplay:YES];
 }
 
@@ -25,7 +26,7 @@
   nu::Container* shell = static_cast<nu::Container*>([self shell]);
   nu::RectF dirty(dirtyRect);
   nu::PainterMac painter;
-  painter.SetColor(shell->GetBackgroundColor());
+  painter.SetColor(background_color_);
   painter.FillRect(dirty);
   shell->on_draw.Emit(shell, &painter, dirty);
 }
