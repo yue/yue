@@ -65,7 +65,7 @@ void View::TakeOverView(NativeView view) {
 void View::SetBounds(const RectF& bounds) {
   NSRect frame = bounds.ToCGRect();
   [view_ setFrame:frame];
-  // Calling setFrame manually does not trigger adjustSubviews.
+  // Calling setFrame manually does not trigger resizeSubviewsWithOldSize.
   [view_ resizeSubviewsWithOldSize:frame.size];
 }
 

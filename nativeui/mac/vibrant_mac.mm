@@ -42,8 +42,7 @@ void InitializeVibrantClass() {
   initialized = true;
   Class source = [NUContainer class];
   Class target = [NUVibrant class];
-  SEL sels[] = { @selector(adjustSubviews),
-                 @selector(isFlipped),
+  SEL sels[] = { @selector(isFlipped),
                  @selector(resizeSubviewsWithOldSize:) };
   for (SEL sel : sels) {
     Method method = class_getInstanceMethod(source, sel);
