@@ -85,6 +85,8 @@ void SetFrameSize(NSView* self, SEL _cmd, NSSize size) {
   auto super_impl = reinterpret_cast<decltype(&SetFrameSize)>(
       [[self superclass] instanceMethodForSelector:_cmd]);
   super_impl(self, _cmd, size);
+
+  [self shell]->OnSizeChanged();
 }
 
 // The contentView gets moved around during certain full-screen operations.

@@ -149,13 +149,6 @@ static void nu_container_size_allocate(GtkWidget* widget,
                            allocation->x, allocation->y,
                            allocation->width, allocation->height);
   }
-
-  // Ignore empty sizes on initialization.
-  if (allocation->x == -1 && allocation->y == -1 &&
-      allocation->width == 1 && allocation->height == 1)
-    return;
-
-  priv->delegate->BoundsChanged();
 }
 
 static void nu_container_style_updated(GtkWidget* widget) {

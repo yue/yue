@@ -58,7 +58,8 @@ void Container::Layout() {
   SetChildBoundsFromCSS();
 }
 
-void Container::BoundsChanged() {
+void Container::OnSizeChanged() {
+  View::OnSizeChanged();
   if (IsRootYGNode(this))
     Layout();
   else

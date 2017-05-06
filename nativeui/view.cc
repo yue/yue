@@ -97,4 +97,8 @@ void View::BecomeContentView(Window* window) {
   parent_ = nullptr;
 }
 
+void View::OnSizeChanged() {
+  on_size_changed.Emit(this);
+}
+
 }  // namespace nu

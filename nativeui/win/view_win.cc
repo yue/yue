@@ -20,9 +20,14 @@ void ViewImpl::SizeAllocate(const Rect& size_allocation) {
   if (size_allocation == size_allocation_)
     return;
 
+  bool size_changed = size_allocation.size() != size_allocation_.size();
+
   Invalidate(size_allocation_);  // old
   size_allocation_ = size_allocation;
   Invalidate(size_allocation_);  // new
+
+  if (size_changed && delegate_)
+    delegate_->OnSizeChanged();
 }
 
 UINT ViewImpl::HitTest(const Point& point) const {

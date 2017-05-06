@@ -20,6 +20,15 @@ namespace {
 // The view that has the capture.
 View* g_grabbed_view = nullptr;
 
+void OnSizeAllocate(GtkWidget* widget, GdkRectangle* allocation, View* view) {
+  // Ignore empty sizes on initialization.
+  if (allocation->x == -1 && allocation->y == -1 &&
+      allocation->width == 1 && allocation->height == 1)
+    return;
+
+  view->OnSizeChanged();
+}
+
 gboolean OnMouseMove(GtkWidget* widget, GdkEvent* event, View* view) {
   // If user is dragging a widget that supports mouseDownMoveWindow, then we
   // need to move the window.
@@ -91,6 +100,7 @@ void View::TakeOverView(NativeView view) {
                               GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK);
 
   // Install event hooks.
+  g_signal_connect(view, "size-allocate", G_CALLBACK(OnSizeAllocate), this);
   g_signal_connect(view, "motion-notify-event", G_CALLBACK(OnMouseMove), this);
   // TODO(zcbenz): Lazily install the event hooks.
   g_signal_connect(view, "button-press-event", G_CALLBACK(OnMouseEvent), this);

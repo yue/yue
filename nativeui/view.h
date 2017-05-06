@@ -39,8 +39,10 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   Vector2dF OffsetFromView(const View* from) const;
   Vector2dF OffsetFromWindow() const;
 
-  // Change/Get position and size.
+  // Internal: Change position and size.
   void SetBounds(const RectF& bounds);
+
+  // Get position and size.
   RectF GetBounds() const;
 
   // Internal: The real pixel bounds that depends on the scale factor.
@@ -98,6 +100,9 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   void SetParent(View* parent);
   void BecomeContentView(Window* window);
 
+  // Internal: Notify that view's size has changed.
+  virtual void OnSizeChanged();
+
   // Internal: Get the CSS node of the view.
   YGNodeRef node() const { return node_; }
 
@@ -109,6 +114,7 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   Signal<void(View*, const MouseEvent&)> on_mouse_leave;
   Signal<bool(View*, const KeyEvent&)> on_key_down;
   Signal<bool(View*, const KeyEvent&)> on_key_up;
+  Signal<void(View*)> on_size_changed;
   Signal<void(View*)> on_capture_lost;
 
  protected:

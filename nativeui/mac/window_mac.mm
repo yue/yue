@@ -131,9 +131,6 @@ void Window::PlatformSetContentView(View* view) {
     if (!IsTransparent())
       [content_view setWantsLayer:YES];
   }
-
-  if (view->GetClassName() == Container::kClassName)
-    static_cast<Container*>(view)->Layout();
 }
 
 void Window::Center() {

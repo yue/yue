@@ -23,9 +23,7 @@ class NATIVEUI_EXPORT Container : public View {
   // View:
   const char* GetClassName() const override;
   void Layout() override;
-
-  // Called when view's bounds changed, and probably needs layout.
-  void BoundsChanged();
+  void OnSizeChanged() override;
 
   // Gets preferred size of view.
   SizeF GetPreferredSize() const;

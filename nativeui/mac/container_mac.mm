@@ -21,14 +21,6 @@
   return YES;
 }
 
-- (void)resizeSubviewsWithOldSize:(NSSize)oldBoundsSize {
-  nu::Container* shell = static_cast<nu::Container*>([self shell]);
-  DCHECK_EQ(static_cast<int>([[self subviews] count]), shell->ChildCount())
-      << "Subviews do not match children views";
-
-  shell->BoundsChanged();
-}
-
 - (void)drawRect:(NSRect)dirtyRect {
   nu::Container* shell = static_cast<nu::Container*>([self shell]);
   nu::RectF dirty(dirtyRect);

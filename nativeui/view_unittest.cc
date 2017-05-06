@@ -2,6 +2,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
+#include "base/bind.h"
 #include "nativeui/nativeui.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
@@ -47,4 +48,17 @@ TEST_F(ViewTest, HiddenViewSkipsLayout) {
   EXPECT_GT(container->ChildAt(1)->GetBounds().y(), 0);
   view_->SetVisible(false);
   EXPECT_EQ(container->ChildAt(1)->GetBounds().y(), 0);
+}
+
+void OnSizeChanged(bool* changed, nu::View* view) {
+  *changed = true;
+}
+
+TEST_F(ViewTest, OnSizeChanged) {
+  scoped_refptr<nu::Window> window(new nu::Window(nu::Window::Options()));
+  window->SetContentView(view_.get());
+  bool changed = false;
+  view_->on_size_changed.Connect(base::Bind(&OnSizeChanged, &changed));
+  window->SetContentSize(nu::SizeF(100, 100));
+  EXPECT_TRUE(changed);
 }
