@@ -6,7 +6,7 @@
 
 #include "nativeui/container.h"
 #include "nativeui/state.h"
-#include "nativeui/util/css.h"
+#include "nativeui/util/yoga_util.h"
 #include "nativeui/window.h"
 #include "third_party/yoga/yoga/Yoga.h"
 
@@ -64,7 +64,11 @@ void View::SetDefaultStyle(const SizeF& minimum) {
 }
 
 void View::SetStyle(const std::string& name, const std::string& value) {
-  SetCSSStyle(node_, name, value);
+  SetYogaProperty(node_, name, value);
+}
+
+void View::SetStyle(const std::string& name, float value) {
+  SetYogaProperty(node_, name, value);
 }
 
 void View::PrintStyle() const {

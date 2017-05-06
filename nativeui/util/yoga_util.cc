@@ -2,7 +2,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/util/css.h"
+#include "nativeui/util/yoga_util.h"
 
 #include <algorithm>
 #include <tuple>
@@ -346,14 +346,18 @@ bool SetIntStyle(YGNodeRef node,
 }
 
 // Set style for float properties.
-bool SetFloatStyle(YGNodeRef node,
-                   const std::string& name,
-                   const std::string& value) {
+bool SetFloatStyle(YGNodeRef node, const std::string& name, float value) {
   auto* tup = Find(float_setters, name);
   if (!tup)
     return false;
-  std::get<1>(*tup)(node, PixelValue(value));
+  std::get<1>(*tup)(node, value);
   return true;
+}
+
+bool SetFloatStyle(YGNodeRef node,
+                   const std::string& name,
+                   const std::string& value) {
+  return SetFloatStyle(node, name, PixelValue(value));
 }
 
 // Set style for percent properties.
@@ -409,15 +413,19 @@ bool IsPercentValue(const std::string& value) {
 
 }  // namespace
 
-void SetCSSStyle(YGNodeRef node,
-                 const std::string& raw_name,
-                 const std::string& value) {
+void SetYogaProperty(YGNodeRef node, const std::string& key, float value) {
+  SetFloatStyle(node, ParseName(key), value);
+}
+
+void SetYogaProperty(YGNodeRef node,
+                     const std::string& key,
+                     const std::string& value) {
   DCHECK(IsSorted(int_setters) &&
          IsSorted(float_setters) &&
          IsSorted(percent_setters) &&
          IsSorted(edge_setters) &&
          IsSorted(edge_percent_setters))<< "Property setters must be sorted";
-  std::string name = ParseName(raw_name);
+  std::string name = ParseName(key);
   if (IsPercentValue(value)) {
     SetPercentStyle(node, name, value) ||
     SetEdgePercentStyle(node, name, value);

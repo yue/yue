@@ -717,13 +717,18 @@ struct Type<nu::View> {
                 "onKeyUp", &nu::View::on_key_up,
                 "onCaptureLost", &nu::View::on_capture_lost);
   }
-  static void SetStyle(Arguments* args,
-                       const std::map<std::string, std::string>& styles) {
+  static void SetStyle(
+      Arguments* args,
+      const std::map<std::string, v8::Local<v8::Value>>& styles) {
     nu::View* view;
     if (!args->GetHolder(&view))
       return;
-    for (const auto& it : styles)
-      view->SetStyle(it.first, it.second);
+    for (const auto& it : styles) {
+      if (it.second->IsNumber())
+        view->SetStyle(it.first, it.second->NumberValue());
+      else
+        view->SetStyle(it.first, *v8::String::Utf8Value(it.second));
+    }
     view->Layout();
   }
 };

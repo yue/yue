@@ -80,6 +80,7 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
 
   // Set CSS style for the node.
   void SetStyle(const std::string& name, const std::string& value);
+  void SetStyle(const std::string& name, float value);
 
   // Print style layout to stdout.
   void PrintStyle() const;
