@@ -244,7 +244,6 @@ component("nativeui") {
 
   if (is_linux) {
     public_configs = [
-      ":curl",
       "//build/config/linux:x11",
       "//build/config/linux/gtk3",
     ]

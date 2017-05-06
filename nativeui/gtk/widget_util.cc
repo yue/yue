@@ -116,7 +116,9 @@ cairo_region_t* CreateRegionFromSurface(cairo_surface_t* surface) {
 
 // Is client-side decoration enabled in window.
 bool IsUsingCSD(GtkWindow* window) {
-  return gtk_window_get_titlebar(window) != nullptr;
+  GtkStyleContext* context = gtk_widget_get_style_context(GTK_WIDGET(window));
+  return gtk_style_context_has_class(context, "csd") ||
+         gtk_style_context_has_class(context, "csd-solid");
 }
 
 void EnableCSD(GtkWindow* window) {
