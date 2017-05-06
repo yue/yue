@@ -4,13 +4,56 @@
 
 #include "nativeui/scroll.h"
 
-#import <Cocoa/Cocoa.h>
+#include "nativeui/mac/nu_private.h"
+#include "nativeui/mac/nu_view.h"
+
+@interface NUScroll : NSScrollView<NUView> {
+ @private
+  nu::NUPrivate private_;
+  NSSize content_size_;
+}
+- (nu::NUPrivate*)nuPrivate;
+- (void)setNUBackgroundColor:(nu::Color)color;
+- (void)setContentSize:(NSSize)size;
+@end
+
+@implementation NUScroll
+
+- (nu::NUPrivate*)nuPrivate {
+  return &private_;
+}
+
+- (void)setNUBackgroundColor:(nu::Color)color {
+}
+
+- (void)setContentSize:(NSSize)size {
+  content_size_ = size;
+}
+
+- (void)resizeSubviewsWithOldSize:(NSSize)oldBoundsSize {
+  // Automatically resize the content view when ScrollView is larger than the
+  // content size.
+  NSSize parent_size = [self frame].size;
+  NSSize content_size = content_size_;
+  if (content_size.width < parent_size.width)
+    content_size.width = parent_size.width;
+  if (content_size.height < parent_size.height)
+    content_size.height = parent_size.height;
+  [self.documentView setFrameSize:content_size];
+  [super resizeSubviewsWithOldSize:oldBoundsSize];
+}
+
+@end
 
 namespace nu {
 
 void Scroll::PlatformInit() {
-  auto* scroll = [[NSScrollView alloc] init];
+  auto* scroll = [[NUScroll alloc] init];
   scroll.drawsBackground = NO;
+  if (scroll.scrollerStyle == NSScrollerStyleOverlay) {
+    scroll.hasHorizontalScroller = YES;
+    scroll.hasVerticalScroller = YES;
+  }
   TakeOverView(scroll);
 }
 
@@ -20,20 +63,20 @@ void Scroll::PlatformSetContentView(Container* container) {
 }
 
 void Scroll::SetContentSize(const SizeF& size) {
-  auto* scroll = static_cast<NSScrollView*>(GetNative());
-  [scroll.documentView setFrameSize:size.ToCGSize()];
+  auto* scroll = static_cast<NUScroll*>(GetNative());
+  NSSize content_size = size.ToCGSize();
+  [scroll setContentSize:content_size];
+  [scroll.documentView setFrameSize:content_size];
 }
 
 void Scroll::SetScrollbarPolicy(Policy h_policy, Policy v_policy) {
-  auto* scroll = static_cast<NSScrollView*>(GetNative());
-  scroll.hasHorizontalScroller = (h_policy == Policy::Always) ||
-                                 (h_policy == Policy::Automatic);
-  scroll.hasVerticalScroller = (v_policy == Policy::Always) ||
-                               (v_policy == Policy::Automatic);
+  auto* scroll = static_cast<NUScroll*>(GetNative());
+  scroll.hasHorizontalScroller = h_policy != Policy::Never;
+  scroll.hasVerticalScroller = v_policy != Policy::Never;
 }
 
 std::tuple<Scroll::Policy, Scroll::Policy> Scroll::GetScrollbarPolicy() const {
-  auto* scroll = static_cast<NSScrollView*>(GetNative());
+  auto* scroll = static_cast<NUScroll*>(GetNative());
   Policy h_policy = scroll.hasHorizontalScroller ? Policy::Automatic
                                                  : Policy::Never;
   Policy v_policy = scroll.hasVerticalScroller ? Policy::Automatic
