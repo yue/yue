@@ -42,8 +42,10 @@ void Scroll::PlatformInit() {
 void Scroll::PlatformSetContentView(Container* container) {
   GtkWidget* viewport = gtk_bin_get_child(GTK_BIN(GetNative()));
   GtkWidget* child = gtk_bin_get_child(GTK_BIN(viewport));
-  if (child)
+  if (child) {
     gtk_container_remove(GTK_CONTAINER(viewport), child);
+    gtk_widget_set_size_request(child, -1, -1);
+  }
   child = container->GetNative();
   gtk_container_add(GTK_CONTAINER(viewport), child);
 

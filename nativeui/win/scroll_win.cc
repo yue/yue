@@ -68,6 +68,10 @@ void ScrollImpl::Layout() {
   if (delegate_->GetContentView()) {
     Rect content_alloc = Rect(size_allocation().origin() + origin_,
                               content_size_);
+    if (content_alloc.width() < size_allocation().width())
+      content_alloc.set_width(size_allocation().width());
+    if (content_alloc.height() < size_allocation().height())
+      content_alloc.set_height(size_allocation().height());
     delegate_->GetContentView()->GetNative()->SizeAllocate(content_alloc);
   }
 }
