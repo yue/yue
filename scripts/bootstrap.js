@@ -10,7 +10,7 @@ if (process.platform !== 'win32') {
   execSync('python tools/clang/scripts/update.py')
 }
 if (process.platform === 'linux') {
-  execSync('python build/linux/sysroot_scripts/install-sysroot.py')
+  execSync('python build/linux/sysroot_scripts/install-sysroot.py --all')
   execSync('node scripts/update_gold.js')
 }
 
@@ -20,6 +20,7 @@ execSync('git submodule update --init --recursive')
 gen('out/Debug', [
   'is_component_build=true',
   'is_debug=true',
+  'use_sysroot=false',
   'node_runtime="node"',
   `node_version="${process.version}"`,
 ])

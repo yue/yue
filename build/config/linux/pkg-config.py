@@ -53,7 +53,7 @@ def SetConfigPath(options):
     print "You must specify an architecture via -a if using a sysroot."
     sys.exit(1)
   if arch == 'x64':
-    libpath = 'lib64'
+    libpath = 'lib'  # Chromium uses lib64 but there is no such directory?
   else:
     libpath = 'lib'
 

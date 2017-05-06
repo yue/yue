@@ -13,18 +13,12 @@ declare_args() {
   target_sysroot = ""
 
   # The absolute path to directory containing sysroots for linux 32 and 64bit
-  target_sysroot_dir = ""
+  target_sysroot_dir = "//build/linux"
 
-  use_sysroot = false
+  use_sysroot = true
 }
 
-if (is_linux && target_sysroot_dir != "") {
-  if (current_cpu == "x64") {
-    sysroot = target_sysroot_dir + "/wheezy-x64"
-  } else if (current_cpu == "x86") {
-    sysroot = target_sysroot_dir + "/wheezy-ia32"
-  }
-} else if (current_os == target_os && current_cpu == target_cpu &&
+if (current_os == target_os && current_cpu == target_cpu &&
            target_sysroot != "") {
   sysroot = target_sysroot
 } else if (is_android) {
@@ -42,33 +36,26 @@ if (is_linux && target_sysroot_dir != "") {
   } else if (current_cpu == "mips64el") {
     sysroot = "$android_ndk_root/$mips64_android_sysroot_subdir"
   } else {
-    sysroot = ""
+    assert(false, "No android sysroot for cpu: $target_cpu")
   }
-} else if (is_linux && !is_chromeos && use_sysroot) {
+} else if (is_linux && use_sysroot) {
   # By default build against a sysroot image downloaded from Cloud Storage
   # during gclient runhooks.
   if (current_cpu == "x64") {
-    sysroot = "//build/linux/debian_wheezy_amd64-sysroot"
+    sysroot = "$target_sysroot_dir/debian_jessie_amd64-sysroot"
   } else if (current_cpu == "x86") {
-    sysroot = "//build/linux/debian_wheezy_i386-sysroot"
+    sysroot = "$target_sysroot_dir/debian_jessie_i386-sysroot"
   } else if (current_cpu == "mipsel") {
-    sysroot = "//build/linux/debian_wheezy_mips-sysroot"
+    sysroot = "$target_sysroot_dir/debian_jessie_mips-sysroot"
   } else if (current_cpu == "arm") {
-    sysroot = "//build/linux/debian_wheezy_arm-sysroot"
+    sysroot = "$target_sysroot_dir/debian_jessie_arm-sysroot"
   } else if (current_cpu == "arm64") {
-    sysroot = "//build/linux/debian_jessie_arm64-sysroot"
+    sysroot = "$target_sysroot_dir/debian_jessie_arm64-sysroot"
   } else {
-    # Any other builds don't use a sysroot.
-    sysroot = ""
+    assert(false, "No linux sysroot for cpu: $target_cpu")
   }
 
   if (sysroot != "") {
-    # Our sysroot images only contains gcc 4.6 headers, but chromium requires
-    # gcc 4.9. Clang is able to detect and work with the 4.6 headers while
-    # gcc is not. This check can be removed if we ever update to a more modern
-    # sysroot.
-    assert(is_clang, "sysroot images require clang (try use_sysroot=false)")
-
     _script_arch = current_cpu
     if (_script_arch == "x86") {
       _script_arch = "i386"

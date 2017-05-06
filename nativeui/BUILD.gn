@@ -244,6 +244,7 @@ component("nativeui") {
 
   if (is_linux) {
     public_configs = [
+      ":curl",
       "//build/config/linux:x11",
       "//build/config/linux/gtk3",
     ]
@@ -290,4 +291,12 @@ test("nativeui_unittests") {
     "//base/test:test_support",
     "//testing/gtest",
   ]
+}
+
+if (is_linux) {
+  import("//build/config/linux/pkg_config.gni")
+
+  pkg_config("curl") {
+    packages = [ "libcurl" ]
+  }
 }
