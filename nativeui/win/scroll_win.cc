@@ -74,7 +74,7 @@ void ScrollImpl::Layout() {
 
 void ScrollImpl::ForEach(const std::function<bool(ViewImpl*)>& callback) {
   callback(delegate_->GetContentView()->GetNative()) &&
-  h_scrollbar_ && callback(h_scrollbar_.get()) &&
+  (!h_scrollbar_ || callback(h_scrollbar_.get())) &&
   v_scrollbar_ && callback(v_scrollbar_.get());
 }
 
