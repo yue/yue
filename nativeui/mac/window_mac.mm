@@ -141,6 +141,13 @@ void Window::Center() {
 }
 
 void Window::SetContentSize(const SizeF& size) {
+  if (!HasFrame()) {
+    NSRect frame = [window_ frame];
+    frame.size = size.ToCGSize();
+    [window_ setFrame:frame display:YES animate:NO];
+    return;
+  }
+
   [window_ setContentSize:size.ToCGSize()];
 }
 
