@@ -196,11 +196,14 @@ class ButtonImpl : public ViewImpl {
       window()->SetCapture(this);
       set_state(ControlState::Pressed);
       Invalidate();
-    } else if (event->message == WM_LBUTTONUP) {
-      if (state() == ControlState::Pressed)
-        OnClick();
-      set_state(ControlState::Hovered);
-      Invalidate();
+    } else {
+      window()->ReleaseCapture();
+      if (event->message == WM_LBUTTONUP) {
+        if (state() == ControlState::Pressed)
+          OnClick();
+        set_state(ControlState::Hovered);
+        Invalidate();
+      }
     }
     return true;
   }
