@@ -112,13 +112,20 @@ bool ScrollImpl::OnMouseWheel(bool vertical, UINT flags, int delta,
 }
 
 void ScrollImpl::UpdateScrollbar() {
-  Rect viewport = GetViewportRect();
+  int width = size_allocation().width();
+  int height = size_allocation().height();
   bool show_h_scrollbar = (h_policy_ == Scroll::Policy::Always) ||
                           (h_policy_ == Scroll::Policy::Automatic &&
-                           viewport.width() < content_size_.width());
+                           width < content_size_.width());
   bool show_v_scrollbar = (v_policy_ == Scroll::Policy::Always) ||
                           (v_policy_ == Scroll::Policy::Automatic &&
-                           viewport.height() < content_size_.height());
+                           height < content_size_.height());
+  if (show_h_scrollbar != show_v_scrollbar) {
+    if (show_h_scrollbar)
+      show_v_scrollbar = height < content_size_.height() + scrollbar_height_;
+    if (show_v_scrollbar)
+      show_h_scrollbar = width < content_size_.width() + scrollbar_height_;
+  }
   if (show_h_scrollbar && !h_scrollbar_) {
     h_scrollbar_.reset(new Scrollbar(false, this));
     h_scrollbar_->SetParent(this);
