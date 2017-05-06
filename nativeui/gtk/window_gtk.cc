@@ -353,6 +353,17 @@ bool Window::IsAlwaysOnTop() const {
   return GetPrivate(this)->window_state & GDK_WINDOW_STATE_ABOVE;
 }
 
+void Window::SetFullscreen(bool fullscreen) {
+  if (fullscreen)
+    gtk_window_fullscreen(window_);
+  else
+    gtk_window_unfullscreen(window_);
+}
+
+bool Window::IsFullscreen() const {
+  return GetPrivate(this)->window_state & GDK_WINDOW_STATE_FULLSCREEN;
+}
+
 void Window::Maximize() {
   gtk_window_maximize(window_);
 }

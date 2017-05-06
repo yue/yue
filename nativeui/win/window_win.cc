@@ -124,17 +124,56 @@ void WindowImpl::ReleaseCapture() {
     ::ReleaseCapture();
 }
 
-void WindowImpl::SetBackgroundColor(nu::Color color) {
-  background_color_ = color;
-  ::InvalidateRect(hwnd(), NULL, TRUE);
-}
+void WindowImpl::SetFullscreen(bool fullscreen) {
+  // Save current window state if not already fullscreen.
+  if (!fullscreen_) {
+    saved_window_info_.style = ::GetWindowLong(hwnd(), GWL_STYLE);
+    saved_window_info_.ex_style = ::GetWindowLong(hwnd(), GWL_EXSTYLE);
+    ::GetWindowRect(hwnd(), &saved_window_info_.window_rect);
+  }
 
-bool WindowImpl::IsMaximized() const {
-  return !!::IsZoomed(hwnd()) && !IsFullscreen();
+  fullscreen_ = fullscreen;
+
+  if (fullscreen_) {
+    // Set new window style and size.
+    ::SetWindowLong(hwnd(), GWL_STYLE,
+                    saved_window_info_.style & ~(WS_CAPTION | WS_THICKFRAME));
+    ::SetWindowLong(hwnd(), GWL_EXSTYLE,
+                    saved_window_info_.ex_style & ~(WS_EX_DLGMODALFRAME |
+                    WS_EX_WINDOWEDGE | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE));
+
+    // On expand, if we're given a window_rect, grow to it, otherwise do
+    // not resize.
+    MONITORINFO monitor_info;
+    monitor_info.cbSize = sizeof(monitor_info);
+    ::GetMonitorInfo(::MonitorFromWindow(hwnd(), MONITOR_DEFAULTTONEAREST),
+                     &monitor_info);
+    Rect window_rect(monitor_info.rcMonitor);
+    ::SetWindowPos(hwnd(), NULL, window_rect.x(), window_rect.y(),
+                   window_rect.width(), window_rect.height(),
+                   SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+  } else {
+    // Reset original window style and size.  The multiple window size/moves
+    // here are ugly, but if SetWindowPos() doesn't redraw, the taskbar won't be
+    // repainted.  Better-looking methods welcome.
+    ::SetWindowLong(hwnd(), GWL_STYLE, saved_window_info_.style);
+    ::SetWindowLong(hwnd(), GWL_EXSTYLE, saved_window_info_.ex_style);
+
+    // On restore, resize to the previous saved rect size.
+    Rect new_rect(saved_window_info_.window_rect);
+    ::SetWindowPos(hwnd(), NULL, new_rect.x(), new_rect.y(), new_rect.width(),
+                   new_rect.height(),
+                   SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+  }
 }
 
 bool WindowImpl::IsFullscreen() const {
-  return false;
+  return fullscreen_;
+}
+
+void WindowImpl::SetBackgroundColor(nu::Color color) {
+  background_color_ = color;
+  ::InvalidateRect(hwnd(), NULL, TRUE);
 }
 
 void WindowImpl::SetWindowStyle(LONG style, bool on) {
@@ -375,7 +414,8 @@ LRESULT WindowImpl::OnNCHitTest(UINT msg, WPARAM w_param, LPARAM l_param) {
   Point point(temp);
 
   // Calculate the resize handle.
-  if (delegate_->IsResizable() && !(IsMaximized() || IsFullscreen())) {
+  if (delegate_->IsResizable() &&
+      !(delegate_->IsMaximized() || IsFullscreen())) {
     Rect bounds = GetPixelBounds();
     int border_thickness = kResizeBorderWidth * scale_factor();
     int corner_width = kResizeCornerWidth * scale_factor();
@@ -507,7 +547,7 @@ bool WindowImpl::GetClientAreaInsets(Insets* insets) {
   if (HasSystemFrame())
     return false;
 
-  if (IsMaximized()) {
+  if (delegate_->IsMaximized()) {
     // Windows automatically adds a standard width border to all sides when a
     // window is maximized.
     int border_thickness = ::GetSystemMetrics(SM_CXSIZEFRAME);
@@ -678,6 +718,14 @@ bool Window::IsAlwaysOnTop() const {
   return (::GetWindowLong(window_->hwnd(), GWL_EXSTYLE) & WS_EX_TOPMOST) != 0;
 }
 
+void Window::SetFullscreen(bool fullscreen) {
+  window_->SetFullscreen(fullscreen);
+}
+
+bool Window::IsFullscreen() const {
+  return window_->IsFullscreen();
+}
+
 void Window::Maximize() {
   window_->ExecuteSystemMenuCommand(SC_MAXIMIZE);
 }
@@ -687,7 +735,7 @@ void Window::Unmaximize() {
 }
 
 bool Window::IsMaximized() const {
-  return !!::IsZoomed(window_->hwnd());
+  return !!::IsZoomed(window_->hwnd()) && !IsFullscreen();
 }
 
 void Window::Minimize() {

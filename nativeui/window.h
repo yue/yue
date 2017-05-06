@@ -70,6 +70,8 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
   bool IsVisible() const;
   void SetAlwaysOnTop(bool top);
   bool IsAlwaysOnTop() const;
+  void SetFullscreen(bool fullscreen);
+  bool IsFullscreen() const;
   void Maximize();
   void Unmaximize();
   bool IsMaximized() const;

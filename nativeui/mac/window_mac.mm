@@ -228,6 +228,17 @@ bool Window::IsAlwaysOnTop() const {
   return [window_ level] != NSNormalWindowLevel;
 }
 
+void Window::SetFullscreen(bool fullscreen) {
+  if (fullscreen == IsFullscreen())
+    return;
+
+  [window_ toggleFullScreen:nil];
+}
+
+bool Window::IsFullscreen() const {
+  return [window_ styleMask] & NSFullScreenWindowMask;
+}
+
 void Window::Maximize() {
   if (!IsMaximized())
     [window_ zoom:nil];

@@ -594,6 +594,8 @@ struct Type<nu::Window> {
            "isvisible", &nu::Window::IsVisible,
            "setalwaysontop", &nu::Window::SetAlwaysOnTop,
            "isalwaysontop", &nu::Window::IsAlwaysOnTop,
+           "setfullscreen", &nu::Window::SetFullscreen,
+           "isfullscreen", &nu::Window::IsFullscreen,
            "maximize", &nu::Window::Maximize,
            "unmaximize", &nu::Window::Unmaximize,
            "ismaximized", &nu::Window::IsMaximized,

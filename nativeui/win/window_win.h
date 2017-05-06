@@ -25,10 +25,10 @@ class WindowImpl : public Win32Window {
   void SetCapture(ViewImpl* view);
   void ReleaseCapture();
 
-  void SetBackgroundColor(nu::Color color);
-
-  bool IsMaximized() const;
+  void SetFullscreen(bool fullscreen);
   bool IsFullscreen() const;
+
+  void SetBackgroundColor(nu::Color color);
 
   void SetWindowStyle(LONG style, bool on);
   bool HasWindowStyle(LONG style) const;
@@ -108,6 +108,15 @@ class WindowImpl : public Win32Window {
 
   // The view that has mouse capture.
   ViewImpl* captured_view_ = nullptr;
+
+  // Information saved before going into fullscreen mode, used to restore the
+  // window afterwards.
+  struct SavedWindowInfo {
+    LONG style;
+    LONG ex_style;
+    RECT window_rect;
+  } saved_window_info_;
+  bool fullscreen_ = false;
 
   // Min/max size.
   Size min_size_;
