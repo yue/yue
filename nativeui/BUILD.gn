@@ -295,6 +295,10 @@ test("nativeui_unittests") {
 if (is_linux) {
   import("//build/config/linux/pkg_config.gni")
 
+  pkg_config("webkitgtk") {
+    packages = [ "webkitgtk-3.0" ]
+  }
+
   pkg_config("curl") {
     packages = [ "libcurl" ]
   }

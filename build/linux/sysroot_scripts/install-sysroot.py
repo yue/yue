@@ -33,7 +33,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 URL_PREFIX = 'https://commondatastorage.googleapis.com'
-URL_PATH = 'chrome-linux-sysroot/toolchain'
+URL_PATH = 'yue-linux-sysroot/toolchain'
 
 VALID_ARCHS = ('arm', 'arm64', 'i386', 'amd64')
 
