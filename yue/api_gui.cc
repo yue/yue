@@ -643,6 +643,8 @@ struct Type<nu::View> {
            "hascapture", &nu::View::HasCapture,
            "setmousedowncanmovewindow", &nu::View::SetMouseDownCanMoveWindow,
            "ismousedowncanmovewindow", &nu::View::IsMouseDownCanMoveWindow,
+           "setfont", &nu::View::SetFont,
+           "setcolor", &nu::View::SetColor,
            "setbackgroundcolor", &nu::View::SetBackgroundColor,
            "setstyle", &SetStyle,
            "printstyle", &nu::View::PrintStyle,

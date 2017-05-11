@@ -5,6 +5,7 @@
 #include "nativeui/view.h"
 
 #include "nativeui/container.h"
+#include "nativeui/gfx/font.h"
 #include "nativeui/state.h"
 #include "nativeui/util/yoga_util.h"
 #include "nativeui/window.h"

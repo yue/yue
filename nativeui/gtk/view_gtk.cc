@@ -8,6 +8,7 @@
 
 #include "nativeui/container.h"
 #include "nativeui/events/event.h"
+#include "nativeui/gfx/font.h"
 #include "nativeui/gfx/geometry/point_f.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/gfx/geometry/rect_f.h"
@@ -237,6 +238,16 @@ void View::SetMouseDownCanMoveWindow(bool yes) {
 
 bool View::IsMouseDownCanMoveWindow() const {
   return g_object_get_data(G_OBJECT(view_), "draggable");
+}
+
+void View::SetFont(Font* font) {
+  font_ = font;
+  gtk_widget_override_font(view_, font->GetNative());
+}
+
+void View::SetColor(Color color) {
+  GdkRGBA rgba = color.ToGdkRGBA();
+  gtk_widget_override_color(view_, GTK_STATE_FLAG_NORMAL, &rgba);
 }
 
 void View::SetBackgroundColor(Color color) {

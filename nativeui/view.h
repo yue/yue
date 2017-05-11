@@ -19,6 +19,7 @@ typedef struct YGConfig *YGConfigRef;
 
 namespace nu {
 
+class Font;
 class Window;
 struct MouseEvent;
 struct KeyEvent;
@@ -76,10 +77,12 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   void SetMouseDownCanMoveWindow(bool yes);
   bool IsMouseDownCanMoveWindow() const;
 
-  // Set background color.
+  // Display related styles.
+  void SetFont(Font* font);
+  void SetColor(Color color);
   void SetBackgroundColor(Color color);
 
-  // Set CSS style for the node.
+  // Set layout related styles.
   void SetStyle(const std::string& name, const std::string& value);
   void SetStyle(const std::string& name, float value);
 
@@ -142,6 +145,9 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
 
   // The config of its yoga node.
   YGConfigRef yoga_config_;
+
+  // The font used for the view.
+  scoped_refptr<Font> font_;
 
   // The node recording CSS styles.
   YGNodeRef node_;
