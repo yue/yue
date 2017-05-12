@@ -15,6 +15,21 @@
 namespace lua {
 
 template<>
+struct Type<base::FilePath> {
+  static constexpr const char* name = "yue.FilePath";
+  static inline void Push(State* state, const base::FilePath& value) {
+    return lua::Push(state, value.value());;
+  }
+  static inline bool To(State* state, int index, base::FilePath* out) {
+    base::FilePath::StringType str;
+    if (!lua::To(state, index, &str))
+      return false;
+    *out = base::FilePath(str);
+    return true;
+  }
+};
+
+template<>
 struct Type<nu::Size> {
   static constexpr const char* name = "yue.Size";
   static inline void Push(State* state, const nu::Size& size) {
@@ -344,7 +359,7 @@ struct Type<nu::Image> {
   static constexpr const char* name = "yue.Image";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
-           "createfromfile", &CreateOnHeap<nu::Image, const nu::FilePath&>,
+           "createfromfile", &CreateOnHeap<nu::Image, const base::FilePath&>,
            "getsize", &nu::Image::GetSize,
            "getscalefactor", &nu::Image::GetScaleFactor);
   }

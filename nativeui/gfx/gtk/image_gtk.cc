@@ -8,9 +8,9 @@
 
 namespace nu {
 
-Image::Image(const std::string& path)
+Image::Image(const base::FilePath& path)
     : scale_factor_(GetScaleFactorFromFilePath(path)),
-      image_(gdk_pixbuf_new_from_file(path.c_str(), nullptr)) {
+      image_(gdk_pixbuf_new_from_file(path.value().c_str(), nullptr)) {
   // When file reading failed |image_| could be nullptr, having a null
   // native image is very dangerous so we create an empty image when it
   // happens.

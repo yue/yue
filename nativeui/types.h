@@ -82,13 +82,6 @@ struct Win32Message;
 struct MenuItemData;
 #endif
 
-// base::FilePath is not free, use native string as FilePath in nativeui.
-#if defined(OS_WIN)
-using FilePath = base::string16;
-#else
-using FilePath = std::string;
-#endif
-
 #if defined(OS_MACOSX)
 using NativeEvent = NSEvent*;
 using NativeView = NSView*;

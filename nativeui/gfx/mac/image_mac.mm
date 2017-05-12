@@ -10,10 +10,10 @@
 
 namespace nu {
 
-Image::Image(const std::string& path)
+Image::Image(const base::FilePath& p)
     : scale_factor_(1.f),
       image_([[NSImage alloc]
-                 initWithContentsOfFile:base::SysUTF8ToNSString(path)]) {
+                 initWithContentsOfFile:base::SysUTF8ToNSString(p.value())]) {
   // Compute the scale factor from actual NSImageRep.
   NSArray* reps = [image_ representations];
   if ([reps count] > 0) {
@@ -24,7 +24,7 @@ Image::Image(const std::string& path)
     // NSImage caculates the DPI from the image automatically, which may not be
     // the same with the DPI set by the @2x suffix, in this case we need to set
     // size of NSImage to match the scale factor.
-    float expected = GetScaleFactorFromFilePath(path);
+    float expected = GetScaleFactorFromFilePath(p);
     if (scale_factor_ != expected) {
       float ph = [static_cast<NSImageRep*>([reps objectAtIndex:0]) pixelsHigh];
       [image_ setSize:NSMakeSize(pw / expected, ph / expected)];

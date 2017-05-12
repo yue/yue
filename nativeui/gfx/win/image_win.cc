@@ -8,9 +8,9 @@
 
 namespace nu {
 
-Image::Image(const base::string16& path)
+Image::Image(const base::FilePath& path)
     : scale_factor_(GetScaleFactorFromFilePath(path)),
-      image_(new Gdiplus::Image(path.c_str())) {
+      image_(new Gdiplus::Image(path.value().c_str())) {
 }
 
 Image::~Image() {

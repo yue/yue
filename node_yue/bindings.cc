@@ -11,6 +11,24 @@
 namespace vb {
 
 template<>
+struct Type<base::FilePath> {
+  static constexpr const char* name = "yue.FilePath";
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   const base::FilePath& value) {
+    return vb::ToV8(context, value.value());;
+  }
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     base::FilePath* out) {
+    base::FilePath::StringType str;
+    if (!vb::FromV8(context, value, &str))
+      return false;
+    *out = base::FilePath(str);
+    return true;
+  }
+};
+
+template<>
 struct Type<nu::Size> {
   static constexpr const char* name = "yue.Size";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
@@ -365,7 +383,7 @@ struct Type<nu::Image> {
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
-        "createFromFile", &CreateOnHeap<nu::Image, const nu::FilePath&>);
+        "createFromFile", &CreateOnHeap<nu::Image, const base::FilePath&>);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {

@@ -35,15 +35,15 @@ ScaleFactorPair kScaleFactorPairs[] = {
 }  // namespace
 
 // static
-float Image::GetScaleFactorFromFilePath(const FilePath& path) {
-  FilePath filename(base::FilePath(path).BaseName().RemoveExtension().value());
-  if (!base::MatchPattern(filename, FILE_PATH_LITERAL("*@*x")))
+float Image::GetScaleFactorFromFilePath(const base::FilePath& path) {
+  base::FilePath::StringType name(path.BaseName().RemoveExtension().value());
+  if (!base::MatchPattern(name, FILE_PATH_LITERAL("*@*x")))
     return 1.0f;
 
   // We don't try to convert string to float here because it is very very
   // expensive.
   for (const auto& p : kScaleFactorPairs) {
-    if (base::EndsWith(filename, p.name, base::CompareCase::INSENSITIVE_ASCII))
+    if (base::EndsWith(name, p.name, base::CompareCase::INSENSITIVE_ASCII))
       return p.scale;
   }
 
