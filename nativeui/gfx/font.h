@@ -15,19 +15,46 @@ namespace nu {
 
 class NATIVEUI_EXPORT Font : public base::RefCounted<Font> {
  public:
-  // Creates an appropriate Font implementation.
-  Font();
-  // Creates a Font implementation with the specified |name|
-  // (encoded in UTF-8) and |size| in DPI-aware pixel.
-  Font(const std::string& name, float size);
+  // Standard font weights as used in Pango and Windows. The values must match
+  // https://msdn.microsoft.com/en-us/library/system.windows.fontweights(v=vs.110).aspx
+  enum class Weight {
+    Invalid = -1,
+    Thin = 100,
+    ExtraLight = 200,
+    Light = 300,
+    Normal = 400,
+    Medium = 500,
+    SemiBold = 600,
+    Bold = 700,
+    ExtraBold = 800,
+    Black = 900,
+  };
 
-  // Returns the specified font name in UTF-8.
+  // The following constants indicate the font style.
+  enum class Style {
+    Normal = 0,
+    Italic = 1,
+  };
+
+  // Create default system UI font.
+  Font();
+  // Create a Font implementation with the specified |name|
+  // (encoded in UTF-8), DIP |size|, |weight| and |style|.
+  Font(const std::string& name, float size, Weight weight, Style style);
+
+  // Return the specified font name in UTF-8.
   std::string GetName() const;
 
-  // Returns the font size in pixels.
+  // Return the font size in pixels.
   float GetSize() const;
 
-  // Returns the native font handle.
+  // Return the font weight.
+  Weight GetWeight() const;
+
+  // Return the font style.
+  Style GetStyle() const;
+
+  // Return the native font handle.
   NativeFont GetNative() const;
 
  protected:

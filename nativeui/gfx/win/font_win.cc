@@ -37,12 +37,17 @@ Font::Font() {
                             Gdiplus::FontStyleRegular, Gdiplus::UnitPoint);
 }
 
-Font::Font(const std::string& name, float size)
-    : font_(new Gdiplus::Font(base::UTF8ToUTF16(name).c_str(),
-                              // Converting DPI-aware pixel size to point.
-                              size * 72.f / 96.f,
-                              Gdiplus::FontStyleRegular,
-                              Gdiplus::UnitPoint)) {
+Font::Font(const std::string& name, float size, Weight weight, Style style) {
+  int style = Gdiplus::FontStyleRegular;
+  if (font_weight >= Font::Weight::BOLD)
+    style |= Gdiplus::FontStyleBold;
+  if (font_style & Font::Style::Italic)
+    style |= Gdiplus::FontStyleItalic;
+  font_ = new Gdiplus::Font(base::UTF8ToUTF16(name).c_str(),
+                            // Converting DPI-aware pixel size to point.
+                            size * 72.f / 96.f,
+                            style,
+                            Gdiplus::UnitPoint);
 }
 
 Font::~Font() {
@@ -58,6 +63,20 @@ std::string Font::GetName() const {
 
 float Font::GetSize() const {
   return font_->GetSize() / 72.f * 96.f;
+}
+
+Font::Weight Font::GetWeight() const {
+  int style = font_->GetStyle();
+  if (style & Gdiplus::FontStyleBold)
+    return Weight::Bold;
+  return Weight::Normal;
+}
+
+Font::Style Font::GetStyle() const {
+  int style = font_->GetStyle();
+  if (style & Gdiplus::FontStyleItalic)
+    return Style::Italic;
+  return Style::Normal;
 }
 
 NativeFont Font::GetNative() const {

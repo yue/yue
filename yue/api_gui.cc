@@ -163,14 +163,120 @@ struct Type<nu::App> {
 };
 
 template<>
+struct Type<nu::Font::Weight> {
+  static constexpr const char* name = "yue.Font.Weight";
+  static inline bool To(State* state, int index, nu::Font::Weight* out) {
+    std::string weight;
+    if (!lua::To(state, index, &weight))
+      return false;
+    if (weight == "thin") {
+      *out = nu::Font::Weight::Thin;
+      return true;
+    } else if (weight == "extra-light") {
+      *out = nu::Font::Weight::ExtraLight;
+      return true;
+    } else if (weight == "light") {
+      *out = nu::Font::Weight::Light;
+      return true;
+    } else if (weight == "normal") {
+      *out = nu::Font::Weight::Normal;
+      return true;
+    } else if (weight == "medium") {
+      *out = nu::Font::Weight::Medium;
+      return true;
+    } else if (weight == "semi-bold") {
+      *out = nu::Font::Weight::SemiBold;
+      return true;
+    } else if (weight == "bold") {
+      *out = nu::Font::Weight::Bold;
+      return true;
+    } else if (weight == "extra-bold") {
+      *out = nu::Font::Weight::ExtraBold;
+      return true;
+    } else if (weight == "black") {
+      *out = nu::Font::Weight::Black;
+      return true;
+    } else {
+      return false;
+    }
+  }
+  static inline void Push(State* state, nu::Font::Weight weight) {
+    switch (weight) {
+      case nu::Font::Weight::Invalid:
+        lua::Push(state, "invalid");
+        break;
+      case nu::Font::Weight::Thin:
+        lua::Push(state, "thin");
+        break;
+      case nu::Font::Weight::ExtraLight:
+        lua::Push(state, "extra-light");
+        break;
+      case nu::Font::Weight::Light:
+        lua::Push(state, "light");
+        break;
+      case nu::Font::Weight::Normal:
+        lua::Push(state, "normal");
+        break;
+      case nu::Font::Weight::Medium:
+        lua::Push(state, "medium");
+        break;
+      case nu::Font::Weight::SemiBold:
+        lua::Push(state, "semi-bold");
+        break;
+      case nu::Font::Weight::Bold:
+        lua::Push(state, "bold");
+        break;
+      case nu::Font::Weight::ExtraBold:
+        lua::Push(state, "extra-bold");
+        break;
+      case nu::Font::Weight::Black:
+        lua::Push(state, "black");
+        break;
+    }
+  }
+};
+
+template<>
+struct Type<nu::Font::Style> {
+  static constexpr const char* name = "yue.Font.Style";
+  static inline bool To(State* state, int index, nu::Font::Style* out) {
+    std::string style;
+    if (!lua::To(state, index, &style))
+      return false;
+    if (style == "normal") {
+      *out = nu::Font::Style::Normal;
+      return true;
+    } else if (style == "italic") {
+      *out = nu::Font::Style::Italic;
+      return true;
+    } else {
+      return false;
+    }
+  }
+  static inline void Push(State* state, nu::Font::Style style) {
+    switch (style) {
+      case nu::Font::Style::Normal:
+        lua::Push(state, "normal");
+        break;
+      case nu::Font::Style::Italic:
+        lua::Push(state, "italic");
+        break;
+    }
+  }
+};
+
+template<>
 struct Type<nu::Font> {
   static constexpr const char* name = "yue.Font";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
-           "create", &CreateOnHeap<nu::Font, const std::string&, float>,
+           "create", &CreateOnHeap<nu::Font, const std::string&, float,
+                                   nu::Font::Weight, nu::Font::Style>,
            "default", &GetDefault,
            "getname", &nu::Font::GetName,
-           "getsize", &nu::Font::GetSize);
+           "getsize", &nu::Font::GetSize,
+           "getweight", &nu::Font::GetWeight,
+           "getstyle", &nu::Font::GetStyle);
   }
   static nu::Font* GetDefault() {
     return nu::State::GetCurrent()->GetDefaultFont();

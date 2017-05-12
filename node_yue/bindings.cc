@@ -165,19 +165,119 @@ struct Type<nu::App> {
 };
 
 template<>
+struct Type<nu::Font::Weight> {
+  static constexpr const char* name = "yue.Font.Weight";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::Font::Weight* out) {
+    std::string weight;
+    if (!vb::FromV8(context, value, &weight))
+      return false;
+    if (weight == "thin") {
+      *out = nu::Font::Weight::Thin;
+      return true;
+    } else if (weight == "extra-light") {
+      *out = nu::Font::Weight::ExtraLight;
+      return true;
+    } else if (weight == "light") {
+      *out = nu::Font::Weight::Light;
+      return true;
+    } else if (weight == "normal") {
+      *out = nu::Font::Weight::Normal;
+      return true;
+    } else if (weight == "medium") {
+      *out = nu::Font::Weight::Medium;
+      return true;
+    } else if (weight == "semi-bold") {
+      *out = nu::Font::Weight::SemiBold;
+      return true;
+    } else if (weight == "bold") {
+      *out = nu::Font::Weight::Bold;
+      return true;
+    } else if (weight == "extra-bold") {
+      *out = nu::Font::Weight::ExtraBold;
+      return true;
+    } else if (weight == "black") {
+      *out = nu::Font::Weight::Black;
+      return true;
+    } else {
+      return false;
+    }
+  }
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   nu::Font::Weight weight) {
+    switch (weight) {
+      case nu::Font::Weight::Invalid:
+        return vb::ToV8(context, "invalid");
+      case nu::Font::Weight::Thin:
+        return vb::ToV8(context, "thin");
+      case nu::Font::Weight::ExtraLight:
+        return vb::ToV8(context, "extra-light");
+      case nu::Font::Weight::Light:
+        return vb::ToV8(context, "light");
+      case nu::Font::Weight::Normal:
+        return vb::ToV8(context, "normal");
+      case nu::Font::Weight::Medium:
+        return vb::ToV8(context, "medium");
+      case nu::Font::Weight::SemiBold:
+        return vb::ToV8(context, "semi-bold");
+      case nu::Font::Weight::Bold:
+        return vb::ToV8(context, "bold");
+      case nu::Font::Weight::ExtraBold:
+        return vb::ToV8(context, "extra-bold");
+      case nu::Font::Weight::Black:
+        return vb::ToV8(context, "black");
+    }
+  }
+};
+
+template<>
+struct Type<nu::Font::Style> {
+  static constexpr const char* name = "yue.Font.Style";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::Font::Style* out) {
+    std::string style;
+    if (!vb::FromV8(context, value, &style))
+      return false;
+    if (style == "normal") {
+      *out = nu::Font::Style::Normal;
+      return true;
+    } else if (style == "italic") {
+      *out = nu::Font::Style::Italic;
+      return true;
+    } else {
+      return false;
+    }
+  }
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   nu::Font::Style style) {
+    switch (style) {
+      case nu::Font::Style::Normal:
+        return vb::ToV8(context, "normal");
+      case nu::Font::Style::Italic:
+        return vb::ToV8(context, "italic");
+    }
+  }
+};
+
+template<>
 struct Type<nu::Font> {
   static constexpr const char* name = "yue.Font";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
-        "create", &CreateOnHeap<nu::Font, const std::string&, float>,
+        "create", &CreateOnHeap<nu::Font, const std::string&, float,
+                                nu::Font::Weight, nu::Font::Style>,
         "default", &GetDefault);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
         "getName", &nu::Font::GetName,
-        "getSize", &nu::Font::GetSize);
+        "getSize", &nu::Font::GetSize,
+        "getWeight", &nu::Font::GetWeight,
+        "getStyle", &nu::Font::GetStyle);
   }
   static nu::Font* GetDefault() {
     return nu::State::GetCurrent()->GetDefaultFont();

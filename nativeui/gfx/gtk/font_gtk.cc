@@ -25,10 +25,13 @@ PangoFontDescription* GetDefaultFontDescription() {
 Font::Font() : font_(GetDefaultFontDescription()) {
 }
 
-Font::Font(const std::string& name, float size)
+Font::Font(const std::string& name, float size, Weight weight, Style style)
     : font_(pango_font_description_new()) {
   pango_font_description_set_family(font_, name.data());
   pango_font_description_set_absolute_size(font_, size * PANGO_SCALE);
+  pango_font_description_set_weight(font_, static_cast<PangoWeight>(weight));
+  if (style == Style::Italic)
+    pango_font_description_set_style(font_, PANGO_STYLE_ITALIC);
 }
 
 Font::~Font() {
@@ -45,6 +48,18 @@ float Font::GetSize() const {
   if (!pango_font_description_get_size_is_absolute(font_))
     size = size * 96.f / 72.f;
   return size;
+}
+
+Font::Weight Font::GetWeight() const {
+  return static_cast<Weight>(pango_font_description_get_weight(font_));
+}
+
+Font::Style Font::GetStyle() const {
+  PangoStyle style = pango_font_description_get_style(font_);
+  if (style == PANGO_STYLE_NORMAL)
+    return Style::Normal;
+  else
+    return Style::Italic;
 }
 
 NativeFont Font::GetNative() const {
