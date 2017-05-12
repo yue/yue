@@ -18,7 +18,6 @@ class NATIVEUI_EXPORT Font : public base::RefCounted<Font> {
   // Standard font weights as used in Pango and Windows. The values must match
   // https://msdn.microsoft.com/en-us/library/system.windows.fontweights(v=vs.110).aspx
   enum class Weight {
-    Invalid = -1,
     Thin = 100,
     ExtraLight = 200,
     Light = 300,

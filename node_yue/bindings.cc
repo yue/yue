@@ -207,8 +207,6 @@ struct Type<nu::Font::Weight> {
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    nu::Font::Weight weight) {
     switch (weight) {
-      case nu::Font::Weight::Invalid:
-        return vb::ToV8(context, "invalid");
       case nu::Font::Weight::Thin:
         return vb::ToV8(context, "thin");
       case nu::Font::Weight::ExtraLight:

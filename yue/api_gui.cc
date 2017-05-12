@@ -202,9 +202,6 @@ struct Type<nu::Font::Weight> {
   }
   static inline void Push(State* state, nu::Font::Weight weight) {
     switch (weight) {
-      case nu::Font::Weight::Invalid:
-        lua::Push(state, "invalid");
-        break;
       case nu::Font::Weight::Thin:
         lua::Push(state, "thin");
         break;
