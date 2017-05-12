@@ -153,6 +153,9 @@ class ContainerAdapter : public ContainerImpl,
         container_(container) {}
 
   // ContainerImpl::Adapter:
+  void Layout() override {
+  }
+
   void ForEach(const std::function<bool(ViewImpl*)>& callback) override {
     for (int i = 0; i < container_->ChildCount(); ++i) {
       if (!callback(container_->ChildAt(i)->GetNative()))

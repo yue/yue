@@ -20,15 +20,8 @@ SubwinView::SubwinView(View* delegate,
                   window_style, window_ex_style),
       ViewImpl(ControlType::Subwin, delegate),
       proc_(SetWindowProc(hwnd(), &WndProc)) {
-  // Create HFONT from default system font.
-  base::win::ScopedCreateDC mem_dc(CreateCompatibleDC(NULL));
-  Gdiplus::Graphics context(mem_dc.Get());
-  LOGFONTW logfont;
-  State::GetCurrent()->GetDefaultFont()->GetNative()->GetLogFontW(
-      &context, &logfont);
-  font_.reset(CreateFontIndirect(&logfont));
-  // Use it as control's default font.
-  SendMessage(hwnd(), WM_SETFONT, reinterpret_cast<WPARAM>(font_.get()), TRUE);
+  // Apply default font.
+  SetFont(font());
 }
 
 SubwinView::~SubwinView() {
@@ -92,9 +85,21 @@ void SubwinView::SetVisible(bool visible) {
   ::ShowWindow(hwnd(), visible ? SW_SHOWNOACTIVATE : SW_HIDE);
 }
 
+void SubwinView::SetFont(Font* new_font) {
+  ViewImpl::SetFont(new_font);
+  // Get LogFontW from gdiplus font.
+  base::win::ScopedGetDC dc(hwnd());
+  Gdiplus::Graphics context(dc);
+  LOGFONTW logfont;
+  font()->GetNative()->GetLogFontW(&context, &logfont);
+  font_.reset(::CreateFontIndirect(&logfont));
+  // Use it as control's default font.
+  SendMessage(hwnd(), WM_SETFONT, reinterpret_cast<WPARAM>(font_.get()), TRUE);
+}
+
 void SubwinView::SetBackgroundColor(Color color) {
-  bg_brush_.reset(CreateSolidBrush(color.ToCOLORREF()));
   ViewImpl::SetBackgroundColor(color);
+  bg_brush_.reset(CreateSolidBrush(color.ToCOLORREF()));
 }
 
 void SubwinView::Draw(PainterWin* painter, const Rect& dirty) {
@@ -102,9 +107,10 @@ void SubwinView::Draw(PainterWin* painter, const Rect& dirty) {
 }
 
 bool SubwinView::OnCtlColor(HDC dc, HBRUSH* brush) {
+  ::SetTextColor(dc, color().ToCOLORREF());
   if (!bg_brush_.get())
     return false;
-  SetBkMode(dc, TRANSPARENT);
+  ::SetBkMode(dc, TRANSPARENT);
   *brush = bg_brush_.get();
   return true;
 }

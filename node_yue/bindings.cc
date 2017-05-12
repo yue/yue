@@ -226,6 +226,8 @@ struct Type<nu::Font::Weight> {
       case nu::Font::Weight::Black:
         return vb::ToV8(context, "black");
     }
+    NOTREACHED();
+    return v8::Undefined(context->GetIsolate());
   }
 };
 
@@ -256,6 +258,8 @@ struct Type<nu::Font::Style> {
       case nu::Font::Style::Italic:
         return vb::ToV8(context, "italic");
     }
+    NOTREACHED();
+    return v8::Undefined(context->GetIsolate());
   }
 };
 

@@ -22,6 +22,8 @@
   nu::Color background_color_;
 }
 - (nu::NUPrivate*)nuPrivate;
+- (void)setNUFont:(nu::Font*)font;
+- (void)setNUColor:(nu::Color)color;
 - (void)setNUBackgroundColor:(nu::Color)color;
 - (void)setText:(const std::string&)text;
 - (std::string)text;

@@ -9,12 +9,17 @@
 #include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/gfx/screen.h"
 #include "nativeui/label.h"
+#include "nativeui/state.h"
 #include "nativeui/win/scroll_win.h"
 
 namespace nu {
 
 ViewImpl::ViewImpl(ControlType type, View* delegate)
-    : type_(type), scale_factor_(GetScaleFactor()), delegate_(delegate) {}
+    : type_(type),
+      font_(State::GetCurrent()->GetDefaultFont()),
+      color_(GetSystemColor(SystemColor::Text)),
+      scale_factor_(GetScaleFactor()),
+      delegate_(delegate) {}
 
 void ViewImpl::SizeAllocate(const Rect& size_allocation) {
   if (size_allocation == size_allocation_)
@@ -85,6 +90,16 @@ bool ViewImpl::HasFocus() const {
 
 void ViewImpl::SetVisible(bool visible) {
   is_visible_ = visible;
+}
+
+void ViewImpl::SetFont(Font* font) {
+  font_ = font;
+  Invalidate();
+}
+
+void ViewImpl::SetColor(Color color) {
+  color_ = color;
+  Invalidate();
 }
 
 void ViewImpl::SetBackgroundColor(Color color) {
@@ -283,6 +298,14 @@ void View::SetMouseDownCanMoveWindow(bool yes) {
 
 bool View::IsMouseDownCanMoveWindow() const {
   return view_->is_draggable();
+}
+
+void View::SetFont(Font* font) {
+  view_->SetFont(font);
+}
+
+void View::SetColor(Color color) {
+  view_->SetColor(color);
 }
 
 void View::SetBackgroundColor(Color color) {

@@ -57,7 +57,9 @@ class ViewImpl {
   // Show/Hide the view.
   virtual void SetVisible(bool visible);
 
-  // Set the background color.
+  // Set styles.
+  virtual void SetFont(Font* font);
+  virtual void SetColor(Color color);
   virtual void SetBackgroundColor(Color color);
 
   /////////////////////////////////////////////////////////////////////////////
@@ -114,6 +116,8 @@ class ViewImpl {
   // Returns the DPI of current view.
   float scale_factor() const { return scale_factor_; }
 
+  Font* font() const { return font_.get(); }
+  Color color() const { return color_; }
   Color background_color() const { return background_color_; }
 
   WindowImpl* window() const { return window_; }
@@ -135,7 +139,9 @@ class ViewImpl {
   // Whether dragging the view can move the window.
   bool draggable_ = false;
 
-  // The background color.
+  // Styles.
+  scoped_refptr<Font> font_;
+  Color color_;
   Color background_color_ = Color(0, 0, 0, 0);  // transparent
 
   // The focus state.

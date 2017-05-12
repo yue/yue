@@ -133,8 +133,8 @@ class ButtonImpl : public ViewImpl {
     text_bounds.Inset(box_size_.width() + padding, padding, padding, padding);
 
     // The text.
-    TextAttributes attributes;
-    attributes.align = attributes.valign = TextAlign::Center;
+    TextAttributes attributes(font(), color(), TextAlign::Center,
+                              TextAlign::Center);
     painter->DrawTextPixel(title_, text_bounds, attributes);
 
     // Draw focused ring.

@@ -38,15 +38,15 @@ Font::Font() {
 }
 
 Font::Font(const std::string& name, float size, Weight weight, Style style) {
-  int style = Gdiplus::FontStyleRegular;
-  if (font_weight >= Font::Weight::BOLD)
-    style |= Gdiplus::FontStyleBold;
-  if (font_style & Font::Style::Italic)
-    style |= Gdiplus::FontStyleItalic;
+  int font_style = Gdiplus::FontStyleRegular;
+  if (weight >= Font::Weight::Bold)
+    font_style |= Gdiplus::FontStyleBold;
+  if (style == Font::Style::Italic)
+    font_style |= Gdiplus::FontStyleItalic;
   font_ = new Gdiplus::Font(base::UTF8ToUTF16(name).c_str(),
                             // Converting DPI-aware pixel size to point.
                             size * 72.f / 96.f,
-                            style,
+                            font_style,
                             Gdiplus::UnitPoint);
 }
 

@@ -62,8 +62,8 @@ class GroupImpl : public ContainerImpl,
   void Draw(PainterWin* painter, const Rect& dirty) override {
     // Draw title.
     if (dirty.Intersects(title_bounds_)) {
-      TextAttributes attributes;
-      attributes.align = attributes.valign = TextAlign::Center;
+      TextAttributes attributes(font(), color(), TextAlign::Center,
+                                TextAlign::Center);
       painter->DrawTextPixel(title_, title_bounds_, attributes);
     }
 

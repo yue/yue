@@ -32,8 +32,8 @@ class LabelImpl : public ViewImpl {
   // ViewImpl:
   void Draw(PainterWin* painter, const Rect& dirty) override {
     ViewImpl::Draw(painter, dirty);
-    TextAttributes attributes;
-    attributes.align = attributes.valign = TextAlign::Center;
+    TextAttributes attributes(font(), color(), TextAlign::Center,
+                              TextAlign::Center);
     painter->DrawTextPixel(text_, Rect(size_allocation().size()), attributes);
   }
 

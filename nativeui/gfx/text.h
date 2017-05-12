@@ -7,11 +7,10 @@
 
 #include "base/memory/ref_counted.h"
 #include "nativeui/gfx/color.h"
+#include "nativeui/gfx/font.h"
 #include "nativeui/gfx/geometry/size_f.h"
 
 namespace nu {
-
-class Font;
 
 // Text alignment when drawing text.
 enum class TextAlign {
