@@ -5,6 +5,7 @@
 #include "nativeui/button.h"
 
 #include "base/strings/sys_string_conversions.h"
+#include "nativeui/gfx/font.h"
 #include "nativeui/gfx/geometry/insets_f.h"
 #include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/nu_view.h"
@@ -34,6 +35,8 @@ nu::InsetsF GetButtonInsets(NSButton* button) {
   nu::NUPrivate private_;
 }
 - (nu::NUPrivate*)nuPrivate;
+- (void)setNUFont:(nu::Font*)font;
+- (void)setNUColor:(nu::Color)color;
 - (void)setNUBackgroundColor:(nu::Color)color;
 @end
 
@@ -41,6 +44,20 @@ nu::InsetsF GetButtonInsets(NSButton* button) {
 
 - (nu::NUPrivate*)nuPrivate {
   return &private_;
+}
+
+- (void)setNUFont:(nu::Font*)font {
+  [self.cell setFont:font->GetNative()];
+}
+
+- (void)setNUColor:(nu::Color)color {
+  base::scoped_nsobject<NSMutableAttributedString> colored_title(
+      [[NSMutableAttributedString alloc]
+          initWithAttributedString:[self attributedTitle]]);
+  [colored_title addAttribute:NSForegroundColorAttributeName
+                        value:color.ToNSColor()
+                        range:NSMakeRange(0, [colored_title length])];
+  [self setAttributedTitle:colored_title];
 }
 
 - (void)setNUBackgroundColor:(nu::Color)color {

@@ -378,7 +378,9 @@ struct Type<nu::TextAttributes> {
   static inline bool To(State* state, int index, nu::TextAttributes* out) {
     if (GetType(state, index) != LuaType::Table)
       return false;
-    RawGetAndPop(state, index, "font", &out->font);
+    nu::Font* font;
+    if (RawGetAndPop(state, index, "font", &font))
+      out->font = font;
     RawGetAndPop(state, index, "color", &out->color);
     RawGetAndPop(state, index, "align", &out->align);
     RawGetAndPop(state, index, "valign", &out->valign);

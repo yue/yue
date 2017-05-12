@@ -403,8 +403,10 @@ struct Type<nu::TextAttributes> {
     if (!value->IsObject())
       return false;
     v8::Local<v8::Object> obj = value.As<v8::Object>();
-    Get(context, obj, "font", &out->font);
-    Get(context, obj, "color", &out->font);
+    nu::Font* font;
+    if (Get(context, obj, "font", &font))
+      out->font = font;
+    Get(context, obj, "color", &out->color);
     Get(context, obj, "align", &out->align);
     Get(context, obj, "valign", &out->valign);
     return true;

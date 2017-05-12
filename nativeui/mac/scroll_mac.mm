@@ -13,6 +13,8 @@
   NSSize content_size_;
 }
 - (nu::NUPrivate*)nuPrivate;
+- (void)setNUFont:(nu::Font*)font;
+- (void)setNUColor:(nu::Color)color;
 - (void)setNUBackgroundColor:(nu::Color)color;
 - (void)setContentSize:(NSSize)size;
 @end
@@ -21,6 +23,12 @@
 
 - (nu::NUPrivate*)nuPrivate {
   return &private_;
+}
+
+- (void)setNUFont:(nu::Font*)font {
+}
+
+- (void)setNUColor:(nu::Color)color {
 }
 
 - (void)setNUBackgroundColor:(nu::Color)color {

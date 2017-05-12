@@ -12,6 +12,8 @@
   nu::NUPrivate private_;
 }
 - (nu::NUPrivate*)nuPrivate;
+- (void)setNUFont:(nu::Font*)font;
+- (void)setNUColor:(nu::Color)color;
 - (void)setNUBackgroundColor:(nu::Color)color;
 @end
 
@@ -19,6 +21,12 @@
 
 - (nu::NUPrivate*)nuPrivate {
   return &private_;
+}
+
+- (void)setNUFont:(nu::Font*)font {
+}
+
+- (void)setNUColor:(nu::Color)color {
 }
 
 - (void)setNUBackgroundColor:(nu::Color)color {

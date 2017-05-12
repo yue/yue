@@ -5,6 +5,7 @@
 #include "nativeui/mac/nu_view.h"
 
 #include "nativeui/container.h"
+#include "nativeui/gfx/font.h"
 #include "nativeui/gfx/geometry/point_conversions.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/gfx/mac/painter_mac.h"
@@ -159,6 +160,17 @@ void View::SetMouseDownCanMoveWindow(bool yes) {
 
 bool View::IsMouseDownCanMoveWindow() const {
   return [view_ mouseDownCanMoveWindow];
+}
+
+void View::SetFont(Font* font) {
+  font_ = font;
+  if (IsNUView(view_))
+    [view_ setNUFont:font];
+}
+
+void View::SetColor(Color color) {
+  if (IsNUView(view_))
+    [view_ setNUColor:color];
 }
 
 void View::SetBackgroundColor(Color color) {

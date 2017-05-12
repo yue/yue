@@ -5,6 +5,7 @@
 #include "nativeui/entry.h"
 
 #include "base/strings/sys_string_conversions.h"
+#include "nativeui/gfx/font.h"
 #include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/nu_view.h"
 
@@ -13,6 +14,8 @@
   nu::NUPrivate private_;
 }
 - (nu::NUPrivate*)nuPrivate;
+- (void)setNUFont:(nu::Font*)font;
+- (void)setNUColor:(nu::Color)color;
 - (void)setNUBackgroundColor:(nu::Color)color;
 @end
 
@@ -20,6 +23,14 @@
 
 - (nu::NUPrivate*)nuPrivate {
   return &private_;
+}
+
+- (void)setNUFont:(nu::Font*)font {
+  [self setFont:font->GetNative()];
+}
+
+- (void)setNUColor:(nu::Color)color {
+  [self setTextColor:color.ToNSColor()];
 }
 
 - (void)setNUBackgroundColor:(nu::Color)color {

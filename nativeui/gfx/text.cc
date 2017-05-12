@@ -4,6 +4,7 @@
 
 #include "nativeui/gfx/text.h"
 
+#include "nativeui/gfx/font.h"
 #include "nativeui/state.h"
 
 namespace nu {
@@ -13,6 +14,14 @@ TextAttributes::TextAttributes()
       color(GetSystemColor(SystemColor::Text)),
       align(TextAlign::Start),
       valign(TextAlign::Start) {
+}
+
+TextAttributes::TextAttributes(Font* font, Color color, TextAlign align,
+                               TextAlign valign)
+    : font(font), color(color), align(align), valign(valign) {
+}
+
+TextAttributes::~TextAttributes() {
 }
 
 }  // namespace nu

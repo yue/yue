@@ -5,6 +5,7 @@
 #include "nativeui/label.h"
 
 #include "base/strings/sys_string_conversions.h"
+#include "nativeui/gfx/font.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/mac/painter_mac.h"
 #include "nativeui/gfx/mac/text_mac.h"
@@ -16,6 +17,8 @@
  @private
   nu::NUPrivate private_;
   std::string text_;
+  scoped_refptr<nu::Font> font_;
+  nu::Color color_;
   nu::Color background_color_;
 }
 - (nu::NUPrivate*)nuPrivate;
@@ -28,6 +31,16 @@
 
 - (nu::NUPrivate*)nuPrivate {
   return &private_;
+}
+
+- (void)setNUFont:(nu::Font*)font {
+  font_ = font;
+  [self setNeedsDisplay:YES];
+}
+
+- (void)setNUColor:(nu::Color)color {
+  color_ = color;
+  [self setNeedsDisplay:YES];
 }
 
 - (void)setNUBackgroundColor:(nu::Color)color {
@@ -48,8 +61,8 @@
   nu::PainterMac painter;
   painter.SetColor(background_color_);
   painter.FillRect(nu::RectF(dirtyRect));
-  nu::TextAttributes attributes;
-  attributes.align = attributes.valign = nu::TextAlign::Center;
+  nu::TextAttributes attributes(font_.get(), color_, nu::TextAlign::Center,
+                                nu::TextAlign::Center);
   painter.DrawText(text_, nu::RectF(nu::SizeF([self frame].size)), attributes);
 }
 
@@ -70,6 +83,9 @@ SizeF GetPreferredSizeForText(const std::string& text) {
 Label::Label(const std::string& text) {
   TakeOverView([[NULabel alloc] init]);
   SetText(text);
+  // Default styles.
+  [GetNative() setNUFont:nu::State::GetCurrent()->GetDefaultFont()];
+  [GetNative() setNUColor:GetSystemColor(SystemColor::Text)];
 }
 
 Label::~Label() {

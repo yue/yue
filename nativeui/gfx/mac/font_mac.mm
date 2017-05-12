@@ -13,12 +13,12 @@ namespace nu {
 namespace {
 
 // Returns an autoreleased NSFont created with the passed-in specifications.
-NSFont* NSFontWithSpec(const std::string& name, float font_size,
-                       Weight font_weight, Style font_style) {
+NSFont* NSFontWithSpec(const std::string& font_name, float font_size,
+                       Font::Weight font_weight, Font::Style font_style) {
   NSFontSymbolicTraits trait_bits = 0;
-  if (font_weight >= Font::Weight::BOLD)
+  if (font_weight >= Font::Weight::Bold)
     trait_bits |= NSFontBoldTrait;
-  if (font_style & Font::Style::Italic)
+  if (font_style == Font::Style::Italic)
     trait_bits |= NSFontItalicTrait;
   // The Mac doesn't support underline as a font trait, so just drop it.
   // (Underlines must be added as an attribute on an NSAttributedString.)
@@ -73,12 +73,12 @@ float Font::GetSize() const {
 
 Font::Weight Font::GetWeight() const {
   NSFontSymbolicTraits traits = [[font_ fontDescriptor] symbolicTraits];
-  return (traits & NSFontBoldTrait) ? Font::Weight::BOLD
+  return (traits & NSFontBoldTrait) ? Font::Weight::Bold
                                     : Font::Weight::Normal;
 }
 
 Font::Style Font::GetStyle() const {
-  NSFontSymbolicTraits traits = [[font fontDescriptor] symbolicTraits];
+  NSFontSymbolicTraits traits = [[font_ fontDescriptor] symbolicTraits];
   if (traits & NSFontItalicTrait)
     return Font::Style::Italic;
   else

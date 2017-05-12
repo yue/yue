@@ -5,6 +5,7 @@
 #ifndef NATIVEUI_GFX_TEXT_H_
 #define NATIVEUI_GFX_TEXT_H_
 
+#include "base/memory/ref_counted.h"
 #include "nativeui/gfx/color.h"
 #include "nativeui/gfx/geometry/size_f.h"
 
@@ -20,10 +21,12 @@ enum class TextAlign {
 };
 
 // Attributes used for drawing the text.
-struct TextAttributes {
-  NATIVEUI_EXPORT TextAttributes();
+struct NATIVEUI_EXPORT TextAttributes {
+  TextAttributes();
+  TextAttributes(Font* font, Color color, TextAlign align, TextAlign valign);
+  ~TextAttributes();
 
-  Font* font;
+  scoped_refptr<Font> font;
   Color color;
   TextAlign align;
   TextAlign valign;

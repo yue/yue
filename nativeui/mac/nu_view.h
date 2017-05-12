@@ -10,6 +10,7 @@
 #include "nativeui/gfx/color.h"
 
 namespace nu {
+class Font;
 class View;
 struct NUPrivate;
 }
@@ -17,6 +18,8 @@ struct NUPrivate;
 // The methods that every View should implemented.
 @protocol NUView
 - (nu::NUPrivate*)nuPrivate;
+- (void)setNUFont:(nu::Font*)font;
+- (void)setNUColor:(nu::Color)color;
 - (void)setNUBackgroundColor:(nu::Color)color;
 @end
 
