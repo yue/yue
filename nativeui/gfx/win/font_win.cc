@@ -51,6 +51,7 @@ Font::Font(const std::string& name, float size, Weight weight, Style style) {
 }
 
 Font::~Font() {
+  delete font_;
 }
 
 std::string Font::GetName() const {
