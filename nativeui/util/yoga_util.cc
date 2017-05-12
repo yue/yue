@@ -393,17 +393,6 @@ bool SetEdgePercentStyle(YGNodeRef node,
   return true;
 }
 
-// Convert case to lower and remove non-ASCII characters.
-std::string ParseName(const std::string& name) {
-  std::string parsed;
-  parsed.reserve(name.size());
-  for (char c : name) {
-    if (base::IsAsciiAlpha(c))
-      parsed.push_back(base::ToLowerASCII(c));
-  }
-  return parsed;
-}
-
 // Check whether the value is xx%.
 bool IsPercentValue(const std::string& value) {
   if (value.size() < 2 || value.size() > 4)
@@ -413,19 +402,18 @@ bool IsPercentValue(const std::string& value) {
 
 }  // namespace
 
-void SetYogaProperty(YGNodeRef node, const std::string& key, float value) {
-  SetFloatStyle(node, ParseName(key), value);
+void SetYogaProperty(YGNodeRef node, const std::string& name, float value) {
+  SetFloatStyle(node, name, value);
 }
 
 void SetYogaProperty(YGNodeRef node,
-                     const std::string& key,
+                     const std::string& name,
                      const std::string& value) {
   DCHECK(IsSorted(int_setters) &&
          IsSorted(float_setters) &&
          IsSorted(percent_setters) &&
          IsSorted(edge_setters) &&
          IsSorted(edge_percent_setters))<< "Property setters must be sorted";
-  std::string name = ParseName(key);
   if (IsPercentValue(value)) {
     SetPercentStyle(node, name, value) ||
     SetEdgePercentStyle(node, name, value);

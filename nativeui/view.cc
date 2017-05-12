@@ -4,6 +4,7 @@
 
 #include "nativeui/view.h"
 
+#include "base/strings/string_util.h"
 #include "nativeui/container.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/state.h"
@@ -12,6 +13,21 @@
 #include "third_party/yoga/yoga/Yoga.h"
 
 namespace nu {
+
+namespace {
+
+// Convert case to lower and remove non-ASCII characters.
+std::string ParseName(const std::string& name) {
+  std::string parsed;
+  parsed.reserve(name.size());
+  for (char c : name) {
+    if (base::IsAsciiAlpha(c))
+      parsed.push_back(base::ToLowerASCII(c));
+  }
+  return parsed;
+}
+
+}  // namespace
 
 // static
 const char View::kClassName[] = "View";
@@ -56,11 +72,17 @@ void View::SetDefaultStyle(const SizeF& minimum) {
 }
 
 void View::SetStyle(const std::string& name, const std::string& value) {
-  SetYogaProperty(node_, name, value);
+  std::string key(ParseName(name));
+  if (key == "color")
+    SetColor(Color(value));
+  else if (key == "backgroundcolor")
+    SetBackgroundColor(Color(value));
+  else
+    SetYogaProperty(node_, key, value);
 }
 
 void View::SetStyle(const std::string& name, float value) {
-  SetYogaProperty(node_, name, value);
+  SetYogaProperty(node_, ParseName(name), value);
 }
 
 void View::PrintStyle() const {
