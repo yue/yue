@@ -65,9 +65,9 @@ void Scroll::PlatformInit() {
   TakeOverView(scroll);
 }
 
-void Scroll::PlatformSetContentView(Container* container) {
+void Scroll::PlatformSetContentView(View* view) {
   auto* scroll = static_cast<NSScrollView*>(GetNative());
-  scroll.documentView = container->GetNative();
+  scroll.documentView = view->GetNative();
 }
 
 void Scroll::SetContentSize(const SizeF& size) {

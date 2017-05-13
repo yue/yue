@@ -869,6 +869,19 @@ struct Type<nu::Button> {
 };
 
 template<>
+struct Type<nu::Browser> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Browser";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateOnHeap<nu::Browser>,
+           "loadurl", &nu::Browser::LoadURL);
+    RawSetProperty(state, metatable,
+                   "onclose", &nu::Browser::on_close);
+  }
+};
+
+template<>
 struct Type<nu::Entry> {
   using base = nu::View;
   static constexpr const char* name = "yue.Entry";
@@ -1001,6 +1014,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
               "Window",    lua::MetaTable<nu::Window>(),
               "Container", lua::MetaTable<nu::Container>(),
               "Button",    lua::MetaTable<nu::Button>(),
+              "Browser",   lua::MetaTable<nu::Browser>(),
               "Entry",     lua::MetaTable<nu::Entry>(),
               "Label",     lua::MetaTable<nu::Label>(),
               "Progress",  lua::MetaTable<nu::Progress>(),

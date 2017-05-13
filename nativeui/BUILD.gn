@@ -15,6 +15,7 @@ component("nativeui") {
     "accelerator.cc",
     "accelerator.h",
     "accelerator_manager.h",
+    "browser.h",
     "button.cc",
     "button.h",
     "container.cc",
@@ -145,6 +146,7 @@ component("nativeui") {
     "gtk/widget_util.h",
     "gtk/lifetime_gtk.cc",
     "gtk/accelerator_manager_gtk.cc",
+    "gtk/browser_gtk.cc",
     "gtk/button_gtk.cc",
     "gtk/container_gtk.cc",
     "gtk/entry_gtk.cc",
@@ -247,6 +249,7 @@ component("nativeui") {
       "//build/config/linux:x11",
       "//build/config/linux/gtk3",
     ]
+    configs += [ ":webkitgtk" ]
 
     # Do not warn on using deprecated GTK APIs.
     cflags_cc = [ "-Wno-deprecated-declarations" ]
@@ -268,6 +271,7 @@ component("nativeui") {
     ]
     configs -= [ "//build/config/win:lean_and_mean" ]
   }
+
 }
 
 test("nativeui_unittests") {
@@ -297,9 +301,5 @@ if (is_linux) {
 
   pkg_config("webkitgtk") {
     packages = [ "webkitgtk-3.0" ]
-  }
-
-  pkg_config("curl") {
-    packages = [ "libcurl" ]
   }
 }

@@ -7,7 +7,7 @@
 
 #include <tuple>
 
-#include "nativeui/container.h"
+#include "nativeui/view.h"
 
 namespace nu {
 
@@ -18,8 +18,8 @@ class NATIVEUI_EXPORT Scroll : public View {
   // View class name.
   static const char kClassName[];
 
-  void SetContentView(Container* view);
-  Container* GetContentView() const;
+  void SetContentView(View* view);
+  View* GetContentView() const;
 
   void SetContentSize(const SizeF& size);
   SizeF GetContentSize() const;
@@ -40,10 +40,10 @@ class NATIVEUI_EXPORT Scroll : public View {
 
   // Following platform implementations should only be called by wrappers.
   void PlatformInit();
-  void PlatformSetContentView(Container* container);
+  void PlatformSetContentView(View* container);
 
  private:
-  scoped_refptr<Container> content_view_;
+  scoped_refptr<View> content_view_;
 };
 
 }  // namespace nu

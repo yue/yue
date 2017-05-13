@@ -183,10 +183,10 @@ void Scroll::PlatformInit() {
   TakeOverView(new ScrollImpl(this));
 }
 
-void Scroll::PlatformSetContentView(Container* container) {
+void Scroll::PlatformSetContentView(View* view) {
   auto* scroll = static_cast<ScrollImpl*>(GetNative());
-  container->GetNative()->SetParent(scroll);
-  scroll->SetContentSize(container->GetNative()->size_allocation().size());
+  view->GetNative()->SetParent(scroll);
+  scroll->SetContentSize(view->GetNative()->size_allocation().size());
 }
 
 void Scroll::SetContentSize(const SizeF& size) {

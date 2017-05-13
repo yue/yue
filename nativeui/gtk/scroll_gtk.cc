@@ -39,17 +39,17 @@ void Scroll::PlatformInit() {
   gtk_container_add(GTK_CONTAINER(GetNative()), viewport);
 }
 
-void Scroll::PlatformSetContentView(Container* container) {
+void Scroll::PlatformSetContentView(View* view) {
   GtkWidget* viewport = gtk_bin_get_child(GTK_BIN(GetNative()));
   GtkWidget* child = gtk_bin_get_child(GTK_BIN(viewport));
   if (child) {
     gtk_container_remove(GTK_CONTAINER(viewport), child);
     gtk_widget_set_size_request(child, -1, -1);
   }
-  child = container->GetNative();
+  child = view->GetNative();
   gtk_container_add(GTK_CONTAINER(viewport), child);
 
-  Rect bounds = container->GetPixelBounds();
+  Rect bounds = view->GetPixelBounds();
   gtk_widget_set_size_request(child, bounds.width(), bounds.height());
 }
 

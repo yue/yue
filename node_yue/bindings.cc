@@ -945,6 +945,23 @@ struct Type<nu::Button> {
 };
 
 template<>
+struct Type<nu::Browser> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Browser";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor, "create", &CreateOnHeap<nu::Browser>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "loadURL", &nu::Browser::LoadURL);
+    SetProperty(context, templ,
+                "onClose", &nu::Browser::on_close);
+  }
+};
+
+template<>
 struct Type<nu::Entry> {
   using base = nu::View;
   static constexpr const char* name = "yue.Entry";
@@ -1124,6 +1141,7 @@ void Initialize(v8::Local<v8::Object> exports) {
           "View",      vb::Constructor<nu::View>(),
           "Container", vb::Constructor<nu::Container>(),
           "Button",    vb::Constructor<nu::Button>(),
+          "Browser",   vb::Constructor<nu::Browser>(),
           "Entry",     vb::Constructor<nu::Entry>(),
           "Label",     vb::Constructor<nu::Label>(),
           "Progress",  vb::Constructor<nu::Progress>(),
