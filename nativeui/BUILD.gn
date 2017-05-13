@@ -177,6 +177,7 @@ component("nativeui") {
     "mac/app_mac.mm",
     "mac/lifetime_mac.mm",
     "mac/accelerator_manager_mac.mm",
+    "mac/browser_mac.mm",
     "mac/button_mac.mm",
     "mac/container_mac.h",
     "mac/container_mac.mm",
@@ -257,6 +258,7 @@ component("nativeui") {
   } else if (is_mac) {
     libs = [
       "AppKit.framework",
+      "WebKit.framework",
     ]
   } else if (is_win) {
     libs = [
