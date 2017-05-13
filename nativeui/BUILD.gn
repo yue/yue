@@ -301,6 +301,6 @@ if (is_linux) {
   import("//build/config/linux/pkg_config.gni")
 
   pkg_config("webkitgtk") {
-    packages = [ "webkitgtk-3.0" ]
+    packages = [ "webkit2gtk-4.0" ]
   }
 }
