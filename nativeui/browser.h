@@ -15,6 +15,12 @@ class NATIVEUI_EXPORT Browser : public View {
  public:
   Browser();
 
+  // View class name.
+  static const char kClassName[];
+
+  // View:
+  const char* GetClassName() const override;
+
   void LoadURL(const std::string& url);
 
   // Events.

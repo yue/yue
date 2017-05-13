@@ -146,8 +146,9 @@ void View::SetPixelBounds(const Rect& bounds) {
 
   // Call get_preferred_width before size allocation, otherwise GTK would print
   // warnings like "How does the code know the size to allocate?".
-  gint width;
-  gtk_widget_get_preferred_width(view_, &width, nullptr);
+  gint tmp;
+  gtk_widget_get_preferred_width(view_, &tmp, nullptr);
+  gtk_widget_get_preferred_height(view_, &tmp, nullptr);
 
   gtk_widget_size_allocate(view_, &rect);
 }

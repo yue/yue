@@ -15,6 +15,7 @@ component("nativeui") {
     "accelerator.cc",
     "accelerator.h",
     "accelerator_manager.h",
+    "browser.cc",
     "browser.h",
     "button.cc",
     "button.h",
