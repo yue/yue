@@ -495,6 +495,12 @@ LRESULT WindowImpl::OnNCCalcSize(BOOL mode, LPARAM l_param) {
 }
 
 LRESULT WindowImpl::OnSetCursor(UINT message, WPARAM w_param, LPARAM l_param) {
+  // Do not override cursor of child windows.
+  if (reinterpret_cast<HWND>(w_param) != hwnd()) {
+    SetMsgHandled(false);
+    return 0;
+  }
+
   // Reimplement the necessary default behavior here. Calling DefWindowProc can
   // trigger weird non-client painting for non-glass windows with custom frames.
   // Using a ScopedRedrawLock to prevent caption rendering artifacts may allow
