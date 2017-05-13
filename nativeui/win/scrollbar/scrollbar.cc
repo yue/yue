@@ -235,12 +235,14 @@ int Scrollbar::GetScrollAmout() const {
 
 int Scrollbar::GetLineHeight() const {
   int max_amout = std::ceil(20 * scale_factor());
-  Container* contents = scroll_->delegate()->GetContentView();
-  if (contents->ChildCount() > 0)
-    return std::min(max_amout,
-                    contents->ChildAt(0)->GetPixelBounds().height());
-  else
-    return max_amout;
+  View* contents = scroll_->delegate()->GetContentView();
+  if (contents->GetClassName() == Container::kClassName) {
+    Container* container = static_cast<Container*>(contents);
+    if (container->ChildCount() > 0)
+      return std::min(max_amout,
+                      container->ChildAt(0)->GetPixelBounds().height());
+  }
+  return max_amout;
 }
 
 int Scrollbar::GetPageHeight() const {

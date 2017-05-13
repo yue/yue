@@ -16,6 +16,7 @@ class WindowImpl;
 
 // Possible control types.
 enum class ControlType {
+  Browser,
   Button,
   Checkbox,
   Radio,
