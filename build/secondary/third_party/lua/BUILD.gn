@@ -79,6 +79,7 @@ source_set("liblua") {
   ]
 
   if (is_win) {
+    defines = [ "LUA_BUILD_AS_DLL" ]
     cflags = [
       "/wd4310",  # cast truncates constant value
       "/wd4324",  # structure was padded due to alignment specifier

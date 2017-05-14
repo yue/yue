@@ -6,6 +6,5 @@ group("default") {
   deps = [
     "//node_yue",
     "//yue",
-    "//yue:lua_yue",
   ]
 }
