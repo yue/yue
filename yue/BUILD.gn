@@ -6,8 +6,12 @@ import("//testing/test.gni")
 
 # Independent lua executable with yue runtime.
 executable("yue") {
-  sources = [ "yue.cc" ]
-  deps = [ ":yue_runtime" ]
+  sources = [
+    "yue.cc",
+  ]
+  deps = [
+    ":yue_runtime",
+  ]
 }
 
 # Loadable module of core yue libraries to be used with other lua distributions,
@@ -16,7 +20,10 @@ loadable_module("lua_yue") {
   output_name = "yue"
   output_prefix_override = true  # do not add "lib" prefix
 
-  deps = [ ":lua_yue_gui" ]
+  deps = [
+    ":lua_yue_gui",
+    "//third_party/lua",  # build lua executable
+  ]
 
   if (is_mac) {
     ldflags = [
@@ -24,22 +31,20 @@ loadable_module("lua_yue") {
     ]
   } else if (is_linux && is_component_build) {
     configs += [ "//build/config/gcc:rpath_for_built_shared_libraries" ]
+  } else if (is_win) {
   }
 }
 
 # Component used for constructing a lua environment with yue inside.
 source_set("yue_runtime") {
   sources = [
-    "api_sys.cc",
-    "api_sys.h",
-    "api_util.cc",
-    "api_util.h",
     "builtin_loader.cc",
     "builtin_loader.h",
   ]
 
   deps = [
     ":lua_yue_gui",
+    ":lua_yue_util",
     "//third_party/lua:liblua",
   ]
 }
@@ -56,6 +61,21 @@ source_set("lua_yue_gui") {
     "//base",
     "//lua",
     "//nativeui",
+  ]
+}
+
+# Lua bindings of lua-only utilities.
+source_set("lua_yue_util") {
+  sources = [
+    "api_sys.cc",
+    "api_sys.h",
+    "api_util.cc",
+    "api_util.h",
+  ]
+
+  deps = [
+    "//base",
+    "//lua",
   ]
 }
 
