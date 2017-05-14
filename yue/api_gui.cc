@@ -9,6 +9,7 @@
 #include <utility>
 #include <vector>
 
+#include "base/command_line.h"
 #include "nativeui/nativeui.h"
 #include "yue/api_signal.h"
 
@@ -997,6 +998,15 @@ struct Type<nu::Vibrant> {
 }  // namespace lua
 
 extern "C" int luaopen_yue_gui(lua::State* state) {
+  // Initialize nativeui library and leak it.
+  // Doing cleanup job on exit have troubles for us, because nativeui may store
+  // lua objects, and lua may store nativeui objects. So either freeing lua or
+  // nativeui will make the other one crash.
+  new nu::State;
+
+  // Initialize lifetime and leak it.
+  new nu::Lifetime;
+
   lua::NewTable(state);
   lua::RawSet(state, -1,
               // Classes.

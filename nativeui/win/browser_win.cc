@@ -4,8 +4,8 @@
 
 #include "nativeui/browser.h"
 
-#include <ole2.h>
 #include <exdisp.h>
+#include <ole2.h>
 
 #include "base/strings/utf_string_conversions.h"
 #include "base/win/scoped_bstr.h"

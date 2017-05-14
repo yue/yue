@@ -7,6 +7,12 @@
 
 #include "lua/lua.h"
 
-extern "C" int luaopen_yue_gui(lua::State* state);
+#ifdef _WIN32
+# define LUA_MODULE_EXPORT __declspec(dllexport)
+#else
+# define LUA_MODULE_EXPORT __attribute__((visibility("default")))
+#endif
+
+extern "C" LUA_MODULE_EXPORT int luaopen_yue_gui(lua::State* state);
 
 #endif  // YUE_API_GUI_H_

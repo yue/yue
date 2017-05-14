@@ -52,14 +52,14 @@ class NATIVEUI_EXPORT Lifetime {
   void PlatformInit();
   void PlatformDestroy();
 
-  base::AtExitManager at_exit_;
-  base::MessageLoop message_loop_;
-  std::unique_ptr<base::RunLoop> run_loop_;
-
 #if defined(OS_MACOSX)
   base::mac::ScopedNSAutoreleasePool autorelease_pool_;
   NUApplicationDelegate* app_delegate_;
 #endif
+
+  base::AtExitManager at_exit_;
+  base::MessageLoop message_loop_;
+  std::unique_ptr<base::RunLoop> run_loop_;
 
 #if defined(OS_LINUX)
   GtkEventLoop gtk_event_loop_;

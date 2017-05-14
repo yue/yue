@@ -4,25 +4,41 @@
 
 import("//testing/test.gni")
 
+# Independent lua executable with yue runtime.
 executable("yue") {
-  sources = [
-    "yue.cc",
-  ]
-
-  deps = [ ":libyue" ]
+  sources = [ "yue.cc" ]
+  deps = [ ":yue_runtime" ]
 }
 
-source_set("libyue") {
+# Loadable module of core yue libraries to be used with other lua distributions,
+# currently we only build bindings to GUI part of yue.
+loadable_module("lua_yue") {
+  output_name = "yue"
+  output_prefix_override = true  # do not add "lib" prefix
+
+  deps = [ ":libyue_gui" ]
+}
+
+# Component used for constructing a lua environment with yue inside.
+source_set("yue_runtime") {
   sources = [
-    "api_gui.cc",
-    "api_gui.h",
-    "api_signal.h",
     "api_sys.cc",
     "api_sys.h",
     "api_util.cc",
     "api_util.h",
     "builtin_loader.cc",
     "builtin_loader.h",
+  ]
+
+  deps = [ ":libyue_gui" ]
+}
+
+# Lua bindings of yue's GUI part.
+source_set("libyue_gui") {
+  sources = [
+    "api_gui.cc",
+    "api_gui.h",
+    "api_signal.h",
   ]
 
   deps = [
@@ -39,7 +55,7 @@ test("yue_unittests") {
   ]
 
   deps = [
-    ":libyue",
+    ":yue_runtime",
     "//base/test:test_support",
     "//testing/gtest",
   ]

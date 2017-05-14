@@ -26,15 +26,6 @@ int main(int argc, const char *argv[]) {
     return 1;
   }
 
-  // Enter message loop.
-  nu::Lifetime lifetime;
-
-  // Initialize nativeui library and leak it.
-  // Doing cleanup job on exit have troubles for us, because nativeui may store
-  // lua objects, and lua may store nativeui objects. So either freeing lua or
-  // nativeui will make the other one crash.
-  new nu::State;
-
   // Load builtin libraries in lua environment.
   luaL_openlibs(state);
   yue::InsertBuiltinModuleLoader(state);
