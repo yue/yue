@@ -16,7 +16,15 @@ loadable_module("lua_yue") {
   output_name = "yue"
   output_prefix_override = true  # do not add "lib" prefix
 
-  deps = [ ":libyue_gui" ]
+  deps = [ ":lua_yue_gui" ]
+
+  if (is_mac) {
+    ldflags = [
+      "-undefined", "dynamic_lookup",
+    ]
+  } else if (is_linux && is_component_build) {
+    configs += [ "//build/config/gcc:rpath_for_built_shared_libraries" ]
+  }
 }
 
 # Component used for constructing a lua environment with yue inside.
@@ -30,11 +38,14 @@ source_set("yue_runtime") {
     "builtin_loader.h",
   ]
 
-  deps = [ ":libyue_gui" ]
+  deps = [
+    ":lua_yue_gui",
+    "//third_party/lua:liblua",
+  ]
 }
 
 # Lua bindings of yue's GUI part.
-source_set("libyue_gui") {
+source_set("lua_yue_gui") {
   sources = [
     "api_gui.cc",
     "api_gui.h",
