@@ -13,7 +13,7 @@ The only way to get help from me is to subscribe to [paid plans][paid-plans].
 ## Contributions
 
 While I appreciate contributions and will do my best to get them merged, please
-understand that your patch might be modified or rejected.
+understand I have very limited time to review them.
 
 By sending a pull request, you are agreeing to transfer the copyright of its
 code to me.
@@ -24,20 +24,18 @@ The Yue project is under the [Microsoft Reciprocal License (MS-RL)][ms-rl]
 with following clarifications:
 
 * Using or copying headers of this software is not considered as containing
-  its code, so you are not obliged to license your source code under MS-RL
-  when using code from header files.
-* Linking with the code of this software (either statically or dynamically) is
-  not considered as containing its code.
+  its code.
+* Linking with the code of this software in any form is not considered as
+  containing its code.
 * If your software uses a modified version of this software, it is considered
-  as containing this software's code, thus you have to license your software
-  under MS-RL.
+  as containing this software's code.
 * Any forked version of the original [yue/yue](https://github.com/yue/yue) repo
   is considered as a modified version of this software.
 
 ### Alternative license
 
-The source code of Yue project is also available under an alternative license if
-you subscribe to the [paid plans][paid-plans]. Unlike MS-RL, the alternative
+The source code of Yue is also available under an alternative license if you
+subscribe to the [paid plans][paid-plans]. Unlike MS-RL, the alternative
 license does not require you to open source your software when you use a
 modified version of this software.
 
