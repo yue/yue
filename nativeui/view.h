@@ -86,7 +86,7 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   void SetStyle(const std::string& name, const std::string& value);
   void SetStyle(const std::string& name, float value);
 
-  // Print style layout to stdout.
+  // Internal: Print style layout to stdout.
   void PrintStyle() const;
 
   // Get parent.

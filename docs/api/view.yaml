@@ -1,0 +1,279 @@
+name: View
+description: Base class for GUI components.
+detail: |
+  `View` provides methods to receive and change various style properties.
+
+methods:
+  - name: offsetfromview
+    signature:
+      cpp: Vector2dF OffsetFromView(const View* view) const
+      lua: offsetfromview(view)
+      js: offsetFromView(view)
+    return:
+      cpp: Vector2dF
+      lua: Vector2d
+      js: Vector2d
+    params:
+      - name: view
+        type:
+          cpp: const View*
+          lua: View
+          js: View
+    description: Return offset from `view`.
+
+  - name: offsetfromwindow
+    signature:
+      cpp: Vector2dF OffsetFromWindow() const
+      lua: offsetfromwindow()
+      js: offsetFromWindow()
+    return:
+      cpp: Vector2dF
+      lua: Vector2d
+      js: Vector2d
+    description: Return offset from the window that owns the view.
+
+  - name: getbounds
+    signature:
+      cpp: RectF GetBounds() const
+      lua: getbounds()
+      js: getBounds()
+    return:
+      cpp: RectF
+      lua: Rect
+      js: RecF
+    description: Return the position and size of the view, relative to its parent.
+
+  - name: layout
+    signature:
+      cpp: void Layout()
+      lua: layout()
+      js: layout()
+    description: Make the view re-recalculate its layout.
+
+  - name: schedulepaint
+    signature:
+      cpp: void SchedulePaint()
+      lua: schedulepaint()
+      js: schedulePaint()
+    description: Schedule to repaint the whole view.
+
+  - name: setvisible
+    signature:
+      cpp: void SetVisible(bool visible)
+      lua: setvisible(visible)
+      js: setVisible(visible)
+    params:
+      - name: visible
+        type:
+          cpp: bool
+          lua: boolean
+          js: Boolean
+    description: Show/Hide the view.
+
+  - name: isvisible
+    signature:
+      cpp: bool IsVisible() const
+      lua: isvisible()
+      js: isVisible()
+    return:
+      cpp: bool
+      lua: boolean
+      js: Boolean
+    description: Return whether the view is visible.
+
+  - name: focus
+    signature:
+      cpp: void Focus()
+      lua: focus()
+      js: focus()
+    description: Move the keyboard focus to the view.
+
+  - name: hasfocus
+    signature:
+      cpp: bool HasFocus() const
+      lua: hasfocus()
+      js: hasFocus()
+    return:
+      cpp: bool
+      lua: boolean
+      js: Boolean
+    description: Return whether the view has keyboard focus.
+
+  - name: setfocusable
+    signature:
+      cpp: void SetFocusable(bool focusable)
+      lua: setfocusable(focusable)
+      js: setFocusable(focusable)
+    params:
+      - name: focusable
+        type:
+          cpp: bool
+          lua: boolean
+          js: Boolean
+    description: Set whether the view can be focused on.
+
+  - name: isfocusable
+    signature:
+      cpp: bool IsFocusable() const
+      lua: isfocusable()
+      js: isFocusable()
+    return:
+      cpp: bool
+      lua: boolean
+      js: Boolean
+    description: Return whether the view can be focused on.
+
+  - name: setcapture
+    signature:
+      cpp: void SetCapture()
+      lua: setcapture()
+      js: setCapture()
+    description: Set mouse capture to the view.
+
+  - name: releasecapture
+    signature:
+      cpp: void ReleaseCapture()
+      lua: releasecapture()
+      js: releaseCapture()
+    description: Release mouse capture if the view has mouse capture.
+
+  - name: hascapture
+    signature:
+      cpp: bool HasCapture() const
+      lua: hascapture()
+      js: hasCapture()
+    return:
+      cpp: bool
+      lua: boolean
+      js: Boolean
+    description: Return whether the view has mouse capture.
+
+  - name: setmousedowncanmovewindow
+    signature:
+      cpp: void SetMouseDownCanMoveWindow(bool can)
+      lua: setmousedowncanmovewindow(can)
+      js: setMouseDownCanMoveWindow(can)
+    params:
+      - name: can
+        type:
+          cpp: bool
+          lua: boolean
+          js: Boolean
+    description: Set whether dragging mouse would move the window.
+    detail: |
+      For most platforms this method only works for frameless windows, having
+      this feature may also prevent mouse events to happen.
+
+      On macOS the `Container` view has this feature turned on by default. To
+      turn this feature on for the view, the view's parent view must also has
+      this feature turned on.
+
+      On Windows the view with this feature will be treated as titlebar, e.g.
+      double-clicking would maximize the window, right-clicking may show the
+      system menu.
+
+  - name: ismousedowncanmovewindow
+    signature:
+      cpp: bool IsMouseDownCanMoveWindow() const
+      lua: ismousedowncanmovewindow()
+      js: isMouseDownCanMoveWindow()
+    return:
+      cpp: bool
+      lua: boolean
+      js: Boolean
+    description: Return whether dragging the view would move the window.
+
+  - name: setfont
+    signature:
+      cpp: void SetFont(Font* font)
+      lua: setfont(font)
+      js: setFont(font)
+    params:
+      - name: font
+        type:
+          cpp: Font*
+          lua: Font
+          js: Font
+    description: Change the font used for drawing text in the view.
+    detail: |
+      This methods only works for `View`s that display text, like `Label` or
+      `Entry`.
+
+  - name: setcolor
+    signature:
+      cpp: void SetColor(Color color)
+      lua: setcolor(color)
+      js: setColor(color)
+    params:
+      - name: color
+        type:
+          cpp: Color
+          lua: Color
+          js: Color
+    description: Change the color used for drawing text in the view
+    detail: |
+      This methods only works for `View`s that display text, like `Label` or
+      `Entry`.
+
+  - name: setbackgroundcolor
+    signature:
+      cpp: void SetBackgroundColor(Color color)
+      lua: setbackgroundcolor(color)
+      js: setBackgroundColor(color)
+    params:
+      - name: color
+        type:
+          cpp: Color
+          lua: Color
+          js: Color
+    description: Change the background color of the view.
+
+  - name: setstyle
+    signature:
+      lua: setstyle(style)
+      js: setStyle(style)
+    params:
+      - name: style
+        type:
+          lua: table
+          js: Object
+        description: |
+          A key-value dictionary that defines the name and value of the style
+          properties, key must be string, and value must be either string or
+          number.
+    description: Change the styles of the view.
+    detail: |
+      Available style properties can be found at [Flex Layout][flex-layout].
+
+  - name: getparent
+    signature:
+      cpp: View* GetParent() const
+      lua: getparent()
+      js: getparent()
+    return:
+      cpp: View*
+      lua: View
+      js: View
+    description: Return parent view.
+    detail: |
+      Will return null type if there is no parent view.
+
+  - name: getwindow
+    signature:
+      cpp: Window* GetWindow() const
+      lua: getwindow()
+      js: getWindow()
+    return:
+      cpp: Window*
+      lua: Window
+      js: Window
+    description: Return the window that the view belongs to.
+    detail: |
+      Will return null type if there is no parent window.
+
+  - name: getnative
+    signature:
+      cpp: NativeView GetNative() const
+    return:
+      cpp: NativeView
+    description: Return the native type wrapped by the view.
