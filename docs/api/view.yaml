@@ -16,7 +16,7 @@ lang_detail:
     ```
 
 class_properties:
-  - name: const char kClassName[];
+  - name: const char kClassName[]
     lang: ['cpp']
     description: The class name of this view.
 

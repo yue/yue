@@ -18,7 +18,7 @@ process.env.PATH = `${binaries_dir}${path.delimiter}${process.env.PATH}`
 // Parse args.
 let verbose = false
 const argv = process.argv.slice(2).filter((arg) => {
-  if (arg === '--verbose') {
+  if (arg == '-v' || arg == '--verbose') {
     verbose = true
     return false
   } else {
