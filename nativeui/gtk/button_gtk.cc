@@ -13,7 +13,7 @@ namespace nu {
 namespace {
 
 void OnClick(GtkButton*, Button* button) {
-  button->on_click.Emit();
+  button->on_click.Emit(button);
 }
 
 }  // namespace

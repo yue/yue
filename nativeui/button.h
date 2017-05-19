@@ -32,7 +32,7 @@ class NATIVEUI_EXPORT Button : public View {
   const char* GetClassName() const override;
 
   // Events.
-  Signal<void()> on_click;
+  Signal<void(Button*)> on_click;
 
  protected:
   ~Button() override;

@@ -8,7 +8,7 @@ const fs = require('fs')
 const yaml = loadYaml()
 
 console.log(require('util').inspect(
-  yaml.load(fs.readFileSync('docs/api/view.yaml')),
+  yaml.load(fs.readFileSync('docs/api/button.yaml')),
   {depth: 5}))
 
 // Load js-yaml from its browserify pack.

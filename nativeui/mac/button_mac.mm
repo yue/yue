@@ -101,7 +101,7 @@ nu::InsetsF GetButtonInsets(NSButton* button) {
 }
 
 - (IBAction)onClick:(id)sender {
-  shell_->on_click.Emit();
+  shell_->on_click.Emit(shell_);
 }
 
 @end

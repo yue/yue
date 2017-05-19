@@ -1,164 +1,76 @@
 name: View
+type: class
 description: Base class for GUI components.
 detail: |
   `View` provides methods to receive and change various style properties.
+lang_detail:
+  cpp: |
+    `View` is a `RefCounted` type. Sub-classes of `View` can only be created on
+    heap, and must be managed with `scoped_refptr`.
+    Every API that accpets `View*` will store a reference to the pointer, so it
+    is safe to pass a newly created raw pointer to public APIs.
+
+    ```cpp
+    scoped_refptr<nu::Container> container = new nu::Container;
+    container->AddChildView(new nu::Label("child"));
+    ```
+
+class_properties:
+  - name: const char kClassName[];
+    lang: ['cpp']
+    description: The class name of this view.
 
 methods:
-  - name: offsetfromview
-    signature:
-      cpp: Vector2dF OffsetFromView(const View* view) const
-      lua: offsetfromview(view)
-      js: offsetFromView(view)
-    return:
-      cpp: Vector2dF
-      lua: Vector2d
-      js: Vector2d
-    params:
-      - name: view
-        type:
-          cpp: const View*
-          lua: View
-          js: View
+  - signature: const char* GetClassName() const;
+    lang: ['cpp']
+    description: Return the class name.
+    detail: |
+      The returned value is guarenteed to be the `kClassName` property of each
+      view.
+
+  - signature: Vector2dF OffsetFromView(const View* view) const
     description: Return offset from `view`.
 
-  - name: offsetfromwindow
-    signature:
-      cpp: Vector2dF OffsetFromWindow() const
-      lua: offsetfromwindow()
-      js: offsetFromWindow()
-    return:
-      cpp: Vector2dF
-      lua: Vector2d
-      js: Vector2d
+  - signature: Vector2dF OffsetFromWindow() const
     description: Return offset from the window that owns the view.
 
-  - name: getbounds
-    signature:
-      cpp: RectF GetBounds() const
-      lua: getbounds()
-      js: getBounds()
-    return:
-      cpp: RectF
-      lua: Rect
-      js: RecF
+  - signature: RectF GetBounds() const
     description: Return the position and size of the view, relative to its parent.
 
-  - name: layout
-    signature:
-      cpp: void Layout()
-      lua: layout()
-      js: layout()
+  - signature: void Layout()
     description: Make the view re-recalculate its layout.
 
-  - name: schedulepaint
-    signature:
-      cpp: void SchedulePaint()
-      lua: schedulepaint()
-      js: schedulePaint()
+  - signature: void SchedulePaint()
     description: Schedule to repaint the whole view.
 
-  - name: setvisible
-    signature:
-      cpp: void SetVisible(bool visible)
-      lua: setvisible(visible)
-      js: setVisible(visible)
-    params:
-      - name: visible
-        type:
-          cpp: bool
-          lua: boolean
-          js: Boolean
+  - signature: void SetVisible(bool visible)
     description: Show/Hide the view.
 
-  - name: isvisible
-    signature:
-      cpp: bool IsVisible() const
-      lua: isvisible()
-      js: isVisible()
-    return:
-      cpp: bool
-      lua: boolean
-      js: Boolean
+  - signature: bool IsVisible() const
     description: Return whether the view is visible.
 
-  - name: focus
-    signature:
-      cpp: void Focus()
-      lua: focus()
-      js: focus()
+  - signature: void Focus()
     description: Move the keyboard focus to the view.
 
-  - name: hasfocus
-    signature:
-      cpp: bool HasFocus() const
-      lua: hasfocus()
-      js: hasFocus()
-    return:
-      cpp: bool
-      lua: boolean
-      js: Boolean
+  - signature: bool HasFocus() const
     description: Return whether the view has keyboard focus.
 
-  - name: setfocusable
-    signature:
-      cpp: void SetFocusable(bool focusable)
-      lua: setfocusable(focusable)
-      js: setFocusable(focusable)
-    params:
-      - name: focusable
-        type:
-          cpp: bool
-          lua: boolean
-          js: Boolean
+  - signature: void SetFocusable(bool focusable)
     description: Set whether the view can be focused on.
 
-  - name: isfocusable
-    signature:
-      cpp: bool IsFocusable() const
-      lua: isfocusable()
-      js: isFocusable()
-    return:
-      cpp: bool
-      lua: boolean
-      js: Boolean
+  - signature: bool IsFocusable() const
     description: Return whether the view can be focused on.
 
-  - name: setcapture
-    signature:
-      cpp: void SetCapture()
-      lua: setcapture()
-      js: setCapture()
+  - signature: void SetCapture()
     description: Set mouse capture to the view.
 
-  - name: releasecapture
-    signature:
-      cpp: void ReleaseCapture()
-      lua: releasecapture()
-      js: releaseCapture()
+  - signature: void ReleaseCapture()
     description: Release mouse capture if the view has mouse capture.
 
-  - name: hascapture
-    signature:
-      cpp: bool HasCapture() const
-      lua: hascapture()
-      js: hasCapture()
-    return:
-      cpp: bool
-      lua: boolean
-      js: Boolean
+  - signature: bool HasCapture() const
     description: Return whether the view has mouse capture.
 
-  - name: setmousedowncanmovewindow
-    signature:
-      cpp: void SetMouseDownCanMoveWindow(bool can)
-      lua: setmousedowncanmovewindow(can)
-      js: setMouseDownCanMoveWindow(can)
-    params:
-      - name: can
-        type:
-          cpp: bool
-          lua: boolean
-          js: Boolean
+  - signature: void SetMouseDownCanMoveWindow(bool can)
     description: Set whether dragging mouse would move the window.
     detail: |
       For most platforms this method only works for frameless windows, having
@@ -172,71 +84,28 @@ methods:
       double-clicking would maximize the window, right-clicking may show the
       system menu.
 
-  - name: ismousedowncanmovewindow
-    signature:
-      cpp: bool IsMouseDownCanMoveWindow() const
-      lua: ismousedowncanmovewindow()
-      js: isMouseDownCanMoveWindow()
-    return:
-      cpp: bool
-      lua: boolean
-      js: Boolean
+  - signature: bool IsMouseDownCanMoveWindow() const
     description: Return whether dragging the view would move the window.
 
-  - name: setfont
-    signature:
-      cpp: void SetFont(Font* font)
-      lua: setfont(font)
-      js: setFont(font)
-    params:
-      - name: font
-        type:
-          cpp: Font*
-          lua: Font
-          js: Font
+  - signature: void SetFont(Font* font)
     description: Change the font used for drawing text in the view.
     detail: |
       This methods only works for `View`s that display text, like `Label` or
       `Entry`.
 
-  - name: setcolor
-    signature:
-      cpp: void SetColor(Color color)
-      lua: setcolor(color)
-      js: setColor(color)
-    params:
-      - name: color
-        type:
-          cpp: Color
-          lua: Color
-          js: Color
+  - signature: void SetColor(Color color)
     description: Change the color used for drawing text in the view
     detail: |
       This methods only works for `View`s that display text, like `Label` or
       `Entry`.
 
-  - name: setbackgroundcolor
-    signature:
-      cpp: void SetBackgroundColor(Color color)
-      lua: setbackgroundcolor(color)
-      js: setBackgroundColor(color)
-    params:
-      - name: color
-        type:
-          cpp: Color
-          lua: Color
-          js: Color
+  - signature: void SetBackgroundColor(Color color)
     description: Change the background color of the view.
 
-  - name: setstyle
-    signature:
-      lua: setstyle(style)
-      js: setStyle(style)
+  - signature: void SetStyle(Dictionary style)
+    lang: ['lua', 'js']
     params:
-      - name: style
-        type:
-          lua: table
-          js: Object
+      style:
         description: |
           A key-value dictionary that defines the name and value of the style
           properties, key must be string, and value must be either string or
@@ -245,35 +114,49 @@ methods:
     detail: |
       Available style properties can be found at [Flex Layout][flex-layout].
 
-  - name: getparent
-    signature:
-      cpp: View* GetParent() const
-      lua: getparent()
-      js: getparent()
-    return:
-      cpp: View*
-      lua: View
-      js: View
+  - signature: View* GetParent() const
     description: Return parent view.
-    detail: |
-      Will return null type if there is no parent view.
 
-  - name: getwindow
-    signature:
-      cpp: Window* GetWindow() const
-      lua: getwindow()
-      js: getWindow()
-    return:
-      cpp: Window*
-      lua: Window
-      js: Window
+  - signature: Window* GetWindow() const
     description: Return the window that the view belongs to.
-    detail: |
-      Will return null type if there is no parent window.
 
-  - name: getnative
-    signature:
-      cpp: NativeView GetNative() const
-    return:
-      cpp: NativeView
+  - signature: NativeView GetNative() const
+    lang: ['cpp']
     description: Return the native type wrapped by the view.
+
+events:
+  - name: on_mouse_down
+    signature: bool(View* self, const MouseEvent& event)
+    description: Emitted when pressing mouse buttons.
+
+  - name: on_mouse_up
+    signature: bool(View* self, const MouseEvent& event)
+    description: Emitted when releasing mouse buttons.
+
+  - name: on_mouse_move
+    signature: void(View* self, const MouseEvent& event)
+    description: Emitted when user moves mouse in the view.
+
+  - name: on_mouse_enter
+    signature: void(View* self, const MouseEvent& event)
+    description: Emitted when mouse enters the view.
+
+  - name: on_mouse_leave
+    signature: void(View* self, const MouseEvent& event)
+    description: Emitted when mouse leaves the view.
+
+  - name: on_key_down
+    signature: bool(View* self, const KeyEvent& event)
+    description: Emitted when pressing keyboard.
+
+  - name: on_key_up
+    signature: bool(View* self, const KeyEvent& event)
+    description: Emitted when releasing keyboard.
+
+  - name: on_size_changed
+    signature: void(View* self)
+    description: Emitted when the view's size has been changed.
+
+  - name: on_capture_lost
+    signature: void(View* self)
+    description: Emitted when the mouse capture on view has been released.

@@ -60,7 +60,7 @@ class ButtonImpl : public ViewImpl {
       SetChecked(!IsChecked());
     else if (type() == ControlType::Radio && !IsChecked())
       SetChecked(true);
-    static_cast<Button*>(delegate())->on_click.Emit();
+    static_cast<Button*>(delegate())->on_click.Emit(delegate());
   }
 
   void SetChecked(bool checked) {

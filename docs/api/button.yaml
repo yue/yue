@@ -1,3 +1,49 @@
 name: Button
+type: class
 inherit: View
 description: Native button, can also be used as checkbox and radio button.
+
+constructors:
+  - signature: Button(const std::string& title, Button::Type type)
+    lang: ['cpp']
+    description: Create a new button.
+
+class_methods:
+  - signature: Button* Create(const std::string& title)
+    lang: ['lua', 'js']
+    description: Create a normal button with `title`.
+  - signature: Button* Create(Dictionary options)
+    lang: ['lua', 'js']
+    params:
+      options:
+        keys:
+          - name: std::string title
+            description: Button's title
+          - name: std::string type
+            description: >
+              Button's type, can be `normal`, `checkbox` or `radio`, default
+              is `normal`.
+    description: Create a button by reading `options`.
+
+class_properties:
+  - name: const char* kClassName;
+    lang: ['cpp']
+    description: The class name of this view.
+
+methods:
+  - signature: void SetTitle(const std::string& title)
+    description: Set button title.
+
+  - signature: std::string GetTitle() const
+    description: Return the button title.
+
+  - signature: void SetChecked(bool checked)
+    description: Set `checked` state of checkbox or radio.
+
+  - signature: bool IsChecked() const
+    description: Return whether checkbox or radio is checked.
+
+events:
+  - name: on_click
+    signature: void(Button* self)
+    description: Emitted when button is clicked.
