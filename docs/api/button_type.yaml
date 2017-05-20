@@ -1,5 +1,4 @@
 name: Button::Type
-type: enum class
 description: An `enum class` that lists possible `Button` types.
 detail: |
   Possible values are:

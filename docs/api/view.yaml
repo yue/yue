@@ -1,5 +1,4 @@
 name: View
-type: class
 description: Base class for GUI components.
 detail: |
   `View` provides methods to receive and change various style properties.
@@ -16,7 +15,7 @@ lang_detail:
     ```
 
 class_properties:
-  - name: const char kClassName[]
+  - property: const char* kClassName
     lang: ['cpp']
     description: The class name of this view.
 
@@ -125,38 +124,29 @@ methods:
     description: Return the native type wrapped by the view.
 
 events:
-  - name: on_mouse_down
-    signature: bool(View* self, const MouseEvent& event)
+  - callback: bool on_mouse_down(View* self, const MouseEvent& event)
     description: Emitted when pressing mouse buttons.
 
-  - name: on_mouse_up
-    signature: bool(View* self, const MouseEvent& event)
+  - callback: bool on_mouse_up(View* self, const MouseEvent& event)
     description: Emitted when releasing mouse buttons.
 
-  - name: on_mouse_move
-    signature: void(View* self, const MouseEvent& event)
+  - callback: void on_mouse_move(View* self, const MouseEvent& event)
     description: Emitted when user moves mouse in the view.
 
-  - name: on_mouse_enter
-    signature: void(View* self, const MouseEvent& event)
+  - callback: void on_mouse_enter(View* self, const MouseEvent& event)
     description: Emitted when mouse enters the view.
 
-  - name: on_mouse_leave
-    signature: void(View* self, const MouseEvent& event)
+  - callback: void on_mouse_leave(View* self, const MouseEvent& event)
     description: Emitted when mouse leaves the view.
 
-  - name: on_key_down
-    signature: bool(View* self, const KeyEvent& event)
+  - callback: bool on_key_down(View* self, const KeyEvent& event)
     description: Emitted when pressing keyboard.
 
-  - name: on_key_up
-    signature: bool(View* self, const KeyEvent& event)
+  - callback: bool on_key_up(View* self, const KeyEvent& event)
     description: Emitted when releasing keyboard.
 
-  - name: on_size_changed
-    signature: void(View* self)
+  - callback: void on_size_changed(View* self)
     description: Emitted when the view's size has been changed.
 
-  - name: on_capture_lost
-    signature: void(View* self)
+  - callback: void on_capture_lost(View* self)
     description: Emitted when the mouse capture on view has been released.

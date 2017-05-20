@@ -1,5 +1,4 @@
 name: Button
-type: class
 inherit: View
 description: Native button, can also be used as checkbox and radio button.
 
@@ -16,17 +15,17 @@ class_methods:
     lang: ['lua', 'js']
     params:
       options:
-        keys:
-          - name: std::string title
+        properties:
+          - property: std::string title
             description: Button's title
-          - name: std::string type
+          - property: std::string type
             description: >
               Button's type, can be `normal`, `checkbox` or `radio`, default
               is `normal`.
     description: Create a button by reading `options`.
 
 class_properties:
-  - name: const char* kClassName;
+  - property: const char* kClassName
     lang: ['cpp']
     description: The class name of this view.
 
@@ -44,6 +43,5 @@ methods:
     description: Return whether checkbox or radio is checked.
 
 events:
-  - name: on_click
-    signature: void(Button* self)
+  - callback: void on_click(Button* self)
     description: Emitted when button is clicked.
