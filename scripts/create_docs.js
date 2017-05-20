@@ -113,7 +113,8 @@ function pruneNode(lang, node) {
     }
   } else if (node.property) {
     node.id = parseParam('lua', node.property).name
-    node.property = parseParam(lang, node.property)
+    Object.assign(node, parseParam(lang, node.property))
+    delete node.property
   } else if (node.callback) {
     node.id = generateIdForSignature(node.callback)
     node.callback = parseSignature(lang, node.callback)

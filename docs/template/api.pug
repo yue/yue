@@ -1,24 +1,65 @@
+//- Title with permanent link.
+mixin title(level, id, str)
+  #{level}(id=id)
+    a(href=`#${id}`) #{str}
+
+//- Block description of a method or properties.
+mixin description(node)
+  p.description #{node.description}
+  if node.detail
+    p.detail #{node.detail}
+
+//- A list of parameter.
+mixin parameters(parameters)
+  ul
+    each param in parameters
+      li
+        +parameter(param)
+
+//- Inline description of parameter.
+mixin parameter(node)
+  code #{node.name}
+  | #{node.type}
+  if node.description
+    |  - #{node.description}
+  if node.properties
+    ul
+      each property in node.properties
+        li
+          +parameter(property)
+
+//- Display a method.
+mixin method(node)
+  +title('h3', node.id, node.signature.str)
+  +description(node)
+  if node.signature.parameters.length > 0
+    h4 Parameters
+    +parameters(node.signature.parameters)
+  if node.signature.returnType
+    h4 Return
+    code #{node.signature.returnType}
+
+//- Main page starts from here.
 h1 #{doc.name}
-p.description #{doc.description}
-if doc.detail
-  p.detail #{doc.detail}
++description(doc)
 
 if doc.constructors
-  h2 Constructors
+  +title('h2', 'constructors', 'Constructors')
   each node in doc.constructors
-    include method.pug
+    +method(node)
 
 if doc.class_methods
-  h2 Class Methods
+  +title('h2', 'class-methods', 'Class methods')
   each node in doc.class_methods
-    include method.pug
+    +method(node)
 
 if doc.class_properties
-  h2 Class Properties
+  +title('h2', 'class-properties', 'Class properties')
   each node in doc.class_properties
-    include property.pug
+    +title('h3', node.id, `${node.type} ${node.name}`)
+    +description(node)
 
 if doc.methods
-  h2 Methods
+  +title('h2', 'methods', 'Methods')
   each node in doc.methods
-    include method.pug
+    +method(node)
