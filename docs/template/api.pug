@@ -1,0 +1,24 @@
+h1 #{doc.name}
+p.description #{doc.description}
+if doc.detail
+  p.detail #{doc.detail}
+
+if doc.constructors
+  h2 Constructors
+  each node in doc.constructors
+    include method.pug
+
+if doc.class_methods
+  h2 Class Methods
+  each node in doc.class_methods
+    include method.pug
+
+if doc.class_properties
+  h2 Class Properties
+  each node in doc.class_properties
+    include property.pug
+
+if doc.methods
+  h2 Methods
+  each node in doc.methods
+    include method.pug

@@ -1,0 +1,20 @@
+h3(id=node.id)
+  a(href=`#${node.id}`) #{node.signature.str}
+
+p.description #{node.description}
+if node.detail
+  p.detail #{node.detail}
+
+if node.signature.args.length > 0
+  h4 Parameters
+  ul
+    each arg in node.signature.args
+      li
+        code #{arg.name}
+        | #{arg.type}
+        if arg.description
+          | "- #{arg.description}"
+
+if node.signature.returnType
+  h4 Return
+  code #{node.signature.returnType}

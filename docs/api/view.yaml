@@ -93,7 +93,7 @@ methods:
       `Entry`.
 
   - signature: void SetColor(Color color)
-    description: Change the color used for drawing text in the view
+    description: Change the color used for drawing text in the view.
     detail: |
       This methods only works for `View`s that display text, like `Label` or
       `Entry`.

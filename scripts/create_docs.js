@@ -18,17 +18,22 @@ const langs = ['cpp', 'lua', 'js']
 // Output dir.
 const outputdir = path.join('out', 'Documents')
 
-// Read docs and generate HTML pages.
+// Read API docs and generate HTML pages.
 const apis = fs.readdirSync('docs/api')
 for (let api of apis) {
   if (!api.endsWith('.yaml')) continue
   const name = path.basename(api, '.yaml')
   const doc = yaml.load(fs.readFileSync(`docs/api/${api}`))
   for (let lang of langs) {
-    const langDoc = pruneDocTree(lang, doc)
     const langdir = path.join(outputdir, lang, 'api')
     mkdir(langdir)
-    fs.writeFileSync(path.join(langdir, `${name}.yaml`), yaml.dump(langDoc))
+    // Output JSON files.
+    const langDoc = pruneDocTree(lang, doc)
+    fs.writeFileSync(path.join(langdir, `${name}.json`),
+                     JSON.stringify(langDoc, null, '  '))
+    // Output HTML pages.
+    const html = pug.renderFile('docs/template/api.pug', { doc: langDoc })
+    fs.writeFileSync(path.join(langdir, `${name}.html`), html)
   }
 }
 
@@ -45,7 +50,7 @@ function loadYaml() {
 function loadPug() {
   const vm = require('vm')
   const script = new vm.Script(fs.readFileSync(`${__dirname}/libs/pug.js`))
-  const sandbox = {}
+  const sandbox = {fs: fs}
   script.runInNewContext(sandbox)
   return sandbox.require('pug')
 }
@@ -123,12 +128,19 @@ function parseSignature(lang, str) {
     signature.args = match[2]
   } else {
     match = str.match(/^(.*) (\w+)\((.*)\).*$/)
-    signature.returnType = parseType(lang, match[1])
+    if (match[1] != 'void')
+      signature.returnType = parseType(lang, match[1])
     signature.name = match[2]
     signature.args = match[3]
   }
   signature.name = parseName(lang, signature.name)
   signature.args = parseArgs(lang, signature.args)
+  if (lang == 'cpp') {
+    signature.str = str
+  } else {
+    let args = signature.args.map((arg) => arg.name)
+    signature.str = `${signature.name}(${args.join(', ')})`
+  }
   return signature
 }
 
