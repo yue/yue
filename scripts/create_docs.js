@@ -32,7 +32,10 @@ for (let api of apis) {
     fs.writeFileSync(path.join(langdir, `${name}.json`),
                      JSON.stringify(langDoc, null, '  '))
     // Output HTML pages.
-    const html = pug.renderFile('docs/template/api.pug', { doc: langDoc })
+    const html = pug.renderFile('docs/template/api.pug', {
+      doc: langDoc,
+      filters: { 'css-minimize': cssMinimize },
+    })
     fs.writeFileSync(path.join(langdir, `${name}.html`), html)
   }
 }
@@ -220,4 +223,10 @@ function generateIdForSignature(str) {
   for (let param of signature.parameters)
     id += `-${param.name}`
   return id
+}
+
+// A simple CSS minimize function.
+function cssMinimize(str) {
+  let lines = str.split('\n')
+  return lines.map((line) => line.trim()).join('')
 }

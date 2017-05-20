@@ -1,0 +1,27 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.content {
+  padding: 45px;
+}
+
+h1:hover .achor, h2:hover .anchor, h3:hover .anchor, h4:hover .anchor
+h5:hover .achor, h6:hover .anchor {
+  text-decoration: none;
+  visibility: visible;
+}
+
+.anchor {
+  float: left;
+  padding-right: 4px;
+  margin-left: -20px;
+
+  vertical-align: middle;
+  visibility: hidden;
+}
+
+.anchor:focus {
+  outline: none;
+}
