@@ -13,7 +13,7 @@ class_methods:
     description: Create a normal button with `title`.
   - signature: Button* Create(Dictionary options)
     lang: ['lua', 'js']
-    params:
+    parameters:
       options:
         properties:
           - property: std::string title

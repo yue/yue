@@ -5,15 +5,23 @@ p.description #{node.description}
 if node.detail
   p.detail #{node.detail}
 
-if node.signature.args.length > 0
+if node.signature.parameters.length > 0
   h4 Parameters
   ul
-    each arg in node.signature.args
+    each param in node.signature.parameters
       li
-        code #{arg.name}
-        | #{arg.type}
-        if arg.description
-          | "- #{arg.description}"
+        code #{param.name}
+        | #{param.type}
+        if param.description
+          |  - #{param.description}
+        if param.properties
+          ul
+            each property in param.properties
+              li
+                code #{property.property.name}
+                | #{property.property.type}
+                if property.description
+                  |  - #{property.description}
 
 if node.signature.returnType
   h4 Return

@@ -103,7 +103,7 @@ methods:
 
   - signature: void SetStyle(Dictionary style)
     lang: ['lua', 'js']
-    params:
+    parameters:
       style:
         description: |
           A key-value dictionary that defines the name and value of the style

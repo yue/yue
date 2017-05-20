@@ -94,12 +94,12 @@ function pruneNode(lang, node) {
 
   delete node.lang
   // Recursively prune the Dictionary type parameters.
-  if (node.params) {
-    for (let param in node.params) {
-      let descriptor = node.params[param]
+  if (node.parameters) {
+    for (let param in node.parameters) {
+      let descriptor = node.parameters[param]
       if (descriptor.properties) {
-        for (let property of descriptor.properties)
-          pruneNode(lang, property)
+        for (let i in descriptor.properties)
+          descriptor.properties[i] = pruneNode(lang, descriptor.properties[i])
       }
     }
   }
@@ -107,9 +107,13 @@ function pruneNode(lang, node) {
   if (node.signature) {
     node.id = generateIdForSignature(node.signature)
     node.signature = parseSignature(lang, node.signature)
+    if (node.parameters) {
+      mergePrameters(node.signature, node.parameters)
+      delete node.parameters
+    }
   } else if (node.property) {
-    node.id = parseArg('lua', node.property).name
-    node.property = parseArg(lang, node.property)
+    node.id = parseParam('lua', node.property).name
+    node.property = parseParam(lang, node.property)
   } else if (node.callback) {
     node.id = generateIdForSignature(node.callback)
     node.callback = parseSignature(lang, node.callback)
@@ -125,34 +129,34 @@ function parseSignature(lang, str) {
   if (match) {
     // Constructor type.
     signature.name = match[1]
-    signature.args = match[2]
+    signature.parameters = match[2]
   } else {
     match = str.match(/^(.*) (\w+)\((.*)\).*$/)
     if (match[1] != 'void')
       signature.returnType = parseType(lang, match[1])
     signature.name = match[2]
-    signature.args = match[3]
+    signature.parameters = match[3]
   }
   signature.name = parseName(lang, signature.name)
-  signature.args = parseArgs(lang, signature.args)
+  signature.parameters = parseParameters(lang, signature.parameters)
   if (lang == 'cpp') {
     signature.str = str
   } else {
-    let args = signature.args.map((arg) => arg.name)
-    signature.str = `${signature.name}(${args.join(', ')})`
+    let parameters = signature.parameters.map((param) => param.name)
+    signature.str = `${signature.name}(${parameters.join(', ')})`
   }
   return signature
 }
 
-// Parse args.
-function parseArgs(lang, str) {
+// Parse parameters.
+function parseParameters(lang, str) {
   if (str == '') return []
-  let args = str.split(',').map(parseArg.bind(null, lang))
-  return args
+  let parameters = str.split(',').map(parseParam.bind(null, lang))
+  return parameters
 }
 
-// Parse arg.
-function parseArg(lang, str) {
+// Parse param.
+function parseParam(lang, str) {
   let match = str.trim().match(/(.+) (\w+)/)
   return { type: parseType(lang, match[1]), name: parseName(lang, match[2]) }
 }
@@ -199,12 +203,20 @@ function parseType(lang, str) {
   return str
 }
 
+// Put the extra parameter descriptions into signature object.
+function mergePrameters(signature, parameters) {
+  for (let param of signature.parameters) {
+    if (parameters[param.name])
+      Object.assign(param, parameters[param.name])
+  }
+}
+
 // Generate a readable ID from signature string.
 function generateIdForSignature(str) {
   // Convert to all lowercase names.
   let signature = parseSignature('lua', str)
   let id = signature.name
-  for (let arg of signature.args)
-    id += `-${arg.name}`
+  for (let param of signature.parameters)
+    id += `-${param.name}`
   return id
 }
