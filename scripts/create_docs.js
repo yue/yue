@@ -13,40 +13,46 @@ const yaml   = loadYaml()
 const pug    = loadPug()
 const hljs   = loadHighlight()
 
-// Supported languages.
-const langs = ['cpp', 'lua', 'js']
-
-// Output dir.
-const outputdir = path.join('out', 'Documents')
-
 // Support highlighting in markdown.
 marked.setOptions({
   highlight: (code) => hljs.highlightAuto(code).value
 })
 
+// Output dir.
+const outputdir = path.join('out', 'Documents')
+
+// Supported languages.
+const langs = ['cpp', 'lua', 'js']
+
+// Iterate API documents for different languages.
 for (let lang of langs) {
-  // Read API docs and generate HTML pages.
   const langdir = path.join(outputdir, 'api', lang)
   mkdir(langdir)
-  const apis = fs.readdirSync('docs/api')
-  for (let api of apis) {
-    if (!api.endsWith('.yaml')) continue
-    const name = path.basename(api, '.yaml')
-    const doc = yaml.load(fs.readFileSync(`docs/api/${api}`))
-    // Output JSON files.
+  // Parse all API docs.
+  const docs = fs.readdirSync('docs/api').reduce((docs, file) => {
+    if (!file.endsWith('.yaml')) return docs
+    const name = path.basename(file, '.yaml')
+    const doc = yaml.load(fs.readFileSync(`docs/api/${file}`))
     const langDoc = pruneDocTree(lang, doc)
-    if (!langDoc)
-      continue
-    fs.writeFileSync(path.join(langdir, `${name}.json`),
-                     JSON.stringify(langDoc, null, '  '))
+    if (!langDoc) return docs
+    langDoc.id = name
+    return docs.concat(langDoc)
+  }, [])
+  // Read API docs and generate HTML pages.
+  for (let doc of docs) {
+    // Output JSON files.
+    fs.writeFileSync(path.join(langdir, `${doc.id}.json`),
+                     JSON.stringify(doc, null, '  '))
     // Output HTML pages.
     const html = pug.renderFile('docs/template/api.pug', {
-      doc: langDoc,
+      lang: lang,
+      doc: doc,
+      types: docs,
       markdown: marked,
       imarkdown: inlineMarkdown,
       filters: { 'css-minimize': cssMinimize },
     })
-    fs.writeFileSync(path.join(langdir, `${name}.html`), html)
+    fs.writeFileSync(path.join(langdir, `${doc.id}.html`), html)
   }
 }
 
@@ -214,7 +220,8 @@ function parseType(lang, str) {
   // No need to convert types for C++.
   if (lang == 'cpp') {
     let builtin = ['bool', 'float', 'std::string', 'char'].includes(type)
-    return builtin ? { name: str } : { name: str, id: type.toLowerCase() }
+    return builtin ? { name: str } :
+                     { name: str, id: type.toLowerCase().replace('::', '_') }
   }
   // Convertbuilt-in types for differnt languages.
   let builtin = true

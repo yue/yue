@@ -1,7 +1,3 @@
-.markdown-body {
-  padding: 45px;
-}
-
 .markdown-body::before {
   display: table;
   content: "";

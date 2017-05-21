@@ -103,4 +103,28 @@ block content
       else
         | No.
 
-//- 
+//- Display a link with chosen state.
+mixin switch(text, href, chosen, enabled)
+  if !enabled
+    span.disabled #{text}
+  else if chosen
+    span.current #{text}
+  else
+    a(href=href) #{text}
+
+//- The sidebar that lists all types.
+block sidebar
+  h4 Langauge: 
+  +switch('Lua', `../lua/${doc.id}.html`, lang == 'lua',
+          !doc.lang || doc.lang.includes('lua'))
+  |  | 
+  +switch('C++', `../cpp/${doc.id}.html`, lang == 'cpp',
+          !doc.lang || doc.lang.includes('cpp'))
+  |  | 
+  +switch('JavaScript', `../js/${doc.id}.html`, lang == 'js',
+          !doc.lang || doc.lang.includes('js'))
+  h4 Types:
+  ul
+    each type in types
+      li
+        +switch(type.name, `${type.id}.html`, doc.name == type.name, true)

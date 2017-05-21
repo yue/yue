@@ -7,7 +7,10 @@ html
       include:css-minimize markdown.css
       include:css-minimize highlight.css
   body
-    .sidebar.markdown-body
-      block sidebar
-    .content.markdown-body
-      block content
+    #container
+      #content
+        .markdown-body
+          block content
+      #sidebar
+        .markdown-body
+          block sidebar

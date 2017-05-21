@@ -19,14 +19,48 @@ a:hover {
   text-decoration: underline;
 }
 
-h3 {
+.markdown-body {
+  padding: 45px;
+}
+
+.markdown-body h3 {
   color: #e86850;
 }
 
-h4 {
+.markdown-body h4 {
   color: #587498;
 }
 
-code a {
+.markdown-body code a {
   color: #587058;
+}
+
+#container {
+  display: flex;
+  flex-direction: row;
+}
+
+#content {
+  flex-grow: 1;
+}
+
+#sidebar {
+  flex: 0 0 200px;
+}
+
+#sidebar .markdown-body {
+  padding-left: 0;
+}
+
+#sidebar ul {
+  padding: 0;
+  list-style-type: none;
+}
+
+#sidebar .current {
+  font-weight: 500;
+}
+
+#sidebar .disabled {
+  color: #d3d4d5;
 }
