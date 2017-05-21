@@ -84,3 +84,16 @@ block content
     +title('h2', 'methods', 'Methods')
     each node in doc.methods
       +method(node)
+
+  if doc.events
+    +title('h2', 'events', 'Events')
+    each node in doc.events
+      +title('h3', node.id, node.callback.str)
+      +description(node)
+      h4 Parameters
+      +parameters(node.callback.parameters)
+      h4 Preventable
+      if node.callback.returnType
+        | Yes.
+      else
+        | No.
