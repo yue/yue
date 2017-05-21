@@ -24,17 +24,19 @@ marked.setOptions({
   highlight: (code) => hljs.highlightAuto(code).value
 })
 
-// Read API docs and generate HTML pages.
-const apis = fs.readdirSync('docs/api')
-for (let api of apis) {
-  if (!api.endsWith('.yaml')) continue
-  const name = path.basename(api, '.yaml')
-  const doc = yaml.load(fs.readFileSync(`docs/api/${api}`))
-  for (let lang of langs) {
-    const langdir = path.join(outputdir, 'api', lang)
-    mkdir(langdir)
+for (let lang of langs) {
+  // Read API docs and generate HTML pages.
+  const langdir = path.join(outputdir, 'api', lang)
+  mkdir(langdir)
+  const apis = fs.readdirSync('docs/api')
+  for (let api of apis) {
+    if (!api.endsWith('.yaml')) continue
+    const name = path.basename(api, '.yaml')
+    const doc = yaml.load(fs.readFileSync(`docs/api/${api}`))
     // Output JSON files.
     const langDoc = pruneDocTree(lang, doc)
+    if (!langDoc)
+      continue
     fs.writeFileSync(path.join(langdir, `${name}.json`),
                      JSON.stringify(langDoc, null, '  '))
     // Output HTML pages.
@@ -85,7 +87,13 @@ function mkdir(dir) {
 
 // Parse |doc| tree and only keep nodes for |lang|.
 function pruneDocTree(lang, doc) {
+  if (doc.lang && !doc.lang.includes(lang))
+    return null
+
   doc = JSON.parse(JSON.stringify(doc))
+
+  if (doc.inherit)
+    doc.inherit = parseType(lang, doc.inherit)
 
   if (doc.lang_detail && doc.lang_detail[lang])
     doc.detail += '\n' + doc.lang_detail[lang]

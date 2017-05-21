@@ -1,4 +1,5 @@
 name: Button::Type
+lang: ['cpp']
 description: An `enum class` that lists possible `Button` types.
 detail: |
   Possible values are:

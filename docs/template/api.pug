@@ -59,6 +59,11 @@ mixin method(node)
 //- Main page starts from here.
 block content
   h1 #{doc.name}
+  if doc.inherit
+    p
+      | Inherits 
+      +type(doc.inherit)
+      | .
   +description(doc)
 
   if doc.constructors
@@ -97,3 +102,5 @@ block content
         | Yes.
       else
         | No.
+
+//- 
