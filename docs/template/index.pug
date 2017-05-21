@@ -13,7 +13,7 @@ mixin items(filter)
       if type.component == filter
         li
           h3
-            a(href=`${type.id}.html`) #{type.name}
+            a(href=`api/${type.id}.html`) #{type.name}
           != ' ' + imarkdown(type.description)
 
 block content

@@ -116,13 +116,13 @@ block content
 block sidebar
   h4 Langauge:
   .lang-switcher
-    +switch('Lua', `../lua/${doc.id}.html`, lang == 'lua',
+    +switch('Lua', `../../lua/api/${doc.id}.html`, lang == 'lua',
             !doc.lang || doc.lang.includes('lua'))
     |  | 
-    +switch('C++', `../cpp/${doc.id}.html`, lang == 'cpp',
+    +switch('C++', `../../cpp/api/${doc.id}.html`, lang == 'cpp',
             !doc.lang || doc.lang.includes('cpp'))
     |  | 
-    +switch('JavaScript', `../js/${doc.id}.html`, lang == 'js',
+    +switch('JavaScript', `../../js/api/${doc.id}.html`, lang == 'js',
             !doc.lang || doc.lang.includes('js'))
 
   h4 Formats:

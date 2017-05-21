@@ -26,7 +26,7 @@ const langs = ['cpp', 'lua', 'js']
 
 // Iterate API documents for different languages.
 for (let lang of langs) {
-  const langdir = path.join(outputdir, 'api', lang)
+  const langdir = path.join(outputdir, lang)
   mkdir(langdir)
 
   // Parse all API docs.
@@ -42,6 +42,7 @@ for (let lang of langs) {
 
   // Generate the index page.
   const html = pug.renderFile('docs/template/index.pug', {
+    page: 'index',
     doc: { name: 'Docs' },
     lang: lang,
     types: docs,
@@ -53,11 +54,14 @@ for (let lang of langs) {
 
   // Read API docs and generate HTML pages.
   for (let doc of docs) {
+    const apidir = path.join(langdir, 'api')
+    mkdir(apidir)
     // Output JSON files.
-    fs.writeFileSync(path.join(langdir, `${doc.id}.json`),
+    fs.writeFileSync(path.join(apidir, `${doc.id}.json`),
                      JSON.stringify(doc, null, '  '))
     // Output HTML pages.
     const html = pug.renderFile('docs/template/api.pug', {
+      page: 'api',
       lang: lang,
       doc: doc,
       types: docs,
@@ -65,7 +69,7 @@ for (let lang of langs) {
       imarkdown: inlineMarkdown,
       filters: { 'css-minimize': cssMinimize },
     })
-    fs.writeFileSync(path.join(langdir, `${doc.id}.html`), html)
+    fs.writeFileSync(path.join(apidir, `${doc.id}.html`), html)
   }
 }
 

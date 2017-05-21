@@ -10,7 +10,10 @@ html
     #header
       p.logo Yue
       .nav
-        a(href="index.html") Docs
+        if page == 'api'
+          a(href="../index.html") Docs
+        else
+          a(href="index.html") Docs
         a(href="https://github.com/yue/yue") GitHub
     #container
       #content.markdown-body
