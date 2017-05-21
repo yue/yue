@@ -84,7 +84,7 @@ a:hover {
   flex-grow: 1;
 }
 
-#sidebar .markdown-body {
+#sidebar {
   padding-left: 0;
 }
 
@@ -103,4 +103,23 @@ a:hover {
 
 #sidebar .lang-switcher {
   white-space: nowrap;
+}
+
+#index {
+  display: flex;
+  flex-direction: row;
+}
+
+#index .column {
+  flex: 1;
+  padding-right: 45px;
+}
+
+#index>.column:last-child {
+  padding-right: 0;
+}
+
+#index ul {
+  padding: 0;
+  list-style-type: none;
 }

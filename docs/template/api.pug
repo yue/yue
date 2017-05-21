@@ -56,6 +56,15 @@ mixin method(node)
     h4 Return
     +type(node.signature.returnType)
 
+//- Display a link with chosen state.
+mixin switch(text, href, chosen, enabled)
+  if !enabled
+    span.disabled #{text}
+  else if chosen
+    span.current #{text}
+  else
+    a(href=href) #{text}
+
 //- Main page starts from here.
 block content
   h1 #{doc.name}
@@ -103,15 +112,6 @@ block content
       else
         | No.
 
-//- Display a link with chosen state.
-mixin switch(text, href, chosen, enabled)
-  if !enabled
-    span.disabled #{text}
-  else if chosen
-    span.current #{text}
-  else
-    a(href=href) #{text}
-
 //- The sidebar that lists all types.
 block sidebar
   h4 Langauge:
@@ -132,4 +132,4 @@ block sidebar
   ul
     each type in types
       li
-        +switch(type.name, `${type.id}.html`, doc.name == type.name, true)
+      +switch(type.name, `${type.id}.html`, doc.name == type.name, true)

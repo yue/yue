@@ -1,4 +1,5 @@
 name: Button
+component: gui
 inherit: View
 description: Native button, can also be used as checkbox and radio button.
 

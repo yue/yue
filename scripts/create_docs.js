@@ -28,6 +28,7 @@ const langs = ['cpp', 'lua', 'js']
 for (let lang of langs) {
   const langdir = path.join(outputdir, 'api', lang)
   mkdir(langdir)
+
   // Parse all API docs.
   const docs = fs.readdirSync('docs/api').reduce((docs, file) => {
     if (!file.endsWith('.yaml')) return docs
@@ -38,6 +39,18 @@ for (let lang of langs) {
     langDoc.id = name
     return docs.concat(langDoc)
   }, [])
+
+  // Generate the index page.
+  const html = pug.renderFile('docs/template/index.pug', {
+    doc: { name: 'Docs' },
+    lang: lang,
+    types: docs,
+    markdown: marked,
+    imarkdown: inlineMarkdown,
+    filters: { 'css-minimize': cssMinimize },
+  })
+  fs.writeFileSync(path.join(langdir, `index.html`), html)
+
   // Read API docs and generate HTML pages.
   for (let doc of docs) {
     // Output JSON files.

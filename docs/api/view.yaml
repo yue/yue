@@ -1,4 +1,5 @@
 name: View
+component: gui
 description: Base class for GUI components.
 detail: |
   `View` provides methods to receive and change various style properties.
