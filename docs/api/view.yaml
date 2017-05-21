@@ -20,7 +20,7 @@ class_properties:
     description: The class name of this view.
 
 methods:
-  - signature: const char* GetClassName() const;
+  - signature: const char* GetClassName() const
     lang: ['cpp']
     description: Return the class name.
     detail: |

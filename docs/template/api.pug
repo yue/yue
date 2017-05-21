@@ -9,9 +9,9 @@ mixin title(level, id, str)
 
 //- Block description of a method or properties.
 mixin description(node)
-  p.description #{node.description}
+  != markdown(node.description)
   if node.detail
-    p.detail #{node.detail}
+    != markdown(node.detail)
 
 //- A list of parameter.
 mixin parameters(parameters)
@@ -23,9 +23,10 @@ mixin parameters(parameters)
 //- Inline description of parameter.
 mixin parameter(node)
   code #{node.name}
-  | #{node.type}
+  |  #{node.type}
   if node.description
-    |  - #{node.description}
+    |  -
+    |  != markdown(node.description)
   if node.properties
     ul
       each property in node.properties

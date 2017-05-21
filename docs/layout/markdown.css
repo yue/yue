@@ -241,15 +241,9 @@
   outline: none;
 }
 
-h1:hover .markdown-body .anchor, h2:hover .markdown-body .anchor,
-h3:hover .markdown-body .anchor, h4:hover .markdown-body .anchor,
-h5:hover .markdown-body .anchor, h6:hover .markdown-body .anchor {
-  text-decoration: none;
-}
-
-h1:hover .markdown-body .anchor svg, h2:hover .markdown-body .anchor svg,
-h3:hover .markdown-body .anchor svg, h4:hover .markdown-body .anchor svg,
-h5:hover .markdown-body .anchor svg, h6:hover .markdown-body .anchor svg {
+.markdown-body h1:hover .anchor svg, .markdown-body h2:hover .anchor svg,
+.markdown-body h3:hover .anchor svg, .markdown-body h4:hover .anchor svg,
+.markdown-body h5:hover .anchor svg, .markdown-body h6:hover .anchor svg {
   visibility: visible;
 }
 

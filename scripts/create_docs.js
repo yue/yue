@@ -11,12 +11,18 @@ const path   = require('path')
 const marked = require('./libs/marked')
 const yaml   = loadYaml()
 const pug    = loadPug()
+const hljs   = loadHighlight()
 
 // Supported languages.
 const langs = ['cpp', 'lua', 'js']
 
 // Output dir.
 const outputdir = path.join('out', 'Documents')
+
+// Support highlighting in markdown.
+marked.setOptions({
+  highlight: (code) => hljs.highlightAuto(code).value
+})
 
 // Read API docs and generate HTML pages.
 const apis = fs.readdirSync('docs/api')
@@ -34,6 +40,7 @@ for (let api of apis) {
     // Output HTML pages.
     const html = pug.renderFile('docs/template/api.pug', {
       doc: langDoc,
+      markdown: marked,
       filters: { 'css-minimize': cssMinimize },
     })
     fs.writeFileSync(path.join(langdir, `${name}.html`), html)
@@ -56,6 +63,16 @@ function loadPug() {
   const sandbox = {fs: fs}
   script.runInNewContext(sandbox)
   return sandbox.require('pug')
+}
+
+// Load hightlight.js from its browserify pack.
+function loadHighlight() {
+  const vm = require('vm')
+  const script = new vm.Script(fs.readFileSync(`${__dirname}/libs/highlight.js`))
+  const sandbox = {}
+  sandbox.window = sandbox
+  script.runInNewContext(sandbox)
+  return sandbox.hljs
 }
 
 // Make dir and ignore error.
