@@ -31,7 +31,7 @@ for (let api of apis) {
   const name = path.basename(api, '.yaml')
   const doc = yaml.load(fs.readFileSync(`docs/api/${api}`))
   for (let lang of langs) {
-    const langdir = path.join(outputdir, lang, 'api')
+    const langdir = path.join(outputdir, 'api', lang)
     mkdir(langdir)
     // Output JSON files.
     const langDoc = pruneDocTree(lang, doc)
@@ -41,6 +41,7 @@ for (let api of apis) {
     const html = pug.renderFile('docs/template/api.pug', {
       doc: langDoc,
       markdown: marked,
+      imarkdown: inlineMarkdown,
       filters: { 'css-minimize': cssMinimize },
     })
     fs.writeFileSync(path.join(langdir, `${name}.html`), html)
@@ -196,32 +197,40 @@ function parseName(lang, str) {
 
 // Convert type name from C++ to |lang|.
 function parseType(lang, str) {
-  if (lang == 'cpp') return str
   // Strip C++ qualifiers.
-  if (str.startsWith('const '))
-    str = str.substr('const '.length)
-  if (str.endsWith('*') || str.endsWith('&'))
-    str = str.substr(0, str.length - 1)
-  // Built-in types.
+  let type = str
+  if (type.startsWith('const '))
+    type = type.substr('const '.length)
+  if (type.endsWith('*') || type.endsWith('&'))
+    type = type.substr(0, type.length - 1)
+  // No need to convert types for C++.
+  if (lang == 'cpp') {
+    let builtin = ['bool', 'float', 'std::string', 'char'].includes(type)
+    return builtin ? { name: str } : { name: str, id: type.toLowerCase() }
+  }
+  // Convertbuilt-in types for differnt languages.
+  let builtin = true
   if (lang == 'lua') {
-    switch (str) {
-      case 'bool': return 'boolean'
-      case 'float': return 'number'
-      case 'std::string': return 'string'
-      case 'char': return 'string'
-      case 'Dictionary': return 'table'
+    switch (type) {
+      case 'bool': type = 'boolean'; break
+      case 'float': type = 'number'; break
+      case 'std::string': type = 'string'; break
+      case 'char': type = 'string'; break
+      case 'Dictionary': type = 'table'; break
+      default: builtin = false
     }
   } else if (lang == 'js') {
-    switch (str) {
-      case 'bool': return 'Boolean'
-      case 'float': return 'Number'
-      case 'std::string': return 'String'
-      case 'char': return 'String'
-      case 'Dictionary': return 'Object'
+    switch (type) {
+      case 'bool': type = 'Boolean'; break
+      case 'float': type = 'Number'; break
+      case 'std::string': type = 'String'; break
+      case 'char': type = 'String'; break
+      case 'Dictionary': type = 'Object'; break
+      default: builtin = false
     }
   }
   // Custom types usually have 1-to-1 maps.
-  return str
+  return builtin ? { name: type } : { name: type, id: type.toLowerCase() }
 }
 
 // Put the extra parameter descriptions into signature object.
@@ -246,4 +255,10 @@ function generateIdForSignature(str) {
 function cssMinimize(str) {
   let lines = str.split('\n')
   return lines.map((line) => line.trim()).join('')
+}
+
+// Strip p tag around markdown result.
+function inlineMarkdown(str) {
+  let markdown = marked(str)
+  return markdown.substr(3, markdown.length - 8)
 }

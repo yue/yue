@@ -19,6 +19,14 @@ a:hover {
   text-decoration: underline;
 }
 
-strong {
-  font-weight: 600;
+h3 {
+  color: #e86850;
+}
+
+h4 {
+  color: #587498;
+}
+
+code a {
+  color: #587058;
 }

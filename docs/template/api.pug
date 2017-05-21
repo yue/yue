@@ -13,6 +13,14 @@ mixin description(node)
   if node.detail
     != markdown(node.detail)
 
+//- Display a type with possible goto link.
+mixin type(node)
+  code
+    if node.id
+      a(href=`${node.id}.html`) #{node.name}
+    else
+      | #{node.name}
+
 //- A list of parameter.
 mixin parameters(parameters)
   ul
@@ -22,11 +30,11 @@ mixin parameters(parameters)
 
 //- Inline description of parameter.
 mixin parameter(node)
-  code #{node.name}
-  |  #{node.type}
+  +type(node.type)
+  |  #{node.name}
   if node.description
     |  -
-    |  != markdown(node.description)
+    != ' ' + imarkdown(node.description)
   if node.properties
     ul
       each property in node.properties
@@ -42,7 +50,7 @@ mixin method(node)
     +parameters(node.signature.parameters)
   if node.signature.returnType
     h4 Return
-    code #{node.signature.returnType}
+    +type(node.signature.returnType)
 
 //- Main page starts from here.
 block content
@@ -62,7 +70,7 @@ block content
   if doc.class_properties
     +title('h2', 'class-properties', 'Class properties')
     each node in doc.class_properties
-      +title('h3', node.id, `${node.type} ${node.name}`)
+      +title('h3', node.id, `${node.type.name} ${node.name}`)
       +description(node)
 
   if doc.methods
