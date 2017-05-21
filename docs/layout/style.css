@@ -35,6 +35,44 @@ a:hover {
   color: #587058;
 }
 
+#header {
+  width: 100%;
+  height: 50px;
+  line-height: 50px;
+  background-color: #587498;
+}
+
+#header p {
+  color: white;
+  display: inline-block;
+  padding-left: 45px;
+  padding-right: 45px;
+  margin: 0;
+}
+
+#header .nav {
+  position: absolute;
+  right: 45px;
+  top: 0;
+}
+
+#header .nav a {
+  margin-left: 30px;
+  color: white;
+}
+
+#footer {
+  height: 30px;
+  width: 100%;
+  background-color: #587498;
+}
+
+#footer p {
+  padding-left: 45px;
+  line-height: 30px;
+  color: white;
+}
+
 #container {
   display: flex;
   flex-direction: row;
@@ -42,10 +80,6 @@ a:hover {
 
 #content {
   flex-grow: 1;
-}
-
-#sidebar {
-  flex: 0 0 200px;
 }
 
 #sidebar .markdown-body {
@@ -63,4 +97,8 @@ a:hover {
 
 #sidebar .disabled {
   color: #d3d4d5;
+}
+
+#sidebar .lang-switcher {
+  white-space: nowrap;
 }

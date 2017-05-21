@@ -115,14 +115,15 @@ mixin switch(text, href, chosen, enabled)
 //- The sidebar that lists all types.
 block sidebar
   h4 Langauge: 
-  +switch('Lua', `../lua/${doc.id}.html`, lang == 'lua',
-          !doc.lang || doc.lang.includes('lua'))
-  |  | 
-  +switch('C++', `../cpp/${doc.id}.html`, lang == 'cpp',
-          !doc.lang || doc.lang.includes('cpp'))
-  |  | 
-  +switch('JavaScript', `../js/${doc.id}.html`, lang == 'js',
-          !doc.lang || doc.lang.includes('js'))
+  .lang-switcher
+    +switch('Lua', `../lua/${doc.id}.html`, lang == 'lua',
+            !doc.lang || doc.lang.includes('lua'))
+    |  | 
+    +switch('C++', `../cpp/${doc.id}.html`, lang == 'cpp',
+            !doc.lang || doc.lang.includes('cpp'))
+    |  | 
+    +switch('JavaScript', `../js/${doc.id}.html`, lang == 'js',
+            !doc.lang || doc.lang.includes('js'))
   h4 Types:
   ul
     each type in types
