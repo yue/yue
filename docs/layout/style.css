@@ -42,7 +42,9 @@ a:hover {
   background-color: #587498;
 }
 
-#header p {
+#header .logo {
+  font-weight: 700;
+  font-size: 30px;
   color: white;
   display: inline-block;
   padding-left: 45px;
