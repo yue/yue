@@ -33,11 +33,11 @@ block content
 block sidebar
   h4 Langauge:
   .lang-switcher
-    +switch('Lua', `../lua/index.html`, lang == 'lua',
-            !doc.lang || doc.lang.includes('lua'))
-    |  | 
     +switch('C++', `../cpp/index.html`, lang == 'cpp',
             !doc.lang || doc.lang.includes('cpp'))
+    |  | 
+    +switch('Lua', `../lua/index.html`, lang == 'lua',
+            !doc.lang || doc.lang.includes('lua'))
     |  | 
     +switch('JavaScript', `../js/index.html`, lang == 'js',
             !doc.lang || doc.lang.includes('js'))

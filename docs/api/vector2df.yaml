@@ -1,0 +1,93 @@
+name: Vector2dF
+description: Two dimensions vector.
+lang_detail:
+  cpp: |
+    This class is used to indicate a distance in two dimensions between two
+    points. Subtracting two points should produce a vector, and adding a vector
+    to a point produces the point at the vector's distance from the original
+    point.
+
+    ```cpp
+    nu::PointF view_point(100, 100);
+    nu::PointF window_point = view_point + view->OffsetFromWindow();
+    window_point == nu::PointF(200, 200);
+    ```
+
+  lua: |
+    This is represented by a table with `x` and `y` properties, indicating a
+    distance in two dimensions between two points.
+
+    ```lua
+    print(view:offsetfromwindow())
+    -- { x=100, y=100 }
+    ```
+
+  js: |
+    This is represented by an `Object` with `x` and `y` properties, indicating a
+    distance in two dimensions between two points.
+
+    ```lua
+    console.log(view.offsetFromWindow())
+    // { x: 100, y: 100 }
+    ```
+
+constructors:
+  - signature: Vector2dF()
+    lang: ['cpp']
+    description: Create an empty vector.
+
+  - signature: Vector2dF(float x, float y)
+    lang: ['cpp']
+    description: Create a vector with dimensions of `x` and `y`.
+
+properties:
+  - property: float x
+    lang: ['lua', 'js']
+    description: X component.
+
+  - property: float y
+    lang: ['lua', 'js']
+    description: Y component.
+
+methods:
+  - signature: float x() const
+    lang: ['cpp']
+    description: Return X component.
+
+  - signature: void set_x(float x)
+    lang: ['cpp']
+    description: Set X component.
+
+  - signature: float y() const
+    lang: ['cpp']
+    description: Return Y component.
+
+  - signature: void set_y(float y)
+    lang: ['cpp']
+    description: Set Y component.
+
+  - signature: bool IsZero() const
+    lang: ['cpp']
+    description: Return whether the vector is empty.
+
+  - signature: void Add(const Vector2dF& other)
+    lang: ['cpp']
+    description: |
+      Add the components of the `other` vector to the current vector.
+
+  - signature: void Subtract(const Vector2dF& other)
+    lang: ['cpp']
+    description: |
+      Subtract the components of the `other` vector from the current vector.
+
+  - signature: float Length() const
+    lang: ['cpp']
+    description: Return the diagonal length of the vector.
+
+  - signature: void Scale(float scale)
+    lang: ['cpp']
+    description: Scale the x and y components of the vector by `scale|`.
+
+  - signature: std::string ToString() const;
+    lang: ['cpp']
+    description: Return string representation of the vector.

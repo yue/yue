@@ -118,12 +118,15 @@ function pruneDocTree(lang, doc) {
   if (doc.inherit)
     doc.inherit = parseType(lang, doc.inherit)
 
-  if (doc.lang_detail && doc.lang_detail[lang])
+  if (doc.lang_detail && doc.lang_detail[lang]) {
+    if (!doc.detail)
+      doc.detail = ''
     doc.detail += '\n' + doc.lang_detail[lang]
+  }
   delete doc.lang_detail
 
   const categories = ['constructors', 'class_properties', 'class_methods',
-                      'methods', 'events']
+                      'properties', 'methods', 'events']
   for (let category of categories) {
     if (!doc[category]) continue
     let nodes = []

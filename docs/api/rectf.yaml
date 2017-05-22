@@ -1,0 +1,255 @@
+name: RectF
+description: Rectangle type.
+detail: |
+  This type defines a simple integer rectangle class. The containment semantics
+  are array-like; that is, the coordinate (x, y) is considered to be
+  contained by the rectangle, but the coordinate (x + width, y) is not.
+
+lang_detail:
+  cpp: |
+    The class will happily let you create malformed rectangles (that is,
+    rectangles with negative width and/or height), but there will be assertions
+    in the operations (such as Contains()) to complain in this case.
+
+  lua: |
+    This type is represented by a table with `x`, `y`, `width`, `height`
+    properties.
+
+    ```lua
+    window:setbounds{x=11, y=24, width=100, height=100}
+    ```
+
+    When a function accepts `RectF` as its last parameter, you can simply
+    unpack the properties:
+
+    ```lua
+    window:setbounds(11, 24, 100, 100)
+    ```
+
+  js: |
+    This type is represented by an `Object` with `x`, `y`, `width`, `height`
+    properties.
+
+    ```js
+    window.setBounds({x: 11, y: 24, width: 100, height: 100})
+    ```
+
+constructors:
+  - signature: RectF()
+    lang: ['cpp']
+    description: Create an empty rectangle.
+
+  - signature: RectF(float width, float height)
+    lang: ['cpp']
+    description: |
+      Create a rectangle with `width` and `height`, positioned at (0, 0).
+
+  - signature: RectF(float x, float y, float width, float height)
+    lang: ['cpp']
+    description: |
+      Create a rectangle defined with `x`, `y`, `width`, `height`.
+
+  - signature: RectF(const SizeF& size)
+    lang: ['cpp']
+    description: |
+      Create a rectangle with `size`, positioned at (0, 0).
+
+  - signature: RectF(const PointF& origin, const SizeF& size)
+    lang: ['cpp']
+    description: |
+      Create a rectangle with `origin` and `size`.
+
+properties:
+  - property: float x
+    lang: ['lua', 'js']
+    description: X coordinate.
+
+  - property: float y
+    lang: ['lua', 'js']
+    description: Y coordinate.
+
+  - property: float width
+    lang: ['lua', 'js']
+    description: Rectangle width.
+
+  - property: float height
+    lang: ['lua', 'js']
+    description: Rectangle height.
+
+methods:
+  - signature: float x() const
+    lang: ['cpp']
+    description: Return X coordinate.
+
+  - signature: void set_x(float x)
+    lang: ['cpp']
+    description: Set X coordinate.
+
+  - signature: float y() const
+    lang: ['cpp']
+    description: Return Y coordinate.
+
+  - signature: void set_y(float y)
+    lang: ['cpp']
+    description: Set Y coordinate.
+
+  - signature: float width() const
+    lang: ['cpp']
+    description: Return rectangle width.
+
+  - signature: void set_width(float width)
+    lang: ['cpp']
+    description: Set rectangle width.
+
+  - signature: float height() const
+    lang: ['cpp']
+    description: Return rectangle height.
+
+  - signature: void set_height(float height)
+    lang: ['cpp']
+    description: Set rectangle height.
+
+  - signature: const PointF& origin() const
+    lang: ['cpp']
+    description: Return origin.
+
+  - signature: void set_origin(const PointF& origin)
+    lang: ['cpp']
+    description: Set origin.
+
+  - signature: const SizeF& size() const
+    lang: ['cpp']
+    description: Return size.
+
+  - signature: void set_size(const SizeF& size)
+    lang: ['cpp']
+    description: Set size.
+
+  - signature: float right() const
+    lang: ['cpp']
+    description: Return the x coordinate of lower-right corner of the rectangle.
+
+  - signature: float bottom() const
+    lang: ['cpp']
+    description: Return the y coordinate of lower-right corner of the rectangle.
+
+  - signature: Vector2dF OffsetFromOrigin() const
+    lang: ['cpp']
+    description: Return the vector version of upper-left corner.
+
+  - signature: void Inset(float horizontal, float vertical)
+    lang: ['cpp']
+    description: |
+      Shrink the rectangle by a `horizontal` and `vertical` distance on all
+      sides.
+
+  - signature: void Inset(const InsetsF& insets)
+    lang: ['cpp']
+    description: Shrink the rectangle by the given `insets`.
+
+  - signature: void Inset(float left, float top, float right, float bottom)
+    lang: ['cpp']
+    description: Shrink the rectangle by the specified amount on each side.
+
+  - signature: void Offset(float horizontal, float vertical);
+    lang: ['cpp']
+    description: Move the rectangle by a `horizontal` and `vertical` distance.
+
+  - signature: void Offset(const Vector2dF& distance)
+    lang: ['cpp']
+    description: Move the rectangle by the `distance` vector.
+
+  - signature: bool IsEmpty() const
+    lang: ['cpp']
+    description: Return `true` if the area of the rectangle is zero.
+
+  - signature: bool Contains(float x, float y) const
+    lang: ['cpp']
+    description: |
+      Return `true` if the point identified by point `x` and `y` falls inside
+      this rectangle. The point (x, y) is inside the rectangle, but the
+      point (x + width, y + height) is not.
+
+  - signature: bool Contains(const PointF& point) const
+    lang: ['cpp']
+    description: Return `true` if `point` is contained by the rectangle.
+
+  - signature: bool Contains(const RectF& rect) const
+    lang: ['cpp']
+    description: Return `true` if `rect` is contained by the rectangle.
+
+  - signature: bool Intersects(const RectF& rect) const
+    lang: ['cpp']
+    description: |
+      Return `true` if this rectangle intersects the specified `rect`. An empty
+      rectangle doesn't intersect any rectangle.
+
+  - signature: void Intersect(const RectF& rect)
+    lang: ['cpp']
+    description: |
+      Compute the intersection of this rectangle with the given `rect`.
+
+  - signature: void Union(const RectF& rect)
+    lang: ['cpp']
+    description: |
+      Compute the union of this rectangle with the given `rect`. The union
+      is the smallest rectangle containing both rectangles.
+
+  - signature: void Subtract(const RectF& rect)
+    lang: ['cpp']
+    description: |
+      Compute the rectangle resulting from subtracting `rect` from `*this`,
+      i.e. the bounding rect of `Region(*this) - Region(rect)`.
+
+  - signature: void AdjustToFit(const RectF& rect)
+    lang: ['cpp']
+    description: |
+      Fit as much of the receiving rectangle into the supplied rectangle as
+      possible, becoming the result. For example, if the receiver had
+      a x-location of 2 and a width of 4, and the supplied rectangle had
+      an x-location of 0 with a width of 5, the returned rectangle would have
+      an x-location of 1 with a width of 4.
+
+  - signature: PointF CenterPoint() const
+    lang: ['cpp']
+    description: Return the center of the rectangle.
+
+  - signature: void ClampToCenteredSize(const SizeF& size)
+    lang: ['cpp']
+    description: |
+      Become a rectangle that has the same center point but with a size capped
+      at given `size`.
+
+  - signature: void SplitVertically(RectF* left_half, RectF* right_half) const
+    lang: ['cpp']
+    description: |
+      Split the rectangle in two halves, `left_half` and `right_half`.
+
+  - signature: bool SharesEdgeWith(const RectF& rect) const
+    lang: ['cpp']
+    description: |
+      Return `true` if this rectangle shares an entire edge (i.e., same width
+      or same height) with the given rectangle, and the rectangles do not
+      overlap.
+
+  - signature: float ManhattanDistanceToPoint(const PointF& point) const
+    lang: ['cpp']
+    description: |
+      Return the manhattan distance from the rect to the `point`. If the point
+      is inside the rect, return 0.
+
+  - signature: float ManhattanInternalDistance(const RectF& rect) const
+    lang: ['cpp']
+    description: |
+      Return the manhattan distance between the contents of this rect and the
+      contents of the given rect. That is, if the intersection of the two rects
+      is non-empty then the function returns 0. If the rects share a side, it
+      return the smallest non-zero value appropriate for float.
+
+  - signature: void Scale(float scale)
+    lang: ['cpp']
+    description: Scale the rectangle by `scale`.
+
+  - signature: std::string ToString() const
+    lang: ['cpp']
+    description: Return string representation of the rectangle.

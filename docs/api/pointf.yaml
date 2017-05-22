@@ -1,0 +1,74 @@
+name: PointF
+description: A point with x and y coordinate.
+lang_detail:
+  lua: |
+    This type is represented by a table with `x` and `y` properties.
+
+    ```lua
+    painter:moveto{x=11, y=24}
+    ```
+
+    When a function accepts `PointF` as its last parameter, you can simply
+    unpack `x` and `y`:
+
+    ```lua
+    painter:moveto(11, 24)
+    ```
+
+  js: |
+    This type is represented by an `Object` with `x` and `y` properties.
+
+    ```js
+    painter.moveTo({x: 11, y: 24})
+    ```
+
+constructors:
+  - signature: PointF()
+    lang: ['cpp']
+    description: Create an empty point.
+
+  - signature: PointF(float x, float y)
+    lang: ['cpp']
+    description: Create a point with coordinates of `x` and `y`.
+
+properties:
+  - property: float x
+    lang: ['lua', 'js']
+    description: X coordinate.
+
+  - property: float y
+    lang: ['lua', 'js']
+    description: Y coordinate.
+
+methods:
+  - signature: float x() const
+    lang: ['cpp']
+    description: Return X coordinate.
+
+  - signature: void set_x(float x)
+    lang: ['cpp']
+    description: Set X coordinate.
+
+  - signature: float y() const
+    lang: ['cpp']
+    description: Return Y coordinate.
+
+  - signature: void set_y(float y)
+    lang: ['cpp']
+    description: Set Y coordinate.
+
+  - signature: bool IsOrigin() const
+    lang: ['cpp']
+    description: Return whether the point is empty.
+
+  - signature: Vector2dF OffsetFromOrigin() const
+    lang: ['cpp']
+    description: Return the `Vector2dF` version of the point.
+
+  - signature: void Scale(float scale)
+    lang: ['cpp']
+    description: Scale the x and y coordinates by `scale|`.
+
+  - signature: std::string ToString() const
+    lang: ['cpp']
+    description: Return string representation of the point.

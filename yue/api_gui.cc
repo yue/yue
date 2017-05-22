@@ -53,7 +53,7 @@ struct Type<nu::Size> {
 
 template<>
 struct Type<nu::SizeF> {
-  static constexpr const char* name = "yue.Size";
+  static constexpr const char* name = "yue.SizeF";
   static inline void Push(State* state, const nu::SizeF& size) {
     lua::NewTable(state);
     lua::RawSet(state, -1, "width", size.width(), "height", size.height());
@@ -74,7 +74,7 @@ struct Type<nu::SizeF> {
 
 template<>
 struct Type<nu::RectF> {
-  static constexpr const char* name = "yue.Rect";
+  static constexpr const char* name = "yue.RectF";
   static inline void Push(State* state, const nu::RectF& rect) {
     lua::NewTable(state);
     lua::RawSet(state, -1,
@@ -99,7 +99,7 @@ struct Type<nu::RectF> {
 
 template<>
 struct Type<nu::Vector2dF> {
-  static constexpr const char* name = "yue.Vector2d";
+  static constexpr const char* name = "yue.Vector2dF";
   static inline void Push(State* state, const nu::Vector2dF& vec) {
     lua::NewTable(state);
     lua::RawSet(state, -1, "x", vec.x(), "y", vec.y());
@@ -120,7 +120,7 @@ struct Type<nu::Vector2dF> {
 
 template<>
 struct Type<nu::PointF> {
-  static constexpr const char* name = "yue.Point";
+  static constexpr const char* name = "yue.PointF";
   static inline void Push(State* state, const nu::PointF& p) {
     lua::NewTable(state);
     lua::RawSet(state, -1, "x", p.x(), "y", p.y());

@@ -1,0 +1,67 @@
+name: SizeF
+description: Size type.
+lang_detail:
+  lua: |
+    This type is represented by a table with `width` and `height` properties.
+
+    ```lua
+    window:setcontentsize{width=100, height=100}
+    ```
+
+    When a function accepts `SizeF` as its last parameter, you can simply
+    unpack `width` and `height`:
+
+    ```lua
+    window:setcontentsize(100, 100)
+    ```
+
+  js: |
+    This type is represented by an `Object` with `width` and `height`
+    properties.
+
+    ```js
+    window.setContentSize({width: 100, height: 100})
+    ```
+
+constructors:
+  - signature: SizeF()
+    lang: ['cpp']
+    description: Create an empty size.
+
+  - signature: SizeF(float width, float height)
+    lang: ['cpp']
+    description: Create a size with `width` and `height`.
+
+properties:
+  - property: float width
+    lang: ['lua', 'js']
+    description: Size width.
+
+  - property: float height
+    lang: ['lua', 'js']
+    description: Size height.
+
+methods:
+  - signature: float width() const
+    lang: ['cpp']
+    description: Return size width.
+
+  - signature: void set_width(float width)
+    lang: ['cpp']
+    description: Set size width.
+
+  - signature: float height() const
+    lang: ['cpp']
+    description: Return size height.
+
+  - signature: void set_height(float height)
+    lang: ['cpp']
+    description: Set size height.
+
+  - signature: bool IsEmpty() const
+    lang: ['cpp']
+    description: Return `true` if the size is zero.
+
+  - signature: std::string ToString() const
+    lang: ['cpp']
+    description: Return string representation of the size.

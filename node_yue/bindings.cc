@@ -51,7 +51,7 @@ struct Type<nu::Size> {
 
 template<>
 struct Type<nu::SizeF> {
-  static constexpr const char* name = "yue.Size";
+  static constexpr const char* name = "yue.SizeF";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    const nu::SizeF& value) {
     auto obj = v8::Object::New(context->GetIsolate());
@@ -72,7 +72,7 @@ struct Type<nu::SizeF> {
 
 template<>
 struct Type<nu::RectF> {
-  static constexpr const char* name = "yue.Rect";
+  static constexpr const char* name = "yue.RectF";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    const nu::RectF& value) {
     auto obj = v8::Object::New(context->GetIsolate());
@@ -95,7 +95,7 @@ struct Type<nu::RectF> {
 
 template<>
 struct Type<nu::Vector2dF> {
-  static constexpr const char* name = "yue.Vector2d";
+  static constexpr const char* name = "yue.Vector2dF";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    const nu::Vector2dF& value) {
     auto obj = v8::Object::New(context->GetIsolate());
@@ -116,7 +116,7 @@ struct Type<nu::Vector2dF> {
 
 template<>
 struct Type<nu::PointF> {
-  static constexpr const char* name = "yue.Point";
+  static constexpr const char* name = "yue.PointF";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    const nu::PointF& value) {
     auto obj = v8::Object::New(context->GetIsolate());

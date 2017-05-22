@@ -94,6 +94,15 @@ block content
         |  #{node.name}
       +description(node)
 
+  if doc.properties
+    +title('h2', 'properties', 'Properties')
+    each node in doc.properties
+      h3(id=node.id)
+        +anchor(id)
+        +type(node.type)
+        |  #{node.name}
+      +description(node)
+
   if doc.methods
     +title('h2', 'methods', 'Methods')
     each node in doc.methods
@@ -116,11 +125,11 @@ block content
 block sidebar
   h4 Langauge:
   .lang-switcher
-    +switch('Lua', `../../lua/api/${doc.id}.html`, lang == 'lua',
-            !doc.lang || doc.lang.includes('lua'))
-    |  | 
     +switch('C++', `../../cpp/api/${doc.id}.html`, lang == 'cpp',
             !doc.lang || doc.lang.includes('cpp'))
+    |  | 
+    +switch('Lua', `../../lua/api/${doc.id}.html`, lang == 'lua',
+            !doc.lang || doc.lang.includes('lua'))
     |  | 
     +switch('JavaScript', `../../js/api/${doc.id}.html`, lang == 'js',
             !doc.lang || doc.lang.includes('js'))
