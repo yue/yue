@@ -10,7 +10,8 @@ if (process.platform !== 'win32') {
   execSync('python tools/clang/scripts/update.py')
 }
 if (process.platform === 'linux') {
-  execSync('python build/linux/sysroot_scripts/install-sysroot.py --all')
+  // TODO(zcbenz): Support more arch.
+  execSync('python build/linux/sysroot_scripts/install-sysroot.py --arch amd64')
   execSync('node scripts/update_gold.js')
 }
 

@@ -32,10 +32,10 @@ import urllib2
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
-URL_PREFIX = 'https://commondatastorage.googleapis.com'
-URL_PATH = 'yue-linux-sysroot/toolchain'
+URL_PREFIX = 'http://s3.amazonaws.com'
+URL_PATH = 'gh-contractor-zcbenz/toolchain'
 
-VALID_ARCHS = ('arm', 'arm64', 'i386', 'amd64')
+VALID_ARCHS = ('arm', 'arm64', 'i386', 'amd64', 'mips')
 
 
 class Error(Exception):
@@ -54,6 +54,53 @@ def GetSha1(filename):
   return sha1.hexdigest()
 
 
+def DetectHostArch():
+  # Figure out host arch using build/detect_host_arch.py and
+  # set target_arch to host arch
+  detected_host_arch = detect_host_arch.HostArch()
+  if detected_host_arch == 'x64':
+    return 'amd64'
+  elif detected_host_arch == 'ia32':
+    return 'i386'
+  elif detected_host_arch == 'arm':
+    return 'arm'
+  elif detected_host_arch == 'arm64':
+    return 'arm64'
+  elif detected_host_arch == 'mips':
+    return 'mips'
+  elif detected_host_arch == 'ppc':
+    return 'ppc'
+  elif detected_host_arch == 's390':
+    return 's390'
+
+  raise Error('Unrecognized host arch: %s' % detected_host_arch)
+
+
+def DetectTargetArch():
+  """Attempt for determine target architecture.
+
+  This works by looking for target_arch in GYP_DEFINES.
+  """
+  # TODO(agrieve): Make this script not depend on GYP_DEFINES so that it works
+  #     with GN as well.
+  gyp_environment.SetEnvironment()
+  supplemental_includes = gyp_chromium.GetSupplementalFiles()
+  gyp_defines = gyp_chromium.GetGypVars(supplemental_includes)
+  target_arch = gyp_defines.get('target_arch')
+  if target_arch == 'x64':
+    return 'amd64'
+  elif target_arch == 'ia32':
+    return 'i386'
+  elif target_arch == 'arm':
+    return 'arm'
+  elif target_arch == 'arm64':
+    return 'arm64'
+  elif target_arch == 'mipsel':
+    return 'mips'
+
+  return None
+
+
 def InstallDefaultSysroots(host_arch):
   """Install the default set of sysroot images.
 
@@ -66,10 +113,17 @@ def InstallDefaultSysroots(host_arch):
   flipping things back and forth and whether the sysroots have been downloaded
   or not.
   """
-  InstallSysroot('amd64')
-  InstallSysroot('i386')
-  InstallSysroot('arm')
-  InstallSysroot('arm64')
+  InstallDefaultSysrootForArch(host_arch)
+
+  if host_arch == 'amd64':
+    InstallDefaultSysrootForArch('i386')
+
+  # If we can detect a non-standard target_arch such as ARM or MIPS,
+  # then install the sysroot too.  Don't attempt to install arm64
+  # since this is currently and android-only architecture.
+  target_arch = DetectTargetArch()
+  if target_arch and target_arch not in (host_arch, 'i386'):
+    InstallDefaultSysrootForArch(target_arch)
 
 
 def main(args):
@@ -87,7 +141,11 @@ def main(args):
     return 0
 
   if options.running_as_hook:
-    return 0
+    host_arch = DetectHostArch()
+    # PPC/s390 don't use sysroot, see http://crbug.com/646169
+    if host_arch in ['ppc','s390']:
+      return 0
+    InstallDefaultSysroots(host_arch)
   elif options.arch:
     InstallDefaultSysrootForArch(options.arch)
   elif options.all:
