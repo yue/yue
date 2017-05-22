@@ -1,0 +1,116 @@
+name: Color
+description: 32-bit Color with alpha channel.
+
+lang_detail:
+  cpp: |
+    This class should be copied by value under most cases, since the underlying
+    type is a simple `uint32_t`.
+
+  lua: |
+    `Color` is represented by a 32-bit ARGB integer.
+
+    For APIs that accept `Color`, you can pass a hex string representing the
+    color, like `"#A123"`, `"#123"`, `"#AA112233"`, `"#112233"`.
+
+    ```lua
+    label:setcolor('#F000')
+    ```
+
+  js: |
+    `Color` is represented by a 32-bit ARGB integer.
+
+    For APIs that accept `Color`, you can pass a hex string representing the
+    color, like `"#A123"`, `"#123"`, `"#AA112233"`, `"#112233"`.
+
+    ```js
+    label.setColor('#F000')
+    ```
+
+constructors:
+  - signature: Color()
+    lang: ['cpp']
+    description: Create a black color.
+
+  - signature: Color(const std::string& hex)
+    lang: ['cpp']
+    description: |
+      Create color from hex string, like `"#A123"`, `"#123"`, `"#AA112233"`,
+      `"#112233"`.
+
+  - signature: Color(uint32_t value)
+    lang: ['cpp']
+    description: Create color from raw ARGB value.
+
+  - signature: Color(unsigned a, unsigned r, unsigned g, unsigned b)
+    lang: ['cpp']
+    description: Create an ARGB color.
+    parameters:
+      a:
+        description: 8-bit alpha channel value.
+      r:
+        description: 8-bit red channel value.
+      g:
+        description: 8-bit green channel value.
+      b:
+        description: 8-bit blue channel value.
+
+  - signature: Color(unsigned r, unsigned g, unsigned b)
+    lang: ['cpp']
+    description: Create an opaque RGB color.
+    parameters:
+      r:
+        description: 8-bit red channel value.
+      g:
+        description: 8-bit green channel value.
+      b:
+        description: 8-bit blue channel value.
+
+class_methods:
+  - signature: Color rgb(unsigned r, unsigned g, unsigned b)
+    lang: ['lua', 'js']
+    description: Create an opaque RGB color.
+    parameters:
+      r:
+        description: 8-bit red channel value.
+      g:
+        description: 8-bit green channel value.
+      b:
+        description: 8-bit blue channel value.
+
+  - signature: Color argb(unsigned a, unsigned r, unsigned g, unsigned b)
+    lang: ['lua', 'js']
+    description: Create an ARGB color.
+    parameters:
+      a:
+        description: 8-bit alpha channel value.
+      r:
+        description: 8-bit red channel value.
+      g:
+        description: 8-bit green channel value.
+      b:
+        description: 8-bit blue channel value.
+
+methods:
+  - signature: uint32_t value() const
+    lang: ['cpp']
+    description: Return raw RGBA value.
+
+  - signature: unsigned a() const
+    lang: ['cpp']
+    description: Return alpha channel value.
+
+  - signature: unsigned r() const
+    lang: ['cpp']
+    description: Return red channel value.
+
+  - signature: unsigned g() const
+    lang: ['cpp']
+    description: Return green channel value.
+
+  - signature: unsigned b() const
+    lang: ['cpp']
+    description: Return blue channel value.
+
+  - signature: bool transparent() const
+    lang: ['cpp']
+    description: Return whether color is transparent.

@@ -12,6 +12,7 @@ class_methods:
   - signature: Button* Create(const std::string& title)
     lang: ['lua', 'js']
     description: Create a normal button with `title`.
+
   - signature: Button* Create(Dictionary options)
     lang: ['lua', 'js']
     parameters:

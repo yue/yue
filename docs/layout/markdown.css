@@ -177,8 +177,7 @@
   padding-top: 0.2em;
   padding-bottom: 0.2em;
   margin: 0;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
-  font-size: 12px;
+  font: 12px "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
   background-color: rgba(27,31,35,0.05);
   border-radius: 3px;
 }

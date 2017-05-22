@@ -239,9 +239,11 @@ function parseType(lang, str) {
     type = type.substr(0, type.length - 1)
   // No need to convert types for C++.
   if (lang == 'cpp') {
-    let builtin = ['bool', 'float', 'std::string', 'char'].includes(type)
-    return builtin ? { name: str } :
-                     { name: str, id: type.toLowerCase().replace('::', '_') }
+    let builtins = [ 'bool', 'float', 'std::string', 'char', 'uint32_t',
+                     'unsigned' ]
+    return builtins.includes(type)
+      ? { name: str }
+      : { name: str, id: type.toLowerCase().replace('::', '_') }
   }
   // Convertbuilt-in types for differnt languages.
   let builtin = true
@@ -251,6 +253,8 @@ function parseType(lang, str) {
       case 'float': type = 'number'; break
       case 'std::string': type = 'string'; break
       case 'char': type = 'string'; break
+      case 'uint32_t': type = 'integer'; break
+      case 'unsigned': type = 'integer'; break
       case 'Dictionary': type = 'table'; break
       default: builtin = false
     }
@@ -260,6 +264,8 @@ function parseType(lang, str) {
       case 'float': type = 'Number'; break
       case 'std::string': type = 'String'; break
       case 'char': type = 'String'; break
+      case 'uint32_t': type = 'Integer'; break
+      case 'unsigned': type = 'Integer'; break
       case 'Dictionary': type = 'Object'; break
       default: builtin = false
     }
