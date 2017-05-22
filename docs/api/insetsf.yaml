@@ -1,0 +1,46 @@
+name: InsetsF
+lang: ['cpp']
+description: Borders inside rectangle.
+
+constructors:
+  - signature: InsetsF()
+    description: Create an empty insets.
+
+  - signature: InsetsF(float all)
+    description: Create an insets using `all` as borders.
+
+  - signature: InsetsF(float vertical, float horizontal)
+    description: Create an insets with `vertical` and `horizontal` borders.
+
+  - signature: InsetsF(float top, float left, float bottom, float right)
+    description: Create an insets with specified borders.
+
+methods:
+  - signature: float top() const
+    description: Return the top border.
+
+  - signature: float left() const
+    description: Return the left border.
+
+  - signature: float bottom() const
+    description: Return the bottom border.
+
+  - signature: float right() const
+    description: Return the right border.
+
+  - signature: float width() const
+    description: |
+      Return the total width taken up by the insets, which is the sum of the
+      left and right insets.
+
+  - signature: float height() const
+    description: |
+      Return the total height taken up by the insets, which is the sum of the
+      top and bottom insets.
+
+  - signature: bool IsEmpty() const
+    description: Return `true` if the insets are empty.
+
+  - signature: std::string ToString() const
+    lang: ['cpp']
+    description: Return string representation of the insets.
