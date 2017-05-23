@@ -8,14 +8,10 @@ lang_detail:
     * `Button::Type::Checkbox`
     * `Button::Type::Radio`
 
-  lua: |
-    This type is an `string` with following possible values:
+  lua: &ref |
+    This type is a string with following possible values:
     * `"normal"`
     * `"checkbox"`
     * `"radio"`
 
-  js: |
-    This type is an `String` with following possible values:
-    * `"normal"`
-    * `"checkbox"`
-    * `"radio"`
+  js: *ref

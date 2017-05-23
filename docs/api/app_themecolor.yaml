@@ -6,10 +6,8 @@ lang_detail:
     This type is an `enum class` with following values:
       * `App::ThemeColor::Text`
 
-  lua: |
-    This type is an `string` with following possible values:
+  lua: &ref |
+    This type is a string with following possible values:
     * `"text"`
 
-  js: |
-    This type is an `String` with following possible values:
-    * `"text"`
+  js: *ref

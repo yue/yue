@@ -1,0 +1,71 @@
+name: Signal
+component: gui
+description: Connect and emit events.
+lang_detail:
+  cpp: |
+    The template class `Signal<Sig>` implements the signal/slot pattern, which
+    is used as event type.
+
+    It can be used to register a list of callbacks, and then dispatch the event
+    to all the callbacks.
+
+    ```cpp
+    #include "base/bind.h"
+    #include "base/logging.h"
+    #include "nativeui/nativeui.h"
+
+    void OnEvent(const std::string& arg) {
+      LOG(ERROR) << "OnEvent: " << arg;
+    }
+
+    void Main() {
+      nu::Signal<void(const std::string&)> event;
+      event.Connect(base::Bind(&OnEvent));
+
+      event.Emit("Emitted");
+    }
+    ```
+
+  lua: &ref |
+    This class implements the signal/slot pattern, which is used as event type.
+
+  js: *ref
+
+methods:
+  - signature: int Connect(const base::Callback<Sig>& slot)
+    lang: ['cpp']
+    description: |
+      Connect `slot` to the signal, and return an ID that can be used to
+      disconnect it.
+
+  - signature: int Connect(const Function& slot)
+    lang: ['lua', 'js']
+    description: |
+      Connect `slot` to the signal, and return an ID that can be used to
+      disconnect it.
+
+      The signature of `slot` must match the event's type.
+
+  - signature: void Disconnect(int id)
+    description: Disconnect the `id` from the signal.
+
+  - signature: void DisconnectAll()
+    description: Disconnect all slots in the signal.
+
+  - signature: bool IsEmpty() const
+    description: Return `true` if there is no slot connected to the signal.
+
+  - signature: void Emit(Args... args)
+    lang: ['cpp']
+    description: |
+      Emit the event by passing `args...` to callbacks. The `Sig` must be in the
+      form of `void(Args...)`.
+
+  - signature: bool Emit(Args... args)
+    lang: ['cpp']
+    description: |
+      Emit the event by passing `args...` to callbacks. The `Sig` must be in the
+      form of `bool(Args...)`.
+
+      If any of the callbacks returns `true`, `Emit` would return `true`
+      immediately without executing other callbacks.

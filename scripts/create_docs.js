@@ -240,7 +240,7 @@ function parseType(lang, str) {
   // No need to convert types for C++.
   if (lang == 'cpp') {
     let builtins = [ 'bool', 'float', 'std::string', 'char', 'uint32_t',
-                     'unsigned' ]
+                     'unsigned', 'int', 'base::Callback<Sig>', 'Args...' ]
     return builtins.includes(type)
       ? { name: str }
       : { name: str, id: type.toLowerCase().replace('::', '_') }
@@ -255,7 +255,9 @@ function parseType(lang, str) {
       case 'char': type = 'string'; break
       case 'uint32_t': type = 'integer'; break
       case 'unsigned': type = 'integer'; break
+      case 'int': type = 'integer'; break
       case 'Dictionary': type = 'table'; break
+      case 'Function': type = 'function'; break
       default: builtin = false
     }
   } else if (lang == 'js') {
@@ -266,7 +268,9 @@ function parseType(lang, str) {
       case 'char': type = 'String'; break
       case 'uint32_t': type = 'Integer'; break
       case 'unsigned': type = 'Integer'; break
+      case 'int': type = 'Integer'; break
       case 'Dictionary': type = 'Object'; break
+      case 'Function': break
       default: builtin = false
     }
   }

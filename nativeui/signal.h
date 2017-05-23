@@ -69,13 +69,14 @@ template<typename... Args>
 class Signal<bool(Args...)> : public SignalBase<bool(Args...)> {
  public:
   bool Emit(Args... args) {
-    bool result = false;
     // Copy the list before iterating, since it is possible that user removes
     // elements from the list when iterating.
     auto slots = this->slots_;
-    for (auto& slot : slots)
-      result |= slot.second.Run(std::forward<Args>(args)...);
-    return result;
+    for (auto& slot : slots) {
+      if (slot.second.Run(std::forward<Args>(args)...))
+        return true;
+    }
+    return false;
   }
 };
 
