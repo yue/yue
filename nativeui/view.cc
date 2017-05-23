@@ -71,7 +71,7 @@ void View::SetDefaultStyle(const SizeF& minimum) {
   Layout();
 }
 
-void View::SetStyle(const std::string& name, const std::string& value) {
+void View::SetStyleProperty(const std::string& name, const std::string& value) {
   std::string key(ParseName(name));
   if (key == "color")
     SetColor(Color(value));
@@ -81,7 +81,7 @@ void View::SetStyle(const std::string& name, const std::string& value) {
     SetYogaProperty(node_, key, value);
 }
 
-void View::SetStyle(const std::string& name, float value) {
+void View::SetStyleProperty(const std::string& name, float value) {
   SetYogaProperty(node_, ParseName(name), value);
 }
 

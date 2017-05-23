@@ -847,9 +847,9 @@ struct Type<nu::View> {
       return;
     for (const auto& it : styles) {
       if (it.second->IsNumber())
-        view->SetStyle(it.first, it.second->NumberValue());
+        view->SetStyleProperty(it.first, it.second->NumberValue());
       else
-        view->SetStyle(it.first, *v8::String::Utf8Value(it.second));
+        view->SetStyleProperty(it.first, *v8::String::Utf8Value(it.second));
     }
     view->Layout();
   }

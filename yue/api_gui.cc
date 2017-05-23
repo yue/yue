@@ -785,7 +785,7 @@ struct Type<nu::View> {
   static void SetStyle(nu::View* view,
                        const std::map<std::string, std::string>& styles) {
     for (const auto& it : styles)
-      view->SetStyle(it.first, it.second);
+      view->SetStyleProperty(it.first, it.second);
     view->Layout();
   }
 };

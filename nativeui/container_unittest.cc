@@ -109,15 +109,15 @@ TEST_F(ContainerTest, MoveBetweenContainers) {
   window_->SetContentSize(nu::SizeF(200, 400));
 
   nu::Container* c1 = new nu::Container;
-  c1->SetStyle("flex", "1");
-  c1->SetStyle("flex-direction", "row");
-  c1->SetStyle("align-content", "stretch");
+  c1->SetStyle("flex", 1,
+               "flex-direction", "row",
+               "align-content", "stretch");
   container_->AddChildView(c1);
 
   nu::Container* c2 = new nu::Container;
-  c2->SetStyle("flex", "1");
-  c2->SetStyle("flex-direction", "column");
-  c2->SetStyle("align-content", "stretch");
+  c2->SetStyle("flex", 1,
+               "flex-direction", "column",
+               "align-content", "stretch");
   container_->AddChildView(c2);
 
   scoped_refptr<nu::Container> v1 = new nu::Container;

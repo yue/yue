@@ -102,17 +102,33 @@ methods:
   - signature: void SetBackgroundColor(Color color)
     description: Change the background color of the view.
 
-  - signature: void SetStyle(Dictionary style)
+  - signature: void SetStyle(Args... styles)
+    lang: ['cpp']
+    parameters:
+      styles:
+        description: |
+          Variadic parameters that are pairs of keys and values.
+    description: Change the styles of the view.
+    detail: |
+      Available style properties can be found at
+      [Flex Layout](../guide/flex-layout.html).
+
+      ```cpp
+      view->SetStyle("flex", 1, "flex-direction", "row");
+      ```
+
+  - signature: void SetStyle(Dictionary styles)
     lang: ['lua', 'js']
     parameters:
-      style:
+      styles:
         description: |
           A key-value dictionary that defines the name and value of the style
           properties, key must be string, and value must be either string or
           number.
     description: Change the styles of the view.
     detail: |
-      Available style properties can be found at [Flex Layout][flex-layout].
+      Available style properties can be found at
+      [Flex Layout](../guide/flex-layout.html).
 
   - signature: View* GetParent() const
     description: Return parent view.

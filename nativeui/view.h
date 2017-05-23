@@ -82,9 +82,27 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   void SetColor(Color color);
   void SetBackgroundColor(Color color);
 
-  // Set layout related styles.
-  void SetStyle(const std::string& name, const std::string& value);
-  void SetStyle(const std::string& name, float value);
+  // Set layout related styles without doing layout.
+  // While this is public API, it should only be used by language bindings.
+  void SetStyleProperty(const std::string& name, const std::string& value);
+  void SetStyleProperty(const std::string& name, float value);
+
+  // Set styles and re-compute the layout.
+  template<typename... Args>
+  void SetStyle(const std::string& name, const std::string& value,
+                Args... args) {
+    SetStyleProperty(name, value);
+    SetStyle(args...);
+    Layout();
+  }
+  template<typename... Args>
+  void SetStyle(const std::string& name, float value, Args... args) {
+    SetStyleProperty(name, value);
+    SetStyle(args...);
+    Layout();
+  }
+  void SetStyle() {
+  }
 
   // Internal: Print style layout to stdout.
   void PrintStyle() const;
