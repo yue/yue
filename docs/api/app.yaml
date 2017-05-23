@@ -38,11 +38,11 @@ class_methods:
 
 methods:
   - signature: void SetApplicationMenu(MenuBar* menu)
-    platforms: ['mac']
+    platform: ['macOS']
     description: Set the application menu bar.
 
   - signature: MenuBar* GetApplicationMenu() const
-    platforms: ['mac']
+    platform: ['macOS']
     description: Return the application menu bar.
 
   - signature: Color GetColor(App::ThemeColor name)

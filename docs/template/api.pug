@@ -47,7 +47,13 @@ mixin parameter(node)
 
 //- Display a method.
 mixin method(node)
-  +title('h3', node.id, node.signature.str)
+  h3(id=node.id)
+    +anchor(node.id)
+    | #{node.signature.str}
+    if node.platform
+      each platform in node.platform
+        |  
+        span.platform #{platform}
   +description(node)
   if node.signature.parameters.length > 0
     h4 Parameters
