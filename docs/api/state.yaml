@@ -1,0 +1,33 @@
+name: State
+lang: ['cpp']
+component: gui
+description: Global state.
+detail: |
+  This class manages the global state of Yue's GUI components, it should always
+  be initialized before you call any GUI related API, and released after all
+  instances of GUI components get destroyed.
+
+  A common pattern is to create `State` on stack before entering message loop:
+
+  ```cpp
+  int main() {
+    nu::State state;
+
+    // Enter message loop.
+    MessageLoop().Run();
+
+    return 0;
+  }
+  ```
+
+  It is safe to leak it if you can't or don't want to clean up resources on
+  exit.
+
+
+constructors:
+  - signature: State()
+    description: Create global state, each thread can only have one `State`.
+
+class_methods:
+  - signature: State* GetCurrent()
+    description: Return the global state of current thread.
