@@ -12,11 +12,14 @@
 
 namespace nu {
 
+class Font;
 class MenuBar;
 
 // App wide APIs, this class is managed by State.
 class NATIVEUI_EXPORT App {
  public:
+  static App* GetCurrent();
+
   // Available theme names of colors.
   enum class ThemeColor {
     Text,
@@ -24,6 +27,9 @@ class NATIVEUI_EXPORT App {
 
   // Return color of a theme component.
   Color GetColor(ThemeColor name);
+
+  // Return the default GUI font.
+  Font* GetDefaultFont();
 
 #if defined(OS_MACOSX)
   // Set the application menu.
@@ -44,6 +50,8 @@ class NATIVEUI_EXPORT App {
 
   // Cached theme colors.
   std::unordered_map<int, Color> theme_colors_;
+
+  scoped_refptr<Font> default_font_;
 
 #if defined(OS_MACOSX)
   scoped_refptr<MenuBar> application_menu_;

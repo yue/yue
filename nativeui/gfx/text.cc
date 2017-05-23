@@ -4,14 +4,14 @@
 
 #include "nativeui/gfx/text.h"
 
+#include "nativeui/app.h"
 #include "nativeui/gfx/font.h"
-#include "nativeui/state.h"
 
 namespace nu {
 
 TextAttributes::TextAttributes()
-    : font(State::GetCurrent()->GetDefaultFont()),
-      color(State::GetCurrent()->GetApp()->GetColor(App::ThemeColor::Text)),
+    : font(App::GetCurrent()->GetDefaultFont()),
+      color(App::GetCurrent()->GetColor(App::ThemeColor::Text)),
       align(TextAlign::Start),
       valign(TextAlign::Start) {
 }

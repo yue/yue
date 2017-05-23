@@ -318,7 +318,7 @@ struct Type<nu::Font> {
         "getStyle", &nu::Font::GetStyle);
   }
   static nu::Font* GetDefault() {
-    return nu::State::GetCurrent()->GetDefaultFont();
+    return nu::App::GetCurrent()->GetDefaultFont();
   }
 };
 
@@ -337,9 +337,6 @@ struct Type<nu::Canvas> {
         "getScaleFactor", &nu::Canvas::GetScaleFactor,
         "getPainter", &nu::Canvas::GetPainter,
         "getSize", &nu::Canvas::GetSize);
-  }
-  static nu::Font* GetDefault() {
-    return nu::State::GetCurrent()->GetDefaultFont();
   }
 };
 

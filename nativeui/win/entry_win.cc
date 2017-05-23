@@ -5,9 +5,9 @@
 #include "nativeui/entry.h"
 
 #include "base/strings/utf_string_conversions.h"
+#include "nativeui/app.h"
 #include "nativeui/gfx/screen.h"
 #include "nativeui/gfx/win/text_win.h"
-#include "nativeui/state.h"
 #include "nativeui/win/subwin_view.h"
 #include "nativeui/win/util/hwnd_util.h"
 
@@ -50,9 +50,9 @@ class EntryImpl : public SubwinView {
 Entry::Entry() {
   TakeOverView(new EntryImpl(this));
 
-  Font* font = State::GetCurrent()->GetDefaultFont();
-  float height = MeasureText(L"some text", font).height() / GetScaleFactor() +
-                 2 * kEntryPadding;
+  float height =
+      MeasureText(L"some text", view()->font()).height() / GetScaleFactor() +
+      2 * kEntryPadding;
   SetDefaultStyle(SizeF(0, height));
 }
 

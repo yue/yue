@@ -5,11 +5,9 @@
 #include "nativeui/label.h"
 
 #include "base/strings/utf_string_conversions.h"
-#include "nativeui/gfx/color.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/screen.h"
 #include "nativeui/gfx/win/text_win.h"
-#include "nativeui/state.h"
 #include "nativeui/win/view_win.h"
 
 namespace nu {
@@ -56,8 +54,8 @@ void Label::SetText(const std::string& text) {
   base::string16 wtext = base::UTF8ToUTF16(text);
   label->SetText(wtext);
 
-  Font* font = State::GetCurrent()->GetDefaultFont();
-  SetDefaultStyle(ScaleSize(MeasureText(wtext, font), 1.0f / GetScaleFactor()));
+  SetDefaultStyle(ScaleSize(MeasureText(wtext, view()->font()),
+                            1.0f / GetScaleFactor()));
   label->Invalidate();
 }
 

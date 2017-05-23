@@ -15,7 +15,6 @@
 #include "nativeui/gfx/geometry/vector2d_conversions.h"
 #include "nativeui/gfx/win/screen_win.h"
 #include "nativeui/gfx/win/text_win.h"
-#include "nativeui/state.h"
 #include "nativeui/win/view_win.h"
 #include "nativeui/win/window_win.h"
 
@@ -160,7 +159,7 @@ class ButtonImpl : public ViewImpl {
     else if (type() == ControlType::Radio)
       box_size_ = theme->GetThemePartSize(dc, NativeTheme::Part::Radio,
                                           state());
-    text_size_ = MeasureText(dc, title_, State::GetCurrent()->GetDefaultFont());
+    text_size_ = MeasureText(dc, title_, font());
   }
 
   void OnMouseEnter(NativeEvent event) override {

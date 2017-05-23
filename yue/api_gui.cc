@@ -308,7 +308,7 @@ struct Type<nu::Font> {
            "getstyle", &nu::Font::GetStyle);
   }
   static nu::Font* GetDefault() {
-    return nu::State::GetCurrent()->GetDefaultFont();
+    return nu::App::GetCurrent()->GetDefaultFont();
   }
 };
 

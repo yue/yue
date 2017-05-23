@@ -14,8 +14,6 @@ typedef struct YGConfig *YGConfigRef;
 
 namespace nu {
 
-class Font;
-
 #if defined(OS_WIN)
 class ClassRegistrar;
 class NativeTheme;
@@ -29,9 +27,6 @@ class NATIVEUI_EXPORT State {
 
   static State* GetCurrent();
 
-  // Return the default GUI font.
-  Font* GetDefaultFont();
-
   // Return the instance of App.
   App* GetApp() { return &app_; }
 
@@ -43,16 +38,12 @@ class NATIVEUI_EXPORT State {
   UINT GetNextCommandID();
 #endif
 
-  // Return the default yoga config.
+  // Internal: Return the default yoga config.
   YGConfigRef yoga_config() const { return yoga_config_; }
 
  private:
   void PlatformInit();
   void PlatformDestroy();
-
-  YGConfigRef yoga_config_;
-
-  scoped_refptr<Font> default_font_;
 
 #if defined(OS_WIN)
   ULONG_PTR token_;
@@ -67,6 +58,8 @@ class NATIVEUI_EXPORT State {
 
   // The app instance.
   App app_;
+
+  YGConfigRef yoga_config_;
 
   DISALLOW_COPY_AND_ASSIGN(State);
 };

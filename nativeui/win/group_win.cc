@@ -11,7 +11,6 @@
 #include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/geometry/vector2d.h"
 #include "nativeui/gfx/win/text_win.h"
-#include "nativeui/state.h"
 #include "nativeui/win/container_win.h"
 
 namespace nu {
@@ -104,10 +103,9 @@ class GroupImpl : public ContainerImpl,
 
   void OnDPIChanged() override {
     base::win::ScopedGetDC dc(window() ? window()->hwnd() : NULL);
-    Font* font = State::GetCurrent()->GetDefaultFont();
     // Update the rect of the title.
     title_bounds_ = Rect(Point(kTitleLeftMargin * scale_factor(), 0),
-                         ToCeiledSize(MeasureText(dc, title_, font)));
+                         ToCeiledSize(MeasureText(dc, title_, font())));
   }
 
  private:

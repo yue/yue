@@ -6,7 +6,6 @@
 
 #include "base/lazy_instance.h"
 #include "base/threading/thread_local.h"
-#include "nativeui/gfx/font.h"
 #include "third_party/yoga/yoga/Yoga.h"
 
 #if defined(OS_WIN)
@@ -40,9 +39,6 @@ State::State() : yoga_config_(YGConfigNew()) {
 State::~State() {
   YGConfigFree(yoga_config_);
 
-  // The GUI members must be destroyed before we shutdone GUI engine.
-  default_font_ = nullptr;
-
   PlatformDestroy();
   DCHECK_EQ(GetCurrent(), this);
   lazy_tls_ptr.Pointer()->Set(nullptr);
@@ -51,12 +47,6 @@ State::~State() {
 // static
 State* State::GetCurrent() {
   return lazy_tls_ptr.Pointer()->Get();
-}
-
-Font* State::GetDefaultFont() {
-  if (!default_font_)
-    default_font_ = new Font;
-  return default_font_.get();
 }
 
 }  // namespace nu

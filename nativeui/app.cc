@@ -4,15 +4,23 @@
 
 #include "nativeui/app.h"
 
+#include "nativeui/gfx/font.h"
 #include "nativeui/menu_bar.h"
 #include "nativeui/state.h"
 
 namespace nu {
 
+// static
+App* App::GetCurrent() {
+  return State::GetCurrent()->GetApp();
+}
+
 App::App() : weak_factory_(this) {
 }
 
 App::~App() {
+  // The GUI members must be destroyed before we shutdown GUI engine.
+  default_font_ = nullptr;
 }
 
 Color App::GetColor(ThemeColor name) {
@@ -23,6 +31,12 @@ Color App::GetColor(ThemeColor name) {
   Color color = PlatformGetColor(name);
   theme_colors_[key] = color;
   return color;
+}
+
+Font* App::GetDefaultFont() {
+  if (!default_font_)
+    default_font_ = new Font;
+  return default_font_.get();
 }
 
 }  // namespace nu
