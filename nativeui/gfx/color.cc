@@ -4,7 +4,6 @@
 
 #include "nativeui/gfx/color.h"
 
-#include <unordered_map>
 #include <vector>
 
 #include "base/strings/string_number_conversions.h"
@@ -12,9 +11,6 @@
 namespace nu {
 
 namespace {
-
-// Cached theme colors.
-std::unordered_map<int, Color> g_theme_colors;
 
 const uint32_t kColorWhite = 0xFFFFFFFF;
 
@@ -56,18 +52,5 @@ uint32_t ParseHexColor(const std::string& color_string) {
 }  // namespace
 
 Color::Color(const std::string& hex) : value_(ParseHexColor(hex)) {}
-
-// The platform implementation to get theme color.
-Color PlatformGetSystemColor(SystemColor id);
-
-Color GetSystemColor(SystemColor id) {
-  int key = static_cast<int>(id);
-  auto it = g_theme_colors.find(key);
-  if (it != g_theme_colors.end())
-    return it->second;
-  Color color = PlatformGetSystemColor(id);
-  g_theme_colors[key] = color;
-  return color;
-}
 
 }  // namespace nu

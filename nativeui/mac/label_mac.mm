@@ -86,8 +86,9 @@ Label::Label(const std::string& text) {
   TakeOverView([[NULabel alloc] init]);
   SetText(text);
   // Default styles.
-  [GetNative() setNUFont:nu::State::GetCurrent()->GetDefaultFont()];
-  [GetNative() setNUColor:GetSystemColor(SystemColor::Text)];
+  State* state = State::GetCurrent();
+  [GetNative() setNUFont:state->GetDefaultFont()];
+  [GetNative() setNUColor:state->GetApp()->GetColor(App::ThemeColor::Text)];
 }
 
 Label::~Label() {

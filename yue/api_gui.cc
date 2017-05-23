@@ -168,13 +168,29 @@ struct Type<nu::Lifetime> {
 };
 
 template<>
+struct Type<nu::App::ThemeColor> {
+  static constexpr const char* name = "yue.ThemeColor";
+  static inline bool To(State* state, int index, nu::App::ThemeColor* out) {
+    std::string id;
+    if (!lua::To(state, index, &id))
+      return false;
+    if (id == "text")
+      *out = nu::App::ThemeColor::Text;
+    else
+      return false;
+    return true;
+  }
+};
+
+template<>
 struct Type<nu::App> {
   static constexpr const char* name = "yue.App";
   static void BuildMetaTable(State* state, int metatable) {
-#if defined(OS_MACOSX)
     RawSet(state, metatable,
-           "setapplicationmenu", &nu::App::SetApplicationMenu);
+#if defined(OS_MACOSX)
+           "setapplicationmenu", &nu::App::SetApplicationMenu,
 #endif
+           "getcolor", &nu::App::GetColor);
   }
 };
 
@@ -310,21 +326,6 @@ struct Type<nu::Canvas> {
 };
 
 template<>
-struct Type<nu::SystemColor> {
-  static constexpr const char* name = "yue.SystemColor";
-  static inline bool To(State* state, int index, nu::SystemColor* out) {
-    std::string id;
-    if (!lua::To(state, index, &id))
-      return false;
-    if (id == "text")
-      *out = nu::SystemColor::Text;
-    else
-      return false;
-    return true;
-  }
-};
-
-template<>
 struct Type<nu::Color> {
   static constexpr const char* name = "yue.Color";
   static inline void Push(State* state, nu::Color color) {
@@ -348,7 +349,6 @@ struct Type<nu::Color> {
   }
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
-           "getsystem", &nu::GetSystemColor,
            "rgb", &CreateOnStack<nu::Color, unsigned, unsigned, unsigned>,
            "argb", &CreateOnStack<nu::Color, unsigned, unsigned, unsigned,
                                   unsigned>);

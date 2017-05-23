@@ -6,8 +6,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-#include "nativeui/gfx/geometry/safe_integer_conversions.h"
-
 namespace nu {
 
 NSColor* Color::ToNSColor() const {
@@ -15,21 +13,6 @@ NSColor* Color::ToNSColor() const {
                                    green:g() / 255.0
                                     blue:b() / 255.0
                                    alpha:a() / 255.0];
-}
-
-Color PlatformGetSystemColor(SystemColor id) {
-  NSColor* color;
-  if (id == SystemColor::Text)
-    color = [NSColor textColor];
-  else
-    color = [NSColor blackColor];
-  CGFloat red, green, blue, alpha;
-  color = [color colorUsingColorSpace:[NSColorSpace deviceRGBColorSpace]];
-  [color getRed:&red green:&green blue:&blue alpha:&alpha];
-  return Color(ToRoundedInt(255. * alpha),
-               ToRoundedInt(255. * red),
-               ToRoundedInt(255. * green),
-               ToRoundedInt(255. * blue));
 }
 
 }  // namespace nu

@@ -169,16 +169,34 @@ struct Type<nu::Lifetime> {
 #endif
 
 template<>
+struct Type<nu::App::ThemeColor> {
+  static constexpr const char* name = "yue.ThemeColor";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::App::ThemeColor* out) {
+    std::string id;
+    if (!vb::FromV8(context, value, &id))
+      return false;
+    if (id == "text")
+      *out = nu::App::ThemeColor::Text;
+    else
+      return false;
+    return true;
+  }
+};
+
+template<>
 struct Type<nu::App> {
   static constexpr const char* name = "yue.App";
   static void BuildConstructor(v8::Local<v8::Context>, v8::Local<v8::Object>) {
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
-#if defined(OS_MACOSX)
     Set(context, templ,
-        "setApplicationMenu", &nu::App::SetApplicationMenu);
+#if defined(OS_MACOSX)
+        "setApplicationMenu", &nu::App::SetApplicationMenu,
 #endif
+        "getColor", &nu::App::GetColor);
   }
 };
 
@@ -326,23 +344,6 @@ struct Type<nu::Canvas> {
 };
 
 template<>
-struct Type<nu::SystemColor> {
-  static constexpr const char* name = "yue.SystemColor";
-  static bool FromV8(v8::Local<v8::Context> context,
-                     v8::Local<v8::Value> value,
-                     nu::SystemColor* out) {
-    std::string id;
-    if (!vb::FromV8(context, value, &id))
-      return false;
-    if (id == "text")
-      *out = nu::SystemColor::Text;
-    else
-      return false;
-    return true;
-  }
-};
-
-template<>
 struct Type<nu::Color> {
   static constexpr const char* name = "yue.Color";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
@@ -367,7 +368,6 @@ struct Type<nu::Color> {
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
-        "getSystem", &nu::GetSystemColor,
         "rgb", &CreateOnStack<nu::Color, unsigned, unsigned, unsigned>,
         "argb", &CreateOnStack<nu::Color, unsigned, unsigned, unsigned,
                                unsigned>);

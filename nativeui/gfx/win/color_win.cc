@@ -10,12 +10,4 @@ COLORREF Color::ToCOLORREF() const {
   return RGB(r(), g(), b());
 }
 
-Color PlatformGetSystemColor(SystemColor id) {
-  int index = 0;
-  if (id == SystemColor::Text)
-    index = COLOR_WINDOWTEXT;
-  DWORD color = ::GetSysColor(index);
-  return Color(GetRValue(color), GetGValue(color), GetBValue(color));
-}
-
 }  // namespace nu

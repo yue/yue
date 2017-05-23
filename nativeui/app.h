@@ -5,8 +5,10 @@
 #ifndef NATIVEUI_APP_H_
 #define NATIVEUI_APP_H_
 
+#include <unordered_map>
+
 #include "base/memory/weak_ptr.h"
-#include "nativeui/nativeui_export.h"
+#include "nativeui/gfx/color.h"
 
 namespace nu {
 
@@ -15,6 +17,14 @@ class MenuBar;
 // App wide APIs, this class is managed by State.
 class NATIVEUI_EXPORT App {
  public:
+  // Available theme names of colors.
+  enum class ThemeColor {
+    Text,
+  };
+
+  // Return color of a theme component.
+  Color GetColor(ThemeColor name);
+
 #if defined(OS_MACOSX)
   // Set the application menu.
   void SetApplicationMenu(MenuBar* menu);
@@ -29,6 +39,11 @@ class NATIVEUI_EXPORT App {
 
  private:
   friend class State;
+
+  Color PlatformGetColor(ThemeColor name);
+
+  // Cached theme colors.
+  std::unordered_map<int, Color> theme_colors_;
 
 #if defined(OS_MACOSX)
   scoped_refptr<MenuBar> application_menu_;

@@ -10,8 +10,8 @@
 namespace nu {
 
 TextAttributes::TextAttributes()
-    : font(nu::State::GetCurrent()->GetDefaultFont()),
-      color(GetSystemColor(SystemColor::Text)),
+    : font(State::GetCurrent()->GetDefaultFont()),
+      color(State::GetCurrent()->GetApp()->GetColor(App::ThemeColor::Text)),
       align(TextAlign::Start),
       valign(TextAlign::Start) {
 }

@@ -75,12 +75,6 @@ class NATIVEUI_EXPORT Color {
   uint32_t value_;
 };
 
-// Get system theme color.
-enum class SystemColor {
-  Text,
-};
-NATIVEUI_EXPORT Color GetSystemColor(SystemColor color_id);
-
 }  // namespace nu
 
 #endif  // NATIVEUI_GFX_COLOR_H_
