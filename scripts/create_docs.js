@@ -271,7 +271,8 @@ function parseType(lang, str) {
     }
   }
   // Custom types usually have 1-to-1 maps.
-  return builtin ? { name: type } : { name: type, id: type.toLowerCase() }
+  return builtin ? { name: type }
+                 : { name: type, id: type.toLowerCase().replace('::', '_') }
 }
 
 // Put the extra parameter descriptions into signature object.

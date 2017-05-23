@@ -1,0 +1,52 @@
+name: App
+component: gui
+description: Application class.
+detail: |
+  This class represents current app and provides app wide APIs.
+lang_detail:
+  cpp: |
+    This class can not be created by user, you must create `State` first and
+    then receive an instance of `App` via `App::GetCurrent`.
+
+    ```cpp
+    nu::State state;
+    nu::App* app = nu::App::GetCurrent();
+    ```
+
+  lua: |
+    This class can not be created by user, you can only receive its global
+    instance from the `app` property of the module:
+
+    ```lua
+    local gui = require('yue.gui')
+    gui.app:getcolor('text')
+    ```
+
+  js: |
+    This class can not be created by user, you can only receive its global
+    instance from the `app` property of the module:
+
+    ```js
+    const gui = require('gui')
+    gui.app.getColor('text')
+    ```
+
+class_methods:
+  - signature: App* GetCurrent()
+    lang: ['cpp']
+    description: Return current app.
+
+methods:
+  - signature: void SetApplicationMenu(MenuBar* menu)
+    platforms: ['mac']
+    description: Set the application menu bar.
+
+  - signature: MenuBar* GetApplicationMenu() const
+    platforms: ['mac']
+    description: Return the application menu bar.
+
+  - signature: Color GetColor(App::ThemeColor name)
+    description: Return color of a theme component.
+
+  - signature: Font* GetDefaultFont()
+    description: Return the default font for displaying GUI components.

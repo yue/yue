@@ -190,7 +190,8 @@ struct Type<nu::App> {
 #if defined(OS_MACOSX)
            "setapplicationmenu", &nu::App::SetApplicationMenu,
 #endif
-           "getcolor", &nu::App::GetColor);
+           "getcolor", &nu::App::GetColor,
+           "getdefaultfont", &nu::App::GetDefaultFont);
   }
 };
 

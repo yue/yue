@@ -20,10 +20,8 @@ class_methods:
         properties:
           - property: std::string title
             description: Button's title.
-          - property: std::string type
-            description: >
-              Button's type, can be `normal`, `checkbox` or `radio`, default
-              is `normal`.
+          - property: Button::Type type
+            description: Button's type.
     description: Create a button by reading `options`.
 
 class_properties:

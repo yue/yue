@@ -1,8 +1,21 @@
 name: Button::Type
-lang: ['cpp']
-description: An `enum class` that lists possible `Button` types.
-detail: |
-  Possible values are:
-  * `Button::Type::Normal`
-  * `Button::Type::Checkbox`
-  * `Button::Type::Radio`
+description: Represent possible `Button` types.
+
+lang_detail:
+  cpp: |
+    This type is an `enum class` with following values:
+    * `Button::Type::Normal`
+    * `Button::Type::Checkbox`
+    * `Button::Type::Radio`
+
+  lua: |
+    This type is an `string` with following possible values:
+    * `"normal"`
+    * `"checkbox"`
+    * `"radio"`
+
+  js: |
+    This type is an `String` with following possible values:
+    * `"normal"`
+    * `"checkbox"`
+    * `"radio"`
