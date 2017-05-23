@@ -21,7 +21,7 @@ mixin description(node)
 mixin type(node)
   code
     if node.id
-      a(href=`${node.id}.html`) #{node.name}
+      a.type(href=`${node.id}.html`) #{node.name}
     else
       | #{node.name}
 
@@ -35,7 +35,8 @@ mixin parameters(parameters)
 //- Inline description of parameter.
 mixin parameter(node)
   +type(node.type)
-  |  #{node.name}
+  |  
+  span.code #{node.name}
   if node.description
     |  -
     != ' ' + imarkdown(node.description)

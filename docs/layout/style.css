@@ -31,11 +31,15 @@ a:hover {
   color: #587498;
 }
 
-.markdown-body code a {
+.markdown-body .type {
   color: #587058;
 }
 
-.markdown-body span.platform {
+.markdown-body .code {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+
+.markdown-body .platform {
   padding: .1em .4em;
   font-size: .88em;
   font-weight: 300;
