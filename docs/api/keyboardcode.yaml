@@ -166,3 +166,22 @@ lang_detail:
     * `VKEY_OEM_7`
     * `VKEY_OEM_CLEAR`
     * `VKEY_UNKNOWN`
+
+global_functions:
+  - signature: const char* KeyboardCodeToStr(KeyboardCode code)
+    lang: ['cpp']
+    description: |
+      Convert a key code to string, using the values of `KeyboardEvent.key`,
+      a list of available keys can be found at:
+      [Key Values - MDN](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values).
+
+      There is an exception that the <kbd>Space Bar</kbd> is represented as
+      `"Space"` in Yue instead of `" "`.
+
+  - signature: KeyboardCode KeyboardCodeFromStr(const std::string& str, bool* shifted)
+    lang: ['cpp']
+    description: Convert a string to a KeyboardCode.
+    parameters:
+      shifted:
+        description: >
+          Whether the represented key requires <kbd>Shift</kbd> to be pressed.

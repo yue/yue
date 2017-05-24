@@ -120,8 +120,8 @@ function pruneDocTree(lang, doc) {
 
   doc.detail = parseDetail(lang, doc)
 
-  const categories = ['constructors', 'class_properties', 'class_methods',
-                      'properties', 'methods', 'events']
+  const categories = ['global_functions', 'constructors', 'class_properties',
+                      'class_methods', 'properties', 'methods', 'events']
   for (let category of categories) {
     if (!doc[category]) continue
     let nodes = []

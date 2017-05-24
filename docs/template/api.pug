@@ -82,6 +82,11 @@ block content
       | .
   +description(doc)
 
+  if doc.global_functions
+    +title('h2', 'global-functions', 'Global functions')
+    each node in doc.global_functions
+      +method(node)
+
   if doc.constructors
     +title('h2', 'constructors', 'Constructors')
     each node in doc.constructors
