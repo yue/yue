@@ -1,0 +1,15 @@
+name: EventType
+lang: ['cpp']
+description: Represent possible event types.
+
+detail: |
+  `EventType` is an `enum class` with following values:
+
+  * `EventType::Unknown`
+  * `EventType::MouseDown`
+  * `EventType::MouseUp`
+  * `EventType::MouseMove`
+  * `EventType::MouseEnter`
+  * `EventType::MouseLeave`
+  * `EventType::KeyDown`
+  * `EventType::KeyUp`

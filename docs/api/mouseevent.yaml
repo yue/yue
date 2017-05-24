@@ -1,0 +1,16 @@
+name: MouseEvent
+component: gui
+inherit: Event
+description: Mouse event.
+
+properties:
+  - property: int button
+    description: |
+      The mouse button being pressed, `1` is for left button, `2` is for right
+      button, `3` is for middle button.
+
+  - property: PointF position_in_view
+    description: Relative position inside the view where the event happened.
+
+  - property: PointF position_in_window
+    description: Relative position inside the window.

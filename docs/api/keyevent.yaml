@@ -1,0 +1,8 @@
+name: KeyEvent
+component: gui
+inherit: Event
+description: Keyboard event.
+
+properties:
+  - property: KeyboardCode key
+    description: The key associated with the event.

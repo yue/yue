@@ -23,7 +23,7 @@ mixin type(node)
     if node.id
       a.type(href=`${node.id}.html`) #{node.name}
     else
-      | #{node.name}
+      span.type #{node.name}
 
 //- A list of parameter.
 mixin parameters(parameters)

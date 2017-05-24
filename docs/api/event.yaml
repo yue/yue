@@ -1,0 +1,35 @@
+name: Event
+component: gui
+description: Generic input event type.
+
+class_properties:
+  - property: int MaskShift
+    lang: ['lua', 'js']
+    description: Modifier for <kbd>Shift</kbd> key.
+
+  - property: int MaskContrl
+    lang: ['lua', 'js']
+    description: Modifier for <kbd>Control</kbd> key.
+
+  - property: int MaskAlt
+    lang: ['lua', 'js']
+    description: Modifier for <kbd>Alt</kbd> key.
+
+  - property: int MaskMeta
+    lang: ['lua', 'js']
+    description: Modifier for <kbd>Win</kbd> or <kbd>Command</kbd> key.
+
+properties:
+  - property: EventType type
+    description: The type of the event.
+
+  - property: int modifiers
+    description: Keyboard modifiers of the event.
+
+  - property: uint32_t timestamp
+    description: |
+      Time when event was created, starts from when machine was booted.
+
+  - property: NativeEvent native_event
+    lang: ['cpp']
+    description: The underlying native event.

@@ -31,8 +31,12 @@ a:hover {
   color: #587498;
 }
 
-.markdown-body .type {
+.markdown-body a.type {
   color: #587058;
+}
+
+.markdown-body span.type {
+  color: #24292e;
 }
 
 .markdown-body .code {
