@@ -1,0 +1,11 @@
+name: KeyboardModifier
+lang: ['cpp']
+description: The keyboard modifier masks.
+
+detail: |
+  `KeyboardModifier` is an `enum` with following values:
+
+  * `MASK_SHIFT`
+  * `MASK_CONTROL`
+  * `MASK_ALT`
+  * `MASK_META`

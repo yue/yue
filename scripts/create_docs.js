@@ -118,12 +118,7 @@ function pruneDocTree(lang, doc) {
   if (doc.inherit)
     doc.inherit = parseType(lang, doc.inherit)
 
-  if (doc.lang_detail && doc.lang_detail[lang]) {
-    if (!doc.detail)
-      doc.detail = ''
-    doc.detail += '\n' + doc.lang_detail[lang]
-  }
-  delete doc.lang_detail
+  doc.detail = parseDetail(lang, doc)
 
   const categories = ['constructors', 'class_properties', 'class_methods',
                       'properties', 'methods', 'events']
@@ -146,6 +141,8 @@ function pruneDocTree(lang, doc) {
 // Convert C++ representation to |lang| representation.
 function pruneNode(lang, node) {
   node = JSON.parse(JSON.stringify(node))
+
+  node.detail = parseDetail(lang, node)
 
   delete node.lang
   // Recursively prune the Dictionary type parameters.
@@ -202,6 +199,17 @@ function parseSignature(lang, str) {
     signature.str = `${signature.name}(${parameters.join(', ')})`
   }
   return signature
+}
+
+// Parse detailed information of a node.
+function parseDetail(lang, node) {
+  if (node.lang_detail && node.lang_detail[lang]) {
+    if (!node.detail)
+      node.detail = ''
+    node.detail += '\n' + node.lang_detail[lang]
+  }
+  delete node.lang_detail
+  return node.detail
 }
 
 // Parse parameters.

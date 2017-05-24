@@ -24,7 +24,11 @@ properties:
     description: The type of the event.
 
   - property: int modifiers
-    description: Keyboard modifiers of the event.
+    description: A bit array  of keyboard modifiers of the event.
+    lang_detail:
+      cpp: |
+        Available modifiers can be found in
+        [KeyboardModifier](keyboardmodifier.html).
 
   - property: uint32_t timestamp
     description: |
