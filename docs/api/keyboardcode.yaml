@@ -1,0 +1,168 @@
+name: KeyboardCode
+description: Codes of keyboard keys.
+
+lang_detail:
+  lua: &ref |
+    Keyboard keys are represented with strings, in Yue we use the values of
+    HTML5 DOM's `KeyboardEvent.key` to represent the keys. A list of available
+    keys can be found at:
+    [Key Values - MDN](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values).
+
+    There is an exception that the <kbd>Space Bar</kbd> is represented as
+    `"Space"` in Yue instead of `" "`.
+
+  js: *ref
+
+  cpp: |
+    `KeyboardCode` is an `enum` with following values, the actual integer values
+    are different on different platforms:
+
+    * `VKEY_CANCEL`
+    * `VKEY_BACK`
+    * `VKEY_TAB`
+    * `VKEY_CLEAR`
+    * `VKEY_RETURN`
+    * `VKEY_SHIFT`
+    * `VKEY_CONTROL`
+    * `VKEY_MENU`
+    * `VKEY_PAUSE`
+    * `VKEY_CAPITAL`
+    * `VKEY_KANA`
+    * `VKEY_HANGUL`
+    * `VKEY_HANJA`
+    * `VKEY_KANJI`
+    * `VKEY_ESCAPE`
+    * `VKEY_SPACE`
+    * `VKEY_PRIOR`
+    * `VKEY_NEXT`
+    * `VKEY_END`
+    * `VKEY_HOME`
+    * `VKEY_LEFT`
+    * `VKEY_UP`
+    * `VKEY_RIGHT`
+    * `VKEY_DOWN`
+    * `VKEY_SELECT`
+    * `VKEY_PRINT`
+    * `VKEY_EXECUTE`
+    * `VKEY_SNAPSHOT`
+    * `VKEY_INSERT`
+    * `VKEY_DELETE`
+    * `VKEY_HELP`
+    * `VKEY_0`
+    * `VKEY_1`
+    * `VKEY_2`
+    * `VKEY_3`
+    * `VKEY_4`
+    * `VKEY_5`
+    * `VKEY_6`
+    * `VKEY_7`
+    * `VKEY_8`
+    * `VKEY_9`
+    * `VKEY_A`
+    * `VKEY_B`
+    * `VKEY_C`
+    * `VKEY_D`
+    * `VKEY_E`
+    * `VKEY_F`
+    * `VKEY_G`
+    * `VKEY_H`
+    * `VKEY_I`
+    * `VKEY_J`
+    * `VKEY_K`
+    * `VKEY_L`
+    * `VKEY_M`
+    * `VKEY_N`
+    * `VKEY_O`
+    * `VKEY_P`
+    * `VKEY_Q`
+    * `VKEY_R`
+    * `VKEY_S`
+    * `VKEY_T`
+    * `VKEY_U`
+    * `VKEY_V`
+    * `VKEY_W`
+    * `VKEY_X`
+    * `VKEY_Y`
+    * `VKEY_Z`
+    * `VKEY_LWIN`
+    * `VKEY_COMMAND`
+    * `VKEY_RWIN`
+    * `VKEY_APPS`
+    * `VKEY_NUMPAD0`
+    * `VKEY_NUMPAD1`
+    * `VKEY_NUMPAD2`
+    * `VKEY_NUMPAD3`
+    * `VKEY_NUMPAD4`
+    * `VKEY_NUMPAD5`
+    * `VKEY_NUMPAD6`
+    * `VKEY_NUMPAD7`
+    * `VKEY_NUMPAD8`
+    * `VKEY_NUMPAD9`
+    * `VKEY_MULTIPLY`
+    * `VKEY_ADD`
+    * `VKEY_SUBTRACT`
+    * `VKEY_DECIMAL`
+    * `VKEY_DIVIDE`
+    * `VKEY_F1`
+    * `VKEY_F2`
+    * `VKEY_F3`
+    * `VKEY_F4`
+    * `VKEY_F5`
+    * `VKEY_F6`
+    * `VKEY_F7`
+    * `VKEY_F8`
+    * `VKEY_F9`
+    * `VKEY_F10`
+    * `VKEY_F11`
+    * `VKEY_F12`
+    * `VKEY_F13`
+    * `VKEY_F14`
+    * `VKEY_F15`
+    * `VKEY_F16`
+    * `VKEY_F17`
+    * `VKEY_F18`
+    * `VKEY_F19`
+    * `VKEY_F20`
+    * `VKEY_F21`
+    * `VKEY_F22`
+    * `VKEY_F23`
+    * `VKEY_F24`
+    * `VKEY_NUMLOCK`
+    * `VKEY_SCROLL`
+    * `VKEY_LSHIFT`
+    * `VKEY_RSHIFT`
+    * `VKEY_LCONTROL`
+    * `VKEY_RCONTROL`
+    * `VKEY_LMENU`
+    * `VKEY_RMENU`
+    * `VKEY_BROWSER_BACK`
+    * `VKEY_BROWSER_FORWARD`
+    * `VKEY_BROWSER_REFRESH`
+    * `VKEY_BROWSER_STOP`
+    * `VKEY_BROWSER_SEARCH`
+    * `VKEY_BROWSER_FAVORITES`
+    * `VKEY_BROWSER_HOME`
+    * `VKEY_VOLUME_MUTE`
+    * `VKEY_VOLUME_DOWN`
+    * `VKEY_VOLUME_UP`
+    * `VKEY_MEDIA_NEXT_TRACK`
+    * `VKEY_MEDIA_PREV_TRACK`
+    * `VKEY_MEDIA_STOP`
+    * `VKEY_MEDIA_PLAY_PAUSE`
+    * `VKEY_MEDIA_LAUNCH_MAIL`
+    * `VKEY_MEDIA_LAUNCH_MEDIA_SELECT`
+    * `VKEY_MEDIA_LAUNCH_APP1`
+    * `VKEY_MEDIA_LAUNCH_APP2`
+    * `VKEY_OEM_1`
+    * `VKEY_OEM_PLUS`
+    * `VKEY_OEM_COMMA`
+    * `VKEY_OEM_MINUS`
+    * `VKEY_OEM_PERIOD`
+    * `VKEY_OEM_2`
+    * `VKEY_OEM_3`
+    * `VKEY_OEM_4`
+    * `VKEY_OEM_5`
+    * `VKEY_OEM_6`
+    * `VKEY_OEM_7`
+    * `VKEY_OEM_CLEAR`
+    * `VKEY_UNKNOWN`
