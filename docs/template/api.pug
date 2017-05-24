@@ -144,8 +144,9 @@ block sidebar
   h4 Formats:
   a(href=`${doc.id}.json`) JSON
 
-  h4 Types:
+  h4 Components:
   ul
     each type in types
-      li
-      +switch(type.name, `${type.id}.html`, doc.name == type.name, true)
+      if type.component == 'gui'
+        li
+        +switch(type.name, `${type.id}.html`, doc.name == type.name, true)
