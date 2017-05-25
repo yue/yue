@@ -28,8 +28,9 @@ class EntryImpl : public SubwinView {
   }
 
   void OnCommand(UINT code, int command) override {
+    Entry* entry = static_cast<Entry*>(delegate());
     if (code == EN_CHANGE)
-      static_cast<Entry*>(delegate())->on_text_change.Emit();
+      entry->on_text_change.Emit(entry);
   }
 
  protected:
@@ -38,8 +39,9 @@ class EntryImpl : public SubwinView {
   CR_END_MSG_MAP()
 
   void OnChar(UINT ch, UINT repeat, UINT flags) {
+    Entry* entry = static_cast<Entry*>(delegate());
     if (ch == VK_RETURN)  // enter means activate.
-      static_cast<Entry*>(delegate())->on_activate.Emit();
+      entry->on_activate.Emit(entry);
     else
       SetMsgHandled(false);
   }

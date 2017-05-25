@@ -1,0 +1,33 @@
+name: Entry
+component: gui
+inherit: View
+description: Single-line text input view.
+
+constructors:
+  - signature: Entry()
+    lang: ['cpp']
+    description: Create a new `Entry`.
+
+class_methods:
+  - signature: Entry* Create()
+    lang: ['lua', 'js']
+    description: Create a new `Entry`.
+
+class_properties:
+  - property: const char* kClassName
+    lang: ['cpp']
+    description: The class name of this view.
+
+methods:
+  - signature: void SetText(const std::string& text)
+    description: Change the text in the view.
+
+  - signature: std::string GetText() const
+    description: Return currently displayed text.
+
+events:
+  - callback: void on_text_change(Entry* self)
+    description: Emitted when user has changed text.
+
+  - callback: void on_activate(Entry* self)
+    description: Emitted when user has pressed <kbd>Enter</kbd> in the view.

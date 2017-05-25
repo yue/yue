@@ -56,11 +56,11 @@
 }
 
 - (IBAction)onActivate:(id)sender {
-  shell_->on_activate.Emit();
+  shell_->on_activate.Emit(shell_);
 }
 
 - (void)controlTextDidChange:(NSNotification*)notification {
-  shell_->on_text_change.Emit();
+  shell_->on_text_change.Emit(shell_);
 }
 
 @end

@@ -25,8 +25,8 @@ class NATIVEUI_EXPORT Entry : public View {
   const char* GetClassName() const override;
 
   // Events.
-  Signal<void()> on_text_change;
-  Signal<void()> on_activate;
+  Signal<void(Entry*)> on_text_change;
+  Signal<void(Entry*)> on_activate;
 
  protected:
   ~Entry() override;
