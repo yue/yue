@@ -1,43 +1,57 @@
 [submodule "third_party/modp_b64"]
 	path = third_party/modp_b64
 	url = https://chromium.googlesource.com/chromium/src/third_party/modp_b64
+	shallow = true
 [submodule "third_party/icu"]
 	path = third_party/icu
 	url = https://chromium.googlesource.com/chromium/deps/icu
+	shallow = true
 [submodule "testing/gmock"]
 	path = testing/gmock
 	url = https://chromium.googlesource.com/external/googlemock
+	shallow = true
 [submodule "third_party/zlib"]
 	path = third_party/zlib
 	url = https://chromium.googlesource.com/chromium/src/third_party/zlib
+	shallow = true
 [submodule "testing/gtest"]
 	path = testing/gtest
 	url = https://github.com/google/googletest/
+	shallow = true
 [submodule "tools/gyp"]
 	path = tools/gyp
 	url = https://chromium.googlesource.com/external/gyp
+	shallow = true
 [submodule "third_party/tcmalloc/chromium"]
 	path = third_party/tcmalloc/chromium
 	url = https://chromium.googlesource.com/chromium/src/third_party/tcmalloc/chromium
+	shallow = true
 [submodule "base"]
 	path = base
 	url = https://chromium.googlesource.com/chromium/src/base
+	shallow = true
 [submodule "build/toolchain"]
 	path = build/toolchain
 	url = https://chromium.googlesource.com/chromium/src/build/toolchain
   ignore = untracked
+	shallow = true
 [submodule "third_party/lua"]
 	path = third_party/lua
 	url = https://github.com/lua/lua
+	shallow = true
 [submodule "third_party/yoga"]
 	path = third_party/yoga
 	url = https://github.com/facebook/yoga
+	shallow = true
 [submodule "third_party/yxml"]
 	path = third_party/yxml
 	url = git://g.blicky.net/yxml.git
+	shallow = true
 [submodule "testing/libfuzzer"]
 	path = testing/libfuzzer
 	url = https://chromium.googlesource.com/chromium/src/testing/libfuzzer/
+	shallow = true
 [submodule "third_party/ced/src"]
 	path = third_party/ced/src
 	url = https://github.com/google/compact_enc_det.git
+	shallow = true
