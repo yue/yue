@@ -622,6 +622,7 @@ struct Type<nu::MenuItem> {
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
            "create", &Create,
+           "click", &nu::MenuItem::Click,
            "setlabel", &nu::MenuItem::SetLabel,
            "getlabel", &nu::MenuItem::GetLabel,
            "setchecked", &nu::MenuItem::SetChecked,

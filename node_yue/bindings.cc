@@ -667,6 +667,7 @@ struct Type<nu::MenuItem> {
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
+        "click", &nu::MenuItem::Click,
         "setLabel", &nu::MenuItem::SetLabel,
         "getLabel", &nu::MenuItem::GetLabel,
         "setChecked", &nu::MenuItem::SetChecked,

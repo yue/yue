@@ -60,7 +60,7 @@ class NATIVEUI_EXPORT MenuItem : public base::RefCounted<MenuItem> {
   NativeMenuItem GetNative() const { return menu_item_; }
 
   // Events.
-  Signal<void()> on_click;
+  Signal<void(MenuItem*)> on_click;
 
   // Internal: Set the owner of menu item.
   void set_menu(MenuBase* menu) { menu_ = menu; }

@@ -1,0 +1,23 @@
+name: Menu
+component: gui
+inherit: MenuBase
+description: Popup menu.
+
+constructors:
+  - signature: Menu()
+    lang: ['cpp']
+    description: Create a popup menu.
+
+class_methods:
+  - signature: Menu create(Array items)
+    lang: ['lua', 'js']
+    description: Create a popup menu.
+    parameters:
+      items:
+        description: An array of menu items to be inserted to the menu.
+
+method:
+  - signature: void Popup()
+    description: |
+      Show the popup menu at current mouse position, this method will block
+      until the menu is dismissed.

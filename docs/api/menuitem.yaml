@@ -1,0 +1,92 @@
+name: MenuItem
+type: refcounted
+component: gui
+description: Menu item.
+
+constructors:
+  - signature: MenuItem(MenuItem::Type type)
+    lang: ['cpp']
+    description: Create a menu item.
+
+class_methods:
+  - signature: MenuItem create(MenuItem::Type type)
+    lang: ['lua', 'js']
+    description: Create a menu item with `type`.
+
+  - signature: MenuItem create(Dictionary options)
+    lang: ['lua', 'js']
+    description: Create a menu item with `options`.
+    parameters:
+      options:
+        properties:
+          - property: MenuItem::Type type
+          - property: bool checked
+          - property: Menu submenu
+          - property: bool visible
+          - property: bool enabled
+          - property: std::string label
+          - property: Accelerator accelerator
+          - property: Function on_click
+
+methods:
+  - signature: void Click()
+    description: Emulate user clicking the menu item.
+
+  - signature: void SetLabel(const std::string& label)
+    description: Change the item's label.
+
+  - signature: std::string GetLabel() const
+    description: Return the item's label.
+
+  - signature: void SetSubmenu(Menu* submenu)
+    description: |
+      Set the submenu attached to the item.
+
+      This method only works for `submenu` type menu items.
+
+  - signature: Menu* GetSubmenu() const
+    description: Return the submenu attached to the item.
+
+  - signature: void SetChecked(bool checked)
+    description: |
+      Set the `checked` state of the item.
+
+      This method only works for `radio` and `checkbox` type menu items.
+
+  - signature: bool IsChecked() const
+    description: Return the `checked` state of the item.
+
+  - signature: void SetEnabled(bool enabled)
+    description: Enable/disable the item.
+
+  - signature: bool IsEnabled() const
+    description: Return whether the item is enabled.
+
+  - signature: void SetVisible(bool visible)
+    description: Show/hide the item.
+
+  - signature: bool IsVisible() const
+    description: Return whether the item is visible to users.
+
+  - signature: void SetAccelerator(const Accelerator& accelerator)
+    description: Set the `accelerator` used to activate the item.
+
+  - signature: Accelerator GetAccelerator() const
+    lang: ['cpp']
+    description: Return the accelerator of the item.
+
+  - signature: MenuItem::Type GetType() const
+    lang: ['cpp']
+    description: Return the type of the item.
+
+  - signature: MenuBase* GetMenu() const
+    lang: ['cpp']
+    description: Return the parent menu of the item.
+
+  - signature: NativeMenuItem GetNative() const
+    lang: ['cpp']
+    description: Return the native instance wrapped by the item.
+
+events:
+  - callback: void on_click(MenuItem* self)
+    description: Emitted when item is clicked.

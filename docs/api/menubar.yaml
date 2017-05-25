@@ -1,0 +1,17 @@
+name: MenuBar
+component: gui
+inherit: MenuBase
+description: Menu bar.
+
+constructors:
+  - signature: MenuBar()
+    lang: ['cpp']
+    description: Create a menubar.
+
+class_methods:
+  - signature: MenuBar create(Array items)
+    lang: ['lua', 'js']
+    description: Create a menubar.
+    parameters:
+      items:
+        description: An array of menu items to be inserted to the menu.

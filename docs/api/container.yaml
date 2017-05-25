@@ -7,6 +7,10 @@ detail: |
   * Show custom drawn content;
   * Display a collection of child views.
 
+lang_detail:
+  lua: |
+    Note that the `index` counts from `1`, following lua's convention.
+
 constructors:
   - signature: Container()
     lang: ['cpp']

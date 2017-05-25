@@ -1,5 +1,5 @@
 name: MouseEvent
-component: gui
+type: struct
 inherit: Event
 description: Mouse event.
 

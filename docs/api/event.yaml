@@ -1,5 +1,5 @@
 name: Event
-component: gui
+type: struct
 description: Generic input event type.
 
 class_properties:

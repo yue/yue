@@ -1,0 +1,23 @@
+name: MenuItem::Type
+type: enum_class
+description: Represent possible `Menuitem` types.
+
+lang_detail:
+  cpp: |
+    This type is an `enum class` with following values:
+    * `MenuItem::Type::Label`
+    * `MenuItem::Type::Checkbox`
+    * `MenuItem::Type::Radio`
+    * `MenuItem::Type::Separator`
+    * `MenuItem::Type::Submenu`
+
+  lua: &ref |
+    This type is a string with following possible values:
+    * `"label"`
+    * `"checkbox"`
+    * `"radio"`
+    * `"separator"`
+    * `"submenu"`
+
+  js: *ref
+

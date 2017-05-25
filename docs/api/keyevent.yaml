@@ -1,5 +1,5 @@
 name: KeyEvent
-component: gui
+type: struct
 inherit: Event
 description: Keyboard event.
 

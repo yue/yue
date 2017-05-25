@@ -270,6 +270,7 @@ function parseType(lang, str) {
       case 'unsigned': type = 'integer'; break
       case 'int': type = 'integer'; break
       case 'Dictionary': type = 'table'; break
+      case 'Array': type = 'table'; break
       case 'Function': type = 'function'; break
       case 'base::Closure': type = 'function'; break
       default: builtin = false
@@ -284,7 +285,8 @@ function parseType(lang, str) {
       case 'unsigned': type = 'Integer'; break
       case 'int': type = 'Integer'; break
       case 'Dictionary': type = 'Object'; break
-      case 'Function': break
+      case 'Array': type = 'Array'; break
+      case 'Function': type = 'Function'; break
       case 'base::Closure': type = 'Function'; break
       default: builtin = false
     }

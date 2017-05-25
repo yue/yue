@@ -1,8 +1,10 @@
 name: View
+type: refcounted
 component: gui
 description: Base class for GUI components.
 detail: |
   `View` provides methods to receive and change various style properties.
+
 lang_detail:
   cpp: |
     `View` is a `RefCounted` type. Sub-classes of `View` can only be created on

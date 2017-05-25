@@ -1,4 +1,5 @@
 name: Button::Type
+type: enum_class
 description: Represent possible `Button` types.
 
 lang_detail:

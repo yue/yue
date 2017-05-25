@@ -12,7 +12,7 @@ class MenuItemTest : public testing::Test {
   nu::State state_;
 };
 
-void OnClick(bool* ptr) {
+void OnClick(bool* ptr, nu::MenuItem* item) {
   *ptr = true;
 }
 

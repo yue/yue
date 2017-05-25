@@ -16,7 +16,7 @@ void MenuItem::Click() {
     SetChecked(!IsChecked());
   else if (type_ == Type::Radio)
     SetChecked(true);
-  on_click.Emit();
+  on_click.Emit(this);
 }
 
 void MenuItem::SetLabel(const std::string& label) {

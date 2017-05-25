@@ -1,0 +1,28 @@
+name: MenuBase
+type: refcounted
+component: gui
+description: Base class of menu bar and popup menu.
+
+lang_detail:
+  lua: |
+    Note that the `index` counts from `1`, following lua's convention.
+
+methods:
+  - signature: void Append(MenuItem* item)
+    description: Append the `item` to the menu.
+
+  - signature: void Insert(MenuItem* item, int index)
+    description: Insert the `item` at `index` to the menu.
+
+  - signature: void Remove(MenuItem* item)
+    description: Remove the `item` from the menu.
+
+  - signature: int ItemCount() const
+    description: Return the count of items in the menu.
+
+  - signature: MenuItem* ItemAt(int index) const
+    description: Return the item at `index`.
+
+  - signature: NativeMenu GetNative() const
+    lang: ['cpp']
+    description: Return the native instance wrapped by the class.

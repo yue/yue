@@ -30,7 +30,7 @@
     shell_->SetChecked(!shell_->IsChecked());
   else if (shell_->GetType() == nu::MenuItem::Type::Radio)
     shell_->SetChecked(true);
-  shell_->on_click.Emit();
+  shell_->on_click.Emit(shell_);
 }
 
 @end

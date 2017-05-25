@@ -1,4 +1,5 @@
 name: App::ThemeColor
+type: enum_class
 description: Represent possible theme colors.
 
 lang_detail:
