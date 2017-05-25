@@ -30,10 +30,6 @@ State::State() : yoga_config_(YGConfigNew()) {
 
   lazy_tls_ptr.Pointer()->Set(this);
   PlatformInit();
-
-  // Default yoga config.
-  YGConfigSetExperimentalFeatureEnabled(yoga_config_,
-                                        YGExperimentalFeatureRounding, true);
 }
 
 State::~State() {
