@@ -1,0 +1,64 @@
+name: Lifetime
+component: gui
+description: Event loop and application lifetime.
+detail: |
+  This class initializes a GUI event loop, and provides APIs to manage
+  application's lifetime. Depending on the runtime you use, Yue may or may not
+  provide this API.
+
+lang_detail:
+  cpp: |
+    If you are using Yue in an environment that does not have its own event
+    loop, you should create `Lifetime` at any time before entering event loop.
+
+    ```cpp
+    nu::State state;
+    nu::Lifetime lifetime;
+    lifetime.Run();
+    ```
+
+  lua: |
+    This class can not be created by user, you can only receive its global
+    instance from the `lifetime` property of the module:
+
+    ```lua
+    local gui = require('yue.gui')
+    gui.lifetime:run()
+    ```
+
+  js: |
+    This class can not be created by user, you can only receive its global
+    instance from the `lifetime` property of the module:
+
+    ```js
+    const gui = require('gui')
+    gui.lifetime.run()
+    ```
+
+constructor:
+  - signature: Lifetime()
+    lang: ['cpp']
+    description: |
+      Create a `Lifetime` instance, you can only have one instance per thread.
+
+methods:
+  - signature: void Run()
+    description: Enter event loop.
+
+  - signature: void Quit()
+    description: Quit event loop.
+
+  - signature: void PostTask(const base::Closure& task)
+    description: Post a `task` to event loop.
+
+  - signature: void PostDelayedTask(int ms, const base::Closure& task);
+    description: Post a `task` to event loop and execute it after `ms`.
+    parameters:
+      ms:
+        description: The number of milliseconds to wait
+
+events:
+  - callback: void on_ready()
+    platform: ['macOS']
+    description: |
+      Emitted when received `applicationDidFinishLaunching` notification.

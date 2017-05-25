@@ -46,15 +46,19 @@ mixin parameter(node)
         li
           +parameter(property)
 
-//- Display a method.
-mixin method(node)
+//- The title with platform label.
+mixin title_with_label(node, str)
   h3(id=node.id)
     +anchor(node.id)
-    | #{node.signature.str}
+    | #{str}
     if node.platform
       each platform in node.platform
         |  
         span.platform #{platform}
+
+//- Display a method.
+mixin method(node)
+  +title_with_label(node, node.signature.str)
   +description(node)
   if node.signature.parameters.length > 0
     h4 Parameters
@@ -123,10 +127,11 @@ block content
   if doc.events
     +title('h2', 'events', 'Events')
     each node in doc.events
-      +title('h3', node.id, node.callback.str)
+      +title_with_label(node, node.callback.str)
       +description(node)
-      h4 Parameters
-      +parameters(node.callback.parameters)
+      if node.callback.parameters.length > 0
+        h4 Parameters
+        +parameters(node.callback.parameters)
       h4 Preventable
       if node.callback.returnType
         | Yes.
