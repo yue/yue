@@ -1,0 +1,32 @@
+name: Group
+component: gui
+inherit: View
+description: Display a container view with title and border.
+
+constructors:
+  - signature: Group(const std::string& title)
+    lang: ['cpp']
+    description: Create a new `Group` with `title`.
+
+class_methods:
+  - signature: Group* Create(const std::string& title)
+    lang: ['lua', 'js']
+    description: Create a new `Group` with `title`.
+
+class_properties:
+  - property: const char* kClassName
+    lang: ['cpp']
+    description: The class name of this view.
+
+methods:
+  - signature: void SetContentView(Container* view)
+    description: Set the content view.
+
+  - signature: Container* GetContentView() const
+    description: Return the content view.
+
+  - signature: void SetTitle(const std::string& title)
+    description: Set the title.
+
+  - signature: std::string GetTitle() const
+    description: Return the title.
