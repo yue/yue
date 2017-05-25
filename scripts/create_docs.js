@@ -170,6 +170,10 @@ function pruneNode(lang, node) {
   } else if (node.callback) {
     node.id = generateIdForSignature(node.callback)
     node.callback = parseSignature(lang, node.callback)
+    if (node.parameters) {
+      mergePrameters(node.callback, node.parameters)
+      delete node.parameters
+    }
   }
 
   return node

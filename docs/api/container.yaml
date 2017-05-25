@@ -1,0 +1,79 @@
+name: Container
+component: gui
+inherit: View
+description: Drawable view with child views.
+detail: |
+  The `Container` view is mainly used for two purposes:
+  * Show custom drawn content;
+  * Display a collection of child views.
+
+constructors:
+  - signature: Container()
+    lang: ['cpp']
+    description: Create a new container view.
+
+class_methods:
+  - signature: Container* Create()
+    lang: ['lua', 'js']
+    description: Create a new container view.
+
+class_properties:
+  - property: const char* kClassName
+    lang: ['cpp']
+    description: The class name of this view.
+
+methods:
+  - signature: SizeF GetPreferredSize() const
+    description: |
+      Get the minimum size to show all children of the view.
+
+      Note that if the view is using a `flex-wrap: wrap` style, this method
+      might return a extremely wide/high size since it does not know the best
+      width/height to show the children.
+
+  - signature: float GetPreferredHeightForWidth(float width) const
+    description: |
+      Return the minimum height to show all child of the view for the `width`.
+
+  - signature: float GetPreferredWidthForHeight(float height) const
+    description: |
+      Return the minimum width to show all child of the view for the `height`.
+
+  - signature: void AddChildView(View* view)
+    description: |
+      Append a child `view` to the container.
+
+      This method will silently fail if the `view` already has a parent.
+
+  - signature: void AddChildViewAt(View* view, int index)
+    description: |
+      Add a child `view` to the container at `index`.
+
+      This method will silently fail if the `view` already has a parent.
+
+  - signature: void RemoveChildView(View* view)
+    description: |
+      Remove a child `view` from this container.
+
+      This method will silently fail if the `view` is not a child of the
+      container.
+
+  - signature: int ChildCount() const
+    description: Return the count of children in the container.
+
+  - signature: View* ChildAt(int index) const
+    description: |
+      Return the child `view` at `index`.
+
+      This method will silently fail if the `index` is out of range.
+
+events:
+  - callback: void on_draw(Container* self, Painter* painter, const RectF& dirty)
+    description: |
+      Emitted when button the operating system or application requests to draw
+      a portion of the view.
+    parameters:
+      painter:
+        description: The drawing context of the view.
+      dirty:
+        description: The area in the view to draw on.
