@@ -31,13 +31,13 @@ Progress::Progress() {
 Progress::~Progress() {
 }
 
-void Progress::SetValue(int value) {
+void Progress::SetValue(float value) {
   auto* progress = static_cast<ProgressImpl*>(GetNative());
   SetIndeterminate(false);
   SendMessageW(progress->hwnd(), PBM_SETPOS, value, 0);
 }
 
-int Progress::GetValue() const {
+float Progress::GetValue() const {
   return 0;
 }
 

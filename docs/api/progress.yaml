@@ -1,0 +1,35 @@
+name: Progress
+component: gui
+header: nativeui/progress.h
+type: refcounted
+namespace: nu
+inherit: View
+description: Horizontal bar showing progress.
+
+constructors:
+  - signature: Progress()
+    lang: ['cpp']
+    description: Create a new `Progress` bar.
+
+class_methods:
+  - signature: Progress* Create()
+    lang: ['lua', 'js']
+    description: Create a new `Progress` bar.
+
+class_properties:
+  - property: const char* kClassName
+    lang: ['cpp']
+    description: The class name of this view.
+
+methods:
+  - signature: void SetValue(float percent)
+    description: Set the percent value between `0` and `100.0`.
+
+  - signature: float GetValue() const
+    description: Return the percent value between `0` and `100.0`.
+
+  - signature: void SetIndeterminate(bool indeterminate)
+    description: Set whether the progress bar is indeterminate.
+
+  - signature: bool IsIndeterminate() const
+    description: Return whether the progress bar is indeterminate.

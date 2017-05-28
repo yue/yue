@@ -31,13 +31,13 @@ Progress::Progress() {
 Progress::~Progress() {
 }
 
-void Progress::SetValue(int value) {
+void Progress::SetValue(float value) {
   SetIndeterminate(false);
-  gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(GetNative()), value / 100.0);
+  gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(GetNative()), value / 100.);
 }
 
-int Progress::GetValue() const {
-  return gtk_progress_bar_get_fraction(GTK_PROGRESS_BAR(GetNative())) * 100;
+float Progress::GetValue() const {
+  return gtk_progress_bar_get_fraction(GTK_PROGRESS_BAR(GetNative())) * 100.;
 }
 
 void Progress::SetIndeterminate(bool indeterminate) {

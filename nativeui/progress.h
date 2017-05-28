@@ -19,7 +19,7 @@ class NATIVEUI_EXPORT Progress : public View {
   void SetValue(int value);
   int GetValue() const;
 
-  void SetIndeterminate(bool inditerminate);
+  void SetIndeterminate(bool indeterminate);
   bool IsIndeterminate() const;
 
   // View:
