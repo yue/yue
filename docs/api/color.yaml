@@ -1,4 +1,7 @@
 name: Color
+header: nativeui/gfx/color.h
+type: class
+namespace: nu
 description: 32-bit Color with alpha channel.
 
 lang_detail:

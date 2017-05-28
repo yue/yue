@@ -1,6 +1,8 @@
 name: MouseEvent
-type: struct
 inherit: Event
+header: nativeui/events/event.h
+type: struct
+namespace: nu
 description: Mouse event.
 
 properties:

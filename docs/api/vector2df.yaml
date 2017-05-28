@@ -1,5 +1,9 @@
 name: Vector2dF
+header: nativeui/gfx/geometry/vector2d_f.h
+type: class
+namespace: nu
 description: Two dimensions vector.
+
 lang_detail:
   cpp: |
     This class is used to indicate a distance in two dimensions between two

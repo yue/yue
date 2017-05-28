@@ -1,5 +1,8 @@
 name: Menu
 component: gui
+header: nativeui/menu.h
+type: refcounted
+namespace: nu
 inherit: MenuBase
 description: Popup menu.
 

@@ -19,11 +19,10 @@ mixin description(node)
 
 //- Display a type with possible goto link.
 mixin type(node)
-  code
-    if node.id
-      a.type(href=`${node.id}.html`) #{node.name}
-    else
-      span.type #{node.name}
+  if node.id
+    a.type(href=`${node.id}.html`) #{node.name}
+  else
+    span.type #{node.name}
 
 //- A list of parameter.
 mixin parameters(parameters)
@@ -34,7 +33,8 @@ mixin parameters(parameters)
 
 //- Inline description of parameter.
 mixin parameter(node)
-  +type(node.type)
+  code
+    +type(node.type)
   |  
   span.code #{node.name}
   if node.description
@@ -65,7 +65,8 @@ mixin method(node)
     +parameters(node.signature.parameters)
   if node.signature.returnType
     h4 Return
-    +type(node.signature.returnType)
+    code
+      +type(node.signature.returnType)
 
 //- Display a link with chosen state.
 mixin switch(text, href, chosen, enabled)
@@ -79,12 +80,42 @@ mixin switch(text, href, chosen, enabled)
 //- Main page starts from here.
 block content
   h1 #{doc.name}
-  if doc.inherit
-    p
-      | Inherits 
-      +type(doc.inherit)
-      | .
-  +description(doc)
+  != markdown(doc.description)
+
+  if lang == 'cpp'
+    table
+      tr
+        td Header
+        td.code #include "#{doc.header}"
+
+      if doc.namespace
+        tr
+          td Namespace
+          td.code namespace #{doc.namespace}
+
+      tr
+        td Type
+        td.code
+          if doc.type == 'refcounted'
+            | class (RefCounted)
+          else
+            | #{doc.type}
+
+      if doc.inherit
+        tr
+          td Inherits
+          td.code
+            +type(doc.inherit)
+
+  else if doc.inherit
+    table
+      tr
+        td Inherits
+        td.code
+          +type(doc.inherit)
+
+  if doc.detail
+    != markdown(doc.detail)
 
   if doc.global_functions
     +title('h2', 'global-functions', 'Global functions')
@@ -106,7 +137,8 @@ block content
     each node in doc.class_properties
       h3(id=node.id)
         +anchor(id)
-        +type(node.type)
+        code
+          +type(node.type)
         |  #{node.name}
       +description(node)
 
@@ -115,7 +147,8 @@ block content
     each node in doc.properties
       h3(id=node.id)
         +anchor(id)
-        +type(node.type)
+        code
+          +type(node.type)
         |  #{node.name}
       +description(node)
 

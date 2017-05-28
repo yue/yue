@@ -1,5 +1,9 @@
 name: PointF
+header: nativeui/gfx/geometry/point_f.h
+type: class
+namespace: nu
 description: A point with x and y coordinate.
+
 lang_detail:
   lua: |
     This type is represented by a table with `x` and `y` properties.

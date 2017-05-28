@@ -1,5 +1,7 @@
 name: App::ThemeColor
-type: enum_class
+header: nativeui/app.h
+type: enum class
+namespace: nu
 description: Represent possible theme colors.
 
 lang_detail:

@@ -1,5 +1,8 @@
 name: EventType
 lang: ['cpp']
+header: nativeui/events/event.h
+type: enum class
+namespace: nu
 description: Represent possible event types.
 
 detail: |

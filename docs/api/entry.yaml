@@ -1,5 +1,8 @@
 name: Entry
 component: gui
+header: nativeui/entry.h
+type: refcounted
+namespace: nu
 inherit: View
 description: Single-line text input view.
 

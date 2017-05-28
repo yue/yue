@@ -1,5 +1,8 @@
 name: Button
 component: gui
+header: nativeui/button.h
+type: refcounted
+namespace: nu
 inherit: View
 description: Native button, can also be used as checkbox and radio button.
 

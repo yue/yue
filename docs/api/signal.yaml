@@ -1,6 +1,10 @@
 name: Signal
 component: gui
+header: nativeui/signal.h
+type: template class<typename Sig>
+namespace: nu
 description: Connect and emit events.
+
 lang_detail:
   cpp: |
     The template class `Signal<Sig>` implements the signal/slot pattern, which

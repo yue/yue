@@ -1,5 +1,9 @@
 name: RectF
+header: nativeui/gfx/geometry/rect_f.h
+type: class
+namespace: nu
 description: Rectangle type.
+
 detail: |
   This type defines a simple integer rectangle class. The containment semantics
   are array-like; that is, the coordinate (x, y) is considered to be

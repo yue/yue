@@ -1,6 +1,8 @@
 name: MenuBase
-type: refcounted
 component: gui
+header: nativeui/menu_base.h
+type: refcounted
+namespace: nu
 description: Base class of menu bar and popup menu.
 
 lang_detail:

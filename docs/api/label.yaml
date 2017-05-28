@@ -1,5 +1,8 @@
 name: Label
 component: gui
+header: nativeui/label.h
+type: refcounted
+namespace: nu
 inherit: View
 description: Display text.
 

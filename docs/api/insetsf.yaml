@@ -1,5 +1,8 @@
 name: InsetsF
 lang: ['cpp']
+header: nativeui/gfx/geometry/insets_f.h
+type: class
+namespace: nu
 description: Borders inside rectangle.
 
 constructors:

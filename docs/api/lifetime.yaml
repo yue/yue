@@ -1,5 +1,8 @@
 name: Lifetime
 component: gui
+header: nativeui/lifetime.h
+type: class
+namespace: nu
 description: Event loop and application lifetime.
 detail: |
   This class initializes a GUI event loop, and provides APIs to manage

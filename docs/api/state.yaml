@@ -1,7 +1,11 @@
 name: State
 lang: ['cpp']
 component: gui
+header: nativeui/state.h
+type: class
+namespace: nu
 description: Global state.
+
 detail: |
   This class manages the global state of Yue's GUI components, it should always
   be initialized before you call any GUI related API, and released after all

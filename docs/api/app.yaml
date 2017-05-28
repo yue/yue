@@ -1,8 +1,13 @@
 name: App
 component: gui
+header: nativeui/app.h
+type: class
+namespace: nu
 description: Application class.
+
 detail: |
   This class represents current app and provides app wide APIs.
+
 lang_detail:
   cpp: |
     This class can not be created by user, you must create `State` first and

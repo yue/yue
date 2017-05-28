@@ -1,4 +1,7 @@
 name: Accelerator
+header: nativeui/accelerator.h
+type: class
+namespace: nu
 description: Keyboard shortcut.
 
 detail: |

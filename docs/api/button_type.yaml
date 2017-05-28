@@ -1,5 +1,7 @@
 name: Button::Type
-type: enum_class
+header: nativeui/button.h
+type: enum class
+namespace: nu
 description: Represent possible `Button` types.
 
 lang_detail:

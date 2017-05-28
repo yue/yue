@@ -1,5 +1,7 @@
 name: Event
+header: nativeui/events/event.h
 type: struct
+namespace: nu
 description: Generic input event type.
 
 class_properties:

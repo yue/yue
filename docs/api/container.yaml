@@ -1,7 +1,11 @@
 name: Container
 component: gui
+header: nativeui/container.h
+type: class
+namespace: nu
 inherit: View
 description: Drawable view with child views.
+
 detail: |
   The `Container` view is mainly used for two purposes:
   * Show custom drawn content;

@@ -1,5 +1,8 @@
 name: KeyboardModifier
 lang: ['cpp']
+header: nativeui/events/keyboard_codes.h
+type: enum
+namespace: nu
 description: The keyboard modifier masks.
 
 detail: |

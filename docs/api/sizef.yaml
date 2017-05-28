@@ -1,5 +1,9 @@
 name: SizeF
+header: nativeui/gfx/geometry/size_f.h
+type: class
+namespace: nu
 description: Size type.
+
 lang_detail:
   lua: |
     This type is represented by a table with `width` and `height` properties.

@@ -1,5 +1,8 @@
 name: MenuBar
 component: gui
+header: nativeui/menu_bar.h
+type: refcounted
+namespace: nu
 inherit: MenuBase
 description: Menu bar.
 

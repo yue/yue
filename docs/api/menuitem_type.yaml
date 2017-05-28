@@ -1,5 +1,7 @@
 name: MenuItem::Type
-type: enum_class
+header: nativeui/menu_item.h
+type: enum class
+namespace: nu
 description: Represent possible `Menuitem` types.
 
 lang_detail:

@@ -1,4 +1,7 @@
 name: KeyboardCode
+header: nativeui/events/keyboard_codes.h
+type: enum
+namespace: nu
 description: Codes of keyboard keys.
 
 lang_detail:

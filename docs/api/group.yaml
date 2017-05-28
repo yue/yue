@@ -1,5 +1,8 @@
 name: Group
 component: gui
+header: nativeui/group.h
+type: refcounted
+namespace: nu
 inherit: View
 description: Display a container view with title and border.
 
