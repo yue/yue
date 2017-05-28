@@ -1,0 +1,55 @@
+name: Scroll
+component: gui
+header: nativeui/scroll.h
+type: refcounted
+namespace: nu
+inherit: View
+description: Show a part of view with scrollbar.
+
+detail: |
+  The `Scroll` view can show an arbitrary content view inside it.
+
+  When the content is larger than the `Scroll` view, scrollbars will be
+  optionally showed. When the content view is smaller then the `Scroll` view,
+  the content view will be resized to the size of the `Scroll` view.
+
+constructors:
+  - signature: Scroll()
+    lang: ['cpp']
+    description: Create a new `Scroll` view.
+
+class_methods:
+  - signature: Scroll* Create()
+    lang: ['lua', 'js']
+    description: Create a new `Scroll` view.
+
+class_properties:
+  - property: const char* kClassName
+    lang: ['cpp']
+    description: The class name of this view.
+
+methods:
+  - signature: void SetContentView(View* view)
+    description: Set the content `view`.
+
+  - signature: View* GetContentView() const
+    description: Return the content `view`.
+
+  - signature: void SetContentSize(const SizeF& size)
+    description: Set the size of content view.
+
+  - signature: SizeF GetContentSize() const
+    description: Return the size of content view.
+
+  - signature: void SetScrollbarPolicy(Scroll::Policy hpolicy, Scroll::Policy vpolicy)
+    description: |
+      Change the display policy for horizontal and vertical scrollbars.
+    parameters:
+      hpolicy:
+        description: Policy for horizontal scrollbar.
+      vpolicy:
+        description: Policy for vertical scrollbar.
+
+  - signature: std::tuple<Scroll::Policy, Scroll::Policy> GetScrollbarPolicy() const
+    description: |
+      Return the display policy of horizontal and vertical scrollbars.
