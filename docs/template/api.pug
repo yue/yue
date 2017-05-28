@@ -19,7 +19,24 @@ mixin description(node)
 
 //- Display a type with possible goto link.
 mixin type(node)
-  if node.id
+  if node.template
+    span.type
+      if lang == 'cpp'
+        | #{node.template}<
+      else if lang == 'js'
+        | [
+      each arg, i in node.args
+        if arg.id
+          a.type(href=`${arg.id}.html}`) #{arg.name}
+        else
+          | #{arg.name}
+        if i != node.args.length - 1
+          | , 
+      if lang == 'cpp'
+        | >
+      else if lang == 'js'
+        | ]
+  else if node.id
     a.type(href=`${node.id}.html`) #{node.name}
   else
     span.type #{node.name}

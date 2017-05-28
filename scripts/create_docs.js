@@ -244,56 +244,66 @@ function parseName(lang, str) {
 // Convert type name from C++ to |lang|.
 function parseType(lang, str) {
   // Strip C++ qualifiers.
-  let type = str
-  if (type.startsWith('const '))
-    type = type.substr('const '.length)
-  if (type.endsWith('*') || type.endsWith('&'))
-    type = type.substr(0, type.length - 1)
+  let type = { name: str }
+  if (type.name.startsWith('const '))
+    type.name = type.name.substr('const '.length)
+  if (type.name.endsWith('*') || type.name.endsWith('&'))
+    type.name = type.name.substr(0, type.name.length - 1)
+  // Parse the templates.
+  let match = type.name.match(/^(.*)<(.*)>$/)
+  if (match) {
+    type.name = match[1]
+    if (type.name == 'std::tuple') {
+      type.template = match[1]
+      type.args = match[2].split(',').map((t) => parseType(lang, t.trim()))
+    }
+  }
   // No need to convert types for C++.
+  let builtin = true
   if (lang == 'cpp') {
     let builtins = [ 'bool', 'float', 'std::string', 'char', 'uint32_t',
-                     'unsigned', 'int', 'base::Callback<Sig>', 'base::Closure',
-                     'Args...' ]
-    return builtins.includes(type)
-      ? { name: str }
-      : { name: str, id: type.toLowerCase().replace('::', '_') }
+                     'unsigned', 'int', 'base::Callback', 'Args...' ]
+    builtin = builtins.includes(type.name)
   }
   // Convertbuilt-in types for differnt languages.
-  let builtin = true
   if (lang == 'lua') {
-    switch (type) {
-      case 'bool': type = 'boolean'; break
-      case 'float': type = 'number'; break
-      case 'std::string': type = 'string'; break
-      case 'char': type = 'string'; break
-      case 'uint32_t': type = 'integer'; break
-      case 'unsigned': type = 'integer'; break
-      case 'int': type = 'integer'; break
-      case 'Dictionary': type = 'table'; break
-      case 'Array': type = 'table'; break
-      case 'Function': type = 'function'; break
-      case 'base::Closure': type = 'function'; break
+    switch (type.name) {
+      case 'bool': type.name = 'boolean'; break
+      case 'float': type.name = 'number'; break
+      case 'std::string': type.name = 'string'; break
+      case 'char': type.name = 'string'; break
+      case 'uint32_t': type.name = 'integer'; break
+      case 'unsigned': type.name = 'integer'; break
+      case 'int': type.name = 'integer'; break
+      case 'Dictionary': type.name = 'table'; break
+      case 'Array': type.name = 'table'; break
+      case 'Function': type.name = 'function'; break
+      case 'base::Callback': type.name = 'function'; break
       default: builtin = false
     }
   } else if (lang == 'js') {
-    switch (type) {
-      case 'bool': type = 'Boolean'; break
-      case 'float': type = 'Number'; break
-      case 'std::string': type = 'String'; break
-      case 'char': type = 'String'; break
-      case 'uint32_t': type = 'Integer'; break
-      case 'unsigned': type = 'Integer'; break
-      case 'int': type = 'Integer'; break
-      case 'Dictionary': type = 'Object'; break
-      case 'Array': type = 'Array'; break
-      case 'Function': type = 'Function'; break
-      case 'base::Closure': type = 'Function'; break
+    switch (type.name) {
+      case 'bool': type.name = 'Boolean'; break
+      case 'float': type.name = 'Number'; break
+      case 'std::string': type.name = 'String'; break
+      case 'char': type.name = 'String'; break
+      case 'uint32_t': type.name = 'Integer'; break
+      case 'unsigned': type.name = 'Integer'; break
+      case 'int': type.name = 'Integer'; break
+      case 'Dictionary': type.name = 'Object'; break
+      case 'Array': type.name = 'Array'; break
+      case 'Function': type.name = 'Function'; break
+      case 'base::Callback': type.name = 'Function'; break
       default: builtin = false
     }
   }
   // Custom types usually have 1-to-1 maps.
-  return builtin ? { name: type }
-                 : { name: type, id: type.toLowerCase().replace('::', '_') }
+  if (!builtin)
+    type.id = type.name.toLowerCase().replace('::', '_')
+  // C++ uses full type as name.
+  if (lang == 'cpp')
+    type.name = str
+  return type
 }
 
 // Put the extra parameter descriptions into signature object.

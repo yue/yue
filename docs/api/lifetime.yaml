@@ -51,10 +51,10 @@ methods:
   - signature: void Quit()
     description: Quit event loop.
 
-  - signature: void PostTask(const base::Closure& task)
+  - signature: void PostTask(const base::Callback<void()>& task)
     description: Post a `task` to event loop.
 
-  - signature: void PostDelayedTask(int ms, const base::Closure& task);
+  - signature: void PostDelayedTask(int ms, const base::Callback<void()>& task);
     description: Post a `task` to event loop and execute it after `ms`.
     parameters:
       ms:
