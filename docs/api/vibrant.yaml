@@ -1,0 +1,29 @@
+name: Vibrant
+platform: ['macOS']
+component: gui
+header: nativeui/container.h
+type: class
+namespace: nu
+inherit: Container
+description: Translucency view.
+
+detail: |
+  This view is only implemented for macOS by wrapping `NSVisualEffectView`.
+
+  It is not possible to draw on this view, to display content on it you have to
+  add the content as child view.
+
+constructors:
+  - signature: Vibrant()
+    lang: ['cpp']
+    description: Create a new `Vibrant` view.
+
+class_methods:
+  - signature: Vibrant* Create()
+    lang: ['lua', 'js']
+    description: Create a new `Vibrant` view.
+
+class_properties:
+  - property: const char* kClassName
+    lang: ['cpp']
+    description: The class name of this view.

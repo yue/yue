@@ -123,13 +123,30 @@ block content
           td Inherits
           td.code
             +type(doc.inherit)
+      if doc.platform
+        tr
+          td Platforms
+          td
+            each platform, i in doc.platform
+              | #{platform}
+              if i != doc.platform.length - 1
+                | , 
 
-  else if doc.inherit
+  else if doc.inherit || doc.platform
     table
-      tr
-        td Inherits
-        td.code
-          +type(doc.inherit)
+      if doc.inherit
+        tr
+          td Inherits
+          td.code
+            +type(doc.inherit)
+      if doc.platform
+        tr
+          td Platforms
+          td
+            each platform, i in doc.platform
+              | #{platform}
+              if i != doc.platform.length - 1
+                | , 
 
   if doc.detail
     != markdown(doc.detail)
