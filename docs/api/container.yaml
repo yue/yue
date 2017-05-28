@@ -1,7 +1,7 @@
 name: Container
 component: gui
 header: nativeui/container.h
-type: class
+type: refcounted
 namespace: nu
 inherit: View
 description: Drawable view with child views.

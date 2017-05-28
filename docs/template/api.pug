@@ -104,12 +104,9 @@ block content
       tr
         td Header
         td.code #include "#{doc.header}"
-
-      if doc.namespace
-        tr
-          td Namespace
-          td.code namespace #{doc.namespace}
-
+      tr
+        td Namespace
+        td.code namespace #{doc.namespace}
       tr
         td Type
         td.code
@@ -117,7 +114,6 @@ block content
             | class (RefCounted)
           else
             | #{doc.type}
-
       if doc.inherit
         tr
           td Inherits
@@ -131,9 +127,15 @@ block content
               | #{platform}
               if i != doc.platform.length - 1
                 | , 
-
-  else if doc.inherit || doc.platform
+  else
     table
+      if doc.module
+        tr
+          td Module
+          td.code require("#{doc.module}")
+      tr
+        td Type
+        td.code #{doc.type}
       if doc.inherit
         tr
           td Inherits

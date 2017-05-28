@@ -118,6 +118,9 @@ function pruneDocTree(lang, doc) {
   if (doc.inherit)
     doc.inherit = parseType(lang, doc.inherit)
 
+  if (lang != 'cpp')
+    convertModuleAndType(lang, doc)
+
   doc.detail = parseDetail(lang, doc)
 
   const categories = ['global_functions', 'constructors', 'class_properties',
@@ -177,6 +180,28 @@ function pruneNode(lang, node) {
   }
 
   return node
+}
+
+// Convert C++ namespace and type to script modules.
+function convertModuleAndType(lang, node) {
+  if (node.component == 'gui') {
+    if (lang == 'lua')
+      node.module = 'yue.gui'
+    else if (lang == 'js')
+      node.module = 'gui'
+  }
+
+  let wrappedTypes = ['Painter', 'App', 'Lifetime', 'Signal']
+  let stringTypes = ['Accelerator', 'KeyboardCode']
+  let integerTypes = ['Color']
+  if (node.type == 'refcounted' || wrappedTypes.includes(node.name))
+    node.type = 'Class'
+  else if (node.type == 'enum class' || stringTypes.includes(node.name))
+    node.type = lang == 'lua' ? 'string' : 'String'
+  else if (node.type == 'enum' || integerTypes.includes(node.name))
+    node.type = lang == 'lua' ? 'integer' : 'Integer'
+  else
+    node.type = lang == 'lua' ? 'table' : 'Object'
 }
 
 // Parse the C++ signature string.
@@ -262,7 +287,7 @@ function parseType(lang, str) {
   let builtin = true
   if (lang == 'cpp') {
     let builtins = [ 'bool', 'float', 'std::string', 'char', 'uint32_t',
-                     'unsigned', 'int', 'base::Callback', 'Args...' ]
+                     'unsigned', 'int', 'Args...', 'base::Callback' ]
     builtin = builtins.includes(type.name)
   }
   // Convertbuilt-in types for differnt languages.
