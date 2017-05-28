@@ -4,10 +4,6 @@ type: struct
 namespace: nu
 description: Options for creating window.
 
-lang_detail:
-  lua: This type is represented as `table`.
-  js: This type is represented as `Object`.
-
 properties:
   - property: bool frame
     description: |

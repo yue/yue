@@ -99,17 +99,17 @@ block content
   h1 #{doc.name}
   != markdown(doc.description)
 
-  if lang == 'cpp'
-    table
+  table.code
+    if lang == 'cpp'
       tr
         td Header
-        td.code #include "#{doc.header}"
+        td #include "#{doc.header}"
       tr
         td Namespace
-        td.code namespace #{doc.namespace}
+        td namespace #{doc.namespace}
       tr
         td Type
-        td.code
+        td
           if doc.type == 'refcounted'
             | class (RefCounted)
           else
@@ -117,7 +117,7 @@ block content
       if doc.inherit
         tr
           td Inherits
-          td.code
+          td
             +type(doc.inherit)
       if doc.platform
         tr
@@ -127,19 +127,18 @@ block content
               | #{platform}
               if i != doc.platform.length - 1
                 | , 
-  else
-    table
+    else
       if doc.module
         tr
           td Module
-          td.code require("#{doc.module}")
+          td require("#{doc.module}")
       tr
         td Type
-        td.code #{doc.type}
+        td #{doc.type}
       if doc.inherit
         tr
           td Inherits
-          td.code
+          td
             +type(doc.inherit)
       if doc.platform
         tr
