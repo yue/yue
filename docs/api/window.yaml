@@ -1,0 +1,16 @@
+name: Window
+component: gui
+header: nativeui/window.h
+type: refcounted
+namespace: nu
+description: Native window.
+
+constructors:
+  - signature: Window(const Window::Options& options)
+    lang: ['cpp']
+    description: Create a new window with `options`.
+
+class_methods:
+  - signature: Button* Create(Window::Options options)
+    lang: ['lua', 'js']
+    description: Create a new window with `options`.

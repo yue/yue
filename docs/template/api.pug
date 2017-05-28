@@ -184,6 +184,10 @@ block content
         code
           +type(node.type)
         |  #{node.name}
+        if node.platform
+          each platform in node.platform
+            |  
+            span.platform #{platform}
       +description(node)
 
   if doc.methods

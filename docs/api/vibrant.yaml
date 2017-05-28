@@ -1,8 +1,8 @@
 name: Vibrant
 platform: ['macOS']
 component: gui
-header: nativeui/container.h
-type: class
+header: nativeui/vibrant.h
+type: refcounted
 namespace: nu
 inherit: Container
 description: Translucency view.
