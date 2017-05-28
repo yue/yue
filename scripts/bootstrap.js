@@ -17,6 +17,7 @@ if (process.platform === 'linux') {
 
 execSync('git submodule sync --recursive')
 execSync('git submodule update --init --recursive')
+execSync(`node scripts/download_node_headers.js node ${process.version}`)
 
 gen('out/Debug', [
   'is_component_build=true',
