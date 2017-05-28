@@ -1,0 +1,4 @@
+build/* linguist-vendored
+tools/* linguist-vendored
+testing/* linguist-vendored
+third_party/* linguist-vendored
