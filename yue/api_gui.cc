@@ -361,7 +361,7 @@ struct Type<nu::Image> {
   static constexpr const char* name = "yue.Image";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
-           "createfromfile", &CreateOnHeap<nu::Image, const base::FilePath&>,
+           "createfrompath", &CreateOnHeap<nu::Image, const base::FilePath&>,
            "getsize", &nu::Image::GetSize,
            "getscalefactor", &nu::Image::GetScaleFactor);
   }

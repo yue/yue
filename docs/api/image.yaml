@@ -1,0 +1,27 @@
+name: Image
+component: gui
+header: nativeui/gfx/image.h
+type: refcounted
+namespace: nu
+description: Native image.
+
+constructors:
+  - signature: Image(const base::FilePath& path)
+    lang: ['cpp']
+    description: &ref1 Create an image by reading from `path`.
+
+class_methods:
+  - signature: Image CreateFromPath(const base::FilePath& path)
+    lang: ['lua', 'js']
+    description: *ref1
+
+methods:
+  - signature: SizeF GetSize() const
+    description: Return image's size in DIP.
+
+  - signature: float GetScaleFactor() const
+    description: Return image's scale factor.
+
+  - signature: NativeImage GetNative() const
+    lang: ['cpp']
+    description: Return the native instance wrapped by the class.

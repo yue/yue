@@ -305,6 +305,7 @@ function parseType(lang, str) {
       case 'Array': type.name = 'table'; break
       case 'Function': type.name = 'function'; break
       case 'base::Callback': type.name = 'function'; break
+      case 'base::FilePath': type.name = 'string'; break
       default: builtin = false
     }
   } else if (lang == 'js') {
@@ -320,6 +321,7 @@ function parseType(lang, str) {
       case 'Array': type.name = 'Array'; break
       case 'Function': type.name = 'Function'; break
       case 'base::Callback': type.name = 'Function'; break
+      case 'base::FilePath': type.name = 'String'; break
       default: builtin = false
     }
   }
