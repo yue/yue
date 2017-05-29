@@ -787,8 +787,8 @@ struct Type<nu::Window> {
         "setMovable", &nu::Window::SetMovable,
         "isMovable", &nu::Window::IsMovable,
 #if defined(OS_WIN) || defined(OS_LINUX)
-        "setMenu", &nu::Window::SetMenu,
-        "getMenu", &nu::Window::GetMenu,
+        "setMenuBar", &nu::Window::SetMenuBar,
+        "getMenuBar", &nu::Window::GetMenuBar,
 #endif
         "setBackgroundColor", &nu::Window::SetBackgroundColor);
     SetProperty(context, templ,

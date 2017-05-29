@@ -734,8 +734,8 @@ struct Type<nu::Window> {
            "setmovable", &nu::Window::SetMovable,
            "ismovable", &nu::Window::IsMovable,
 #if defined(OS_WIN) || defined(OS_LINUX)
-           "setmenu", &nu::Window::SetMenu,
-           "getmenu", &nu::Window::GetMenu,
+           "setmenubar", &nu::Window::SetMenuBar,
+           "getmenubar", &nu::Window::GetMenuBar,
 #endif
            "setbackgroundcolor", &nu::Window::SetBackgroundColor);
     RawSetProperty(state, metatable,

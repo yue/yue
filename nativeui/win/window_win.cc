@@ -794,8 +794,8 @@ void Window::SetBackgroundColor(Color color) {
   window_->SetBackgroundColor(color);
 }
 
-void Window::PlatformSetMenu(MenuBar* menu_bar) {
-  ::SetMenu(window_->hwnd(), menu_bar ? menu_bar->GetNative() : NULL);
+void Window::PlatformSetMenuBar(MenuBar* menu_bar) {
+  ::SetMenuBar(window_->hwnd(), menu_bar ? menu_bar->GetNative() : NULL);
 }
 
 }  // namespace nu

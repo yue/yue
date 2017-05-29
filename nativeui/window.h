@@ -91,8 +91,8 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
   void SetBackgroundColor(Color color);
 
 #if defined(OS_WIN) || defined(OS_LINUX)
-  void SetMenu(MenuBar* menu_bar);
-  MenuBar* GetMenu() const;
+  void SetMenuBar(MenuBar* menu_bar);
+  MenuBar* GetMenuBar() const;
 #endif
 
   // Get the native window object.
@@ -118,7 +118,7 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
   void PlatformDestroy();
   void PlatformSetContentView(View* container);
 #if defined(OS_WIN) || defined(OS_LINUX)
-  void PlatformSetMenu(MenuBar* menu_bar);
+  void PlatformSetMenuBar(MenuBar* menu_bar);
 #endif
 
   // Whether window has a native chrome.
