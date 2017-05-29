@@ -1,0 +1,40 @@
+name: Canvas
+component: gui
+header: nativeui/canvas.h
+type: refcounted
+namespace: nu
+description: Offscreen drawing.
+
+constructors:
+  - signature: Canvas(const SizeF& size, float scale_factor)
+    lang: ['cpp']
+    description: &ref1 |
+      Create a new canvas with specified size and scale factor.
+
+  - signature: Canvas(const SizeF& size)
+    lang: ['cpp']
+    description: &ref2 |
+      Create a new canvas with `size` using default scale factor.
+
+      This is strongly discouraged for using, since it does not work well with
+      multi-monitor setup. Only use it when you does not care about per-monitor
+      DPI.
+
+class_methods:
+  - signature: Canvas* Create(const SizeF& size, float scale_factor)
+    lang: ['lua', 'js']
+    description: *ref1
+
+  - signature: Canvas* Create(const SizeF& size)
+    lang: ['lua', 'js']
+    description: *ref2
+
+methods:
+  - signature: float GetScaleFactor() const
+    description: Return the scale factor of the canvas.
+
+  - signature: Painter* GetPainter()
+    description: Return the Painter that can be used to draw on the canvas.
+
+  - signature: SizeF GetSize() const
+    description: Return the DIP size of canvas.
