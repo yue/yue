@@ -1,4 +1,5 @@
 name: Color
+component: gui
 header: nativeui/gfx/color.h
 type: class
 namespace: nu
@@ -47,7 +48,7 @@ constructors:
   - signature: Color(unsigned a, unsigned r, unsigned g, unsigned b)
     lang: ['cpp']
     description: Create an ARGB color.
-    parameters:
+    parameters: &ref1
       a:
         description: 8-bit alpha channel value.
       r:
@@ -60,7 +61,7 @@ constructors:
   - signature: Color(unsigned r, unsigned g, unsigned b)
     lang: ['cpp']
     description: Create an opaque RGB color.
-    parameters:
+    parameters: &ref2
       r:
         description: 8-bit red channel value.
       g:
@@ -72,26 +73,12 @@ class_methods:
   - signature: Color rgb(unsigned r, unsigned g, unsigned b)
     lang: ['lua', 'js']
     description: Create an opaque RGB color.
-    parameters:
-      r:
-        description: 8-bit red channel value.
-      g:
-        description: 8-bit green channel value.
-      b:
-        description: 8-bit blue channel value.
+    parameters: *ref1
 
   - signature: Color argb(unsigned a, unsigned r, unsigned g, unsigned b)
     lang: ['lua', 'js']
     description: Create an ARGB color.
-    parameters:
-      a:
-        description: 8-bit alpha channel value.
-      r:
-        description: 8-bit red channel value.
-      g:
-        description: 8-bit green channel value.
-      b:
-        description: 8-bit blue channel value.
+    parameters: *ref2
 
 methods:
   - signature: uint32_t value() const

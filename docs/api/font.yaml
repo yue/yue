@@ -1,0 +1,44 @@
+name: Font
+component: gui
+header: nativeui/gfx/font.h
+type: refcounted
+namespace: nu
+description: Native font.
+
+lang_detail:
+  cpp: |
+    To get the default font used for displaying text, you should use the
+    [`App::GetDefaultFont()`](app.html#getdefaultfont) API.
+
+constructors:
+  - signature: Font(const std::string& name, float size, Font::Weight weight, Font::Style style)
+    lang: ['cpp']
+    description: &ref1 |
+      Create a Font implementation with the specified `name`, DIP `size`,
+      `weight` and `style`.
+
+class_methods:
+  - signature: Font* Default()
+    lang: ['lua', 'js']
+    description: Return the default font used for displaying text.
+
+  - signature: Font* Create(const std::string& name, float size, Font::Weight weight, Font::Style style)
+    lang: ['lua', 'js']
+    description: *ref1
+
+methods:
+  - signature: std::string GetName() const
+    description: Return font's family name.
+
+  - signature: float GetSize() const
+    description: Return font's DIP size.
+
+  - signature: Font::Weight GetWeight() const
+    description: Return the font weight.
+
+  - signature: Font::Style GetStyle() const
+    description: Return the font style.
+
+  - signature: NativeFont GetNative() const
+    lang: ['cpp']
+    description: Return the native instance wrapped by the class.

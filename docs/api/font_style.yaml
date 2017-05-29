@@ -1,0 +1,19 @@
+name: Font::Style
+header: nativeui/gfx/font.h
+type: enum class
+namespace: nu
+description: Represent font styles.
+
+lang_detail:
+  cpp: |
+    This type is an `enum class` with following values:
+    * `Font::Style::Normal`
+    * `Font::Style::Italic`
+
+  lua: &ref |
+    This type is a string with following possible values:
+    * `"normal"`
+    * `"italic"`
+
+  js: *ref
+

@@ -1,6 +1,6 @@
 name: Canvas
 component: gui
-header: nativeui/canvas.h
+header: nativeui/gfx/canvas.h
 type: refcounted
 namespace: nu
 description: Offscreen drawing.

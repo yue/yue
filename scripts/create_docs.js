@@ -193,7 +193,7 @@ function convertModuleAndType(lang, node) {
   }
 
   let wrappedTypes = ['Painter', 'App', 'Lifetime', 'Signal']
-  let stringTypes = ['Accelerator', 'KeyboardCode']
+  let stringTypes = ['Accelerator', 'KeyboardCode', 'Font::Weight']
   let integerTypes = ['Color']
   if (node.type == 'refcounted' || wrappedTypes.includes(node.name))
     node.type = 'Class'

@@ -54,4 +54,4 @@ methods:
     description: Return color of a theme component.
 
   - signature: Font* GetDefaultFont()
-    description: Return the default font for displaying GUI components.
+    description: Return the default font for displaying text.

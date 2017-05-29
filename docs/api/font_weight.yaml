@@ -1,0 +1,32 @@
+name: Font::Weight
+header: nativeui/gfx/font.h
+type: enum
+namespace: nu
+description: Represent font weights.
+
+lang_detail:
+  cpp: |
+    This type is an `enum` with following values:
+    * `Font::Style::Thin`
+    * `Font::Style::ExtraLight`
+    * `Font::Style::Light`
+    * `Font::Style::Normal`
+    * `Font::Style::Medium`
+    * `Font::Style::SemiBold`
+    * `Font::Style::Bold`
+    * `Font::Style::ExtraBold`
+    * `Font::Style::Black`
+
+  lua: &ref |
+    This type is a string with following possible values:
+    * `"thin"`
+    * `"extra-light"`
+    * `"light"`
+    * `"normal"`
+    * `"medium"`
+    * `"semi-bold"`
+    * `"bold"`
+    * `"extra-bold"`
+    * `"black"`
+
+  js: *ref
