@@ -691,9 +691,7 @@ std::tuple<SizeF, SizeF> Window::GetContentSizeConstraints() const {
 
 void Window::Activate() {
   HWND hwnd = window_->hwnd();
-  if (IsMinimized())
-    ::ShowWindow(hwnd, SW_RESTORE);
-  ::SetWindowPos(hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+  ::ShowWindow(hwnd, SW_SHOW);
   ::SetForegroundWindow(hwnd);
 }
 
@@ -708,7 +706,7 @@ bool Window::IsActive() const {
 }
 
 void Window::SetVisible(bool visible) {
-  ShowWindow(window_->hwnd(), visible ? SW_SHOWNOACTIVATE : SW_HIDE);
+  ::ShowWindow(window_->hwnd(), visible ? SW_SHOWNOACTIVATE : SW_HIDE);
 }
 
 bool Window::IsVisible() const {

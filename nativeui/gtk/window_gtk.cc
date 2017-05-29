@@ -326,6 +326,7 @@ std::tuple<SizeF, SizeF> Window::GetContentSizeConstraints() const {
 }
 
 void Window::Activate() {
+  gtk_widget_set_visible(GTK_WIDGET(window_), true);
   gtk_window_present(window_);
 }
 
