@@ -210,6 +210,11 @@ block content
       else
         | No.
 
+  if doc.delegates
+    +title('h2', 'delegates', 'Delegates')
+    each node in doc.delegates
+      +method(node)
+
 //- The sidebar that lists all types.
 block sidebar
   h4 Langauge:
