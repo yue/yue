@@ -15,7 +15,7 @@ const hljs   = loadHighlight()
 
 // Support highlighting in markdown.
 marked.setOptions({
-  highlight: (code) => hljs.highlightAuto(code).value
+  highlight: (code, lang) => hljs.highlightAuto(code, [lang]).value
 })
 
 // Output dir.
@@ -40,17 +40,39 @@ for (let lang of langs) {
     return docs.concat(langDoc)
   }, [])
 
+  // Parse all guides.
+  const guides = fs.readdirSync(`docs/guides/${lang}`).reduce((docs, file) => {
+    if (!file.endsWith('.md')) return docs
+    const content = String(fs.readFileSync(`docs/guides/${lang}/${file}`))
+    const guide = parseMarkdown(lang, content)
+    guide.id = path.basename(file, '.md')
+    return docs.concat(guide)
+  }, [])
+
   // Generate the index page.
   const html = pug.renderFile('docs/template/index.pug', {
     page: 'index',
     doc: { name: 'Docs' },
     lang: lang,
     types: docs,
+    guides: guides,
     markdown: marked,
     imarkdown: inlineMarkdown,
     filters: { 'css-minimize': cssMinimize },
   })
   fs.writeFileSync(path.join(langdir, `index.html`), html)
+
+  // Generate pages for guides.
+  for (let guide of guides) {
+    const guidedir = path.join(langdir, 'guides')
+    mkdir(guidedir)
+    const html = pug.renderFile('docs/template/guide.pug', {
+      page: 'guide',
+      doc: guide,
+      filters: { 'css-minimize': cssMinimize },
+    })
+    fs.writeFileSync(path.join(guidedir, `${guide.id}.html`), html)
+  }
 
   // Read API docs and generate HTML pages.
   for (let doc of docs) {
@@ -61,6 +83,7 @@ for (let lang of langs) {
                      JSON.stringify(doc, null, '  '))
     // Output HTML pages.
     const html = pug.renderFile('docs/template/api.pug', {
+      name: doc.name,
       page: 'api',
       lang: lang,
       doc: doc,
@@ -106,6 +129,26 @@ function mkdir(dir) {
   if (fs.existsSync(dir)) return
   mkdir(path.dirname(dir))
   fs.mkdirSync(dir)
+}
+
+// Read markdown and parse yaml header if there is one.
+function parseMarkdown(lang, content) {
+  let lines = content.split('\n')
+  let result = {}
+  if (lines[0] == '---') {
+    let i = 1
+    for (; i < lines.length; ++i)
+      if (lines[i] == '---') break
+    if (i == lines.length)
+      throw new Error('Invalid markdown header')
+    result = yaml.load(lines.slice(1, i).join('\n'))
+    lines = lines.slice(i + 1)
+  }
+  if (result.priority === undefined)
+    result.priority = 100
+  result.content = marked(lines.join('\n'))
+  result.name = lines[0].substr(2)
+  return result
 }
 
 // Parse |doc| tree and only keep nodes for |lang|.

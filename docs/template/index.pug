@@ -7,20 +7,26 @@ mixin switch(text, href, chosen)
   else
     a(href=href) #{text}
 
+mixin item(dir, node)
+  li
+    h3
+      a(href=`${dir}/${node.id}.html`) #{node.name}
+    != ' ' + imarkdown(node.description)
+
 mixin items(filter)
   ul
     each type in types
       if type.component == filter
-        li
-          h3
-            a(href=`api/${type.id}.html`) #{type.name}
-          != ' ' + imarkdown(type.description)
+        +item('api', type)
 
 block content
   h1 Docs Index
   #index
     .column
       h2 Guides
+      ul
+        each guide in guides
+          +item('guides', guide)
 
     .column
       h2 Components

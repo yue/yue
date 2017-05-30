@@ -6,11 +6,15 @@ html
       include:css-minimize style.css
       include:css-minimize markdown.css
       include:css-minimize highlight.css
+      if page == 'api' || page == 'index'
+        include:css-minimize api.css
+      else if page == 'guide'
+        include:css-minimize guide.css
   body
     #header
       p.logo Yue
       .nav
-        if page == 'api'
+        if page == 'api' || page == 'guide'
           a(href="../index.html") Docs
         else
           a(href="index.html") Docs
