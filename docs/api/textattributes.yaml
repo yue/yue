@@ -1,0 +1,20 @@
+name: TextAttributes
+header: nativeui/gfx/text.h
+type: struct
+namespace: nu
+description: Attributes for drawing text.
+
+detail: By default text is drew at top-left corner using system font and color.
+
+properties:
+  - property: scoped_refptr<Font> font
+    description: Font for drawing text, default is system UI font.
+
+  - property: Color color
+    description: Text color, default is system UI text color.
+
+  - property: TextAlign align
+    description: Horizontal text align, default is to the start of layout.
+
+  - property: TextAlign valign
+    description: Vertical text align, default is to the start of layout.

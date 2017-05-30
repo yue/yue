@@ -1,0 +1,9 @@
+name: TextMetrics
+header: nativeui/gfx/text.h
+type: struct
+namespace: nu
+description: Text measurement.
+
+properties:
+  - property: SizeF size
+    description: Size needed for drawing the text.

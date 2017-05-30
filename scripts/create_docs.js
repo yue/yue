@@ -282,6 +282,8 @@ function parseType(lang, str) {
     if (type.name == 'std::tuple') {
       type.template = match[1]
       type.args = match[2].split(',').map((t) => parseType(lang, t.trim()))
+    } else if (type.name == 'scoped_refptr') {
+      type.name = match[2]
     }
   }
   // No need to convert types for C++.
