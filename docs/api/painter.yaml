@@ -1,0 +1,131 @@
+name: Painter
+component: gui
+header: nativeui/gfx/painter.h
+type: class
+namespace: nu
+description: Graphic context.
+
+detail:
+  The `Painter` class can not be created by user, its instance can only be
+  recevied in drawing events or via the [`Canvas`](canvas.html) class.
+
+methods:
+  - signature: void Save()
+    description: Save the entire state of the painter.
+
+  - signature: void Restore()
+    description: Restore the most recently saved state.
+
+  - signature: void BeginPath()
+    description: Create a new path.
+
+  - signature: void ClosePath()
+    description: |
+      Close current path and move current point to the start of current path.
+
+      A straight line will be drew from current point to the start.
+
+  - signature: void MoveTo(const PointF& point)
+    description: Move current point to `point`.
+
+  - signature: void LineTo(const PointF& point)
+    description: |
+      Connect the last point in current path to `point` with a straight line.
+
+  - signature: void BezierCurveTo(const PointF& cp1, const PointF& cp2, const PointF& ep)
+    description: |
+      Add a cubic Bézier curve to current path.
+
+      The first two points are control points and the third one is the end
+      point. The starting point is the last point in the current path.
+
+  - signature: void ArcTo(const PointF& cp1, const PointF& cp2, float radius)
+    description: |
+      Add an arc to current path with the given control points and radius.
+      connected to the previous point by a straight line.
+
+  - signature: void Arc(const PointF& point, float radius, float sa, float ea)
+    description: |
+      Add an arc to the path which is centered at `point` with `radius`
+      starting at `sa` angle and ending at `ea` angle going in clockwise
+      direction.
+    parameters:
+      point:
+        description: Arc's center.
+      radius:
+        description: Arc's radius.
+      sa:
+        description: >
+          The angle at which the arc starts, measured clockwise from the
+          positive x axis and expressed in radians.
+      ea:
+        description: >
+          The angle at which the arc ends, measured clockwise from the
+          positive x axis and expressed in radians.
+
+  - signature: void Rect(const RectF& rect)
+    description: Add rectangle to current path.
+
+  - signature: void Clip()
+    description: Add current path to clip area by intersection.
+
+  - signature: void ClipRect(const RectF& rect)
+    description: Add `rect` to clip area by intersection.
+
+  - signature: void Translate(const Vector2dF& offset)
+    description: |
+      Add translate transformation which moves the origin by `offset`.
+
+  - signature: void Rotate(float angle)
+    description: Add rotation transformation.
+    parameters:
+      angle:
+        description: The angle to rotate clockwise in radians.
+
+  - signature: void Scale(const Vector2dF& scale)
+    description: Add scaling transformation to the painter.
+
+  - signature: void SetColor(Color color)
+    description: Set stroke color and fill color to `color`.
+
+  - signature: void SetStrokeColor(Color color)
+    description: Set the color used for shapes' outlines.
+
+  - signature: void SetFillColor(Color color)
+    description: Set the color used when filling shapes.
+
+  - signature: void SetLineWidth(float width)
+    description: Set the width of lines.
+
+  - signature: void Stroke()
+    description: Draw current path by stroking its outline.
+
+  - signature: void Fill()
+    description: Draw a solid shape by filling current path's content area.
+
+  - signature: void StrokeRect(const RectF& rect)
+    description: Draw a rectangular outline.
+
+  - signature: void FillRect(const RectF& rect)
+    description: Draw a filled rectangle.
+
+  - signature: void DrawImage(Image* image, const RectF& rect)
+    description: Draw scaled `image` to fit `rect`.
+
+  - signature: void DrawImageFromRect(Image* image, const RectF& src, const RectF& dest)
+    description: Draw the specified portion of `image` at `src` to fit `rect`.
+
+  - signature: void DrawCanvas(Canvas* canvas, const RectF& rect)
+    description: Draw scaled `canvas` to fit `rect`.
+
+  - signature: void DrawCanvasFromRect(Canvas* canvas, const RectF& src, const RectF& dest)
+    description: Draw the specified portion of `canvas` at `src` to fit `rect`.
+
+  - signature: TextMetrics MeasureText(const std::string& text, float width, const TextAttributes& attributes)
+    description: Measure the `text` with `attributes`, with maximum `width`.
+    parameters:
+      width:
+        description: Maximum width, passing `-1` to indicate unlimited width.
+
+  - signature: void DrawText(const std::string& text, const RectF& rect, const TextAttributes& attributes)
+    description: Draw `text` with `attributes` bounded by `rect`.
