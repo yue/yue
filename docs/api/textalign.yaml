@@ -1,4 +1,4 @@
-name: Text::Align
+name: TextAlign
 header: nativeui/gfx/text.h
 type: enum class
 namespace: nu
