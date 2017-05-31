@@ -8,6 +8,7 @@ component("nativeui") {
   if (!is_component_build) {
     static_component_type = "static_library"
     complete_static_lib = true
+    output_dir = root_out_dir
   }
 
   sources = [
