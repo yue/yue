@@ -5,8 +5,8 @@
 #include <node.h>
 
 #include "nativeui/nativeui.h"
+#include "node_yue/binding_signal.h"
 #include "node_yue/node_integration.h"
-#include "node_yue/signal.h"
 
 namespace vb {
 
@@ -1158,4 +1158,4 @@ void Initialize(v8::Local<v8::Object> exports) {
 
 }  // namespace node_yue
 
-NODE_MODULE(yue, node_yue::Initialize)
+NODE_MODULE(gui, node_yue::Initialize)

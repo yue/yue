@@ -2,8 +2,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef NODE_YUE_SIGNAL_H_
-#define NODE_YUE_SIGNAL_H_
+#ifndef NODE_YUE_BINDING_SIGNAL_H_
+#define NODE_YUE_BINDING_SIGNAL_H_
 
 #include "nativeui/nativeui.h"
 #include "v8binding/v8binding.h"
@@ -112,4 +112,4 @@ struct MemberTraits<nu::Signal<Sig>> {
 
 }  // namespace vb
 
-#endif  // NODE_YUE_SIGNAL_H_
+#endif  // NODE_YUE_BINDING_SIGNAL_H_

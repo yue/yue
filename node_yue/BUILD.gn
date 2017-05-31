@@ -5,14 +5,14 @@
 import("//v8binding/node.gni")
 
 loadable_module("node_yue") {
-  output_name = "yue"
+  output_name = "gui"
   output_extension = "node"
   output_prefix_override = true  # do not add "lib" prefix
 
   sources = [
-    "bindings.cc",
-    "signal.cc",
-    "signal.h",
+    "binding_gui.cc",
+    "binding_signal.cc",
+    "binding_signal.h",
   ]
 
   if (node_runtime != "electron") {

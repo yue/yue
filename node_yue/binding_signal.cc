@@ -2,7 +2,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "node_yue/signal.h"
+#include "node_yue/binding_signal.h"
 
 namespace node_yue {
 
