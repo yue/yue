@@ -5,6 +5,11 @@
 import("//testing/test.gni")
 
 component("nativeui") {
+  if (!is_component_build) {
+    static_component_type = "static_library"
+    complete_static_lib = true
+  }
+
   sources = [
     "nativeui.h",
     "nativeui_export.h",
@@ -277,7 +282,6 @@ component("nativeui") {
     ]
     configs -= [ "//build/config/win:lean_and_mean" ]
   }
-
 }
 
 test("nativeui_unittests") {
