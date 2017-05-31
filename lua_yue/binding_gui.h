@@ -2,8 +2,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef YUE_API_GUI_H_
-#define YUE_API_GUI_H_
+#ifndef LUA_YUE_BINDING_GUI_H_
+#define LUA_YUE_BINDING_GUI_H_
 
 #include "lua/lua.h"
 
@@ -15,4 +15,4 @@
 
 extern "C" LUA_MODULE_EXPORT int luaopen_yue_gui(lua::State* state);
 
-#endif  // YUE_API_GUI_H_
+#endif  // LUA_YUE_BINDING_GUI_H_

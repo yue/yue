@@ -23,8 +23,8 @@ const blacklist = [
 ]
 
 const sourceFiles = listFiles([
-  'yue',
   'lua',
+  'lua_yue',
   'nativeui',
   'node_yue',
   'v8binding'])

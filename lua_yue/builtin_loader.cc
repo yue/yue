@@ -2,15 +2,15 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "yue/builtin_loader.h"
+#include "lua_yue/builtin_loader.h"
 
 #include <algorithm>
 #include <string>
 #include <utility>
 
-#include "yue/api_gui.h"
-#include "yue/api_sys.h"
-#include "yue/api_util.h"
+#include "lua_yue/binding_gui.h"
+#include "lua_yue/binding_sys.h"
+#include "lua_yue/binding_util.h"
 
 namespace yue {
 

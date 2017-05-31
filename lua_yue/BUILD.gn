@@ -7,10 +7,24 @@ import("//testing/test.gni")
 # Independent lua executable with yue runtime.
 executable("yue") {
   sources = [
-    "yue.cc",
+    "main.cc",
   ]
   deps = [
-    ":yue_runtime",
+    ":lua_yue_runtime",
+  ]
+}
+
+# Component used for constructing a lua environment with yue inside.
+source_set("lua_yue_runtime") {
+  sources = [
+    "builtin_loader.cc",
+    "builtin_loader.h",
+  ]
+
+  deps = [
+    ":lua_yue_gui",
+    ":lua_yue_util",
+    "//third_party/lua:liblua",
   ]
 }
 
@@ -35,26 +49,12 @@ loadable_module("lua_yue") {
   }
 }
 
-# Component used for constructing a lua environment with yue inside.
-source_set("yue_runtime") {
-  sources = [
-    "builtin_loader.cc",
-    "builtin_loader.h",
-  ]
-
-  deps = [
-    ":lua_yue_gui",
-    ":lua_yue_util",
-    "//third_party/lua:liblua",
-  ]
-}
-
 # Lua bindings of yue's GUI part.
 source_set("lua_yue_gui") {
   sources = [
-    "api_gui.cc",
-    "api_gui.h",
-    "api_signal.h",
+    "binding_gui.cc",
+    "binding_gui.h",
+    "binding_signal.h",
   ]
 
   deps = [
@@ -67,10 +67,10 @@ source_set("lua_yue_gui") {
 # Lua bindings of lua-only utilities.
 source_set("lua_yue_util") {
   sources = [
-    "api_sys.cc",
-    "api_sys.h",
-    "api_util.cc",
-    "api_util.h",
+    "binding_sys.cc",
+    "binding_sys.h",
+    "binding_util.cc",
+    "binding_util.h",
   ]
 
   deps = [
@@ -79,14 +79,14 @@ source_set("lua_yue_util") {
   ]
 }
 
-test("yue_unittests") {
+test("lua_yue_unittests") {
   sources = [
-    "api_signal_unittest.cc",
+    "binding_signal_unittest.cc",
     "test/run_all_unittests.cc",
   ]
 
   deps = [
-    ":yue_runtime",
+    ":lua_yue_runtime",
     "//base/test:test_support",
     "//testing/gtest",
   ]

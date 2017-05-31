@@ -2,8 +2,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef YUE_BUILTIN_LOADER_H_
-#define YUE_BUILTIN_LOADER_H_
+#ifndef LUA_YUE_BUILTIN_LOADER_H_
+#define LUA_YUE_BUILTIN_LOADER_H_
 
 #include "lua/lua.h"
 
@@ -14,4 +14,4 @@ void InsertBuiltinModuleLoader(lua::State* state);
 
 }  // namespace yue
 
-#endif  // YUE_BUILTIN_LOADER_H_
+#endif  // LUA_YUE_BUILTIN_LOADER_H_

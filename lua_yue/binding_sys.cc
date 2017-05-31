@@ -2,7 +2,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "yue/api_sys.h"
+#include "lua_yue/binding_sys.h"
 
 #include "build/build_config.h"
 

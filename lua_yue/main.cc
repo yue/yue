@@ -5,9 +5,9 @@
 #include "base/command_line.h"
 #include "base/logging.h"
 #include "base/strings/utf_string_conversions.h"
+#include "lua_yue/builtin_loader.h"
 #include "nativeui/lifetime.h"
 #include "nativeui/state.h"
-#include "yue/builtin_loader.h"
 
 int main(int argc, const char *argv[]) {
   // Initialize base library.

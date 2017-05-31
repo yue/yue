@@ -2,9 +2,9 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
+#include "lua_yue/builtin_loader.h"
 #include "nativeui/nativeui.h"
 #include "testing/gtest/include/gtest/gtest.h"
-#include "yue/builtin_loader.h"
 
 class YueSignalTest : public testing::Test {
  protected:

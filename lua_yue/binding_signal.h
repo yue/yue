@@ -2,8 +2,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef YUE_API_SIGNAL_H_
-#define YUE_API_SIGNAL_H_
+#ifndef LUA_YUE_BINDING_SIGNAL_H_
+#define LUA_YUE_BINDING_SIGNAL_H_
 
 #include <string>
 
@@ -126,4 +126,4 @@ struct MemberTraits<nu::Signal<Sig>> {
 
 }  // namespace lua
 
-#endif  // YUE_API_SIGNAL_H_
+#endif  // LUA_YUE_BINDING_SIGNAL_H_

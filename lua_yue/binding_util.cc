@@ -2,7 +2,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "yue/api_util.h"
+#include "lua_yue/binding_util.h"
 
 #include <algorithm>
 #include <iostream>
