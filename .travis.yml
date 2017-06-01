@@ -15,24 +15,22 @@ dist: trusty
 addons:
   apt:
     sources:
+      - ubuntu-toolchain-r-test
       - sourceline: 'ppa:webkit-team/ppa'
     packages:
-      - gcc-multilib
-      - g++-multilib
-      - libc6-dev-armhf-cross
-      - linux-libc-dev-armhf-cross
+      - gcc-4.8-multilib
+      - g++-4.8-multilib
       - gcc-arm-linux-gnueabihf
       - g++-arm-linux-gnueabihf
+      - libc6-dev-armhf-cross
+      - linux-libc-dev-armhf-cross
       - binutils-aarch64-linux-gnu
       - libgtk-3-dev
       - libnotify-dev
       - webkit2gtk-4.0-dev
 
 env:
-  global:
-    - BUILD_TYPE=Release
-  matrix:
-    - TARGET_CPU=x64
+  - TARGET_CPU=x64
 
 matrix:
   include:
