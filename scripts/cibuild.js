@@ -7,4 +7,4 @@
 const {execSync} = require('./common')
 
 execSync('node ./scripts/bootstrap.js')
-execSync(`node ./scripts/build.js -c out/${process.env.BUILD_TYPE}`)
+execSync(`node ./scripts/build.js -C out/${process.env.BUILD_TYPE}`)
