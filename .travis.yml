@@ -32,18 +32,18 @@ env:
   global:
     - BUILD_TYPE=Release
   matrix:
-    - TARGET_ARCH=x64
+    - TARGET_CPU=x64
 
 matrix:
   include:
     - os: linux
       env:
-        - TARGET_ARCH=ia32
+        - TARGET_CPU=ia32
     - os: linux
       env:
-        - TARGET_ARCH=arm
+        - TARGET_CPU=arm
     - os: linux
       env:
-        - TARGET_ARCH=arm64
+        - TARGET_CPU=arm64
 
 script: node ./scripts/cibuild.js
