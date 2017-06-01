@@ -151,7 +151,7 @@ component("nativeui") {
     "gtk/nu_container.h",
     "gtk/widget_util.cc",
     "gtk/widget_util.h",
-    "gfx/app_gtk.cc",
+    "gtk/app_gtk.cc",
     "gtk/lifetime_gtk.cc",
     "gtk/accelerator_manager_gtk.cc",
     "gtk/browser_gtk.cc",
