@@ -16,7 +16,7 @@ for (let arg of argv) {
 // Get the arch of sysroot.
 let sysrootArch = {
   x64: 'amd64',
-  ia32: 'i386',
+  x86: 'i386',
   arm: 'arm',
   arm64: 'arm64',
 }[targetCpu]
