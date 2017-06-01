@@ -6,12 +6,27 @@
 
 const {argv, execSync, spawnSync} = require('./common')
 
+// Parse target cpu.
+let targetCpu = 'x64'
+for (let arg of argv) {
+  if (arg.startsWith('--target-cpu='))
+    targetCpu = arg.substr(arg.indexOf('=') + 1)
+}
+
+// Get the arch of sysroot.
+let sysrootArch = {
+  x64: 'amd64',
+  ia32: 'i386',
+  arm: 'arm',
+  arm64: 'arm64',
+}[targetCpu]
+
 if (process.platform !== 'win32') {
   execSync('python tools/clang/scripts/update.py')
 }
 if (process.platform === 'linux') {
   // TODO(zcbenz): Support more arch.
-  execSync('python build/linux/sysroot_scripts/install-sysroot.py --arch amd64')
+  execSync(`python build/linux/sysroot_scripts/install-sysroot.py --arch ${sysrootArch}`)
   execSync('node scripts/update_gold.js')
 }
 
@@ -19,19 +34,13 @@ execSync('git submodule sync --recursive')
 execSync('git submodule update --init --recursive')
 execSync(`node scripts/download_node_headers.js node ${process.version}`)
 
-let target_cpu = 'x64'
-for (let arg of argv) {
-  if (arg.startsWith('--target_cpu='))
-    target_cpu = arg.substr(arg.indexOf('=') + 1)
-}
-
 gen('out/Debug', [
   'is_component_build=true',
   'is_debug=true',
   'use_sysroot=false',
   'node_runtime="node"',
   `node_version="${process.version}"`,
-  `target_cpu="${target_cpu}"`,
+  `target_cpu="${targetCpu}"`,
 ])
 gen('out/Release', [
   'is_component_build=false',
@@ -39,7 +48,7 @@ gen('out/Release', [
   'is_official_build=true',
   'node_runtime="node"',
   `node_version="${process.version}"`,
-  `target_cpu="${target_cpu}"`,
+  `target_cpu="${targetCpu}"`,
 ])
 
 function gen(dir, args) {

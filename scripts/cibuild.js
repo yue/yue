@@ -6,5 +6,5 @@
 
 const {execSync} = require('./common')
 
-execSync(`node ./scripts/bootstrap.js --target_cpu=${process.env.TARGET_CPU}`)
+execSync(`node ./scripts/bootstrap.js --target-cpu=${process.env.TARGET_CPU}`)
 execSync('node ./scripts/build.js out/Release')
