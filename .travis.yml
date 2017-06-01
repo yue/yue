@@ -1,0 +1,17 @@
+git:
+  depth: 10
+notifications:
+  email: false
+
+language: node_js
+node_js:
+  - "7"
+os:
+  - linux
+  - osx
+env:
+  - BUILD_TYPE=Debug
+  - BUILD_TYPE=Release
+osx_image: xcode7.3
+
+script: node ./scripts/cibuild.js
