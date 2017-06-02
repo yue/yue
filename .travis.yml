@@ -18,6 +18,7 @@ addons:
       - ubuntu-toolchain-r-test
       - sourceline: 'ppa:webkit-team/ppa'
     packages:
+      - xvfb
       - gcc-4.8-multilib
       - g++-4.8-multilib
       - gcc-arm-linux-gnueabihf
@@ -44,4 +45,9 @@ matrix:
       env:
         - TARGET_CPU=arm64
 
-script: node ./scripts/cibuild.js
+script:
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+      xvfb-run node ./scripts/cibuild.js;
+    else
+      node ./scripts/cibuild.js;
+    fi
