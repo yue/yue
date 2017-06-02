@@ -4,16 +4,17 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {targetCpu, execSync} = require('./common')
+const {targetCpu, targetOs, execSync} = require('./common')
 
 execSync(`node ./scripts/bootstrap.js --target-cpu=${targetCpu}`)
 
 // Build common targets.
 const targets = [
   "libyue",
-  'lua_yue',
   'yue',
 ]
+if (targetOs != 'win')
+  targets.append('lua_yue')
 execSync(`node ./scripts/build.js out/Release ${targets.join(' ')}`)
 execSync(`node ./scripts/create_dist.js`)
 

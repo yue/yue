@@ -21,10 +21,7 @@ deploy:
     description: '(placeholder)'
     auth_token:
       secure: txrp2eAOWw3fwVvYuRutmnek5xMtndPskyOMtu09vk9FeA5wdaQ2RGL/YAsCdIGH
-    artifact:
-      - out/Release/libyue_*.zip
-      - out/Release/lua_yue_*.zip
-      - out/Release/node_yue_*.zip
+    artifact: /out\\Release\\.*\.zip/
     draft: true
     force_update: true
     prerelease: false

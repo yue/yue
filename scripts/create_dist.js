@@ -44,14 +44,15 @@ const exeFiles = {
   ],
   win: [
     'yue.exe',
+    'yue.exe.pdb',
     'yue.lib',
-    'yue.pdb',
   ],
 }
 
 generateZip('libyue', cppFiles)
-generateZip('lua_yue_lua_5.3', luaFiles)
 generateZip('yue', exeFiles)
+if (targetOs != 'win')
+  generateZip('lua_yue_lua_5.3', luaFiles)
 
 function generateZip(name, list) {
   const zipname = `${name}_${version}_${targetOs}_${targetCpu}`
