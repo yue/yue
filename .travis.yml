@@ -23,6 +23,7 @@ addons:
       - g++-4.8-multilib
       - gcc-arm-linux-gnueabihf
       - g++-arm-linux-gnueabihf
+      - linux-libc-dev:i386
       - libc6-dev-armhf-cross
       - linux-libc-dev-armhf-cross
       - binutils-aarch64-linux-gnu
