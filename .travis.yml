@@ -24,6 +24,7 @@ addons:
       - gcc-arm-linux-gnueabihf
       - g++-arm-linux-gnueabihf
       - linux-libc-dev:i386
+      - linux-libc-dev:armhf
       - libc6-dev-armhf-cross
       - linux-libc-dev-armhf-cross
       - binutils-aarch64-linux-gnu
@@ -42,9 +43,6 @@ matrix:
     - os: linux
       env:
         - TARGET_CPU=arm
-    - os: linux
-      env:
-        - TARGET_CPU=arm64
 
 script:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
