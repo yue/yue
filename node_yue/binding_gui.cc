@@ -1112,21 +1112,11 @@ void Initialize(v8::Local<v8::Object> exports) {
 #endif
   // Initialize the nativeui and leak it.
   new nu::State;
-#if !defined(ELECTRON_BUILD)
-  new nu::Lifetime;
-  // Initialize node integration and leak it.
-  NodeIntegration* node_integration = NodeIntegration::Create();
-  node_integration->PrepareMessageLoop();
-  node_integration->RunMessageLoop();
-#endif
 
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::Local<v8::Context> context = isolate->GetCurrentContext();
   vb::Set(context, exports,
           // Classes.
-#if !defined(ELECTRON_BUILD)
-          "Lifetime",  vb::Constructor<nu::Lifetime>(),
-#endif
           "App",       vb::Constructor<nu::App>(),
           "Font",      vb::Constructor<nu::Font>(),
           "Color",     vb::Constructor<nu::Color>(),
@@ -1150,9 +1140,6 @@ void Initialize(v8::Local<v8::Object> exports) {
           "Vibrant",   vb::Constructor<nu::Vibrant>(),
 #endif
           // Properties.
-#if !defined(ELECTRON_BUILD)
-          "lifetime", nu::Lifetime::GetCurrent(),
-#endif
           "app",      nu::State::GetCurrent()->GetApp());
 }
 

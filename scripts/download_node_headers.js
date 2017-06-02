@@ -35,7 +35,8 @@ if (fs.existsSync(node_dir)) {
   process.exit(0)
 }
 
-const url = `${prefix[runtime]}/${version}/node-${version}.tar.gz`
+const suffix = runtime == 'electron' ? '' : '-headers'
+const url = `${prefix[runtime]}/${version}/node-${version}${suffix}.tar.gz`
 https.get(url, (response) => {
   response.pipe(zlib.createGunzip())
           .pipe(cp.exec('tar xf -', {cwd: 'third_party'}).stdin)
