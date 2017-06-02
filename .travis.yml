@@ -62,6 +62,7 @@ deploy:
     - out/Release/libyue_*.zip
     - out/Release/lua_yue_*.zip
     - out/Release/node_yue_*.zip
+  skip_cleanup: true
   overwrite: true
   draft: true
   tag_name: ${YUE_VERSION}
