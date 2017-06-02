@@ -36,7 +36,9 @@ execSync('ninja -C out/Node node_yue')
 let arch = targetCpu
 if (arch == 'x86')
   arch = 'ia32'
-let shortver = nodever.substr(0, nodever.indexOf('.'))
+let shortver = nodever.substr(0, nodever.lastIndexOf('.'))
+if (runtime == "node")
+  shortver = shortver.substr(0, shortver.lastIndexOf('.'))
 const zipname = `node_yue_${version}_${runtime}_${shortver}_${process.platform}_${arch}`
 
 // Create zip archive of the node module.
