@@ -15,11 +15,18 @@ process.env.DEPOT_TOOLS_WIN_TOOLCHAIN = 0
 const binaries_dir = path.resolve('tools', 'build', process.platform)
 process.env.PATH = `${binaries_dir}${path.delimiter}${process.env.PATH}`
 
+// Get yue's version.
+const version = String(execSync('git describe --always --tags')).trim()
+
 // Parse args.
+let targetCpu = 'x64'
 let verbose = false
 const argv = process.argv.slice(2).filter((arg) => {
   if (arg == '-v' || arg == '--verbose') {
     verbose = true
+    return false
+  } else if (arg.startsWith('--target-cpu=')) {
+    targetCpu = arg.substr(arg.indexOf('=') + 1)
     return false
   } else {
     return true
@@ -58,7 +65,9 @@ if (!verbose) {
 // Export public APIs.
 module.exports = {
   verbose,
+  version,
   argv,
+  targetCpu,
   execSync: execSyncWrapper,
   spawnSync: spawnSyncWrapper,
 }

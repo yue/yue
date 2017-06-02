@@ -4,14 +4,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {argv, execSync, spawnSync} = require('./common')
-
-// Parse target cpu.
-let targetCpu = 'x64'
-for (let arg of argv) {
-  if (arg.startsWith('--target-cpu='))
-    targetCpu = arg.substr(arg.indexOf('=') + 1)
-}
+const {targetCpu, execSync, spawnSync} = require('./common')
 
 // Get the arch of sysroot.
 let sysrootArch = {
