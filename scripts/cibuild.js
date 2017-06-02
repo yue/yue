@@ -15,6 +15,7 @@ const targets = [
   'yue',
 ]
 execSync(`node ./scripts/build.js out/Release ${targets.join(' ')}`)
+execSync(`node ./scripts/create_dist.js`)
 
 // Build node extensions.
 const runtimes = {
