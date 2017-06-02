@@ -4,12 +4,14 @@
 
 import("//testing/test.gni")
 
-static_library("libnativeui") {
-  complete_static_lib = true
-  output_prefix_override = true  # do not add "lib" prefix
-  output_dir = root_out_dir
+if (!is_component_build) {
+  static_library("libnativeui") {
+    complete_static_lib = true
+    output_prefix_override = true  # do not add "lib" prefix
+    output_dir = root_out_dir
 
-  deps = [ ":nativeui" ]
+    deps = [ ":nativeui" ]
+  }
 }
 
 component("nativeui") {

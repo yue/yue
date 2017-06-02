@@ -4,8 +4,7 @@
 
 group("default") {
   deps = [
-    "//nativeui:libnativeui",
     "//node_yue",
-    "//lua_yue",
+    "//lua_yue:yue",
   ]
 }
