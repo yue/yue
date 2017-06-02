@@ -49,3 +49,14 @@ script:
     else
       node ./scripts/cibuild.js --target-cpu=$TARGET_CPU;
     fi
+
+deploy:
+  provider: releases
+  api_key:
+    secure: kOBMmyflUZKqw6oXrXF3z0BuulaLSwwIte4TpqdWH9+aArGvjomxsRsthDDsa4MviAKLDQwjst8VBrfK0XD4Z/cydU9dUpC2aIPSLo+27kTMI18X3A9eBeaSU9DkT/bMhLtTIbH7vDUN+wlY8AH6j22W87gCP1skiHC8rsy6ySOl5toRVi+7RHWCTp9L+gl8jDaP0/+UsOD+2ElH15JaDbTXs3CR/b+jwFMMVp8iVnH5/52pAW2VdxRIEZ0KCEA+3rPdolEcGuTOmjMix1GRKq84LMlsasKo9vJ/jZ50RVBktcyKILvHqksgCk4UOAApe4y/GCftFUXQ8faYT5t3zfhpxfGKSrCzMQGV1/LmyLIPSsxoEph4yVVymvf65Mxa6gMLC7olHcKfE+2M0GzjFX5E4mTsapIzfHB+Q5pb9DOKAXugaUdecTNSnYHiLRnfpK5hZN3zssUTxe+ItGz+V+qxCyNNgeod39l7v6QAP8xg7SgLibtryFUNF/8RjY21iPufwRinVhjuD5o8L2iGamrsWU5PI8YRnW1if3Mpr7GBQXtjR4lVm+hoTi0hEyCGjQdmblamPeVhABu4a1bJqYwzEg9L6frCXkRTTZ17Y32WjwSoFve/XqYCSPglqXC3R1RRkDNH0bJhjj/lrYvxfGLdOkciCGI6PMQo1qsPqHA=
+  file_glob: true
+  file: out/Node/node_yue_*.zip
+  overwrite: true
+  draft: true
+  on:
+    tags: true
