@@ -13,6 +13,15 @@
 #include "base/strings/string_tokenizer.h"
 #include "base/strings/string_util.h"
 
+#if GTK_MAJOR_VERSION > 2
+// These constants are defined in gtk/gtkenums.h in Gtk3.12 or later.
+// They are added here as a convenience to avoid version checks, and
+// can be removed once the sysroot is switched from Wheezy to Jessie.
+#define GTK_STATE_FLAG_LINK static_cast<GtkStateFlags>(1 << 9)
+#define GTK_STATE_FLAG_VISITED static_cast<GtkStateFlags>(1 << 10)
+#define GTK_STATE_FLAG_CHECKED static_cast<GtkStateFlags>(1 << 11)
+#endif
+
 namespace nu {
 
 namespace {

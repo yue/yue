@@ -375,7 +375,7 @@ void Window::Unmaximize() {
 }
 
 bool Window::IsMaximized() const {
-  return gtk_window_is_maximized(window_);
+  return GetPrivate(this)->window_state & GDK_WINDOW_STATE_MAXIMIZED;
 }
 
 void Window::Minimize() {
