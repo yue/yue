@@ -209,8 +209,8 @@ void WindowImpl::OnClose() {
 }
 
 void WindowImpl::OnCommand(UINT code, int command, HWND window) {
-  if (!code && !window && delegate_->GetMenu()) {
-    DispatchCommandToItem(delegate_->GetMenu(), command);
+  if (!code && !window && delegate_->GetMenuBar()) {
+    DispatchCommandToItem(delegate_->GetMenuBar(), command);
     return;
   } else if (::GetParent(window) != hwnd()) {
     LOG(ERROR) << "Received notification " << code << " " << command
@@ -303,11 +303,11 @@ LRESULT WindowImpl::OnKeyEvent(UINT message, WPARAM w_param, LPARAM l_param) {
 
   // If no one handles it then pass the event to menu.
   KeyEvent event(&msg, delegate_->GetContentView()->GetNative());
-  if (event.type == EventType::KeyDown && delegate_->GetMenu()) {
+  if (event.type == EventType::KeyDown && delegate_->GetMenuBar()) {
     Accelerator accelerator(event);
-    int command = delegate_->GetMenu()->accel_manager()->Process(accelerator);
-    if (command != -1) {
-      DispatchCommandToItem(delegate_->GetMenu(), command);
+    int id = delegate_->GetMenuBar()->accel_manager()->Process(accelerator);
+    if (id != -1) {
+      DispatchCommandToItem(delegate_->GetMenuBar(), id);
       return 0;
     }
   }
@@ -795,7 +795,7 @@ void Window::SetBackgroundColor(Color color) {
 }
 
 void Window::PlatformSetMenuBar(MenuBar* menu_bar) {
-  ::SetMenuBar(window_->hwnd(), menu_bar ? menu_bar->GetNative() : NULL);
+  ::SetMenu(window_->hwnd(), menu_bar ? menu_bar->GetNative() : NULL);
 }
 
 }  // namespace nu

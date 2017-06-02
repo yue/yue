@@ -15,6 +15,7 @@
 #include "nativeui/gfx/geometry/vector2d_conversions.h"
 #include "nativeui/gfx/win/screen_win.h"
 #include "nativeui/gfx/win/text_win.h"
+#include "nativeui/state.h"
 #include "nativeui/win/view_win.h"
 #include "nativeui/win/window_win.h"
 
@@ -59,7 +60,8 @@ class ButtonImpl : public ViewImpl {
       SetChecked(!IsChecked());
     else if (type() == ControlType::Radio && !IsChecked())
       SetChecked(true);
-    static_cast<Button*>(delegate())->on_click.Emit(delegate());
+    Button* button = static_cast<Button*>(delegate());
+    button->on_click.Emit(button);
   }
 
   void SetChecked(bool checked) {

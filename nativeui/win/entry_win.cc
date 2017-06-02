@@ -52,9 +52,8 @@ class EntryImpl : public SubwinView {
 Entry::Entry() {
   TakeOverView(new EntryImpl(this));
 
-  float height =
-      MeasureText(L"some text", view()->font()).height() / GetScaleFactor() +
-      2 * kEntryPadding;
+  SizeF size = MeasureText(L"some text", GetNative()->font());
+  float height = size.height() / GetScaleFactor() + 2 * kEntryPadding;
   SetDefaultStyle(SizeF(0, height));
 }
 

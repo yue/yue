@@ -54,7 +54,7 @@ void Label::SetText(const std::string& text) {
   base::string16 wtext = base::UTF8ToUTF16(text);
   label->SetText(wtext);
 
-  SetDefaultStyle(ScaleSize(MeasureText(wtext, view()->font()),
+  SetDefaultStyle(ScaleSize(MeasureText(wtext, GetNative()->font()),
                             1.0f / GetScaleFactor()));
   label->Invalidate();
 }
