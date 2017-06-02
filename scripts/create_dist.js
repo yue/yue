@@ -9,6 +9,7 @@ const {version, targetCpu, targetOs, execSync} = require('./common')
 const fs = require('fs')
 const JSZip = require('./libs/jszip')
 
+// C++ static library.
 const cppFiles = {
   linux: [
     'libyue.a',
@@ -21,14 +22,25 @@ const cppFiles = {
   ],
 }
 
+// Lua loadable module.
 const luaFiles = {
   linux: [
-    'yue',
     'yue.so',
   ],
   mac: [
-    'yue',
     'yue.so',
+  ],
+  win: [
+  ],
+}
+
+// Independent executable.
+const exeFiles = {
+  linux: [
+    'yue'
+  ],
+  mac: [
+    'yue'
   ],
   win: [
     'yue.exe',
@@ -38,7 +50,8 @@ const luaFiles = {
 }
 
 generateZip('libyue', cppFiles)
-generateZip('lua_yue', luaFiles)
+generateZip('lua_yue_lua_5.3', luaFiles)
+generateZip('yue', exeFiles)
 
 function generateZip(name, list) {
   const zipname = `${name}_${version}_${targetOs}_${targetCpu}`
