@@ -50,7 +50,8 @@ https.get(url, (response) => {
 })
 
 function downloadNodeLib(arch) {
-  const lib = `${prefix[runtime]}/${version}/win-${arch}/node.lib`
+  const name = runtime == 'electron' ? 'iojs' : 'node'
+  const lib = `${prefix[runtime]}/${version}/win-${arch}/${name}.lib`
   return https.get(lib, (response) => {
     const lib_dir = path.join(node_dir, arch)
     fs.mkdirSync(lib_dir)
