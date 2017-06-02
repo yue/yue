@@ -9,6 +9,7 @@ const {execSync} = require('./common')
 execSync(`node ./scripts/bootstrap.js --target-cpu=${process.env.TARGET_CPU}`)
 
 const targets = [
+  "libnativeui",
   'node_yue',
   'lua_yue',
   'yue',

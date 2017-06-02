@@ -16,8 +16,8 @@ class NATIVEUI_EXPORT Progress : public View {
   // View class name.
   static const char kClassName[];
 
-  void SetValue(int value);
-  int GetValue() const;
+  void SetValue(float value);
+  float GetValue() const;
 
   void SetIndeterminate(bool indeterminate);
   bool IsIndeterminate() const;

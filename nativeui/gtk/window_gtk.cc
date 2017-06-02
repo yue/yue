@@ -95,9 +95,10 @@ gboolean OnDraw(GtkWidget* widget, cairo_t* cr, NUWindowPrivate* priv) {
 // Get the height of menubar.
 inline int GetMenuBarHeight(const Window* window) {
   int menu_bar_height = 0;
-  if (window->GetMenu()) {
-    gtk_widget_get_preferred_height(GTK_WIDGET(window->GetMenu()->GetNative()),
-                                    &menu_bar_height, nullptr);
+  if (window->GetMenuBar()) {
+    gtk_widget_get_preferred_height(
+        GTK_WIDGET(window->GetMenuBar()->GetNative()),
+        &menu_bar_height, nullptr);
   }
   return menu_bar_height;
 }

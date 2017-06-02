@@ -20,13 +20,13 @@ Progress::Progress() {
 Progress::~Progress() {
 }
 
-void Progress::SetValue(int value) {
+void Progress::SetValue(float value) {
   auto* progress = static_cast<NSProgressIndicator*>(GetNative());
   progress.indeterminate = NO;
   progress.doubleValue = value;
 }
 
-int Progress::GetValue() const {
+float Progress::GetValue() const {
   auto* progress = static_cast<NSProgressIndicator*>(GetNative());
   return progress.doubleValue;
 }
