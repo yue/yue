@@ -1,0 +1,36 @@
+version: "{build}"
+
+os: Visual Studio 2015
+
+init:
+  - git config --global core.autocrlf input
+
+platform:
+  - x86
+  - x64
+
+install:
+  - cmd: SET PATH=C:\Program Files (x86)\MSBuild\14.0\bin\;%PATH%
+  - cmd: SET PATH=C:\python27;%PATH%
+  - cmd: node script/cibuild.js
+
+deploy:
+  - provider: GitHub
+    release: Yue $(APPVEYOR_REPO_TAG_NAME)
+    tag: $(APPVEYOR_REPO_TAG_NAME)
+    description: '(placeholder)'
+    auth_token:
+      secure: txrp2eAOWw3fwVvYuRutmnek5xMtndPskyOMtu09vk9FeA5wdaQ2RGL/YAsCdIGH
+    artifact:
+      - out/Release/libyue_*.zip
+      - out/Release/lua_yue_*.zip
+      - out/Release/node_yue_*.zip
+    draft: true
+    force_update: true
+    prerelease: false
+    on:
+      appveyor_repo_tag: true
+
+# disable build and test pahses
+build: off
+test: off
