@@ -10,7 +10,7 @@ execSync(`node ./scripts/bootstrap.js --target-cpu=${targetCpu}`)
 
 // Build common targets.
 const targets = [
-  "libnativeui",
+  "libyue",
   'lua_yue',
   'yue',
 ]

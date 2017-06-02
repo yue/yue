@@ -2,6 +2,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
+const fs = require('fs')
 const path = require('path')
 const {execSync, spawnSync} = require('child_process')
 
@@ -18,8 +19,23 @@ process.env.PATH = `${binaries_dir}${path.delimiter}${process.env.PATH}`
 // Get yue's version.
 const version = String(execSync('git describe --always --tags')).trim()
 
-// Parse args.
+// Get target_cpu from args.gn.
 let targetCpu = 'x64'
+if (fs.existsSync('out/Release/args.gn')) {
+  const content = String(fs.readFileSync('out/Release/args.gn'))
+  const match = content.match(/target_cpu = "(.*)"/)
+  if (match && match.length > 2)
+    targetCpu = match[1]
+}
+
+// Get target OS.
+const targetOs = {
+  win32: 'win',
+  linux: 'linux',
+  darwin: 'mac',
+}[process.platform]
+
+// Parse args.
 let verbose = false
 const argv = process.argv.slice(2).filter((arg) => {
   if (arg == '-v' || arg == '--verbose') {
@@ -68,6 +84,7 @@ module.exports = {
   version,
   argv,
   targetCpu,
+  targetOs,
   execSync: execSyncWrapper,
   spawnSync: spawnSyncWrapper,
 }

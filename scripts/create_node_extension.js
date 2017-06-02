@@ -4,7 +4,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {version, argv, targetCpu, execSync, spawnSync} = require('./common')
+const {version, argv, targetCpu, targetOs, execSync, spawnSync} = require('./common')
 
 const fs = require('fs')
 const JSZip = require('./libs/jszip')
@@ -34,13 +34,10 @@ spawnSync('gn', ['gen', 'out/Release', `--args=${args.join(' ')}`])
 execSync('ninja -C out/Release node_yue')
 
 // Generate a name conforming node's convention.
-let arch = targetCpu
-if (arch == 'x86')
-  arch = 'ia32'
 let shortver = nodever.substr(0, nodever.lastIndexOf('.'))
 if (runtime == "node")
   shortver = shortver.substr(0, shortver.lastIndexOf('.'))
-const zipname = `node_yue_${version}_${runtime}_${shortver}_${process.platform}_${arch}`
+const zipname = `node_yue_${version}_${runtime}_${shortver}_${targetOs}_${targetCpu}`
 
 // Create zip archive of the node module.
 let zip = new JSZip()
