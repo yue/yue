@@ -43,8 +43,19 @@ generateZip('lua_yue', luaFiles)
 function generateZip(name, list) {
   const zipname = `${name}_${version}_${targetOs}_${targetCpu}`
   let zip = new JSZip()
-  for (let file of list[targetOs])
+  for (let file of list[targetOs]) {
+    if (targetOs == 'linux')
+      strip(`out/Release/${file}`)
     zip.file(file, fs.readFileSync(`out/Release/${file}`))
+  }
   zip.generateNodeStream({streamFiles:true})
      .pipe(fs.createWriteStream(`out/Release/${zipname}.zip`))
+}
+
+function strip(file) {
+  if (file.endsWith('.a'))
+    return
+  const strip = targetCpu.startsWith('arm') ? 'arm-linux-gnueabihf-strip'
+                                            : 'strip'
+  execSync(`${strip} ${file}`)
 }

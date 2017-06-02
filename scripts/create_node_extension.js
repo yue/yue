@@ -39,6 +39,12 @@ if (runtime == "node")
   shortver = shortver.substr(0, shortver.lastIndexOf('.'))
 const zipname = `node_yue_${version}_${runtime}_${shortver}_${targetOs}_${targetCpu}`
 
+// Strip the binaries on Linux.
+if (targetOs == 'linux') {
+  const strip = targetCpu.startsWith('arm') ? 'arm-linux-gnueabihf-strip' : 'strip'
+  execSync(`${strip} out/Release/gui.node`)
+}
+
 // Create zip archive of the node module.
 let zip = new JSZip()
 zip.file('gui.node', fs.readFileSync('out/Release/gui.node'))
