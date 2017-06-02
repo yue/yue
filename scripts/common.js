@@ -24,7 +24,7 @@ let targetCpu = 'x64'
 if (fs.existsSync('out/Release/args.gn')) {
   const content = String(fs.readFileSync('out/Release/args.gn'))
   const match = content.match(/target_cpu = "(.*)"/)
-  if (match && match.length > 2)
+  if (match && match.length > 1)
     targetCpu = match[1]
 }
 
