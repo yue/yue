@@ -31,17 +31,17 @@ gen('out/Debug', [
   'is_component_build=true',
   'is_debug=true',
   'use_sysroot=false',
+  `target_cpu="${targetCpu}"`,
   'node_runtime="node"',
   `node_version="${process.version}"`,
-  `target_cpu="${targetCpu}"`,
 ])
 gen('out/Release', [
   'is_component_build=false',
   'is_debug=false',
   'is_official_build=true',
+  `target_cpu="${targetCpu}"`,
   'node_runtime="node"',
   `node_version="${process.version}"`,
-  `target_cpu="${targetCpu}"`,
 ])
 
 function gen(dir, args) {

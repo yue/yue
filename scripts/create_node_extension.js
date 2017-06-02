@@ -22,6 +22,7 @@ const args = [
   'is_component_build=false',
   'is_debug=false',
   'is_official_build=true',
+  `target_cpu="${targetCpu}"`,
   // Set node nodever and runtime.
   `node_version="${nodever}"`,
   `node_runtime="${runtime}"`,
@@ -29,8 +30,8 @@ const args = [
 
 // Build the node module.
 execSync(`node ./scripts/download_node_headers.js ${runtime} ${nodever}`)
-spawnSync('gn', ['gen', 'out/Node', `--args=${args.join(' ')}`])
-execSync('ninja -C out/Node node_yue')
+spawnSync('gn', ['gen', 'out/Release', `--args=${args.join(' ')}`])
+execSync('ninja -C out/Release node_yue')
 
 // Generate a name conforming node's convention.
 let arch = targetCpu
@@ -43,6 +44,6 @@ const zipname = `node_yue_${version}_${runtime}_${shortver}_${process.platform}_
 
 // Create zip archive of the node module.
 let zip = new JSZip()
-zip.file('gui.node', fs.readFileSync('out/Node/gui.node'))
+zip.file('gui.node', fs.readFileSync('out/Release/gui.node'))
 zip.generateNodeStream({streamFiles:true})
-   .pipe(fs.createWriteStream(`out/Node/${zipname}.zip`))
+   .pipe(fs.createWriteStream(`out/Release/${zipname}.zip`))
