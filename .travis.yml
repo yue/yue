@@ -24,7 +24,6 @@ addons:
       - gcc-arm-linux-gnueabihf
       - g++-arm-linux-gnueabihf
       - linux-libc-dev:i386
-      - linux-libc-dev:armhf
       - libc6-dev-armhf-cross
       - linux-libc-dev-armhf-cross
       - binutils-aarch64-linux-gnu

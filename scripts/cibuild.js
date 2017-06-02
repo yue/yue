@@ -6,7 +6,11 @@
 
 const {execSync} = require('./common')
 
-execSync(`node ./scripts/bootstrap.js --target-cpu=${process.env.TARGET_CPU}`)
+let targetCpu = 'x64'
+if (process.env.TARGET_CPU)
+  targetCpu = process.env.TARGET_CPU
+
+execSync(`node ./scripts/bootstrap.js --target-cpu=${targetCpu}`)
 
 const targets = [
   "libnativeui",
@@ -16,11 +20,13 @@ const targets = [
 ]
 execSync(`node ./scripts/build.js out/Release ${targets.join(' ')}`)
 
-const tests = [
-  'nativeui_unittests',
-  'lua_unittests',
-]
-execSync(`node ./scripts/build.js out/Debug ${tests.join(' ')}`)
+if (targetCpu == 'x64') {
+  const tests = [
+    'nativeui_unittests',
+    'lua_unittests',
+  ]
+  execSync(`node ./scripts/build.js out/Debug ${tests.join(' ')}`)
 
-for (test of tests)
-  execSync(`./out/Debug/${test} --single-process-tests`)
+  for (test of tests)
+    execSync(`./out/Debug/${test} --single-process-tests`)
+}
