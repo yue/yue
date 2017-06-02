@@ -23,7 +23,7 @@ const args = [
   'is_debug=false',
   'is_official_build=true',
   // Set node nodever and runtime.
-  `node_nodever="${nodever}"`,
+  `node_version="${nodever}"`,
   `node_runtime="${runtime}"`,
 ]
 

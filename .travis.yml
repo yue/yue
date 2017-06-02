@@ -45,7 +45,7 @@ matrix:
 
 script:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-      xvfb-run node ./scripts/cibuild.js;
+      xvfb-run node ./scripts/cibuild.js --target-cpu=$TARGET_CPU;
     else
-      node ./scripts/cibuild.js;
+      node ./scripts/cibuild.js --target-cpu=$TARGET_CPU;
     fi
