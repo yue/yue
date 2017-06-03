@@ -34,9 +34,9 @@ spawnSync('gn', ['gen', 'out/Release', `--args=${args.join(' ')}`])
 execSync('ninja -C out/Release node_yue')
 
 // Generate a name conforming node's convention.
-let shortver = nodever.substr(1, nodever.lastIndexOf('.'))
+let shortver = nodever.substring(1, nodever.lastIndexOf('.'))
 if (runtime == "node")
-  shortver = shortver.substr(0, shortver.lastIndexOf('.'))
+  shortver = shortver.substring(0, shortver.lastIndexOf('.'))
 const zipname = `node_yue_${runtime}_${shortver}_${version}_${targetOs}_${targetCpu}`
 
 // Strip the binaries on Linux.
