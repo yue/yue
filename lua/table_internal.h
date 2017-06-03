@@ -97,7 +97,8 @@ template<typename... ArgTypes>
 struct PSetArgs {
   using Tuple = std::tuple<typename PSetArgReplacer<const ArgTypes&>::Type...>;
   static Tuple Convert(State* state, int* upvalues, const ArgTypes&... args) {
-    Tuple refs(PSetArgReplacer<const ArgTypes&>::Do(state, upvalues, args)...);
+    Tuple refs(std::forward<typename PSetArgReplacer<const ArgTypes&>::Type>(
+        PSetArgReplacer<const ArgTypes&>::Do(state, upvalues, args))...);
     return std::move(refs);
   }
 };
