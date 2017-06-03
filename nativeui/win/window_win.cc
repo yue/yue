@@ -124,6 +124,10 @@ void WindowImpl::ReleaseCapture() {
     ::ReleaseCapture();
 }
 
+bool WindowImpl::IsMaximized() const {
+  return !!::IsZoomed(hwnd()) && !IsFullscreen();
+}
+
 void WindowImpl::SetFullscreen(bool fullscreen) {
   // Save current window state if not already fullscreen.
   if (!fullscreen_) {
@@ -414,8 +418,7 @@ LRESULT WindowImpl::OnNCHitTest(UINT msg, WPARAM w_param, LPARAM l_param) {
   Point point(temp);
 
   // Calculate the resize handle.
-  if (delegate_->IsResizable() &&
-      !(delegate_->IsMaximized() || IsFullscreen())) {
+  if (delegate_->IsResizable() && !(IsMaximized() || IsFullscreen())) {
     Rect bounds = GetPixelBounds();
     int border_thickness = kResizeBorderWidth * scale_factor();
     int corner_width = kResizeCornerWidth * scale_factor();
@@ -553,7 +556,7 @@ bool WindowImpl::GetClientAreaInsets(Insets* insets) {
   if (HasSystemFrame())
     return false;
 
-  if (delegate_->IsMaximized()) {
+  if (IsMaximized()) {
     // Windows automatically adds a standard width border to all sides when a
     // window is maximized.
     int border_thickness = ::GetSystemMetrics(SM_CXSIZEFRAME);
@@ -739,7 +742,7 @@ void Window::Unmaximize() {
 }
 
 bool Window::IsMaximized() const {
-  return !!::IsZoomed(window_->hwnd()) && !IsFullscreen();
+  return window_->IsMaximized();
 }
 
 void Window::Minimize() {

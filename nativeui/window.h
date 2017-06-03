@@ -137,7 +137,7 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
   scoped_refptr<MenuBar> menu_bar_;
 #endif
 
-  NativeWindow window_;
+  NativeWindow window_ = nullptr;
   scoped_refptr<View> content_view_;
 };
 

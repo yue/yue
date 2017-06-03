@@ -25,6 +25,7 @@ class WindowImpl : public Win32Window {
   void SetCapture(ViewImpl* view);
   void ReleaseCapture();
 
+  bool IsMaximized() const;
   void SetFullscreen(bool fullscreen);
   bool IsFullscreen() const;
 
