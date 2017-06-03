@@ -14,7 +14,7 @@ const targets = [
   'yue',
 ]
 if (targetOs != 'win')
-  targets.append('lua_yue')
+  targets.push('lua_yue')
 execSync(`node ./scripts/build.js out/Release ${targets.join(' ')}`)
 execSync(`node ./scripts/create_dist.js`)
 

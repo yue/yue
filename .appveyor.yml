@@ -10,6 +10,7 @@ platform:
   - x64
 
 install:
+  - ps: Install-Product node 7
   - cmd: SET PATH=C:\Program Files (x86)\MSBuild\14.0\bin\;%PATH%
   - cmd: SET PATH=C:\python27;%PATH%
   - cmd: node scripts/cibuild.js
