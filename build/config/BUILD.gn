@@ -173,7 +173,6 @@ config("default_libs") {
       "shell32.lib",
       "shlwapi.lib",
       "user32.lib",
-      "uuid.lib",
       "version.lib",
       "ws2_32.lib",
 

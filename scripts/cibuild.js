@@ -4,7 +4,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {targetCpu, targetOs, execSync} = require('./common')
+const {targetCpu, targetOs, execSync, spawnSync} = require('./common')
 
 execSync(`node ./scripts/bootstrap.js --target-cpu=${targetCpu}`)
 
@@ -43,5 +43,5 @@ if (targetCpu == 'x64') {
   execSync(`node ./scripts/build.js out/Debug ${tests.join(' ')}`)
 
   for (test of tests)
-    execSync(`./out/Debug/${test} --single-process-tests`)
+    spawnSync(`./out/Debug/${test}`, ['-single-process-tests'])
 }
