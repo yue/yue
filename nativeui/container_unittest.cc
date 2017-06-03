@@ -92,7 +92,9 @@ TEST_F(ContainerTest, VisibleLayout) {
   container_->AddChildView(new nu::Container);
   EXPECT_GE(container_->layout_count(), 2);
   window_->SetBounds(nu::RectF(0, 0, 100, 200));
+#if !defined(OS_LINUX)  // SetBounds is async in GTK+
   EXPECT_GE(container_->layout_count(), 3);
+#endif
 }
 
 TEST_F(ContainerTest, RemoveAndAddBack) {

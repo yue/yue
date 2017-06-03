@@ -21,13 +21,26 @@ namespace {
 // The view that has the capture.
 View* g_grabbed_view = nullptr;
 
-void OnSizeAllocate(GtkWidget* widget, GdkRectangle* allocation, View* view) {
+// View private data.
+struct NUViewPrivate {
+  View* delegate;
+  // Current view size.
+  Size size;
+};
+
+void OnSizeAllocate(GtkWidget* widget, GdkRectangle* allocation,
+                    NUViewPrivate* priv) {
   // Ignore empty sizes on initialization.
   if (allocation->x == -1 && allocation->y == -1 &&
       allocation->width == 1 && allocation->height == 1)
     return;
 
-  view->OnSizeChanged();
+  // Size allocation happens unnecessarily often.
+  Size size(allocation->width, allocation->height);
+  if (size != priv->size) {
+    priv->size = size;
+    priv->delegate->OnSizeChanged();
+  }
 }
 
 gboolean OnMouseMove(GtkWidget* widget, GdkEvent* event, View* view) {
@@ -96,12 +109,16 @@ void View::TakeOverView(NativeView view) {
   g_object_ref_sink(view);
   gtk_widget_show(view);  // visible by default
 
+  NUViewPrivate* priv = new NUViewPrivate;
+  priv->delegate = this;
+  g_object_set_data_full(G_OBJECT(view), "private", priv, operator delete);
+
   // Make the view accepts events.
   gtk_widget_add_events(view, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
                               GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK);
 
   // Install event hooks.
-  g_signal_connect(view, "size-allocate", G_CALLBACK(OnSizeAllocate), this);
+  g_signal_connect(view, "size-allocate", G_CALLBACK(OnSizeAllocate), priv);
   g_signal_connect(view, "motion-notify-event", G_CALLBACK(OnMouseMove), this);
   // TODO(zcbenz): Lazily install the event hooks.
   g_signal_connect(view, "button-press-event", G_CALLBACK(OnMouseEvent), this);
