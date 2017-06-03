@@ -9,9 +9,9 @@
 #include "base/logging.h"
 #include "base/win/windows_version.h"
 #include "nativeui/gfx/screen.h"
-#include "nativeui/gfx/win/gdiplus.h"
 #include "nativeui/gfx/win/native_theme.h"
 #include "nativeui/win/util/class_registrar.h"
+#include "nativeui/win/util/gdiplus_holder.h"
 #include "nativeui/win/util/subwin_holder.h"
 #include "third_party/yoga/yoga/Yoga.h"
 
@@ -71,12 +71,7 @@ void State::PlatformInit() {
 
   YGConfigSetPointScaleFactor(yoga_config(), GetScaleFactor());
 
-  Gdiplus::GdiplusStartupInput input;
-  Gdiplus::GdiplusStartup(&token_, &input, nullptr);
-}
-
-void State::PlatformDestroy() {
-  Gdiplus::GdiplusShutdown(token_);
+  gdiplus_holder_.reset(new GdiplusHolder);
 }
 
 HWND State::GetSubwinHolder() {

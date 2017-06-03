@@ -15,6 +15,7 @@ typedef struct YGConfig *YGConfigRef;
 namespace nu {
 
 #if defined(OS_WIN)
+class GdiplusHolder;
 class ClassRegistrar;
 class NativeTheme;
 class SubwinHolder;
@@ -43,10 +44,9 @@ class NATIVEUI_EXPORT State {
 
  private:
   void PlatformInit();
-  void PlatformDestroy();
 
 #if defined(OS_WIN)
-  ULONG_PTR token_;
+  std::unique_ptr<GdiplusHolder> gdiplus_holder_;
   std::unique_ptr<ClassRegistrar> class_registrar_;
   std::unique_ptr<SubwinHolder> subwin_holder_;
   std::unique_ptr<NativeTheme> native_theme_;

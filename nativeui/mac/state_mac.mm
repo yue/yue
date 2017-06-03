@@ -17,7 +17,4 @@ void State::PlatformInit() {
                               [NSScreen mainScreen].backingScaleFactor);
 }
 
-void State::PlatformDestroy() {
-}
-
 }  // namespace nu

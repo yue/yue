@@ -9,7 +9,4 @@ namespace nu {
 void State::PlatformInit() {
 }
 
-void State::PlatformDestroy() {
-}
-
 }  // namespace nu

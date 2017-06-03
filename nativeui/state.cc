@@ -11,6 +11,7 @@
 #if defined(OS_WIN)
 #include "nativeui/gfx/win/native_theme.h"
 #include "nativeui/win/util/class_registrar.h"
+#include "nativeui/win/util/gdiplus_holder.h"
 #include "nativeui/win/util/subwin_holder.h"
 #endif
 
@@ -35,7 +36,6 @@ State::State() : yoga_config_(YGConfigNew()) {
 State::~State() {
   YGConfigFree(yoga_config_);
 
-  PlatformDestroy();
   DCHECK_EQ(GetCurrent(), this);
   lazy_tls_ptr.Pointer()->Set(nullptr);
 }

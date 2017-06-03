@@ -243,6 +243,7 @@ component("nativeui") {
     "win/scrollbar/scrollbar_thumb.h",
     "win/util/class_registrar.cc",
     "win/util/class_registrar.h",
+    "win/util/gdiplus_holder.h",
     "win/util/hwnd_util.cc",
     "win/util/hwnd_util.h",
     "win/util/msg_util.h",
