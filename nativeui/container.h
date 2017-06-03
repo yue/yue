@@ -64,6 +64,9 @@ class NATIVEUI_EXPORT Container : public View {
  private:
   // Relationships.
   std::vector<scoped_refptr<View>> children_;
+
+  // Whether the container should update children's layout.
+  bool dirty_ = false;
 };
 
 }  // namespace nu

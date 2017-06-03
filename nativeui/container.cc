@@ -48,7 +48,15 @@ const char* Container::GetClassName() const {
 void Container::Layout() {
   // For child CSS node, tell parent to do the layout.
   if (!IsRootYGNode(this)) {
+    dirty_ = true;
     static_cast<Container*>(GetParent())->Layout();
+    // The parent may choose to not update this view because its size is not
+    // changed, in that case we need to force updating here.
+    // This usually happens after adding a child view, since the container does
+    // not change its size.
+    // TODO(zcbenz): Revisit the logic here, should have a cleaner way.
+    if (dirty_)
+      SetChildBoundsFromCSS();
     return;
   }
 
@@ -129,6 +137,7 @@ void Container::RemoveChildView(View* view) {
 }
 
 void Container::SetChildBoundsFromCSS() {
+  dirty_ = false;
   for (int i = 0; i < ChildCount(); ++i) {
     View* child = ChildAt(i);
     if (child->IsVisible())
