@@ -28,6 +28,8 @@ const args = [
   `node_runtime="${runtime}"`,
 ]
 
+console.log(`Creating native extension for ${runtime} ${nodever}...`)
+
 // Build the node module.
 execSync(`node ./scripts/download_node_headers.js ${runtime} ${nodever}`)
 spawnSync('gn', ['gen', 'out/Release', `--args=${args.join(' ')}`])
