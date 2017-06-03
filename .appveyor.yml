@@ -15,6 +15,9 @@ install:
   - cmd: SET PATH=C:\python27;%PATH%
   - cmd: node scripts/cibuild.js
 
+artifacts:
+  - path: 'out\Release\*.zip'
+
 deploy:
   - provider: GitHub
     release: Yue $(APPVEYOR_REPO_TAG_NAME)
@@ -22,7 +25,7 @@ deploy:
     description: '(placeholder)'
     auth_token:
       secure: txrp2eAOWw3fwVvYuRutmnek5xMtndPskyOMtu09vk9FeA5wdaQ2RGL/YAsCdIGH
-    artifact: /out\\Release\\.*\.zip/
+    artifact: /.*\.zip/
     draft: true
     force_update: true
     prerelease: false
