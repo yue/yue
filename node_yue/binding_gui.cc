@@ -838,6 +838,7 @@ struct Type<nu::View> {
                 "onMouseLeave", &nu::View::on_mouse_leave,
                 "onKeyDown", &nu::View::on_key_down,
                 "onKeyUp", &nu::View::on_key_up,
+                "onSizeChanged", &nu::View::on_size_changed,
                 "onCaptureLost", &nu::View::on_capture_lost);
   }
   static void SetStyle(
