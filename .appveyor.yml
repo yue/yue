@@ -12,7 +12,7 @@ platform:
 install:
   - cmd: SET PATH=C:\Program Files (x86)\MSBuild\14.0\bin\;%PATH%
   - cmd: SET PATH=C:\python27;%PATH%
-  - cmd: node script/cibuild.js
+  - cmd: node scripts/cibuild.js
 
 deploy:
   - provider: GitHub
