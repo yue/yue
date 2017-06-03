@@ -626,10 +626,10 @@ void Window::Center() {
 
 void Window::SetContentSize(const SizeF& size) {
   Size psize = ToRoundedSize(ScaleSize(size, window_->scale_factor()));
-  window_->SetPixelBounds(Rect(
-      window_->GetPixelBounds().origin(),
-      HasFrame() ? ContentToWindowSize(window_, !!menu_bar_, psize)
-                 : psize));
+  if (HasFrame())
+    psize = ContentToWindowSize(window_, !!menu_bar_, psize);
+  ::SetWindowPos(window_->hwnd(), NULL, 0, 0, psize.width(), psize.height(),
+                 SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOMOVE);
 }
 
 void Window::SetBounds(const RectF& bounds) {

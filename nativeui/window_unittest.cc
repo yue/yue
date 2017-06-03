@@ -19,7 +19,7 @@ class WindowTest : public testing::Test {
 };
 
 TEST_F(WindowTest, Bounds) {
-  nu::SizeF size(123, 456);
+  nu::SizeF size(124, 456);
   window_->SetContentSize(size);
   EXPECT_EQ(window_->GetContentSize(), size);
   nu::RectF bounds = window_->GetBounds();
@@ -89,7 +89,7 @@ TEST_F(WindowTest, Visible) {
 }
 
 TEST_F(WindowTest, Resizable) {
-  nu::SizeF size(123, 456);
+  nu::SizeF size(124, 456);
   window_->SetContentSize(size);
   nu::RectF bounds = window_->GetBounds();
   EXPECT_EQ(window_->IsResizable(), true);
@@ -103,7 +103,7 @@ TEST_F(WindowTest, Resizable) {
 }
 
 TEST_F(WindowTest, VisibleWindowResizable) {
-  nu::SizeF size(123, 456);
+  nu::SizeF size(124, 456);
   window_->SetContentSize(size);
   EXPECT_EQ(window_->GetContentSize(), size);
   window_->SetResizable(false);
