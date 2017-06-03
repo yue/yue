@@ -30,6 +30,7 @@ execSync(`node scripts/download_node_headers.js node ${process.version}`)
 gen('out/Debug', [
   'is_component_build=true',
   'is_debug=true',
+  'fatal_linker_warnings=false',
   'use_sysroot=false',
   `target_cpu="${targetCpu}"`,
   'node_runtime="node"',
