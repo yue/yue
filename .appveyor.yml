@@ -5,9 +5,11 @@ os: Visual Studio 2015
 init:
   - git config --global core.autocrlf input
 
-platform:
-  - x86
-  - x64
+platform: x64
+environment:
+  matrix:
+    - TARGET_CPU: x64
+    - TARGET_CPU: x86
 
 install:
   - ps: Install-Product node 7
