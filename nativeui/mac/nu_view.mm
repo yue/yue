@@ -82,11 +82,14 @@ void SetFrameSize(NSView* self, SEL _cmd, NSSize size) {
       [self nuPrivate]->is_content_view && [self superview])
     size = [[self superview] bounds].size;
 
+  NSSize old_size = [self bounds].size;
+
   auto super_impl = reinterpret_cast<decltype(&SetFrameSize)>(
       [[self superclass] instanceMethodForSelector:_cmd]);
   super_impl(self, _cmd, size);
 
-  [self shell]->OnSizeChanged();
+  if (size.width != old_size.width || size.height != old_size.height)
+    [self shell]->OnSizeChanged();
 }
 
 // The contentView gets moved around during certain full-screen operations.
