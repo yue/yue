@@ -7,6 +7,7 @@
 const {version, targetCpu, targetOs, execSync} = require('./common')
 
 const fs = require('fs')
+const path = require('path')
 const JSZip = require('./libs/jszip')
 
 // C++ static library.
@@ -29,6 +30,7 @@ const luaFiles = {
   ],
   mac: [
     'yue.so',
+    'yue.so.dSYM',
   ],
   win: [
   ],
@@ -37,10 +39,11 @@ const luaFiles = {
 // Independent executable.
 const exeFiles = {
   linux: [
-    'yue'
+    'yue',
   ],
   mac: [
-    'yue'
+    'yue',
+    'yue.dSYM',
   ],
   win: [
     'yue.exe',
@@ -57,18 +60,32 @@ if (targetOs != 'win')
 function generateZip(name, list) {
   const zipname = `${name}_${version}_${targetOs}_${targetCpu}`
   let zip = new JSZip()
-  for (let file of list[targetOs]) {
-    if (targetOs == 'linux')
-      strip(`out/Release/${file}`)
-    zip.file(file, fs.readFileSync(`out/Release/${file}`))
-  }
+  for (let file of list[targetOs])
+    addFileToZip(zip, `out/Release/${file}`, 'out/Release')
   zip.generateNodeStream({streamFiles:true})
      .pipe(fs.createWriteStream(`out/Release/${zipname}.zip`))
 }
 
+function addFileToZip(zip, file, base) {
+  const stat = fs.statSync(file)
+  if (stat.isDirectory()) {
+    const subfiles = fs.readdirSync(file)
+    for (let sub of subfiles)
+      addFileToZip(zip, `${file}/${sub}`, base)
+  } else if (stat.isFile()) {
+    // TODO(zcbenz): Stripping should be an independent step.
+    if (targetOs == 'linux') strip(file)
+
+    const filename = path.relative(base, file)
+    zip.file(filename, fs.readFileSync(file))
+  }
+}
+
 function strip(file) {
-  if (file.endsWith('.a'))
+  // TODO(zcbenz): Use |file| command to determine type.
+  if (!file.endsWith('.so') && path.basename(file) != 'yue')
     return
+  // TODO(zcbenz): Copy the debug symbols out before striping.
   const strip = targetCpu.startsWith('arm') ? 'arm-linux-gnueabihf-strip'
                                             : 'strip'
   execSync(`${strip} ${file}`)
