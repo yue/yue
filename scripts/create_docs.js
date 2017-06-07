@@ -9,6 +9,7 @@ require('./common')
 const fs     = require('fs')
 const path   = require('path')
 const marked = require('./libs/marked')
+const JSZip  = require('./libs/jszip')
 const yaml   = loadYaml()
 const pug    = loadPug()
 const hljs   = loadHighlight()
@@ -18,15 +19,15 @@ marked.setOptions({
   highlight: (code, lang) => hljs.highlightAuto(code, [lang]).value
 })
 
-// Output dir.
-const outputdir = path.join('out', 'Documents')
+// Dir to put generated files.
+const gendir = path.join('out', 'Release', 'gen', 'docs')
 
 // Supported languages.
 const langs = ['cpp', 'lua', 'js']
 
 // Iterate API documents for different languages.
 for (let lang of langs) {
-  const langdir = path.join(outputdir, lang)
+  const langdir = path.join(gendir, lang)
   mkdir(langdir)
 
   // Parse all API docs.
