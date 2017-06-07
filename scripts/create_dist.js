@@ -52,6 +52,13 @@ const exeFiles = {
   ],
 }
 
+// Strip binaries for Linux.
+if (targetOs == 'linux') {
+  const list = cppFiles.concat(luaFiles).concat(exeFiles)
+  for (const file of list)
+    strip(`out/Release/${file}`)
+}
+
 generateZip('libyue', cppFiles)
 generateZip('yue', exeFiles)
 if (targetOs != 'win')
@@ -82,9 +89,6 @@ function addFileToZip(zip, file, base) {
     for (let sub of subfiles)
       addFileToZip(zip, `${file}/${sub}`, base)
   } else if (stat.isFile()) {
-    // TODO(zcbenz): Stripping should be an independent step.
-    if (targetOs == 'linux') strip(file)
-
     const filename = path.relative(base, file)
     zip.file(filename, fs.readFileSync(file))
   }
