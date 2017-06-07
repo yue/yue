@@ -8,6 +8,9 @@ const {targetCpu, targetOs, execSync} = require('./common')
 
 const path = require('path')
 
+// Mark this is CI build.
+process.env.CI = 'true'
+
 execSync(`node ./scripts/bootstrap.js --target-cpu=${targetCpu}`)
 
 // Build common targets.

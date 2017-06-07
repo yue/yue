@@ -57,6 +57,15 @@ generateZip('yue', exeFiles)
 if (targetOs != 'win')
   generateZip('lua_yue_lua_5.3', luaFiles)
 
+// Generate zip for docs, but only do it for linux/x64 when running on CI, in
+// order avoid uploading docs for multiple times.
+if (process.env.CI != 'true' || (targetOs == 'linux' && targetCpu == 'x64')) {
+  execSync('node ./scripts/create_docs.js')
+  addFileToZip(new JSZip(), 'out/Release/gen/docs', 'out/Release/gen/docs')
+    .generateNodeStream({streamFiles:true})
+    .pipe(fs.createWriteStream(`out/Release/yue_docs_${version}.zip`))
+}
+
 function generateZip(name, list) {
   const zipname = `${name}_${version}_${targetOs}_${targetCpu}`
   let zip = new JSZip()
@@ -79,6 +88,7 @@ function addFileToZip(zip, file, base) {
     const filename = path.relative(base, file)
     zip.file(filename, fs.readFileSync(file))
   }
+  return zip
 }
 
 function strip(file) {
