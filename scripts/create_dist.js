@@ -54,7 +54,7 @@ const exeFiles = {
 
 // Strip binaries for Linux.
 if (targetOs == 'linux') {
-  const list = cppFiles.concat(luaFiles).concat(exeFiles)
+  const list = cppFiles.linux.concat(luaFiles.linux).concat(exeFiles.linux)
   for (const file of list)
     strip(`out/Release/${file}`)
 }
