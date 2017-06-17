@@ -12,12 +12,14 @@ html
         include:css-minimize guide.css
   body
     #header
-      p.logo Yue
+      if page == 'api' || page == 'guide'
+        - var docslink = "../index.html"
+      else
+        - var docslink = "index.html"
+      a.logo(href=`${docslink}`) Yue
       .nav
-        if page == 'api' || page == 'guide'
-          a(href="../index.html") Docs
-        else
-          a(href="index.html") Docs
+        a(href=`${docslink}`) Docs
+        a(href="/") Versions
         a(href="https://github.com/yue/yue") GitHub
     #container
       #content.markdown-body
