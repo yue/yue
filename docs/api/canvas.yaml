@@ -25,7 +25,7 @@ class_methods:
     lang: ['lua', 'js']
     description: *ref1
 
-  - signature: Canvas* Create(const SizeF& size)
+  - signature: Canvas* CreateForMainScreen(const SizeF& size)
     lang: ['lua', 'js']
     description: *ref2
 
