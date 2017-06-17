@@ -228,6 +228,9 @@ block sidebar
     +switch('JavaScript', `../../js/api/${doc.id}.html`, lang == 'js',
             !doc.lang || doc.lang.includes('js'))
 
+  h4 Version:
+  span.current #{version}
+
   h4 Formats:
   a(href=`${doc.id}.json`) JSON
 

@@ -4,7 +4,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-require('./common')
+const {version} = require('./common')
 
 const fs     = require('fs')
 const path   = require('path')
@@ -54,9 +54,10 @@ for (let lang of langs) {
   const html = pug.renderFile('docs/template/index.pug', {
     page: 'index',
     doc: { name: 'Docs' },
-    lang: lang,
+    lang,
+    version,
     types: docs,
-    guides: guides,
+    guides,
     markdown: marked,
     imarkdown: inlineMarkdown,
     filters: { 'css-minimize': cssMinimize },
@@ -86,8 +87,9 @@ for (let lang of langs) {
     const html = pug.renderFile('docs/template/api.pug', {
       name: doc.name,
       page: 'api',
-      lang: lang,
-      doc: doc,
+      doc,
+      lang,
+      version,
       types: docs,
       markdown: marked,
       imarkdown: inlineMarkdown,
