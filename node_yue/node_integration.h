@@ -11,10 +11,6 @@
 #include "uv.h"  // NOLINT(build/include)
 #include "v8.h"  // NOLINT(build/include)
 
-namespace node {
-class Environment;
-}
-
 namespace node_yue {
 
 class NodeIntegration {
