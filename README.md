@@ -4,18 +4,15 @@ A library to create cross-platform GUI apps.
 
 ## Issues
 
-The Issues page of this repo is disabled on purpose, and I do not answer emails
-on using or building this project. For help please go to the
+The issues page of this repo is disabled on purpose, for help please go to the
 [yue/help](https://github.com/yue/help) repo where users help themselves.
 
-The only way to get help from me is to subscribe to [paid plans][paid-plans].
+To report a bug, you have to create a pull request with a test case of your
+problem, or you can choose to subscribe to [paid plans][paid-plans].
 
 ## Contributions
 
-While I appreciate contributions and will do my best to get them merged, please
-understand I have very limited time to review them.
-
-By sending a pull request, you are agreeing to transfer the copyright of its
+By sending a pull request, you are agreeing to transfer the copyright of your
 code to me.
 
 ## License
@@ -27,17 +24,15 @@ with following clarifications:
   its code.
 * Linking with the code of this software in any form is not considered as
   containing its code.
-* If your software uses a modified version of this software, it is considered
-  as containing this software's code.
+* Using a modified version of this software is considered as containing this
+  software's code, so any code linked to it has to be licensed under MS-RL.
 * Any forked version of the original [yue/yue](https://github.com/yue/yue) repo
   is considered as a modified version of this software.
 
 ### Alternative license
 
-The source code of Yue is also available under an alternative license if you
-subscribe to the [paid plans][paid-plans]. Unlike MS-RL, the alternative
-license does not require you to open source your software when you use a
-modified version of this software.
+The source code of Yue is also available under MS-PL license if you subscribe to
+the [paid plans][paid-plans].
 
 [ms-rl]: https://github.com/yue/yue/blob/master/LICENSE
 [paid-plans]: https://github.com/yue/yue/tree/master/docs/paid_plans
