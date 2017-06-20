@@ -13,7 +13,7 @@ problem, or you can choose to subscribe to [paid plans][paid-plans].
 ## Contributions
 
 By sending a pull request, you are agreeing to transfer the copyright of your
-code to me.
+code to Cheng Zhao.
 
 ## License
 
