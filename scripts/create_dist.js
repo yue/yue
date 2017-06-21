@@ -30,7 +30,6 @@ const luaFiles = {
   ],
   mac: [
     'yue.so',
-    'yue.so.dSYM',
   ],
   win: [
   ],
@@ -43,12 +42,9 @@ const exeFiles = {
   ],
   mac: [
     'yue',
-    'yue.dSYM',
   ],
   win: [
     'yue.exe',
-    'yue.exe.pdb',
-    'yue.lib',
   ],
 }
 
