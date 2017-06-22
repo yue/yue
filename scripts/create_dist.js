@@ -55,13 +55,20 @@ if (targetOs == 'linux') {
     strip(`out/Release/${file}`)
 }
 
-generateZip('libyue', cppFiles)
+// Zip the static library and headers.
+const libyuezip = new JSZip()
+const headers = searchFiles('base', '.h').concat(searchFiles('nativeui', '.h'))
+for (let h of headers)
+  addFileToZip(libyuezip, h, '', 'include/')
+generateZip('libyue', cppFiles, libyuezip)
+
+// Zip other binaries.
 generateZip('yue', exeFiles)
 if (targetOs != 'win')
   generateZip('lua_yue_lua_5.3', luaFiles)
 
-// Generate zip for docs, but only do it for linux/x64 when running on CI, in
-// order avoid uploading docs for multiple times.
+// Zip docs, but only do it for linux/x64 when running on CI, to avoid uploading
+// docs for multiple times.
 if (process.env.CI != 'true' || (targetOs == 'linux' && targetCpu == 'x64')) {
   execSync('node ./scripts/create_docs.js')
   addFileToZip(new JSZip(), 'out/Release/gen/docs', 'out/Release/gen/docs')
@@ -69,16 +76,15 @@ if (process.env.CI != 'true' || (targetOs == 'linux' && targetCpu == 'x64')) {
     .pipe(fs.createWriteStream(`out/Release/yue_docs_${version}.zip`))
 }
 
-function generateZip(name, list) {
+function generateZip(name, list, zip = new JSZip()) {
   const zipname = `${name}_${version}_${targetOs}_${targetCpu}`
-  let zip = new JSZip()
   for (let file of list[targetOs])
     addFileToZip(zip, `out/Release/${file}`, 'out/Release')
   zip.generateNodeStream({streamFiles:true})
      .pipe(fs.createWriteStream(`out/Release/${zipname}.zip`))
 }
 
-function addFileToZip(zip, file, base) {
+function addFileToZip(zip, file, base, prefix = '') {
   const stat = fs.statSync(file)
   if (stat.isDirectory()) {
     const subfiles = fs.readdirSync(file)
@@ -86,9 +92,21 @@ function addFileToZip(zip, file, base) {
       addFileToZip(zip, `${file}/${sub}`, base)
   } else if (stat.isFile()) {
     const filename = path.relative(base, file)
-    zip.file(filename, fs.readFileSync(file))
+    zip.file(prefix + filename, fs.readFileSync(file))
   }
   return zip
+}
+
+function searchFiles(dir, suffix, list = []) {
+  return fs.readdirSync(dir).reduce((list, filename) => {
+    const p = path.join(dir, filename)
+    const stat = fs.statSync(p)
+    if (stat.isFile() && filename.endsWith(suffix))
+      list.push(p)
+    else if (stat.isDirectory())
+      searchFiles(p, suffix, list)
+    return list
+  }, list)
 }
 
 function strip(file) {
