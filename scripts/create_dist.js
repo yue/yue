@@ -63,11 +63,12 @@ if (targetOs == 'linux') {
 
 // Zip the static library and headers.
 const libyuezip = new JSZip()
-const headers = searchFiles('base', '.h').concat(searchFiles('nativeui', '.h'))
+const headers = searchFiles('base', '.h').concat(
+                searchFiles('nativeui', '.h')).concat(
+                searchFiles('testing', '.h')).concat(
+                ['build/build_config.h', 'build/buildflag.h'])
 for (let h of headers)
   addFileToZip(libyuezip, h, '', 'include/')
-addFileToZip(libyuezip, 'build/build_config.h', '', 'include/')
-addFileToZip(libyuezip, 'build/buildflag.h', '', 'include/')
 generateZip('libyue', cppFiles, libyuezip)
 
 // Zip other binaries.
