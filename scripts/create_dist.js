@@ -66,6 +66,8 @@ const libyuezip = new JSZip()
 const headers = searchFiles('base', '.h').concat(searchFiles('nativeui', '.h'))
 for (let h of headers)
   addFileToZip(libyuezip, h, '', 'include/')
+addFileToZip(libyuezip, 'build/build_config.h', '', 'include/')
+addFileToZip(libyuezip, 'build/buildflag.h', '', 'include/')
 generateZip('libyue', cppFiles, libyuezip)
 
 // Zip other binaries.
