@@ -48,6 +48,12 @@ const exeFiles = {
   ],
 }
 
+// Clear previous distributions.
+fs.readdirSync('out/Release').forEach((f) => {
+  if (f.endsWith('.zip'))
+    fs.unlinkSync(`out/Release/${f}`)
+})
+
 // Strip binaries for Linux.
 if (targetOs == 'linux') {
   const list = cppFiles.linux.concat(luaFiles.linux).concat(exeFiles.linux)
