@@ -17,9 +17,42 @@ read the header files on how to use it.
 
 Documentation of `nativeui` library is part of this site.
 
-## 
+## A minimal program
 
-## Building a program with Yue
+```c++
+#include "base/bind.h"
+#include "base/command_line.h"
+#include "nativeui/nativeui.h"
+
+int main(int argc, const char *argv[]) {
+  // Initialize the base library.
+  base::CommandLine::Init(argc, argv);
+
+  // Initialize the global instance of nativeui.
+  nu::State state;
+
+  // Create GUI message loop.
+  nu::Lifetime lifetime;
+
+  // Create window with default options, and then show it.
+  scoped_refptr<nu::Window> window(new nu::Window(nu::Window::Options()));
+  window->SetContentSize(nu::SizeF(400, 400));
+  window->Center();
+  window->Activate();
+
+  // Quit when window is closed.
+  window->on_close.Connect(base::Bind([](nu::Window*) {
+    nu::Lifetime::GetCurrent()->Quit();
+  }));
+
+  // Enter message loop.
+  lifetime.Run();
+
+  return 0;
+}
+```
+
+## Building the program with Yue
 
 There is no assumption on which build system you should use, to use Yue, you can
 download the `libyue_VERSION_PLATFORM_ARCH.zip` archive from the
@@ -33,7 +66,7 @@ To link with Yue, your program must be linked with `AppKit.framework` and
 
 ```bash
 clang++ main.cc \
-        libyue/libyue.a -Ilibyue/include -framework AppKit -framework Security \
+        libyue.a -Iinclude -framework AppKit -framework Security \
         -std=c++14 -Wl,-dead_strip
 ```
 
