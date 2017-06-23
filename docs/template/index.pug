@@ -11,7 +11,8 @@ mixin item(dir, node)
   li
     h3
       a(href=`${dir}/${node.id}.html`) #{node.name}
-    != ' ' + imarkdown(node.description)
+    if node.description
+      != ' ' + imarkdown(node.description)
 
 mixin items(filter)
   ul

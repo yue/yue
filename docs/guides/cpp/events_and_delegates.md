@@ -1,7 +1,8 @@
 ---
-priority: 0
+priority: 99
 description: Walkthrough of the event system.
 ---
+
 # Events and delegates
 
 The event system of Yue heavily relies on Chromium's `base::Callback` library,

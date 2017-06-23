@@ -48,7 +48,9 @@ for (let lang of langs) {
     const guide = parseMarkdown(lang, content)
     guide.id = path.basename(file, '.md')
     return docs.concat(guide)
-  }, [])
+  }, []).sort((a, b) => {
+    return b.priority - a.priority
+  })
 
   // Generate the index page.
   const html = pug.renderFile('docs/template/index.pug', {
@@ -148,9 +150,10 @@ function parseMarkdown(lang, content) {
     lines = lines.slice(i + 1)
   }
   if (result.priority === undefined)
-    result.priority = 100
+    result.priority = 0
   result.content = marked(lines.join('\n'))
-  result.name = lines[0].substr(2)
+  result.name = result.content.substring(result.content.indexOf('>') + 1,
+                                         result.content.indexOf('</h1>'))
   return result
 }
 
