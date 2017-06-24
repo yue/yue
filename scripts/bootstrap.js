@@ -40,6 +40,7 @@ gen('out/Release', [
   'is_component_build=false',
   'is_debug=false',
   'is_official_build=true',
+  'allow_posix_link_time_opt=false',
   `target_cpu="${targetCpu}"`,
   'node_runtime="node"',
   `node_version="${process.version}"`,
