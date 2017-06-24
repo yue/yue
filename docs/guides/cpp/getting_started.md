@@ -10,14 +10,25 @@ programs, currently it includes:
 
 * Chromium's [`base`][base] library for basic cross platform APIs like
   string manipulation and filesystem operations;
-* And the `nativeui` library for cross platform GUI APIs.
+* The `nativeui` library for cross platform GUI APIs.
 
 Please notice that there is no documentation on the `base` library, you have to
 read the header files on how to use it.
 
 Documentation of `nativeui` library is part of this site.
 
-## A minimal program
+## The `base` library
+
+Though the `base` library is undocumented, there are few guides to help you
+learn it:
+
+* [Smart Pointer Guidelines](https://www.chromium.org/developers/smart-pointer-guidelines)
+* [`Callback<>` and `Bind()`](https://chromium.googlesource.com/chromium/src/+/master/docs/callback.md)
+* [Threading and Tasks in Chrome](https://chromium.googlesource.com/chromium/src/+/master/docs/threading_and_tasks.md)
+
+It is strongly recommended to read all of the guides before using `nativeui`.
+
+## A minimal GUI program using `nativeui`
 
 ```c++
 #include "base/bind.h"
