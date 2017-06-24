@@ -264,8 +264,8 @@ component("nativeui") {
     public_configs = [
       "//build/config/linux:x11",
       "//build/config/linux/gtk3",
+      ":webkitgtk",
     ]
-    configs += [ ":webkitgtk" ]
 
     # Do not warn on using deprecated GTK APIs.
     cflags_cc = [ "-Wno-deprecated-declarations" ]
