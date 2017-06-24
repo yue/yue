@@ -62,13 +62,16 @@ library from of Yue.
 ### macOS
 
 To link with Yue, your program must be linked with `AppKit.framework` and
-`Security.framework`, and compiled with C++14 enabled:
+`Security.framework`, and compiled with at least C++11 enabled:
 
 ```bash
-clang++ main.cc \
-        libyue.a -Iinclude -framework AppKit -framework Security \
-        -std=c++14 -Wl,-dead_strip
+clang++ main.cc libyue.a \
+        -Iinclude -framework AppKit -framework Security \
+        -std=c++14 -DNDEBUG -Wl,-dead_strip
 ```
+
+Since the prebuilt binaries were built in Release configuration, you have to
+define `NDEBUG` to make sure your program uses the same STL configuration.
 
 You should also pass `-Wl,-dead_strip` to the linker to remove unused code, so
 the generated binary would have minimal size.
