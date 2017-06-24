@@ -47,6 +47,7 @@ int main(int argc, const char *argv[]) {
 
   // Create window with default options, and then show it.
   scoped_refptr<nu::Window> window(new nu::Window(nu::Window::Options()));
+  window->SetContentView(new nu::Label("Content View"));
   window->SetContentSize(nu::SizeF(400, 400));
   window->Center();
   window->Activate();
@@ -70,22 +71,47 @@ download the `libyue_VERSION_PLATFORM_ARCH.zip` archive from the
 [Releases][releases] page, which includes header files and a prebuilt static
 library from of Yue.
 
+Then you can direct your build system to link with Yue and its dependencies.
+
+### Linux
+
+To link with Yue, your program must be linked with GTK3 and X11, and compiled
+with at least C++11 enabled:
+
+```bash
+clang++ main.cc libyue.a -Iinclude \
+        -ldl `pkg-config --cflags --libs gtk+-3.0 x11` \
+        -D_GLIBCXX_USE_CXX11_ABI=0 \
+        -std=c++14 -DNDEBUG \
+        -fdata-sections -ffunction-sections -Wl,--gc-section
+```
+
+The `NDEBUG` is required to be defined, because the prebuilt binaries were built
+with Release configuration, and your program should use the same configuration.
+
+The `_GLIBCXX_USE_CXX11_ABI=0` is required to be defined, because the prebuilt
+binaries were compiled with clang targeting Debian Jessie, and we need to avoid
+using cxx11 ABI introduced in newer versions of libstdc++.
+
+In order to minimize the size of binary, `--gc-section` should be passed to the
+linker to remove unused code.
+
 ### macOS
 
 To link with Yue, your program must be linked with `AppKit.framework` and
 `Security.framework`, and compiled with at least C++11 enabled:
 
 ```bash
-clang++ main.cc libyue.a \
-        -Iinclude -framework AppKit -framework Security \
+clang++ main.cc libyue.a -Iinclude \
+        -framework AppKit -framework Security \
         -std=c++14 -DNDEBUG -Wl,-dead_strip
 ```
 
-Since the prebuilt binaries were built in Release configuration, you have to
-define `NDEBUG` to make sure your program uses the same STL configuration.
+The `NDEBUG` is required to be defined, because the prebuilt binaries were built
+with Release configuration, and your program should use the same configuration.
 
-You should also pass `-Wl,-dead_strip` to the linker to remove unused code, so
-the generated binary would have minimal size.
+In order to minimize the size of binary, `-Wl,-dead_strip` should be passed to
+the linker to remove unused code.
 
 [base]: https://chromium.googlesource.com/chromium/src/base/
 [releases]: https://github.com/yue/yue/releases
