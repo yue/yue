@@ -1,5 +1,5 @@
 ---
-priority: 0
+priority: 99
 description: Walkthrough of the event system.
 ---
 # Events and delegates
