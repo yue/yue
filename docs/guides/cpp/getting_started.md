@@ -28,16 +28,20 @@ learn it:
 
 It is strongly recommended to read all of the guides before using `nativeui`.
 
-## A minimal GUI program using `nativeui`
+## A minimal GUI program using `nativeui` library
 
 ```c++
 #include "base/bind.h"
 #include "base/command_line.h"
 #include "nativeui/nativeui.h"
 
+#if defined(OS_WIN)
+int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
+  base::CommandLine::Init(0, nullptr);
+#else
 int main(int argc, const char *argv[]) {
-  // Initialize the base library.
   base::CommandLine::Init(argc, argv);
+#endif
 
   // Initialize the global instance of nativeui.
   nu::State state;
@@ -64,7 +68,7 @@ int main(int argc, const char *argv[]) {
 }
 ```
 
-## Building the program with Yue
+## Building the program with prebuilt static library
 
 There is no assumption on which build system you should use, to use Yue, you can
 download the `libyue_VERSION_PLATFORM_ARCH.zip` archive from the
@@ -112,6 +116,22 @@ with Release configuration, and your program should use the same configuration.
 
 In order to minimize the size of binary, `-Wl,-dead_strip` should be passed to
 the linker to remove unused code.
+
+### Windows
+
+To link with Yue, you program must:
+
+* Be a Win32 project;
+* Use the `Release` configuration;
+* Use `/MT` (static Release version) in `Runtime Library` of `Code Generation`;
+* Have `NOMINMAX` defined in `Preprocessor Definitions`;
+* Have the `include` directory of the downloaded archive added to the `Include
+  Directories`;
+* Have the path of the downloaded archive added to the `Library Directories`;
+* Have `setupapi.lib;powrprof.lib;ws2_32.lib;dbghelp.lib;shlwapi.lib;version.lib;winmm.lib;psapi.lib;dwmapi.lib;gdi32.lib;gdiplus.lib;libyue.lib`
+  added to the `Additional Dependencies` of the `Linker`;
+* Have `setupapi.dll;powrprof.dll;dwmapi.dll` added to the `Delay Loaded DLLs` of
+  the `Linker`.
 
 [base]: https://chromium.googlesource.com/chromium/src/base/
 [releases]: https://github.com/yue/yue/releases
