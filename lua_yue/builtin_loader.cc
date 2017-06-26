@@ -34,8 +34,8 @@ int SearchBuiltin(lua::State* state) {
       << "The builtin loaders map must be in sorted order";
   std::string name;
   lua::To(state, 1, &name);
-  auto iter = std::lower_bound(std::begin(loaders_map), std::end(loaders_map),
-                               name, TupleCompare);
+  auto* iter = std::lower_bound(std::begin(loaders_map), std::end(loaders_map),
+                                name, TupleCompare);
   if (iter == std::end(loaders_map) || name != iter->first) {
     lua::PushFormatedString(state, "\n\tno builtin '%s'", name.c_str());
     return 1;

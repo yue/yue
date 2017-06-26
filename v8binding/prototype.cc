@@ -51,7 +51,7 @@ bool GetOrCreateFunctionTemplate(
     v8::Isolate* isolate,
     const char* name,
     v8::Local<v8::FunctionTemplate>* templ) {
-  auto per_isolate_data = PerIsolateData::Get(isolate);
+  auto* per_isolate_data = PerIsolateData::Get(isolate);
   *templ = per_isolate_data->GetFunctionTemplate(name);
   if (templ->IsEmpty()) {
     *templ = v8::FunctionTemplate::New(isolate, &DefaultConstructor);
