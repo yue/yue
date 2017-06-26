@@ -14,19 +14,27 @@ const yaml   = loadYaml()
 const pug    = loadPug()
 const hljs   = loadHighlight()
 
+// Supported languages.
+const langs = ['cpp', 'lua', 'js']
+
+// The renderer that can filter language specific paragraphs.
+const renderer = new marked.Renderer()
+const oc = renderer.code.bind(renderer)
+renderer.code = (code, lang) => (!langs.includes(lang) || lang == renderer.lang) ? oc(code, lang) : ''
+
 // Support highlighting in markdown.
 marked.setOptions({
+  renderer,
   highlight: (code, lang) => hljs.highlightAuto(code, [lang]).value
 })
 
 // Dir to put generated files.
 const gendir = path.join('out', 'Release', 'gen', 'docs')
 
-// Supported languages.
-const langs = ['cpp', 'lua', 'js']
-
 // Iterate API documents for different languages.
 for (let lang of langs) {
+  renderer.lang = lang
+
   const langdir = path.join(gendir, lang)
   mkdir(langdir)
 
@@ -42,15 +50,17 @@ for (let lang of langs) {
   }, [])
 
   // Parse all guides.
-  const guides = fs.readdirSync(`docs/guides/${lang}`).reduce((docs, file) => {
-    if (!file.endsWith('.md')) return docs
-    const content = String(fs.readFileSync(`docs/guides/${lang}/${file}`))
-    const guide = parseMarkdown(lang, content)
-    guide.id = path.basename(file, '.md')
-    return docs.concat(guide)
-  }, []).sort((a, b) => {
-    return b.priority - a.priority
-  })
+  const guides = []
+  for (const dir of ['docs/guides', `docs/guides/${lang}`]) {
+    for (const file of fs.readdirSync(dir)) {
+      if (!file.endsWith('.md')) continue
+      const content = String(fs.readFileSync(`${dir}/${file}`))
+      const guide = parseMarkdown(lang, content)
+      guide.id = path.basename(file, '.md')
+      guides.push(guide)
+    }
+  }
+  guides.sort((a, b) => b.priority - a.priority)
 
   // Generate the index page.
   const html = pug.renderFile('docs/template/index.pug', {
