@@ -173,7 +173,7 @@ GtkStyleContext* AppendCssNodeToStyleContext(GtkStyleContext* context,
 GtkStyleContext* GetStyleContextFromCss(const std::string& css_selector) {
   // Prepend a window node to the selector since all widgets must live
   // in a window, but we don't want to specify that every time.
-  auto context =
+  auto* context =
       AppendCssNodeToStyleContext(nullptr, "GtkWindow#window.background");
 
   for (const auto& widget_type :
