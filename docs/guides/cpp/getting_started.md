@@ -12,7 +12,7 @@ programs, currently it includes:
   string manipulation and filesystem operations;
 * The `nativeui` library for cross platform GUI APIs.
 
-Please notice that there is no documentation on the `base` library, you have to
+Please note that there is no documentation on the `base` library, you have to
 read the header files on how to use it.
 
 Documentation of `nativeui` library is part of this site.

@@ -63,7 +63,7 @@ gui.lifetime.run()
 process.exit(0)
 ```
 
-Please notice that this feature is not stable (and may never be), so do not use
+Please note that this feature is not stable (and may never be), so do not use
 Yue in Node.js in any production environment.
 
 ### Electron
@@ -86,6 +86,6 @@ electron.app.on('ready', () => {
 })
 ```
 
-Please notice that you can only use Yue in the main process of Electron.
+Please note that you can only use Yue in the main process of Electron.
 
 [native-module]: https://github.com/electron/electron/blob/master/docs/tutorial/using-native-node-modules.md
