@@ -116,7 +116,7 @@ methods:
     description: Change the styles of the view.
     detail: |
       Available style properties can be found at
-      [Flex Layout](../guide/flex-layout.html).
+      [Layout System](../guides/layout_system.html).
 
       ```cpp
       view->SetStyle("flex", 1, "flex-direction", "row");
@@ -133,7 +133,7 @@ methods:
     description: Change the styles of the view.
     detail: |
       Available style properties can be found at
-      [Flex Layout](../guide/flex-layout.html).
+      [Layout System](../guides/layout_system.html).
 
   - signature: View* GetParent() const
     description: Return parent view.
