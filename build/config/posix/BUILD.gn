@@ -13,19 +13,6 @@ group("posix") {
   visibility = [ "//:optimize_gn_gen" ]
 }
 
-# This is included by reference in the //build/config/compiler config that
-# is applied to all Posix targets. It is here to separate out the logic that is
-# Posix-only. Note that this is in addition to an OS-specific variant of this
-# config.
-config("compiler") {
-  if ((allow_posix_link_time_opt || is_cfi) && !is_nacl) {
-    arflags = [
-      "--plugin",
-      rebase_path("$clang_base_path/lib/LLVMgold.so", root_build_dir),
-    ]
-  }
-}
-
 # This is included by reference in the //build/config/compiler:runtime_library
 # config that is applied to all targets. It is here to separate out the logic
 # that is Posix-only. Please see that target for advice on what should go in
@@ -38,12 +25,19 @@ config("runtime_library") {
     ldflags = cflags
 
     # Need to get some linker flags out of the sysroot.
-    ldflags += exec_script("sysroot_ld_path.py",
+    ld_paths = exec_script("sysroot_ld_path.py",
                            [
                              rebase_path("//build/linux/sysroot_ld_path.sh",
                                          root_build_dir),
                              rebase_path(sysroot),
                            ],
                            "list lines")
+    foreach(ld_path, ld_paths) {
+      ld_path = rebase_path(ld_path, root_build_dir)
+      ldflags += [
+        "-L" + ld_path,
+        "-Wl,-rpath-link=" + ld_path,
+      ]
+    }
   }
 }

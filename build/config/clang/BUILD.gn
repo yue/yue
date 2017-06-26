@@ -3,7 +3,6 @@
 # found in the LICENSE file.
 
 import("clang.gni")
-import("//build/config/chromecast_build.gni")
 
 config("find_bad_constructs") {
   if (clang_use_chrome_plugins) {
@@ -35,9 +34,13 @@ config("find_bad_constructs") {
       "-add-plugin",
       "-Xclang",
       "find-bad-constructs",
+      "-Xclang",
+      "-plugin-arg-find-bad-constructs",
+      "-Xclang",
+      "check-auto-raw-pointer",
     ]
 
-    if ((is_linux || is_android) && !is_chromecast) {
+    if (is_linux || is_android) {
       cflags += [
         "-Xclang",
         "-plugin-arg-find-bad-constructs",
@@ -56,5 +59,7 @@ config("extra_warnings") {
 
     # Warns when a const char[] is converted to bool.
     "-Wstring-conversion",
+
+    "-Wtautological-overlap-compare",
   ]
 }

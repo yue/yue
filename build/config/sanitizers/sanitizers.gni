@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 
 import("//build/config/chrome_build.gni")
+import("//build/config/chromecast_build.gni")
 import("//build/toolchain/toolchain.gni")
 
 declare_args() {
@@ -62,9 +63,17 @@ declare_args() {
   # https://crbug.com/626794
   use_cfi_cast = false
 
-  # By default, Control Flow Integrity will crash the program if it detects a
-  # violation. Set this to true to print detailed diagnostics instead.
+  # Enable checks for indirect function calls via a function pointer.
+  # TODO(pcc): remove this when we're ready to add these checks by default.
+  # https://crbug.com/701919
+  use_cfi_icall = false
+
+  # Print detailed diagnostics when Control Flow Integrity detects a violation.
   use_cfi_diag = false
+
+  # Let Control Flow Integrity continue execution instead of crashing when
+  # printing diagnostics (use_cfi_diag = true).
+  use_cfi_recover = false
 
   # Compile for fuzzing with LLVM LibFuzzer.
   # See http://www.chromium.org/developers/testing/libfuzzer
@@ -87,11 +96,17 @@ declare_args() {
 
   # Value for -fsanitize-coverage flag. Setting this causes
   # use_sanitizer_coverage to be enabled.
-  # Default value when unset and use_afl=true:
-  # trace-pc
+  # Default value when unset and use_afl=true or use_libfuzzer=true:
+  #     trace-pc-guard
   # Default value when unset and use_sanitizer_coverage=true:
-  #     edge,indirect-calls,8bit-counters
+  #     trace-pc-guard,indirect-calls
   sanitizer_coverage_flags = ""
+
+  # Keep symbol level when building with sanitizers. When sanitizers are
+  # enabled, the default is to compile with the minimum debug info level
+  # necessary, overriding any other symbol level arguments that may be set.
+  # Setting this to true prevents this.
+  sanitizer_keep_symbols = false
 }
 
 # Disable sanitizers for non-default toolchains.
@@ -109,8 +124,9 @@ if (current_toolchain != default_toolchain) {
   is_ubsan_vptr = false
   msan_track_origins = 0
   sanitizer_coverage_flags = ""
+  use_afl = false
   use_cfi_diag = false
-  use_custom_libcxx = false
+  use_cfi_recover = false
   use_drfuzz = false
   use_libfuzzer = false
   use_prebuilt_instrumented_libraries = false
@@ -122,13 +138,6 @@ if (current_toolchain != default_toolchain) {
 # declare_args block. User overrides are only applied at the end of a
 # declare_args block.
 declare_args() {
-  # Use libc++ (buildtools/third_party/libc++ and
-  # buildtools/third_party/libc++abi) instead of stdlibc++ as standard library.
-  # This is intended to be used for instrumented builds.
-  use_custom_libcxx =
-      (is_asan && is_linux && !is_chromeos) || is_tsan || is_msan || is_ubsan ||
-      is_ubsan_security || use_libfuzzer || use_afl
-
   # Enable -fsanitize-coverage.
   use_sanitizer_coverage =
       use_libfuzzer || use_afl || sanitizer_coverage_flags != ""
@@ -139,15 +148,18 @@ declare_args() {
   asan_globals = !is_mac
 }
 
-if (use_afl && sanitizer_coverage_flags == "") {
-  sanitizer_coverage_flags = "trace-pc"
+if ((use_afl || use_libfuzzer) && sanitizer_coverage_flags == "") {
+  sanitizer_coverage_flags = "trace-pc-guard"
 } else if (use_sanitizer_coverage && sanitizer_coverage_flags == "") {
-  sanitizer_coverage_flags = "edge,indirect-calls,8bit-counters"
+  sanitizer_coverage_flags = "trace-pc-guard,indirect-calls"
 }
 
+# Whether we are linking against a sanitizer runtime library. Among other
+# things, this changes the default symbol level and other settings in order to
+# prepare to create stack traces "live" using the sanitizer runtime.
 using_sanitizer =
     is_asan || is_lsan || is_tsan || is_msan || is_ubsan || is_ubsan_null ||
-    is_ubsan_vptr || is_ubsan_security || use_sanitizer_coverage
+    is_ubsan_vptr || is_ubsan_security || use_sanitizer_coverage || use_cfi_diag
 
 assert(!using_sanitizer || is_clang,
        "Sanitizers (is_*san) require setting is_clang = true in 'gn args'")
@@ -184,3 +196,13 @@ assert(!is_debug || !(is_msan || is_ubsan || is_ubsan_null || is_ubsan_vptr),
 
 assert(!is_msan || (is_linux && current_cpu == "x64"),
        "MSan currently only works on 64-bit Linux and ChromeOS builds.")
+
+# ASAN build on Windows is not working in debug mode. Intercepting memory
+# allocation functions is hard on Windows and not yet implemented in LLVM.
+assert(!is_win || !is_debug || !is_asan,
+       "ASan on Windows doesn't work in debug (set is_debug=false).")
+
+# Make sure that if we recover on detection (i.e. not crash), diagnostics are
+# printed.
+assert(!use_cfi_recover || use_cfi_diag,
+       "Only use CFI recovery together with diagnostics.")

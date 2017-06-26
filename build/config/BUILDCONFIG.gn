@@ -135,8 +135,12 @@ declare_args() {
 
   # Set to true when compiling with the Clang compiler. Typically this is used
   # to configure warnings.
-  is_clang = current_os == "mac" || current_os == "ios" ||
-             current_os == "linux" || current_os == "chromeos"
+  is_clang =
+      current_os == "mac" || current_os == "ios" || current_os == "chromeos" ||
+      current_os == "fuchsia" || current_os == "android" ||
+      (current_os == "linux" && current_cpu != "s390x" &&
+       current_cpu != "s390" && current_cpu != "ppc64" &&
+       current_cpu != "ppc" && current_cpu != "mips" && current_cpu != "mips64")
 
   # Allows the path to a custom target toolchain to be injected as a single
   # argument, and set as the default toolchain.
@@ -161,7 +165,8 @@ declare_args() {
   #
   # For more information see
   # https://chromium.googlesource.com/chromium/src/+/master/docs/component_build.md
-  is_component_build = is_debug && current_os != "ios"
+  is_component_build =
+      is_debug && current_os != "ios" && current_os != "fuchsia"
 }
 
 assert(!(is_debug && is_official_build), "Can't do official debug builds")
@@ -207,6 +212,8 @@ if (host_toolchain == "") {
     } else {
       host_toolchain = "//build/toolchain/win:$target_cpu"
     }
+  } else if (host_os == "aix") {
+    host_toolchain = "//build/toolchain/aix:$host_cpu"
   } else {
     assert(false, "Unsupported host_os: $host_os")
   }
@@ -229,6 +236,8 @@ if (target_os == "android") {
   } else {
     _default_toolchain = "//build/toolchain/linux:$target_cpu"
   }
+} else if (target_os == "fuchsia") {
+  _default_toolchain = "//build/toolchain/fuchsia:$target_cpu"
 } else if (target_os == "ios") {
   _default_toolchain = "//build/toolchain/mac:ios_clang_$target_cpu"
 } else if (target_os == "mac") {
@@ -242,6 +251,8 @@ if (target_os == "android") {
   } else {
     _default_toolchain = "//build/toolchain/win:$target_cpu"
   }
+} else if (target_os == "aix") {
+  _default_toolchain = "//build/toolchain/aix:$target_cpu"
 } else if (target_os == "winrt_81" || target_os == "winrt_81_phone" ||
            target_os == "winrt_10") {
   _default_toolchain = "//build/toolchain/win:winrt_$target_cpu"
@@ -279,6 +290,7 @@ if (current_os == "win" || current_os == "winrt_81" ||
     current_os == "winrt_81_phone" || current_os == "winrt_10") {
   is_android = false
   is_chromeos = false
+  is_fuchsia = false
   is_ios = false
   is_linux = false
   is_mac = false
@@ -288,6 +300,7 @@ if (current_os == "win" || current_os == "winrt_81" ||
 } else if (current_os == "mac") {
   is_android = false
   is_chromeos = false
+  is_fuchsia = false
   is_ios = false
   is_linux = false
   is_mac = true
@@ -297,6 +310,7 @@ if (current_os == "win" || current_os == "winrt_81" ||
 } else if (current_os == "android") {
   is_android = true
   is_chromeos = false
+  is_fuchsia = false
   is_ios = false
   is_linux = false
   is_mac = false
@@ -306,6 +320,7 @@ if (current_os == "win" || current_os == "winrt_81" ||
 } else if (current_os == "chromeos") {
   is_android = false
   is_chromeos = true
+  is_fuchsia = false
   is_ios = false
   is_linux = true
   is_mac = false
@@ -318,15 +333,27 @@ if (current_os == "win" || current_os == "winrt_81" ||
   # Posix variant.
   is_android = false
   is_chromeos = false
+  is_fuchsia = false
   is_ios = false
   is_linux = false
   is_mac = false
   is_nacl = true
   is_posix = true
   is_win = false
+} else if (current_os == "fuchsia") {
+  is_android = false
+  is_chromeos = false
+  is_fuchsia = true
+  is_ios = false
+  is_linux = false
+  is_mac = false
+  is_nacl = false
+  is_posix = true
+  is_win = false
 } else if (current_os == "ios") {
   is_android = false
   is_chromeos = false
+  is_fuchsia = false
   is_ios = true
   is_linux = false
   is_mac = false
@@ -336,8 +363,18 @@ if (current_os == "win" || current_os == "winrt_81" ||
 } else if (current_os == "linux") {
   is_android = false
   is_chromeos = false
+  is_fuchsia = false
   is_ios = false
   is_linux = true
+  is_mac = false
+  is_nacl = false
+  is_posix = true
+  is_win = false
+} else if (current_os == "aix") {
+  is_android = false
+  is_chromeos = false
+  is_ios = false
+  is_linux = false
   is_mac = false
   is_nacl = false
   is_posix = true
@@ -370,6 +407,7 @@ if (!is_posix) {
     "*\bposix/*",
   ]
 }
+
 if (!is_win) {
   sources_assignment_filter += [
     "*_win.cc",
@@ -478,7 +516,6 @@ default_compiler_configs = [
   "//build/config:feature_flags",
   "//build/config/compiler:afdo",
   "//build/config/compiler:compiler",
-  "//build/config/compiler:pthread",
   "//build/config/compiler:clang_stackrealign",
   "//build/config/compiler:compiler_arm_fpu",
   "//build/config/compiler:compiler_arm_thumb",
@@ -505,11 +542,13 @@ if (current_os == "winrt_81" || current_os == "winrt_81_phone" ||
     current_os == "winrt_10") {
   default_compiler_configs += [ "//build/config/win:target_winrt" ]
 }
+
 if (is_posix) {
-  default_compiler_configs += [
-    "//build/config/gcc:no_exceptions",
-    "//build/config/gcc:symbol_visibility_hidden",
-  ]
+  default_compiler_configs += [ "//build/config/gcc:no_exceptions" ]
+  if (current_os != "aix") {
+    default_compiler_configs +=
+        [ "//build/config/gcc:symbol_visibility_hidden" ]
+  }
 }
 
 if (is_android) {
@@ -551,7 +590,7 @@ if (is_win) {
     # that shouldn't use the windows subsystem.
     "//build/config/win:console",
   ]
-} else if (is_mac || is_ios) {
+} else if (is_mac) {
   _linker_configs = [ "//build/config/mac:strip_all" ]
 } else {
   _linker_configs = []
@@ -575,16 +614,19 @@ default_shared_library_configs = default_compiler_configs + [
 if (is_android) {
   # Strip native JNI exports from shared libraries by default. Binaries that
   # want this can remove this config.
-  default_shared_library_configs += [
-    "//build/config/android:hide_native_jni_exports",
-    "//build/config/android:hide_all_but_jni_onload",
-  ]
+  default_shared_library_configs +=
+      [ "//build/config/android:hide_all_but_jni_onload" ]
 }
 set_defaults("shared_library") {
   configs = default_shared_library_configs
 }
 set_defaults("loadable_module") {
   configs = default_shared_library_configs
+
+  # loadable_modules are generally used by other libs, not just via JNI.
+  if (is_android) {
+    configs -= [ "//build/config/android:hide_all_but_jni_onload" ]
+  }
 }
 
 # ==============================================================================
@@ -647,7 +689,7 @@ template("component") {
     if (!defined(deps)) {
       deps = []
     }
-    deps += [ "//build/config/sanitizers:deps" ]
+    deps += [ "//build/config:exe_and_shlib_deps" ]
   }
 }
 
@@ -656,10 +698,7 @@ set_defaults("component") {
   if (is_component_build) {
     configs = default_shared_library_configs
     if (is_android) {
-      configs -= [
-        "//build/config/android:hide_native_jni_exports",
-        "//build/config/android:hide_all_but_jni_onload",
-      ]
+      configs -= [ "//build/config/android:hide_all_but_jni_onload" ]
     }
   } else {
     configs = default_compiler_configs

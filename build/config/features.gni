@@ -2,17 +2,17 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-# This file contains Chrome-feature-related build flags (see ui.gni for
-# UI-related ones). These should theoretically be moved to the build files of
-# the features themselves.
+# =============================================
+#   PLEASE DO NOT ADD MORE FLAGS TO THIS FILE
+# =============================================
 #
-# However, today we have many "bad" dependencies on some of these flags from,
-# e.g. base, so they need to be global to match the GYP configuration. Also,
-# anything that needs a grit define must be in either this file or ui.gni.
+# These flags are effectively global. Your feature flag should go near the
+# code it controls. Most of these items are here now because they control
+# legacy global #defines passed to the compiler (now replaced with generated
+# buildflag headers -- see //build/buildflag_header.gni).
 #
-# PLEASE TRY TO AVOID ADDING FLAGS TO THIS FILE in cases where grit isn't
-# required. See the declare_args block of BUILDCONFIG.gn for advice on how
-# to set up feature flags.
+# There is more advice on where to put build flags in the "Build flag" section
+# of //build/config/BUILDCONFIG.gn.
 
 import("//build/config/chrome_build.gni")
 if (is_android) {
@@ -20,6 +20,10 @@ if (is_android) {
 }
 
 declare_args() {
-  # Multicast DNS.
-  enable_mdns = is_win || is_linux
 }
+#
+# =============================================
+#   PLEASE DO NOT ADD MORE FLAGS TO THIS FILE
+# =============================================
+#
+# See comment at the top.

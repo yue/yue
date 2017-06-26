@@ -1,0 +1,78 @@
+# Copyright 2017 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+assert(is_fuchsia)
+
+# This template is used to generate a runner script for test binaries into the
+# build dir for Fuchsia. It's generally used from the "test" template.
+template("test_runner_script") {
+  testonly = true
+  _test_name = invoker.test_name
+
+  # This runtime_deps file is used at runtime and thus cannot go in
+  # target_gen_dir.
+  _target_dir_name = get_label_info(":$target_name", "dir")
+  _runtime_deps_file =
+      "$root_out_dir/gen.runtime/$_target_dir_name/$target_name.runtime_deps"
+  _runtime_deps_target = "${target_name}__write_deps"
+  group(_runtime_deps_target) {
+    forward_variables_from(invoker,
+                           [
+                             "data",
+                             "data_deps",
+                             "deps",
+                             "public_deps",
+                           ])
+    write_runtime_deps = _runtime_deps_file
+  }
+
+  action(target_name) {
+    forward_variables_from(invoker,
+                           [
+                             "data_deps",
+                             "deps",
+                           ])
+    if (!defined(deps)) {
+      deps = []
+    }
+    if (!defined(data_deps)) {
+      data_deps = []
+    }
+
+    script = "//build/fuchsia/create_test_runner_script.py"
+    depfile = "$target_gen_dir/$target_name.d"
+
+    data = []
+    test_runner_args = []
+
+    generated_script = "$root_build_dir/bin/run_${_test_name}"
+    outputs = [
+      generated_script,
+    ]
+    data += [ generated_script ]
+
+    test_runner_args += [
+      "--output-directory",
+      rebase_path(root_build_dir, root_build_dir),
+    ]
+
+    deps += [ ":$_runtime_deps_target" ]
+    data += [ _runtime_deps_file ]
+    test_runner_args += [
+      "--runtime-deps-path",
+      rebase_path(_runtime_deps_file, root_build_dir),
+    ]
+
+    args = [
+      "--depfile",
+      rebase_path(depfile, root_build_dir),
+      "--script-output-path",
+      rebase_path(generated_script, root_build_dir),
+      "--test-name",
+      _test_name,
+    ]
+
+    args += test_runner_args
+  }
+}

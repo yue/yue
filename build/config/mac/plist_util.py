@@ -18,20 +18,7 @@ import shlex
 # while IDENT_RE matches all characters that are not valid in an "identifier"
 # value (used when applying the modifier).
 SUBST_RE = re.compile(r'\$\{(?P<id>[^}]*?)(?P<modifier>:[^}]*)?\}')
-IDENT_RE = re.compile(r'[/\s]')
-
-
-class ArgumentParser(argparse.ArgumentParser):
-  """Subclass of argparse.ArgumentParser to work with GN response files.
-
-  GN response file writes all the arguments on a single line and assumes
-  that the python script uses shlext.split() to extract them. Since the
-  default ArgumentParser expects a single argument per line, we need to
-  provide a subclass to have the correct support for @{{response_file_name}}.
-  """
-
-  def convert_arg_line_to_args(self, arg_line):
-    return shlex.split(arg_line)
+IDENT_RE = re.compile(r'[_/\s]')
 
 
 def InterpolateList(values, substitutions):
@@ -73,13 +60,13 @@ def InterpolateString(value, substitutions):
       return None
     # Some values need to be identifier and thus the variables references may
     # contains :modifier attributes to indicate how they should be converted
-    # to identifiers ("identifier" replaces all invalid characters by '-' and
-    # "rfc1034identifier" replaces them by "_" to make valid URI too).
+    # to identifiers ("identifier" replaces all invalid characters by '_' and
+    # "rfc1034identifier" replaces them by "-" to make valid URI too).
     modifier = match.group('modifier')
-    if modifier == 'identifier':
-      interpolated = IDENT_RE.sub('-', substitutions[variable])
-    elif modifier == 'rfc1034identifier':
+    if modifier == ':identifier':
       interpolated = IDENT_RE.sub('_', substitutions[variable])
+    elif modifier == ':rfc1034identifier':
+      interpolated = IDENT_RE.sub('-', substitutions[variable])
     else:
       interpolated = substitutions[variable]
     result = result[:match.start()] + interpolated + result[match.end():]
@@ -154,7 +141,7 @@ def MergePList(plist1, plist2):
 
   Creates a new dictionary representing a Property List (.plist) files by
   merging the two dictionary |plist1| and |plist2| recursively (only for
-  dictionary values).
+  dictionary values). List value will be concatenated.
 
   Args:
     plist1: a dictionary representing a Property List (.plist) file
@@ -163,7 +150,8 @@ def MergePList(plist1, plist2):
   Returns:
     A new dictionary representing a Property List (.plist) file by merging
     |plist1| with |plist2|. If any value is a dictionary, they are merged
-    recursively, otherwise |plist2| value is used.
+    recursively, otherwise |plist2| value is used. If values are list, they
+    are concatenated.
   """
   if not isinstance(plist1, dict) or not isinstance(plist2, dict):
     if plist2 is not None:
@@ -178,32 +166,89 @@ def MergePList(plist1, plist2):
       value = plist1[key]
     if isinstance(value, dict):
       value = MergePList(plist1.get(key, None), plist2.get(key, None))
+    if isinstance(value, list):
+      value = plist1.get(key, []) + plist2.get(key, [])
     result[key] = value
   return result
 
 
-def main():
-  parser = ArgumentParser(
-      description='A script to generate iOS application Info.plist.',
-      fromfile_prefix_chars='@')
-  parser.add_argument('-o', '--output', required=True,
-                      help='Path to output plist file.')
-  parser.add_argument('-s', '--subst', action='append', default=[],
-                      help='Substitution rule in the format "key=value".')
-  parser.add_argument('-f', '--format', required=True,
-                      help='Plist format (e.g. binary1, xml1) to output.')
-  parser.add_argument('path', nargs="+", help='Path to input plist files.')
+class Action(object):
+  """Class implementing one action supported by the script."""
+
+  @classmethod
+  def Register(cls, subparsers):
+    parser = subparsers.add_parser(cls.name, help=cls.help)
+    parser.set_defaults(func=cls._Execute)
+    cls._Register(parser)
+
+
+class MergeAction(Action):
+  """Class to merge multiple plist files."""
+
+  name = 'merge'
+  help = 'merge multiple plist files'
+
+  @staticmethod
+  def _Register(parser):
+    parser.add_argument(
+        '-o', '--output', required=True,
+        help='path to the output plist file')
+    parser.add_argument(
+        '-f', '--format', required=True, choices=('xml1', 'binary1', 'json'),
+        help='format of the plist file to generate')
+    parser.add_argument(
+          'path', nargs="+",
+          help='path to plist files to merge')
+
+  @staticmethod
+  def _Execute(args):
+    data = {}
+    for filename in args.path:
+      data = MergePList(data, LoadPList(filename))
+    SavePList(args.output, args.format, data)
+
+
+class SubstituteAction(Action):
+  """Class implementing the variable substitution in a plist file."""
+
+  name = 'substitute'
+  help = 'perform pattern substitution in a plist file'
+
+  @staticmethod
+  def _Register(parser):
+    parser.add_argument(
+        '-o', '--output', required=True,
+        help='path to the output plist file')
+    parser.add_argument(
+        '-t', '--template', required=True,
+        help='path to the template file')
+    parser.add_argument(
+        '-s', '--substitution', action='append', default=[],
+        help='substitution rule in the format key=value')
+    parser.add_argument(
+        '-f', '--format', required=True, choices=('xml1', 'binary1', 'json'),
+        help='format of the plist file to generate')
+
+  @staticmethod
+  def _Execute(args):
+    substitutions = {}
+    for substitution in args.substitution:
+      key, value = substitution.split('=', 1)
+      substitutions[key] = value
+    data = Interpolate(LoadPList(args.template), substitutions)
+    SavePList(args.output, args.format, data)
+
+
+def Main():
+  parser = argparse.ArgumentParser(description='manipulate plist files')
+  subparsers = parser.add_subparsers()
+
+  for action in [MergeAction, SubstituteAction]:
+    action.Register(subparsers)
+
   args = parser.parse_args()
-  substitutions = {}
-  for subst in args.subst:
-    key, value = subst.split('=', 1)
-    substitutions[key] = value
-  data = {}
-  for filename in args.path:
-    data = MergePList(data, LoadPList(filename))
-  data = Interpolate(data, substitutions)
-  SavePList(args.output, args.format, data)
-  return 0
+  args.func(args)
+
 
 if __name__ == '__main__':
-  sys.exit(main())
+  sys.exit(Main())

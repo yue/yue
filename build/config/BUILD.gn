@@ -3,23 +3,16 @@
 # found in the LICENSE file.
 
 import("//build/config/allocator.gni")
+import("//build/config/c++/c++.gni")
 import("//build/config/chrome_build.gni")
 import("//build/config/chromecast_build.gni")
 import("//build/config/crypto.gni")
 import("//build/config/dcheck_always_on.gni")
 import("//build/config/features.gni")
+import("//build/config/pch.gni")
 import("//build/config/sanitizers/sanitizers.gni")
 import("//build/config/ui.gni")
-import("//build/config/v8_target_cpu.gni")
 import("//build/toolchain/goma.gni")
-
-# One common error that happens is that GYP-generated headers within gen/ get
-# included rather than the GN-generated ones within gen/ subdirectories.
-# TODO(GYP_GONE): Remove once GYP is gone (as well as exec_script exception).
-assert(
-    exec_script("//build/dir_exists.py", [ "obj.host" ], "string") == "False",
-    "GYP artifacts detected in $root_build_dir.$0x0A" +
-        "You must wipe this directory before building with GN.")
 
 declare_args() {
   # When set (the default) enables C++ iterator debugging in debug builds.
@@ -32,36 +25,37 @@ declare_args() {
   # of the current object. For iterator- and thread-heavy code, this can
   # significantly slow execution.
   enable_iterator_debugging = true
-
-  # Normally we try to decide whether to use precompiled headers or
-  # not based on the other build arguments, but in some cases it is
-  # easiest to force them off explicitly.
-  disable_precompiled_headers = false
 }
 
-# TODO(brettw) Most of these should be removed. Instead of global feature
-# flags, we should have more modular flags that apply only to a target and its
-# dependents. For example, depending on the "x11" meta-target should define
-# USE_X11 for all dependents so that everything that could use X11 gets the
-# define, but anything that doesn't depend on X11 doesn't see it.
+# ==============================================
+#   PLEASE DO NOT ADD MORE THINGS TO THIS LIST
+# ==============================================
 #
-# For now we define these globally to match the current GYP build.
+# Legacy feature defines applied to all targets.
+#
+# These are applied to every single compile in the build and most of them are
+# only relevant to a few files. This bloats command lines and causes
+# unnecessary recompiles when flags are flipped.
+#
+# To pass defines to source code from the build, use the buildflag system which
+# will write headers containing the defines you need. This isolates the define
+# and means its definition can participate in the build graph, only recompiling
+# things when it actually changes.
+#
+# See //build/buildflag_header.gni for inntructions on generating headers.
+#
+# This will also allow you to scope your build flag to a BUILD.gn file (or a
+# .gni file if you need it from more than one place) rather than making global
+# flags. See //build/config/BUILDCONFIG.gn for advice on where to define
+# build flags.
 config("feature_flags") {
-  defines = []
-  if (enable_mdns) {
-    defines += [ "ENABLE_MDNS=1" ]
-  }
+  # Don't use deprecated V8 APIs anywhere.
+  defines = [ "V8_DEPRECATION_WARNINGS" ]
   if (dcheck_always_on) {
     defines += [ "DCHECK_ALWAYS_ON=1" ]
   }
   if (use_glib) {
     defines += [ "USE_GLIB=1" ]
-  }
-  if (use_openssl_certs) {
-    defines += [ "USE_OPENSSL_CERTS=1" ]
-  }
-  if (use_nss_certs) {
-    defines += [ "USE_NSS_CERTS=1" ]
   }
   if (use_allocator != "tcmalloc") {
     defines += [ "NO_TCMALLOC" ]
@@ -76,9 +70,7 @@ config("feature_flags") {
     defines += [ "ADDRESS_SANITIZER" ]
   }
   if (is_lsan) {
-    defines += [
-      "LEAK_SANITIZER",
-    ]
+    defines += [ "LEAK_SANITIZER" ]
   }
   if (is_tsan) {
     defines += [
@@ -95,18 +87,18 @@ config("feature_flags") {
   if (is_official_build) {
     defines += [ "OFFICIAL_BUILD" ]
   }
-  if (is_chrome_branded) {
-    defines += [ "GOOGLE_CHROME_BUILD" ]
-  } else {
-    defines += [ "CHROMIUM_BUILD" ]
-  }
   if (is_syzyasan) {
     defines += [
       "SYZYASAN",
-      "MEMORY_TOOL_REPLACES_ALLOCATOR",
       "MEMORY_SANITIZER_INITIAL_SIZE",
     ]
   }
+
+  # ==============================================
+  #   PLEASE DO NOT ADD MORE THINGS TO THIS LIST
+  # ==============================================
+  #
+  # See the comment at the top.
 }
 
 # Debug/release ----------------------------------------------------------------
@@ -150,6 +142,12 @@ config("release") {
       # 1 for all .nexes.
       defines += [ "DYNAMIC_ANNOTATIONS_ENABLED=0" ]
     }
+  }
+
+  if (is_ios) {
+    # Disable NSAssert and GTMDevAssert (from Google Toolbox for Mac). This
+    # follows XCode's default behavior for Release builds.
+    defines += [ "NS_BLOCK_ASSERTIONS=1" ]
   }
 }
 
@@ -202,8 +200,23 @@ config("default_libs") {
   } else if (is_linux) {
     libs = [
       "dl",
+      "pthread",
       "rt",
     ]
+  }
+}
+
+# Dependencies that all executables and shared libraries should have.
+group("exe_and_shlib_deps") {
+  public_deps = []
+  if (using_sanitizer) {
+    public_deps += [ "//build/config/sanitizers:deps" ]
+  }
+  if (use_custom_libcxx) {
+    public_deps += [ "//buildtools/third_party/libc++:libcxx_proxy" ]
+  }
+  if (use_afl) {
+    public_deps += [ "//third_party/afl" ]
   }
 }
 
@@ -223,15 +236,25 @@ config("executable_config") {
 
   if (is_win) {
     configs += _windows_linker_configs
+
+    # Currently only turn on linker CFI for executables.
+    configs += [ "//build/config/win:cfi_linker" ]
   } else if (is_mac) {
     configs += [
       "//build/config/mac:mac_dynamic_flags",
       "//build/config/mac:mac_executable_flags",
     ]
-  } else if (is_linux || is_android) {
+  } else if (is_ios) {
+    configs += [
+      "//build/config/ios:ios_dynamic_flags",
+      "//build/config/ios:ios_executable_flags",
+    ]
+  } else if (is_linux || is_android || current_os == "aix") {
     configs += [ "//build/config/gcc:executable_ldconfig" ]
     if (is_android) {
       configs += [ "//build/config/android:executable_config" ]
+    } else if (is_chromecast) {
+      configs += [ "//build/config/chromecast:executable_config" ]
     }
   }
 
@@ -240,6 +263,10 @@ config("executable_config") {
   if (prebuilt_instrumented_libraries_available) {
     configs += [ "//third_party/instrumented_libraries:prebuilt_ldflags" ]
   }
+  if (use_locally_built_instrumented_libraries) {
+    configs += [ "//third_party/instrumented_libraries:locally_built_ldflags" ]
+  }
+  configs += [ "//build/config/sanitizers:link_executable" ]
 }
 
 # Shared library configs -------------------------------------------------------
@@ -252,6 +279,8 @@ config("shared_library_config") {
     configs += _windows_linker_configs
   } else if (is_mac) {
     configs += [ "//build/config/mac:mac_dynamic_flags" ]
+  } else if (is_ios) {
+    configs += [ "//build/config/ios:ios_dynamic_flags" ]
   } else if (is_chromecast) {
     configs += [ "//build/config/chromecast:shared_library_config" ]
   }
@@ -261,6 +290,10 @@ config("shared_library_config") {
   if (prebuilt_instrumented_libraries_available) {
     configs += [ "//third_party/instrumented_libraries:prebuilt_ldflags" ]
   }
+  if (use_locally_built_instrumented_libraries) {
+    configs += [ "//third_party/instrumented_libraries:locally_built_ldflags" ]
+  }
+  configs += [ "//build/config/sanitizers:link_shared_library" ]
 }
 
 # Add this config to your target to enable precompiled headers.
@@ -272,7 +305,7 @@ config("shared_library_config") {
 #
 # Recommend precompiled headers for targets with more than 50 .cc files.
 config("precompiled_headers") {
-  if (!is_official_build && !use_goma && !disable_precompiled_headers) {
+  if (enable_precompiled_headers) {
     if (is_win) {
       # This is a string rather than a file GN knows about. It has to match
       # exactly what's in the /FI flag below, and what might appear in the
@@ -286,19 +319,7 @@ config("precompiled_headers") {
 
       # Force include the header.
       cflags = [ "/FI$precompiled_header" ]
-
-      # Disable warning for "this file was empty after preprocessing". This
-      # error is generated only in C mode for ANSI compatibility. It conflicts
-      # with precompiled headers since the source file that's "compiled" for
-      # making the precompiled header is empty.
-      #
-      # This error doesn't happen every time. In VS2013, it seems if the .pch
-      # file doesn't exist, no error will be generated (probably MS tested this
-      # case but forgot the other one?). To reproduce this error, do a build,
-      # then delete the precompile.c.obj file, then build again.
-      cflags_c = [ "/wd4206" ]
     } else if (is_mac) {
-      precompiled_header = "build/precompile.h"
       precompiled_source = "//build/precompile.h"
     }
   }

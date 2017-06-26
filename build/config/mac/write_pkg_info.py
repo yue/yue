@@ -4,7 +4,7 @@
 
 import argparse
 import os
-import plistlib
+import plist_util
 import sys
 
 # This script creates a PkgInfo file for an OS X .app bundle's plist.
@@ -24,7 +24,7 @@ def Main():
   if os.path.exists(args.output):
     os.unlink(args.output)
 
-  plist = plistlib.readPlist(args.plist)
+  plist = plist_util.LoadPList(args.plist)
   package_type = plist['CFBundlePackageType']
   if package_type != 'APPL':
     raise ValueError('Expected CFBundlePackageType to be %s, got %s' % \

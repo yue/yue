@@ -2,53 +2,45 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import argparse
+import errno
 import os
+import shutil
 import sys
 
-# Packages a framework bundle by setting up symlinks for the "Current" version.
-# Usage: python /path/to/Foo.framework current_version
+def Main():
+  parser = argparse.ArgumentParser(description='Create Mac Framework symlinks')
+  parser.add_argument('--framework', action='store', type=str, required=True)
+  parser.add_argument('--version', action='store', type=str)
+  parser.add_argument('--contents', action='store', type=str, nargs='+')
+  parser.add_argument('--stamp', action='store', type=str, required=True)
+  args = parser.parse_args()
 
-def Main(args):
-  if len(args) != 3:
-    print >> sys.stderr, "Usage: %s /path/to/Something.framework A", (args[0],)
-    return 1
-
-  (framework, version) = args[1:]
-
-  # Find the name of the binary based on the part before the ".framework".
-  binary = os.path.splitext(os.path.basename(framework))[0]
-
-  CURRENT = 'Current'
-  RESOURCES = 'Resources'
   VERSIONS = 'Versions'
+  CURRENT = 'Current'
 
-  if not os.path.exists(os.path.join(framework, VERSIONS, version, binary)):
-    # Binary-less frameworks don't seem to contain symlinks (see e.g.
-    # chromium's out/Debug/org.chromium.Chromium.manifest/ bundle).
-    return 0
+  # Ensure the Foo.framework/Versions/A/ directory exists and create the
+  # Foo.framework/Versions/Current symlink to it.
+  if args.version:
+    try:
+      os.makedirs(os.path.join(args.framework, VERSIONS, args.version), 0744)
+    except OSError as e:
+      if e.errno != errno.EEXIST:
+        raise e
+    _Relink(os.path.join(args.version),
+            os.path.join(args.framework, VERSIONS, CURRENT))
 
-  # Move into the framework directory to set the symlinks correctly.
-  os.chdir(framework)
+  # Establish the top-level symlinks in the framework bundle. The dest of
+  # the symlinks may not exist yet.
+  if args.contents:
+    for item in args.contents:
+      _Relink(os.path.join(VERSIONS, CURRENT, item),
+              os.path.join(args.framework, item))
 
-  # Set up the Current version.
-  _Relink(version, os.path.join(VERSIONS, CURRENT))
-
-  # Set up the root symlinks.
-  _Relink(os.path.join(VERSIONS, CURRENT, binary), binary)
-  _Relink(os.path.join(VERSIONS, CURRENT, RESOURCES), RESOURCES)
-
-  # The following directories are optional but should also be symlinked
-  # in the root.
-  EXTRA_DIRS = [
-      'Helpers',
-      'Internet Plug-Ins',
-      'Libraries',
-      'XPCServices',
-  ]
-  for extra_dir in EXTRA_DIRS:
-    extra_dir_target = os.path.join(VERSIONS, version, extra_dir)
-    if os.path.exists(extra_dir_target):
-      _Relink(extra_dir_target, extra_dir)
+  # Write out a stamp file.
+  if args.stamp:
+    with open(args.stamp, 'w') as f:
+      f.write(str(args))
 
   return 0
 
@@ -56,10 +48,13 @@ def Main(args):
 def _Relink(dest, link):
   """Creates a symlink to |dest| named |link|. If |link| already exists,
   it is overwritten."""
-  if os.path.lexists(link):
+  try:
     os.remove(link)
+  except OSError as e:
+    if e.errno != errno.ENOENT:
+      shutil.rmtree(link)
   os.symlink(dest, link)
 
 
 if __name__ == '__main__':
-  sys.exit(Main(sys.argv))
+  sys.exit(Main())

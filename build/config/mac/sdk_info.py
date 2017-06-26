@@ -2,6 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import argparse
 import os
 import subprocess
 import sys
@@ -24,6 +25,7 @@ def FillXcodeVersion(settings):
   """Fills the Xcode version and build number into |settings|."""
   lines = subprocess.check_output(['xcodebuild', '-version']).splitlines()
   settings['xcode_version'] = FormatVersion(lines[0].split()[-1])
+  settings['xcode_version_int'] = int(settings['xcode_version'], 10)
   settings['xcode_build'] = lines[-1].split()[-1]
 
 
@@ -39,6 +41,8 @@ def FillSDKPathAndVersion(settings, platform, xcode_version):
       'xcrun', '-sdk', platform, '--show-sdk-path']).strip()
   settings['sdk_version'] = subprocess.check_output([
       'xcrun', '-sdk', platform, '--show-sdk-version']).strip()
+  settings['sdk_platform_path'] = subprocess.check_output([
+      'xcrun', '-sdk', platform, '--show-sdk-platform-path']).strip()
   # TODO: unconditionally use --show-sdk-build-version once Xcode 7.2 or
   # higher is required to build Chrome for iOS or OS X.
   if xcode_version >= '0720':
@@ -49,7 +53,13 @@ def FillSDKPathAndVersion(settings, platform, xcode_version):
 
 
 if __name__ == '__main__':
-  if len(sys.argv) != 2:
+  parser = argparse.ArgumentParser()
+  parser.add_argument("--developer_dir", required=False)
+  args, unknownargs = parser.parse_known_args()
+  if args.developer_dir:
+    os.environ['DEVELOPER_DIR'] = args.developer_dir
+
+  if len(unknownargs) != 1:
     sys.stderr.write(
         'usage: %s [iphoneos|iphonesimulator|macosx]\n' %
         os.path.basename(sys.argv[0]))
@@ -58,7 +68,10 @@ if __name__ == '__main__':
   settings = {}
   FillMachineOSBuild(settings)
   FillXcodeVersion(settings)
-  FillSDKPathAndVersion(settings, sys.argv[1], settings['xcode_version'])
+  FillSDKPathAndVersion(settings, unknownargs[0], settings['xcode_version'])
 
   for key in sorted(settings):
-    print '%s="%s"' % (key, settings[key])
+    value = settings[key]
+    if isinstance(value, str):
+      value = '"%s"' % value
+    print '%s=%s' % (key, value)

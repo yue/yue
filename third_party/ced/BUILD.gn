@@ -6,6 +6,14 @@ import("//testing/test.gni")
 
 config("ced_config") {
   include_dirs = [ "src" ]
+}
+
+config("ced_config_private") {
+  # This cannot be set directly on the "ced" and "ced_unittests" target because
+  # the target cflags property is added to the command-line before the cflags
+  # property from its config. For configs, the cflags property are set in the
+  # order public_configs, configs thus it is correctly set after the flag that
+  # enable the error.
   if (is_clang) {
     cflags = [ "-Wno-unused-function" ]
   }
@@ -38,7 +46,10 @@ static_library("ced") {
     "src/compact_enc_det/compact_enc_det.h",
   ]
   configs -= [ "//build/config/compiler:chromium_code" ]
-  configs += [ "//build/config/compiler:no_chromium_code" ]
+  configs += [
+    "//build/config/compiler:no_chromium_code",
+    ":ced_config_private",
+  ]
 
   public_configs = [ ":ced_config" ]
 
@@ -53,6 +64,8 @@ static_library("ced") {
   } else {
     defines = [ "COMPILER_GCC" ]
   }
+
+  defines += [ "HTML5_MODE" ]
 }
 
 test("ced_unittests") {
@@ -63,6 +76,8 @@ test("ced_unittests") {
     "src/util/encodings/encodings_unittest.cc",
   ]
 
+  configs += [ ":ced_config_private" ]
+
   if (is_win) {
     defines = [ "COMPILER_MSVC" ]
     cflags = [
@@ -72,6 +87,8 @@ test("ced_unittests") {
   } else {
     defines = [ "COMPILER_GCC" ]
   }
+
+  defines += [ "HTML5_MODE" ]
 
   deps = [
     ":ced",

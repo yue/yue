@@ -4,6 +4,7 @@
 
 
 import argparse
+import logging
 import os
 import re
 import subprocess
@@ -18,7 +19,12 @@ def main():
                       help='Path to output bundle.')
   parser.add_argument('-i', '--input', required=True,
                       help='Path to input xib or storyboard.')
+  parser.add_argument('--developer_dir', required=False,
+                      help='Path to Xcode.')
   args, unknown_args = parser.parse_known_args()
+
+  if args.developer_dir:
+    os.environ['DEVELOPER_DIR'] = args.developer_dir
 
   ibtool_args = [
       'xcrun', 'ibtool',
@@ -34,17 +40,21 @@ def main():
 
   ibtool_section_re = re.compile(r'/\*.*\*/')
   ibtool_re = re.compile(r'.*note:.*is clipping its content')
-  ibtoolout = subprocess.Popen(ibtool_args, stdout=subprocess.PIPE)
+  try:
+    stdout = subprocess.check_output(ibtool_args)
+  except subprocess.CalledProcessError as e:
+    print(e.output)
+    raise
   current_section_header = None
-  for line in ibtoolout.stdout:
+  for line in stdout.splitlines():
     if ibtool_section_re.match(line):
       current_section_header = line
     elif not ibtool_re.match(line):
       if current_section_header:
-        sys.stdout.write(current_section_header)
+        print(current_section_header)
         current_section_header = None
-      sys.stdout.write(line)
-  return ibtoolout.returncode
+      print(line)
+  return 0
 
 
 if __name__ == '__main__':

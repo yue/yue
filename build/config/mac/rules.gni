@@ -43,7 +43,7 @@ template("mac_info_plist") {
       extra_substitutions = invoker.extra_substitutions
     }
     extra_substitutions += [
-      "MAC_SDK_BUILD=$mac_sdk_build",
+      "MAC_SDK_BUILD=$mac_sdk_version",
       "MAC_SDK_NAME=$mac_sdk_name$mac_sdk_version",
     ]
     plist_templates = [
@@ -77,10 +77,11 @@ template("mac_xib_bundle_data") {
   _target_name = target_name
   _compile_target_name = _target_name + "_compile_ibtool"
 
-  compile_xibs(_compile_target_name) {
+  compile_ib_files(_compile_target_name) {
     forward_variables_from(invoker, [ "testonly" ])
     visibility = [ ":$_target_name" ]
     sources = invoker.sources
+    output_extension = "nib"
     ibtool_flags = [
       "--minimum-deployment-target",
       mac_deployment_target,
@@ -116,12 +117,11 @@ template("mac_xib_bundle_data") {
 
 # Template to package a shared library into a Mac framework bundle.
 #
-# This template provides two targets to control whether the framework is
-# merely built when targets depend on it, or whether it is linked as well:
-# "$target_name" and "$target_name+link".
-#
-# See the //build/config/mac/base_rules.gni:framework_bundle for a discussion
-# and examples.
+# By default, the bundle target this template generates does not link the
+# resulting framework into anything that depends on it. If a dependency wants
+# a link-time (as well as build-time) dependency on the framework bundle,
+# depend against "$target_name+link". If only the build-time dependency is
+# required (e.g., for copying into another bundle), then use "$target_name".
 #
 # Arguments
 #
@@ -144,15 +144,87 @@ template("mac_xib_bundle_data") {
 #         structure will not be created, and build output will go directly
 #         into the framework subdirectory.
 #
+#     framework_contents:
+#         (optional) list of string, top-level items in the framework. For
+#         frameworks with a framework_version, this is the list of symlinks to
+#         create in the .framework directory that link into Versions/Current/.
+#
 #     extra_substitutions:
 #         (optional) string array, 'key=value' pairs for extra fields which are
 #         specified in a source Info.plist template.
+#
+# This template provides two targets for the resulting framework bundle. The
+# link-time behavior varies depending on which of the two targets below is
+# added as a dependency:
+#   - $target_name only adds a build-time dependency. Targets that depend on
+#     it will not link against the framework.
+#   - $target_name+link adds a build-time and link-time dependency. Targets
+#     that depend on it will link against the framework.
+#
+# The build-time-only dependency is used for when a target needs to use the
+# framework either only for resources, or because the target loads it at run-
+# time, via dlopen() or NSBundle. The link-time dependency will cause the
+# dependee to have the framework loaded by dyld at launch.
+#
+# Example of build-time only dependency:
+#
+#     mac_framework_bundle("CoreTeleportation") {
+#       sources = [ ... ]
+#     }
+#
+#     bundle_data("core_teleportation_bundle_data") {
+#       deps = [ ":CoreTeleportation" ]
+#       sources = [ "$root_out_dir/CoreTeleportation.framework" ]
+#       outputs = [ "{{bundle_root_dir}}/Frameworks/{{source_file_part}}" ]
+#     }
+#
+#     app_bundle("GoatTeleporter") {
+#       sources = [ ... ]
+#       deps = [
+#         ":core_teleportation_bundle_data",
+#       ]
+#     }
+#
+# The GoatTeleporter.app will not directly link against
+# CoreTeleportation.framework, but it will be included in the bundle's
+# Frameworks directory.
+#
+# Example of link-time dependency:
+#
+#     mac_framework_bundle("CoreTeleportation") {
+#       sources = [ ... ]
+#       ldflags = [
+#         "-install_name",
+#         "@executable_path/../Frameworks/$target_name.framework"
+#       ]
+#     }
+#
+#     bundle_data("core_teleportation_bundle_data") {
+#       deps = [ ":CoreTeleportation+link" ]
+#       sources = [ "$root_out_dir/CoreTeleportation.framework" ]
+#       outputs = [ "{{bundle_root_dir}}/Frameworks/{{source_file_part}}" ]
+#     }
+#
+#     app_bundle("GoatTeleporter") {
+#       sources = [ ... ]
+#       deps = [
+#         ":core_teleportation_bundle_data",
+#       ]
+#     }
+#
+# Note that the framework is still copied to the app's bundle, but dyld will
+# load this library when the app is launched because it uses the "+link"
+# target as a dependency. This also requires that the framework set its
+# install_name so that dyld can locate it.
 #
 # See "gn help shared_library" for more information on arguments supported
 # by shared library target.
 template("mac_framework_bundle") {
   assert(defined(invoker.deps),
          "Dependencies must be specified for $target_name")
+  assert(!defined(invoker.framework_contents) ||
+             defined(invoker.framework_version),
+         "framework_contents requres a versioned framework")
 
   _info_plist_target = target_name + "_info_plist"
 
@@ -183,19 +255,206 @@ template("mac_framework_bundle") {
     ]
   }
 
-  framework_bundle(target_name) {
-    forward_variables_from(invoker, "*", [ "info_plist" ])
+  _target_name = target_name
+  _output_name = target_name
+  if (defined(invoker.output_name)) {
+    _output_name = invoker.output_name
+  }
+
+  # Create a file to track the build dependency on the framework_version and
+  # framework_contents variables.
+  _framework_toc = []
+  if (defined(invoker.framework_version)) {
+    _framework_toc += [
+      "Version=" + invoker.framework_version,
+      _output_name,
+    ]
+    _framework_contents = [ _output_name ]
+  }
+  if (defined(invoker.framework_contents)) {
+    _framework_toc += invoker.framework_contents
+    _framework_contents += invoker.framework_contents
+  }
+  _framework_toc_file = "$target_out_dir/${target_name}.toc"
+  write_file(_framework_toc_file, _framework_toc)
+
+  # Create local variables for referencing different parts of the bundle.
+  _framework_target = _target_name
+  _framework_name = _output_name + ".framework"
+  _framework_base_dir = "$root_out_dir/$_framework_name"
+  if (defined(invoker.framework_version) && invoker.framework_version != "") {
+    _framework_version = invoker.framework_version
+    _framework_root_dir = _framework_base_dir + "/Versions/$_framework_version"
+  } else {
+    _framework_root_dir = _framework_base_dir
+  }
+
+  # Clean the entire framework if the framework_version changes.
+  _version_arg = "''"
+  if (defined(invoker.framework_version)) {
+    _version_arg = _framework_version
+  }
+  _version_file = "$target_out_dir/${target_name}_version"
+  exec_script("//build/config/mac/prepare_framework_version.py",
+              [
+                rebase_path(_version_file),
+                rebase_path(_framework_base_dir),
+                _version_arg,
+              ])
+
+  # Create the symlinks.
+  _framework_package_target = target_name + "_package"
+  action(_framework_package_target) {
+    script = "//build/config/mac/package_framework.py"
+
+    # The TOC file never needs to be read, since its contents are the values
+    # of GN variables. It is only used to trigger this rule when the values
+    # change.
+    inputs = [
+      _framework_toc_file,
+    ]
+
+    _stamp_file = "$target_out_dir/run_${_framework_package_target}.stamp"
+    outputs = [
+      _stamp_file,
+    ]
+
+    visibility = [ ":$_framework_target" ]
+
+    args = [
+      "--framework",
+      rebase_path(_framework_base_dir, root_build_dir),
+      "--stamp",
+      rebase_path(_stamp_file, root_build_dir),
+    ]
+
+    if (defined(invoker.framework_version)) {
+      args += [
+                "--version",
+                invoker.framework_version,
+                "--contents",
+              ] + _framework_contents
+      # It is not possible to list _framework_contents as outputs, since
+      # ninja does not properly stat symbolic links.
+      # https://github.com/ninja-build/ninja/issues/1186
+    }
+  }
+
+  _link_shared_library_target = target_name + "_shared_library"
+  _shared_library_bundle_data = target_name + "_shared_library_bundle_data"
+
+  shared_library(_link_shared_library_target) {
+    forward_variables_from(invoker,
+                           "*",
+                           [
+                             "assert_no_deps",
+                             "bundle_deps",
+                             "code_signing_enabled",
+                             "data_deps",
+                             "info_plist",
+                             "info_plist_target",
+                             "output_name",
+                             "visibility",
+                           ])
+    visibility = [ ":$_shared_library_bundle_data" ]
+    output_name = _output_name
+    output_prefix_override = true
+    output_extension = ""
+    output_dir = "$target_out_dir/$_link_shared_library_target"
+  }
+
+  bundle_data(_shared_library_bundle_data) {
+    visibility = [ ":$_framework_target" ]
+    forward_variables_from(invoker, [ "testonly" ])
+    sources = [
+      "$target_out_dir/$_link_shared_library_target/$_output_name",
+    ]
+    outputs = [
+      "{{bundle_executable_dir}}/$_output_name",
+    ]
+    public_deps = [
+      ":$_link_shared_library_target",
+    ]
+  }
+
+  _framework_public_config = _target_name + "_public_config"
+  config(_framework_public_config) {
+    # TODO(sdefresne): should we have a framework_dirs similar to lib_dirs
+    # and include_dirs to avoid duplicate values on the command-line.
+    visibility = [ ":$_framework_target" ]
+    ldflags = [
+      "-F",
+      rebase_path("$root_out_dir/.", root_build_dir),
+    ]
+    lib_dirs = [ root_out_dir ]
+    libs = [ _framework_name ]
+  }
+
+  create_bundle(_framework_target) {
+    forward_variables_from(invoker,
+                           [
+                             "data_deps",
+                             "deps",
+                             "public_deps",
+                             "testonly",
+                           ])
+
+    if (defined(invoker.visibility)) {
+      visibility = invoker.visibility
+      visibility += [ ":$_target_name+link" ]
+    }
 
     if (!defined(deps)) {
       deps = []
     }
     deps += [ ":$_info_plist_bundle_data" ]
+
+    if (defined(invoker.bundle_deps)) {
+      deps += invoker.bundle_deps
+    }
+
+    if (!defined(public_deps)) {
+      public_deps = []
+    }
+    public_deps += [
+      ":$_framework_package_target",
+      ":$_shared_library_bundle_data",
+    ]
+
+    bundle_root_dir = _framework_root_dir
+    bundle_resources_dir = "$bundle_root_dir/Resources"
+    bundle_executable_dir = "$bundle_root_dir"
   }
+
+  group(_target_name + "+link") {
+    forward_variables_from(invoker,
+                           [
+                             "public_configs",
+                             "testonly",
+                             "visibility",
+                           ])
+    public_deps = [
+      ":$_target_name",
+    ]
+    if (!defined(public_configs)) {
+      public_configs = []
+    }
+    public_configs += [ ":$_framework_public_config" ]
+  }
+}
+
+set_defaults("mac_framework_bundle") {
+  configs = default_shared_library_configs
 }
 
 # Template to create a Mac executable application bundle.
 #
 # Arguments
+#
+#     package_type:
+#         (optional) string, the product package type to create. Options are:
+#             "app" to create a .app bundle (default)
+#             "xpc" to create an .xpc service bundle
 #
 #     info_plist:
 #         (optional) string, path to the Info.plist file that will be used for
@@ -227,6 +486,23 @@ template("mac_app_bundle") {
     _output_name = invoker.output_name
   }
 
+  _package_type = "app"
+  if (defined(invoker.package_type)) {
+    _package_type = invoker.package_type
+  }
+
+  if (_package_type == "app") {
+    _output_extension = "app"
+    _product_type = "com.apple.product-type.application"
+    _write_pkg_info = true
+  } else if (_package_type == "xpc") {
+    _output_extension = "xpc"
+    _product_type = "com.apple.product-type.xpc-service"
+    _write_pkg_info = false
+  } else {
+    assert(false, "Unsupported packge_type: " + packge_type)
+  }
+
   _executable_target = target_name + "_executable"
   _executable_bundle_data = _executable_target + "_bundle_data"
 
@@ -243,20 +519,22 @@ template("mac_app_bundle") {
                            ])
   }
 
-  _pkg_info_target = target_name + "_pkg_info"
+  if (_write_pkg_info) {
+    _pkg_info_target = target_name + "_pkg_info"
 
-  action(_pkg_info_target) {
-    forward_variables_from(invoker, [ "testonly" ])
-    script = "//build/config/mac/write_pkg_info.py"
-    sources = get_target_outputs(":$_info_plist_target")
-    outputs = [
-      "$target_gen_dir/$_pkg_info_target",
-    ]
-    args = [ "--plist" ] + rebase_path(sources, root_build_dir) +
-           [ "--output" ] + rebase_path(outputs, root_build_dir)
-    deps = [
-      ":$_info_plist_target",
-    ]
+    action(_pkg_info_target) {
+      forward_variables_from(invoker, [ "testonly" ])
+      script = "//build/config/mac/write_pkg_info.py"
+      sources = get_target_outputs(":$_info_plist_target")
+      outputs = [
+        "$target_gen_dir/$_pkg_info_target",
+      ]
+      args = [ "--plist" ] + rebase_path(sources, root_build_dir) +
+             [ "--output" ] + rebase_path(outputs, root_build_dir)
+      deps = [
+        ":$_info_plist_target",
+      ]
+    }
   }
 
   executable(_executable_target) {
@@ -308,18 +586,20 @@ template("mac_app_bundle") {
     ]
   }
 
-  _pkg_info_bundle_data = _pkg_info_target + "_bundle_data"
+  if (_write_pkg_info) {
+    _pkg_info_bundle_data = _pkg_info_target + "_bundle_data"
 
-  bundle_data(_pkg_info_bundle_data) {
-    forward_variables_from(invoker, [ "testonly" ])
-    visibility = [ ":$_target_name" ]
-    sources = get_target_outputs(":$_pkg_info_target")
-    outputs = [
-      "{{bundle_root_dir}}/PkgInfo",
-    ]
-    public_deps = [
-      ":$_pkg_info_target",
-    ]
+    bundle_data(_pkg_info_bundle_data) {
+      forward_variables_from(invoker, [ "testonly" ])
+      visibility = [ ":$_target_name" ]
+      sources = get_target_outputs(":$_pkg_info_target")
+      outputs = [
+        "{{bundle_root_dir}}/PkgInfo",
+      ]
+      public_deps = [
+        ":$_pkg_info_target",
+      ]
+    }
   }
 
   create_bundle(_target_name) {
@@ -336,10 +616,13 @@ template("mac_app_bundle") {
     deps += [
       ":$_executable_bundle_data",
       ":$_info_plist_bundle_data",
-      ":$_pkg_info_bundle_data",
     ]
-    product_type = "com.apple.product-type.application"
-    bundle_root_dir = "$root_out_dir/${_output_name}.app/Contents"
+    if (_write_pkg_info) {
+      deps += [ ":$_pkg_info_bundle_data" ]
+    }
+    product_type = _product_type
+    bundle_root_dir =
+        "$root_out_dir/${_output_name}.${_output_extension}/Contents"
     bundle_resources_dir = "$bundle_root_dir/Resources"
     bundle_executable_dir = "$bundle_root_dir/MacOS"
   }

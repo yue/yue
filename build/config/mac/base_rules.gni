@@ -5,6 +5,7 @@
 # This file contains rules that are shared between Mac and iOS.
 
 import("//build/toolchain/toolchain.gni")
+import("//build/config/mac/symbols.gni")
 
 if (is_mac) {
   import("//build/config/mac/mac_sdk.gni")
@@ -44,13 +45,101 @@ template("convert_plist") {
     outputs = [
       invoker.output,
     ]
-    args = [
+    args = []
+    if (!use_system_xcode) {
+      args += [
+        "--developer_dir",
+        hermetic_xcode_path,
+      ]
+    }
+    args += [
       "plutil",
       "-convert",
       invoker.format,
       "-o",
       rebase_path(invoker.output, root_build_dir),
       rebase_path(invoker.source, root_build_dir),
+    ]
+  }
+}
+
+# Template to merge multiple plist files and perform variable substitutions.
+#
+# Arguments
+#
+#     plist_templates:
+#         string array, paths to plist files which will be used for the bundle.
+#
+#     format:
+#         string, the format to `plutil -convert` the plist to when
+#         generating the output.
+#
+#     substitutions:
+#         string array, 'key=value' pairs used to replace ${key} by value
+#         when generating the output plist file.
+#
+#     output_name:
+#         string, name of the generated plist file.
+template("compile_plist") {
+  assert(defined(invoker.plist_templates),
+         "A list of template plist files must be specified for $target_name")
+  assert(defined(invoker.format),
+         "The plist format must be specified for $target_name")
+  assert(defined(invoker.substitutions),
+         "A list of key=value pairs must be specified for $target_name")
+  assert(defined(invoker.output_name),
+         "The name of the output file must be specified for $target_name")
+
+  _output_name = invoker.output_name
+  _merged_name = get_path_info(_output_name, "dir") + "/" +
+                 get_path_info(_output_name, "name") + "_merged." +
+                 get_path_info(_output_name, "extension")
+
+  _merge_target = target_name + "_merge"
+
+  action(_merge_target) {
+    forward_variables_from(invoker,
+                           [
+                             "deps",
+                             "testonly",
+                           ])
+
+    script = "//build/config/mac/plist_util.py"
+    sources = invoker.plist_templates
+    outputs = [
+      _merged_name,
+    ]
+    args = [
+             "merge",
+             "-f=" + invoker.format,
+             "-o=" + rebase_path(_merged_name, root_build_dir),
+           ] + rebase_path(invoker.plist_templates, root_build_dir)
+  }
+
+  action(target_name) {
+    forward_variables_from(invoker,
+                           [
+                             "testonly",
+                             "visibility",
+                           ])
+    script = "//build/config/mac/plist_util.py"
+    sources = [
+      _merged_name,
+    ]
+    outputs = [
+      _output_name,
+    ]
+    args = [
+      "substitute",
+      "-f=" + invoker.format,
+      "-o=" + rebase_path(_output_name, root_build_dir),
+      "-t=" + rebase_path(_merged_name, root_build_dir),
+    ]
+    foreach(_substitution, invoker.substitutions) {
+      args += [ "-s=$_substitution" ]
+    }
+    deps = [
+      ":$_merge_target",
     ]
   }
 }
@@ -79,267 +168,41 @@ template("convert_plist") {
 #         (optional) string, name of the generated plist file, default to
 #         "$target_gen_dir/$target_name.plist".
 template("info_plist") {
-  assert(defined(invoker.plist_templates),
-         "A list of template plist files must be specified for $target_name")
   assert(defined(invoker.executable_name),
          "The executable_name must be specified for $target_name")
-  assert(defined(invoker.format),
-         "The plist format must be specified for $target_name")
   executable_name = invoker.executable_name
 
-  _output_name = "$target_gen_dir/$target_name.plist"
-  if (defined(invoker.output_name)) {
-    _output_name = invoker.output_name
-  }
-
-  action(target_name) {
-    script = "//build/config/mac/gen_plist.py"
-    sources = invoker.plist_templates
-    outputs = [
-      _output_name,
-    ]
-    extra_args = []
-    if (defined(invoker.extra_substitutions)) {
-      foreach(substitution, invoker.extra_substitutions) {
-        extra_args += [ "-s=$substitution" ]
-      }
-    }
-    response_file_contents =
-        extra_args + [
-          "-s=BUILD_MACHINE_OS_BUILD=$machine_os_build",
-          "-s=EXECUTABLE_NAME=$executable_name",
-          "-s=GCC_VERSION=com.apple.compilers.llvm.clang.1_0",
-          "-s=PRODUCT_NAME=$executable_name",
-          "-s=XCODE_BUILD=$xcode_build",
-          "-s=XCODE_VERSION=$xcode_version",
-          "-o=" + rebase_path(_output_name, root_build_dir),
-          "-f=" + invoker.format,
-        ] + rebase_path(sources, root_build_dir)
-    args = [ "@{{response_file_name}}" ]
+  compile_plist(target_name) {
     forward_variables_from(invoker,
                            [
-                             "deps",
+                             "plist_templates",
                              "testonly",
-                             "visibility",
-                           ])
-  }
-}
-
-# This is used as the base template for both iOS and Mac frameworks.
-#
-# By default, the bundle target this template generates does not link the
-# resulting framework into anything that depends on it. If a dependency wants
-# a link-time (as well as build-time) dependency on the framework bundle,
-# depend against "$target_name+link". If only the build-time dependency is
-# required (e.g., for copying into another bundle), then use "$target_name".
-#
-# Arguments
-#
-#     output_name:
-#         (optional) string, name of the generated framework without the
-#         .framework suffix. If omitted, defaults to target_name.
-#
-#     framework_version:
-#         (optional) string, version of the framework. Typically this is a
-#         single letter, like "A". If omitted, the Versions/ subdirectory
-#         structure will not be created, and build output will go directly
-#         into the framework subdirectory.
-#
-# This template provides two targets for the resulting framework bundle. The
-# link-time behavior varies depending on which of the two targets below is
-# added as a dependency:
-#   - $target_name only adds a build-time dependency. Targets that depend on
-#     it will not link against the framework.
-#   - $target_name+link adds a build-time and link-time dependency. Targets
-#     that depend on it will link against the framework.
-#
-# The build-time-only dependency is used for when a target needs to use the
-# framework either only for resources, or because the target loads it at run-
-# time, via dlopen() or NSBundle. The link-time dependency will cause the
-# dependee to have the framework loaded by dyld at launch.
-#
-# Example of build-time only dependency:
-#
-#     framework_bundle("CoreTeleportation") {
-#       sources = [ ... ]
-#     }
-#
-#     bundle_data("core_teleportation_bundle_data") {
-#       deps = [ ":CoreTeleportation" ]
-#       sources = [ "$root_out_dir/CoreTeleportation.framework" ]
-#       outputs = [ "{{bundle_root_dir}}/Frameworks/{{source_file_part}}" ]
-#     }
-#
-#     app_bundle("GoatTeleporter") {
-#       sources = [ ... ]
-#       deps = [
-#         ":core_teleportation_bundle_data",
-#       ]
-#     }
-#
-# The GoatTeleporter.app will not directly link against
-# CoreTeleportation.framework, but it will be included in the bundle's
-# Frameworks directory.
-#
-# Example of link-time dependency:
-#
-#     framework_bundle("CoreTeleportation") {
-#       sources = [ ... ]
-#       ldflags = [
-#         "-install_name",
-#         "@executable_path/../Frameworks/$target_name.framework"
-#       ]
-#     }
-#
-#     bundle_data("core_teleportation_bundle_data") {
-#       deps = [ ":CoreTeleportation+link" ]
-#       sources = [ "$root_out_dir/CoreTeleportation.framework" ]
-#       outputs = [ "{{bundle_root_dir}}/Frameworks/{{source_file_part}}" ]
-#     }
-#
-#     app_bundle("GoatTeleporter") {
-#       sources = [ ... ]
-#       deps = [
-#         ":core_teleportation_bundle_data",
-#       ]
-#     }
-#
-# Note that the framework is still copied to the app's bundle, but dyld will
-# load this library when the app is launched because it uses the "+link"
-# target as a dependency. This also requires that the framework set its
-# install_name so that dyld can locate it.
-#
-# See "gn help shared_library" for more information on arguments supported
-# by shared library target.
-template("framework_bundle") {
-  _target_name = target_name
-  _output_name = target_name
-  if (defined(invoker.output_name)) {
-    _output_name = invoker.output_name
-  }
-
-  # If the framework is unversioned, the final _target_name will be the
-  # create_bundle(_framework_target), otherwise an action with the name
-  # _target_name will depends on the the create_bundle() in order to prepare
-  # the versioned directory structure.
-  _framework_target = _target_name
-  _framework_name = _output_name + ".framework"
-  _framework_root_dir = "$root_out_dir/$_framework_name"
-  if (defined(invoker.framework_version) && invoker.framework_version != "") {
-    _framework_version = invoker.framework_version
-    _framework_root_dir += "/Versions/$_framework_version"
-    _framework_target = _target_name + "_create_bundle"
-  }
-
-  _shared_library_target = target_name + "_shared_library"
-  _shared_library_bundle_data = _shared_library_target + "_bundle_data"
-
-  shared_library(_shared_library_target) {
-    visibility = [ ":$_shared_library_bundle_data" ]
-    forward_variables_from(invoker,
-                           "*",
-                           [
-                             "assert_no_deps",
-                             "data_deps",
-                             "info_plist",
-                             "output_name",
-                             "visibility",
-                           ])
-    output_name = _output_name
-    output_prefix_override = true
-    output_extension = ""
-    output_dir = "$target_out_dir/$_shared_library_target"
-  }
-
-  bundle_data(_shared_library_bundle_data) {
-    visibility = [ ":$_framework_target" ]
-    forward_variables_from(invoker, [ "testonly" ])
-    sources = [
-      "$target_out_dir/$_shared_library_target/$_output_name",
-    ]
-    outputs = [
-      "{{bundle_executable_dir}}/$_output_name",
-    ]
-    public_deps = [
-      ":$_shared_library_target",
-    ]
-  }
-
-  _framework_public_config = _target_name + "_public_config"
-  config(_framework_public_config) {
-    # TODO(sdefresne): should we have a framework_dirs similar to lib_dirs
-    # and include_dirs to avoid duplicate values on the command-line.
-    visibility = [ ":$_framework_target" ]
-    ldflags = [ "-F" + rebase_path("$root_out_dir/.", root_build_dir) ]
-    lib_dirs = [ root_out_dir ]
-    libs = [ _framework_name ]
-  }
-
-  create_bundle(_framework_target) {
-    forward_variables_from(invoker,
-                           [
-                             "data_deps",
                              "deps",
-                             "public_deps",
-                             "testonly",
+                             "visibility",
+                             "format",
                            ])
 
-    if (defined(_framework_version)) {
-      visibility = [ ":$_target_name" ]
+    if (defined(invoker.output_name)) {
+      output_name = invoker.output_name
     } else {
-      if (defined(invoker.visibility)) {
-        visibility = invoker.visibility
-        visibility += [ ":$_target_name+link" ]
-      }
+      output_name = "$target_gen_dir/$target_name.plist"
     }
 
-    if (!defined(public_deps)) {
-      public_deps = []
-    }
-    public_deps += [ ":$_shared_library_bundle_data" ]
-
-    bundle_root_dir = _framework_root_dir
-    bundle_resources_dir = "$bundle_root_dir/Resources"
-    bundle_executable_dir = "$bundle_root_dir"
-  }
-
-  if (defined(_framework_version)) {
-    action(_target_name) {
-      forward_variables_from(invoker, [ "testonly" ])
-
-      if (defined(invoker.visibility)) {
-        visibility = invoker.visibility
-        visibility += [ ":$_target_name+link" ]
-      }
-
-      script = "//build/config/mac/package_framework.py"
-      outputs = [
-        "$root_out_dir/$_framework_name/Versions/Current",
-      ]
-      args = [
-        "$_framework_name",
-        "$_framework_version",
-      ]
-      public_deps = [
-        ":$_framework_target",
-      ]
-    }
-  }
-
-  group(_target_name + "+link") {
-    forward_variables_from(invoker,
-                           [
-                             "visibility",
-                             "testonly",
-                           ])
-    public_deps = [
-      ":$_target_name",
+    substitutions = [
+      "BUILD_MACHINE_OS_BUILD=$machine_os_build",
+      "EXECUTABLE_NAME=$executable_name",
+      "GCC_VERSION=com.apple.compilers.llvm.clang.1_0",
+      "PRODUCT_NAME=$executable_name",
+      "XCODE_BUILD=$xcode_build",
+      "XCODE_VERSION=$xcode_version",
     ]
-    public_configs = [ ":$_framework_public_config" ]
+    if (defined(invoker.extra_substitutions)) {
+      substitutions += invoker.extra_substitutions
+    }
   }
 }
 
-# Template to combile .xib or .storyboard files.
+# Template to compile .xib and .storyboard files.
 #
 # Arguments
 #
@@ -348,7 +211,7 @@ template("framework_bundle") {
 #
 #     ibtool_flags:
 #         (optional) list of string, additional flags to pass to the ibtool
-template("compile_xibs") {
+template("compile_ib_files") {
   action_foreach(target_name) {
     forward_variables_from(invoker,
                            [
@@ -356,23 +219,35 @@ template("compile_xibs") {
                              "visibility",
                            ])
     assert(defined(invoker.sources),
-           "Sources must be specified for $target_name")
+           "sources must be specified for $target_name")
+    assert(defined(invoker.output_extension),
+           "output_extension must be specified for $target_name")
 
     ibtool_flags = []
     if (defined(invoker.ibtool_flags)) {
       ibtool_flags = invoker.ibtool_flags
     }
 
-    script = "//build/config/mac/compile_xib.py"
+    _output_extension = invoker.output_extension
+
+    script = "//build/config/mac/compile_ib_files.py"
     sources = invoker.sources
     outputs = [
-      "$target_gen_dir/{{source_name_part}}.nib",
+      "$target_gen_dir/$target_name/{{source_name_part}}.$_output_extension",
     ]
     args = [
-             "--input",
-             "{{source}}",
-             "--output",
-             rebase_path("$target_gen_dir/{{source_name_part}}.nib"),
-           ] + ibtool_flags
+      "--input",
+      "{{source}}",
+      "--output",
+      rebase_path(
+          "$target_gen_dir/$target_name/{{source_name_part}}.$_output_extension"),
+    ]
+    if (!use_system_xcode) {
+      args += [
+        "--developer_dir",
+        hermetic_xcode_path,
+      ]
+    }
+    args += ibtool_flags
   }
 }
