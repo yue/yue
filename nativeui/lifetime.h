@@ -9,6 +9,7 @@
 #include <unordered_map>
 
 #include "base/memory/weak_ptr.h"
+#include "base/synchronization/lock.h"
 #include "nativeui/signal.h"
 
 #if defined(OS_MACOSX)
@@ -54,6 +55,7 @@ class NATIVEUI_EXPORT Lifetime {
 #if defined(OS_WIN)
   static void OnTimer(HWND, UINT, UINT_PTR event, DWORD);
 
+  static base::Lock lock_;
   static std::unordered_map<UINT_PTR, base::Closure> tasks_;
 #endif
 
