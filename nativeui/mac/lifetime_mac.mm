@@ -25,13 +25,22 @@ void Lifetime::Run() {
 }
 
 void Lifetime::Quit() {
-  [NSApp stop];
+  [NSApp stop:nil];
 }
 
 void Lifetime::PostTask(const base::Closure& task) {
+  __block base::Closure callback = task;
+  dispatch_async(dispatch_get_main_queue(), ^{
+    callback.Run();
+  });
 }
 
 void Lifetime::PostDelayedTask(int ms, const base::Closure& task) {
+  __block base::Closure callback = task;
+  dispatch_time_t t = dispatch_time(DISPATCH_TIME_NOW, ms * NSEC_PER_MSEC);
+  dispatch_after(t, dispatch_get_main_queue(), ^{
+    callback.Run();
+  });
 }
 
 }  // namespace nu
