@@ -7,7 +7,6 @@
 
 #include <memory>
 
-#include "base/at_exit.h"
 #include "base/memory/weak_ptr.h"
 #include "nativeui/signal.h"
 
@@ -50,8 +49,6 @@ class NATIVEUI_EXPORT Lifetime {
   base::mac::ScopedNSAutoreleasePool autorelease_pool_;
   NUApplicationDelegate* app_delegate_;
 #endif
-
-  base::AtExitManager at_exit_;
 
   base::WeakPtrFactory<Lifetime> weak_factory_;
 
