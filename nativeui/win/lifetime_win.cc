@@ -12,7 +12,7 @@ namespace nu {
 base::Lock Lifetime::lock_;
 
 // static
-std::unordered_map<UINT_PTR, base::Closure> Lifetime::tasks_;
+std::unordered_map<UINT_PTR, std::function<void()>> Lifetime::tasks_;
 
 // static
 void CALLBACK Lifetime::OnTimer(HWND, UINT, UINT_PTR event, DWORD) {
@@ -40,11 +40,11 @@ void Lifetime::Quit() {
   ::PostQuitMessage(0);
 }
 
-void Lifetime::PostTask(const base::Closure& task) {
+void Lifetime::PostTask(const std::function<void()>& task) {
   PostDelayedTask(USER_TIMER_MINIMUM, task);
 }
 
-void Lifetime::PostDelayedTask(int ms, const base::Closure& task) {
+void Lifetime::PostDelayedTask(int ms, const std::function<void()>& task) {
   UINT_PTR event = ::SetTimer(NULL, NULL, ms, OnTimer);
   base::AutoLock auto_lock(lock_);
   tasks_[event] = task;

@@ -4,8 +4,6 @@
 
 #include "nativeui/lifetime.h"
 
-#include "base/lazy_instance.h"
-
 namespace nu {
 
 namespace {

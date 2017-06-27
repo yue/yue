@@ -10,7 +10,7 @@ namespace nu {
 
 namespace {
 
-gboolean OnSource(base::Closure* func) {
+gboolean OnSource(std::function<void()>* func) {
   func->Run();
   return G_SOURCE_REMOVE;
 }
@@ -32,15 +32,15 @@ void Lifetime::Quit() {
   gtk_main_quit();
 }
 
-void Lifetime::PostTask(const base::Closure& task) {
+void Lifetime::PostTask(const std::function<void()>& task) {
   g_idle_add_full(G_PRIORITY_DEFAULT, reinterpret_cast<GSourceFunc>(OnSource),
-                  new base::Closure(task), operator delete);
+                  new std::function<void()>(task), operator delete);
 }
 
-void Lifetime::PostDelayedTask(int ms, const base::Closure& task) {
+void Lifetime::PostDelayedTask(int ms, const std::function<void()>& task) {
   g_timeout_add_full(G_PRIORITY_DEFAULT, ms,
                      reinterpret_cast<GSourceFunc>(OnSource),
-                     new base::Closure(task), operator delete);
+                     new std::function<void()>(task), operator delete);
 }
 
 }  // namespace nu

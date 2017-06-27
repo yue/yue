@@ -5,6 +5,7 @@
 #ifndef NATIVEUI_WINDOW_H_
 #define NATIVEUI_WINDOW_H_
 
+#include <functional>
 #include <tuple>
 
 #include "nativeui/container.h"
@@ -105,7 +106,7 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
   Signal<void(Window*)> on_close;
 
   // Delegate methods.
-  base::Callback<bool(Window*)> should_close;
+  std::function<bool(Window*)> should_close;
 
  protected:
   virtual ~Window();

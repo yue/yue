@@ -6,10 +6,10 @@
 #define NATIVEUI_SIGNAL_H_
 
 #include <algorithm>
+#include <functional>
 #include <utility>
 #include <vector>
 
-#include "base/callback.h"
 #include "nativeui/nativeui_export.h"
 
 namespace nu {
@@ -17,7 +17,7 @@ namespace nu {
 // A simple signal/slot implementation.
 template<typename Sig> class SignalBase {
  public:
-  using Slot = base::Callback<Sig>;
+  using Slot = std::function<Sig>;
 
   int Connect(const Slot& slot) {
     slots_.push_back(std::make_pair(++next_id_, slot));
@@ -60,7 +60,7 @@ class Signal<void(Args...)> : public SignalBase<void(Args...)> {
     // elements from the list when iterating.
     auto slots = this->slots_;
     for (auto& slot : slots)
-      slot.second.Run(std::forward<Args>(args)...);
+      slot.second(std::forward<Args>(args)...);
   }
 };
 
@@ -73,7 +73,7 @@ class Signal<bool(Args...)> : public SignalBase<bool(Args...)> {
     // elements from the list when iterating.
     auto slots = this->slots_;
     for (auto& slot : slots) {
-      if (slot.second.Run(std::forward<Args>(args)...))
+      if (slot.second(std::forward<Args>(args)...))
         return true;
     }
     return false;

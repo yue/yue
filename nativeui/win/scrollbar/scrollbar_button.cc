@@ -4,7 +4,6 @@
 
 #include "nativeui/win/scrollbar/scrollbar_button.h"
 
-#include "base/bind.h"
 #include "nativeui/events/win/event_win.h"
 #include "nativeui/win/scrollbar/scrollbar.h"
 
@@ -12,7 +11,7 @@ namespace nu {
 
 ScrollbarButton::ScrollbarButton(Type type, Scrollbar* scrollbar)
     : ViewImpl(ControlType::ScrollbarButton, nullptr),
-      repeater_(base::Bind(&ScrollbarButton::OnClick, base::Unretained(this))),
+      repeater_(std::bind(&ScrollbarButton::OnClick, this)),
       type_(type),
       scrollbar_(scrollbar) {
 }

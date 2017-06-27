@@ -29,7 +29,7 @@
 }
 
 - (BOOL)windowShouldClose:(id)sender {
-  return shell_->should_close.is_null() || shell_->should_close.Run(shell_);
+  return !shell_->should_close || shell_->should_close(shell_);
 }
 
 - (void)windowWillClose:(NSNotification*)notification {

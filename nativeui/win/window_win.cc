@@ -205,8 +205,8 @@ void WindowImpl::OnCaptureChanged(HWND window) {
 }
 
 void WindowImpl::OnClose() {
-  if (delegate_->should_close.is_null() ||
-      delegate_->should_close.Run(delegate_)) {
+  if (!delegate_->should_close ||
+      delegate_->should_close(delegate_)) {
     delegate_->on_close.Emit(delegate_);
     SetMsgHandled(false);
   }

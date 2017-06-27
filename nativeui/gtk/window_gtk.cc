@@ -41,7 +41,7 @@ inline NUWindowPrivate* GetPrivate(const Window* window) {
 
 // User clicks the close button.
 gboolean OnClose(GtkWidget* widget, GdkEvent* event, Window* window) {
-  if (window->should_close.is_null() || window->should_close.Run(window))
+  if (!window->should_close || window->should_close(window))
     window->Close();
 
   // We are destroying the window ourselves, so prevent the default behavior.
@@ -148,7 +148,7 @@ void Window::PlatformDestroy() {
 }
 
 void Window::Close() {
-  if (!should_close.is_null() && !should_close.Run(this))
+  if (should_close && !should_close(this))
     return;
 
   on_close.Emit(this);

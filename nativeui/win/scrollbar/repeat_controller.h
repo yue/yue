@@ -5,7 +5,8 @@
 #ifndef NATIVEUI_WIN_SCROLLBAR_REPEAT_CONTROLLER_H_
 #define NATIVEUI_WIN_SCROLLBAR_REPEAT_CONTROLLER_H_
 
-#include "base/callback.h"
+#include <funtional>
+
 #include "base/macros.h"
 #include "base/memory/weak_ptr.h"
 
@@ -19,7 +20,7 @@ class Lifetime;
 // associated action.
 class RepeatController {
  public:
-  explicit RepeatController(const base::Closure& callback);
+  explicit RepeatController(const std::function<void()>& callback);
   virtual ~RepeatController();
 
   // Start repeating.
@@ -34,7 +35,7 @@ class RepeatController {
 
   bool running_;
   Lifetime* lifetime_;
-  base::Closure callback_;
+  std::function<void()> callback_;
 
   base::WeakPtrFactory<RepeatController> weak_factory_;
 

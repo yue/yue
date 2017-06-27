@@ -2,7 +2,6 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "base/bind.h"
 #include "nativeui/nativeui.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
@@ -12,15 +11,13 @@ class MenuItemTest : public testing::Test {
   nu::State state_;
 };
 
-void OnClick(bool* ptr, nu::MenuItem* item) {
-  *ptr = true;
-}
-
 TEST_F(MenuItemTest, Click) {
   scoped_refptr<nu::MenuItem> item =
       new nu::MenuItem(nu::MenuItem::Type::Label);
   bool clicked = false;
-  item->on_click.Connect(base::Bind(&OnClick, &clicked));
+  item->on_click.Connect([&clicked](nu::MenuItem*) {
+    clicked = true;
+  });
   item->Click();
   EXPECT_TRUE(clicked);
 }

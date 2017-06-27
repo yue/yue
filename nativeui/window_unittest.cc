@@ -2,7 +2,6 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "base/bind.h"
 #include "nativeui/nativeui.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
@@ -54,28 +53,20 @@ TEST_F(WindowTest, ContentView) {
   EXPECT_EQ(window_->GetContentView(), view.get());
 }
 
-void OnClose(bool* ptr, nu::Window*) {
-  *ptr = true;
-}
-
 TEST_F(WindowTest, OnClose) {
   bool closed = false;
-  window_->on_close.Connect(base::Bind(&OnClose, &closed));
+  window_->on_close.Connect([&closed](nu::Window*) { closed = true; });
   window_->Close();
   EXPECT_EQ(closed, true);
 }
 
-bool ShouldClose(nu::Window*) {
-  return false;
-}
-
 TEST_F(WindowTest, ShouldClose) {
   bool closed = false;
-  window_->on_close.Connect(base::Bind(&OnClose, &closed));
-  window_->should_close = base::Bind(&ShouldClose);
+  window_->on_close.Connect([&closed](nu::Window*) { closed = true; });
+  window_->should_close = [](nu::Window*) { return false; };
   window_->Close();
   EXPECT_EQ(closed, false);
-  window_->should_close.Reset();
+  window_->should_close = nullptr;
   window_->Close();
   EXPECT_EQ(closed, true);
 }

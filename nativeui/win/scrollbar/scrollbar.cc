@@ -6,7 +6,6 @@
 
 #include <algorithm>
 
-#include "base/bind.h"
 #include "nativeui/events/win/event_win.h"
 
 namespace nu {
@@ -18,7 +17,7 @@ Scrollbar::Scrollbar(bool vertical, ScrollImpl* scroll)
       far_button_(vertical ? ScrollbarButton::Down : ScrollbarButton::Right,
                   this),
       thumb_(vertical, this),
-      repeater_(base::Bind(&Scrollbar::OnClick, base::Unretained(this))),
+      repeater_(std::bind(&Scrollbar::OnClick, this)),
       vertical_(vertical),
       scroll_(scroll) {
   near_button_.SetParent(this);
