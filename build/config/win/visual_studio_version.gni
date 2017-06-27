@@ -9,7 +9,7 @@ declare_args() {
   visual_studio_path = ""
 
   # Version of Visual Studio pointed to by the visual_studio_path.
-  # Use "2013" for Visual Studio 2013, or "2013e" for the Express version.
+  # Currently always "2015".
   visual_studio_version = ""
 
   # Directory of the Windows driver kit. If visual_studio_path is empty, this

@@ -6,6 +6,7 @@
 
 #include <exdisp.h>
 #include <ole2.h>
+#include <wrl.h>
 
 #include "base/strings/utf_string_conversions.h"
 #include "base/win/scoped_bstr.h"
@@ -22,8 +23,9 @@ class BrowserImpl : public ViewImpl {
  public:
   explicit BrowserImpl(Browser* delegate)
       : ViewImpl(ControlType::Browser, delegate) {
-    browser_.CreateInstance(CLSID_InternetExplorer, nullptr,
-                            CLSCTX_LOCAL_SERVER);
+    ::CoCreateInstance(CLSID_InternetExplorer, nullptr, CLSCTX_LOCAL_SERVER,
+                       IID_PPV_ARGS(&browser_));
+
     browser_->put_Visible(VARIANT_TRUE);
   }
 
@@ -36,7 +38,7 @@ class BrowserImpl : public ViewImpl {
 
  private:
   base::win::ScopedCOMInitializer com_;
-  base::win::ScopedComPtr<IWebBrowser2, &IID_IWebBrowser2> browser_;
+  Microsoft::WRL::ComPtr<IWebBrowser2> browser_;
 };
 
 }  // namespace

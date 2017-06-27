@@ -55,11 +55,6 @@ config("compiler") {
 
     # Work around crbug.com/526851, bug in VS 2015 RTM compiler.
     "/Zc:sizedDealloc-",
-
-    # Disable thread-safe statics to avoid overhead and because
-    # they are disabled on other platforms. See crbug.com/587210
-    # and -fno-threadsafe-statics.
-    "/Zc:threadSafeInit-",
   ]
 
   # Building with Clang on Windows is a work in progress and very
@@ -91,13 +86,13 @@ config("compiler") {
   # information is used by the Syzygy optimization tool when decomposing the
   # release image. It is enabled for syzyasan builds and opportunistically for
   # other builds where it is not prohibited (not supported when incrementally
-  # linking, using /debug:fastlink, or building with clang).
+  # linking, or using /debug:fastlink).
   if (is_syzyasan) {
     assert(!is_win_fastlink)
     ldflags = [ "/PROFILE" ]
   } else {
     if (!is_debug && !is_component_build) {
-      if (is_win_fastlink || is_clang) {
+      if (is_win_fastlink) {
         # /PROFILE implies the following linker flags. Therefore if we are
         # skipping /PROFILE because it is incompatible with /DEBUG:FASTLINK
         # we should explicitly add these flags in order to avoid unintended
@@ -128,7 +123,7 @@ config("compiler") {
 }
 
 config("vs_code_analysis") {
-  if (use_vs_code_analysis) {
+  if (use_vs_code_analysis && !is_clang) {
     # When use_vs_code_analysis is specified add the /analyze switch to enable
     # static analysis. Specifying /analyze:WX- says that /analyze warnings
     # should not be treated as errors.
@@ -265,13 +260,14 @@ config("common_linker_setup") {
   }
 }
 
-# Control Flow Guard (CFG)
-# https://msdn.microsoft.com/en-us/library/windows/desktop/mt637065.aspx
-config("win_msvc_cfg") {
+config("cfi_linker") {
+  # Control Flow Guard (CFG)
+  # https://msdn.microsoft.com/en-us/library/windows/desktop/mt637065.aspx
   # /DYNAMICBASE (ASLR) is turned off in debug builds, therefore CFG can’t be
   # turned on either.
-  if (!is_clang && !is_debug) {
-    cflags = [ "/guard:cf" ]
+  # TODO(thakis): Turn this on with lld once supported, https://crbug.com/693709
+  if (!is_debug && !use_lld) {
+    # Turn on CFG in msvc linker, regardless of compiler used.
     ldflags = [ "/guard:cf" ]
   }
 }
@@ -298,8 +294,21 @@ config("default_crt") {
   }
 }
 
+# Use this to force the debug CRT for when building perf-critical build tools
+# that need to be fully optimized even in debug builds, for those times when the
+# debug CRT is part of the bottleneck. This also avoids *implicitly* defining
+# _DEBUG.
+config("release_crt") {
+  if (is_component_build) {
+    cflags = [ "/MD" ]
+  } else {
+    cflags = [ "/MT" ]
+  }
+}
+
 config("dynamic_crt") {
   if (is_debug) {
+    # This pulls in the DLL debug CRT and defines _DEBUG
     cflags = [ "/MDd" ]
   } else {
     cflags = [ "/MD" ]
@@ -308,6 +317,7 @@ config("dynamic_crt") {
 
 config("static_crt") {
   if (is_debug) {
+    # This pulls in the static debug CRT and defines _DEBUG
     cflags = [ "/MTd" ]
   } else {
     cflags = [ "/MT" ]
