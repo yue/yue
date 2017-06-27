@@ -4,7 +4,19 @@
 
 #include "nativeui/lifetime.h"
 
+#include "base/lazy_instance.h"
+
 namespace nu {
+
+// static
+std::unordered_map<UINT_PTR, base::Closure> Lifetime::tasks_;
+
+// static
+void Lifetime::OnTimer(HWND, UINT, UINT_PTR event, DWORD) {
+  ::KillTimer(NULL, event);
+  tasks_[event].Run();
+  tasks_.erase(event);
+}
 
 void Lifetime::PlatformInit() {
 }
@@ -25,9 +37,12 @@ void Lifetime::Quit() {
 }
 
 void Lifetime::PostTask(const base::Closure& task) {
+  PostDelayedTask(USER_TIMER_MINIMUM, task);
 }
 
 void Lifetime::PostDelayedTask(int ms, const base::Closure& task) {
+  UINT_PTR event = ::SetTimer(NULL, NULL, ms, OnTimer);
+  tasks_[event] = task;
 }
 
 }  // namespace nu

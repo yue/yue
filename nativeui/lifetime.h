@@ -6,6 +6,7 @@
 #define NATIVEUI_LIFETIME_H_
 
 #include <memory>
+#include <unordered_map>
 
 #include "base/memory/weak_ptr.h"
 #include "nativeui/signal.h"
@@ -48,6 +49,12 @@ class NATIVEUI_EXPORT Lifetime {
 #if defined(OS_MACOSX)
   base::mac::ScopedNSAutoreleasePool autorelease_pool_;
   NUApplicationDelegate* app_delegate_;
+#endif
+
+#if defined(OS_WIN)
+  static void OnTimer(HWND, UINT, UINT_PTR event, DWORD);
+
+  static std::unordered_map<UINT_PTR, base::Closure> tasks_;
 #endif
 
   base::WeakPtrFactory<Lifetime> weak_factory_;
