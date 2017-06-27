@@ -4,7 +4,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {argv, execSync} = require('./common')
+const {argv, verbose, execSync} = require('./common')
 
 let dir = 'out/Debug'
 const args = argv.filter((arg) => {
@@ -16,4 +16,4 @@ const args = argv.filter((arg) => {
   }
 })
 
-execSync(`ninja -C ${dir} ${args.join(' ')}`)
+execSync(`ninja ${verbose ? '-v' : ''} -C ${dir} ${args.join(' ')}`)
