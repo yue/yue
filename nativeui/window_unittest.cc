@@ -3,7 +3,6 @@
 // LICENSE file.
 
 #include "base/bind.h"
-#include "base/run_loop.h"
 #include "nativeui/nativeui.h"
 #include "testing/gtest/include/gtest/gtest.h"
 

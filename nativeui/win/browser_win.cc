@@ -11,7 +11,6 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/win/scoped_bstr.h"
 #include "base/win/scoped_com_initializer.h"
-#include "base/win/scoped_comptr.h"
 #include "base/win/scoped_variant.h"
 #include "nativeui/win/view_win.h"
 

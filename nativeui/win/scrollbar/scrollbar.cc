@@ -6,6 +6,7 @@
 
 #include <algorithm>
 
+#include "base/bind.h"
 #include "nativeui/events/win/event_win.h"
 
 namespace nu {

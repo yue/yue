@@ -4,6 +4,7 @@
 
 #include "nativeui/win/scrollbar/scrollbar_button.h"
 
+#include "base/bind.h"
 #include "nativeui/events/win/event_win.h"
 #include "nativeui/win/scrollbar/scrollbar.h"
 

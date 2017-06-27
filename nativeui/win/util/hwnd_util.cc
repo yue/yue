@@ -4,7 +4,6 @@
 
 #include "nativeui/win/util/hwnd_util.h"
 
-#include "base/i18n/rtl.h"
 #include "base/strings/string_util.h"
 #include "base/win/win_util.h"
 #include "nativeui/gfx/geometry/point.h"

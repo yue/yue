@@ -4,6 +4,9 @@
 
 #include "nativeui/win/scrollbar/repeat_controller.h"
 
+#include "base/bind.h"
+#include "nativeui/lifetime.h"
+
 namespace nu {
 
 namespace {
@@ -15,29 +18,34 @@ const int kRepeatDelay = 50;
 
 }  // namespace
 
-using base::TimeDelta;
-
 RepeatController::RepeatController(const base::Closure& callback)
-    : callback_(callback) {
+    : running_(false),
+      lifetime_(Lifetime::GetCurrent()),
+      callback_(callback),
+      weak_factory_(this) {
 }
 
 RepeatController::~RepeatController() {
 }
 
 void RepeatController::Start() {
-  // The first timer is slightly longer than subsequent repeats.
-  timer_.Start(FROM_HERE, TimeDelta::FromMilliseconds(kInitialRepeatDelay),
-               this, &RepeatController::Run);
+  running_ = true;
+  lifetime_->PostDelayedTask(
+      kInitialRepeatDelay,
+      base::Bind(&RepeatController::Run, weak_factory_.GetWeakPtr()));
 }
 
 void RepeatController::Stop() {
-  timer_.Stop();
+  running_ = false;
 }
 
 void RepeatController::Run() {
-  timer_.Start(FROM_HERE, TimeDelta::FromMilliseconds(kRepeatDelay), this,
-               &RepeatController::Run);
-  callback_.Run();
+  if (running_) {
+    lifetime_->PostDelayedTask(
+        kRepeatDelay,
+        base::Bind(&RepeatController::Run, weak_factory_.GetWeakPtr()));
+    callback_.Run();
+  }
 }
 
 }  // namespace nu

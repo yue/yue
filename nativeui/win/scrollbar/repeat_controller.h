@@ -7,9 +7,11 @@
 
 #include "base/callback.h"
 #include "base/macros.h"
-#include "base/timer/timer.h"
+#include "base/memory/weak_ptr.h"
 
 namespace nu {
+
+class Lifetime;
 
 // An object that handles auto-repeating UI actions. There is a longer initial
 // delay after which point repeats become constant. Users provide a callback
@@ -30,10 +32,11 @@ class RepeatController {
   // Called when the timer expires.
   void Run();
 
-  // The current timer.
-  base::OneShotTimer timer_;
-
+  bool running_;
+  Lifetime* lifetime_;
   base::Closure callback_;
+
+  base::WeakPtrFactory<RepeatController> weak_factory_;
 
   DISALLOW_COPY_AND_ASSIGN(RepeatController);
 };
