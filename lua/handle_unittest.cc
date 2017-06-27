@@ -4,7 +4,6 @@
 
 #include <memory>
 
-#include "base/bind.h"
 #include "lua/lua.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
@@ -20,7 +19,7 @@ class HandleTest : public testing::Test {
 TEST_F(HandleTest, Persistent) {
   size_t original_registry_len = lua::RawLen(state_, LUA_REGISTRYINDEX);
   lua::NewTable(state_);
-  std::unique_ptr<lua::Persistent> handle(lua::Persistent::New(state_, -1));
+  std::shared_ptr<lua::Persistent> handle(lua::Persistent::New(state_, -1));
   ASSERT_EQ(lua::RawLen(state_, LUA_REGISTRYINDEX), original_registry_len + 1);
   lua::PopAndIgnore(state_, 1);
   ASSERT_EQ(lua::GetTop(state_), 0);
@@ -33,16 +32,12 @@ TEST_F(HandleTest, Persistent) {
   ASSERT_EQ(lua::RawLen(state_, LUA_REGISTRYINDEX), original_registry_len);
 }
 
-void OnGC(int* ptr) {
-  if (ptr)
-    *ptr = 456;
-}
-
 TEST_F(HandleTest, GC) {
   int changed = 123;
   lua::NewTable(state_);
   lua::NewTable(state_);
-  lua::RawSet(state_, 2, "__gc", base::Bind(&OnGC, &changed));
+  std::function<void()> on_gc = [&changed] { changed = 456; };
+  lua::RawSet(state_, 2, "__gc", on_gc);
   lua::SetMetaTable(state_, 1);
   ASSERT_EQ(lua::GetTop(state_), 1);
   lua::SetTop(state_, 0);
@@ -55,7 +50,8 @@ TEST_F(HandleTest, Weak) {
   int changed = 123;
   lua::NewTable(state_);
   lua::NewTable(state_);
-  lua::RawSet(state_, 2, "__gc", base::Bind(&OnGC, &changed));
+  std::function<void()> on_gc = [&changed] { changed = 456; };
+  lua::RawSet(state_, 2, "__gc", on_gc);
   lua::SetMetaTable(state_, 1);
   ASSERT_EQ(lua::GetTop(state_), 1);
   int ref = lua::CreateWeakReference(state_, -1);

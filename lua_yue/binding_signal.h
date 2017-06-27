@@ -47,7 +47,7 @@ struct Type<nu::Signal<Sig>> {
   static bool To(State* state, int value, nu::Signal<Sig>* out) {
     if (lua::GetType(state, value) != lua::LuaType::Function)
       return false;
-    base::Callback<Sig> callback;
+    std::function<Sig> callback;
     if (!lua::To(state, value, &callback))
       return false;
     out->Connect(callback);

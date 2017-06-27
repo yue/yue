@@ -19,7 +19,7 @@ class PropertiesClass : public base::RefCounted<PropertiesClass> {
   PropertiesClass() {}
 
   int property = 0;
-  base::Closure func;
+  std::function<void()> func;
 
  private:
   friend class base::RefCounted<PropertiesClass>;
@@ -80,7 +80,7 @@ TEST_F(IndexTest, IndexCache) {
   EXPECT_EQ(lua::GetType(state_, 2), lua::LuaType::Nil)
       << "Cached property should be nil before assignment";
 
-  lua::Push(state_, base::Closure());
+  lua::Push(state_, std::function<void()>());
   ASSERT_TRUE(lua::PSet(state_, 1, "func", lua::ValueOnStack(state_, 3)));
   ASSERT_TRUE(lua::PGet(state_, 1, "func"));
   EXPECT_TRUE(lua::Compare(state_, 3, 4, lua::CompareOp::EQ))

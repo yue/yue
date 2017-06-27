@@ -7,6 +7,7 @@
 #ifndef LUA_STACK_H_
 #define LUA_STACK_H_
 
+#include <functional>
 #include <tuple>
 
 #include "base/compiler_specific.h"

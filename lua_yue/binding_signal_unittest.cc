@@ -25,7 +25,8 @@ void OnClose(bool* ptr) {
 
 TEST_F(YueSignalTest, Connect) {
   bool closed = false;
-  lua::Push(state_, base::Bind(&OnClose, &closed));
+  std::function<void()> on_close = [&closed] { closed = true; };
+  lua::Push(state_, on_close);
   lua_setglobal(state_, "callback");
   ASSERT_FALSE(luaL_dostring(state_,
       "win.onclose:connect(callback)\n"
@@ -42,7 +43,8 @@ TEST_F(YueSignalTest, ConnectCheckParam) {
 
 TEST_F(YueSignalTest, Disconnect) {
   bool closed = false;
-  lua::Push(state_, base::Bind(&OnClose, &closed));
+  std::function<void()> on_close = [&closed] { closed = true; };
+  lua::Push(state_, on_close);
   lua_setglobal(state_, "callback");
   ASSERT_FALSE(luaL_dostring(state_,
       "local id = win.onclose:connect(callback)\n"
@@ -53,7 +55,8 @@ TEST_F(YueSignalTest, Disconnect) {
 
 TEST_F(YueSignalTest, DisconnectAll) {
   bool closed = false;
-  lua::Push(state_, base::Bind(&OnClose, &closed));
+  std::function<void()> on_close = [&closed] { closed = true; };
+  lua::Push(state_, on_close);
   lua_setglobal(state_, "callback");
   ASSERT_FALSE(luaL_dostring(state_,
       "local id = win.onclose:connect(callback)\n"
@@ -86,7 +89,8 @@ TEST_F(YueSignalTest, OwnerGarbageCollected) {
 
 TEST_F(YueSignalTest, EventAssignment) {
   bool closed = false;
-  lua::Push(state_, base::Bind(&OnClose, &closed));
+  std::function<void()> on_close = [&closed] { closed = true; };
+  lua::Push(state_, on_close);
   lua_setglobal(state_, "callback");
   ASSERT_FALSE(luaL_dostring(state_,
       "win.onclose = callback\n"
@@ -96,7 +100,8 @@ TEST_F(YueSignalTest, EventAssignment) {
 
 TEST_F(YueSignalTest, NilAssignment) {
   bool closed = false;
-  lua::Push(state_, base::Bind(&OnClose, &closed));
+  std::function<void()> on_close = [&closed] { closed = true; };
+  lua::Push(state_, on_close);
   lua_setglobal(state_, "callback");
   ASSERT_FALSE(luaL_dostring(state_,
       "win.shouldclose = callback\n"
@@ -107,7 +112,8 @@ TEST_F(YueSignalTest, NilAssignment) {
 
 TEST_F(YueSignalTest, DelegateAssignment) {
   bool closed = false;
-  lua::Push(state_, base::Bind(&OnClose, &closed));
+  std::function<void()> on_close = [&closed] { closed = true; };
+  lua::Push(state_, on_close);
   lua_setglobal(state_, "callback");
   ASSERT_FALSE(luaL_dostring(state_,
       "win.onclose = callback\n"

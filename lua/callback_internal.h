@@ -5,11 +5,11 @@
 #ifndef LUA_CALLBACK_INTERNAL_H_
 #define LUA_CALLBACK_INTERNAL_H_
 
+#include <functional>
 #include <memory>
 #include <string>
 #include <utility>
 
-#include "base/callback.h"
 #include "base/template_util.h"
 #include "lua/call_context.h"
 #include "lua/handle.h"
@@ -42,7 +42,7 @@ struct CallbackParamTraits<const char*> {
   typedef const char* LocalType;
 };
 
-// CallbackHolder and CallbackHolderBase are used to pass a base::Callback from
+// CallbackHolder and CallbackHolderBase are used to pass a std::function from
 // PushCFunction through DispatchToCallback, where it is invoked.
 
 // This simple base class is used so that we can share a single object template
@@ -55,10 +55,10 @@ class CallbackHolderBase {
 template<typename Sig>
 class CallbackHolder : public CallbackHolderBase {
  public:
-  CallbackHolder(State* state, const base::Callback<Sig>& callback)
+  CallbackHolder(State* state, const std::function<Sig>& callback)
       : CallbackHolderBase(state), callback(callback) {}
 
-  base::Callback<Sig> callback;
+  std::function<Sig> callback;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(CallbackHolder);
@@ -122,8 +122,8 @@ class Invoker<IndicesHolder<indices...>, ArgTypes...>
 
   template<typename ReturnType>
   void DispatchToCallback(
-      const base::Callback<ReturnType(ArgTypes...)>& callback) {
-    ReturnType&& r = callback.Run(ArgumentHolder<indices, ArgTypes>::value...);
+      const std::function<ReturnType(ArgTypes...)>& callback) {
+    ReturnType&& r = callback(ArgumentHolder<indices, ArgTypes>::value...);
     // Convert result to lua if there is no error happened.
     if (!context_->has_error)
       Push(context_->state, r);
@@ -132,8 +132,8 @@ class Invoker<IndicesHolder<indices...>, ArgTypes...>
   // In C++, you can declare the function foo(void), but you can't pass a void
   // expression to foo. As a result, we must specialize the case of Callbacks
   // that have the void return type.
-  void DispatchToCallback(const base::Callback<void(ArgTypes...)>& callback) {
-    callback.Run(ArgumentHolder<indices, ArgTypes>::value...);
+  void DispatchToCallback(const std::function<void(ArgTypes...)>& callback) {
+    callback(ArgumentHolder<indices, ArgTypes>::value...);
   }
 
  private:
@@ -155,7 +155,7 @@ class Invoker<IndicesHolder<indices...>, ArgTypes...>
 };
 
 // DispatchToCallback converts all the lua arguments to C++ types and
-// invokes the base::Callback.
+// invokes the std::function.
 template<typename Sig>
 struct Dispatcher {};
 
@@ -211,7 +211,7 @@ struct Dispatcher<ReturnType(ArgTypes...)> {
 
 // Push the function on stack without wrapping it with pcall.
 template<typename Sig>
-inline void PushCFunction(State* state, const base::Callback<Sig>& callback) {
+inline void PushCFunction(State* state, const std::function<Sig>& callback) {
   typedef CallbackHolder<Sig> HolderT;
   void* holder = lua_newuserdata(state, sizeof(HolderT));
   new(holder) HolderT(state, callback);
@@ -222,7 +222,7 @@ inline void PushCFunction(State* state, const base::Callback<Sig>& callback) {
 // Call PCall for the gloal handle.
 template<typename ReturnType, typename...ArgTypes>
 struct PCallHelper {
-  static ReturnType Run(State* state, const std::unique_ptr<Persistent>& handle,
+  static ReturnType Run(State* state, const std::shared_ptr<Persistent>& handle,
                         ArgTypes... args) {
     ReturnType result = ReturnType();
     int top = GetTop(state);
@@ -240,7 +240,7 @@ struct PCallHelper {
 // The void return type version for PCallHelper.
 template<typename...ArgTypes>
 struct PCallHelper<void, ArgTypes...> {
-  static void Run(State* state, const std::unique_ptr<Persistent>& handle,
+  static void Run(State* state, const std::shared_ptr<Persistent>& handle,
                   ArgTypes... args) {
     int top = GetTop(state);
     handle->Push(state);

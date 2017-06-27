@@ -32,10 +32,13 @@ inline int CollectGarbage(State* state, GCOp op = GCOp::Collect, int arg = 0) {
 // The strong reference to a value.
 class Persistent {
  public:
-  static std::unique_ptr<Persistent> New(State* state, int index) {
+  static std::shared_ptr<Persistent> New(State* state, int index) {
     lua::Push(state, ValueOnStack(state, index));
-    return std::unique_ptr<Persistent>(new Persistent(state));
+    return std::make_shared<Persistent>(state);
   }
+
+  explicit Persistent(State* state)
+      : state_(state), ref_(luaL_ref(state, LUA_REGISTRYINDEX)) {}
 
   ~Persistent() {
     luaL_unref(state_, LUA_REGISTRYINDEX, ref_);
@@ -46,10 +49,6 @@ class Persistent {
     DCHECK_EQ(state, state_) << "Pushing a handle on wrong thread";
     lua_rawgeti(state_, LUA_REGISTRYINDEX, ref_);
   }
-
- protected:
-  explicit Persistent(State* state)
-      : state_(state), ref_(luaL_ref(state, LUA_REGISTRYINDEX)) {}
 
  private:
   State* state_;
