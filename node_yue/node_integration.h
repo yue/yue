@@ -7,9 +7,12 @@
 #define NODE_YUE_NODE_INTEGRATION_H_
 
 #include "base/memory/weak_ptr.h"
-#include "base/single_thread_task_runner.h"
 #include "uv.h"  // NOLINT(build/include)
 #include "v8.h"  // NOLINT(build/include)
+
+namespace nu {
+class Lifetime;
+}
 
 namespace node_yue {
 
@@ -40,9 +43,6 @@ class NodeIntegration {
   // Interrupt the PollEvents.
   void WakeupEmbedThread();
 
-  // Main thread's MessageLoop.
-  scoped_refptr<base::SingleThreadTaskRunner> task_runner_;
-
   // Main thread's libuv loop.
   uv_loop_t* uv_loop_;
 
@@ -62,6 +62,7 @@ class NodeIntegration {
   // Semaphore to wait for main loop in the embed thread.
   uv_sem_t embed_sem_;
 
+  nu::Lifetime* lifetime_;
   base::WeakPtrFactory<NodeIntegration> weak_factory_;
 
   DISALLOW_COPY_AND_ASSIGN(NodeIntegration);

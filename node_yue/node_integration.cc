@@ -9,8 +9,7 @@
 #include <vector>
 
 #include "base/bind.h"
-#include "base/run_loop.h"
-#include "base/threading/thread_task_runner_handle.h"
+#include "nativeui/lifetime.h"
 #include "node.h"  // NOLINT(build/include)
 
 namespace node_yue {
@@ -18,6 +17,7 @@ namespace node_yue {
 NodeIntegration::NodeIntegration()
     : uv_loop_(uv_default_loop()),
       embed_closed_(false),
+      lifetime_(nu::Lifetime::GetCurrent()),
       weak_factory_(this) {
 }
 
@@ -46,9 +46,6 @@ void NodeIntegration::PrepareMessageLoop() {
 }
 
 void NodeIntegration::RunMessageLoop() {
-  // The MessageLoop should have been created, remember the one in main thread.
-  task_runner_ = base::ThreadTaskRunnerHandle::Get();
-
   // Run uv loop for once to give the uv__io_poll a chance to add all events.
   UvRunOnce();
 }
@@ -62,9 +59,8 @@ void NodeIntegration::UvRunOnce() {
 }
 
 void NodeIntegration::WakeupMainThread() {
-  DCHECK(task_runner_);
-  task_runner_->PostTask(FROM_HERE, base::Bind(&NodeIntegration::UvRunOnce,
-                                               weak_factory_.GetWeakPtr()));
+  lifetime_->PostTask(base::Bind(&NodeIntegration::UvRunOnce,
+                                 weak_factory_.GetWeakPtr()));
 }
 
 void NodeIntegration::WakeupEmbedThread() {
