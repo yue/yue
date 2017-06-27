@@ -15,7 +15,7 @@ base::Lock Lifetime::lock_;
 std::unordered_map<UINT_PTR, base::Closure> Lifetime::tasks_;
 
 // static
-void Lifetime::OnTimer(HWND, UINT, UINT_PTR event, DWORD) {
+void CALLBACK Lifetime::OnTimer(HWND, UINT, UINT_PTR event, DWORD) {
   ::KillTimer(NULL, event);
   base::AutoLock auto_lock(lock_);
   tasks_[event].Run();

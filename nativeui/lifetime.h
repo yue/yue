@@ -53,7 +53,7 @@ class NATIVEUI_EXPORT Lifetime {
 #endif
 
 #if defined(OS_WIN)
-  static void OnTimer(HWND, UINT, UINT_PTR event, DWORD);
+  static void CALLBACK OnTimer(HWND, UINT, UINT_PTR event, DWORD);
 
   static base::Lock lock_;
   static std::unordered_map<UINT_PTR, base::Closure> tasks_;
