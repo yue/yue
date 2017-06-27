@@ -5,7 +5,7 @@
 #ifndef NATIVEUI_WIN_SCROLLBAR_REPEAT_CONTROLLER_H_
 #define NATIVEUI_WIN_SCROLLBAR_REPEAT_CONTROLLER_H_
 
-#include <funtional>
+#include <functional>
 
 #include "base/macros.h"
 #include "base/memory/weak_ptr.h"

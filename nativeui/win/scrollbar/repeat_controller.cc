@@ -44,10 +44,11 @@ void RepeatController::Run() {
   if (running_) {
     auto self = weak_factory_.GetWeakPtr();
     lifetime_->PostDelayedTask(kRepeatDelay, [self] {
-      callback_();
-      if (self)
+      if (self) {
+        self->callback_();
         self->Run();
-    }
+      }
+    });
   }
 }
 

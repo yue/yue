@@ -18,7 +18,7 @@ std::unordered_map<UINT_PTR, std::function<void()>> Lifetime::tasks_;
 void CALLBACK Lifetime::OnTimer(HWND, UINT, UINT_PTR event, DWORD) {
   ::KillTimer(NULL, event);
   base::AutoLock auto_lock(lock_);
-  tasks_[event].Run();
+  tasks_[event]();
   tasks_.erase(event);
 }
 
