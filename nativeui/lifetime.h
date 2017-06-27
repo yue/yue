@@ -32,11 +32,14 @@ class NATIVEUI_EXPORT Lifetime {
 
   static Lifetime* GetCurrent();
 
+  // Function type for tasks.
+  using Task = std::function<void()>;
+
   // Control message loop.
   void Run();
   void Quit();
-  void PostTask(const std::function<void()>& task);
-  void PostDelayedTask(int ms, const std::function<void()>& task);
+  void PostTask(const Task& task);
+  void PostDelayedTask(int ms, const Task& task);
 
   // Events.
   Signal<void()> on_ready;
@@ -56,7 +59,7 @@ class NATIVEUI_EXPORT Lifetime {
   static void CALLBACK OnTimer(HWND, UINT, UINT_PTR event, DWORD);
 
   static base::Lock lock_;
-  static std::unordered_map<UINT_PTR, std::function<void()>> tasks_;
+  static std::unordered_map<UINT_PTR, Task> tasks_;
 #endif
 
   base::WeakPtrFactory<Lifetime> weak_factory_;

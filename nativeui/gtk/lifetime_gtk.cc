@@ -6,12 +6,14 @@
 
 #include <gtk/gtk.h>
 
+#include "nativeui/gtk/widget_util.h"
+
 namespace nu {
 
 namespace {
 
 gboolean OnSource(std::function<void()>* func) {
-  func->Run();
+  (*func)();
   return G_SOURCE_REMOVE;
 }
 
@@ -32,15 +34,15 @@ void Lifetime::Quit() {
   gtk_main_quit();
 }
 
-void Lifetime::PostTask(const std::function<void()>& task) {
+void Lifetime::PostTask(const Task& task) {
   g_idle_add_full(G_PRIORITY_DEFAULT, reinterpret_cast<GSourceFunc>(OnSource),
-                  new std::function<void()>(task), operator delete);
+                  new Task(task), Delete<Task>);
 }
 
-void Lifetime::PostDelayedTask(int ms, const std::function<void()>& task) {
+void Lifetime::PostDelayedTask(int ms, const Task& task) {
   g_timeout_add_full(G_PRIORITY_DEFAULT, ms,
                      reinterpret_cast<GSourceFunc>(OnSource),
-                     new std::function<void()>(task), operator delete);
+                     new Task(task), Delete<Task>);
 }
 
 }  // namespace nu

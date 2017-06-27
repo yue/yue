@@ -44,6 +44,12 @@ void ForceSizeAllocation(GtkWindow* window, GtkWidget* view);
 // Resize window's client area ignoring the size request.
 void ResizeWindow(GtkWindow* window, bool resizable, int width, int height);
 
+// A helper to call destructor for a type.
+template<typename T>
+void Delete(void* ptr) {
+  delete static_cast<T*>(ptr);
+}
+
 }  // namespace nu
 
 #endif  // NATIVEUI_GTK_WIDGET_UTIL_H_

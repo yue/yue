@@ -13,6 +13,7 @@
 #include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/gfx/geometry/rect_f.h"
 #include "nativeui/gtk/nu_container.h"
+#include "nativeui/gtk/widget_util.h"
 
 namespace nu {
 
@@ -111,7 +112,8 @@ void View::TakeOverView(NativeView view) {
 
   NUViewPrivate* priv = new NUViewPrivate;
   priv->delegate = this;
-  g_object_set_data_full(G_OBJECT(view), "private", priv, operator delete);
+  g_object_set_data_full(G_OBJECT(view), "private", priv,
+                         Delete<NUViewPrivate>);
 
   // Make the view accepts events.
   gtk_widget_add_events(view, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |

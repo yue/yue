@@ -110,7 +110,8 @@ void Window::PlatformInit(const Options& options) {
 
   NUWindowPrivate* priv = new NUWindowPrivate;
   priv->delegate = this;
-  g_object_set_data_full(G_OBJECT(window_), "private", priv, operator delete);
+  g_object_set_data_full(G_OBJECT(window_), "private", priv,
+                         Delete<NUWindowPrivate>);
 
   // Window is not focused by default.
   gtk_window_set_focus_on_map(window_, false);
