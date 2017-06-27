@@ -4,7 +4,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {targetCpu, execSync, spawnSync} = require('./common')
+const {targetCpu, targetOs, execSync, spawnSync} = require('./common')
 
 // Get the arch of sysroot.
 let sysrootArch = {
@@ -33,19 +33,25 @@ const commonConfig = [
   'node_runtime="node"',
   `node_version="${process.version}"`,
 ]
-
-gen('out/Debug', [
+const debugConfig = [
   'is_component_build=true',
   'is_debug=true',
   'fatal_linker_warnings=false',
   'use_sysroot=false',
-])
-gen('out/Release', [
+]
+const releaseConfig = [
   'is_component_build=false',
   'is_debug=false',
   'is_official_build=true',
   'allow_posix_link_time_opt=false',
-])
+]
+
+// Generate linker map for Linux.
+if (targetOs == 'linux')
+  releaseConfig.push('generate_linker_map=true')
+
+gen('out/Debug', debugConfig)
+gen('out/Release', releaseConfig)
 
 function gen(dir, args) {
   spawnSync('gn', ['gen', dir, `--args=${commonConfig.concat(args).join(' ')}`])
