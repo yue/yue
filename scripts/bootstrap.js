@@ -28,7 +28,6 @@ execSync('git submodule update --init --recursive')
 execSync(`node scripts/download_node_headers.js node ${process.version}`)
 
 const commonConfig = [
-  'use_allocator="none"',
   'use_allocator_shim=false',
   `target_cpu="${targetCpu}"`,
   'node_runtime="node"',
