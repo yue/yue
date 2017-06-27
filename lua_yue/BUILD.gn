@@ -24,7 +24,7 @@ source_set("lua_yue_runtime") {
   deps = [
     ":lua_yue_gui",
     ":lua_yue_util",
-    "//third_party/lua:liblua",
+    "//third_party/lua",
   ]
 }
 

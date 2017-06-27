@@ -6,17 +6,12 @@ config("lua_config") {
   include_dirs = [ "." ]
 }
 
-executable("lua") {
-  sources = [ "lua.c" ]
-  deps = [ ":liblua" ]
-}
-
 executable("luac") {
   sources = [ "luac.c" ]
-  deps = [ ":liblua" ]
+  deps = [ ":lua" ]
 }
 
-source_set("liblua") {
+source_set("lua") {
   sources = [
     "lapi.c",
     "lapi.h",

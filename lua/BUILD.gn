@@ -54,6 +54,6 @@ test("lua_unittests") {
     ":lua",
     "//base/test:test_support",
     "//testing/gtest",
-    "//third_party/lua:liblua",
+    "//third_party/lua",
   ]
 }
