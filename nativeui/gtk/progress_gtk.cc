@@ -6,19 +6,20 @@
 
 #include <gtk/gtk.h>
 
-#include "base/timer/timer.h"
 #include "nativeui/gtk/widget_util.h"
 
 namespace nu {
 
 namespace {
 
-void DeleteTimer(void* timer) {
-  delete static_cast<base::Timer*>(timer);
+void DeleteTimer(void* data) {
+  guint timer = *reinterpret_cast<guint*>(&data);
+  g_source_remove(timer);
 }
 
-void OnTimer(Progress* progress) {
-  gtk_progress_bar_pulse(GTK_PROGRESS_BAR(progress->GetNative()));
+gboolean OnTimer(GtkWidget* widget) {
+  gtk_progress_bar_pulse(GTK_PROGRESS_BAR(widget));
+  return G_SOURCE_CONTINUE;
 }
 
 }  // namespace
@@ -45,12 +46,10 @@ void Progress::SetIndeterminate(bool indeterminate) {
   if (indeterminate == is_indeterminate)
     return;
   if (indeterminate) {
-    auto* timer = new base::Timer(FROM_HERE,
-                                  base::TimeDelta::FromMilliseconds(100),
-                                  base::Bind(OnTimer, base::Unretained(this)),
-                                  true);
-    timer->Reset();
-    g_object_set_data_full(G_OBJECT(GetNative()), "timer", timer, DeleteTimer);
+    guint timer = g_timeout_add(100, reinterpret_cast<GSourceFunc>(OnTimer),
+                                GetNative());
+    g_object_set_data_full(G_OBJECT(GetNative()), "timer",
+                           reinterpret_cast<void*>(timer), DeleteTimer);
   } else {
     g_object_set_data(G_OBJECT(GetNative()), "timer", nullptr);
   }
