@@ -20,4 +20,18 @@ void Lifetime::PlatformDestroy() {
   [app_delegate_ release];
 }
 
+void Lifetime::Run() {
+  [NSApp run];
+}
+
+void Lifetime::Quit() {
+  [NSApp stop];
+}
+
+void Lifetime::PostTask(const base::Closure& task) {
+}
+
+void Lifetime::PostDelayedTask(int ms, const base::Closure& task) {
+}
+
 }  // namespace nu

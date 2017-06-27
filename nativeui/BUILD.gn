@@ -149,8 +149,6 @@ component("nativeui") {
     "gfx/geometry/vector2d_conversions.h",
     "gfx/geometry/vector2d_f.cc",
     "gfx/geometry/vector2d_f.h",
-    "gtk/gtk_event_loop.cc",
-    "gtk/gtk_event_loop.h",
     "gtk/nu_container.cc",
     "gtk/nu_container.h",
     "gtk/widget_util.cc",

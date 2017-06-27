@@ -9,8 +9,6 @@
 
 #include "base/at_exit.h"
 #include "base/memory/weak_ptr.h"
-#include "base/message_loop/message_loop.h"
-#include "base/run_loop.h"
 #include "nativeui/signal.h"
 
 #if defined(OS_MACOSX)
@@ -20,10 +18,6 @@
 #else
 class NUApplicationDelegate;
 #endif
-#endif
-
-#if defined(OS_LINUX)
-#include "nativeui/gtk/gtk_event_loop.h"
 #endif
 
 namespace nu {
@@ -58,12 +52,6 @@ class NATIVEUI_EXPORT Lifetime {
 #endif
 
   base::AtExitManager at_exit_;
-  base::MessageLoop message_loop_;
-  std::unique_ptr<base::RunLoop> run_loop_;
-
-#if defined(OS_LINUX)
-  GtkEventLoop gtk_event_loop_;
-#endif
 
   base::WeakPtrFactory<Lifetime> weak_factory_;
 

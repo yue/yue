@@ -6,14 +6,12 @@
 
 #include <gtk/gtk.h>
 
-#include "base/run_loop.h"
-
 namespace nu {
 
 namespace {
 
-void OnMenuHidden(GtkWidget* widget, base::RunLoop* loop) {
-  loop->Quit();
+void OnMenuHidden(GtkWidget* widget, void*) {
+  gtk_main_quit();
 }
 
 }  // namespace
@@ -26,10 +24,9 @@ void Menu::Popup() {
                  0, gtk_get_current_event_time());
 
   // Block until the menu is hidden.
-  base::RunLoop loop;
   gint id = g_signal_connect(GetNative(), "hide", G_CALLBACK(OnMenuHidden),
-                             &loop);
-  loop.Run();
+                             nullptr);
+  gtk_main();
   g_signal_handler_disconnect(GetNative(), id);
 }
 

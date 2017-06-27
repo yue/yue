@@ -19,8 +19,7 @@ Lifetime* Lifetime::GetCurrent() {
   return g_lifetime;
 }
 
-Lifetime::Lifetime() : message_loop_(base::MessageLoop::TYPE_UI),
-                       weak_factory_(this) {
+Lifetime::Lifetime() : weak_factory_(this) {
   DCHECK(!g_lifetime) << "Lifetime can not be created twice.";
   g_lifetime = this;
   PlatformInit();
@@ -29,28 +28,6 @@ Lifetime::Lifetime() : message_loop_(base::MessageLoop::TYPE_UI),
 Lifetime::~Lifetime() {
   g_lifetime = nullptr;
   PlatformDestroy();
-}
-
-void Lifetime::Run() {
-  if (!run_loop_)
-    run_loop_.reset(new base::RunLoop);
-  run_loop_->Run();
-  run_loop_.reset();
-}
-
-void Lifetime::Quit() {
-  if (!run_loop_)
-    return;
-  PostTask(run_loop_->QuitClosure());
-}
-
-void Lifetime::PostTask(const base::Closure& task) {
-  message_loop_.task_runner()->PostNonNestableTask(FROM_HERE, task);
-}
-
-void Lifetime::PostDelayedTask(int ms, const base::Closure& task) {
-  message_loop_.task_runner()->PostNonNestableDelayedTask(
-      FROM_HERE, task, base::TimeDelta::FromMilliseconds(ms));
 }
 
 }  // namespace nu

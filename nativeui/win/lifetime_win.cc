@@ -12,4 +12,22 @@ void Lifetime::PlatformInit() {
 void Lifetime::PlatformDestroy() {
 }
 
+void Lifetime::Run() {
+  MSG msg;
+  while (::GetMessage(&msg, NULL, 0, 0)) {
+    ::TranslateMessage(&msg);
+    ::DispatchMessage(&msg);
+  }
+}
+
+void Lifetime::Quit() {
+  ::PostQuitMessage(0);
+}
+
+void Lifetime::PostTask(const base::Closure& task) {
+}
+
+void Lifetime::PostDelayedTask(int ms, const base::Closure& task) {
+}
+
 }  // namespace nu
