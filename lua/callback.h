@@ -61,17 +61,6 @@ struct Type<T, typename std::enable_if<
   }
 };
 
-// Specialize for other formats of functions.
-template<typename T>
-struct Type<T, typename std::enable_if<
-                   internal::IsConvertibleToRunType<T>::value>::type> {
-  static constexpr const char* name = "function";
-  static inline void Push(State* state, T callback) {
-    using RunType = typename internal::FunctorTraits<T>::RunType;
-    internal::PushCFunction(state, std::function<RunType>(callback));
-  }
-};
-
 }  // namespace lua
 
 #endif  // LUA_CALLBACK_H_

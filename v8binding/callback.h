@@ -85,19 +85,6 @@ struct Type<T, typename std::enable_if<
   }
 };
 
-// Specialize for other formats of functions.
-template<typename T>
-struct Type<T, typename std::enable_if<
-                   internal::IsConvertibleToRunType<T>::value>::type> {
-  static constexpr const char* name = "Function";
-  static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
-                                          T callback) {
-    using RunType = typename internal::FunctorTraits<T>::RunType;
-    return CreateFunctionTemplate(
-        context, std::function<RunType>(callback))->GetFunction();
-  }
-};
-
 }  // namespace vb
 
 #endif  // V8BINDING_CALLBACK_H_
