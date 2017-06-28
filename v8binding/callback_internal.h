@@ -6,6 +6,7 @@
 #define V8BINDING_CALLBACK_INTERNAL_H_
 
 #include <functional>
+#include <memory>
 #include <vector>
 
 #include "node.h"  // NOLINT(build/include)

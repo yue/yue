@@ -6,6 +6,7 @@
 
 #include <gtk/gtk.h>
 
+#include "base/strings/stringprintf.h"
 #include "nativeui/container.h"
 #include "nativeui/events/event.h"
 #include "nativeui/gfx/font.h"
@@ -266,13 +267,15 @@ void View::SetFont(Font* font) {
 }
 
 void View::SetColor(Color color) {
-  GdkRGBA rgba = color.ToGdkRGBA();
-  gtk_widget_override_color(view_, GTK_STATE_FLAG_NORMAL, &rgba);
+  ApplyStyle(view_, "color",
+             base::StringPrintf("* { color: %s; }",
+                                color.ToString().c_str()));
 }
 
 void View::SetBackgroundColor(Color color) {
-  GdkRGBA rgba = color.ToGdkRGBA();
-  gtk_widget_override_background_color(view_, GTK_STATE_FLAG_NORMAL, &rgba);
+  ApplyStyle(view_, "background-color",
+             base::StringPrintf("* { background-color: %s; }",
+                                color.ToString().c_str()));
 }
 
 }  // namespace nu

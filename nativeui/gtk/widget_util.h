@@ -7,6 +7,7 @@
 
 #include <gtk/gtk.h>
 
+#include "base/strings/string_piece.h"
 #include "nativeui/gfx/geometry/insets_f.h"
 #include "nativeui/gfx/geometry/size.h"
 #include "nativeui/types.h"
@@ -20,6 +21,12 @@ Size GetPreferredSizeForWidget(NativeView widget);
 // Like gdk_cairo_region_create_from_surface, but also include semi-transparent
 // points into the region.
 cairo_region_t* CreateRegionFromSurface(cairo_surface_t* surface);
+
+// Apply CSS |style| on |widget|, the style with same |name| will be
+// overwritten.
+void ApplyStyle(GtkWidget* widget,
+                base::StringPiece name,
+                base::StringPiece style);
 
 // Is client-side decoration enabled in window.
 bool IsUsingCSD(GtkWindow* window);

@@ -114,7 +114,26 @@ cairo_region_t* CreateRegionFromSurface(cairo_surface_t* surface) {
   return region;
 }
 
-// Is client-side decoration enabled in window.
+void ApplyStyle(GtkWidget* widget,
+                base::StringPiece name,
+                base::StringPiece style) {
+  void* old = g_object_get_data(G_OBJECT(widget), name.data());
+  if (old)
+    gtk_style_context_remove_provider(
+        gtk_widget_get_style_context(widget),
+        GTK_STYLE_PROVIDER(old));
+
+  GtkCssProvider* provider = gtk_css_provider_new();
+  gtk_css_provider_load_from_data(
+      provider, style.data(), style.length(), nullptr);
+  gtk_style_context_add_provider(
+      gtk_widget_get_style_context(widget),
+      GTK_STYLE_PROVIDER(provider), G_MAXUINT);
+  // Store the provider inside widget.
+  g_object_set_data_full(G_OBJECT(widget), name.data(), provider,
+                         g_object_unref);
+}
+
 bool IsUsingCSD(GtkWindow* window) {
   GtkStyleContext* context = gtk_widget_get_style_context(GTK_WIDGET(window));
   return gtk_style_context_has_class(context, "csd") ||
@@ -128,23 +147,13 @@ void EnableCSD(GtkWindow* window) {
   // Setting a hidden titlebar to force using CSD rendering.
   gtk_window_set_titlebar(window, gtk_label_new("you should not see me"));
 
-  if (!g_object_get_data(G_OBJECT(window), "css-provider")) {
-    // Since we are not using any titlebar, we have to override the border
-    // radius of the client decoration to avoid having rounded shadow for the
-    // rectange window.
-    GtkCssProvider* provider = gtk_css_provider_new();
-    gtk_css_provider_load_from_data(
-        provider,
-        // Using 0 would triger a bug of GTK's shadow rendering code.
-        "decoration { border-radius: 0.01px; }", -1, nullptr);
-    gtk_style_context_add_provider(
-        gtk_widget_get_style_context(GTK_WIDGET(window)),
-        GTK_STYLE_PROVIDER(provider), G_MAXUINT);
-    // Store the provider inside window, we may need to remove it later when
-    // user sets a custom titlebar.
-    g_object_set_data_full(G_OBJECT(window), "css-provider", provider,
-                           g_object_unref);
-  }
+  // Since we are not using any titlebar, we have to override the border
+  // radius of the client decoration to avoid having rounded shadow for the
+  // rectange window.
+  if (!g_object_get_data(G_OBJECT(window), "rectangle-decoration"))
+    ApplyStyle(GTK_WIDGET(window), "rectangle-decoration",
+               // Using 0 would triger a bug of GTK's shadow rendering code.
+               "decoration { border-radius: 0.01px; }");
 }
 
 void DisableCSD(GtkWindow* window) {

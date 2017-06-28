@@ -6,6 +6,7 @@
 #define V8BINDING_TEMPLATE_UTIL_H_
 
 #include <type_traits>
+#include <utility>
 
 namespace vb {
 

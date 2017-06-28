@@ -58,6 +58,8 @@ class NATIVEUI_EXPORT Color {
 
   bool transparent() const { return a() == 0; }
 
+  std::string ToString() const;
+
   bool operator==(Color other) const {
     return value_ == other.value_;
   }

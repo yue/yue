@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "base/strings/string_number_conversions.h"
+#include "base/strings/stringprintf.h"
 
 namespace nu {
 
@@ -52,5 +53,9 @@ uint32_t ParseHexColor(const std::string& color_string) {
 }  // namespace
 
 Color::Color(const std::string& hex) : value_(ParseHexColor(hex)) {}
+
+std::string Color::ToString() const {
+  return base::StringPrintf("rgba(%d, %d, %d, %d)", r(), g(), b(), a());
+}
 
 }  // namespace nu
