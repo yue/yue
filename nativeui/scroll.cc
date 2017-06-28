@@ -23,10 +23,9 @@ Scroll::~Scroll() {
 void Scroll::SetContentView(View* view) {
   if (content_view_)
     content_view_->SetParent(nullptr);
+  PlatformSetContentView(view);
   content_view_ = view;
   content_view_->SetParent(this);
-
-  PlatformSetContentView(view);
 }
 
 View* Scroll::GetContentView() const {
