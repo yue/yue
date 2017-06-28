@@ -161,8 +161,8 @@ struct Type<nu::Lifetime> {
     RawSet(state, index,
            "run", &nu::Lifetime::Run,
            "quit", &nu::Lifetime::Quit,
-           "post", &nu::Lifetime::PostTask,
-           "postdelayed", &nu::Lifetime::PostDelayedTask);
+           "posttask", &nu::Lifetime::PostTask,
+           "postdelayedtask", &nu::Lifetime::PostDelayedTask);
     RawSetProperty(state, index, "onready", &nu::Lifetime::on_ready);
   }
 };
