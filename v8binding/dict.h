@@ -26,7 +26,8 @@ struct ToV8Data<T, typename std::enable_if<
                        internal::is_function_pointer<T>::value>::type> {
   static inline v8::Local<v8::Data> Do(v8::Local<v8::Context> context,
                                        T callback) {
-    return CreateFunctionTemplate(context, base::Bind(callback));
+    using RunType = typename FunctorTraits<T>::RunType;
+    return CreateFunctionTemplate(context, std::function<RunType>(callback));
   }
 };
 
@@ -36,7 +37,8 @@ struct ToV8Data<T, typename std::enable_if<
                        std::is_member_function_pointer<T>::value>::type> {
   static inline v8::Local<v8::Data> Do(v8::Local<v8::Context> context,
                                        T callback) {
-    return CreateFunctionTemplate(context, base::Bind(callback),
+    using RunType = typename FunctorTraits<T>::RunType;
+    return CreateFunctionTemplate(context, std::function<RunType>(callback),
                                   HolderIsFirstArgument);
   }
 };

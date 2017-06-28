@@ -12,7 +12,7 @@
 namespace vb {
 
 // CreateFunctionTemplate creates a v8::FunctionTemplate that will create
-// JavaScript functions that execute a provided C++ function or base::Callback.
+// JavaScript functions that execute a provided C++ function or std::function.
 // JavaScript arguments are automatically converted via Type<T>, as is
 // the return value of the C++ function, if any.
 //
@@ -22,7 +22,7 @@ namespace vb {
 // will create substantial memory leaks. See http://crbug.com/463487.
 template<typename Sig>
 v8::Local<v8::FunctionTemplate> CreateFunctionTemplate(
-    v8::Local<v8::Context> context, const base::Callback<Sig> callback,
+    v8::Local<v8::Context> context, const std::function<Sig>& callback,
     int callback_flags = 0) {
   v8::Isolate* isolate = context->GetIsolate();
   typedef internal::CallbackHolder<Sig> HolderT;
@@ -36,24 +36,25 @@ v8::Local<v8::FunctionTemplate> CreateFunctionTemplate(
 }
 
 // Define how callbacks are converted.
-template<typename Sig>
-struct Type<base::Callback<Sig>> {
+template<typename ReturnType, typename... ArgTypes>
+struct Type<std::function<ReturnType(ArgTypes...)>> {
   static constexpr const char* name = "Function";
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> val,
-                     base::Callback<Sig>* out) {
+                     std::function<ReturnType(ArgTypes...)>* out) {
     if (val->IsNull()) {
-      *out = base::Callback<Sig>();
+      *out = nullptr;
       return true;
     }
     if (!val->IsFunction())
       return false;
     v8::Isolate* isolate = context->GetIsolate();
-    *out = base::Bind(
-        &internal::V8FunctionInvoker<Sig>::Go,
-        isolate,
-        base::RetainedRef(
-            new internal::V8FunctionWrapper(isolate, val.As<v8::Function>())));
+    auto wrapper = std::make_shared<internal::V8FunctionWrapper>(
+        isolate, val.As<v8::Function>());
+    *out = [isolate, wrapper](ArgTypes... args) -> ReturnType {
+      return internal::V8FunctionInvoker<ReturnType(ArgTypes...)>::Go(
+          isolate, wrapper, args...);
+    };
     return true;
   }
 };
@@ -65,7 +66,9 @@ struct Type<T, typename std::enable_if<
   static constexpr const char* name = "Function";
   static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                           T callback) {
-    return CreateFunctionTemplate(context, base::Bind(callback))->GetFunction();
+    using RunType = typename internal::FunctorTraits<T>::RunType;
+    return CreateFunctionTemplate(
+        context, std::function<RunType>(callback))->GetFunction();
   }
 };
 
@@ -76,8 +79,22 @@ struct Type<T, typename std::enable_if<
   static constexpr const char* name = "Method";
   static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                           T callback) {
-    return CreateFunctionTemplate(context, base::Bind(callback),
+    using RunType = typename internal::FunctorTraits<T>::RunType;
+    return CreateFunctionTemplate(context,  std::function<RunType>(callback),
                                   HolderIsFirstArgument)->GetFunction();
+  }
+};
+
+// Specialize for other formats of functions.
+template<typename T>
+struct Type<T, typename std::enable_if<
+                   internal::IsConvertibleToRunType<T>::value>::type> {
+  static constexpr const char* name = "Function";
+  static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                          T callback) {
+    using RunType = typename internal::FunctorTraits<T>::RunType;
+    return CreateFunctionTemplate(
+        context, std::function<RunType>(callback))->GetFunction();
   }
 };
 

@@ -5,10 +5,9 @@
 #ifndef V8BINDING_CALLBACK_INTERNAL_H_
 #define V8BINDING_CALLBACK_INTERNAL_H_
 
+#include <functional>
 #include <vector>
 
-#include "base/bind.h"
-#include "base/callback.h"
 #include "node.h"  // NOLINT(build/include)
 #include "v8binding/arguments.h"
 #include "v8binding/locker.h"
@@ -46,7 +45,7 @@ struct CallbackParamTraits<const T*> {
   typedef T* LocalType;
 };
 
-// CallbackHolder and CallbackHolderBase are used to pass a base::Callback from
+// CallbackHolder and CallbackHolderBase are used to pass a std::function from
 // CreateFunctionTemplate through v8 (via v8::FunctionTemplate) to
 // DispatchToCallback, where it is invoked.
 
@@ -75,11 +74,11 @@ template<typename Sig>
 class CallbackHolder : public CallbackHolderBase {
  public:
   CallbackHolder(v8::Isolate* isolate,
-                 const base::Callback<Sig>& callback,
+                 const std::function<Sig>& callback,
                  int flags)
       : CallbackHolderBase(isolate), callback(callback), flags(flags) {}
 
-  base::Callback<Sig> callback;
+  std::function<Sig> callback;
   int flags;
 
  private:
@@ -168,19 +167,21 @@ class Invoker<IndicesHolder<indices...>, ArgTypes...>
   }
 
   template<typename ReturnType>
-  void DispatchToCallback(base::Callback<ReturnType(ArgTypes...)> callback) {
+  void DispatchToCallback(
+      const std::function<ReturnType(ArgTypes...)>& callback) {
     v8::MicrotasksScope script_scope(
         args_->isolate(), v8::MicrotasksScope::kRunMicrotasks);
-    args_->Return(callback.Run(ArgumentHolder<indices, ArgTypes>::value...));
+    args_->Return(callback(ArgumentHolder<indices, ArgTypes>::value...));
   }
 
   // In C++, you can declare the function foo(void), but you can't pass a void
   // expression to foo. As a result, we must specialize the case of Callbacks
   // that have the void return type.
-  void DispatchToCallback(base::Callback<void(ArgTypes...)> callback) {
+  void DispatchToCallback(
+      const std::function<void(ArgTypes...)>& callback) {
     v8::MicrotasksScope script_scope(
         args_->isolate(), v8::MicrotasksScope::kRunMicrotasks);
-    callback.Run(ArgumentHolder<indices, ArgTypes>::value...);
+    callback(ArgumentHolder<indices, ArgTypes>::value...);
   }
 
  private:
@@ -194,7 +195,7 @@ class Invoker<IndicesHolder<indices...>, ArgTypes...>
 };
 
 // DispatchToCallback converts all the JavaScript arguments to C++ types and
-// invokes the base::Callback.
+// invokes the std::function.
 template<typename Sig>
 struct Dispatcher {};
 
@@ -219,17 +220,14 @@ struct Dispatcher<ReturnType(ArgTypes...)> {
 };
 
 // A RefCounted struct that stores a v8::Function.
-class V8FunctionWrapper : public base::RefCounted<V8FunctionWrapper> {
+class V8FunctionWrapper {
  public:
   V8FunctionWrapper(v8::Isolate* isolate, v8::Local<v8::Function> v8_ref);
+  ~V8FunctionWrapper();
 
   v8::Local<v8::Function> Get(v8::Isolate* isolate) const;
 
  private:
-  friend class base::RefCounted<V8FunctionWrapper>;
-
-  ~V8FunctionWrapper();
-
   v8::Global<v8::Function> v8_ref_;
 };
 
@@ -239,9 +237,10 @@ struct V8FunctionInvoker {};
 
 template<typename... ArgTypes>
 struct V8FunctionInvoker<v8::Local<v8::Value>(ArgTypes...)> {
-  static v8::Local<v8::Value> Go(v8::Isolate* isolate,
-                                 V8FunctionWrapper* wrapper,
-                                 ArgTypes... raw) {
+  static v8::Local<v8::Value> Go(
+      v8::Isolate* isolate,
+      const std::shared_ptr<V8FunctionWrapper>& wrapper,
+      ArgTypes... raw) {
     Locker locker(isolate);
     v8::EscapableHandleScope handle_scope(isolate);
     v8::MicrotasksScope script_scope(isolate,
@@ -259,7 +258,7 @@ struct V8FunctionInvoker<v8::Local<v8::Value>(ArgTypes...)> {
 template<typename... ArgTypes>
 struct V8FunctionInvoker<void(ArgTypes...)> {
   static void Go(v8::Isolate* isolate,
-                 V8FunctionWrapper* wrapper,
+                 const std::shared_ptr<V8FunctionWrapper>& wrapper,
                  ArgTypes... raw) {
     Locker locker(isolate);
     v8::HandleScope handle_scope(isolate);
@@ -277,7 +276,7 @@ struct V8FunctionInvoker<void(ArgTypes...)> {
 template<typename ReturnType, typename... ArgTypes>
 struct V8FunctionInvoker<ReturnType(ArgTypes...)> {
   static ReturnType Go(v8::Isolate* isolate,
-                       V8FunctionWrapper* wrapper,
+                       const std::shared_ptr<V8FunctionWrapper>& wrapper,
                        ArgTypes... raw) {
     Locker locker(isolate);
     v8::HandleScope handle_scope(isolate);

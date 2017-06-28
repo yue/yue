@@ -44,7 +44,7 @@ struct Type<nu::Signal<Sig>> {
                      nu::Signal<Sig>* out) {
     if (!value->IsFunction())
       return false;
-    base::Callback<Sig> callback;
+    std::function<Sig> callback;
     if (!vb::FromV8(context, value, &callback))
       return false;
     out->Connect(callback);

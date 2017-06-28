@@ -5,10 +5,10 @@
 
 #include "node_yue/node_integration.h"
 
+#include <functional>
 #include <string>
 #include <vector>
 
-#include "base/bind.h"
 #include "nativeui/lifetime.h"
 #include "node.h"  // NOLINT(build/include)
 
@@ -59,8 +59,11 @@ void NodeIntegration::UvRunOnce() {
 }
 
 void NodeIntegration::WakeupMainThread() {
-  lifetime_->PostTask(base::Bind(&NodeIntegration::UvRunOnce,
-                                 weak_factory_.GetWeakPtr()));
+  auto self = weak_factory_.GetWeakPtr();
+  lifetime_->PostTask([self] {
+    if (self)
+      self->UvRunOnce();
+  });
 }
 
 void NodeIntegration::WakeupEmbedThread() {
