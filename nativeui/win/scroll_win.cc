@@ -186,7 +186,6 @@ void Scroll::PlatformInit() {
 void Scroll::PlatformSetContentView(View* view) {
   auto* scroll = static_cast<ScrollImpl*>(GetNative());
   view->GetNative()->SetParent(scroll);
-  scroll->SetContentSize(view->GetNative()->size_allocation().size());
 }
 
 void Scroll::SetContentSize(const SizeF& size) {
