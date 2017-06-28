@@ -66,12 +66,13 @@ void ScrollImpl::Layout() {
                                size_allocation().OffsetFromOrigin());
 
   if (delegate_->GetContentView()) {
+    Size viewport_size = GetViewportRect().size();
     Rect content_alloc = Rect(size_allocation().origin() + origin_,
                               content_size_);
-    if (content_alloc.width() < size_allocation().width())
-      content_alloc.set_width(size_allocation().width());
-    if (content_alloc.height() < size_allocation().height())
-      content_alloc.set_height(size_allocation().height());
+    if (content_alloc.width() < viewport_size.width())
+      content_alloc.set_width(viewport_size.width());
+    if (content_alloc.height() < viewport_size.height())
+      content_alloc.set_height(viewport_size.height());
     delegate_->GetContentView()->GetNative()->SizeAllocate(content_alloc);
   }
 }
