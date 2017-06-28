@@ -45,6 +45,9 @@ class NATIVEUI_EXPORT Container : public View {
     return children_[index].get();
   }
 
+  // Internal: Used by certain implementations to refresh layout.
+  void SetChildBoundsFromCSS();
+
   // Events.
   Signal<void(Container*, Painter*, const RectF&)> on_draw;
 
@@ -53,8 +56,6 @@ class NATIVEUI_EXPORT Container : public View {
 
   // Empty constructor used by subclasses.
   explicit Container(const char* an_empty_constructor);
-
-  void SetChildBoundsFromCSS();
 
   void PlatformInit();
   void PlatformDestroy();
