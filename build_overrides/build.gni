@@ -40,23 +40,14 @@ linux_use_bundled_binutils_override = false
 # Uncomment these to specify a different lint suppressions file for android
 # lint_suppressions_file = path/to/your/suppressions/file/suppressions.xml
 
-declare_args() {
-  # Android 32-bit non-component, non-clang builds cannot have symbol_level=2
-  # due to 4GiB file size limit, see https://crbug.com/648948.
-  # Set this flag to true to skip the assertion.
-  ignore_elf32_limitations = false
+# Android 32-bit non-component, non-clang builds cannot have symbol_level=2
+# due to 4GiB file size limit, see https://crbug.com/648948.
+# Set this flag to true to skip the assertion.
+ignore_elf32_limitations = false
 
-  # Use the system install of Xcode for tools like ibtool, libtool, etc.
-  # This does not affect the compiler. When this variable is false, targets will
-  # instead use a hermetic install of Xcode. [The hermetic install can be
-  # obtained with gclient sync after setting the environment variable
-  # FORCE_MAC_TOOLCHAIN].
-  use_system_xcode = true
-}
-
-if (use_system_xcode == "") {
-  _result = exec_script("//build/mac/should_use_hermetic_xcode.py",
-                        [ target_os ],
-                        "value")
-  use_system_xcode = _result == 0
-}
+# Use the system install of Xcode for tools like ibtool, libtool, etc.
+# This does not affect the compiler. When this variable is false, targets will
+# instead use a hermetic install of Xcode. [The hermetic install can be
+# obtained with gclient sync after setting the environment variable
+# FORCE_MAC_TOOLCHAIN].
+use_system_xcode = true
