@@ -9,9 +9,9 @@ const fs    = require('fs')
 const path  = require('path')
 
 const sha1 = {
-  linux: 'f9c665db33ad9a4653b2467fc34fbf5a4e3fb4f2',
-  darwin: '0508bb515ce789ff2858ba5a2c0042cbd22afa13',
-  win32: 'ef11542024a22846422b213316715a4e77f7e009',
+  linux: '2d79b4acffac0b084f250a9699f670d41f164864',
+  darwin: 'b8db422af70c716836c579dad9153c687ab54f7c',
+  win32: '3b6a35d309aeeba61ba945d91752d1d65acf3d4f',
 }
 
 const buildtools = path.resolve(__dirname, '..', 'tools', 'build')
