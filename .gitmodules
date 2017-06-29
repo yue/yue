@@ -4,15 +4,9 @@
 [submodule "third_party/icu"]
 	path = third_party/icu
 	url = https://chromium.googlesource.com/chromium/deps/icu
-[submodule "testing/gmock"]
-	path = testing/gmock
-	url = https://chromium.googlesource.com/external/googlemock
 [submodule "third_party/zlib"]
 	path = third_party/zlib
 	url = https://chromium.googlesource.com/chromium/src/third_party/zlib
-[submodule "testing/gtest"]
-	path = testing/gtest
-	url = https://github.com/google/googletest/
 [submodule "tools/gyp"]
 	path = tools/gyp
 	url = https://chromium.googlesource.com/external/gyp
@@ -35,9 +29,6 @@
 [submodule "third_party/yxml"]
 	path = third_party/yxml
 	url = git://g.blicky.net/yxml.git
-[submodule "testing/libfuzzer"]
-	path = testing/libfuzzer
-	url = https://chromium.googlesource.com/chromium/src/testing/libfuzzer/
 [submodule "third_party/ced/src"]
 	path = third_party/ced/src
 	url = https://github.com/google/compact_enc_det.git
