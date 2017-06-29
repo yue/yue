@@ -17,7 +17,7 @@ Scrollbar::Scrollbar(bool vertical, ScrollImpl* scroll)
       far_button_(vertical ? ScrollbarButton::Down : ScrollbarButton::Right,
                   this),
       thumb_(vertical, this),
-      repeater_(std::bind(&Scrollbar::OnClick, this)),
+      repeater_([this] { this->OnClick(); }),
       vertical_(vertical),
       scroll_(scroll) {
   near_button_.SetParent(this);

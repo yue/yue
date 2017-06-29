@@ -11,7 +11,7 @@ namespace nu {
 
 ScrollbarButton::ScrollbarButton(Type type, Scrollbar* scrollbar)
     : ViewImpl(ControlType::ScrollbarButton, nullptr),
-      repeater_(std::bind(&ScrollbarButton::OnClick, this)),
+      repeater_([this] { this->OnClick(); }),
       type_(type),
       scrollbar_(scrollbar) {
 }
