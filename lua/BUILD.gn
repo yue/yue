@@ -52,7 +52,6 @@ test("lua_unittests") {
 
   deps = [
     ":lua",
-    "//base/test:test_support",
     "//testing/gtest",
     "//third_party/lua",
   ]

@@ -87,7 +87,7 @@ test("lua_yue_unittests") {
 
   deps = [
     ":lua_yue_runtime",
-    "//base/test:test_support",
+    "//base",
     "//testing/gtest",
   ]
 }

@@ -305,7 +305,7 @@ test("nativeui_unittests") {
 
   deps = [
     ":nativeui",
-    "//base/test:test_support",
+    "//base",
     "//testing/gtest",
   ]
 }
