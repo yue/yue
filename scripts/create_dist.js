@@ -4,14 +4,14 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {version, targetCpu, targetOs, execSync} = require('./common')
+const {version, targetCpu, targetOs, mkdir, execSync} = require('./common')
 
 const fs = require('fs')
 const path = require('path')
 const JSZip = require('./libs/jszip')
 
 // C++ static library.
-const cppFiles = {
+const staticLibs = {
   linux: [
     'libyue.a',
   ],
@@ -20,6 +20,24 @@ const cppFiles = {
   ],
   win: [
     'libyue.lib',
+  ],
+}
+
+// C++ dynamic library.
+const sharedLibs = {
+  linux: [
+    'libbase.so',
+    'libnativeui.so',
+  ],
+  mac: [
+    'libbase.dylib',
+    'libnativeui.dylib',
+  ],
+  win: [
+    'base.dll',
+    'base.dll.lib',
+    'nativeui.dll',
+    'nativeui.dll.lib',
   ],
 }
 
@@ -49,34 +67,39 @@ const exeFiles = {
 }
 
 // Clear previous distributions.
-if (fs.existsSync('out/Dist')) {
-  fs.readdirSync('out/Dist').forEach((f) => {
-    if (f.endsWith('.zip'))
-      fs.unlinkSync(`out/Dist/${f}`)
-  })
-}
+mkdir('out/Dist')
+fs.readdirSync('out/Dist').forEach((f) => {
+  if (f.endsWith('.zip'))
+    fs.unlinkSync(`out/Dist/${f}`)
+})
 
 // Strip binaries for Linux.
 if (targetOs == 'linux') {
-  const list = cppFiles.linux.concat(luaFiles.linux).concat(exeFiles.linux)
+  const list = staticLibs.linux.concat(luaFiles.linux).concat(exeFiles.linux)
   for (const file of list)
     strip(`out/Release/${file}`)
+  for (const file of sharedLibs.linux)
+    strip(`out/Debug/${file}`)
 }
 
 // Zip the static library and headers.
-const libyuezip = new JSZip()
+const yuezip = new JSZip()
 const headers = searchFiles('base', '.h').concat(
                 searchFiles('nativeui', '.h')).concat(
                 searchFiles('testing', '.h')).concat(
                 ['build/build_config.h', 'build/buildflag.h'])
-for (let h of headers)
-  addFileToZip(libyuezip, h, '', 'include/')
-generateZip('libyue', cppFiles, libyuezip)
+for (const h of headers)
+  addFileToZip(yuezip, h, '', 'include/')
+for (const file of staticLibs[targetOs])
+  addFileToZip(yuezip, `out/Release/${file}`, 'out/Release', 'static_library/')
+for (const file of sharedLibs[targetOs])
+  addFileToZip(yuezip, `out/Debug/${file}`, 'out/Debug', 'shared_library/')
+generateZip('libyue', [], yuezip)
 
 // Zip other binaries.
-generateZip('yue', exeFiles)
+generateZip('yue', exeFiles[targetOs])
 if (targetOs != 'win')
-  generateZip('lua_yue_lua_5.3', luaFiles)
+  generateZip('lua_yue_lua_5.3', luaFiles[targetOs])
 
 // Zip docs, but only do it for linux/x64 when running on CI, to avoid uploading
 // docs for multiple times.
@@ -89,10 +112,10 @@ if (process.env.CI != 'true' || (targetOs == 'linux' && targetCpu == 'x64')) {
 
 function generateZip(name, list, zip = new JSZip()) {
   const zipname = `${name}_${version}_${targetOs}_${targetCpu}`
-  for (let file of list[targetOs])
+  for (let file of list)
     addFileToZip(zip, `out/Release/${file}`, 'out/Release')
   zip.generateNodeStream({streamFiles:true})
-     .pipe(fs.createWriteStream(`out/Release/${zipname}.zip`))
+     .pipe(fs.createWriteStream(`out/Dist/${zipname}.zip`))
 }
 
 function addFileToZip(zip, file, base, prefix = '') {
