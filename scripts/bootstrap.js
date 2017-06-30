@@ -37,7 +37,6 @@ const debugConfig = [
   'is_component_build=true',
   'is_debug=true',
   'fatal_linker_warnings=false',
-  'use_sysroot=false',
 ]
 const releaseConfig = [
   'is_component_build=false',
