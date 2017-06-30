@@ -4,7 +4,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {version} = require('./common')
+const {version, mkdir} = require('./common')
 
 const fs     = require('fs')
 const path   = require('path')
@@ -29,7 +29,7 @@ marked.setOptions({
 })
 
 // Dir to put generated files.
-const gendir = path.join('out', 'Release', 'gen', 'docs')
+const gendir = path.join('out', 'Dist', 'docs')
 
 // Iterate API documents for different languages.
 for (let lang of langs) {
@@ -137,13 +137,6 @@ function loadHighlight() {
   sandbox.window = sandbox
   script.runInNewContext(sandbox)
   return sandbox.hljs
-}
-
-// Make dir and ignore error.
-function mkdir(dir) {
-  if (fs.existsSync(dir)) return
-  mkdir(path.dirname(dir))
-  fs.mkdirSync(dir)
 }
 
 // Read markdown and parse yaml header if there is one.

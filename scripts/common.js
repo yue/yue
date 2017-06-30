@@ -49,6 +49,13 @@ const argv = process.argv.slice(2).filter((arg) => {
   }
 })
 
+// Make dir and ignore error.
+function mkdir(dir) {
+  if (fs.existsSync(dir)) return
+  mkdir(path.dirname(dir))
+  fs.mkdirSync(dir)
+}
+
 // Helper around execSync.
 const execSyncWrapper = (command, options = {}) => {
   // Print command output by default.
@@ -85,6 +92,7 @@ module.exports = {
   argv,
   targetCpu,
   targetOs,
+  mkdir,
   execSync: execSyncWrapper,
   spawnSync: spawnSyncWrapper,
 }

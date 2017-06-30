@@ -18,7 +18,7 @@ install:
   - cmd: node scripts/cibuild.js --target-cpu=%TARGET_CPU%
 
 artifacts:
-  - path: 'out\Release\*.zip'
+  - path: 'out\Dist\*.zip'
 
 deploy:
   - provider: GitHub

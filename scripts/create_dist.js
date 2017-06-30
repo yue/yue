@@ -49,10 +49,12 @@ const exeFiles = {
 }
 
 // Clear previous distributions.
-fs.readdirSync('out/Release').forEach((f) => {
-  if (f.endsWith('.zip'))
-    fs.unlinkSync(`out/Release/${f}`)
-})
+if (fs.existsSync('out/Dist')) {
+  fs.readdirSync('out/Dist').forEach((f) => {
+    if (f.endsWith('.zip'))
+      fs.unlinkSync(`out/Dist/${f}`)
+  })
+}
 
 // Strip binaries for Linux.
 if (targetOs == 'linux') {
@@ -80,9 +82,9 @@ if (targetOs != 'win')
 // docs for multiple times.
 if (process.env.CI != 'true' || (targetOs == 'linux' && targetCpu == 'x64')) {
   execSync('node ./scripts/create_docs.js')
-  addFileToZip(new JSZip(), 'out/Release/gen/docs', 'out/Release/gen/docs')
+  addFileToZip(new JSZip(), 'out/Dist/docs', 'out/Dist/docs')
     .generateNodeStream({streamFiles:true})
-    .pipe(fs.createWriteStream(`out/Release/yue_docs_${version}.zip`))
+    .pipe(fs.createWriteStream(`out/Dist/yue_docs_${version}.zip`))
 }
 
 function generateZip(name, list, zip = new JSZip()) {

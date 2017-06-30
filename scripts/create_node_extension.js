@@ -4,7 +4,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {version, argv, targetCpu, targetOs, execSync, spawnSync} = require('./common')
+const {version, argv, targetCpu, targetOs, mkdir, execSync, spawnSync} = require('./common')
 
 const fs = require('fs')
 const JSZip = require('./libs/jszip')
@@ -48,7 +48,8 @@ if (targetOs == 'linux') {
 }
 
 // Create zip archive of the node module.
+mkdir('out/Dist')
 let zip = new JSZip()
 zip.file('gui.node', fs.readFileSync('out/Release/gui.node'))
 zip.generateNodeStream({streamFiles:true})
-   .pipe(fs.createWriteStream(`out/Release/${zipname}.zip`))
+   .pipe(fs.createWriteStream(`out/Dist/${zipname}.zip`))
