@@ -31,7 +31,6 @@ It is strongly recommended to read all of the guides before using `nativeui`.
 ## A minimal GUI program using `nativeui` library
 
 ```c++
-#include "base/bind.h"
 #include "base/command_line.h"
 #include "nativeui/nativeui.h"
 
@@ -51,15 +50,15 @@ int main(int argc, const char *argv[]) {
 
   // Create window with default options, and then show it.
   scoped_refptr<nu::Window> window(new nu::Window(nu::Window::Options()));
-  window->SetContentView(new nu::Label("Content View"));
+  window->SetContentView(new nu::Label("Hello world"));
   window->SetContentSize(nu::SizeF(400, 400));
   window->Center();
   window->Activate();
 
   // Quit when window is closed.
-  window->on_close.Connect(base::Bind([](nu::Window*) {
+  window->on_close.Connect([](nu::Window*) {
     nu::Lifetime::GetCurrent()->Quit();
-  }));
+  });
 
   // Enter message loop.
   lifetime.Run();

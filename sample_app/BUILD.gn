@@ -1,0 +1,10 @@
+# This file is published under public domain.
+
+executable("sample_app") {
+  sources = [ "main.cc" ]
+
+  deps = [
+    "//base",
+    "//nativeui",
+  ]
+}

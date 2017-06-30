@@ -6,6 +6,7 @@ group("default") {
   deps = [
     "//node_yue",
     "//lua_yue:yue",
+    "//sample_app",
   ]
 
   if (!is_component_build) {
