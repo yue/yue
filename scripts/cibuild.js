@@ -14,14 +14,8 @@ process.env.CI = 'true'
 execSync(`node ./scripts/bootstrap.js --target-cpu=${targetCpu}`)
 
 // Build common targets.
-const targets = [
-  "libyue",
-  'yue',
-]
-if (targetOs != 'win')
-  targets.push('lua_yue')
-execSync(`node ./scripts/build.js out/Release ${targets.join(' ')}`)
-execSync(`node ./scripts/build.js out/Debug ${targets.join(' ')}`)
+execSync('node ./scripts/build.js out/Release')
+execSync('node ./scripts/build.js out/Debug')
 
 // Create distributions.
 execSync(`node ./scripts/create_dist.js`)

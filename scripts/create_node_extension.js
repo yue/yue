@@ -32,8 +32,8 @@ console.log(`Creating native extension for ${runtime} ${nodever}...`)
 
 // Build the node module.
 execSync(`node ./scripts/download_node_headers.js ${runtime} ${nodever}`)
-spawnSync('gn', ['gen', 'out/Release', `--args=${args.join(' ')}`])
-execSync('ninja -C out/Release node_yue')
+spawnSync('gn', ['gen', 'out/Node', `--args=${args.join(' ')}`])
+execSync('ninja -C out/Node node_yue')
 
 // Generate a name conforming node's convention.
 let shortver = nodever.substring(1, nodever.lastIndexOf('.'))
@@ -44,12 +44,12 @@ const zipname = `node_yue_${runtime}_${shortver}_${version}_${targetOs}_${target
 // Strip the binaries on Linux.
 if (targetOs == 'linux') {
   const strip = targetCpu.startsWith('arm') ? 'arm-linux-gnueabihf-strip' : 'strip'
-  execSync(`${strip} out/Release/gui.node`)
+  execSync(`${strip} out/Node/gui.node`)
 }
 
 // Create zip archive of the node module.
 mkdir('out/Dist')
 let zip = new JSZip()
-zip.file('gui.node', fs.readFileSync('out/Release/gui.node'))
+zip.file('gui.node', fs.readFileSync('out/Node/gui.node'))
 zip.generateNodeStream({streamFiles:true})
    .pipe(fs.createWriteStream(`out/Dist/${zipname}.zip`))
