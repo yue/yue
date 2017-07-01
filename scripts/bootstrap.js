@@ -42,10 +42,13 @@ const componentConfig = [
 const debugConfig = [
   'is_component_build=false',
   'is_debug=true',
+  // This flag caused weird compilation errors when building on Linux.
+  'enable_iterator_debugging=false',
 ]
 const releaseConfig = [
   'is_component_build=false',
   'is_debug=false',
+  // This flag makes the library incompatible with other versions of clang.
   'allow_posix_link_time_opt=false',
 ]
 
