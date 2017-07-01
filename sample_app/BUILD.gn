@@ -7,4 +7,9 @@ executable("sample_app") {
     "//base",
     "//nativeui",
   ]
+
+  if (is_win) {
+    configs -= [ "//build/config/win:console" ]
+    configs += [ "//build/config/win:windowed" ]
+  }
 }
