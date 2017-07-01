@@ -41,6 +41,7 @@ const componentConfig = [
 const debugConfig = [
   'is_component_build=false',
   'is_debug=true',
+  'fatal_linker_warnings=false',
 ]
 const releaseConfig = [
   'is_component_build=false',
