@@ -33,10 +33,14 @@ const commonConfig = [
   'node_runtime="node"',
   `node_version="${process.version}"`,
 ]
-const debugConfig = [
+const componentConfig = [
   'is_component_build=true',
   'is_debug=true',
   'fatal_linker_warnings=false',
+]
+const debugConfig = [
+  'is_component_build=false',
+  'is_debug=true',
 ]
 const releaseConfig = [
   'is_component_build=false',
@@ -49,6 +53,7 @@ const releaseConfig = [
 if (targetOs == 'linux')
   releaseConfig.push('generate_linker_map=true')
 
+gen('out/Component', componentConfig)
 gen('out/Debug', debugConfig)
 gen('out/Release', releaseConfig)
 

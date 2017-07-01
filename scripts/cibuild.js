@@ -27,7 +27,7 @@ const tests = [
   'nativeui_unittests',
   'lua_unittests',
 ]
-execSync(`node ./scripts/build.js out/Debug ${tests.join(' ')}`)
+execSync(`node ./scripts/build.js out/Component ${tests.join(' ')}`)
 
 // Create distributions.
 execSync(`node ./scripts/create_dist.js`)
@@ -35,7 +35,7 @@ execSync(`node ./scripts/create_dist.js`)
 // Run test except for cross compilation on Linux.
 if (targetOs != 'linux' || targetCpu == 'x64') {
   for (test of tests)
-    execSync(`${path.join('out', 'Debug', test)}`)
+    execSync(`${path.join('out', 'Component', test)}`)
 }
 
 // Build node extensions.

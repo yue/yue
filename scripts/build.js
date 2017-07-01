@@ -6,7 +6,7 @@
 
 const {argv, verbose, execSync} = require('./common')
 
-let dir = 'out/Debug'
+let dir = 'out/Component'
 const args = argv.filter((arg) => {
   if (arg.startsWith('out')) {
     dir = arg

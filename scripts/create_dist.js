@@ -79,7 +79,7 @@ if (targetOs == 'linux') {
   for (const file of list)
     strip(`out/Release/${file}`)
   for (const file of sharedLibs.linux)
-    strip(`out/Debug/${file}`)
+    strip(`out/Component/${file}`)
 }
 
 // Zip the static library and headers.
@@ -93,7 +93,7 @@ for (const h of headers)
 for (const file of staticLibs[targetOs])
   addFileToZip(yuezip, `out/Release/${file}`, 'out/Release', 'static_library/')
 for (const file of sharedLibs[targetOs])
-  addFileToZip(yuezip, `out/Debug/${file}`, 'out/Debug', 'shared_library/')
+  addFileToZip(yuezip, `out/Component/${file}`, 'out/Component', 'shared_library/')
 generateZip('libyue', [], yuezip)
 
 // Zip other binaries.
