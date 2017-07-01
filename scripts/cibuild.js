@@ -21,6 +21,7 @@ const targets = [
 if (targetOs != 'win')
   targets.push('lua_yue')
 execSync(`node ./scripts/build.js out/Release ${targets.join(' ')}`)
+execSync(`node ./scripts/build.js out/Debug ${targets.join(' ')}`)
 
 // Build tests.
 const tests = [

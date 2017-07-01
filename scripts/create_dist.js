@@ -23,24 +23,6 @@ const staticLibs = {
   ],
 }
 
-// C++ dynamic library.
-const sharedLibs = {
-  linux: [
-    'libbase.so',
-    'libnativeui.so',
-  ],
-  mac: [
-    'libbase.dylib',
-    'libnativeui.dylib',
-  ],
-  win: [
-    'base.dll',
-    'base.dll.lib',
-    'nativeui.dll',
-    'nativeui.dll.lib',
-  ],
-}
-
 // Lua loadable module.
 const luaFiles = {
   linux: [
@@ -78,8 +60,6 @@ if (targetOs == 'linux') {
   const list = staticLibs.linux.concat(luaFiles.linux).concat(exeFiles.linux)
   for (const file of list)
     strip(`out/Release/${file}`)
-  for (const file of sharedLibs.linux)
-    strip(`out/Component/${file}`)
 }
 
 // Zip the static library and headers.
@@ -89,11 +69,11 @@ const headers = searchFiles('base', '.h').concat(
                 searchFiles('testing', '.h')).concat(
                 ['build/build_config.h', 'build/buildflag.h'])
 for (const h of headers)
-  addFileToZip(yuezip, h, '', 'include/')
-for (const file of staticLibs[targetOs])
-  addFileToZip(yuezip, `out/Release/${file}`, 'out/Release', 'static_library/')
-for (const file of sharedLibs[targetOs])
-  addFileToZip(yuezip, `out/Component/${file}`, 'out/Component', 'shared_library/')
+  addFileToZip(yuezip, h, '', 'include')
+for (const file of staticLibs[targetOs]) {
+  addFileToZip(yuezip, `out/Release/${file}`, 'out/Release', 'lib')
+  addFileToZip(yuezip, `out/Debug/${file}`, 'out/Debug', 'lib', 'd')
+}
 generateZip('libyue', [], yuezip)
 
 // Zip other binaries.
@@ -118,15 +98,18 @@ function generateZip(name, list, zip = new JSZip()) {
      .pipe(fs.createWriteStream(`out/Dist/${zipname}.zip`))
 }
 
-function addFileToZip(zip, file, base, prefix = '') {
+function addFileToZip(zip, file, base, prefix = '', suffix = '') {
   const stat = fs.statSync(file)
   if (stat.isDirectory()) {
     const subfiles = fs.readdirSync(file)
     for (let sub of subfiles)
       addFileToZip(zip, `${file}/${sub}`, base)
   } else if (stat.isFile()) {
-    const filename = path.relative(base, file)
-    zip.file(prefix + filename, fs.readFileSync(file))
+    const extname = path.extname(file)
+    const filename = path.basename(file, extname) + suffix + extname
+    let p = path.relative(base, file)
+    p = path.join(prefix, path.dirname(p), filename)
+    zip.file(p, fs.readFileSync(file))
   }
   return zip
 }
