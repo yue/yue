@@ -64,10 +64,12 @@ if (targetOs == 'linux') {
 
 // Zip the static library and headers.
 const yuezip = new JSZip()
-const headers = searchFiles('base', '.h').concat(
-                searchFiles('nativeui', '.h')).concat(
-                searchFiles('testing', '.h')).concat(
-                ['build/build_config.h', 'build/buildflag.h'])
+const headers =
+  searchFiles('base', '.h').concat(
+  searchFiles('nativeui', '.h')).concat(
+  searchFiles('testing', '.h')).concat(
+  searchFiles('third_party/googletest/src/googletest/include', '.h')).concat(
+  ['build/build_config.h', 'build/buildflag.h'])
 for (const h of headers)
   addFileToZip(yuezip, h, '', 'include')
 for (const file of staticLibs[targetOs]) {
