@@ -29,6 +29,7 @@ execSync(`node scripts/download_node_headers.js node ${process.version}`)
 
 const commonConfig = [
   'use_allocator_shim=false',
+  'fatal_linker_warnings=false',
   `target_cpu="${targetCpu}"`,
   'node_runtime="node"',
   `node_version="${process.version}"`,
@@ -36,19 +37,21 @@ const commonConfig = [
 const componentConfig = [
   'is_component_build=true',
   'is_debug=true',
-  'fatal_linker_warnings=false',
+  'use_sysroot=false',
 ]
 const debugConfig = [
   'is_component_build=false',
   'is_debug=true',
-  'fatal_linker_warnings=false',
 ]
 const releaseConfig = [
   'is_component_build=false',
   'is_debug=false',
-  'is_official_build=true',
   'allow_posix_link_time_opt=false',
 ]
+
+// Don't set official build for Windows, which increases the size of libyue.
+if (targetOs != 'win')
+  releaseConfig.push('is_official_build=true')
 
 // Generate linker map for Linux.
 if (targetOs == 'linux')

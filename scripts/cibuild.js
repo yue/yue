@@ -23,18 +23,16 @@ if (targetOs != 'win')
 execSync(`node ./scripts/build.js out/Release ${targets.join(' ')}`)
 execSync(`node ./scripts/build.js out/Debug ${targets.join(' ')}`)
 
-// Build tests.
-const tests = [
-  'nativeui_unittests',
-  'lua_unittests',
-]
-execSync(`node ./scripts/build.js out/Component ${tests.join(' ')}`)
-
 // Create distributions.
 execSync(`node ./scripts/create_dist.js`)
 
 // Run test except for cross compilation on Linux.
 if (targetOs != 'linux' || targetCpu == 'x64') {
+  const tests = [
+    'nativeui_unittests',
+    'lua_unittests',
+  ]
+  execSync(`node ./scripts/build.js out/Component ${tests.join(' ')}`)
   for (test of tests)
     execSync(`${path.join('out', 'Component', test)}`)
 }

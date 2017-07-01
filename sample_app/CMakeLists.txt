@@ -30,8 +30,6 @@ if(WIN32)
                          /DELAYLOAD:powrprof.dll \
                          /DELAYLOAD:dwmapi.dll \
                          /SUBSYSTEM:WINDOWS")
-  set_target_properties(${APP_NAME} PROPERTIES LINK_FLAGS_RELEASE
-                        "/LTCG")
   target_link_libraries(${APP_NAME}
                         setupapi.lib powrprof.lib ws2_32.lib dbghelp.lib
                         shlwapi.lib version.lib winmm.lib psapi.lib dwmapi.lib
