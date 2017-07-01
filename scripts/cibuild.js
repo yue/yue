@@ -11,6 +11,10 @@ const path = require('path')
 // Mark this is CI build.
 process.env.CI = 'true'
 
+// Lint code.
+execSync('node ./scripts/cpplint.js')
+
+// Bootstrap.
 execSync(`node ./scripts/bootstrap.js --target-cpu=${targetCpu}`)
 
 // Run test except for cross compilation on Linux.
