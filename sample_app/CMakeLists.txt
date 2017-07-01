@@ -15,9 +15,7 @@ if(APPLE)
   find_library(IOKIT IOKit)
   find_library(SECURITY Security)
   target_link_libraries(${APP_NAME}
-                        optimized ${APPKIT}
-                        optimized ${IOKIT}
-                        optimized ${SECURITY}
+                        ${APPKIT} ${IOKIT} ${SECURITY}
                         optimized ${CMAKE_SOURCE_DIR}/lib/libyue.a
                         debug ${CMAKE_SOURCE_DIR}/lib/libyued.a)
   set_target_properties(${APP_NAME} PROPERTIES LINK_FLAGS

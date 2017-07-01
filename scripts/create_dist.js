@@ -76,6 +76,8 @@ for (const file of staticLibs[targetOs]) {
   addFileToZip(yuezip, `out/Release/${file}`, 'out/Release', 'lib')
   addFileToZip(yuezip, `out/Debug/${file}`, 'out/Debug', 'lib', 'd')
 }
+addFileToZip(yuezip, 'sample_app/CMakeLists.txt', 'sample_app')
+addFileToZip(yuezip, 'sample_app/main.cc', '')
 generateZip('libyue', [], yuezip)
 
 // Zip other binaries.
