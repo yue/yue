@@ -13,13 +13,6 @@ process.env.CI = 'true'
 
 execSync(`node ./scripts/bootstrap.js --target-cpu=${targetCpu}`)
 
-// Build common targets.
-execSync('node ./scripts/build.js out/Release')
-execSync('node ./scripts/build.js out/Debug')
-
-// Create distributions.
-execSync(`node ./scripts/create_dist.js`)
-
 // Run test except for cross compilation on Linux.
 if (targetOs != 'linux' || targetCpu == 'x64') {
   const tests = [
@@ -30,6 +23,13 @@ if (targetOs != 'linux' || targetCpu == 'x64') {
   for (test of tests)
     execSync(`${path.join('out', 'Component', test)}`)
 }
+
+// Build common targets.
+execSync('node ./scripts/build.js out/Release')
+execSync('node ./scripts/build.js out/Debug')
+
+// Create distributions.
+execSync(`node ./scripts/create_dist.js`)
 
 // Build node extensions.
 const runtimes = {
