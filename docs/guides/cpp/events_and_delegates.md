@@ -5,9 +5,8 @@ description: Walkthrough of the event system.
 
 # Events and delegates
 
-The event system of Yue heavily relies on Chromium's `base::Callback` library,
-it is recommended to have a read of [Callback and Bind][callback] before
-continue.
+The event system of Yue heavily relies on `std::function`, it is strongly
+recommended to know more about `std::function` before continue.
 
 ## Event
 
@@ -16,17 +15,14 @@ that can be connected by multiple slots, and event handlers are slots that can
 connect to multiple signals.
 
 In Yue signal is represented as the [`nu::Signal<Sig>`](../api/signal.html)
-template class, while slot is represented as the
-[`base::Callback<Sig>`](../api/base_callback.html) template class. `Sig` is the
-signature of slot.
+template class, while slot is represented as the `std::function<Sig>` template
+class. `Sig` is the signature of slot.
 
 ```cpp
-void OnReady() {
-  LOG(ERROR) << "OnReady";
-}
-
 void Main() {
-  nu::App::GetCurrent()->on_ready.Connect(base::Bind(&OnReady));
+  nu::App::GetCurrent()->on_ready.Connect([] {
+    LOG(ERROR) << "OnReady";
+  });
 }
 ```
 
@@ -36,7 +32,7 @@ Certain events have default behaviors that can be prevented, which require the
 slots to return `bool`.
 
 Returning `true` means preventing the default behavior, and other slots of the
-events will not be executed. While returning `false` means the slot is only
+event will not be executed. While returning `false` means the slot is only
 observing the event.
 
 ```cpp
@@ -45,23 +41,22 @@ bool OnMouseDown(nu::View* self, const nu::MouseEvent& event) {
 }
 
 void Main(nu::View* view) {
-  view->on_mouse_down.Connect(base::Bind(&OnMouseDown));
+  view->on_mouse_down.Connect(&OnMouseDown);
 }
 ```
 
 ## Delegate
 
 Unlike event that can have multiple handlers connected, a delegate is a single
-`base::Callback<Sig>` that can only be assigned by one function.
+`std::function<Sig>` data member that can only be assigned by one function.
 
 ```cpp
-bool ShouldClose(nu::Window* self) {
-  return false;
-}
-
 void Main(nu::Window* window) {
-  window->should_close = base::Bind(&OnMouseDown);
+  window->should_close = [](nu::Window* self) { return false; };
 }
 ```
+
+The delegates are usually used over events when the library is requesting data
+dynamically.
 
 [callback]: https://chromium.googlesource.com/chromium/src/+/master/docs/callback.md

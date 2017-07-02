@@ -23,8 +23,6 @@ Though the `base` library is undocumented, there are few guides to help you
 learn it:
 
 * [Smart Pointer Guidelines](https://www.chromium.org/developers/smart-pointer-guidelines)
-* [`Callback<>` and `Bind()`](https://chromium.googlesource.com/chromium/src/+/master/docs/callback.md)
-* [Threading and Tasks in Chrome](https://chromium.googlesource.com/chromium/src/+/master/docs/threading_and_tasks.md)
 
 It is strongly recommended to read all of the guides before using `nativeui`.
 
@@ -71,66 +69,19 @@ int main(int argc, const char *argv[]) {
 
 There is no assumption on which build system you should use, to use Yue, you can
 download the `libyue_VERSION_PLATFORM_ARCH.zip` archive from the
-[Releases][releases] page, which includes header files and a prebuilt static
-library from of Yue.
+[Releases][releases] page, which includes header files and prebuilt static
+libraries of Yue.
 
-Then you can direct your build system to link with Yue and its dependencies.
+The libyue zip archive includes following files:
 
-### Linux
+* `include` - Headers of `nativeui` and `base` libraries.
+* `lib` - Debug and Release builds of static libraries, the filename of Debug
+  version ends with a `d`.
+* `sample_app` - A sample app using Yue.
+* `CMakeLists.txt` - An example cmake file building the sample app.
 
-To link with Yue, your program must be linked with GTK3 and X11, and compiled
-with at least C++11 enabled:
-
-```bash
-clang++ main.cc libyue.a -Iinclude \
-        -ldl `pkg-config --cflags --libs gtk+-3.0 x11` \
-        -D_GLIBCXX_USE_CXX11_ABI=0 \
-        -std=c++14 -DNDEBUG \
-        -fdata-sections -ffunction-sections -Wl,--gc-section
-```
-
-The `NDEBUG` is required to be defined, because the prebuilt binaries were built
-with Release configuration, and your program should use the same configuration.
-
-The `_GLIBCXX_USE_CXX11_ABI=0` is required to be defined, because the prebuilt
-binaries were compiled with clang targeting Debian Jessie, and we need to avoid
-using cxx11 ABI introduced in newer versions of libstdc++.
-
-In order to minimize the size of binary, `--gc-section` should be passed to the
-linker to remove unused code.
-
-### macOS
-
-To link with Yue, your program must be linked with `AppKit.framework` and
-`Security.framework`, and compiled with at least C++11 enabled:
-
-```bash
-clang++ main.cc libyue.a -Iinclude \
-        -framework AppKit -framework Security \
-        -std=c++14 -DNDEBUG -Wl,-dead_strip
-```
-
-The `NDEBUG` is required to be defined, because the prebuilt binaries were built
-with Release configuration, and your program should use the same configuration.
-
-In order to minimize the size of binary, `-Wl,-dead_strip` should be passed to
-the linker to remove unused code.
-
-### Windows
-
-To link with Yue, you program must:
-
-* Be a Win32 project;
-* Use the `Release` configuration;
-* Use `/MT` (static Release version) in `Runtime Library` of `Code Generation`;
-* Have `NOMINMAX` defined in `Preprocessor Definitions`;
-* Have the `include` directory of the downloaded archive added to the `Include
-  Directories`;
-* Have the path of the downloaded archive added to the `Library Directories`;
-* Have `setupapi.lib;powrprof.lib;ws2_32.lib;dbghelp.lib;shlwapi.lib;version.lib;winmm.lib;psapi.lib;dwmapi.lib;gdi32.lib;gdiplus.lib;libyue.lib`
-  added to the `Additional Dependencies` of the `Linker`;
-* Have `setupapi.dll;powrprof.dll;dwmapi.dll` added to the `Delay Loaded DLLs` of
-  the `Linker`.
+If you are interested in integrating Yue into a build system, you can look into
+the `CMakeLists.txt` on which compilation options should be used.
 
 [base]: https://chromium.googlesource.com/chromium/src/base/
 [releases]: https://github.com/yue/yue/releases

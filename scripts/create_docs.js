@@ -341,9 +341,9 @@ function parseType(lang, str) {
   // No need to convert types for C++.
   let builtin = true
   if (lang == 'cpp') {
-    let builtins = [ 'bool', 'float', 'std::string', 'char', 'uint32_t',
-                     'unsigned', 'int', 'Args...', 'base::Callback' ]
-    builtin = builtins.includes(type.name)
+    let builtins = [ 'bool', 'float', 'char', 'uint32_t', 'unsigned', 'int' ]
+    builtin = type.name.startsWith('std::') || type.name.endsWith('...') ||
+              builtins.includes(type.name)
   }
   // Convertbuilt-in types for differnt languages.
   if (lang == 'lua') {
@@ -358,7 +358,7 @@ function parseType(lang, str) {
       case 'Dictionary': type.name = 'table'; break
       case 'Array': type.name = 'table'; break
       case 'Function': type.name = 'function'; break
-      case 'base::Callback': type.name = 'function'; break
+      case 'std::function': type.name = 'function'; break
       case 'base::FilePath': type.name = 'string'; break
       default: builtin = false
     }
@@ -374,7 +374,7 @@ function parseType(lang, str) {
       case 'Dictionary': type.name = 'Object'; break
       case 'Array': type.name = 'Array'; break
       case 'Function': type.name = 'Function'; break
-      case 'base::Callback': type.name = 'Function'; break
+      case 'std::function': type.name = 'Function'; break
       case 'base::FilePath': type.name = 'String'; break
       default: builtin = false
     }

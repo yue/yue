@@ -13,17 +13,14 @@ lang_detail:
     to all the callbacks.
 
     ```cpp
-    #include "base/bind.h"
     #include "base/logging.h"
     #include "nativeui/nativeui.h"
 
-    void OnEvent(const std::string& arg) {
-      LOG(ERROR) << "OnEvent: " << arg;
-    }
-
     void Main() {
       nu::Signal<void(const std::string&)> event;
-      event.Connect(base::Bind(&OnEvent));
+      event.Connect([](const std::string&) {
+        LOG(ERROR) << "OnEvent: " << arg;
+      });
 
       event.Emit("Emitted");
     }
@@ -35,7 +32,7 @@ lang_detail:
   js: *ref
 
 methods:
-  - signature: int Connect(const base::Callback<Sig>& slot)
+  - signature: int Connect(const std::function<Sig>& slot)
     lang: ['cpp']
     description: |
       Connect `slot` to the signal, and return an ID that can be used to

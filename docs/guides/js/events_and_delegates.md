@@ -30,7 +30,7 @@ app.onReady = () => console.log('on ready')
 Certain events have default behaviors that can be prevented.
 
 Returning `true` means preventing the default behavior, and other slots of the
-events will not be executed. While returning nothing or `false` means the slot
+event will not be executed. While returning nothing or `false` means the slot
 is only observing the event.
 
 ```js
@@ -49,3 +49,6 @@ const {Window} = require('gui')
 let window = Window.create({})
 window.shouldClose = (self) => false
 ```
+
+The delegates are usually used over events when the library is requesting data
+dynamically.
