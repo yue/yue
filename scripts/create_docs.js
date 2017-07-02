@@ -63,7 +63,7 @@ for (let lang of langs) {
   guides.sort((a, b) => b.priority - a.priority)
 
   // Generate the index page.
-  const html = pug.renderFile('docs/template/index.pug', {
+  const html = pug.renderFile('docs/layout/index.pug', {
     page: 'index',
     doc: { name: 'Docs' },
     lang,
@@ -80,7 +80,7 @@ for (let lang of langs) {
   for (let guide of guides) {
     const guidedir = path.join(langdir, 'guides')
     mkdir(guidedir)
-    const html = pug.renderFile('docs/template/guide.pug', {
+    const html = pug.renderFile('docs/layout/guide.pug', {
       page: 'guide',
       doc: guide,
       filters: { 'css-minimize': cssMinimize },
@@ -96,7 +96,7 @@ for (let lang of langs) {
     fs.writeFileSync(path.join(apidir, `${doc.id}.json`),
                      JSON.stringify(doc, null, '  '))
     // Output HTML pages.
-    const html = pug.renderFile('docs/template/api.pug', {
+    const html = pug.renderFile('docs/layout/api.pug', {
       name: doc.name,
       page: 'api',
       doc,
