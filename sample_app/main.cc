@@ -4,7 +4,7 @@
 #include "nativeui/nativeui.h"
 
 #if defined(OS_WIN)
-int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
+int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
   base::CommandLine::Init(0, nullptr);
 #else
 int main(int argc, const char *argv[]) {
