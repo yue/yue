@@ -4,6 +4,7 @@
 
 #include "nativeui/group.h"
 
+#include "nativeui/container.h"
 #include "nativeui/gfx/geometry/insets.h"
 
 namespace nu {
@@ -15,7 +16,6 @@ Group::Group(const std::string& title) {
   PlatformInit();
   SetContentView(new Container);
   SetTitle(title);
-  SetDefaultStyle(GetBorderSize());
 }
 
 Group::~Group() {
@@ -30,18 +30,18 @@ void Group::Layout() {
   content_view_->Layout();
 }
 
-void Group::SetContentView(Container* container) {
+void Group::SetContentView(View* view) {
   if (content_view_)
     content_view_->SetParent(nullptr);
-  content_view_ = container;
+  content_view_ = view;
   content_view_->SetParent(this);
-  PlatformSetContentView(container);
+  PlatformSetContentView(view);
 
-  SetDefaultStyle(GetBorderSize() + container->GetPreferredSize());
+  SetDefaultStyle(GetBorderSize());
   Layout();
 }
 
-Container* Group::GetContentView() const {
+View* Group::GetContentView() const {
   return content_view_.get();
 }
 

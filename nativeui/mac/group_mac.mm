@@ -18,9 +18,9 @@ void Group::PlatformInit() {
   TakeOverView(group);
 }
 
-void Group::PlatformSetContentView(Container* container) {
-  [static_cast<NSBox*>(GetNative()) setContentView:container->GetNative()];
-  container->Layout();
+void Group::PlatformSetContentView(View* view) {
+  [static_cast<NSBox*>(GetNative()) setContentView:view->GetNative()];
+  view->Layout();
 }
 
 void Group::SetTitle(const std::string& title) {

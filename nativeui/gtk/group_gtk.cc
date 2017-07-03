@@ -16,13 +16,13 @@ void Group::PlatformInit() {
   gtk_widget_size_allocate(GetNative(), &rect);
 }
 
-void Group::PlatformSetContentView(Container* container) {
+void Group::PlatformSetContentView(View* view) {
   GtkWidget* child = gtk_bin_get_child(GTK_BIN(GetNative()));
   if (child)
     gtk_container_remove(GTK_CONTAINER(GetNative()), child);
-  gtk_container_add(GTK_CONTAINER(GetNative()), container->GetNative());
+  gtk_container_add(GTK_CONTAINER(GetNative()), view->GetNative());
 
-  container->Layout();
+  view->Layout();
 }
 
 void Group::SetTitle(const std::string& title) {

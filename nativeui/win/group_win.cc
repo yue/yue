@@ -120,8 +120,8 @@ void Group::PlatformInit() {
   TakeOverView(new GroupImpl(this));
 }
 
-void Group::PlatformSetContentView(Container* container) {
-  container->GetNative()->SetParent(GetNative());
+void Group::PlatformSetContentView(View* view) {
+  view->GetNative()->SetParent(GetNative());
   static_cast<GroupImpl*>(GetNative())->Layout();
 }
 
