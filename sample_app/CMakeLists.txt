@@ -2,6 +2,10 @@
 
 cmake_minimum_required(VERSION 3.1)
 
+if((CMAKE_GENERATOR STREQUAL "Unix Makefiles") AND (NOT CMAKE_BUILD_TYPE))
+  message(FATAL_ERROR "You must specify a build type.")
+endif()
+
 project(YueSampleApp)
 set(APP_NAME "sample_app")
 
