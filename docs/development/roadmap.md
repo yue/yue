@@ -9,6 +9,7 @@ Please note that the items are __not__ prioritized.
 ## v1.x
 
 * XML support
+* Ability to embed resources into executables/bundles
 
 ### More widget types
 
@@ -22,7 +23,7 @@ Please note that the items are __not__ prioritized.
 * List view
 * Image viewer with GIF support
 
-### Improve widget
+### Improved widgets
 
 * Icon button
 * More Entry types
@@ -35,6 +36,17 @@ Please note that the items are __not__ prioritized.
 ### Windows
 
 * Per-monitor DPI support
+* Optional font rendering with DirectWrite
+* Custom draw all widgets
+
+### Lua
+
+* Add LuaRocks module
+* Improve our Yue-integrated lua runtime
+
+### Node.js
+
+* Provide a custom distribution of Node.js which uses a GUI event loop
 
 ## v2.0
 
