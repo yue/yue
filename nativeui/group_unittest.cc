@@ -23,3 +23,8 @@ TEST_F(GroupTest, Title) {
   group->SetTitle("test");
   EXPECT_EQ(group->GetTitle(), "test");
 }
+
+TEST_F(GroupTest, EmbeddingScroll) {
+  scoped_refptr<nu::Group> group(new nu::Group("title"));
+  group->SetContentView(new nu::Scroll);
+}

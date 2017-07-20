@@ -14,6 +14,7 @@ const char Group::kClassName[] = "Group";
 
 Group::Group(const std::string& title) {
   PlatformInit();
+  SetDefaultStyle(GetBorderSize());
   SetContentView(new Container);
   SetTitle(title);
 }
@@ -25,20 +26,12 @@ const char* Group::GetClassName() const {
   return kClassName;
 }
 
-void Group::Layout() {
-  View::Layout();
-  content_view_->Layout();
-}
-
 void Group::SetContentView(View* view) {
   if (content_view_)
     content_view_->SetParent(nullptr);
   content_view_ = view;
   content_view_->SetParent(this);
   PlatformSetContentView(view);
-
-  SetDefaultStyle(GetBorderSize());
-  Layout();
 }
 
 View* Group::GetContentView() const {
