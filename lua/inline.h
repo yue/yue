@@ -8,7 +8,7 @@
 #include "lua/state.h"
 
 extern "C" {
-#include "third_party/lua/lstate.h"
+#include "third_party/lua/src/lstate.h"
 }
 
 namespace lua {

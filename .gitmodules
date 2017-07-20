@@ -20,9 +20,6 @@
 	path = build/toolchain
 	url = https://chromium.googlesource.com/chromium/src/build/toolchain
   ignore = untracked
-[submodule "third_party/lua"]
-	path = third_party/lua
-	url = https://github.com/lua/lua
 [submodule "third_party/yoga"]
 	path = third_party/yoga
 	url = https://github.com/facebook/yoga
@@ -38,3 +35,6 @@
 [submodule "third_party/googletest/src"]
 	path = third_party/googletest/src
 	url = https://github.com/google/googletest
+[submodule "third_party/lua"]
+	path = third_party/lua
+	url = https://github.com/ejoy/lua.git

@@ -8,9 +8,9 @@
 #include "base/macros.h"
 
 extern "C" {
-#include "third_party/lua/lauxlib.h"
-#include "third_party/lua/lua.h"
-#include "third_party/lua/lualib.h"
+#include "third_party/lua/src/lauxlib.h"
+#include "third_party/lua/src/lua.h"
+#include "third_party/lua/src/lualib.h"
 }
 
 namespace lua {
