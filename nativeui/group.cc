@@ -14,9 +14,9 @@ const char Group::kClassName[] = "Group";
 
 Group::Group(const std::string& title) {
   PlatformInit();
-  SetDefaultStyle(GetBorderSize());
   SetContentView(new Container);
   SetTitle(title);
+  SetDefaultStyle(GetBorderSize());
 }
 
 Group::~Group() {
