@@ -41,7 +41,16 @@ UINT ViewImpl::HitTest(const Point& point) const {
 
 void ViewImpl::SetParent(ViewImpl* parent) {
   window_ = parent ? parent->window_ : nullptr;
-  viewport_ = parent ? parent->viewport_ : nullptr;
+
+  if (parent) {
+    if (parent->type() == ControlType::Scroll &&
+        type() != ControlType::Scrollbar)
+      viewport_ = static_cast<ScrollImpl*>(parent);
+    else
+      viewport_ = parent->viewport_;
+  } else {
+    viewport_ = nullptr;
+  }
 
   ParentChanged();
 }

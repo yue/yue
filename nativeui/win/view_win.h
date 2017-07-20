@@ -19,12 +19,15 @@ class WindowImpl;
 // usually just be |Container| or |View|.
 enum class ControlType {
   View,
-  Container,
   Subwin,
+  Scrollbar,
   // Button types.
   Button,
   Checkbox,
   Radio,
+  // Container types, other types should NOT be appended after Container.
+  Container,
+  Scroll,
 };
 
 // The common base for native window based view and directui view.

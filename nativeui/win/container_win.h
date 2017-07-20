@@ -27,7 +27,8 @@ class ContainerImpl : public ViewImpl {
     virtual void OnDraw(PainterWin* painter, const Rect& dirty) {}
   };
 
-  ContainerImpl(View* view, Adapter* delegate);
+  ContainerImpl(View* view, Adapter* delegate,
+                ControlType type = ControlType::Container);
 
   // Baseview:
   void SizeAllocate(const Rect& size_allocation) override;

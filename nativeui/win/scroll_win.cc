@@ -12,7 +12,7 @@
 namespace nu {
 
 ScrollImpl::ScrollImpl(Scroll* delegate)
-    : ContainerImpl(delegate, this),
+    : ContainerImpl(delegate, this, ControlType::Scroll),
       scrollbar_height_(GetSystemMetrics(SM_CXVSCROLL)),
       delegate_(delegate) {
   SetScrollbarPolicy(Scroll::Policy::Automatic, Scroll::Policy::Automatic);

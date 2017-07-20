@@ -10,8 +10,8 @@
 
 namespace nu {
 
-ContainerImpl::ContainerImpl(View* delegate, Adapter* adapter)
-    : ViewImpl(ControlType::Container, delegate), adapter_(adapter) {}
+ContainerImpl::ContainerImpl(View* delegate, Adapter* adapter, ControlType type)
+    : ViewImpl(type, delegate), adapter_(adapter) {}
 
 void ContainerImpl::SizeAllocate(const Rect& size_allocation) {
   ViewImpl::SizeAllocate(size_allocation);

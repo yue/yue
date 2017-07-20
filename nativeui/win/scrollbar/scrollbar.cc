@@ -11,7 +11,7 @@
 namespace nu {
 
 Scrollbar::Scrollbar(bool vertical, ScrollImpl* scroll)
-    : ContainerImpl(nullptr, this),
+    : ContainerImpl(nullptr, this, ControlType::Scrollbar),
       near_button_(vertical ? ScrollbarButton::Up : ScrollbarButton::Left,
                    this),
       far_button_(vertical ? ScrollbarButton::Down : ScrollbarButton::Right,
