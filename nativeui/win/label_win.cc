@@ -17,7 +17,7 @@ namespace {
 class LabelImpl : public ViewImpl {
  public:
   explicit LabelImpl(Label* delegate)
-      : ViewImpl(ControlType::Label, delegate) {}
+      : ViewImpl(ControlType::View, delegate) {}
 
   void SetText(const base::string16& text) {
     text_ = text;

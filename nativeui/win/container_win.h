@@ -21,12 +21,13 @@ class ContainerImpl : public ViewImpl {
     virtual ~Adapter() = default;
 
     virtual void Layout() = 0;
-    virtual void ForEach(const std::function<bool(ViewImpl*)>& callback) = 0;
+    virtual void ForEach(const std::function<bool(ViewImpl*)>& callback,
+                         bool reverse = false) = 0;
     virtual bool HasChild(ViewImpl* child) = 0;
     virtual void OnDraw(PainterWin* painter, const Rect& dirty) {}
   };
 
-  ContainerImpl(ControlType type, View* view, Adapter* delegate);
+  ContainerImpl(View* view, Adapter* delegate);
 
   // Baseview:
   void SizeAllocate(const Rect& size_allocation) override;
@@ -40,6 +41,8 @@ class ContainerImpl : public ViewImpl {
   bool OnMouseWheel(bool vertical, UINT flags, int delta,
                     const Point& point) override;
   bool OnMouseClick(NativeEvent event) override;
+
+  Adapter* adapter() const { return adapter_; }
 
  protected:
   void DrawChild(ViewImpl* child, PainterWin* painter, const Rect& dirty);

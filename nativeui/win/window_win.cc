@@ -109,9 +109,8 @@ Rect WindowImpl::GetContentPixelBounds() {
 }
 
 void WindowImpl::AdvanceFocus() {
-  if (delegate_->GetContentView()->GetClassName() == Container::kClassName)
-    focus_manager_.AdvanceFocus(
-        static_cast<Container*>(delegate_->GetContentView()), IsShiftPressed());
+  focus_manager_.AdvanceFocus(delegate_->GetContentView()->GetNative(),
+                              IsShiftPressed());
 }
 
 void WindowImpl::SetCapture(ViewImpl* view) {
@@ -302,7 +301,7 @@ LRESULT WindowImpl::OnKeyEvent(UINT message, WPARAM w_param, LPARAM l_param) {
   // First pass the event to view.
   Win32Message msg = {message, w_param, l_param};
   if (focus_manager()->focused_view() &&
-      focus_manager()->focused_view()->GetNative()->OnKeyEvent(&msg))
+      focus_manager()->focused_view()->OnKeyEvent(&msg))
     return 0;
 
   // If no one handles it then pass the event to menu.

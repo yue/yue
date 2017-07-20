@@ -125,7 +125,7 @@ void SubwinView::OnChar(UINT ch, UINT repeat, UINT flags) {
 void SubwinView::OnSetFocus(HWND hwnd) {
   // Notify the window that focus has changed.
   if (window())
-    window()->focus_manager()->TakeFocus(delegate());
+    window()->focus_manager()->TakeFocus(this);
   SetMsgHandled(false);
 }
 

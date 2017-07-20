@@ -21,7 +21,7 @@ namespace {
 class BrowserImpl : public ViewImpl {
  public:
   explicit BrowserImpl(Browser* delegate)
-      : ViewImpl(ControlType::Browser, delegate) {
+      : ViewImpl(ControlType::View, delegate) {
     ::CoCreateInstance(CLSID_InternetExplorer, nullptr, CLSCTX_LOCAL_SERVER,
                        IID_PPV_ARGS(&browser_));
 

@@ -187,7 +187,7 @@ class ButtonImpl : public ViewImpl {
     // This has to be done before handling the mouse event, because user may
     // want to move focus to other view later.
     if (event->message == WM_LBUTTONDOWN)
-      window()->focus_manager()->TakeFocus(delegate());
+      window()->focus_manager()->TakeFocus(this);
 
     if (ViewImpl::OnMouseClick(event))
       return true;

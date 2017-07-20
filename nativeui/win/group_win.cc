@@ -24,8 +24,7 @@ class GroupImpl : public ContainerImpl,
                   public ContainerImpl::Adapter {
  public:
   explicit GroupImpl(Group* delegate)
-      : ContainerImpl(ControlType::Group, delegate, this),
-        delegate_(delegate) {}
+      : ContainerImpl(delegate, this), delegate_(delegate) {}
 
   void SetTitle(const base::string16& title) {
     title_ = title;
@@ -49,7 +48,8 @@ class GroupImpl : public ContainerImpl,
     delegate_->GetContentView()->GetNative()->SizeAllocate(child_alloc);
   }
 
-  void ForEach(const std::function<bool(ViewImpl*)>& callback) override {
+  void ForEach(const std::function<bool(ViewImpl*)>& callback,
+               bool reverse) override {
     callback(delegate_->GetContentView()->GetNative());
   }
 

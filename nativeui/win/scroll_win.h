@@ -31,7 +31,8 @@ class ScrollImpl : public ContainerImpl,
 
   // ContainerImpl::Adapter:
   void Layout() override;
-  void ForEach(const std::function<bool(ViewImpl*)>& callback) override;
+  void ForEach(const std::function<bool(ViewImpl*)>& callback,
+               bool reverse) override;
   bool HasChild(ViewImpl* child) override;
 
   // ViewImpl:

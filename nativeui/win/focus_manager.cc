@@ -4,8 +4,7 @@
 
 #include "nativeui/win/focus_manager.h"
 
-#include "nativeui/group.h"
-#include "nativeui/win/view_win.h"
+#include "nativeui/win/container_win.h"
 
 namespace nu {
 
@@ -15,61 +14,63 @@ FocusManager::FocusManager() {
 FocusManager::~FocusManager() {
 }
 
-void FocusManager::TakeFocus(View* view) {
+void FocusManager::TakeFocus(ViewImpl* view) {
   // This happens when you switch to a child window.
   if (focused_view_ == view)
     return;
 
   if (focused_view_)
-    focused_view_->GetNative()->SetFocus(false);
+    focused_view_->SetFocus(false);
   focused_view_ = view;
 }
 
-void FocusManager::AdvanceFocus(Container* container, bool reverse) {
+void FocusManager::AdvanceFocus(ViewImpl* view, bool reverse) {
+  // We can not advance focus in a non-container view.
+  if (view->type() != ControlType::Container)
+    return;
+
   // Should we focus on next view.
   bool focus_on_next_view = focused_view_ == nullptr;
 
+  ContainerImpl* container = static_cast<ContainerImpl*>(view);
   bool found = DoAdvanceFocus(container, reverse, &focus_on_next_view);
 
   // Search again from start.
   if (!found && focus_on_next_view && focused_view_) {
-    focused_view_->GetNative()->SetFocus(false);
+    focused_view_->SetFocus(false);
     focused_view_ = nullptr;
     DoAdvanceFocus(container, reverse, &focus_on_next_view);
   }
 }
 
-bool FocusManager::DoAdvanceFocus(Container* container, bool reverse,
+bool FocusManager::DoAdvanceFocus(ContainerImpl* container, bool reverse,
                                   bool* focus_on_next_view) {
+  bool result = false;
   // Iterate views recusively.
-  for (int i = reverse ? container->ChildCount() - 1 : 0;
-       reverse ? (i >= 0) : (i < container->ChildCount());
-       reverse ? --i : ++i) {
-    View* child = container->ChildAt(i);
-    if (!child->IsVisible())
-      continue;
+  container->adapter()->ForEach([&](ViewImpl* child) {
+    if (!child->is_visible())
+      return true;  // continue
 
-    if (child->GetNative()->type() == ControlType::Container &&
-        DoAdvanceFocus(static_cast<Container*>(child), reverse,
+    if (child->type() == ControlType::Container &&
+        DoAdvanceFocus(static_cast<ContainerImpl*>(child), reverse,
                        focus_on_next_view)) {
-      return true;
-    } else if (child->GetNative()->type() == ControlType::Group &&
-               DoAdvanceFocus(static_cast<Group*>(child)->GetContentView(),
-                              reverse, focus_on_next_view)) {
-      return true;
+      result = true;
+      return false;  // break
     }
 
     if (child == focused_view_) {
       *focus_on_next_view = true;
-    } else if (*focus_on_next_view && child->GetNative()->is_focusable()) {
+    } else if (*focus_on_next_view && child->is_focusable()) {
       if (focused_view_)
-        focused_view_->GetNative()->SetFocus(false);
+        focused_view_->SetFocus(false);
       focused_view_ = child;
-      child->GetNative()->SetFocus(true);
-      return true;
+      child->SetFocus(true);
+      result = true;
+      return false;  // break
     }
-  }
-  return false;
+    return true;  // continue
+  }, reverse);
+  return result;
 }
 
 }  // namespace nu

@@ -10,7 +10,7 @@
 namespace nu {
 
 ScrollbarThumb::ScrollbarThumb(bool vertical, Scrollbar* scrollbar)
-    : ViewImpl(ControlType::ScrollbarThumb, nullptr),
+    : ViewImpl(ControlType::View, nullptr),
       vertical_(vertical),
       scrollbar_(scrollbar) {
 }

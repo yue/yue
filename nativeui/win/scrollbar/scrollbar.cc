@@ -11,7 +11,7 @@
 namespace nu {
 
 Scrollbar::Scrollbar(bool vertical, ScrollImpl* scroll)
-    : ContainerImpl(ControlType::Scrollbar, nullptr, this),
+    : ContainerImpl(nullptr, this),
       near_button_(vertical ? ScrollbarButton::Up : ScrollbarButton::Left,
                    this),
       far_button_(vertical ? ScrollbarButton::Down : ScrollbarButton::Right,
@@ -110,7 +110,8 @@ void Scrollbar::Layout() {
   UpdateThumbPosition();
 }
 
-void Scrollbar::ForEach(const std::function<bool(ViewImpl*)>& callback) {
+void Scrollbar::ForEach(const std::function<bool(ViewImpl*)>& callback,
+                        bool reverse /* ignored for Scrollbar */) {
   callback(&near_button_) && callback(&far_button_) && callback(&thumb_);
 }
 

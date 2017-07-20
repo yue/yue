@@ -12,7 +12,7 @@
 namespace nu {
 
 ScrollImpl::ScrollImpl(Scroll* delegate)
-    : ContainerImpl(ControlType::Scroll, delegate, this),
+    : ContainerImpl(delegate, this),
       scrollbar_height_(GetSystemMetrics(SM_CXVSCROLL)),
       delegate_(delegate) {
   SetScrollbarPolicy(Scroll::Policy::Automatic, Scroll::Policy::Automatic);
@@ -77,7 +77,8 @@ void ScrollImpl::Layout() {
   }
 }
 
-void ScrollImpl::ForEach(const std::function<bool(ViewImpl*)>& callback) {
+void ScrollImpl::ForEach(const std::function<bool(ViewImpl*)>& callback,
+                         bool reverse /* ignored for Scroll */) {
   callback(delegate_->GetContentView()->GetNative()) &&
   (!h_scrollbar_ || callback(h_scrollbar_.get())) &&
   v_scrollbar_ && callback(v_scrollbar_.get());
@@ -187,6 +188,7 @@ void Scroll::PlatformInit() {
 void Scroll::PlatformSetContentView(View* view) {
   auto* scroll = static_cast<ScrollImpl*>(GetNative());
   view->GetNative()->SetParent(scroll);
+  view->GetNative()->set_viewport(scroll);
 }
 
 void Scroll::SetContentSize(const SizeF& size) {

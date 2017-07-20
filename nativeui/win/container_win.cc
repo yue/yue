@@ -10,8 +10,8 @@
 
 namespace nu {
 
-ContainerImpl::ContainerImpl(ControlType type, View* delegate, Adapter* adapter)
-    : ViewImpl(type, delegate), adapter_(adapter) {}
+ContainerImpl::ContainerImpl(View* delegate, Adapter* adapter)
+    : ViewImpl(ControlType::Container, delegate), adapter_(adapter) {}
 
 void ContainerImpl::SizeAllocate(const Rect& size_allocation) {
   ViewImpl::SizeAllocate(size_allocation);
@@ -149,16 +149,18 @@ class ContainerAdapter : public ContainerImpl,
                          public ContainerImpl::Adapter {
  public:
   explicit ContainerAdapter(Container* container)
-      : ContainerImpl(ControlType::Container, container, this),
-        container_(container) {}
+      : ContainerImpl(container, this), container_(container) {}
 
   // ContainerImpl::Adapter:
   void Layout() override {
     container_->SetChildBoundsFromCSS();
   }
 
-  void ForEach(const std::function<bool(ViewImpl*)>& callback) override {
-    for (int i = 0; i < container_->ChildCount(); ++i) {
+  void ForEach(const std::function<bool(ViewImpl*)>& callback,
+               bool reverse) override {
+    for (int i = reverse ? container_->ChildCount() - 1 : 0;
+         reverse ? (i >= 0) : (i < container_->ChildCount());
+         reverse ? --i : ++i) {
       if (!callback(container_->ChildAt(i)->GetNative()))
         break;
     }

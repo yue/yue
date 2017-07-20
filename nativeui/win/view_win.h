@@ -15,19 +15,16 @@ class ScrollImpl;
 class WindowImpl;
 
 // Possible control types.
+// We only add new types when it is necessary, otherwise a new View should
+// usually just be |Container| or |View|.
 enum class ControlType {
-  Browser,
+  View,
+  Container,
+  Subwin,
+  // Button types.
   Button,
   Checkbox,
   Radio,
-  Container,
-  Group,
-  Label,
-  Scroll,
-  Scrollbar,
-  ScrollbarButton,
-  ScrollbarThumb,
-  Subwin,
 };
 
 // The common base for native window based view and directui view.
@@ -113,6 +110,9 @@ class ViewImpl {
   // Set control's state.
   void set_state(ControlState state) { state_ = state; }
   ControlState state() const { return state_; }
+
+  // Set control's viewport, only called by Scroll.
+  void set_viewport(ScrollImpl* scroll) { viewport_ = scroll; }
 
   // Returns the DPI of current view.
   float scale_factor() const { return scale_factor_; }
