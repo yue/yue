@@ -998,20 +998,20 @@ struct Type<nu::Label> {
 };
 
 template<>
-struct Type<nu::Progress> {
+struct Type<nu::ProgressBar> {
   using base = nu::View;
-  static constexpr const char* name = "yue.Progress";
+  static constexpr const char* name = "yue.ProgressBar";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
-    Set(context, constructor, "create", &CreateOnHeap<nu::Progress>);
+    Set(context, constructor, "create", &CreateOnHeap<nu::ProgressBar>);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
-        "setValue", &nu::Progress::SetValue,
-        "getValue", &nu::Progress::GetValue,
-        "setIndeterminate", &nu::Progress::SetIndeterminate,
-        "isIndeterminate", &nu::Progress::IsIndeterminate);
+        "setValue", &nu::ProgressBar::SetValue,
+        "getValue", &nu::ProgressBar::GetValue,
+        "setIndeterminate", &nu::ProgressBar::SetIndeterminate,
+        "isIndeterminate", &nu::ProgressBar::IsIndeterminate);
   }
 };
 
@@ -1126,29 +1126,29 @@ void Initialize(v8::Local<v8::Object> exports) {
   vb::Set(context, exports,
           // Classes.
 #if !defined(ELECTRON_BUILD)
-          "Lifetime",  vb::Constructor<nu::Lifetime>(),
+          "Lifetime",    vb::Constructor<nu::Lifetime>(),
 #endif
-          "App",       vb::Constructor<nu::App>(),
-          "Font",      vb::Constructor<nu::Font>(),
-          "Color",     vb::Constructor<nu::Color>(),
-          "Image",     vb::Constructor<nu::Image>(),
-          "Painter",   vb::Constructor<nu::Painter>(),
-          "Event",     vb::Constructor<nu::Event>(),
-          "MenuBar",   vb::Constructor<nu::MenuBar>(),
-          "Menu",      vb::Constructor<nu::Menu>(),
-          "MenuItem",  vb::Constructor<nu::MenuItem>(),
-          "Window",    vb::Constructor<nu::Window>(),
-          "View",      vb::Constructor<nu::View>(),
-          "Container", vb::Constructor<nu::Container>(),
-          "Button",    vb::Constructor<nu::Button>(),
-          "Browser",   vb::Constructor<nu::Browser>(),
-          "Entry",     vb::Constructor<nu::Entry>(),
-          "Label",     vb::Constructor<nu::Label>(),
-          "Progress",  vb::Constructor<nu::Progress>(),
-          "Group",     vb::Constructor<nu::Group>(),
-          "Scroll",    vb::Constructor<nu::Scroll>(),
+          "App",         vb::Constructor<nu::App>(),
+          "Font",        vb::Constructor<nu::Font>(),
+          "Color",       vb::Constructor<nu::Color>(),
+          "Image",       vb::Constructor<nu::Image>(),
+          "Painter",     vb::Constructor<nu::Painter>(),
+          "Event",       vb::Constructor<nu::Event>(),
+          "MenuBar",     vb::Constructor<nu::MenuBar>(),
+          "Menu",        vb::Constructor<nu::Menu>(),
+          "MenuItem",    vb::Constructor<nu::MenuItem>(),
+          "Window",      vb::Constructor<nu::Window>(),
+          "View",        vb::Constructor<nu::View>(),
+          "Container",   vb::Constructor<nu::Container>(),
+          "Button",      vb::Constructor<nu::Button>(),
+          "Browser",     vb::Constructor<nu::Browser>(),
+          "Entry",       vb::Constructor<nu::Entry>(),
+          "Label",       vb::Constructor<nu::Label>(),
+          "ProgressBar", vb::Constructor<nu::ProgressBar>(),
+          "Group",       vb::Constructor<nu::Group>(),
+          "Scroll",      vb::Constructor<nu::Scroll>(),
 #if defined(OS_MACOSX)
-          "Vibrant",   vb::Constructor<nu::Vibrant>(),
+          "Vibrant",     vb::Constructor<nu::Vibrant>(),
 #endif
           // Properties.
 #if !defined(ELECTRON_BUILD)

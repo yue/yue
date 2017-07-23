@@ -9,9 +9,9 @@
 
 namespace nu {
 
-class NATIVEUI_EXPORT Progress : public View {
+class NATIVEUI_EXPORT ProgressBar : public View {
  public:
-  Progress();
+  ProgressBar();
 
   // View class name.
   static const char kClassName[];
@@ -26,7 +26,7 @@ class NATIVEUI_EXPORT Progress : public View {
   const char* GetClassName() const override;
 
  protected:
-  ~Progress() override;
+  ~ProgressBar() override;
 };
 
 }  // namespace nu

@@ -2,7 +2,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/progress.h"
+#include "nativeui/progress_bar.h"
 
 #include <gtk/gtk.h>
 
@@ -24,24 +24,24 @@ gboolean OnTimer(GtkWidget* widget) {
 
 }  // namespace
 
-Progress::Progress() {
+ProgressBar::ProgressBar() {
   TakeOverView(gtk_progress_bar_new());
   SetDefaultStyle(SizeF(GetPreferredSizeForWidget(GetNative())));
 }
 
-Progress::~Progress() {
+ProgressBar::~ProgressBar() {
 }
 
-void Progress::SetValue(float value) {
+void ProgressBar::SetValue(float value) {
   SetIndeterminate(false);
   gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(GetNative()), value / 100.);
 }
 
-float Progress::GetValue() const {
+float ProgressBar::GetValue() const {
   return gtk_progress_bar_get_fraction(GTK_PROGRESS_BAR(GetNative())) * 100.;
 }
 
-void Progress::SetIndeterminate(bool indeterminate) {
+void ProgressBar::SetIndeterminate(bool indeterminate) {
   bool is_indeterminate = IsIndeterminate();
   if (indeterminate == is_indeterminate)
     return;
@@ -55,7 +55,7 @@ void Progress::SetIndeterminate(bool indeterminate) {
   }
 }
 
-bool Progress::IsIndeterminate() const {
+bool ProgressBar::IsIndeterminate() const {
   return g_object_get_data(G_OBJECT(GetNative()), "timer");
 }
 

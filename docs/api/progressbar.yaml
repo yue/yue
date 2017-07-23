@@ -1,4 +1,4 @@
-name: Progress
+name: ProgressBar
 component: gui
 header: nativeui/progress.h
 type: refcounted
@@ -7,14 +7,14 @@ inherit: View
 description: Horizontal bar showing progress.
 
 constructors:
-  - signature: Progress()
+  - signature: ProgressBar()
     lang: ['cpp']
-    description: Create a new `Progress` bar.
+    description: Create a new `ProgressBar`.
 
 class_methods:
-  - signature: Progress* Create()
+  - signature: ProgressBar* Create()
     lang: ['lua', 'js']
-    description: Create a new `Progress` bar.
+    description: Create a new `ProgressBar`.
 
 class_properties:
   - property: const char* kClassName

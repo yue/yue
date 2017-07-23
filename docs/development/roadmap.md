@@ -38,6 +38,7 @@ Please note that the items are __not__ prioritized.
 * Per-monitor DPI support
 * Optional font rendering with DirectWrite
 * Custom draw all widgets
+* ICO file format support
 
 ### Lua
 

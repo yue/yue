@@ -2,13 +2,13 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/progress.h"
+#include "nativeui/progress_bar.h"
 
 #import <Cocoa/Cocoa.h>
 
 namespace nu {
 
-Progress::Progress() {
+ProgressBar::ProgressBar() {
   auto* progress = [[NSProgressIndicator alloc] init];
   progress.indeterminate = NO;
   TakeOverView(progress);
@@ -17,21 +17,21 @@ Progress::Progress() {
   SetDefaultStyle(SizeF(0, height));
 }
 
-Progress::~Progress() {
+ProgressBar::~ProgressBar() {
 }
 
-void Progress::SetValue(float value) {
+void ProgressBar::SetValue(float value) {
   auto* progress = static_cast<NSProgressIndicator*>(GetNative());
   progress.indeterminate = NO;
   progress.doubleValue = value;
 }
 
-float Progress::GetValue() const {
+float ProgressBar::GetValue() const {
   auto* progress = static_cast<NSProgressIndicator*>(GetNative());
   return progress.doubleValue;
 }
 
-void Progress::SetIndeterminate(bool indeterminate) {
+void ProgressBar::SetIndeterminate(bool indeterminate) {
   auto* progress = static_cast<NSProgressIndicator*>(GetNative());
   progress.indeterminate = indeterminate;
   if (indeterminate)
@@ -40,7 +40,7 @@ void Progress::SetIndeterminate(bool indeterminate) {
     [progress stopAnimation:nil];
 }
 
-bool Progress::IsIndeterminate() const {
+bool ProgressBar::IsIndeterminate() const {
   auto* progress = static_cast<NSProgressIndicator*>(GetNative());
   return progress.isIndeterminate;
 }

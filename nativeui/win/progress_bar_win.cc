@@ -2,7 +2,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/progress.h"
+#include "nativeui/progress_bar.h"
 
 #include <commctrl.h>
 
@@ -13,36 +13,36 @@ namespace nu {
 
 namespace {
 
-class ProgressImpl : public SubwinView {
+class ProgressBarImpl : public SubwinView {
  public:
-  explicit ProgressImpl(Progress* delegate)
+  explicit ProgressBarImpl(ProgressBar* delegate)
       : SubwinView(delegate, PROGRESS_CLASS,
                    PBS_SMOOTH | WS_CHILD | WS_VISIBLE) {}
 };
 
 }  // namespace
 
-Progress::Progress() {
-  TakeOverView(new ProgressImpl(this));
+ProgressBar::ProgressBar() {
+  TakeOverView(new ProgressBarImpl(this));
   SetDefaultStyle(ScaleSize(SizeF(0, GetSystemMetrics(SM_CYVSCROLL)),
                             1.0f / GetScaleFactor()));
 }
 
-Progress::~Progress() {
+ProgressBar::~ProgressBar() {
 }
 
-void Progress::SetValue(float value) {
-  auto* progress = static_cast<ProgressImpl*>(GetNative());
+void ProgressBar::SetValue(float value) {
+  auto* progress = static_cast<ProgressBarImpl*>(GetNative());
   SetIndeterminate(false);
   SendMessageW(progress->hwnd(), PBM_SETPOS, value, 0);
 }
 
-float Progress::GetValue() const {
+float ProgressBar::GetValue() const {
   return 0;
 }
 
-void Progress::SetIndeterminate(bool indeterminate) {
-  auto* progress = static_cast<ProgressImpl*>(GetNative());
+void ProgressBar::SetIndeterminate(bool indeterminate) {
+  auto* progress = static_cast<ProgressBarImpl*>(GetNative());
   DWORD style = GetWindowLong(progress->hwnd(), GWL_STYLE);
   if (indeterminate) {
     SetWindowLong(progress->hwnd(), GWL_STYLE, style | PBS_MARQUEE);
@@ -53,8 +53,8 @@ void Progress::SetIndeterminate(bool indeterminate) {
   }
 }
 
-bool Progress::IsIndeterminate() const {
-  auto* progress = static_cast<ProgressImpl*>(GetNative());
+bool ProgressBar::IsIndeterminate() const {
+  auto* progress = static_cast<ProgressBarImpl*>(GetNative());
   return (GetWindowLong(progress->hwnd(), GWL_STYLE) & PBS_MARQUEE) != 0;
 }
 

@@ -2,14 +2,14 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/progress.h"
+#include "nativeui/progress_bar.h"
 
 namespace nu {
 
 // static
-const char Progress::kClassName[] = "Progress";
+const char ProgressBar::kClassName[] = "ProgressBar";
 
-const char* Progress::GetClassName() const {
+const char* ProgressBar::GetClassName() const {
   return kClassName;
 }
 

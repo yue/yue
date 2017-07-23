@@ -913,16 +913,16 @@ struct Type<nu::Label> {
 };
 
 template<>
-struct Type<nu::Progress> {
+struct Type<nu::ProgressBar> {
   using base = nu::View;
-  static constexpr const char* name = "yue.Progress";
+  static constexpr const char* name = "yue.ProgressBar";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
-           "create", &CreateOnHeap<nu::Progress>,
-           "setvalue", &nu::Progress::SetValue,
-           "getvalue", &nu::Progress::GetValue,
-           "setindeterminate", &nu::Progress::SetIndeterminate,
-           "isindeterminate", &nu::Progress::IsIndeterminate);
+           "create", &CreateOnHeap<nu::ProgressBar>,
+           "setvalue", &nu::ProgressBar::SetValue,
+           "getvalue", &nu::ProgressBar::GetValue,
+           "setindeterminate", &nu::ProgressBar::SetIndeterminate,
+           "isindeterminate", &nu::ProgressBar::IsIndeterminate);
   }
 };
 
@@ -1013,28 +1013,28 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   lua::NewTable(state);
   lua::RawSet(state, -1,
               // Classes.
-              "Lifetime",  lua::MetaTable<nu::Lifetime>(),
-              "App",       lua::MetaTable<nu::App>(),
-              "Font",      lua::MetaTable<nu::Font>(),
-              "Canvas",    lua::MetaTable<nu::Canvas>(),
-              "Color",     lua::MetaTable<nu::Color>(),
-              "Image",     lua::MetaTable<nu::Image>(),
-              "Painter",   lua::MetaTable<nu::Painter>(),
-              "Event",     lua::MetaTable<nu::Event>(),
-              "MenuBar",   lua::MetaTable<nu::MenuBar>(),
-              "Menu",      lua::MetaTable<nu::Menu>(),
-              "MenuItem",  lua::MetaTable<nu::MenuItem>(),
-              "Window",    lua::MetaTable<nu::Window>(),
-              "Container", lua::MetaTable<nu::Container>(),
-              "Button",    lua::MetaTable<nu::Button>(),
-              "Browser",   lua::MetaTable<nu::Browser>(),
-              "Entry",     lua::MetaTable<nu::Entry>(),
-              "Label",     lua::MetaTable<nu::Label>(),
-              "Progress",  lua::MetaTable<nu::Progress>(),
-              "Group",     lua::MetaTable<nu::Group>(),
-              "Scroll",    lua::MetaTable<nu::Scroll>(),
+              "Lifetime",    lua::MetaTable<nu::Lifetime>(),
+              "App",         lua::MetaTable<nu::App>(),
+              "Font",        lua::MetaTable<nu::Font>(),
+              "Canvas",      lua::MetaTable<nu::Canvas>(),
+              "Color",       lua::MetaTable<nu::Color>(),
+              "Image",       lua::MetaTable<nu::Image>(),
+              "Painter",     lua::MetaTable<nu::Painter>(),
+              "Event",       lua::MetaTable<nu::Event>(),
+              "MenuBar",     lua::MetaTable<nu::MenuBar>(),
+              "Menu",        lua::MetaTable<nu::Menu>(),
+              "MenuItem",    lua::MetaTable<nu::MenuItem>(),
+              "Window",      lua::MetaTable<nu::Window>(),
+              "Container",   lua::MetaTable<nu::Container>(),
+              "Button",      lua::MetaTable<nu::Button>(),
+              "Browser",     lua::MetaTable<nu::Browser>(),
+              "Entry",       lua::MetaTable<nu::Entry>(),
+              "Label",       lua::MetaTable<nu::Label>(),
+              "ProgressBar", lua::MetaTable<nu::ProgressBar>(),
+              "Group",       lua::MetaTable<nu::Group>(),
+              "Scroll",      lua::MetaTable<nu::Scroll>(),
 #if defined(OS_MACOSX)
-              "Vibrant",   lua::MetaTable<nu::Vibrant>(),
+              "Vibrant",     lua::MetaTable<nu::Vibrant>(),
 #endif
               // Properties.
               "lifetime", nu::Lifetime::GetCurrent(),
