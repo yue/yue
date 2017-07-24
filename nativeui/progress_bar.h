@@ -2,8 +2,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef NATIVEUI_PROGRESS_H_
-#define NATIVEUI_PROGRESS_H_
+#ifndef NATIVEUI_PROGRESS_BAR_H_
+#define NATIVEUI_PROGRESS_BAR_H_
 
 #include "nativeui/view.h"
 
@@ -31,4 +31,4 @@ class NATIVEUI_EXPORT ProgressBar : public View {
 
 }  // namespace nu
 
-#endif  // NATIVEUI_PROGRESS_H_
+#endif  // NATIVEUI_PROGRESS_BAR_H_
