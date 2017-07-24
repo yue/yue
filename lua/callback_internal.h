@@ -15,6 +15,7 @@
 #include "lua/handle.h"
 #include "lua/pcall.h"
 #include "lua/table.h"
+#include "lua/user_data.h"
 
 namespace lua {
 
@@ -42,21 +43,13 @@ struct CallbackParamTraits<const char*> {
   typedef const char* LocalType;
 };
 
-// CallbackHolder and CallbackHolderBase are used to pass a std::function from
-// PushCFunction through DispatchToCallback, where it is invoked.
-
-// This simple base class is used so that we can share a single object template
-// among every CallbackHolder instance.
-class CallbackHolderBase {
- protected:
-  explicit CallbackHolderBase(State* state);
-};
-
+// CallbackHolder is used to pass a std::function from PushCFunction through
+// DispatchToCallback, where it is invoked.
 template<typename Sig>
-class CallbackHolder : public CallbackHolderBase {
+class CallbackHolder {
  public:
-  CallbackHolder(State* state, const std::function<Sig>& callback)
-      : CallbackHolderBase(state), callback(callback) {}
+  explicit CallbackHolder(const std::function<Sig>& callback)
+      : callback(callback) {}
 
   std::function<Sig> callback;
 
@@ -212,10 +205,7 @@ struct Dispatcher<ReturnType(ArgTypes...)> {
 // Push the function on stack without wrapping it with pcall.
 template<typename Sig>
 inline void PushCFunction(State* state, const std::function<Sig>& callback) {
-  typedef CallbackHolder<Sig> HolderT;
-  void* holder = lua_newuserdata(state, sizeof(HolderT));
-  new(holder) HolderT(state, callback);
-
+  NewUserData<CallbackHolder<Sig>>(state, callback);
   lua_pushcclosure(state, &internal::Dispatcher<Sig>::DispatchToCallback, 1);
 }
 

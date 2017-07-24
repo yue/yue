@@ -42,10 +42,10 @@ void NewUserData(State* state, T* ptr) {
 }
 
 // Construct a new UserData with |T|, and assign it with a default metatable.
+// T must be type that can be destructed by calling destructor.
 template<typename T, typename... ArgTypes>
 void NewUserData(State* state, const ArgTypes... args) {
-  using Type = typename UserData<T>::Type;
-  Type* memory = static_cast<Type*>(lua_newuserdata(state, sizeof(Type)));
+  T* memory = static_cast<T*>(lua_newuserdata(state, sizeof(T)));
   new(memory) T(args...);
   NewTable(state, 0, 1);
   RawSet(state, -1, "__gc", CFunction(&OnGC<T>));
