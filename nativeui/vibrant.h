@@ -13,11 +13,22 @@ class NATIVEUI_EXPORT Vibrant : public Container {
  public:
   Vibrant();
 
+  // Values here should match NSVisualEffectMaterial.
+  enum class Material {
+    AppearanceBased,
+    Light,
+    Dark,
+    Titlebar,
+  };
+
   // View class name.
   static const char kClassName[];
 
   // View:
   const char* GetClassName() const override;
+
+  void SetMaterial(Material material);
+  Material GetMaterial() const;
 
  protected:
   ~Vibrant() override;

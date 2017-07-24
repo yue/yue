@@ -54,4 +54,14 @@ const char* Vibrant::GetClassName() const {
   return kClassName;
 }
 
+void Vibrant::SetMaterial(Material material) {
+  static_cast<NUVibrant*>(GetNative()).material =
+      static_cast<NSVisualEffectMaterial>(material);
+}
+
+Vibrant::Material Vibrant::GetMaterial() const {
+  return static_cast<Vibrant::Material>(
+      static_cast<NUVibrant*>(GetNative()).material);
+}
+
 }  // namespace nu

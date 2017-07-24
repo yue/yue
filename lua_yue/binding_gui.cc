@@ -988,12 +988,49 @@ struct Type<nu::Scroll> {
 
 #if defined(OS_MACOSX)
 template<>
+struct Type<nu::Vibrant::Material> {
+  static constexpr const char* name = "yue.Scroll.Policy";
+  static inline bool To(State* state, int index, nu::Vibrant::Material* out) {
+    std::string material;
+    if (!lua::To(state, index, &material))
+      return false;
+    if (material == "appearance-based") {
+      *out = nu::Vibrant::Material::AppearanceBased;
+      return true;
+    } else if (material == "light") {
+      *out = nu::Vibrant::Material::Light;
+      return true;
+    } else if (material == "dark") {
+      *out = nu::Vibrant::Material::Dark;
+      return true;
+    } else if (material == "titlebar") {
+      *out = nu::Vibrant::Material::Titlebar;
+      return true;
+    } else {
+      return false;
+    }
+  }
+  static inline void Push(State* state, nu::Vibrant::Material material) {
+    if (material == nu::Vibrant::Material::Light)
+      lua::Push(state, "light");
+    else if (material == nu::Vibrant::Material::Dark)
+      lua::Push(state, "dark");
+    else if (material == nu::Vibrant::Material::Titlebar)
+      lua::Push(state, "titlebar");
+    else
+      lua::Push(state, "appearance-based");
+  }
+};
+
+template<>
 struct Type<nu::Vibrant> {
   using base = nu::Container;
   static constexpr const char* name = "yue.Vibrant";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
-           "create", &CreateOnHeap<nu::Vibrant>);
+           "create", &CreateOnHeap<nu::Vibrant>,
+           "setmaterial", &nu::Vibrant::SetMaterial,
+           "getmaterial", &nu::Vibrant::GetMaterial);
   }
 };
 #endif

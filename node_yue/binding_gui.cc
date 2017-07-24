@@ -1089,6 +1089,44 @@ struct Type<nu::Scroll> {
 
 #if defined(OS_MACOSX)
 template<>
+struct Type<nu::Vibrant::Material> {
+  static constexpr const char* name = "yue.Vibrant.Material";
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   nu::Vibrant::Material material) {
+    if (material == nu::Vibrant::Material::Light)
+      return vb::ToV8(context, "light");
+    else if (material == nu::Vibrant::Material::Dark)
+      return vb::ToV8(context, "dark");
+    else if (material == nu::Vibrant::Material::Titlebar)
+      return vb::ToV8(context, "titlebar");
+    else
+      return vb::ToV8(context, "appearance-based");
+  }
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::Vibrant::Material* out) {
+    std::string material;
+    if (!vb::FromV8(context, value, &material))
+      return false;
+    if (material == "appearance-based") {
+      *out = nu::Vibrant::Material::AppearanceBased;
+      return true;
+    } else if (material == "light") {
+      *out = nu::Vibrant::Material::Light;
+      return true;
+    } else if (material == "dark") {
+      *out = nu::Vibrant::Material::Dark;
+      return true;
+    } else if (material == "titlebar") {
+      *out = nu::Vibrant::Material::Titlebar;
+      return true;
+    } else {
+      return false;
+    }
+  }
+};
+
+template<>
 struct Type<nu::Vibrant> {
   using base = nu::Container;
   static constexpr const char* name = "yue.Vibrant";
@@ -1098,6 +1136,9 @@ struct Type<nu::Vibrant> {
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "setMaterial", &nu::Vibrant::SetMaterial,
+        "getMaterial", &nu::Vibrant::GetMaterial);
   }
 };
 #endif
