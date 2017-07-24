@@ -29,6 +29,14 @@ int InheritanceChainLookup(State* state);
 // A implementation of __newindex that works as prototype chain.
 int InheritanceChainAssign(State* state);
 
+// Dereference the native object for __gc.
+template<typename T>
+int DereferenceOnGC(lua::State* state) {
+  void* data = lua_touserdata(state, 1);
+  UserData<T>::Destruct(static_cast<typename UserData<T>::Type*>(data));
+  return 0;
+}
+
 // Create metatable for T, returns true if the metattable has already been
 // created.
 template<typename T>
@@ -37,7 +45,7 @@ bool NewMetaTable(State* state) {
     return true;
 
   RawSet(state, -1,
-         "__gc", CFunction(&OnGC<T>),
+         "__gc", CFunction(&DereferenceOnGC<T>),
          "__index", CClosure(state, &InheritanceChainLookup, 1),
          "__newindex", CClosure(state, &InheritanceChainAssign, 1));
   Type<T>::BuildMetaTable(state, AbsIndex(state, -1));
