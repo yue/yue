@@ -15,8 +15,6 @@ class YueSignalTest : public testing::Test {
   }
 
   lua::ManagedState state_;
-  nu::Lifetime lifetime_;
-  nu::State nu_state_;
 };
 
 void OnClose(bool* ptr) {

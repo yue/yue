@@ -1000,43 +1000,50 @@ struct Type<nu::Vibrant> {
 
 }  // namespace lua
 
+template<typename T>
+inline void BindType(lua::State* state, const char* name) {
+  int top = lua::GetTop(state);
+  lua::Push(state, name);
+  lua::Push(state, lua::MetaTable<T>());
+  // Reference the nu::State object so it is freed at last.
+  lua::RawSet(state, -1, "__state", lua::ValueOnStack(state, top - 1));
+  // Assign to exports table.
+  lua_rawset(state, top);
+}
+
 extern "C" int luaopen_yue_gui(lua::State* state) {
-  // Initialize nativeui library and leak it.
-  // Doing cleanup job on exit have troubles for us, because nativeui may store
-  // lua objects, and lua may store nativeui objects. So either freeing lua or
-  // nativeui will make the other one crash.
-  new nu::State;
-
-  // Initialize lifetime and leak it.
-  new nu::Lifetime;
-
+  // Initialize nativeui.
+  lua::NewUserData<nu::State>(state);
+  lua::NewUserData<nu::Lifetime>(state);
+  // The exports table.
   lua::NewTable(state);
-  lua::RawSet(state, -1,
-              // Classes.
-              "Lifetime",    lua::MetaTable<nu::Lifetime>(),
-              "App",         lua::MetaTable<nu::App>(),
-              "Font",        lua::MetaTable<nu::Font>(),
-              "Canvas",      lua::MetaTable<nu::Canvas>(),
-              "Color",       lua::MetaTable<nu::Color>(),
-              "Image",       lua::MetaTable<nu::Image>(),
-              "Painter",     lua::MetaTable<nu::Painter>(),
-              "Event",       lua::MetaTable<nu::Event>(),
-              "MenuBar",     lua::MetaTable<nu::MenuBar>(),
-              "Menu",        lua::MetaTable<nu::Menu>(),
-              "MenuItem",    lua::MetaTable<nu::MenuItem>(),
-              "Window",      lua::MetaTable<nu::Window>(),
-              "Container",   lua::MetaTable<nu::Container>(),
-              "Button",      lua::MetaTable<nu::Button>(),
-              "Browser",     lua::MetaTable<nu::Browser>(),
-              "Entry",       lua::MetaTable<nu::Entry>(),
-              "Label",       lua::MetaTable<nu::Label>(),
-              "ProgressBar", lua::MetaTable<nu::ProgressBar>(),
-              "Group",       lua::MetaTable<nu::Group>(),
-              "Scroll",      lua::MetaTable<nu::Scroll>(),
+
+  // Classes.
+  BindType<nu::Lifetime>(state, "Lifetime");
+  BindType<nu::App>(state, "App");
+  BindType<nu::Font>(state, "Font");
+  BindType<nu::Canvas>(state, "Canvas");
+  BindType<nu::Color>(state, "Color");
+  BindType<nu::Image>(state, "Image");
+  BindType<nu::Painter>(state, "Painter");
+  BindType<nu::Event>(state, "Event");
+  BindType<nu::MenuBar>(state, "MenuBar");
+  BindType<nu::Menu>(state, "Menu");
+  BindType<nu::MenuItem>(state, "MenuItem");
+  BindType<nu::Window>(state, "Window");
+  BindType<nu::Container>(state, "Container");
+  BindType<nu::Button>(state, "Button");
+  BindType<nu::Browser>(state, "Browser");
+  BindType<nu::Entry>(state, "Entry");
+  BindType<nu::Label>(state, "Label");
+  BindType<nu::ProgressBar>(state, "ProgressBar");
+  BindType<nu::Group>(state, "Group");
+  BindType<nu::Scroll>(state, "Scroll");
 #if defined(OS_MACOSX)
-              "Vibrant",     lua::MetaTable<nu::Vibrant>(),
+  BindType<nu::Vibrant>(state, "Vibrant");
 #endif
-              // Properties.
+  // Properties.
+  lua::RawSet(state, -1,
               "lifetime", nu::Lifetime::GetCurrent(),
               "app",      nu::State::GetCurrent()->GetApp());
   return 1;

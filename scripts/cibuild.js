@@ -22,6 +22,7 @@ if (targetOs != 'linux' || targetCpu == 'x64') {
   const tests = [
     'nativeui_unittests',
     'lua_unittests',
+    'lua_yue_unittests',
   ]
   execSync(`node ./scripts/build.js out/Component ${tests.join(' ')}`)
   for (test of tests)
