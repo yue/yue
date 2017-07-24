@@ -64,4 +64,15 @@ Vibrant::Material Vibrant::GetMaterial() const {
       static_cast<NUVibrant*>(GetNative()).material);
 }
 
+void Vibrant::SetBlendingMode(BlendingMode mode) {
+  NUVibrant* vibrant = static_cast<NUVibrant*>(GetNative());
+  vibrant.wantsLayer = mode == BlendingMode::WithinWindow;
+  vibrant.blendingMode = static_cast<NSVisualEffectBlendingMode>(mode);
+}
+
+Vibrant::BlendingMode Vibrant::GetBlendingMode() const {
+  return static_cast<Vibrant::BlendingMode>(
+      static_cast<NUVibrant*>(GetNative()).blendingMode);
+}
+
 }  // namespace nu

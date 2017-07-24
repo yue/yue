@@ -1127,6 +1127,34 @@ struct Type<nu::Vibrant::Material> {
 };
 
 template<>
+struct Type<nu::Vibrant::BlendingMode> {
+  static constexpr const char* name = "yue.Vibrant.BlendingMode";
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   nu::Vibrant::BlendingMode mode) {
+    if (mode == nu::Vibrant::BlendingMode::WithinWindow)
+      return vb::ToV8(context, "within-window");
+    else
+      return vb::ToV8(context, "behind-window");
+  }
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::Vibrant::BlendingMode* out) {
+    std::string mode;
+    if (!vb::FromV8(context, value, &mode))
+      return false;
+    if (mode == "within-window") {
+      *out = nu::Vibrant::BlendingMode::WithinWindow;
+      return true;
+    } else if (mode == "behind-window") {
+      *out = nu::Vibrant::BlendingMode::BehindWindow;
+      return true;
+    } else {
+      return false;
+    }
+  }
+};
+
+template<>
 struct Type<nu::Vibrant> {
   using base = nu::Container;
   static constexpr const char* name = "yue.Vibrant";
@@ -1138,7 +1166,9 @@ struct Type<nu::Vibrant> {
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
         "setMaterial", &nu::Vibrant::SetMaterial,
-        "getMaterial", &nu::Vibrant::GetMaterial);
+        "getMaterial", &nu::Vibrant::GetMaterial,
+        "setBlendingMode", &nu::Vibrant::SetBlendingMode,
+        "getBlendingMode", &nu::Vibrant::GetBlendingMode);
   }
 };
 #endif

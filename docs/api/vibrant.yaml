@@ -35,3 +35,9 @@ methods:
 
   - signature: Vibrant::Material GetMaterial() const
     description: Get the material for the view.
+
+  - signature: void SetBlendingMode(Vibrant::BlendingMode mode)
+    description: Set the blending mode for the view.
+
+  - signature: Vibrant::BlendingMode GetBlendingMode() const
+    description: Get the blending mode for the view.

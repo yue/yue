@@ -989,7 +989,7 @@ struct Type<nu::Scroll> {
 #if defined(OS_MACOSX)
 template<>
 struct Type<nu::Vibrant::Material> {
-  static constexpr const char* name = "yue.Scroll.Policy";
+  static constexpr const char* name = "yue.Vibrant.Material";
   static inline bool To(State* state, int index, nu::Vibrant::Material* out) {
     std::string material;
     if (!lua::To(state, index, &material))
@@ -1023,6 +1023,32 @@ struct Type<nu::Vibrant::Material> {
 };
 
 template<>
+struct Type<nu::Vibrant::BlendingMode> {
+  static constexpr const char* name = "yue.Vibrant.BlendingMode";
+  static inline bool To(State* state, int index,
+                        nu::Vibrant::BlendingMode* out) {
+    std::string mode;
+    if (!lua::To(state, index, &mode))
+      return false;
+    if (mode == "within-window") {
+      *out = nu::Vibrant::BlendingMode::WithinWindow;
+      return true;
+    } else if (mode == "behind-window") {
+      *out = nu::Vibrant::BlendingMode::BehindWindow;
+      return true;
+    } else {
+      return false;
+    }
+  }
+  static inline void Push(State* state, nu::Vibrant::BlendingMode mode) {
+    if (mode == nu::Vibrant::BlendingMode::WithinWindow)
+      lua::Push(state, "within-window");
+    else
+      lua::Push(state, "behind-window");
+  }
+};
+
+template<>
 struct Type<nu::Vibrant> {
   using base = nu::Container;
   static constexpr const char* name = "yue.Vibrant";
@@ -1030,7 +1056,9 @@ struct Type<nu::Vibrant> {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::Vibrant>,
            "setmaterial", &nu::Vibrant::SetMaterial,
-           "getmaterial", &nu::Vibrant::GetMaterial);
+           "getmaterial", &nu::Vibrant::GetMaterial,
+           "setblendingmode", &nu::Vibrant::SetBlendingMode,
+           "getblendingmode", &nu::Vibrant::GetBlendingMode);
   }
 };
 #endif

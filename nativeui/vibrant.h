@@ -21,6 +21,12 @@ class NATIVEUI_EXPORT Vibrant : public Container {
     Titlebar,
   };
 
+  // Values here should match NSVisualEffectBlendingMode.
+  enum class BlendingMode {
+    BehindWindow,
+    WithinWindow,
+  };
+
   // View class name.
   static const char kClassName[];
 
@@ -29,6 +35,8 @@ class NATIVEUI_EXPORT Vibrant : public Container {
 
   void SetMaterial(Material material);
   Material GetMaterial() const;
+  void SetBlendingMode(BlendingMode mode);
+  BlendingMode GetBlendingMode() const;
 
  protected:
   ~Vibrant() override;
