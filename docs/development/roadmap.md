@@ -10,6 +10,7 @@ Please note that the items are __not__ prioritized.
 
 * XML support
 * Ability to embed resources into executables/bundles
+* Develop a standalone version of `gn` to build Yue
 
 ### More widget types
 
