@@ -26,7 +26,7 @@ deploy:
     tag: $(APPVEYOR_REPO_TAG_NAME)
     description: '(placeholder)'
     auth_token:
-      secure: txrp2eAOWw3fwVvYuRutmnek5xMtndPskyOMtu09vk9FeA5wdaQ2RGL/YAsCdIGH
+      secure: A6p8IoStnodPh/lGnc41E+ACsYdyfOV3Z7K6H3w0Xz2SsLpL06AKb6PTNmMtWp1F
     artifact: /.*\.zip/
     draft: true
     force_update: true
