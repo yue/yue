@@ -76,7 +76,7 @@ const electron = require('electron')
 const gui = require('gui')
 
 const win = gui.Window.create({})
-win.onClose = () => gui.lifetime.quit()
+win.onClose = () => electron.app.quit()
 win.setContentView(gui.Label.create('Content View'))
 win.setContentSize({width: 400, height: 400})
 win.center()
