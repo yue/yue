@@ -40,8 +40,10 @@ execSync(`node ./scripts/create_dist.js`)
 const runtimes = {
   node: [
     'v8.0.0',
+    'v7.0.0',
   ],
   electron: [
+    'v1.7.0',
     'v1.6.0',
   ],
 }
