@@ -9,7 +9,7 @@ Please note that the items are __not__ prioritized.
 ## v1.x
 
 * XML support
-* Ability to embed resources into executables/bundles
+* API to embed resources into executables/bundles
 * Develop a standalone version of `gn` to build Yue
 
 ### More widget types
@@ -22,12 +22,19 @@ Please note that the items are __not__ prioritized.
 * Tray
 * Browser
 * List view
+* Tree view
 * Image viewer with GIF support
+
+### Drawing
+
+* Stock images
+* Bitmap support
 
 ### Improved widgets
 
 * Icon button
 * More Entry types
+* Transparent text input widgets
 
 ### macOS
 
