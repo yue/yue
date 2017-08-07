@@ -56,8 +56,7 @@ win.onClose = () => gui.lifetime.quit()
 win.setContentView(gui.Label.create('Content View'))
 win.setContentSize({width: 400, height: 400})
 win.center()
-
-gui.lifetime.onReady = () => win.activate()
+win.activate()
 
 gui.lifetime.run()
 process.exit(0)
