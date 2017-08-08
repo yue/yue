@@ -171,6 +171,7 @@ component("nativeui") {
     "gtk/progress_bar_gtk.cc",
     "gtk/scroll_gtk.cc",
     "gtk/state_gtk.cc",
+    "gtk/text_edit_gtk.cc",
     "gtk/view_gtk.cc",
     "gtk/window_gtk.cc",
     "mac/events_handler.h",
