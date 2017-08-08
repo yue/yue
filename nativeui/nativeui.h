@@ -26,6 +26,7 @@
 #include "nativeui/progress_bar.h"
 #include "nativeui/scroll.h"
 #include "nativeui/state.h"
+#include "nativeui/text_edit.h"
 #include "nativeui/window.h"
 
 #if defined(OS_MACOSX)

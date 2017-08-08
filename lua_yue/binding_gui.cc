@@ -986,6 +986,19 @@ struct Type<nu::Scroll> {
   }
 };
 
+template<>
+struct Type<nu::TextEdit> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.TextEdit";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateOnHeap<nu::TextEdit>,
+           "gettext", &nu::TextEdit::GetText);
+    RawSetProperty(state, metatable,
+                   "ontextchange", &nu::TextEdit::on_text_change);
+  }
+};
+
 #if defined(OS_MACOSX)
 template<>
 struct Type<nu::Vibrant::Material> {
@@ -1104,6 +1117,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::ProgressBar>(state, "ProgressBar");
   BindType<nu::Group>(state, "Group");
   BindType<nu::Scroll>(state, "Scroll");
+  BindType<nu::TextEdit>(state, "TextEdit");
 #if defined(OS_MACOSX)
   BindType<nu::Vibrant>(state, "Vibrant");
 #endif

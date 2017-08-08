@@ -1,0 +1,30 @@
+name: TextEdit
+component: gui
+header: nativeui/text_edit.h
+type: refcounted
+namespace: nu
+inherit: View
+description: Plain text input view.
+
+constructors:
+  - signature: TextEdit()
+    lang: ['cpp']
+    description: Create a new `TextEdit`.
+
+class_methods:
+  - signature: TextEdit* Create()
+    lang: ['lua', 'js']
+    description: Create a new `TextEdit`.
+
+class_properties:
+  - property: const char* kClassName
+    lang: ['cpp']
+    description: The class name of this view.
+
+methods:
+  - signature: std::string GetText() const
+    description: Return currently displayed text.
+
+events:
+  - callback: void on_text_change(TextEdit* self)
+    description: Emitted when user has changed text.

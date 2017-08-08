@@ -1087,6 +1087,23 @@ struct Type<nu::Scroll> {
   }
 };
 
+template<>
+struct Type<nu::TextEdit> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.TextEdit";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor, "create", &CreateOnHeap<nu::TextEdit>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "getText", &nu::TextEdit::GetText);
+    SetProperty(context, templ,
+                "onTextChange", &nu::TextEdit::on_text_change);
+  }
+};
+
 #if defined(OS_MACOSX)
 template<>
 struct Type<nu::Vibrant::Material> {
@@ -1218,6 +1235,7 @@ void Initialize(v8::Local<v8::Object> exports) {
           "ProgressBar", vb::Constructor<nu::ProgressBar>(),
           "Group",       vb::Constructor<nu::Group>(),
           "Scroll",      vb::Constructor<nu::Scroll>(),
+          "TextEdit",    vb::Constructor<nu::TextEdit>(),
 #if defined(OS_MACOSX)
           "Vibrant",     vb::Constructor<nu::Vibrant>(),
 #endif
