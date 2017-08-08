@@ -10,11 +10,34 @@
 #include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/nu_view.h"
 
+@interface NUTextViewDelegate : NSObject<NSTextViewDelegate> {
+ @private
+  nu::TextEdit* shell_;
+}
+- (id)initWithShell:(nu::TextEdit*)shell;
+@end
+
+@implementation NUTextViewDelegate
+
+- (id)initWithShell:(nu::TextEdit*)shell {
+  if ((self = [super init]))
+    shell_ = shell;
+  return self;
+}
+
+- (void)textDidChange:(NSNotification*)notification {
+  shell_->on_text_change.Emit(shell_);
+}
+
+@end
+
 @interface NUTextEdit : NSScrollView<NUView> {
  @private
   base::scoped_nsobject<NSTextView> textView_;
+  base::scoped_nsobject<NUTextViewDelegate> delegate_;
   nu::NUPrivate private_;
 }
+- (id)initWithShell:(nu::TextEdit*)shell;
 - (nu::NUPrivate*)nuPrivate;
 - (void)setNUFont:(nu::Font*)font;
 - (void)setNUColor:(nu::Color)color;
@@ -23,9 +46,11 @@
 
 @implementation NUTextEdit
 
-- (id)init {
+- (id)initWithShell:(nu::TextEdit*)shell {
   if ((self = [super init])) {
+    delegate_.reset([[NUTextViewDelegate alloc] initWithShell:shell]);
     textView_.reset([[NSTextView alloc] init]);
+    [textView_ setDelegate:delegate_.get()];
     [textView_ setRichText:NO];
     [textView_ setHorizontallyResizable:YES];
     [textView_ setVerticallyResizable:YES];
@@ -58,7 +83,7 @@
 namespace nu {
 
 TextEdit::TextEdit() {
-  NUTextEdit* edit = [[NUTextEdit alloc] init];
+  NUTextEdit* edit = [[NUTextEdit alloc] initWithShell:this];
   [edit setBorderType:NSNoBorder];
   [edit setHasVerticalScroller:YES];
   [edit setHasHorizontalScroller:YES];
