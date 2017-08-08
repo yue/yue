@@ -232,6 +232,7 @@ component("nativeui") {
     "win/scroll_win.cc",
     "win/scroll_win.h",
     "win/state_win.cc",
+    "win/text_edit_win.cc",
     "win/window_win.cc",
     "win/window_win.h",
     "win/scrollbar/repeat_controller.cc",
