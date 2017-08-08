@@ -25,6 +25,21 @@ methods:
   - signature: std::string GetText() const
     description: Return currently displayed text.
 
+  - signature: void Cut()
+    description: |
+      Delete (cut) the current selection, if any, copy the deleted text to the
+      clipboard.
+
+  - signature: void Copy()
+    description: Copy current selection to clipboard.
+
+  - signature: void Paste()
+    description: |
+      copy the current content of the clipboard to current caret position.
+
+  - signature: void Clear()
+    description: Remove all text.
+
 events:
   - callback: void on_text_change(TextEdit* self)
     description: Emitted when user has changed text.

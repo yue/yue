@@ -44,5 +44,31 @@ std::string TextEdit::GetText() const {
   return gtk_text_buffer_get_text(buffer, &start_iter, &end_iter, false);
 }
 
-}  // namespace nu
+void TextEdit::Cut() {
+  GtkClipboard* clipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
+  GtkTextBuffer* buffer = gtk_text_view_get_buffer(
+      GTK_TEXT_VIEW(g_object_get_data(G_OBJECT(GetNative()), "text-view")));
+  gtk_text_buffer_cut_clipboard(buffer, clipboard, TRUE);
+}
 
+void TextEdit::Copy() {
+  GtkClipboard* clipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
+  GtkTextBuffer* buffer = gtk_text_view_get_buffer(
+      GTK_TEXT_VIEW(g_object_get_data(G_OBJECT(GetNative()), "text-view")));
+  gtk_text_buffer_copy_clipboard(buffer, clipboard, TRUE);
+}
+
+void TextEdit::Paste() {
+  GtkClipboard* clipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
+  GtkTextBuffer* buffer = gtk_text_view_get_buffer(
+      GTK_TEXT_VIEW(g_object_get_data(G_OBJECT(GetNative()), "text-view")));
+  gtk_text_buffer_paste_clipboard(buffer, clipboard, TRUE);
+}
+
+void TextEdit::Clear() {
+  GtkTextBuffer* buffer = gtk_text_view_get_buffer(
+      GTK_TEXT_VIEW(g_object_get_data(G_OBJECT(GetNative()), "text-view")));
+  gtk_text_buffer_set_text(buffer, "", 0);
+}
+
+}  // namespace nu

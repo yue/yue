@@ -993,7 +993,11 @@ struct Type<nu::TextEdit> {
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::TextEdit>,
-           "gettext", &nu::TextEdit::GetText);
+           "gettext", &nu::TextEdit::GetText,
+           "cut", &nu::TextEdit::Cut,
+           "copy", &nu::TextEdit::Copy,
+           "paste", &nu::TextEdit::Paste,
+           "clear", &nu::TextEdit::Clear);
     RawSetProperty(state, metatable,
                    "ontextchange", &nu::TextEdit::on_text_change);
   }

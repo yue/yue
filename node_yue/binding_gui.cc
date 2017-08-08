@@ -1098,7 +1098,11 @@ struct Type<nu::TextEdit> {
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
-        "getText", &nu::TextEdit::GetText);
+        "getText", &nu::TextEdit::GetText,
+        "cut", &nu::TextEdit::Cut,
+        "copy", &nu::TextEdit::Copy,
+        "paste", &nu::TextEdit::Paste,
+        "clear", &nu::TextEdit::Clear);
     SetProperty(context, templ,
                 "onTextChange", &nu::TextEdit::on_text_change);
   }

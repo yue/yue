@@ -22,6 +22,10 @@ class NATIVEUI_EXPORT TextEdit : public View {
   const char* GetClassName() const override;
 
   std::string GetText() const;
+  void Cut();
+  void Copy();
+  void Paste();
+  void Clear();
 
   // Events.
   Signal<void(TextEdit*)> on_text_change;

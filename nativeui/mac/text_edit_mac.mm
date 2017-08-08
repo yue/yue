@@ -94,9 +94,33 @@ TextEdit::~TextEdit() {
 }
 
 std::string TextEdit::GetText() const {
-  auto* edit = static_cast<NUTextEdit*>(GetNative());
-  auto* text_view = static_cast<NSTextView*>([edit documentView]);
+  auto* text_view = static_cast<NSTextView*>(
+      [static_cast<NUTextEdit*>(GetNative()) documentView]);
   return base::SysNSStringToUTF8([[text_view textStorage] string]);
+}
+
+void TextEdit::Cut() {
+  auto* text_view = static_cast<NSTextView*>(
+      [static_cast<NUTextEdit*>(GetNative()) documentView]);
+  [text_view cut:nil];
+}
+
+void TextEdit::Copy() {
+  auto* text_view = static_cast<NSTextView*>(
+      [static_cast<NUTextEdit*>(GetNative()) documentView]);
+  [text_view copy:nil];
+}
+
+void TextEdit::Paste() {
+  auto* text_view = static_cast<NSTextView*>(
+      [static_cast<NUTextEdit*>(GetNative()) documentView]);
+  [text_view paste:nil];
+}
+
+void TextEdit::Clear() {
+  auto* text_view = static_cast<NSTextView*>(
+      [static_cast<NUTextEdit*>(GetNative()) documentView]);
+  [text_view setString:@""];
 }
 
 }  // namespace nu
