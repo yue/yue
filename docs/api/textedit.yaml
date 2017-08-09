@@ -22,8 +22,23 @@ class_properties:
     description: The class name of this view.
 
 methods:
+  - signature: void SetText(const std::string& text)
+    description: Change the text in the view.
+
   - signature: std::string GetText() const
     description: Return currently displayed text.
+
+  - signature: void Undo()
+    description: Undo the last edit operation in the undo queue.
+
+  - signature: void CanUndo() const
+    description: Return whether there are any actions in undo queue.
+
+  - signature: void Redo()
+    description: Redo the next action in the redo queue
+
+  - signature: void CanRedo() const
+    description: Return whether there are any actions in redo queue.
 
   - signature: void Cut()
     description: |

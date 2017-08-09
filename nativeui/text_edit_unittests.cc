@@ -60,12 +60,26 @@ TEST_F(TextEditTest, Clipboard) {
 
 TEST_F(TextEditTest, Delete) {
   edit_->SetText("abcde");
-  edit_->Clear();
-  EXPECT_EQ(edit_->GetText(), "");
-  edit_->SetText("abcde");
   edit_->SelectRange(0, 1);
   edit_->Delete();
   EXPECT_EQ(edit_->GetText(), "bcde");
   edit_->DeleteRange(0, 1);
   EXPECT_EQ(edit_->GetText(), "cde");
+}
+
+TEST_F(TextEditTest, Undo) {
+  EXPECT_EQ(edit_->CanUndo(), false);
+  EXPECT_EQ(edit_->CanRedo(), false);
+  edit_->InsertTextAt("a", 0);
+  EXPECT_EQ(edit_->CanUndo(), true);
+  EXPECT_EQ(edit_->CanRedo(), false);
+  edit_->InsertTextAt("b", 0);
+  edit_->Undo();
+  EXPECT_EQ(edit_->GetText(), "a");
+  EXPECT_EQ(edit_->CanUndo(), true);
+  EXPECT_EQ(edit_->CanRedo(), true);
+  edit_->Redo();
+  EXPECT_EQ(edit_->GetText(), "ba");
+  EXPECT_EQ(edit_->CanUndo(), true);
+  EXPECT_EQ(edit_->CanRedo(), false);
 }
