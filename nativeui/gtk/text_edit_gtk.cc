@@ -6,6 +6,7 @@
 
 #include <gtk/gtk.h>
 
+#include "nativeui/gtk/undoable_text_buffer.h"
 #include "nativeui/gtk/widget_util.h"
 
 namespace nu {
@@ -29,6 +30,7 @@ TextEdit::TextEdit() {
   TakeOverView(scroll);
 
   GtkTextBuffer* buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text_view));
+  TextBufferMakeUndoable(buffer);
   g_signal_connect(buffer, "changed", G_CALLBACK(OnTextChange), this);
 }
 
@@ -51,17 +53,27 @@ std::string TextEdit::GetText() const {
 }
 
 void TextEdit::Redo() {
+  GtkTextBuffer* buffer = gtk_text_view_get_buffer(
+      GTK_TEXT_VIEW(g_object_get_data(G_OBJECT(GetNative()), "text-view")));
+  TextBufferRedo(buffer);
 }
 
 bool TextEdit::CanRedo() const {
-  return false;
+  GtkTextBuffer* buffer = gtk_text_view_get_buffer(
+      GTK_TEXT_VIEW(g_object_get_data(G_OBJECT(GetNative()), "text-view")));
+  return TextBufferCanRedo(buffer);
 }
 
 void TextEdit::Undo() {
+  GtkTextBuffer* buffer = gtk_text_view_get_buffer(
+      GTK_TEXT_VIEW(g_object_get_data(G_OBJECT(GetNative()), "text-view")));
+  TextBufferUndo(buffer);
 }
 
 bool TextEdit::CanUndo() const {
-  return false;
+  GtkTextBuffer* buffer = gtk_text_view_get_buffer(
+      GTK_TEXT_VIEW(g_object_get_data(G_OBJECT(GetNative()), "text-view")));
+  return TextBufferCanUndo(buffer);
 }
 
 void TextEdit::Cut() {
