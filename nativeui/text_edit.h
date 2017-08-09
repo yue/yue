@@ -6,6 +6,7 @@
 #define NATIVEUI_TEXT_EDIT_H_
 
 #include <string>
+#include <tuple>
 
 #include "nativeui/view.h"
 
@@ -21,11 +22,21 @@ class NATIVEUI_EXPORT TextEdit : public View {
   // View:
   const char* GetClassName() const override;
 
+  void SetText(const std::string& text);
   std::string GetText() const;
+
   void Cut();
   void Copy();
   void Paste();
   void Clear();
+
+  std::tuple<int, int> GetSelectionRange() const;
+  void SelectRange(int start, int end);
+  std::string GetTextInRange(int start, int end) const;
+  void InsertText(const std::string& text);
+  void InsertTextAt(const std::string& text, int pos);
+  void Delete();
+  void DeleteRange(int start, int end);
 
   // Events.
   Signal<void(TextEdit*)> on_text_change;

@@ -35,12 +35,18 @@ TextEdit::TextEdit() {
 TextEdit::~TextEdit() {
 }
 
+void TextEdit::SetText(const std::string& text) {
+  GtkTextBuffer* buffer = gtk_text_view_get_buffer(
+      GTK_TEXT_VIEW(g_object_get_data(G_OBJECT(GetNative()), "text-view")));
+  gtk_text_buffer_set_text(buffer, text.c_str(), text.size());
+}
+
 std::string TextEdit::GetText() const {
   GtkTextBuffer* buffer = gtk_text_view_get_buffer(
       GTK_TEXT_VIEW(g_object_get_data(G_OBJECT(GetNative()), "text-view")));
   GtkTextIter start_iter, end_iter;
-	gtk_text_buffer_get_start_iter(buffer, &start_iter);
-	gtk_text_buffer_get_end_iter(buffer, &end_iter);
+  gtk_text_buffer_get_start_iter(buffer, &start_iter);
+  gtk_text_buffer_get_end_iter(buffer, &end_iter);
   return gtk_text_buffer_get_text(buffer, &start_iter, &end_iter, false);
 }
 
@@ -55,20 +61,79 @@ void TextEdit::Copy() {
   GtkClipboard* clipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
   GtkTextBuffer* buffer = gtk_text_view_get_buffer(
       GTK_TEXT_VIEW(g_object_get_data(G_OBJECT(GetNative()), "text-view")));
-  gtk_text_buffer_copy_clipboard(buffer, clipboard, TRUE);
+  gtk_text_buffer_copy_clipboard(buffer, clipboard);
 }
 
 void TextEdit::Paste() {
   GtkClipboard* clipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
   GtkTextBuffer* buffer = gtk_text_view_get_buffer(
       GTK_TEXT_VIEW(g_object_get_data(G_OBJECT(GetNative()), "text-view")));
-  gtk_text_buffer_paste_clipboard(buffer, clipboard, TRUE);
+  gtk_text_buffer_paste_clipboard(buffer, clipboard, nullptr, TRUE);
 }
 
 void TextEdit::Clear() {
   GtkTextBuffer* buffer = gtk_text_view_get_buffer(
       GTK_TEXT_VIEW(g_object_get_data(G_OBJECT(GetNative()), "text-view")));
   gtk_text_buffer_set_text(buffer, "", 0);
+}
+
+std::tuple<int, int> TextEdit::GetSelectionRange() const {
+  GtkTextBuffer* buffer = gtk_text_view_get_buffer(
+      GTK_TEXT_VIEW(g_object_get_data(G_OBJECT(GetNative()), "text-view")));
+  GtkTextIter start_iter, end_iter;
+  if (gtk_text_buffer_get_selection_bounds(buffer, &start_iter, &end_iter)) {
+    return std::make_tuple(gtk_text_iter_get_offset(&start_iter),
+                           gtk_text_iter_get_offset(&end_iter));
+  } else {
+    return std::make_tuple(-1, -1);
+  }
+}
+
+void TextEdit::SelectRange(int start, int end) {
+  GtkTextBuffer* buffer = gtk_text_view_get_buffer(
+      GTK_TEXT_VIEW(g_object_get_data(G_OBJECT(GetNative()), "text-view")));
+  GtkTextIter start_iter, end_iter;
+  gtk_text_buffer_get_iter_at_offset(buffer, &start_iter, start);
+  gtk_text_buffer_get_iter_at_offset(buffer, &end_iter, end);
+  gtk_text_buffer_select_range(buffer, &start_iter, &end_iter);
+}
+
+std::string TextEdit::GetTextInRange(int start, int end) const {
+  GtkTextBuffer* buffer = gtk_text_view_get_buffer(
+      GTK_TEXT_VIEW(g_object_get_data(G_OBJECT(GetNative()), "text-view")));
+  GtkTextIter start_iter, end_iter;
+  gtk_text_buffer_get_iter_at_offset(buffer, &start_iter, start);
+  gtk_text_buffer_get_iter_at_offset(buffer, &end_iter, end);
+  return gtk_text_buffer_get_text(buffer, &start_iter, &end_iter, false);
+}
+
+void TextEdit::InsertText(const std::string& text) {
+  GtkTextBuffer* buffer = gtk_text_view_get_buffer(
+      GTK_TEXT_VIEW(g_object_get_data(G_OBJECT(GetNative()), "text-view")));
+  gtk_text_buffer_insert_at_cursor(buffer, text.c_str(), text.size());
+}
+
+void TextEdit::InsertTextAt(const std::string& text, int pos) {
+  GtkTextBuffer* buffer = gtk_text_view_get_buffer(
+      GTK_TEXT_VIEW(g_object_get_data(G_OBJECT(GetNative()), "text-view")));
+  GtkTextIter iter;
+  gtk_text_buffer_get_iter_at_offset(buffer, &iter, pos);
+  gtk_text_buffer_insert(buffer, &iter, text.c_str(), text.size());
+}
+
+void TextEdit::Delete() {
+  GtkTextBuffer* buffer = gtk_text_view_get_buffer(
+      GTK_TEXT_VIEW(g_object_get_data(G_OBJECT(GetNative()), "text-view")));
+  gtk_text_buffer_delete_selection(buffer, FALSE, TRUE);
+}
+
+void TextEdit::DeleteRange(int start, int end) {
+  GtkTextBuffer* buffer = gtk_text_view_get_buffer(
+      GTK_TEXT_VIEW(g_object_get_data(G_OBJECT(GetNative()), "text-view")));
+  GtkTextIter start_iter, end_iter;
+  gtk_text_buffer_get_iter_at_offset(buffer, &start_iter, start);
+  gtk_text_buffer_get_iter_at_offset(buffer, &end_iter, end);
+  gtk_text_buffer_delete(buffer, &start_iter, &end_iter);
 }
 
 }  // namespace nu

@@ -93,6 +93,12 @@ TextEdit::TextEdit() {
 TextEdit::~TextEdit() {
 }
 
+void TextEdit::SetText(const std::string& text) {
+  auto* text_view = static_cast<NSTextView*>(
+      [static_cast<NUTextEdit*>(GetNative()) documentView]);
+  [text_view setString:base::SysUTF8ToNSString(text)];
+}
+
 std::string TextEdit::GetText() const {
   auto* text_view = static_cast<NSTextView*>(
       [static_cast<NUTextEdit*>(GetNative()) documentView]);
@@ -121,6 +127,54 @@ void TextEdit::Clear() {
   auto* text_view = static_cast<NSTextView*>(
       [static_cast<NUTextEdit*>(GetNative()) documentView]);
   [text_view setString:@""];
+}
+
+std::tuple<int, int> TextEdit::GetSelectionRange() const {
+  auto* text_view = static_cast<NSTextView*>(
+      [static_cast<NUTextEdit*>(GetNative()) documentView]);
+  NSRange range = [text_view selectedRange];
+  return std::make_tuple<int, int>(
+      range.location, range.location + range.length);
+}
+
+void TextEdit::SelectRange(int start, int end) {
+  auto* text_view = static_cast<NSTextView*>(
+      [static_cast<NUTextEdit*>(GetNative()) documentView]);
+  [text_view setSelectedRange:NSMakeRange(start, end - start)];
+}
+
+std::string TextEdit::GetTextInRange(int start, int end) const {
+  auto* text_view = static_cast<NSTextView*>(
+      [static_cast<NUTextEdit*>(GetNative()) documentView]);
+  NSString* str = [[text_view textStorage] string];
+  return base::SysNSStringToUTF8(
+      [str substringWithRange:NSMakeRange(start, end - start)]);
+}
+
+void TextEdit::InsertText(const std::string& text) {
+  auto* text_view = static_cast<NSTextView*>(
+      [static_cast<NUTextEdit*>(GetNative()) documentView]);
+  [text_view insertText:base::SysUTF8ToNSString(text)];
+}
+
+void TextEdit::InsertTextAt(const std::string& text, int pos) {
+  auto* text_view = static_cast<NSTextView*>(
+      [static_cast<NUTextEdit*>(GetNative()) documentView]);
+  [text_view insertText:base::SysUTF8ToNSString(text)
+       replacementRange:NSMakeRange(pos, 0)];
+}
+
+void TextEdit::Delete() {
+  auto* text_view = static_cast<NSTextView*>(
+      [static_cast<NUTextEdit*>(GetNative()) documentView]);
+  [text_view delete:nil];
+}
+
+void TextEdit::DeleteRange(int start, int end) {
+  auto* text_view = static_cast<NSTextView*>(
+      [static_cast<NUTextEdit*>(GetNative()) documentView]);
+  [text_view insertText:@""
+       replacementRange:NSMakeRange(start, end - start)];
 }
 
 }  // namespace nu
