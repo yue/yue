@@ -40,6 +40,30 @@ methods:
   - signature: void Clear()
     description: Remove all text.
 
+  - signature: std::tuple<int, int> GetSelectionRange() const
+    description: |
+      Return the start position and end position of current selection.
+
+      If nothing is selected, (-1, -1) would be returned.
+
+  - signature: void SelectRange(int start, int end)
+    description: Select text between `start` and `end` positions.
+
+  - signature: std::string GetTextInRange(int start, int end) const
+    description: Return the text between `start` and `end` positions.
+
+  - signature: void InsertText(const std::string& text)
+    description: Insert `text` at current caret position.
+
+  - signature: void InsertTextAt(const std::string& text, int position)
+    description: Insert `text` at the `position`.
+
+  - signature: void Delete()
+    description: Delete text of current selection.
+
+  - signature: void DeleteRange(int start, int end)
+    description: Delete text between `start` and `end` positions.
+
 events:
   - callback: void on_text_change(TextEdit* self)
     description: Emitted when user has changed text.
