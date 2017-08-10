@@ -43,6 +43,8 @@ void MenuItem::Click() {
 
 void MenuItem::SetLabel(const std::string& label) {
   menu_item_.title = base::SysUTF8ToNSString(label);
+  if (menu_item_.submenu)
+    menu_item_.submenu.title = menu_item_.title;
 }
 
 std::string MenuItem::GetLabel() const {
