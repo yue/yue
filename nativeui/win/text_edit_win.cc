@@ -66,7 +66,7 @@ void TextEdit::Paste() {
 
 void TextEdit::Clear() {
   HWND hwnd = static_cast<SubwinView*>(GetNative())->hwnd();
-  ::SendMessage(hwnd, WM_CLEAR, 0, 0L);
+  ::SetWindowTextW(hwnd, L"");
 }
 
 std::tuple<int, int> TextEdit::GetSelectionRange() const {
@@ -74,7 +74,7 @@ std::tuple<int, int> TextEdit::GetSelectionRange() const {
   int start, end;
   ::SendMessage(hwnd, EM_GETSEL, reinterpret_cast<WPARAM>(&start),
                                  reinterpret_cast<LPARAM>(&end));
-  if (stat == end)
+  if (start == end)
     return std::make_tuple(-1, -1);
   else
     return std::make_tuple(start, end);
@@ -92,8 +92,8 @@ std::string TextEdit::GetTextInRange(int start, int end) const {
 
 void TextEdit::InsertText(const std::string& text) {
   HWND hwnd = static_cast<SubwinView*>(GetNative())->hwnd();
-  ::SendMessage(hwnd, EM_REPLACESEL, FALSE,
-                reinterpret_cast<LPARAM>(text.c_str()));
+  ::SendMessageW(hwnd, EM_REPLACESEL, FALSE,
+                 reinterpret_cast<LPARAM>(base::UTF8ToUTF16(text).c_str()));
 }
 
 void TextEdit::InsertTextAt(const std::string& text, int pos) {
@@ -108,7 +108,7 @@ void TextEdit::Delete() {
 
 void TextEdit::DeleteRange(int start, int end) {
   SelectRange(start, end);
-  InsertText(text);
+  InsertText("");
 }
 
 }  // namespace nu
