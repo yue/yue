@@ -35,6 +35,7 @@ TEST_F(TextEditTest, SelectRange) {
 
 TEST_F(TextEditTest, InsertText) {
   edit_->SetText("d");
+  edit_->SelectRange(0, 0);
   edit_->InsertText("ab");
   EXPECT_EQ(edit_->GetText(), "abd");
   edit_->InsertTextAt("c", 2);
