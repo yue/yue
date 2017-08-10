@@ -584,15 +584,11 @@ struct Type<nu::MenuBase> {
         "itemCount", &nu::MenuBase::ItemCount,
         "itemAt", &nu::MenuBase::ItemAt);
   }
-  // Used by subclasses.
-  static void ReadMembers(Arguments* args, nu::MenuBase* menu) {
-    std::vector<nu::MenuItem*> items;
-    if (args->GetNext(&items)) {
-      for (nu::MenuItem* item : items)
-        menu->Append(item);
-    }
-  }
 };
+
+void ReadMenuItems(v8::Local<v8::Context> context,
+                   v8::Local<v8::Array> options,
+                   nu::MenuBase* menu);
 
 template<>
 struct Type<nu::MenuBar> {
@@ -605,9 +601,10 @@ struct Type<nu::MenuBar> {
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
   }
-  static nu::MenuBar* Create(Arguments* args) {
+  static nu::MenuBar* Create(v8::Local<v8::Context> context,
+                             v8::Local<v8::Array> options) {
     nu::MenuBar* menu = new nu::MenuBar;
-    Type<nu::MenuBase>::ReadMembers(args, menu);
+    ReadMenuItems(context, options, menu);
     return menu;
   }
 };
@@ -625,9 +622,10 @@ struct Type<nu::Menu> {
     Set(context, templ,
         "popup", &nu::Menu::Popup);
   }
-  static nu::Menu* Create(Arguments* args) {
+  static nu::Menu* Create(v8::Local<v8::Context> context,
+                          v8::Local<v8::Array> options) {
     nu::Menu* menu = new nu::Menu;
-    Type<nu::MenuBase>::ReadMembers(args, menu);
+    ReadMenuItems(context, options, menu);
     return menu;
   }
 };
@@ -699,7 +697,10 @@ struct Type<nu::MenuItem> {
       item->SetChecked(b);
     }
     nu::Menu* submenu = nullptr;
-    if (Get(context, obj, "submenu", &submenu)) {
+    v8::Local<v8::Array> options;
+    if (Get(context, obj, "submenu", &submenu) ||
+        (Get(context, obj, "submenu", &options) && options->IsArray())) {
+      if (!submenu) submenu = Type<nu::Menu>::Create(context, options);
       if (!item) item = new nu::MenuItem(nu::MenuItem::Type::Submenu);
       item->SetSubmenu(submenu);
     }
@@ -719,6 +720,21 @@ struct Type<nu::MenuItem> {
     return item;
   }
 };
+
+void ReadMenuItems(v8::Local<v8::Context> context,
+                   v8::Local<v8::Array> arr,
+                   nu::MenuBase* menu) {
+  std::vector<v8::Local<v8::Object>> items;
+  if (vb::FromV8(context, arr, &items)) {
+    for (v8::Local<v8::Object> obj : items) {
+      // Create the item if an object is passed.
+      nu::MenuItem* item;
+      if (!vb::FromV8(context, obj, &item))
+        item = Type<nu::MenuItem>::Create(context, obj);
+      menu->Append(item);
+    }
+  }
+}
 
 template<>
 struct Type<nu::Window::Options> {
