@@ -160,7 +160,8 @@ struct Dispatcher<ReturnType(ArgTypes...)> {
     HolderT* holder = static_cast<HolderT*>(
         lua_touserdata(state, lua_upvalueindex(1)));
 
-    CallContext context(state, Values<ReturnType>::count);
+    CallContext context(state);
+    context.return_values_count = Values<ReturnType>::count;
     static_assert(std::is_trivially_destructible<CallContext>::value,
                   "The CallContext must not invole C++ stack");
     {  // Make sure C++ stack is destroyed before calling lua_error.

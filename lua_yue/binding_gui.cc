@@ -552,15 +552,9 @@ struct Type<nu::MenuBase> {
   static inline nu::MenuItem* ItemAt(nu::MenuBase* menu, int i) {
     return menu->ItemAt(i - 1);
   }
-  // Used by subclasses.
-  static void ReadMembers(State* state, nu::MenuBase* menu) {
-    std::vector<nu::MenuItem*> items;
-    if (lua::To(state, 1, &items)) {
-      for (nu::MenuItem* item : items)
-        menu->Append(item);
-    }
-  }
 };
+
+void ReadMenuItems(State* state, int metatable, nu::MenuBase* menu);
 
 template<>
 struct Type<nu::MenuBar> {
@@ -572,7 +566,7 @@ struct Type<nu::MenuBar> {
   }
   static nu::MenuBar* Create(CallContext* context) {
     nu::MenuBar* menu = new nu::MenuBar;
-    Type<nu::MenuBase>::ReadMembers(context->state, menu);
+    ReadMenuItems(context->state, context->current_arg, menu);
     return menu;
   }
 };
@@ -588,7 +582,7 @@ struct Type<nu::Menu> {
   }
   static nu::Menu* Create(CallContext* context) {
     nu::Menu* menu = new nu::Menu;
-    Type<nu::MenuBase>::ReadMembers(context->state, menu);
+    ReadMenuItems(context->state, context->current_arg, menu);
     return menu;
   }
 };
@@ -638,41 +632,68 @@ struct Type<nu::MenuItem> {
                    "onclick", &nu::MenuItem::on_click);
   }
   static nu::MenuItem* Create(CallContext* context) {
+    State* state = context->state;
+    int options = context->current_arg;
     nu::MenuItem::Type type = nu::MenuItem::Type::Label;
-    if (lua::To(context->state, 1, &type) ||  // 'type'
-        GetType(context->state, 1) != LuaType::Table)  // {type='type'}
+    if (lua::To(state, options, &type) ||  // 'type'
+        GetType(state, options) != LuaType::Table)  // {type='type'}
       return new nu::MenuItem(type);
     // Use label unless "type" is specified.
     nu::MenuItem* item = nullptr;
-    if (RawGetAndPop(context->state, 1, "type", &type))
+    if (RawGetAndPop(state, options, "type", &type))
       item = new nu::MenuItem(type);
     // Read table fields and set attributes.
     bool b = false;
-    if (RawGetAndPop(context->state, 1, "checked", &b)) {
+    if (RawGetAndPop(state, options, "checked", &b)) {
       if (!item) item = new nu::MenuItem(nu::MenuItem::Type::Checkbox);
       item->SetChecked(b);
     }
     nu::Menu* submenu = nullptr;
-    if (RawGetAndPop(context->state, 1, "submenu", &submenu)) {
+    RawGet(state, options, "submenu");
+    if (To(state, -1, &submenu) || GetType(state, -1) == LuaType::Table) {
       if (!item) item = new nu::MenuItem(nu::MenuItem::Type::Submenu);
+      if (!submenu) {
+        CallContext context(state);
+        context.current_arg = AbsIndex(state, -1);
+        submenu = Type<nu::Menu>::Create(&context);
+      }
       item->SetSubmenu(submenu);
     }
+    PopAndIgnore(state, 1);
     if (!item)  // can not deduce type from property, assuming Label item.
       item = new nu::MenuItem(nu::MenuItem::Type::Label);
-    if (RawGetAndPop(context->state, 1, "visible", &b))
+    if (RawGetAndPop(state, options, "visible", &b))
       item->SetVisible(b);
-    if (RawGetAndPop(context->state, 1, "enabled", &b))
+    if (RawGetAndPop(state, options, "enabled", &b))
       item->SetEnabled(b);
     std::string label;
-    if (RawGetAndPop(context->state, 1, "label", &label))
+    if (RawGetAndPop(state, options, "label", &label))
       item->SetLabel(label);
     nu::Accelerator accelerator;
-    if (RawGetAndPop(context->state, 1, "accelerator", &accelerator))
+    if (RawGetAndPop(state, options, "accelerator", &accelerator))
       item->SetAccelerator(accelerator);
-    RawGetAndPop(context->state, 1, "onclick", &item->on_click);
+    RawGetAndPop(state, options, "onclick", &item->on_click);
     return item;
   }
 };
+
+void ReadMenuItems(State* state, int options, nu::MenuBase* menu) {
+  if (GetType(state, options) != LuaType::Table)
+    return;
+  StackAutoReset reset(state);
+  PushNil(state);
+  while (lua_next(state, options) != 0) {
+    // Create the item if a table is passed.
+    nu::MenuItem* item;
+    if (!To(state, -1, &item)) {
+      CallContext context(state);
+      context.current_arg = AbsIndex(state, -1);
+      item = Type<nu::MenuItem>::Create(&context);
+    }
+    PopAndIgnore(state, 1);
+    menu->Append(item);
+  }
+}
 
 template<>
 struct Type<nu::Window::Options> {

@@ -92,7 +92,8 @@ void MenuItem::PlatformDestroy() {
 }
 
 void MenuItem::PlatformSetSubmenu(Menu* submenu) {
-  [menu_item_ setSubmenu:submenu->GetNative()];
+  menu_item_.submenu = submenu->GetNative();
+  menu_item_.submenu.title = menu_item_.title;
 }
 
 }  // namespace nu

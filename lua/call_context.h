@@ -11,14 +11,13 @@ namespace lua {
 
 // A class used by PCall to provide information of current call.
 struct CallContext {
-  CallContext(State* state, int return_values_count)
-      : state(state), return_values_count(return_values_count) {}
+  explicit CallContext(State* state) : state(state) {}
 
   // The lua state.
   State* state;
 
   // How many return values we have.
-  int return_values_count;
+  int return_values_count = 0;
 
   // Whether there is error on stack.
   bool has_error = false;
