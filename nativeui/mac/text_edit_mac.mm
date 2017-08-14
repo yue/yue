@@ -105,6 +105,30 @@ std::string TextEdit::GetText() const {
   return base::SysNSStringToUTF8([[text_view textStorage] string]);
 }
 
+void TextEdit::Redo() {
+  auto* text_view = static_cast<NSTextView*>(
+      [static_cast<NUTextEdit*>(GetNative()) documentView]);
+  [[text_view undoManager] redo];
+}
+
+bool TextEdit::CanRedo() const {
+  auto* text_view = static_cast<NSTextView*>(
+      [static_cast<NUTextEdit*>(GetNative()) documentView]);
+  [[text_view undoManager] canRedo];
+}
+
+void TextEdit::Undo() {
+  auto* text_view = static_cast<NSTextView*>(
+      [static_cast<NUTextEdit*>(GetNative()) documentView]);
+  [[text_view undoManager] undo];
+}
+
+bool TextEdit::CanUndo() const {
+  auto* text_view = static_cast<NSTextView*>(
+      [static_cast<NUTextEdit*>(GetNative()) documentView]);
+  [[text_view undoManager] canUndo];
+}
+
 void TextEdit::Cut() {
   auto* text_view = static_cast<NSTextView*>(
       [static_cast<NUTextEdit*>(GetNative()) documentView]);

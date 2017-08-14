@@ -71,6 +71,12 @@ void State::PlatformInit() {
 
   YGConfigSetPointScaleFactor(yoga_config(), GetScaleFactor());
 
+  // Initialize Common Controls.
+  INITCOMMONCONTROLSEX config;
+  config.dwSize = sizeof(config);
+  config.dwICC = ICC_WIN95_CLASSES;
+  ::InitCommonControlsEx(&config);
+
   gdiplus_holder_.reset(new GdiplusHolder);
 }
 

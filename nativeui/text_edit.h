@@ -25,6 +25,11 @@ class NATIVEUI_EXPORT TextEdit : public View {
   void SetText(const std::string& text);
   std::string GetText() const;
 
+  void Redo();
+  bool CanRedo() const;
+  void Undo();
+  bool CanUndo() const;
+
   void Cut();
   void Copy();
   void Paste();

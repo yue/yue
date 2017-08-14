@@ -279,6 +279,7 @@ component("nativeui") {
     ]
   } else if (is_win) {
     libs = [
+      "comctl32.lib",
       "dwmapi.lib",
       "gdi32.lib",
       "gdiplus.lib",

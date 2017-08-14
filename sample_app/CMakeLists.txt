@@ -37,7 +37,7 @@ if(WIN32)
   target_link_libraries(${APP_NAME}
                         setupapi.lib powrprof.lib ws2_32.lib dbghelp.lib
                         shlwapi.lib version.lib winmm.lib psapi.lib dwmapi.lib
-                        gdi32.lib gdiplus.lib
+                        comctl32.lib gdi32.lib gdiplus.lib
                         optimized ${CMAKE_SOURCE_DIR}/lib/libyue.lib
                         debug ${CMAKE_SOURCE_DIR}/lib/libyued.lib)
   foreach(flag_var

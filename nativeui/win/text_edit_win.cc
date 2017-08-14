@@ -4,6 +4,8 @@
 
 #include "nativeui/text_edit.h"
 
+#include <richedit.h>
+
 #include "base/strings/utf_string_conversions.h"
 #include "nativeui/win/subwin_view.h"
 #include "nativeui/win/util/hwnd_util.h"
@@ -15,18 +17,23 @@ namespace {
 class TextEditImpl : public SubwinView {
  public:
   explicit TextEditImpl(TextEdit* delegate)
-      : SubwinView(delegate,
-                   L"edit",
-                   WS_VSCROLL | ES_AUTOHSCROLL | ES_MULTILINE |
+      : SubwinView((LoadRichEdit(), delegate),  // load dll before constructor
+                   MSFTEDIT_CLASS,
+                   WS_VSCROLL | WS_HSCROLL | ES_MULTILINE |
                    WS_CHILD | WS_VISIBLE,
                    WS_EX_CLIENTEDGE) {
     set_focusable(true);
+    ::SendMessage(hwnd(), EM_SETTEXTMODE, TM_PLAINTEXT, 0L);
   }
 
   void OnCommand(UINT code, int command) override {
     TextEdit* edit = static_cast<TextEdit*>(delegate());
     if (code == EN_CHANGE)
       edit->on_text_change.Emit(edit);
+  }
+
+  void LoadRichEdit() {
+    ::LoadLibraryW(L"msftedit.dll");
   }
 };
 
@@ -47,6 +54,26 @@ void TextEdit::SetText(const std::string& text) {
 std::string TextEdit::GetText() const {
   HWND hwnd = static_cast<SubwinView*>(GetNative())->hwnd();
   return base::UTF16ToUTF8(GetWindowString(hwnd));
+}
+
+void TextEdit::Redo() {
+  HWND hwnd = static_cast<SubwinView*>(GetNative())->hwnd();
+  ::SendMessage(hwnd, EM_REDO, 0, 0L);
+}
+
+bool TextEdit::CanRedo() const {
+  HWND hwnd = static_cast<SubwinView*>(GetNative())->hwnd();
+  return ::SendMessage(hwnd, EM_CANREDO, 0, 0L) != 0;
+}
+
+void TextEdit::Undo() {
+  HWND hwnd = static_cast<SubwinView*>(GetNative())->hwnd();
+  ::SendMessage(hwnd, EM_UNDO, 0, 0L);
+}
+
+bool TextEdit::CanUndo() const {
+  HWND hwnd = static_cast<SubwinView*>(GetNative())->hwnd();
+  return ::SendMessage(hwnd, EM_CANUNDO, 0, 0L) != 0;
 }
 
 void TextEdit::Cut() {
