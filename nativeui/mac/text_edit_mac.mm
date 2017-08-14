@@ -114,7 +114,7 @@ void TextEdit::Redo() {
 bool TextEdit::CanRedo() const {
   auto* text_view = static_cast<NSTextView*>(
       [static_cast<NUTextEdit*>(GetNative()) documentView]);
-  [[text_view undoManager] canRedo];
+  return [[text_view undoManager] canRedo];
 }
 
 void TextEdit::Undo() {
@@ -126,7 +126,7 @@ void TextEdit::Undo() {
 bool TextEdit::CanUndo() const {
   auto* text_view = static_cast<NSTextView*>(
       [static_cast<NUTextEdit*>(GetNative()) documentView]);
-  [[text_view undoManager] canUndo];
+  return [[text_view undoManager] canUndo];
 }
 
 void TextEdit::Cut() {

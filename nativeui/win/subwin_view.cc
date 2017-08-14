@@ -71,9 +71,10 @@ void SubwinView::Invalidate(const Rect& dirty) {
 }
 
 void SubwinView::SetFocus(bool focus) {
-  ::SetFocus(focus ? hwnd() : ::GetParent(hwnd()));
-  if (!focus)
-    ::SendMessage(hwnd(), WM_KILLFOCUS, NULL, NULL);
+  if (focus)
+    ::SetFocus(hwnd());
+  else
+    ::SendMessage(hwnd(), WM_KILLFOCUS, 0, 0L);
 }
 
 bool SubwinView::HasFocus() const {
