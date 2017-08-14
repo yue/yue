@@ -50,6 +50,20 @@ std::string TextEdit::GetText() const {
   return gtk_text_buffer_get_text(buffer, &start_iter, &end_iter, false);
 }
 
+void TextEdit::Redo() {
+}
+
+bool TextEdit::CanRedo() const {
+  return false;
+}
+
+void TextEdit::Undo() {
+}
+
+bool TextEdit::CanUndo() const {
+  return false;
+}
+
 void TextEdit::Cut() {
   GtkClipboard* clipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
   GtkTextBuffer* buffer = gtk_text_view_get_buffer(
