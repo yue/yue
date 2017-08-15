@@ -5,7 +5,9 @@
 #include "nativeui/menu_item.h"
 
 #include <gtk/gtk.h>
+#include <webkit2/webkit2.h>
 
+#include "nativeui/gtk/undoable_text_buffer.h"
 #include "nativeui/menu.h"
 
 namespace nu {
@@ -13,19 +15,99 @@ namespace nu {
 namespace {
 
 // Maps roles to stock IDs.
-const gchar* g_stock_map[] = {
-  GTK_STOCK_COPY,
-  GTK_STOCK_CUT,
-  GTK_STOCK_PASTE,
-  GTK_STOCK_SELECT_ALL,
-  GTK_STOCK_UNDO,
-  GTK_STOCK_REDO,
+struct {
+  const gchar* stock_id;
+  const char* webkit_command;
+} g_stock_map[] = {
+  { GTK_STOCK_COPY, WEBKIT_EDITING_COMMAND_COPY },
+  { GTK_STOCK_CUT, WEBKIT_EDITING_COMMAND_CUT },
+  { GTK_STOCK_PASTE, WEBKIT_EDITING_COMMAND_PASTE },
+  { GTK_STOCK_SELECT_ALL, WEBKIT_EDITING_COMMAND_SELECT_ALL },
+  { GTK_STOCK_UNDO, WEBKIT_EDITING_COMMAND_UNDO },
+  { GTK_STOCK_REDO, WEBKIT_EDITING_COMMAND_REDO },
 };
 
 static_assert(
     arraysize(g_stock_map) == static_cast<size_t>(MenuItem::Role::ItemCount),
     "Stock items should map the roles");
 
+// Find the top-level menu shell.
+MenuBase* FindTopLevelMenu(MenuItem* item) {
+  MenuBase* menu = item->GetMenu();
+  if (!menu)
+    return nullptr;
+  MenuItem* parent = menu->GetParent();
+  while (parent ) {
+    menu = parent->GetMenu();
+    if (!menu)
+      return nullptr;
+    parent = menu->GetParent();
+  }
+  return menu;
+}
+
+// Handling stock item clicking.
+void OnStockClick(GtkWidget*, MenuItem* item) {
+  if (item->GetRole() >= MenuItem::Role::ItemCount)
+    return;
+  // Get the window.
+  MenuBase* menu = FindTopLevelMenu(item);
+  if (!menu)
+    return;
+  GtkWindow* window =
+      GTK_WINDOW(g_object_get_data(G_OBJECT(menu->GetNative()), "window"));
+  if (!window)
+    return;
+  // Get the focused widget.
+  GtkWidget* widget = gtk_window_get_focus(window);
+  if (!widget)
+    return;
+
+  if (WEBKIT_IS_WEB_VIEW(widget)) {
+    webkit_web_view_execute_editing_command(
+        WEBKIT_WEB_VIEW(widget),
+        g_stock_map[static_cast<int>(item->GetRole())].webkit_command);
+  } else {
+    switch (item->GetRole()) {
+      case MenuItem::Role::Copy:
+        if (GTK_IS_ENTRY(widget) || GTK_IS_TEXT_VIEW(widget))
+          g_signal_emit_by_name(widget, "copy-clipboard", nullptr);
+        break;
+      case MenuItem::Role::Cut:
+        if (GTK_IS_ENTRY(widget) || GTK_IS_TEXT_VIEW(widget))
+          g_signal_emit_by_name(widget, "cut-clipboard", nullptr);
+        break;
+      case MenuItem::Role::Paste:
+        if (GTK_IS_ENTRY(widget) || GTK_IS_TEXT_VIEW(widget))
+          g_signal_emit_by_name(widget, "paste-clipboard", nullptr);
+        break;
+      case MenuItem::Role::SelectAll:
+        if (GTK_IS_TEXT_VIEW(widget))
+          g_signal_emit_by_name(widget, "select-all", TRUE, nullptr);
+        else if (GTK_IS_ENTRY(widget))
+          gtk_widget_grab_focus(widget);
+        break;
+      case MenuItem::Role::Undo:
+        if (GTK_IS_TEXT_VIEW(widget)) {
+          auto* buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
+          if (TextBufferIsUndoable(buffer))
+            TextBufferUndo(buffer);
+        }
+        break;
+      case MenuItem::Role::Redo:
+        if (GTK_IS_TEXT_VIEW(widget)) {
+          auto* buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
+          if (TextBufferIsUndoable(buffer))
+            TextBufferRedo(buffer);
+        }
+        break;
+      default:
+        break;
+    }
+  }
+}
+
+// Normal handling of the clicking.
 void OnClick(GtkMenuItem*, MenuItem* item) {
   item->on_click.Emit(item);
 }
@@ -75,9 +157,10 @@ void MenuItem::PlatformInit() {
   GtkWidget* item;
   GtkStockItem stock;
   if (role_ < Role::ItemCount &&
-      gtk_stock_lookup(g_stock_map[static_cast<int>(role_)], &stock)) {
+      gtk_stock_lookup(g_stock_map[static_cast<int>(role_)].stock_id, &stock)) {
     // Create item from the stock.
     item = gtk_image_menu_item_new_from_stock(stock.stock_id, nullptr);
+    g_signal_connect(item, "activate", G_CALLBACK(OnStockClick), this);
     if (stock.keyval) {
       SetAccelerator(Accelerator(static_cast<KeyboardCode>(stock.keyval),
                                  stock.modifier));

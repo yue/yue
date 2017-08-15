@@ -32,6 +32,10 @@ class NATIVEUI_EXPORT MenuBase : public base::RefCounted<MenuBase> {
   // Return the native Menu object.
   NativeMenu GetNative() const { return menu_; }
 
+  // Internal: Relationships with submenu items.
+  void SetParent(MenuItem* item) { parent_ = item; }
+  MenuItem* GetParent() const { return parent_; }
+
   // Internal: Notify the change of AcceleratorManager.
   void SetAcceleratorManager(AcceleratorManager* accel_manager);
 
@@ -51,7 +55,7 @@ class NATIVEUI_EXPORT MenuBase : public base::RefCounted<MenuBase> {
   AcceleratorManager* accel_manager_ = nullptr;
 
   // Relationships.
-  MenuBase* parent_ = nullptr;
+  MenuItem* parent_ = nullptr;
   std::vector<scoped_refptr<MenuItem>> items_;
 
   NativeMenu menu_;

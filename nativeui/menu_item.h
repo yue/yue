@@ -74,6 +74,9 @@ class NATIVEUI_EXPORT MenuItem : public base::RefCounted<MenuItem> {
   // Return the type of menu item.
   Type GetType() const { return type_; }
 
+  // Return the role of menu item.
+  Role GetRole() const { return role_; }
+
   // Get the owner of this item.
   MenuBase* GetMenu() const { return menu_; }
 

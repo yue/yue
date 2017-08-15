@@ -90,7 +90,7 @@ void MenuItem::PlatformSetSubmenu(Menu* submenu) {
     MENUITEMINFO mii = {0};
     mii.cbSize = sizeof(mii);
     mii.fMask = MIIM_SUBMENU;
-    mii.hSubMenu = submenu_->GetNative();
+    mii.hSubMenu = submenu->GetNative();
     SetMenuItemInfo(menu_->GetNative(), menu_item_->id, FALSE, &mii);
   }
 }

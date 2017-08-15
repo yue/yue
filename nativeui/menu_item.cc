@@ -38,8 +38,12 @@ MenuItem::~MenuItem() {
 }
 
 void MenuItem::SetSubmenu(Menu* submenu) {
-  submenu_ = submenu;
+  if (submenu_)
+    submenu_->SetParent(nullptr);
   PlatformSetSubmenu(submenu);
+  submenu_ = submenu;
+  if (submenu_)
+    submenu_->SetParent(this);
 }
 
 Menu* MenuItem::GetSubmenu() const {

@@ -472,18 +472,24 @@ void Window::PlatformSetMenuBar(MenuBar* menu_bar) {
   GtkContainer* vbox = GTK_CONTAINER(gtk_bin_get_child(GTK_BIN(window_)));
   if (menu_bar_)
     gtk_container_remove(vbox, GTK_WIDGET(menu_bar_->GetNative()));
+
+  // Add menu to window's content vbox view.
   GtkWidget* menu = GTK_WIDGET(menu_bar->GetNative());
   gtk_container_add(vbox, menu);
   gtk_box_set_child_packing(GTK_BOX(vbox), menu, FALSE, FALSE, 0,
                             GTK_PACK_START);
 
+  // Leave a hint on which window the menubar belongs to.
+  if (menu_bar_)
+    g_object_set_data(G_OBJECT(menu_bar_->GetNative()), "window", nullptr);
+  g_object_set_data(G_OBJECT(menu_bar->GetNative()), "window", window_);
+
   // Update the accelerator group.
   if (menu_bar_)
     gtk_window_remove_accel_group(window_,
                                   menu_bar_->accel_manager()->accel_group());
-  if (menu_bar)
-    gtk_window_add_accel_group(window_,
-                               menu_bar->accel_manager()->accel_group());
+  gtk_window_add_accel_group(window_,
+                             menu_bar->accel_manager()->accel_group());
 
   ForceSizeAllocation(window_, GTK_WIDGET(vbox));
 }
