@@ -72,6 +72,10 @@ void TextEdit::Paste() {
   static_cast<EditView*>(GetNative())->Paste();
 }
 
+void TextEdit::SelectAll() {
+  static_cast<EditView*>(GetNative())->SelectAll();
+}
+
 std::tuple<int, int> TextEdit::GetSelectionRange() const {
   HWND hwnd = static_cast<SubwinView*>(GetNative())->hwnd();
   int start, end;

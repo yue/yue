@@ -85,6 +85,12 @@ void TextEdit::Paste() {
   gtk_text_buffer_paste_clipboard(buffer, clipboard, nullptr, TRUE);
 }
 
+void TextEdit::SelectAll() {
+  GtkTextView* text_view =
+      GTK_TEXT_VIEW(g_object_get_data(G_OBJECT(GetNative()), "text-view"));
+  g_signal_emit_by_name(text_view, "select-all", TRUE, nullptr);
+}
+
 std::tuple<int, int> TextEdit::GetSelectionRange() const {
   GtkTextBuffer* buffer = gtk_text_view_get_buffer(
       GTK_TEXT_VIEW(g_object_get_data(G_OBJECT(GetNative()), "text-view")));

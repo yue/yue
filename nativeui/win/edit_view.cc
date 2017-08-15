@@ -60,6 +60,10 @@ void EditView::Paste() {
   ::SendMessage(hwnd(), WM_PASTE, 0, 0L);
 }
 
+void EditView::SelectAll() {
+  ::SendMessage(hwnd(), EM_SETSEL, 0, -1);
+}
+
 void EditView::LoadRichEdit() {
   ::LoadLibraryW(L"msftedit.dll");
 }

@@ -148,6 +148,12 @@ void TextEdit::Paste() {
   [text_view paste:nil];
 }
 
+void TextEdit::SelectAll() {
+  auto* text_view = static_cast<NSTextView*>(
+      [static_cast<NUTextEdit*>(GetNative()) documentView]);
+  [text_view selectAll:nil];
+}
+
 std::tuple<int, int> TextEdit::GetSelectionRange() const {
   auto* text_view = static_cast<NSTextView*>(
       [static_cast<NUTextEdit*>(GetNative()) documentView]);
