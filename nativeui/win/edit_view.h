@@ -28,7 +28,6 @@ class EditView : public SubwinView {
   void Cut();
   void Copy();
   void Paste();
-  void Clear();
 
  private:
   void LoadRichEdit();

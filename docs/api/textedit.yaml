@@ -37,9 +37,6 @@ methods:
     description: |
       copy the current content of the clipboard to current caret position.
 
-  - signature: void Clear()
-    description: Remove all text.
-
   - signature: std::tuple<int, int> GetSelectionRange() const
     description: |
       Return the start position and end position of current selection.

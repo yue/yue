@@ -1023,7 +1023,6 @@ struct Type<nu::TextEdit> {
            "cut", &nu::TextEdit::Cut,
            "copy", &nu::TextEdit::Copy,
            "paste", &nu::TextEdit::Paste,
-           "clear", &nu::TextEdit::Clear,
            "getselectionrange", &nu::TextEdit::GetSelectionRange,
            "selectrange", &nu::TextEdit::SelectRange,
            "gettextinrange", &nu::TextEdit::GetTextInRange,

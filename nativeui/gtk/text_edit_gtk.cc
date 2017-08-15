@@ -85,12 +85,6 @@ void TextEdit::Paste() {
   gtk_text_buffer_paste_clipboard(buffer, clipboard, nullptr, TRUE);
 }
 
-void TextEdit::Clear() {
-  GtkTextBuffer* buffer = gtk_text_view_get_buffer(
-      GTK_TEXT_VIEW(g_object_get_data(G_OBJECT(GetNative()), "text-view")));
-  gtk_text_buffer_set_text(buffer, "", 0);
-}
-
 std::tuple<int, int> TextEdit::GetSelectionRange() const {
   GtkTextBuffer* buffer = gtk_text_view_get_buffer(
       GTK_TEXT_VIEW(g_object_get_data(G_OBJECT(GetNative()), "text-view")));

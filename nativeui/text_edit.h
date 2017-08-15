@@ -33,7 +33,6 @@ class NATIVEUI_EXPORT TextEdit : public View {
   void Cut();
   void Copy();
   void Paste();
-  void Clear();
 
   std::tuple<int, int> GetSelectionRange() const;
   void SelectRange(int start, int end);
