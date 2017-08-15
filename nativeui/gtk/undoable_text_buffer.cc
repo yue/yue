@@ -74,7 +74,7 @@ void OnInsertText(GtkTextBuffer* buffer,
                   gchar* text, gint length,
                   UndoableData* data) {
   if (!data->undo_in_progress)
-    data->redo_stack = {};
+    data->redo_stack = std::stack<UndoableAction>();
   if (data->not_undoable_action)
     return;
   UndoableAction cur(iter, std::string(text, length));
@@ -103,7 +103,7 @@ void OnDeleteRange(GtkTextBuffer* buffer,
                    GtkTextIter* end_iter,
                    UndoableData* data) {
   if (!data->undo_in_progress)
-    data->redo_stack = {};
+    data->redo_stack = std::stack<UndoableAction>();
   if (data->not_undoable_action)
     return;
   UndoableAction cur(buffer, start_iter, end_iter);
