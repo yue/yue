@@ -12,6 +12,20 @@ namespace nu {
 
 namespace {
 
+// Maps roles to stock IDs.
+const gchar* g_stock_map[] = {
+  GTK_STOCK_COPY,
+  GTK_STOCK_CUT,
+  GTK_STOCK_PASTE,
+  GTK_STOCK_SELECT_ALL,
+  GTK_STOCK_UNDO,
+  GTK_STOCK_REDO,
+};
+
+static_assert(
+    arraysize(g_stock_map) == static_cast<size_t>(MenuItem::Role::ItemCount),
+    "Stock items should map the roles");
+
 void OnClick(GtkMenuItem*, MenuItem* item) {
   item->on_click.Emit(item);
 }
@@ -59,13 +73,23 @@ bool MenuItem::IsVisible() const {
 
 void MenuItem::PlatformInit() {
   GtkWidget* item;
-  switch (type_) {
-    case Type::Label: case Type::Submenu: item = gtk_menu_item_new(); break;
-    case Type::Radio: item = gtk_radio_menu_item_new(nullptr); break;
-    case Type::Checkbox: item = gtk_check_menu_item_new(); break;
-    case Type::Separator: item = gtk_separator_menu_item_new(); break;
+  GtkStockItem stock;
+  if (role_ < Role::ItemCount &&
+      gtk_stock_lookup(g_stock_map[static_cast<int>(role_)], &stock)) {
+    // Create item from the stock.
+    item = gtk_image_menu_item_new_from_stock(stock.stock_id, nullptr);
+    SetAccelerator(Accelerator(static_cast<KeyboardCode>(stock.keyval),
+                               stock.modifier));
+  } else {
+    // Otherwise create custom item.
+    switch (type_) {
+      case Type::Label: case Type::Submenu: item = gtk_menu_item_new(); break;
+      case Type::Radio: item = gtk_radio_menu_item_new(nullptr); break;
+      case Type::Checkbox: item = gtk_check_menu_item_new(); break;
+      case Type::Separator: item = gtk_separator_menu_item_new(); break;
+    }
+    g_signal_connect(item, "activate", G_CALLBACK(OnClick), this);
   }
-  g_signal_connect(item, "activate", G_CALLBACK(OnClick), this);
 
   gtk_widget_show(item);
   g_object_ref_sink(item);

@@ -9,7 +9,27 @@
 
 namespace nu {
 
+namespace {
+
+MenuItem::Type RoleToType(MenuItem::Role role) {
+  switch (role) {
+    case MenuItem::Role::Edit:
+    case MenuItem::Role::Help:
+    case MenuItem::Role::Window:
+    case MenuItem::Role::Services:
+      return MenuItem::Type::Submenu;
+    default:
+      return MenuItem::Type::Label;
+  }
+}
+
+}  // namespace
+
 MenuItem::MenuItem(Type type) : type_(type) {
+  PlatformInit();
+}
+
+MenuItem::MenuItem(Role role) : role_(role), type_(RoleToType(role)) {
   PlatformInit();
 }
 

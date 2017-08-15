@@ -18,6 +18,7 @@ struct KeyEvent;
 class NATIVEUI_EXPORT Accelerator {
  public:
   Accelerator();
+  explicit Accelerator(KeyboardCode key_code, int modifiers);
   explicit Accelerator(const KeyEvent& event);
   explicit Accelerator(const std::string& description);
   ~Accelerator() = default;

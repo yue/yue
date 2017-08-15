@@ -611,6 +611,39 @@ struct Type<nu::MenuItem::Type> {
 };
 
 template<>
+struct Type<nu::MenuItem::Role> {
+  static constexpr const char* name = "yue.MenuItem.Role";
+  static bool To(State* state, int index, nu::MenuItem::Role* out) {
+    std::string role;
+    if (!lua::To(state, index, &role))
+      return false;
+    if (role == "copy")
+      *out = nu::MenuItem::Role::Copy;
+    else if (role == "cut")
+      *out = nu::MenuItem::Role::Cut;
+    else if (role == "paste")
+      *out = nu::MenuItem::Role::Paste;
+    else if (role == "select-all")
+      *out = nu::MenuItem::Role::SelectAll;
+    else if (role == "undo")
+      *out = nu::MenuItem::Role::Undo;
+    else if (role == "redo")
+      *out = nu::MenuItem::Role::Redo;
+    else if (role == "edit")
+      *out = nu::MenuItem::Role::Edit;
+    else if (role == "help")
+      *out = nu::MenuItem::Role::Help;
+    else if (role == "window")
+      *out = nu::MenuItem::Role::Window;
+    else if (role == "services")
+      *out = nu::MenuItem::Role::Services;
+    else
+      return false;
+    return true;
+  }
+};
+
+template<>
 struct Type<nu::MenuItem> {
   static constexpr const char* name = "yue.MenuItem";
   static void BuildMetaTable(State* state, int index) {
@@ -638,8 +671,12 @@ struct Type<nu::MenuItem> {
     if (lua::To(state, options, &type) ||  // 'type'
         GetType(state, options) != LuaType::Table)  // {type='type'}
       return new nu::MenuItem(type);
-    // Use label unless "type" is specified.
     nu::MenuItem* item = nullptr;
+    // First read role.
+    nu::MenuItem::Role role;
+    if (RawGetAndPop(state, options, "role", &role))
+      item = new nu::MenuItem(role);
+    // Use label unless "type" is specified.
     if (RawGetAndPop(state, options, "type", &type))
       item = new nu::MenuItem(type);
     // Read table fields and set attributes.

@@ -28,7 +28,28 @@ class NATIVEUI_EXPORT MenuItem : public base::RefCounted<MenuItem> {
     Submenu,
   };
 
+  enum class Role {
+    // Item roles.
+    // menu_item_gtk.cc should be updated when new roles are added.
+    Copy,
+    Cut,
+    Paste,
+    SelectAll,
+    Undo,
+    Redo,
+    // Indicate number of item roles, should not be used.
+    ItemCount,
+    // Submenu roles.
+    Edit,
+    Help,
+    Window,
+    Services,
+    // Indicate a normal item, should not be used.
+    None,
+  };
+
   explicit MenuItem(Type type);
+  explicit MenuItem(Role role);
 
   void Click();
 
@@ -85,6 +106,9 @@ class NATIVEUI_EXPORT MenuItem : public base::RefCounted<MenuItem> {
 
   // Weak ref to the owner menu.
   MenuBase* menu_ = nullptr;
+
+  // Role of the menu.
+  Role role_ = Role::None;
 
   // The submenu.
   scoped_refptr<Menu> submenu_;

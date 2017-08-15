@@ -21,6 +21,9 @@ Accelerator::Accelerator()
     : key_code_(VKEY_UNKNOWN), modifiers_(0) {
 }
 
+Accelerator::Accelerator(KeyboardCode key_code, int modifiers)
+    : key_code_(key_code), modifiers_(modifiers) {}
+
 Accelerator::Accelerator(const KeyEvent& event)
     : key_code_(event.key), modifiers_(event.modifiers) {}
 
