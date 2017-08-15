@@ -52,6 +52,7 @@
     textView_.reset([[NSTextView alloc] init]);
     [textView_ setDelegate:delegate_.get()];
     [textView_ setRichText:NO];
+    [textView_ setAllowsUndo:YES];
     [textView_ setHorizontallyResizable:YES];
     [textView_ setVerticallyResizable:YES];
     [textView_ setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
