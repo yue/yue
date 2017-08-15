@@ -210,6 +210,12 @@ InsetsF GetClientShadow(GtkWindow* window) {
 }
 
 void ForceSizeAllocation(GtkWindow* window, GtkWidget* view) {
+  // Call get_preferred_width before size allocation, otherwise GTK would print
+  // warnings like "How does the code know the size to allocate?".
+  gint tmp;
+  gtk_widget_get_preferred_width(view, &tmp, nullptr);
+  gtk_widget_get_preferred_height(view, &tmp, nullptr);
+
   GdkRectangle rect = { 0, 0 };
   gtk_window_get_size(window, &rect.width, &rect.height);
   gtk_widget_size_allocate(view, &rect);
