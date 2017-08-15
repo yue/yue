@@ -78,8 +78,25 @@ void MenuItem::PlatformInit() {
       gtk_stock_lookup(g_stock_map[static_cast<int>(role_)], &stock)) {
     // Create item from the stock.
     item = gtk_image_menu_item_new_from_stock(stock.stock_id, nullptr);
-    SetAccelerator(Accelerator(static_cast<KeyboardCode>(stock.keyval),
-                               stock.modifier));
+    if (stock.keyval) {
+      SetAccelerator(Accelerator(static_cast<KeyboardCode>(stock.keyval),
+                                 stock.modifier));
+    } else {
+      // Some items do not have stock accelerator.
+      switch (role_) {
+        case Role::SelectAll:
+          SetAccelerator(Accelerator(VKEY_A, MASK_CONTROL));
+          break;
+        case Role::Undo:
+          SetAccelerator(Accelerator(VKEY_Z, MASK_CONTROL));
+          break;
+        case Role::Redo:
+          SetAccelerator(Accelerator(VKEY_Z, MASK_CONTROL | MASK_SHIFT));
+          break;
+        default:
+          break;
+      }
+    }
   } else {
     // Otherwise create custom item.
     switch (type_) {
