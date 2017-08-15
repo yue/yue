@@ -30,6 +30,9 @@ class SubwinView : public Win32Window, public ViewImpl {
   void SetBackgroundColor(Color color) override;
   void Draw(PainterWin* painter, const Rect& dirty) override;
 
+  // Change behaviors.
+  void set_switch_focus_on_tab(bool s) { switch_focus_on_tab_ = s; }
+
   // Rerouted from parent window
   virtual void OnCommand(UINT code, int command) {}
   virtual bool OnCtlColor(HDC dc, HBRUSH* brush);
@@ -54,6 +57,9 @@ class SubwinView : public Win32Window, public ViewImpl {
                                   UINT message,
                                   WPARAM w_param,
                                   LPARAM l_param);
+
+  // Should switch focus when TAB is pressed.
+  bool switch_focus_on_tab_ = true;
 
   base::win::ScopedHFONT font_;
   base::win::ScopedGDIObject<HBRUSH> bg_brush_;

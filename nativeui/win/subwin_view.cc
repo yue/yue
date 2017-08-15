@@ -117,7 +117,7 @@ bool SubwinView::OnCtlColor(HDC dc, HBRUSH* brush) {
 }
 
 void SubwinView::OnChar(UINT ch, UINT repeat, UINT flags) {
-  if (ch == VK_TAB && window())  // Switching focus.
+  if (switch_focus_on_tab_ && ch == VK_TAB && window())  // switching focus
     window()->AdvanceFocus();
   else
     SetMsgHandled(false);

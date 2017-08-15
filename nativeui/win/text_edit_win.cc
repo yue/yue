@@ -11,6 +11,7 @@ namespace nu {
 
 TextEdit::TextEdit() {
   auto* edit = new EditView(this, WS_VSCROLL | WS_HSCROLL | ES_MULTILINE);
+  edit->set_switch_focus_on_tab(false);
   edit->SetPlainText();
   TakeOverView(edit);
 }
