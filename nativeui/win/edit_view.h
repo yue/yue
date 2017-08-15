@@ -30,9 +30,6 @@ class EditView : public SubwinView {
   void Paste();
   void Clear();
 
-  // SubwinView:
-  void OnCommand(UINT code, int command) override;
-
  private:
   void LoadRichEdit();
 };

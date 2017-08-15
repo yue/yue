@@ -4,12 +4,10 @@
 
 #include "nativeui/entry.h"
 
-#include "base/strings/utf_string_conversions.h"
-#include "nativeui/app.h"
+#include "base/win/scoped_hdc.h"
 #include "nativeui/gfx/screen.h"
 #include "nativeui/gfx/win/text_win.h"
-#include "nativeui/win/subwin_view.h"
-#include "nativeui/win/util/hwnd_util.h"
+#include "nativeui/win/edit_view.h"
 
 namespace nu {
 
@@ -17,16 +15,21 @@ namespace {
 
 const int kEntryPadding = 1;
 
-class EntryImpl : public SubwinView {
+class EntryImpl : public EditView {
  public:
   explicit EntryImpl(Entry* delegate)
-      : SubwinView(delegate,
-                   L"edit",
-                   ES_AUTOHSCROLL | WS_CHILD | WS_VISIBLE,
-                   WS_EX_CLIENTEDGE) {
-    set_focusable(true);
+      : EditView(delegate, ES_AUTOHSCROLL | WS_CHILD | WS_VISIBLE) {
+    SetPlainText();
   }
 
+  SizeF GetPreferredSize() const {
+    base::win::ScopedGetDC dc(window() ? window()->hwnd() : NULL);
+    SizeF size = MeasureText(dc, L"some text", font());
+    float height = size.height() / scale_factor() + 2 * kEntryPadding;
+    return SizeF(0, height);
+  }
+
+  // SubwinView:
   void OnCommand(UINT code, int command) override {
     Entry* entry = static_cast<Entry*>(delegate());
     if (code == EN_CHANGE)
@@ -50,24 +53,20 @@ class EntryImpl : public SubwinView {
 }  // namespace
 
 Entry::Entry() {
-  TakeOverView(new EntryImpl(this));
-
-  SizeF size = MeasureText(L"some text", GetNative()->font());
-  float height = size.height() / GetScaleFactor() + 2 * kEntryPadding;
-  SetDefaultStyle(SizeF(0, height));
+  auto* edit = new EntryImpl(this);
+  TakeOverView(edit);
+  SetDefaultStyle(edit->GetPreferredSize());
 }
 
 Entry::~Entry() {
 }
 
 void Entry::SetText(const std::string& text) {
-  ::SetWindowTextW(static_cast<SubwinView*>(GetNative())->hwnd(),
-                   base::UTF8ToUTF16(text).c_str());
+  static_cast<EditView*>(GetNative())->SetText(text);
 }
 
 std::string Entry::GetText() const {
-  return base::UTF16ToUTF8(
-      GetWindowString(static_cast<SubwinView*>(GetNative())->hwnd()));
+  return static_cast<EditView*>(GetNative())->GetText();
 }
 
 }  // namespace nu

@@ -64,12 +64,6 @@ void EditView::Clear() {
   ::SetWindowTextW(hwnd(), L"");
 }
 
-void EditView::OnCommand(UINT code, int command) {
-  TextEdit* edit = static_cast<TextEdit*>(delegate());
-  if (code == EN_CHANGE)
-    edit->on_text_change.Emit(edit);
-}
-
 void EditView::LoadRichEdit() {
   ::LoadLibraryW(L"msftedit.dll");
 }

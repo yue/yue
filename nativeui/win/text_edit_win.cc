@@ -9,11 +9,28 @@
 
 namespace nu {
 
+namespace {
+
+class TextEditImpl : public EditView {
+ public:
+  explicit TextEditImpl(View* delegate)
+      : EditView(delegate, WS_VSCROLL | WS_HSCROLL | ES_MULTILINE) {
+    set_switch_focus_on_tab(false);
+    SetPlainText();
+  }
+
+  // SubwinView:
+  void OnCommand(UINT code, int command) override {
+    TextEdit* edit = static_cast<TextEdit*>(delegate());
+    if (code == EN_CHANGE)
+      edit->on_text_change.Emit(edit);
+  }
+};
+
+}  // namespace
+
 TextEdit::TextEdit() {
-  auto* edit = new EditView(this, WS_VSCROLL | WS_HSCROLL | ES_MULTILINE);
-  edit->set_switch_focus_on_tab(false);
-  edit->SetPlainText();
-  TakeOverView(edit);
+  TakeOverView(new TextEditImpl(this));
 }
 
 TextEdit::~TextEdit() {
