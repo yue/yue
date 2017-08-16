@@ -40,7 +40,6 @@ class NATIVEUI_EXPORT MenuItem : public base::RefCounted<MenuItem> {
     // Indicate number of item roles, should not be used.
     ItemCount,
     // Submenu roles.
-    Edit,
     Help,
     Window,
     Services,

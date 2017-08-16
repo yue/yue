@@ -37,6 +37,24 @@
 
 namespace nu {
 
+namespace {
+
+// Mapping roles to selectors.
+SEL g_sels_map[] = {
+  @selector(copy:),
+  @selector(cut:),
+  @selector(paste:),
+  @selector(selectAll:),
+  @selector(undo:),
+  @selector(redo:),
+};
+
+static_assert(
+    arraysize(g_sels_map) == static_cast<size_t>(MenuItem::Role::ItemCount),
+    "g_sels_map should be updated with roles");
+
+}  // namespace
+
 void MenuItem::Click() {
   [NSApp sendAction:menu_item_.action to:menu_item_.target from:menu_item_];
 }
@@ -82,8 +100,14 @@ void MenuItem::PlatformInit() {
     menu_item_ = [[NSMenuItem separatorItem] retain];
   else
     menu_item_ = [[NSMenuItem alloc] init];
-  menu_item_.target = [[NUMenuItemDelegate alloc] initWithShell:this];
-  menu_item_.action = @selector(onClick:);
+  if (role_ < Role::ItemCount) {
+    menu_item_.title = @"";  // explicitly set "" to override default title
+    menu_item_.target = nil;
+    menu_item_.action = g_sels_map[static_cast<int>(role_)];
+  } else if (role_ == Role::None) {
+    menu_item_.target = [[NUMenuItemDelegate alloc] initWithShell:this];
+    menu_item_.action = @selector(onClick:);
+  }
 }
 
 void MenuItem::PlatformDestroy() {
@@ -94,6 +118,12 @@ void MenuItem::PlatformDestroy() {
 void MenuItem::PlatformSetSubmenu(Menu* submenu) {
   menu_item_.submenu = submenu->GetNative();
   menu_item_.submenu.title = menu_item_.title;
+  switch (role_) {
+    case Role::Help: [NSApp setHelpMenu:menu_item_.submenu]; break;
+    case Role::Window: [NSApp setWindowsMenu:menu_item_.submenu]; break;
+    case Role::Services: [NSApp setServicesMenu:menu_item_.submenu]; break;
+    default: break;
+  }
 }
 
 }  // namespace nu

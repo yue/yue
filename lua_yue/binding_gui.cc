@@ -629,8 +629,6 @@ struct Type<nu::MenuItem::Role> {
       *out = nu::MenuItem::Role::Undo;
     else if (role == "redo")
       *out = nu::MenuItem::Role::Redo;
-    else if (role == "edit")
-      *out = nu::MenuItem::Role::Edit;
     else if (role == "help")
       *out = nu::MenuItem::Role::Help;
     else if (role == "window")
