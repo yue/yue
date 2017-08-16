@@ -14,7 +14,7 @@ namespace {
 class TextEditImpl : public EditView {
  public:
   explicit TextEditImpl(View* delegate)
-      : EditView(delegate, WS_VSCROLL | WS_HSCROLL | ES_MULTILINE) {
+      : EditView(delegate, WS_VSCROLL | ES_MULTILINE) {
     set_switch_focus_on_tab(false);
     SetPlainText();
   }
