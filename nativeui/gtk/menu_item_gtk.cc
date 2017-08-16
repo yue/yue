@@ -33,27 +33,12 @@ static_assert(
     arraysize(g_stock_map) == static_cast<size_t>(MenuItem::Role::ItemCount),
     "Stock items should map the roles");
 
-// Find the top-level menu shell.
-MenuBase* FindTopLevelMenu(MenuItem* item) {
-  MenuBase* menu = item->GetMenu();
-  if (!menu)
-    return nullptr;
-  MenuItem* parent = menu->GetParent();
-  while (parent) {
-    menu = parent->GetMenu();
-    if (!menu)
-      return nullptr;
-    parent = menu->GetParent();
-  }
-  return menu;
-}
-
 // Handling stock item clicking.
 void OnStockClick(GtkWidget*, MenuItem* item) {
   if (item->GetRole() >= MenuItem::Role::ItemCount)
     return;
   // Get the window.
-  MenuBase* menu = FindTopLevelMenu(item);
+  MenuBase* menu = item->FindTopLevelMenu();
   if (!menu || menu->GetClassName() != MenuBar::kClassName)
     return;
   Window* window = static_cast<MenuBar*>(menu)->GetWindow();

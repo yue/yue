@@ -4,12 +4,62 @@
 
 #include "nativeui/win/menu_item_win.h"
 
+#include <richedit.h>
+
 #include "base/strings/utf_string_conversions.h"
 #include "nativeui/menu.h"
+#include "nativeui/menu_bar.h"
 #include "nativeui/menu_item.h"
 #include "nativeui/state.h"
+#include "nativeui/win/subwin_view.h"
+#include "nativeui/win/view_win.h"
+#include "nativeui/win/window_win.h"
 
 namespace nu {
+
+namespace {
+
+void OnRoleClick(MenuItem* self) {
+  // Get the window.
+  MenuBase* menu = self->FindTopLevelMenu();
+  if (!menu || menu->GetClassName() != MenuBar::kClassName)
+    return;
+  Window* window = static_cast<MenuBar*>(menu)->GetWindow();
+  if (!window)
+    return;
+  // Get the focused widget.
+  ViewImpl* view = window->GetNative()->focus_manager()->focused_view();
+  if (!view)
+    return;
+  // Only supports Edit widgets.
+  if (view->type() != ControlType::Subwin)
+    return;
+  HWND hwnd = static_cast<SubwinView*>(view)->hwnd();
+  switch (self->GetRole()) {
+    case MenuItem::Role::Copy:
+      ::SendMessage(hwnd, WM_COPY, 0, 0L);
+      break;
+    case MenuItem::Role::Cut:
+      ::SendMessage(hwnd, WM_CUT, 0, 0L);
+      break;
+    case MenuItem::Role::Paste:
+      ::SendMessage(hwnd, WM_PASTE, 0, 0L);
+      break;
+    case MenuItem::Role::SelectAll:
+      ::SendMessage(hwnd, EM_SETSEL, 0, -1);
+      break;
+    case MenuItem::Role::Undo:
+      ::SendMessage(hwnd, EM_UNDO, 0, 0L);
+      break;
+    case MenuItem::Role::Redo:
+      ::SendMessage(hwnd, EM_REDO, 0, 0L);
+      break;
+    default:
+      break;
+  }
+}
+
+}  // namespace
 
 void MenuItem::Click() {
   if (type_ == Type::Checkbox)
@@ -79,6 +129,8 @@ bool MenuItem::IsVisible() const {
 void MenuItem::PlatformInit() {
   menu_item_ = new MenuItemData;
   menu_item_->id = State::GetCurrent()->GetNextCommandID();
+  if (role_ < Role::ItemCount)
+    on_click.Connect(&OnRoleClick);
 }
 
 void MenuItem::PlatformDestroy() {

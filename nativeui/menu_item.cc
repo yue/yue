@@ -92,6 +92,20 @@ Accelerator MenuItem::GetAccelerator() const {
   return accelerator_;
 }
 
+MenuBase* MenuItem::FindTopLevelMenu() const {
+  MenuBase* menu = GetMenu();
+  if (!menu)
+    return nullptr;
+  MenuItem* parent = menu->GetParent();
+  while (parent) {
+    menu = parent->GetMenu();
+    if (!menu)
+      return nullptr;
+    parent = menu->GetParent();
+  }
+  return menu;
+}
+
 // Flip all radio items in the same group with |item|.
 void MenuItem::FlipRadioMenuItems(nu::MenuBase* menu, nu::MenuItem* sender) {
   // Find out from where the group starts.

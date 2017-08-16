@@ -89,6 +89,9 @@ class NATIVEUI_EXPORT MenuItem : public base::RefCounted<MenuItem> {
   // Internal: Set the owner of menu item.
   void set_menu(MenuBase* menu) { menu_ = menu; }
 
+  // Internal: Search for the top-level menu.
+  MenuBase* FindTopLevelMenu() const;
+
  private:
   friend class MenuBase;
   friend class base::RefCounted<MenuItem>;
