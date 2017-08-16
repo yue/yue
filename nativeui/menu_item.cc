@@ -11,16 +11,36 @@ namespace nu {
 
 namespace {
 
-MenuItem::Type RoleToType(MenuItem::Role role) {
-  switch (role) {
-    case MenuItem::Role::Edit:
-    case MenuItem::Role::Help:
-    case MenuItem::Role::Window:
-    case MenuItem::Role::Services:
-      return MenuItem::Type::Submenu;
-    default:
-      return MenuItem::Type::Label;
-  }
+#if defined(OS_MACOSX)
+#define CONTROL_OR_COMMAND MASK_META
+#else
+#define CONTROL_OR_COMMAND MASK_CONTROL
+#endif
+
+// Default mappings for MenuItem roles.
+struct {
+  const char* label;
+  KeyboardCode key;
+  int mask;
+} g_roles_map[] = {
+  { "Copy",       VKEY_C, CONTROL_OR_COMMAND },
+  { "Cut",        VKEY_X, CONTROL_OR_COMMAND },
+  { "Paste",      VKEY_V, CONTROL_OR_COMMAND },
+  { "Select All", VKEY_A, CONTROL_OR_COMMAND },
+  { "Undo",       VKEY_Z, CONTROL_OR_COMMAND },
+  { "Redo",       VKEY_Z, CONTROL_OR_COMMAND | MASK_SHIFT },
+};
+
+static_assert(
+    arraysize(g_roles_map) == static_cast<size_t>(MenuItem::Role::ItemCount),
+    "g_roles_map should be updated with roles");
+
+// Get the MenuItem type from its role.
+inline MenuItem::Type RoleToType(MenuItem::Role role) {
+  if (role > MenuItem::Role::ItemCount && role != MenuItem::Role::None)
+    return MenuItem::Type::Submenu;
+  else
+    return MenuItem::Type::Label;
 }
 
 }  // namespace
@@ -31,6 +51,14 @@ MenuItem::MenuItem(Type type) : type_(type) {
 
 MenuItem::MenuItem(Role role) : role_(role), type_(RoleToType(role)) {
   PlatformInit();
+  // Some platforms do not have stock items, so fill with fallback settings.
+  if (role_ < MenuItem::Role::ItemCount) {
+    const auto& fallback = g_roles_map[static_cast<int>(role_)];
+    if (GetLabel().empty())
+      SetLabel(fallback.label);
+    if (GetAccelerator().IsEmpty())
+      SetAccelerator(Accelerator(fallback.key, fallback.mask));
+  }
 }
 
 MenuItem::~MenuItem() {
