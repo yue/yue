@@ -9,6 +9,8 @@
 
 #include "nativeui/gtk/undoable_text_buffer.h"
 #include "nativeui/menu.h"
+#include "nativeui/menu_bar.h"
+#include "nativeui/window.h"
 
 namespace nu {
 
@@ -37,7 +39,7 @@ MenuBase* FindTopLevelMenu(MenuItem* item) {
   if (!menu)
     return nullptr;
   MenuItem* parent = menu->GetParent();
-  while (parent ) {
+  while (parent) {
     menu = parent->GetMenu();
     if (!menu)
       return nullptr;
@@ -52,14 +54,13 @@ void OnStockClick(GtkWidget*, MenuItem* item) {
     return;
   // Get the window.
   MenuBase* menu = FindTopLevelMenu(item);
-  if (!menu)
+  if (!menu || menu->GetClassName() != MenuBar::kClassName)
     return;
-  GtkWindow* window =
-      GTK_WINDOW(g_object_get_data(G_OBJECT(menu->GetNative()), "window"));
+  Window* window = static_cast<MenuBar*>(menu)->GetWindow();
   if (!window)
     return;
   // Get the focused widget.
-  GtkWidget* widget = gtk_window_get_focus(window);
+  GtkWidget* widget = gtk_window_get_focus(window->GetNative());
   if (!widget)
     return;
 

@@ -18,6 +18,12 @@ class MenuItem;
 
 class NATIVEUI_EXPORT MenuBase : public base::RefCounted<MenuBase> {
  public:
+  // Return the receiving view's class name. A view class is a string which
+  // uniquely identifies the view class. It is intended to be used as a way to
+  // find out during run time if a view can be safely casted to a specific view
+  // subclass.
+  virtual const char* GetClassName() const = 0;
+
   void Append(MenuItem* item);
   void Insert(MenuItem* item, int index);
   void Remove(MenuItem* item);

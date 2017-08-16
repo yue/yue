@@ -6,8 +6,15 @@
 
 namespace nu {
 
+// static
+const char MenuBar::kClassName[] = "MenuBar";
+
 MenuBar::MenuBar() : MenuBase(PlatformCreate()) {
   SetAcceleratorManager(&accel_manager_);
+}
+
+const char* MenuBar::GetClassName() const {
+  return kClassName;
 }
 
 }  // namespace nu

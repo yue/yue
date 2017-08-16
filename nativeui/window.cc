@@ -51,8 +51,11 @@ SizeF Window::GetContentSize() const {
 
 #if defined(OS_WIN) || defined(OS_LINUX)
 void Window::SetMenuBar(MenuBar* menu_bar) {
+  if (menu_bar_)
+    menu_bar_->SetWindow(nullptr);
   PlatformSetMenuBar(menu_bar);
   menu_bar_ = menu_bar;
+  menu_bar_->SetWindow(this);
 }
 
 MenuBar* Window::GetMenuBar() const {

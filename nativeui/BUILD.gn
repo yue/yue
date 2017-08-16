@@ -44,6 +44,7 @@ component("nativeui") {
     "menu_bar.h",
     "menu_item.cc",
     "menu_item.h",
+    "menu.cc",
     "menu.h",
     "progress_bar.cc",
     "progress_bar.h",

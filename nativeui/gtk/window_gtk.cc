@@ -479,11 +479,6 @@ void Window::PlatformSetMenuBar(MenuBar* menu_bar) {
   gtk_box_set_child_packing(GTK_BOX(vbox), menu, FALSE, FALSE, 0,
                             GTK_PACK_START);
 
-  // Leave a hint on which window the menubar belongs to.
-  if (menu_bar_)
-    g_object_set_data(G_OBJECT(menu_bar_->GetNative()), "window", nullptr);
-  g_object_set_data(G_OBJECT(menu_bar->GetNative()), "window", window_);
-
   // Update the accelerator group.
   if (menu_bar_)
     gtk_window_remove_accel_group(window_,

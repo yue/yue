@@ -13,6 +13,12 @@ class NATIVEUI_EXPORT Menu : public MenuBase {
  public:
   Menu();
 
+  // View class name.
+  static const char kClassName[];
+
+  // MenuBase:
+  const char* GetClassName() const override;
+
   void Popup();
 
  protected:
