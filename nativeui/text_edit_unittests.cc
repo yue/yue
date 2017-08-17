@@ -9,11 +9,15 @@ class TextEditTest : public testing::Test {
  protected:
   void SetUp() override {
     edit_ = new nu::TextEdit;
+    // On macOS a window is required for undoManager to work.
+    window_ = new nu::Window(nu::Window::Options());
+    window_->SetContentView(edit_.get());
   }
 
   nu::Lifetime lifetime_;
   nu::State state_;
   scoped_refptr<nu::TextEdit> edit_;
+  scoped_refptr<nu::Window> window_;
 };
 
 TEST_F(TextEditTest, SetText) {
@@ -75,8 +79,11 @@ TEST_F(TextEditTest, Undo) {
   EXPECT_EQ(edit_->CanRedo(), false);
   edit_->InsertTextAt("b", 0);
   edit_->Undo();
+#if !defined(OS_MACOSX)
+  // On macOS an undo operation would undo all.
   EXPECT_EQ(edit_->GetText(), "a");
   EXPECT_EQ(edit_->CanUndo(), true);
+#endif
   EXPECT_EQ(edit_->CanRedo(), true);
   edit_->Redo();
   EXPECT_EQ(edit_->GetText(), "ba");
