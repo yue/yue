@@ -82,7 +82,7 @@ std::string Accelerator::GetShortcutText() const {
   if (modifiers_ & MASK_SHIFT)
     shortcut += "Shift+";
   if (modifiers_ & MASK_CONTROL)
-    shortcut += "Control+";
+    shortcut += "Ctrl+";
   if (modifiers_ & MASK_ALT)
     shortcut += "Alt+";
   if (modifiers_ & MASK_META)
@@ -117,7 +117,7 @@ std::string Accelerator::GetShortcutText() const {
       shortcut += "Insert";
       break;
     case VKEY_DELETE:
-      shortcut += "Delete";
+      shortcut += "Del";
       break;
     case VKEY_LEFT:
       shortcut += "Left";
