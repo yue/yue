@@ -372,14 +372,18 @@ bool SetPercentStyle(YGNodeRef node,
 }
 
 // Set style for edge properties.
-bool SetEdgeStyle(YGNodeRef node,
-                  const std::string& name,
-                  const std::string& value) {
+bool SetEdgeStyle(YGNodeRef node, const std::string& name, float value) {
   auto* tup = Find(edge_setters, name);
   if (!tup)
     return false;
-  std::get<2>(*tup)(node, std::get<1>(*tup), PixelValue(value));
+  std::get<2>(*tup)(node, std::get<1>(*tup), value);
   return true;
+}
+
+bool SetEdgeStyle(YGNodeRef node,
+                  const std::string& name,
+                  const std::string& value) {
+  return SetEdgeStyle(node, name, PixelValue(value));
 }
 
 // Set style for edge percent properties.
@@ -403,7 +407,8 @@ bool IsPercentValue(const std::string& value) {
 }  // namespace
 
 void SetYogaProperty(YGNodeRef node, const std::string& name, float value) {
-  SetFloatStyle(node, name, value);
+  SetFloatStyle(node, name, value) ||
+  SetEdgeStyle(node, name, value);
 }
 
 void SetYogaProperty(YGNodeRef node,

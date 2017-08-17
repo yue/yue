@@ -8,6 +8,7 @@ Please note that the items are __not__ prioritized.
 
 ## v1.x
 
+* Drag and drop API
 * XML support
 * API to embed resources into executables/bundles
 * Develop a standalone version of `gn` to build Yue
