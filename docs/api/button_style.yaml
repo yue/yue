@@ -1,0 +1,48 @@
+name: Button::Style
+header: nativeui/button.h
+type: enum class
+namespace: nu
+description: Represent visual types of `Button`.
+
+lang_detail:
+  cpp: |
+    This type is an `enum class`.
+
+    On macOS it can have following values:
+    * `Button::Style::Rounded`
+    * `Button::Style::RegularSquare`
+    * `Button::Style::ThickSquare`
+    * `Button::Style::ThickerSquare`
+    * `Button::Style::Disclosure`
+    * `Button::Style::ShadowlessSquare`
+    * `Button::Style::Circular`
+    * `Button::Style::TexturedSquare`
+    * `Button::Style::HelpButton`
+    * `Button::Style::SmallSquare`
+    * `Button::Style::TexturedRounded`
+    * `Button::Style::RoundRect`
+    * `Button::Style::Recessed`
+    * `Button::Style::RoundedDisclosure`
+    * `Button::Style::Inline`
+
+  lua: &ref |
+    This type is a string.
+
+    On macOS it can have following possible values:
+    * `"rounded"`
+    * `"regular-square"`
+    * `"thick-square"`
+    * `"thicker-square"`
+    * `"disclosure"`
+    * `"shadowless-square"`
+    * `"circular"`
+    * `"textured-square"`
+    * `"help-button"`
+    * `"small-square"`
+    * `"textured-hrounded"`
+    * `"round-rect"`
+    * `"recessed"`
+    * `"rounded-disclosure"`
+    * `"inline"`
+
+  js: *ref

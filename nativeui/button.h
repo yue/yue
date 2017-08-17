@@ -28,6 +28,31 @@ class NATIVEUI_EXPORT Button : public View {
   void SetChecked(bool checked);
   bool IsChecked() const;
 
+#if defined(OS_MACOSX)
+  // Values here should match NSBezelStyle.
+  enum class Style {
+    Rounded = 1,
+    RegularSquare,
+    ThickSquare,
+    ThickerSquare,
+    Disclosure,
+    ShadowlessSquare,
+    Circular,
+    TexturedSquare,
+    HelpButton,
+    SmallSquare,
+    TexturedRounded,
+    RoundRect,
+    Recessed,
+    RoundedDisclosure,
+    Inline,
+  };
+  void SetButtonStyle(Style style);
+
+  void SetHasBorder(bool yes);
+  bool HasBorder() const;
+#endif
+
   // View:
   const char* GetClassName() const override;
 

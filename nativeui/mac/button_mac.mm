@@ -152,4 +152,17 @@ bool Button::IsChecked() const {
   return static_cast<NSButton*>(GetNative()).state == NSOnState;
 }
 
+void Button::SetButtonStyle(Style style) {
+  auto* button = static_cast<NSButton*>(GetNative());
+  button.bezelStyle = static_cast<NSBezelStyle>(style);
+}
+
+void Button::SetHasBorder(bool yes) {
+  static_cast<NSButton*>(GetNative()).bordered = yes;
+}
+
+bool Button::HasBorder() const {
+  return static_cast<NSButton*>(GetNative()).bordered;
+}
+
 }  // namespace nu

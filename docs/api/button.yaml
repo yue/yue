@@ -45,6 +45,18 @@ methods:
   - signature: bool IsChecked() const
     description: Return whether checkbox or radio is checked.
 
+  - signature: void SetButtonStyle(Button::Style style)
+    platform: ['macOS']
+    description: Set the visual style of the button.
+
+  - signature: void SetHasBorder(bool yes)
+    platform: ['macOS']
+    description: Set whether the button has a border.
+
+  - signature: bool HasBorder() const
+    platform: ['macOS']
+    description: Return whether the button has a border.
+
 events:
   - callback: void on_click(Button* self)
     description: Emitted when button is clicked.

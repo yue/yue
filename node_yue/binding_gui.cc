@@ -961,6 +961,68 @@ struct Type<nu::Button::Type> {
   }
 };
 
+#if defined(OS_MACOSX)
+template<>
+struct Type<nu::Button::Style> {
+  static constexpr const char* name = "yue.Button.Style";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::Button::Style* out) {
+    std::string style;
+    if (!vb::FromV8(context, value, &style))
+      return false;
+    if (style == "rounded") {
+      *out = nu::Button::Style::Rounded;
+      return true;
+    } else if (style == "regular-square") {
+      *out = nu::Button::Style::RegularSquare;
+      return true;
+    } else if (style == "thick-square") {
+      *out = nu::Button::Style::ThickSquare;
+      return true;
+    } else if (style == "thicker-square") {
+      *out = nu::Button::Style::ThickerSquare;
+      return true;
+    } else if (style == "disclosure") {
+      *out = nu::Button::Style::Disclosure;
+      return true;
+    } else if (style == "shadowless-square") {
+      *out = nu::Button::Style::ShadowlessSquare;
+      return true;
+    } else if (style == "circular") {
+      *out = nu::Button::Style::Circular;
+      return true;
+    } else if (style == "textured-square") {
+      *out = nu::Button::Style::TexturedSquare;
+      return true;
+    } else if (style == "help-button") {
+      *out = nu::Button::Style::HelpButton;
+      return true;
+    } else if (style == "small-square") {
+      *out = nu::Button::Style::SmallSquare;
+      return true;
+    } else if (style == "textured-rounded") {
+      *out = nu::Button::Style::TexturedRounded;
+      return true;
+    } else if (style == "round-rect") {
+      *out = nu::Button::Style::RoundRect;
+      return true;
+    } else if (style == "recessed") {
+      *out = nu::Button::Style::Recessed;
+      return true;
+    } else if (style == "rounded-disclosure") {
+      *out = nu::Button::Style::Recessed;
+      return true;
+    } else if (style == "inline") {
+      *out = nu::Button::Style::Inline;
+      return true;
+    } else {
+      return false;
+    }
+  }
+};
+#endif
+
 template<>
 struct Type<nu::Button> {
   using base = nu::View;
@@ -974,6 +1036,11 @@ struct Type<nu::Button> {
     Set(context, templ,
         "setTitle", &nu::Button::SetTitle,
         "getTitle", &nu::Button::GetTitle,
+#if defined(OS_MACOSX)
+        "setButtonStyle", &nu::Button::SetButtonStyle,
+        "setHasBorder", &nu::Button::SetHasBorder,
+        "hasBorder", &nu::Button::HasBorder,
+#endif
         "setChecked", &nu::Button::SetChecked,
         "isChecked", &nu::Button::IsChecked);
     SetProperty(context, templ,
