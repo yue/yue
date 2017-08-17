@@ -52,8 +52,8 @@ bool Button::IsChecked() const {
 }
 
 void Button::SetImage(Image* image) {
-  gtk_button_set_image(GTK_BUTTON(GetNative()),
-                       gtk_image_new_from_pixbuf(image->GetNative()));
+  gtk_button_set_always_show_image(GTK_BUTTON(GetNative()), true);
+  gtk_button_set_image(GTK_BUTTON(GetNative()), img);
 }
 
 }  // namespace nu
