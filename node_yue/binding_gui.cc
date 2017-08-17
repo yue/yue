@@ -1042,7 +1042,9 @@ struct Type<nu::Button> {
         "hasBorder", &nu::Button::HasBorder,
 #endif
         "setChecked", &nu::Button::SetChecked,
-        "isChecked", &nu::Button::IsChecked);
+        "isChecked", &nu::Button::IsChecked,
+        "setImage", &nu::Button::SetImage,
+        "getImage", &nu::Button::GetImage);
     SetProperty(context, templ,
                 "onClick", &nu::Button::on_click);
   }

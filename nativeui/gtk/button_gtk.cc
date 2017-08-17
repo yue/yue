@@ -6,6 +6,7 @@
 
 #include <gtk/gtk.h>
 
+#include "nativeui/gfx/image.h"
 #include "nativeui/gtk/widget_util.h"
 
 namespace nu {
@@ -48,6 +49,11 @@ void Button::SetChecked(bool checked) {
 
 bool Button::IsChecked() const {
   return gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(GetNative()));
+}
+
+void Button::SetImage(Image* image) {
+  gtk_button_set_image(GTK_BUTTON(GetNative()),
+                       gtk_image_new_from_pixbuf(image->GetNative()));
 }
 
 }  // namespace nu

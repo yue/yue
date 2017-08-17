@@ -6,6 +6,7 @@
 
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/gfx/font.h"
+#include "nativeui/gfx/image.h"
 #include "nativeui/gfx/geometry/insets_f.h"
 #include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/nu_view.h"
@@ -150,6 +151,10 @@ void Button::SetChecked(bool checked) {
 
 bool Button::IsChecked() const {
   return static_cast<NSButton*>(GetNative()).state == NSOnState;
+}
+
+void Button::SetImage(Image* image) {
+  static_cast<NSButton*>(GetNative()).image = image->GetNative();
 }
 
 void Button::SetButtonStyle(Style style) {

@@ -13,6 +13,7 @@
 #include "nativeui/gfx/geometry/insets.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/geometry/vector2d_conversions.h"
+#include "nativeui/gfx/image.h"
 #include "nativeui/gfx/win/screen_win.h"
 #include "nativeui/gfx/win/text_win.h"
 #include "nativeui/state.h"
@@ -265,6 +266,9 @@ void Button::SetChecked(bool checked) {
 
 bool Button::IsChecked() const {
   return static_cast<ButtonImpl*>(GetNative())->IsChecked();
+}
+
+void Button::SetImage(Image* image) {
 }
 
 }  // namespace nu

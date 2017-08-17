@@ -973,7 +973,9 @@ struct Type<nu::Button> {
            "hasborder", &nu::Button::HasBorder,
 #endif
            "setchecked", &nu::Button::SetChecked,
-           "ischecked", &nu::Button::IsChecked);
+           "ischecked", &nu::Button::IsChecked,
+           "setimage", &nu::Button::SetImage,
+           "getimage", &nu::Button::GetImage);
     RawSetProperty(state, metatable, "onclick", &nu::Button::on_click);
   }
   static nu::Button* Create(CallContext* context) {

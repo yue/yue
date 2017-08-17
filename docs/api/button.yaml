@@ -45,6 +45,12 @@ methods:
   - signature: bool IsChecked() const
     description: Return whether checkbox or radio is checked.
 
+  - signature: void SetImage(Image* image)
+    description: Set the image of button.
+
+  - signature: Image* GetImage() const
+    description: Return the image of button.
+
   - signature: void SetButtonStyle(Button::Style style)
     platform: ['macOS']
     description: Set the visual style of the button.

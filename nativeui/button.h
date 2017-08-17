@@ -11,6 +11,8 @@
 
 namespace nu {
 
+class Image;
+
 class NATIVEUI_EXPORT Button : public View {
  public:
   enum class Type {
@@ -27,6 +29,8 @@ class NATIVEUI_EXPORT Button : public View {
   std::string GetTitle() const;
   void SetChecked(bool checked);
   bool IsChecked() const;
+  void SetImage(Image* image);
+  Image* GetImage() const { return image_.get(); }
 
 #if defined(OS_MACOSX)
   // Values here should match NSBezelStyle.
@@ -61,6 +65,9 @@ class NATIVEUI_EXPORT Button : public View {
 
  protected:
   ~Button() override;
+
+ private:
+  scoped_refptr<Image> image_;
 };
 
 }  // namespace nu
