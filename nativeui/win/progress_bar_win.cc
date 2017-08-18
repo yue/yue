@@ -24,8 +24,7 @@ class ProgressBarImpl : public SubwinView {
 
 ProgressBar::ProgressBar() {
   TakeOverView(new ProgressBarImpl(this));
-  SetDefaultStyle(ScaleSize(SizeF(0, GetSystemMetrics(SM_CYVSCROLL)),
-                            1.0f / GetScaleFactor()));
+  UpdateDefaultStyle();
 }
 
 ProgressBar::~ProgressBar() {
@@ -56,6 +55,11 @@ void ProgressBar::SetIndeterminate(bool indeterminate) {
 bool ProgressBar::IsIndeterminate() const {
   auto* progress = static_cast<ProgressBarImpl*>(GetNative());
   return (GetWindowLong(progress->hwnd(), GWL_STYLE) & PBS_MARQUEE) != 0;
+}
+
+SizeF ProgressBar::GetMinimumSize() const {
+  return ScaleSize(SizeF(0, ::GetSystemMetrics(SM_CYVSCROLL)),
+                   1.0f / GetScaleFactor());
 }
 
 }  // namespace nu

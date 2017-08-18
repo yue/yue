@@ -59,6 +59,7 @@ class NATIVEUI_EXPORT Button : public View {
 
   // View:
   const char* GetClassName() const override;
+  SizeF GetMinimumSize() const override;
 
   // Events.
   Signal<void(Button*)> on_click;
@@ -67,6 +68,9 @@ class NATIVEUI_EXPORT Button : public View {
   ~Button() override;
 
  private:
+  void PlatformSetImage(Image* image);
+  void PlatformSetTitle(const std::string& title);
+
   scoped_refptr<Image> image_;
 };
 

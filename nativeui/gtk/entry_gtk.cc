@@ -24,7 +24,7 @@ void OnTextChange(GtkEditable*, Entry* entry) {
 
 Entry::Entry() {
   TakeOverView(gtk_entry_new());
-  SetDefaultStyle(GetPreferredSizeForWidget(GetNative()));
+  UpdateDefaultStyle();
 
   g_signal_connect(GetNative(), "activate", G_CALLBACK(OnActivate), this);
   g_signal_connect(GetNative(), "changed", G_CALLBACK(OnTextChange), this);
@@ -39,6 +39,10 @@ void Entry::SetText(const std::string& text) {
 
 std::string Entry::GetText() const {
   return gtk_entry_get_text(GTK_ENTRY(GetNative()));
+}
+
+SizeF Entry::GetMinimumSize() const {
+  return GetPreferredSizeForWidget(GetNative());
 }
 
 }  // namespace nu

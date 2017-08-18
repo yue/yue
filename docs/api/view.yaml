@@ -135,6 +135,9 @@ methods:
       Available style properties can be found at
       [Layout System](../guides/layout_system.html).
 
+  - signature: SizeF GetMinimumSize() const
+    description: Return the minimum size needed to show the view.
+
   - signature: View* GetParent() const
     description: Return parent view.
 

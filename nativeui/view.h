@@ -107,6 +107,9 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   // Internal: Print style layout to stdout.
   void PrintStyle() const;
 
+  // Return the minimum size of view.
+  virtual SizeF GetMinimumSize() const;
+
   // Get parent.
   View* GetParent() const { return parent_; }
 
@@ -141,8 +144,8 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   View();
   virtual ~View();
 
-  // Set the default style of view.
-  void SetDefaultStyle(const SizeF& minimum);
+  // Update the default style.
+  void UpdateDefaultStyle();
 
   // Called by subclasses to take the ownership of |view|.
   void TakeOverView(NativeView view);

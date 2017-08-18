@@ -9,6 +9,16 @@ namespace nu {
 // static
 const char Button::kClassName[] = "Button";
 
+void Button::SetImage(Image* image) {
+  PlatformSetImage(image);
+  UpdateDefaultStyle();
+}
+
+void Button::SetTitle(const std::string& title) {
+  PlatformSetTitle(title);
+  UpdateDefaultStyle();
+}
+
 const char* Button::GetClassName() const {
   return kClassName;
 }

@@ -827,6 +827,7 @@ struct Type<nu::View> {
            "setbackgroundcolor", &nu::View::SetBackgroundColor,
            "setstyle", &SetStyle,
            "printstyle", &nu::View::PrintStyle,
+           "getminimumsize", &nu::View::GetMinimumSize,
            "getparent", &nu::View::GetParent,
            "getwindow", &nu::View::GetWindow);
     RawSetProperty(state, metatable,

@@ -12,9 +12,7 @@ ProgressBar::ProgressBar() {
   auto* progress = [[NSProgressIndicator alloc] init];
   progress.indeterminate = NO;
   TakeOverView(progress);
-
-  float height = progress.intrinsicContentSize.height;
-  SetDefaultStyle(SizeF(0, height));
+  UpdateDefaultStyle();
 }
 
 ProgressBar::~ProgressBar() {
@@ -43,6 +41,11 @@ void ProgressBar::SetIndeterminate(bool indeterminate) {
 bool ProgressBar::IsIndeterminate() const {
   auto* progress = static_cast<NSProgressIndicator*>(GetNative());
   return progress.isIndeterminate;
+}
+
+SizeF ProgressBar::GetMinimumSize() const {
+  auto* progress = static_cast<NSProgressIndicator*>(GetNative());
+  return SizeF(0, progress.intrinsicContentSize.height);
 }
 
 }  // namespace nu

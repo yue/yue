@@ -20,6 +20,7 @@ class NATIVEUI_EXPORT Group : public View {
 
   // View:
   const char* GetClassName() const override;
+  SizeF GetMinimumSize() const override;
 
   void SetContentView(View* view);
   View* GetContentView() const;

@@ -41,6 +41,7 @@ class ButtonImpl : public ViewImpl {
   void SetTitle(const base::string16& title) {
     title_ = title;
     OnDPIChanged();  // update component size
+    Invalidate();
   }
 
   base::string16 GetTitle() const {
@@ -50,6 +51,7 @@ class ButtonImpl : public ViewImpl {
   void SetImage(Image* image) {
     image_ = image;
     OnDPIChanged();  // update component size
+    Invalidate();
   }
 
   SizeF GetDIPPreferredSize() const {
@@ -284,12 +286,10 @@ Button::Button(const std::string& title, Type type) {
 Button::~Button() {
 }
 
-void Button::SetTitle(const std::string& title) {
+void Button::PlatformSetTitle(const std::string& title) {
   auto* button = static_cast<ButtonImpl*>(GetNative());
   base::string16 wtitle = base::UTF8ToUTF16(title);
   button->SetTitle(wtitle);
-  button->Invalidate();
-  SetDefaultStyle(button->GetDIPPreferredSize());
 }
 
 std::string Button::GetTitle() const {
@@ -304,11 +304,14 @@ bool Button::IsChecked() const {
   return static_cast<ButtonImpl*>(GetNative())->IsChecked();
 }
 
-void Button::SetImage(Image* image) {
+void Button::PlatformSetImage(Image* image) {
   auto* button = static_cast<ButtonImpl*>(GetNative());
   button->SetImage(image);
-  button->Invalidate();
-  SetDefaultStyle(button->GetDIPPreferredSize());
+}
+
+SizeF Button::GetMinimumSize() const {
+  auto* button = static_cast<ButtonImpl*>(GetNative());
+  return button->GetDIPPreferredSize();
 }
 
 }  // namespace nu

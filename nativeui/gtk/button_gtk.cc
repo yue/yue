@@ -27,17 +27,15 @@ Button::Button(const std::string& title, Type type) {
     TakeOverView(gtk_check_button_new_with_label(title.c_str()));
   else if (type == Type::Radio)
     TakeOverView(gtk_radio_button_new_with_label(nullptr, title.c_str()));
-
-  SetDefaultStyle(GetPreferredSizeForWidget(GetNative()));
+  UpdateDefaultStyle();
   g_signal_connect(GetNative(), "clicked", G_CALLBACK(OnClick), this);
 }
 
 Button::~Button() {
 }
 
-void Button::SetTitle(const std::string& title) {
+void Button::PlatformSetTitle(const std::string& title) {
   gtk_button_set_label(GTK_BUTTON(GetNative()), title.c_str());
-  SetDefaultStyle(GetPreferredSizeForWidget(GetNative()));
 }
 
 std::string Button::GetTitle() const {
@@ -52,7 +50,7 @@ bool Button::IsChecked() const {
   return gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(GetNative()));
 }
 
-void Button::SetImage(Image* image) {
+void Button::PlatformSetImage(Image* image) {
   GtkButton* button = GTK_BUTTON(GetNative());
   // Explicity nullptr for empty title otherwise space would be reserved for
   // title and image would not show in the middle.
@@ -63,8 +61,10 @@ void Button::SetImage(Image* image) {
   // Use custom NUImage widget instead of GtkImage because the latter does not
   // have high DPI support.
   gtk_button_set_image(button, nu_image_new(image));
-  // Update style.
-  SetDefaultStyle(GetPreferredSizeForWidget(GetNative()));
+}
+
+SizeF Button::GetMinimumSize() const {
+  return GetPreferredSizeForWidget(GetNative());
 }
 
 }  // namespace nu

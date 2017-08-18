@@ -24,6 +24,7 @@ class NATIVEUI_EXPORT ProgressBar : public View {
 
   // View:
   const char* GetClassName() const override;
+  SizeF GetMinimumSize() const override;
 
  protected:
   ~ProgressBar() override;

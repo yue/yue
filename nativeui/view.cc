@@ -65,9 +65,10 @@ void View::Layout() {
     static_cast<Container*>(GetParent())->Layout();
 }
 
-void View::SetDefaultStyle(const SizeF& minimum) {
-  YGNodeStyleSetMinWidth(node_, minimum.width());
-  YGNodeStyleSetMinHeight(node_, minimum.height());
+void View::UpdateDefaultStyle() {
+  SizeF min_size = GetMinimumSize();
+  YGNodeStyleSetMinWidth(node_, min_size.width());
+  YGNodeStyleSetMinHeight(node_, min_size.height());
   Layout();
 }
 
@@ -89,6 +90,10 @@ void View::PrintStyle() const {
   YGNodePrint(node_, static_cast<YGPrintOptions>(YGPrintOptionsLayout |
                                                  YGPrintOptionsStyle |
                                                  YGPrintOptionsChildren));
+}
+
+SizeF View::GetMinimumSize() const {
+  return SizeF();
 }
 
 void View::SetParent(View* parent) {

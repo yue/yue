@@ -75,9 +75,7 @@ Entry::Entry() {
   [entry setAction:@selector(onActivate:)];
   [entry setDelegate:entry.target];
   TakeOverView(entry);
-
-  float height = [[entry cell] cellSize].height;
-  SetDefaultStyle(SizeF(0, height));
+  UpdateDefaultStyle();
 }
 
 Entry::~Entry() {
@@ -95,6 +93,11 @@ void Entry::SetText(const std::string& text) {
 std::string Entry::GetText() const {
   auto* entry = static_cast<NSTextField*>(GetNative());
   return base::SysNSStringToUTF8([entry stringValue]);
+}
+
+SizeF Entry::GetMinimumSize() const {
+  auto* entry = static_cast<NSTextField*>(GetNative());
+  return SizeF(0, [[entry cell] cellSize].height);
 }
 
 }  // namespace nu

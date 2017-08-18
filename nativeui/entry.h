@@ -23,6 +23,7 @@ class NATIVEUI_EXPORT Entry : public View {
 
   // View:
   const char* GetClassName() const override;
+  SizeF GetMinimumSize() const override;
 
   // Events.
   Signal<void(Entry*)> on_text_change;

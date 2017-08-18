@@ -13,4 +13,9 @@ const char* Label::GetClassName() const {
   return kClassName;
 }
 
+void Label::SetText(const std::string& text) {
+  PlatformSetText(text);
+  UpdateDefaultStyle();
+}
+
 }  // namespace nu

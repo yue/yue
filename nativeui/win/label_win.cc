@@ -21,6 +21,7 @@ class LabelImpl : public ViewImpl {
 
   void SetText(const base::string16& text) {
     text_ = text;
+    Invalidate();
   }
 
   base::string16 GetText() const {
@@ -49,19 +50,21 @@ Label::Label(const std::string& text) {
 Label::~Label() {
 }
 
-void Label::SetText(const std::string& text) {
+void Label::PlatformSetText(const std::string& text) {
   LabelImpl* label = static_cast<LabelImpl*>(GetNative());
   base::string16 wtext = base::UTF8ToUTF16(text);
   label->SetText(wtext);
-
-  SetDefaultStyle(ScaleSize(MeasureText(wtext, GetNative()->font()),
-                            1.0f / GetScaleFactor()));
-  label->Invalidate();
 }
 
-std::string Label::GetText() {
+std::string Label::GetText() const {
   LabelImpl* label = static_cast<LabelImpl*>(GetNative());
   return base::UTF16ToUTF8(label->GetText());
+}
+
+SizeF Label::GetMinimumSize() const {
+  LabelImpl* label = static_cast<LabelImpl*>(GetNative());
+  return ScaleSize(MeasureText(label->GetText(), label->font()),
+                   1.0f / GetScaleFactor());
 }
 
 }  // namespace nu

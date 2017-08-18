@@ -19,13 +19,17 @@ class NATIVEUI_EXPORT Label : public View {
   static const char kClassName[];
 
   void SetText(const std::string& text);
-  std::string GetText();
+  std::string GetText() const;
 
   // View:
   const char* GetClassName() const override;
+  SizeF GetMinimumSize() const override;
 
  protected:
   ~Label() override;
+
+ private:
+  void PlatformSetText(const std::string& text);
 };
 
 }  // namespace nu

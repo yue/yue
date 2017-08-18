@@ -55,7 +55,7 @@ class EntryImpl : public EditView {
 Entry::Entry() {
   auto* edit = new EntryImpl(this);
   TakeOverView(edit);
-  SetDefaultStyle(edit->GetPreferredSize());
+  UpdateDefaultStyle();
 }
 
 Entry::~Entry() {
@@ -67,6 +67,10 @@ void Entry::SetText(const std::string& text) {
 
 std::string Entry::GetText() const {
   return static_cast<EditView*>(GetNative())->GetText();
+}
+
+SizeF Entry::GetMinimumSize() const {
+  return static_cast<EditView*>(GetNative())->GetPreferredSize();
 }
 
 }  // namespace nu

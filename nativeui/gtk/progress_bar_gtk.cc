@@ -26,7 +26,7 @@ gboolean OnTimer(GtkWidget* widget) {
 
 ProgressBar::ProgressBar() {
   TakeOverView(gtk_progress_bar_new());
-  SetDefaultStyle(GetPreferredSizeForWidget(GetNative()));
+  UpdateDefaultStyle();
 }
 
 ProgressBar::~ProgressBar() {
@@ -57,6 +57,10 @@ void ProgressBar::SetIndeterminate(bool indeterminate) {
 
 bool ProgressBar::IsIndeterminate() const {
   return g_object_get_data(G_OBJECT(GetNative()), "timer");
+}
+
+SizeF ProgressBar::GetMinimumSize() const {
+  return GetPreferredSizeForWidget(GetNative());
 }
 
 }  // namespace nu

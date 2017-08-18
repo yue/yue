@@ -881,6 +881,7 @@ struct Type<nu::View> {
         "setBackgroundColor", &nu::View::SetBackgroundColor,
         "setStyle", &SetStyle,
         "printStyle", &nu::View::PrintStyle,
+        "getMinimumSize", &nu::View::GetMinimumSize,
         "getParent", &nu::View::GetParent,
         "getWindow", &nu::View::GetWindow);
     SetProperty(context, templ,

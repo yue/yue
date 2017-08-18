@@ -72,16 +72,6 @@
 
 namespace nu {
 
-namespace {
-
-SizeF GetPreferredSizeForText(const std::string& text) {
-  TextMetrics metrics = MeasureText(text, -1, TextAttributes());
-  metrics.size.Enlarge(1, 1);  // leave space for border
-  return metrics.size;
-}
-
-}  // namespace
-
 Label::Label(const std::string& text) {
   TakeOverView([[NULabel alloc] init]);
   SetText(text);
@@ -94,13 +84,18 @@ Label::Label(const std::string& text) {
 Label::~Label() {
 }
 
-void Label::SetText(const std::string& text) {
+void Label::PlatformSetText(const std::string& text) {
   [static_cast<NULabel*>(GetNative()) setText:text];
-  SetDefaultStyle(GetPreferredSizeForText(text));
 }
 
-std::string Label::GetText() {
+std::string Label::GetText() const {
   return [static_cast<NULabel*>(GetNative()) text];
+}
+
+SizeF Label::GetMinimumSize() const {
+  TextMetrics metrics = MeasureText(GetText(), -1, TextAttributes());
+  metrics.size.Enlarge(1, 1);  // leave space for border
+  return metrics.size;
 }
 
 }  // namespace nu

@@ -12,7 +12,7 @@ namespace nu {
 
 Label::Label(const std::string& text) {
   TakeOverView(gtk_label_new(text.c_str()));
-  SetDefaultStyle(GetPreferredSizeForWidget(GetNative()));
+  UpdateDefaultStyle();
   // Create GdkWindow for label, otherwise it can not receive input events.
   gtk_widget_set_has_window(GetNative(), true);
 }
@@ -20,13 +20,16 @@ Label::Label(const std::string& text) {
 Label::~Label() {
 }
 
-void Label::SetText(const std::string& text) {
+void Label::PlatformSetText(const std::string& text) {
   gtk_label_set_text(GTK_LABEL(GetNative()), text.c_str());
-  SetDefaultStyle(GetPreferredSizeForWidget(GetNative()));
 }
 
-std::string Label::GetText() {
+std::string Label::GetText() const {
   return gtk_label_get_text(GTK_LABEL(GetNative()));
+}
+
+SizeF Label::GetMinimumSize() const {
+  return GetPreferredSizeForWidget(GetNative());
 }
 
 }  // namespace nu

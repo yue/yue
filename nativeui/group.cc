@@ -16,7 +16,7 @@ Group::Group(const std::string& title) {
   PlatformInit();
   SetContentView(new Container);
   SetTitle(title);
-  SetDefaultStyle(GetBorderSize());
+  UpdateDefaultStyle();
 }
 
 Group::~Group() {
@@ -24,6 +24,10 @@ Group::~Group() {
 
 const char* Group::GetClassName() const {
   return kClassName;
+}
+
+SizeF Group::GetMinimumSize() const {
+  return GetBorderSize();
 }
 
 void Group::SetContentView(View* view) {

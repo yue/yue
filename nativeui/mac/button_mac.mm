@@ -131,14 +131,8 @@ Button::~Button() {
   [button setTarget:nil];
 }
 
-void Button::SetTitle(const std::string& title) {
-  NSButton* button = static_cast<NSButton*>(GetNative());
-  button.title = base::SysUTF8ToNSString(title);
-
-  // Calculate the preferred size by creating a new button.
-  RectF bounds = RectF(SizeF([[button cell] cellSize]));
-  bounds.Inset(GetButtonInsets(button));
-  SetDefaultStyle(bounds.size());
+void Button::PlatformSetTitle(const std::string& title) {
+  static_cast<NSButton*>(GetNative()).title = base::SysUTF8ToNSString(title);
 }
 
 std::string Button::GetTitle() const {
@@ -153,21 +147,30 @@ bool Button::IsChecked() const {
   return static_cast<NSButton*>(GetNative()).state == NSOnState;
 }
 
-void Button::SetImage(Image* image) {
+void Button::PlatformSetImage(Image* image) {
   static_cast<NSButton*>(GetNative()).image = image->GetNative();
 }
 
 void Button::SetButtonStyle(Style style) {
   auto* button = static_cast<NSButton*>(GetNative());
   button.bezelStyle = static_cast<NSBezelStyle>(style);
+  UpdateDefaultStyle();
 }
 
 void Button::SetHasBorder(bool yes) {
   static_cast<NSButton*>(GetNative()).bordered = yes;
+  UpdateDefaultStyle();
 }
 
 bool Button::HasBorder() const {
   return static_cast<NSButton*>(GetNative()).bordered;
+}
+
+SizeF Button::GetMinimumSize() const {
+  auto* button = static_cast<NSButton*>(GetNative());
+  RectF bounds = RectF(SizeF([[button cell] cellSize]));
+  bounds.Inset(GetButtonInsets(button));
+  return bounds.size();
 }
 
 }  // namespace nu
