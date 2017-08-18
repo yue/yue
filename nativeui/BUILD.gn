@@ -154,6 +154,8 @@ component("nativeui") {
     "gfx/geometry/vector2d_f.h",
     "gtk/nu_container.cc",
     "gtk/nu_container.h",
+    "gtk/nu_image.cc",
+    "gtk/nu_image.h",
     "gtk/undoable_text_buffer.cc",
     "gtk/undoable_text_buffer.h",
     "gtk/widget_util.cc",

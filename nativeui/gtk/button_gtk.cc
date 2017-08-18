@@ -7,6 +7,7 @@
 #include <gtk/gtk.h>
 
 #include "nativeui/gfx/image.h"
+#include "nativeui/gtk/nu_image.h"
 #include "nativeui/gtk/widget_util.h"
 
 namespace nu {
@@ -35,13 +36,7 @@ Button::~Button() {
 }
 
 void Button::SetTitle(const std::string& title) {
-  GtkButton* button = GTK_BUTTON(GetNative());
-  // Explicity nullptr for empty title otherwise space would be reserved for
-  // title and image would not show in the middle.
-  if (title.empty())
-    gtk_button_set_label(button, nullptr);
-  else
-    gtk_button_set_label(button, title.c_str());
+  gtk_button_set_label(GTK_BUTTON(GetNative()), title.c_str());
   SetDefaultStyle(GetPreferredSizeForWidget(GetNative()));
 }
 
@@ -59,9 +54,16 @@ bool Button::IsChecked() const {
 
 void Button::SetImage(Image* image) {
   GtkButton* button = GTK_BUTTON(GetNative());
-  GtkWidget* img = gtk_image_new_from_pixbuf(image->GetNative());
-  gtk_button_set_image(button, img);
+  // Explicity nullptr for empty title otherwise space would be reserved for
+  // title and image would not show in the middle.
+  if (GetTitle().empty())
+    gtk_button_set_label(button, nullptr);
+  // Show image and title together.
   gtk_button_set_always_show_image(button, true);
+  // Use custom NUImage widget instead of GtkImage because the latter does not
+  // have high DPI support.
+  gtk_button_set_image(button, nu_image_new(image));
+  // Update style.
   SetDefaultStyle(GetPreferredSizeForWidget(GetNative()));
 }
 
