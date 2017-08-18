@@ -24,7 +24,7 @@ void OnTextChange(GtkEditable*, Entry* entry) {
 
 Entry::Entry() {
   TakeOverView(gtk_entry_new());
-  SetDefaultStyle(SizeF(GetPreferredSizeForWidget(GetNative())));
+  SetDefaultStyle(GetPreferredSizeForWidget(GetNative()));
 
   g_signal_connect(GetNative(), "activate", G_CALLBACK(OnActivate), this);
   g_signal_connect(GetNative(), "changed", G_CALLBACK(OnTextChange), this);

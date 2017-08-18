@@ -27,7 +27,7 @@ Button::Button(const std::string& title, Type type) {
   else if (type == Type::Radio)
     TakeOverView(gtk_radio_button_new_with_label(nullptr, title.c_str()));
 
-  SetDefaultStyle(SizeF(0, GetPreferredSizeForWidget(GetNative()).height()));
+  SetDefaultStyle(GetPreferredSizeForWidget(GetNative()));
   g_signal_connect(GetNative(), "clicked", G_CALLBACK(OnClick), this);
 }
 
@@ -35,8 +35,14 @@ Button::~Button() {
 }
 
 void Button::SetTitle(const std::string& title) {
-  gtk_button_set_label(GTK_BUTTON(GetNative()), title.c_str());
-  SetDefaultStyle(SizeF(GetPreferredSizeForWidget(GetNative())));
+  GtkButton* button = GTK_BUTTON(GetNative());
+  // Explicity nullptr for empty title otherwise space would be reserved for
+  // title and image would not show in the middle.
+  if (title.empty())
+    gtk_button_set_label(button, nullptr);
+  else
+    gtk_button_set_label(button, title.c_str());
+  SetDefaultStyle(GetPreferredSizeForWidget(GetNative()));
 }
 
 std::string Button::GetTitle() const {
@@ -52,8 +58,11 @@ bool Button::IsChecked() const {
 }
 
 void Button::SetImage(Image* image) {
-  gtk_button_set_always_show_image(GTK_BUTTON(GetNative()), true);
-  gtk_button_set_image(GTK_BUTTON(GetNative()), img);
+  GtkButton* button = GTK_BUTTON(GetNative());
+  GtkWidget* img = gtk_image_new_from_pixbuf(image->GetNative());
+  gtk_button_set_image(button, img);
+  gtk_button_set_always_show_image(button, true);
+  SetDefaultStyle(GetPreferredSizeForWidget(GetNative()));
 }
 
 }  // namespace nu

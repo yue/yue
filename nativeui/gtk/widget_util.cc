@@ -49,10 +49,10 @@ bool CairoSurfaceExtents(cairo_surface_t* surface, GdkRectangle* extents) {
 
 }  // namespace
 
-Size GetPreferredSizeForWidget(GtkWidget* widget) {
+SizeF GetPreferredSizeForWidget(GtkWidget* widget) {
   GtkRequisition size;
   gtk_widget_get_preferred_size(widget, nullptr, &size);
-  return Size(size.width, size.height);
+  return SizeF(size.width, size.height);
 }
 
 cairo_region_t* CreateRegionFromSurface(cairo_surface_t* surface) {

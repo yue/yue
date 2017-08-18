@@ -26,7 +26,7 @@ gboolean OnTimer(GtkWidget* widget) {
 
 ProgressBar::ProgressBar() {
   TakeOverView(gtk_progress_bar_new());
-  SetDefaultStyle(SizeF(GetPreferredSizeForWidget(GetNative())));
+  SetDefaultStyle(GetPreferredSizeForWidget(GetNative()));
 }
 
 ProgressBar::~ProgressBar() {

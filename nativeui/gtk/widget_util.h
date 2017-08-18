@@ -9,14 +9,14 @@
 
 #include "base/strings/string_piece.h"
 #include "nativeui/gfx/geometry/insets_f.h"
-#include "nativeui/gfx/geometry/size.h"
+#include "nativeui/gfx/geometry/size_f.h"
 #include "nativeui/types.h"
 
 typedef struct _cairo_region cairo_region_t;
 
 namespace nu {
 
-Size GetPreferredSizeForWidget(NativeView widget);
+SizeF GetPreferredSizeForWidget(NativeView widget);
 
 // Like gdk_cairo_region_create_from_surface, but also include semi-transparent
 // points into the region.
