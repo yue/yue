@@ -47,12 +47,26 @@ class ButtonImpl : public ViewImpl {
     return title_;
   }
 
-  SizeF GetPreferredSize() const {
-    float padding =
-        (type() == ControlType::Button ? kButtonPadding : kCheckboxPadding) *
-        scale_factor();
+  void SetImage(Image* image) {
+    image_ = image;
+    OnDPIChanged();  // update component size
+  }
+
+  SizeF GetDIPPreferredSize() const {
     SizeF preferred_size(text_size_);
-    preferred_size.Enlarge(box_size_.width() + padding * 2, padding * 2);
+    if (image_) {
+      preferred_size.Enlarge(image_size_.width(), 0);
+      preferred_size.set_height(std::max(image_size_.height(),
+                                         preferred_size.height()));
+    } else if (type() == ControlType::Checkbox ||
+               type() == ControlType::Radio) {
+      preferred_size.Enlarge(box_size_.width(), 0);
+    }
+    preferred_size = ScaleSize(preferred_size, 1.f / scale_factor());
+    if (type() == ControlType::Button)
+      preferred_size.Enlarge(kButtonPadding * 2, kButtonPadding * 2);
+    else
+      preferred_size.Enlarge(kCheckboxPadding * 2, kCheckboxPadding * 2);
     return preferred_size;
   }
 
@@ -93,7 +107,8 @@ class ButtonImpl : public ViewImpl {
   // ViewImpl:
   void Draw(PainterWin* painter, const Rect& dirty) override {
     Size size = size_allocation().size();
-    Size preferred_size = ToCeiledSize(GetPreferredSize());
+    Size preferred_size =
+        ToCeiledSize(ScaleSize(GetDIPPreferredSize(), scale_factor()));
 
     NativeTheme::ExtraParams params;
     params.button = params_;
@@ -104,9 +119,8 @@ class ButtonImpl : public ViewImpl {
                                state(), Rect(size), params);
 
     // Draw control background as a layer on button background.
-    if (!background_color().transparent()) {
+    if (!background_color().transparent())
       ViewImpl::Draw(painter, dirty);
-    }
 
     // Checkbox and radio are left aligned.
     Point origin;
@@ -117,22 +131,35 @@ class ButtonImpl : public ViewImpl {
       origin.Offset(0, (size.height() - preferred_size.height()) / 2);
     }
 
-    // Draw the box.
-    Point box_origin = origin;
-    box_origin.Offset(0, (preferred_size.height() - box_size_.height()) / 2);
-    if (type() == ControlType::Checkbox)
-      painter->DrawNativeTheme(NativeTheme::Part::Checkbox,
-                               state(), Rect(box_origin, box_size_), params);
-    else if (type() == ControlType::Radio)
-      painter->DrawNativeTheme(NativeTheme::Part::Radio,
-                               state(), Rect(box_origin, box_size_), params);
+    if (image_) {
+      // Draw image.
+      PointF image_origin(origin);
+      image_origin.set_y((size.height() - image_size_.height()) / 2.f);
+      image_origin = ScalePoint(image_origin, 1.f / scale_factor());
+      image_origin.Offset(kButtonPadding, 0);
+      painter->DrawImage(image_, RectF(image_origin, image_->GetSize()));
+    } else {
+      // Draw the box.
+      Point box_origin = origin;
+      box_origin.Offset(0, (preferred_size.height() - box_size_.height()) / 2);
+      if (type() == ControlType::Checkbox)
+        painter->DrawNativeTheme(NativeTheme::Part::Checkbox,
+                                 state(), Rect(box_origin, box_size_), params);
+      else if (type() == ControlType::Radio)
+        painter->DrawNativeTheme(NativeTheme::Part::Radio,
+                                 state(), Rect(box_origin, box_size_), params);
+    }
 
     // The bounds of text.
+    Rect text_bounds(origin, preferred_size);
     int padding = std::ceil(
         (type() == ControlType::Button ? kButtonPadding : kCheckboxPadding) *
         scale_factor());
-    Rect text_bounds(origin, preferred_size);
-    text_bounds.Inset(box_size_.width() + padding, padding, padding, padding);
+    text_bounds.Inset(padding, padding);
+    if (type() == ControlType::Button || image_)
+      text_bounds.Inset(image_size_.width(), 0, 0, 0);
+    else
+      text_bounds.Inset(box_size_.width(), 0, 0, 0);
 
     // The text.
     TextAttributes attributes(font(), color(), TextAlign::Center,
@@ -154,6 +181,7 @@ class ButtonImpl : public ViewImpl {
   }
 
   void OnDPIChanged() override {
+    // Size of checkbox.
     NativeTheme* theme = State::GetCurrent()->GetNativeTheme();
     base::win::ScopedGetDC dc(window() ? window()->hwnd() : NULL);
     if (type() == ControlType::Checkbox)
@@ -162,7 +190,13 @@ class ButtonImpl : public ViewImpl {
     else if (type() == ControlType::Radio)
       box_size_ = theme->GetThemePartSize(dc, NativeTheme::Part::Radio,
                                           state());
+    // Size of title.
     text_size_ = MeasureText(dc, title_, font());
+    // Size of image.
+    if (image_)
+      image_size_ = ScaleSize(image_->GetSize(), scale_factor());
+    else
+      image_size_ = SizeF();
   }
 
   void OnMouseEnter(NativeEvent event) override {
@@ -224,8 +258,11 @@ class ButtonImpl : public ViewImpl {
   // The size of box for radio and checkbox.
   Size box_size_;
 
-  // The size of text.
+  // Size of the text.
   SizeF text_size_;
+
+  // Size of the image.
+  SizeF image_size_;
 
   // Whether the button is capturing the mouse.
   bool is_capturing_ = false;
@@ -233,6 +270,7 @@ class ButtonImpl : public ViewImpl {
   // Whether the mouse is hovering the button.
   bool is_hovering_ = false;
 
+  Image* image_ = nullptr;  // managed by delegate
   base::string16 title_;
 };
 
@@ -250,10 +288,8 @@ void Button::SetTitle(const std::string& title) {
   auto* button = static_cast<ButtonImpl*>(GetNative());
   base::string16 wtitle = base::UTF8ToUTF16(title);
   button->SetTitle(wtitle);
-
-  SetDefaultStyle(ScaleSize(button->GetPreferredSize(),
-                            1.0f / button->scale_factor()));
   button->Invalidate();
+  SetDefaultStyle(button->GetDIPPreferredSize());
 }
 
 std::string Button::GetTitle() const {
@@ -269,6 +305,10 @@ bool Button::IsChecked() const {
 }
 
 void Button::SetImage(Image* image) {
+  auto* button = static_cast<ButtonImpl*>(GetNative());
+  button->SetImage(image);
+  button->Invalidate();
+  SetDefaultStyle(button->GetDIPPreferredSize());
 }
 
 }  // namespace nu
