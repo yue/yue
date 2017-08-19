@@ -81,6 +81,8 @@ void ViewImpl::Invalidate(const Rect& dirty) {
 
 void ViewImpl::SetFocus(bool focus) {
   is_focused_ = focus;
+  if (focus && window_)
+    ::SetFocus(window_->hwnd());
   Invalidate();
 }
 
@@ -136,6 +138,15 @@ void ViewImpl::OnMouseLeave(NativeEvent event) {
 }
 
 bool ViewImpl::OnMouseClick(NativeEvent event) {
+  // Clicking a view should move the focus to it.
+  // This has to be done before handling the mouse event, because user may
+  // want to move focus to other view later.
+  if (is_focusable() && window() && event->message == WM_LBUTTONDOWN &&
+      type() != ControlType::Subwin) {  // subwin handles clicking on its own
+    ::SetFocus(window()->hwnd());  // need this to take focus from subwin
+    window()->focus_manager()->TakeFocus(this);
+  }
+
   if (!delegate())
     return false;
   MouseEvent client_event(event, this);

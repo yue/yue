@@ -70,7 +70,7 @@ std::string Entry::GetText() const {
 }
 
 SizeF Entry::GetMinimumSize() const {
-  return static_cast<EditView*>(GetNative())->GetPreferredSize();
+  return static_cast<EntryImpl*>(GetNative())->GetPreferredSize();
 }
 
 }  // namespace nu
