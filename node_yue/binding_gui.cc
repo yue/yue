@@ -575,6 +575,13 @@ struct Type<nu::FileDialog> {
   static constexpr const char* name = "yue.FileDialog";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+        "optionPickFolders",
+        static_cast<int>(nu::FileDialog::OPTION_PICK_FOLDERS),
+        "optionMultiSelect",
+        static_cast<int>(nu::FileDialog::OPTION_MULTI_SELECT),
+        "optionShowHidden",
+        static_cast<int>(nu::FileDialog::OPTION_SHOW_HIDDEN));
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
@@ -585,7 +592,8 @@ struct Type<nu::FileDialog> {
         "setTitle", &nu::FileDialog::SetTitle,
         "setButtonLabel", &nu::FileDialog::SetButtonLabel,
         "setFilename", &nu::FileDialog::SetFilename,
-        "setFolder", &nu::FileDialog::SetFolder);
+        "setFolder", &nu::FileDialog::SetFolder,
+        "setOptions", &nu::FileDialog::SetOptions);
   }
 };
 
@@ -1408,6 +1416,7 @@ void Initialize(v8::Local<v8::Object> exports) {
           "Image",          vb::Constructor<nu::Image>(),
           "Painter",        vb::Constructor<nu::Painter>(),
           "Event",          vb::Constructor<nu::Event>(),
+          "FileDialog",     vb::Constructor<nu::FileDialog>(),
           "FileOpenDialog", vb::Constructor<nu::FileOpenDialog>(),
           "FileSaveDialog", vb::Constructor<nu::FileSaveDialog>(),
           "MenuBar",        vb::Constructor<nu::MenuBar>(),

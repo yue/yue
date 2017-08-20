@@ -56,4 +56,13 @@ void FileDialog::SetFolder(const base::FilePath& folder) {
   gtk_file_chooser_set_current_folder(dialog_, folder.value().c_str());
 }
 
+void FileDialog::SetOptions(int options) {
+  if (options & OPTION_PICK_FOLDERS)
+    gtk_file_chooser_set_action(dialog_, GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
+  if (options & OPTION_MULTI_SELECT)
+    gtk_file_chooser_set_select_multiple(dialog_, true);
+  if (options & OPTION_SHOW_HIDDEN)
+    gtk_file_chooser_set_show_hidden(dialog_, true);
+}
+
 }  // namespace nu

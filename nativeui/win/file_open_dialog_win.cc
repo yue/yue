@@ -9,8 +9,6 @@
 namespace nu {
 
 FileOpenDialogImpl::FileOpenDialogImpl() : FileDialogImpl(Initialize()) {
-  ComPtr<IFileOpenDialog> dialog = Get<IFileOpenDialog>();
-  dialog->SetOptions(FOS_FILEMUSTEXIST);
 }
 
 FileOpenDialogImpl::~FileOpenDialogImpl() {

@@ -18,6 +18,12 @@ class Window;
 
 class NATIVEUI_EXPORT FileDialog : public base::RefCounted<FileDialog> {
  public:
+  enum Option {
+    OPTION_PICK_FOLDERS = 1 << 0,
+    OPTION_MULTI_SELECT = 1 << 1,
+    OPTION_SHOW_HIDDEN = 1 << 2,
+  };
+
   base::FilePath GetResult() const;
   bool Run();
   bool RunForWindow(Window* window);
@@ -25,6 +31,7 @@ class NATIVEUI_EXPORT FileDialog : public base::RefCounted<FileDialog> {
   void SetButtonLabel(const std::string& label);
   void SetFilename(const std::string& filename);
   void SetFolder(const base::FilePath& folder);
+  void SetOptions(int options);
 
   NativeFileDialog GetNative() const { return dialog_; }
 

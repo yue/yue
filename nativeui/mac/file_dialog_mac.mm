@@ -56,4 +56,16 @@ void FileDialog::SetFolder(const base::FilePath& folder) {
       [NSURL fileURLWithPath:base::SysUTF8ToNSString(folder.value())];
 }
 
+void FileDialog::SetOptions(int options) {
+  if (options & OPTION_PICK_FOLDERS) {
+    dialog_.canChooseDirectories = YES;
+    // Keep consistency with other platforms.
+    dialog_.canChooseFiles = NO;
+  }
+  if (options & OPTION_MULTI_SELECT)
+    dialog_.allowsMultipleSelection = YES;
+  if (options & OPTION_SHOW_HIDDEN)
+    dialog_.showsHiddenFiles = YES;
+}
+
 }  // namespace nu
