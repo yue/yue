@@ -537,6 +537,26 @@ struct Type<nu::KeyEvent> {
 };
 
 template<>
+struct Type<nu::FileDialog::Filter> {
+  static constexpr const char* name = "yue.FileDialog.Filter";
+  static inline void Push(State* state,
+                          const nu::FileDialog::Filter& filter) {
+    NewTable(state, 0, 2);
+    RawSet(state, -1,
+           "description", std::get<0>(filter),
+           "extensions", std::get<1>(filter));
+  }
+  static inline bool To(State* state, int index,
+                        nu::FileDialog::Filter* out) {
+    if (GetType(state, index) == LuaType::Table)
+      return false;
+    return RawGetAndPop(state, index,
+                        "description", &std::get<0>(*out),
+                        "extensions", &std::get<1>(*out));
+  }
+};
+
+template<>
 struct Type<nu::FileDialog> {
   static constexpr const char* name = "yue.FileDialog";
   static void BuildMetaTable(State* state, int metatable) {
@@ -554,7 +574,8 @@ struct Type<nu::FileDialog> {
            "setbuttonlabel", &nu::FileDialog::SetButtonLabel,
            "setfilename", &nu::FileDialog::SetFilename,
            "setfolder", &nu::FileDialog::SetFolder,
-           "setoptions", &nu::FileDialog::SetOptions);
+           "setoptions", &nu::FileDialog::SetOptions,
+           "setfilters", &nu::FileDialog::SetFilters);
   }
 };
 

@@ -68,4 +68,7 @@ void FileDialog::SetOptions(int options) {
     dialog_.showsHiddenFiles = YES;
 }
 
+void FileDialog::SetFilters(const std::vector<Filter>& filters) {
+}
+
 }  // namespace nu

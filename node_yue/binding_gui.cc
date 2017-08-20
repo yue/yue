@@ -571,6 +571,28 @@ struct Type<nu::KeyEvent> {
 };
 
 template<>
+struct Type<nu::FileDialog::Filter> {
+  static constexpr const char* name = "yue.FileDialog.Filter";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::FileDialog::Filter* out) {
+    if (!value->IsObject())
+      return false;
+    return Get(context, value.As<v8::Object>(),
+               "description", &std::get<0>(*out),
+               "extensions", &std::get<1>(*out));
+  }
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   const nu::FileDialog::Filter& filter) {
+    auto obj = v8::Object::New(context->GetIsolate());
+    Set(context, obj,
+        "description", std::get<0>(filter),
+        "extensions", std::get<1>(filter));
+    return obj;
+  }
+};
+
+template<>
 struct Type<nu::FileDialog> {
   static constexpr const char* name = "yue.FileDialog";
   static void BuildConstructor(v8::Local<v8::Context> context,
@@ -593,7 +615,8 @@ struct Type<nu::FileDialog> {
         "setButtonLabel", &nu::FileDialog::SetButtonLabel,
         "setFilename", &nu::FileDialog::SetFilename,
         "setFolder", &nu::FileDialog::SetFolder,
-        "setOptions", &nu::FileDialog::SetOptions);
+        "setOptions", &nu::FileDialog::SetOptions,
+        "setFilters", &nu::FileDialog::SetFilters);
   }
 };
 

@@ -14,10 +14,6 @@
 
 typedef struct _cairo_region cairo_region_t;
 
-namespace base {
-class FilePath;
-}
-
 namespace nu {
 
 SizeF GetPreferredSizeForWidget(NativeView widget);
@@ -54,10 +50,6 @@ void ForceSizeAllocation(GtkWindow* window, GtkWidget* view);
 
 // Resize window's client area ignoring the size request.
 void ResizeWindow(GtkWindow* window, bool resizable, int width, int height);
-
-// Add extensions to the filename returned by file chooser.
-base::FilePath AddExtensionForFilename(GtkFileChooser* chooser,
-                                       const char* filename);
 
 // A helper to call destructor for a type.
 template<typename T>
