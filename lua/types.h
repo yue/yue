@@ -231,9 +231,11 @@ struct Type<std::vector<T>> {
   static constexpr const char* name = "table";
   static inline void Push(State* state, const std::vector<T>& vec) {
     int size = static_cast<int>(vec.size());  // lua does not like size_t
-    NewTable(state, size);
-    for (int i = 0; i< vec.size(); ++i)
-      RawSet(state, -1, i + 1, vec[i]);
+    lua_createtable(state, size, 0);
+    for (int i = 0; i < size; ++i) {
+      Type<T>::Push(state, vec[i]);
+      lua_rawseti(state, -2, i + 1);
+    }
   }
   static inline bool To(State* state, int index, std::vector<T>* out) {
     if (GetType(state, index) != LuaType::Table)
@@ -258,9 +260,12 @@ template<typename K, typename V>
 struct Type<std::map<K, V>> {
   static constexpr const char* name = "table";
   static inline void Push(State* state, const std::map<K, V>& dict) {
-    NewTable(state, 0, dict.size());
-    for (const auto& it : dict)
-      RawSet(state, -1, it.first, it.second);
+    lua_createtable(state, 0, dict.size());
+    for (const auto& it : dict) {
+      Type<K>::Push(state, it.first);
+      Type<V>::Push(state, it.second);
+      lua_rawset(state, -3);
+    }
   }
   static inline bool To(State* state, int index, std::map<K, V>* out) {
     if (GetType(state, index) != LuaType::Table)
