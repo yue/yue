@@ -10,6 +10,7 @@
 
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "nativeui/file_dialog.h"
 
@@ -28,6 +29,9 @@ class FileDialogImpl {
   void SetButtonLabel(const std::wstring& label);
   void SetFilename(const std::wstring& filename);
   void SetFolder(const std::wstring& folder);
+  void SetOptions(int options);
+  int GetOptions() const;
+  void SetFilters(const std::vector<FileDialog::Filter>& filters);
 
  protected:
   explicit FileDialogImpl(ComPtr<IFileDialog>&& ptr);
@@ -40,9 +44,13 @@ class FileDialogImpl {
   }
 
   std::wstring GetPathFromItem(const ComPtr<IShellItem>& item) const;
+  void ConvertFilters(const std::vector<FileDialog::Filter>& filters);
 
  private:
   ComPtr<IFileDialog> dialog_;
+
+  std::vector<std::wstring> buffer_;
+  std::vector<COMDLG_FILTERSPEC> filterspec_;
 
   DISALLOW_COPY_AND_ASSIGN(FileDialogImpl);
 };

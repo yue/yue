@@ -4,10 +4,14 @@
 
 #include "nativeui/win/file_dialog_win.h"
 
+#include "base/strings/string_util.h"
 #include "base/strings/utf_string_conversions.h"
 #include "nativeui/win/window_win.h"
 
 namespace nu {
+
+namespace {
+}  // namespace
 
 FileDialogImpl::FileDialogImpl(ComPtr<IFileDialog>&& ptr) : dialog_(ptr) {
 }
@@ -49,6 +53,44 @@ void FileDialogImpl::SetFolder(const std::wstring& folder) {
     dialog_->SetFolder(item.Get());
 }
 
+void FileDialogImpl::SetOptions(int options) {
+  dialog_->SetOptions(options);
+}
+
+int FileDialogImpl::GetOptions() const {
+  int options = 0;
+  dialog_->GetOptions(reinterpret_cast<FILEOPENDIALOGOPTIONS*>(&options));
+  return options;
+}
+
+void FileDialogImpl::SetFilters(
+    const std::vector<FileDialog::Filter>& filters) {
+  ConvertFilters(filters);
+  dialog_->SetFileTypes(static_cast<UINT>(filterspec_.size()),
+                        filterspec_.data());
+
+  // By default, *.* will be added to the file name if file type is "*.*". In
+  // Electron, we disable it to make a better experience.
+  //
+  // From MSDN: https://msdn.microsoft.com/en-us/library/windows/desktop/
+  // bb775970(v=vs.85).aspx
+  //
+  // If SetDefaultExtension is not called, the dialog will not update
+  // automatically when user choose a new file type in the file dialog.
+  //
+  // We set file extension to the first none-wildcard extension to make
+  // sure the dialog will update file extension automatically.
+  for (size_t i = 0; i < filterspec_.size(); i++) {
+    const COMDLG_FILTERSPEC& spec = filterspec_[i];
+    if (std::wstring(spec.pszSpec) != L"*.*") {
+      // SetFileTypeIndex is regarded as one-based index.
+      dialog_->SetFileTypeIndex(static_cast<UINT>(i + 1));
+      dialog_->SetDefaultExtension(spec.pszSpec);
+      break;
+    }
+  }
+}
+
 std::wstring FileDialogImpl::GetPathFromItem(
     const ComPtr<IShellItem>& item) const {
   wchar_t* name = nullptr;
@@ -58,6 +100,33 @@ std::wstring FileDialogImpl::GetPathFromItem(
   std::wstring filename = name;
   ::CoTaskMemFree(name);
   return filename;
+}
+
+void FileDialogImpl::ConvertFilters(
+    const std::vector<FileDialog::Filter>& filters) {
+  buffer_.clear();
+  filterspec_.clear();
+
+  if (filters.empty()) {
+    COMDLG_FILTERSPEC spec = { L"All Files (*.*)", L"*.*" };
+    filterspec_.push_back(spec);
+    return;
+  }
+
+  buffer_.reserve(filters.size() * 2);
+  for (const FileDialog::Filter& filter : filters) {
+    COMDLG_FILTERSPEC spec;
+    buffer_.push_back(base::UTF8ToWide(std::get<0>(filter)));
+    spec.pszName = buffer_.back().c_str();
+
+    std::vector<std::string> extensions(std::get<1>(filter));
+    for (std::string& extension : extensions)
+      extension.insert(0, "*.");
+    buffer_.push_back(base::UTF8ToWide(base::JoinString(extensions, ";")));
+    spec.pszSpec = buffer_.back().c_str();
+
+    filterspec_.push_back(spec);
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -99,8 +168,7 @@ void FileDialog::SetFolder(const base::FilePath& folder) {
 }
 
 void FileDialog::SetOptions(int options) {
-  int winops = 0;
-  dialog_->GetOptions(reinterpret_cast<FILEOPENDIALOGOPTIONS*>(&winops));
+  int winops = dialog_->GetOptions();
   if (options & OPTION_PICK_FOLDERS)
     winops |= FOS_PICKFOLDERS;
   if (options & OPTION_MULTI_SELECT)
@@ -108,6 +176,10 @@ void FileDialog::SetOptions(int options) {
   if (options & OPTION_SHOW_HIDDEN)
     winops |= FOS_FORCESHOWHIDDEN;
   dialog_->SetOptions(winops);
+}
+
+void FileDialog::SetFilters(const std::vector<Filter>& filters) {
+  dialog_->SetFilters(filters);
 }
 
 }  // namespace nu
