@@ -10,10 +10,12 @@
 
 namespace nu {
 
-namespace {
-}  // namespace
-
 FileDialogImpl::FileDialogImpl(ComPtr<IFileDialog>&& ptr) : dialog_(ptr) {
+  // Default filter.
+  COMDLG_FILTERSPEC spec = { L"All Files (*.*)", L"*.*" };
+  filterspec_.push_back(spec);
+  dialog_->SetFileTypes(static_cast<UINT>(filterspec_.size()),
+                        filterspec_.data());
 }
 
 FileDialogImpl::~FileDialogImpl() {
