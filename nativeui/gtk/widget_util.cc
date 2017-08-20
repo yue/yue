@@ -5,6 +5,7 @@
 
 #include "nativeui/gtk/widget_util.h"
 
+#include "base/files/file_path.h"
 #include "base/logging.h"
 #include "nativeui/gfx/color.h"
 
@@ -245,6 +246,31 @@ void ResizeWindow(GtkWindow* window, bool resizable, int width, int height) {
 
   // Notify the content view of the resize.
   ForceSizeAllocation(window, vbox);
+}
+
+base::FilePath AddExtensionForFilename(GtkFileChooser* chooser,
+                                       const char* filename) {
+  base::FilePath path(filename);
+  GtkFileFilter* selected_filter = gtk_file_chooser_get_filter(chooser);
+  if (!selected_filter)
+    return path;
+
+  return path;
+  // GSList* filters = gtk_file_chooser_list_filters(chooser);
+  // int i = g_slist_index(filters, selected_filter);
+  // g_slist_free(filters);
+  // if (i >= filters_.size())
+  //   return path;
+
+  // const auto& extensions = filters_[i].second;
+  // for (const auto& extension : extensions) {
+  //   if (extension == "*" ||
+  //       base::EndsWith(path.value(), "." + extension,
+  //                      base::CompareCase::INSENSITIVE_ASCII))
+  //     return path;
+  // }
+
+  // return path.ReplaceExtension(extensions[0]);
 }
 
 }  // namespace nu
