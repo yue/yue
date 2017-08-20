@@ -100,7 +100,7 @@ void FileDialog::SetFolder(const base::FilePath& folder) {
 
 void FileDialog::SetOptions(int options) {
   int winops = 0;
-  dialog_->GetOptions(static_cast<FILEOPENDIALOGOPTIONS*>(&winops));
+  dialog_->GetOptions(reinterpret_cast<FILEOPENDIALOGOPTIONS*>(&winops));
   if (options & OPTION_PICK_FOLDERS)
     winops |= FOS_PICKFOLDERS;
   if (options & OPTION_MULTI_SELECT)
