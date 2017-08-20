@@ -15,6 +15,8 @@ FileSaveDialog::FileSaveDialog()
                      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                      GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
                      nullptr))) {
+  gtk_file_chooser_set_do_overwrite_confirmation(GetNative(), true);
+  gtk_file_chooser_set_create_folders(GetNative(), true);
 }
 
 FileSaveDialog::~FileSaveDialog() {

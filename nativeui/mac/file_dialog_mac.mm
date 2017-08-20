@@ -13,6 +13,7 @@ namespace nu {
 
 FileDialog::FileDialog(NativeFileDialog dialog) : dialog_(dialog) {
   [dialog_ retain];  // dialog is an autorelease object
+  [dialog_ setCanSelectHiddenExtension:YES];
 }
 
 FileDialog::~FileDialog() {
