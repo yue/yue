@@ -571,6 +571,53 @@ struct Type<nu::KeyEvent> {
 };
 
 template<>
+struct Type<nu::FileDialog> {
+  static constexpr const char* name = "yue.FileDialog";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "getResult", &nu::FileDialog::GetResult,
+        "run", &nu::FileDialog::Run,
+        "runForWindow", &nu::FileDialog::RunForWindow,
+        "setTitle", &nu::FileDialog::SetTitle,
+        "setButtonLabel", &nu::FileDialog::SetButtonLabel,
+        "setFilename", &nu::FileDialog::SetFilename,
+        "setFolder", &nu::FileDialog::SetFolder);
+  }
+};
+
+template<>
+struct Type<nu::FileOpenDialog> {
+  using base = nu::FileDialog;
+  static constexpr const char* name = "yue.FileOpenDialog";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor, "create", &CreateOnHeap<nu::FileOpenDialog>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "getResults", &nu::FileOpenDialog::GetResults);
+  }
+};
+
+template<>
+struct Type<nu::FileSaveDialog> {
+  using base = nu::FileDialog;
+  static constexpr const char* name = "yue.FileSaveDialog";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor, "create", &CreateOnHeap<nu::FileSaveDialog>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+  }
+};
+
+template<>
 struct Type<nu::MenuBase> {
   static constexpr const char* name = "yue.MenuBase";
   static void BuildConstructor(v8::Local<v8::Context> context,
@@ -1353,30 +1400,32 @@ void Initialize(v8::Local<v8::Object> exports) {
   vb::Set(context, exports,
           // Classes.
 #if !defined(ELECTRON_BUILD)
-          "Lifetime",    vb::Constructor<nu::Lifetime>(),
+          "Lifetime",       vb::Constructor<nu::Lifetime>(),
 #endif
-          "App",         vb::Constructor<nu::App>(),
-          "Font",        vb::Constructor<nu::Font>(),
-          "Color",       vb::Constructor<nu::Color>(),
-          "Image",       vb::Constructor<nu::Image>(),
-          "Painter",     vb::Constructor<nu::Painter>(),
-          "Event",       vb::Constructor<nu::Event>(),
-          "MenuBar",     vb::Constructor<nu::MenuBar>(),
-          "Menu",        vb::Constructor<nu::Menu>(),
-          "MenuItem",    vb::Constructor<nu::MenuItem>(),
-          "Window",      vb::Constructor<nu::Window>(),
-          "View",        vb::Constructor<nu::View>(),
-          "Container",   vb::Constructor<nu::Container>(),
-          "Button",      vb::Constructor<nu::Button>(),
-          "Browser",     vb::Constructor<nu::Browser>(),
-          "Entry",       vb::Constructor<nu::Entry>(),
-          "Label",       vb::Constructor<nu::Label>(),
-          "ProgressBar", vb::Constructor<nu::ProgressBar>(),
-          "Group",       vb::Constructor<nu::Group>(),
-          "Scroll",      vb::Constructor<nu::Scroll>(),
-          "TextEdit",    vb::Constructor<nu::TextEdit>(),
+          "App",            vb::Constructor<nu::App>(),
+          "Font",           vb::Constructor<nu::Font>(),
+          "Color",          vb::Constructor<nu::Color>(),
+          "Image",          vb::Constructor<nu::Image>(),
+          "Painter",        vb::Constructor<nu::Painter>(),
+          "Event",          vb::Constructor<nu::Event>(),
+          "FileOpenDialog", vb::Constructor<nu::FileOpenDialog>(),
+          "FileSaveDialog", vb::Constructor<nu::FileSaveDialog>(),
+          "MenuBar",        vb::Constructor<nu::MenuBar>(),
+          "Menu",           vb::Constructor<nu::Menu>(),
+          "MenuItem",       vb::Constructor<nu::MenuItem>(),
+          "Window",         vb::Constructor<nu::Window>(),
+          "View",           vb::Constructor<nu::View>(),
+          "Container",      vb::Constructor<nu::Container>(),
+          "Button",         vb::Constructor<nu::Button>(),
+          "Browser",        vb::Constructor<nu::Browser>(),
+          "Entry",          vb::Constructor<nu::Entry>(),
+          "Label",          vb::Constructor<nu::Label>(),
+          "ProgressBar",    vb::Constructor<nu::ProgressBar>(),
+          "Group",          vb::Constructor<nu::Group>(),
+          "Scroll",         vb::Constructor<nu::Scroll>(),
+          "TextEdit",       vb::Constructor<nu::TextEdit>(),
 #if defined(OS_MACOSX)
-          "Vibrant",     vb::Constructor<nu::Vibrant>(),
+          "Vibrant",        vb::Constructor<nu::Vibrant>(),
 #endif
           // Properties.
 #if !defined(ELECTRON_BUILD)

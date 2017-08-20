@@ -230,8 +230,9 @@ template<typename T>
 struct Type<std::vector<T>> {
   static constexpr const char* name = "table";
   static inline void Push(State* state, const std::vector<T>& vec) {
-    NewTable(state, vec.size());
-    for (size_t i = 0; i< vec.size(); ++i)
+    int size = static_cast<int>(vec.size());  // lua does not like size_t
+    NewTable(state, size);
+    for (int i = 0; i< vec.size(); ++i)
       RawSet(state, -1, i + 1, vec[i]);
   }
   static inline bool To(State* state, int index, std::vector<T>* out) {

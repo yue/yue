@@ -19,6 +19,7 @@
 
 #if defined(OS_LINUX)
 typedef struct _GdkPixbuf GdkPixbuf;
+typedef struct _GtkFileChooser GtkFileChooser;
 typedef struct _GtkMenuItem GtkMenuItem;
 typedef struct _GtkMenuShell GtkMenuShell;
 typedef struct _GtkWidget GtkWidget;
@@ -39,6 +40,7 @@ typedef struct CGContext* CGContextRef;
 @class NSImage;
 @class NSMenu;
 @class NSMenuItem;
+@class NSSavePanel;
 @class NSView;
 @class NSWindow;
 #else
@@ -49,6 +51,7 @@ class NSGraphicsContext;
 class NSImage;
 class NSMenu;
 class NSMenuItem;
+class NSSavePanel;
 struct NSView;
 class NSWindow;
 #endif  // __OBJC__
@@ -76,6 +79,7 @@ class Image;
 namespace nu {
 
 #if defined(OS_WIN)
+class FileDialogImpl;
 class ViewImpl;
 class WindowImpl;
 struct Win32Message;
@@ -84,6 +88,7 @@ struct MenuItemData;
 
 #if defined(OS_MACOSX)
 using NativeEvent = NSEvent*;
+using NativeFileDialog = NSSavePanel*;
 using NativeView = NSView*;
 using NativeWindow = NSWindow*;
 using NativeBitmap = CGContextRef;
@@ -94,6 +99,7 @@ using NativeMenu = NSMenu*;
 using NativeMenuItem = NSMenuItem*;
 #elif defined(OS_LINUX)
 using NativeEvent = GdkEvent*;
+using NativeFileDialog = GtkFileChooser*;
 using NativeView = GtkWidget*;
 using NativeWindow = GtkWindow*;
 using NativeBitmap = cairo_surface_t*;
@@ -104,6 +110,7 @@ using NativeMenu = GtkMenuShell*;
 using NativeMenuItem = GtkMenuItem*;
 #elif defined(OS_WIN)
 using NativeEvent = Win32Message*;
+using NativeFileDialog = FileDialogImpl*;
 using NativeView = ViewImpl*;
 using NativeWindow = WindowImpl*;
 using NativeBitmap = Gdiplus::Bitmap*;

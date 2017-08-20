@@ -237,8 +237,9 @@ struct Type<std::vector<T>> {
   static constexpr const char* name = "Array";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    const std::vector<T>& vec) {
-    auto arr = v8::Array::New(context->GetIsolate(), vec.size());
-    for (size_t i = 0; i< vec.size(); ++i) {
+    int size = static_cast<int>(vec.size());  // v8 does not like size_t
+    auto arr = v8::Array::New(context->GetIsolate(), size);
+    for (int i = 0; i< size; ++i) {
       if (arr->Set(context, i, Type<T>::ToV8(context, vec[i])).IsNothing())
         break;
     }

@@ -12,6 +12,8 @@
 #include "nativeui/events/event.h"
 #include "nativeui/events/keyboard_code_conversion.h"
 #include "nativeui/events/keyboard_codes.h"
+#include "nativeui/file_open_dialog.h"
+#include "nativeui/file_save_dialog.h"
 #include "nativeui/gfx/canvas.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/gfx/geometry/insets.h"

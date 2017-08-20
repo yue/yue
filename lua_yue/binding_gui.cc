@@ -537,6 +537,42 @@ struct Type<nu::KeyEvent> {
 };
 
 template<>
+struct Type<nu::FileDialog> {
+  static constexpr const char* name = "yue.FileDialog";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "getresult", &nu::FileDialog::GetResult,
+           "run", &nu::FileDialog::Run,
+           "runforwindow", &nu::FileDialog::RunForWindow,
+           "settitle", &nu::FileDialog::SetTitle,
+           "setbuttonlabel", &nu::FileDialog::SetButtonLabel,
+           "setfilename", &nu::FileDialog::SetFilename,
+           "setfolder", &nu::FileDialog::SetFolder);
+  }
+};
+
+template<>
+struct Type<nu::FileOpenDialog> {
+  using base = nu::FileOpenDialog;
+  static constexpr const char* name = "yue.FileOpenDialog";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateOnHeap<nu::FileOpenDialog>,
+           "getresults", &nu::FileOpenDialog::GetResults);
+  }
+};
+
+template<>
+struct Type<nu::FileSaveDialog> {
+  using base = nu::FileSaveDialog;
+  static constexpr const char* name = "yue.FileSaveDialog";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateOnHeap<nu::FileSaveDialog>);
+  }
+};
+
+template<>
 struct Type<nu::MenuBase> {
   static constexpr const char* name = "yue.MenuBase";
   static void BuildMetaTable(State* state, int metatable) {
@@ -1245,6 +1281,8 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::Image>(state, "Image");
   BindType<nu::Painter>(state, "Painter");
   BindType<nu::Event>(state, "Event");
+  BindType<nu::FileOpenDialog>(state, "FileOpenDialog");
+  BindType<nu::FileSaveDialog>(state, "FileSaveDialog");
   BindType<nu::MenuBar>(state, "MenuBar");
   BindType<nu::Menu>(state, "Menu");
   BindType<nu::MenuItem>(state, "MenuItem");
