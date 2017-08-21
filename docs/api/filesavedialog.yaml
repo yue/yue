@@ -1,0 +1,17 @@
+name: FileSaveDialog
+component: gui
+header: nativeui/file_save_dialog.h
+type: refcounted
+namespace: nu
+inherit: FileDialog
+description: Dialog used for saveing files.
+
+constructors:
+  - signature: FileSaveDialog()
+    lang: ['cpp']
+    description: Create a save dialog.
+
+class_methods:
+  - signature: FileSaveDialog* Create()
+    lang: ['lua', 'js']
+    description: Create an save dialog.

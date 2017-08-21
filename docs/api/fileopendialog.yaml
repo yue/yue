@@ -1,0 +1,21 @@
+name: FileOpenDialog
+component: gui
+header: nativeui/file_open_dialog.h
+type: refcounted
+namespace: nu
+inherit: FileDialog
+description: Dialog used for opening files or folders.
+
+constructors:
+  - signature: FileOpenDialog()
+    lang: ['cpp']
+    description: Create an open dialog.
+
+class_methods:
+  - signature: FileOpenDialog* Create()
+    lang: ['lua', 'js']
+    description: Create an open dialog.
+
+methods:
+  - signature: std::vector<base::FilePath> GetResults() const
+    description: Return the chosen items in dialog.

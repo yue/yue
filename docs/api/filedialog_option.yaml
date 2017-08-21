@@ -1,0 +1,13 @@
+name: FileDialog::Option
+lang: ['cpp']
+header: nativeui/file_dialog.h
+type: enum
+namespace: nu
+description: The file dialog option masks.
+
+detail: |
+  `FileDialog::Option` is an `enum` with following values:
+
+  * `OPTION_PICK_FOLDERS`
+  * `OPTION_MULTI_SELECT`
+  * `OPTION_SHOW_HIDDEN`

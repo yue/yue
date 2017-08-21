@@ -1,0 +1,25 @@
+name: FileDialog::Filter
+header: nativeui/file_dialog.h
+type: struct
+namespace: nu
+description: FileDialog filters.
+
+lang_detail:
+  cpp: |
+    `FileDialog::Filter` is a `tuple` type:
+
+    ```cpp
+    std::tuple<std::string, std::vector<std::string>>
+    ```
+
+    The first element is the filter's description, the second element is a
+    vector of possible extensions.
+
+properties:
+  - property: std::string description
+    lang: ['lua', 'js']
+    description: Filter's description.
+
+  - property: Array extensions
+    lang: ['lua', 'js']
+    description: An array of filename extensions for the filter.

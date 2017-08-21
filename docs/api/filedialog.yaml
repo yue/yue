@@ -1,0 +1,76 @@
+name: FileDialog
+component: gui
+header: nativeui/file_dialog.h
+type: refcounted
+namespace: nu
+description: Base class for file dialogs.
+
+class_properties:
+  - property: int OptionPickFolders
+    lang: ['lua', 'js']
+    description: |
+      Option that indicates the open dialog will open folders instead of files.
+
+  - property: int OptionMultiSelect
+    lang: ['lua', 'js']
+    description: |
+      Option that indicates the open dialog can select multiple items.
+
+  - property: int OptionShowHidden
+    lang: ['lua', 'js']
+    description: |
+      Option that indicates hidden files will always show in the dialog.
+
+methods:
+  - signature: base::FilePath GetResult() const
+    description: Return the chosen item in dialog.
+
+  - signature: bool Run()
+    description: |
+      Show the dialog and wait for result, return `true` if user has chosen
+      item(s).
+
+  - signature: bool RunForWindow(Window* window)
+    description: |
+      Show the dialog as a modal child of parent `window` and wait for result,
+      return `true` if user has chosen item(s).
+
+  - signature: void SetTitle(const std::string& title)
+    description: Set the title of the dialog.
+
+  - signature: void SetButtonLabel(const std::string& label)
+    description: Set the text of accept button.
+
+  - signature: void SetFilename(const std::string& filename)
+    description: Set the filename to show in the dialog.
+
+  - signature: void SetFolder(const base::FilePath& folder)
+    description: |
+      Set a `folder` that is always selected when the dialog is opened
+
+  - signature: void SetOptions(int options)
+    description: A bit array of `options`.
+    lang_detail:
+      cpp: |
+        Available options can be found in
+        [FileDialog::Option](filedialog_option.html).
+
+  - signature: void SetFilters(const std::vector<FileDialog::Filter>& filters)
+    lang: ['cpp']
+    description: Set the file types that the dialog can open or save.
+
+  - signature: void SetFilters(Array filters)
+    lang: ['lua', 'js']
+    description: Set the file types that the dialog can open or save.
+    parameters:
+      filters:
+        description: |
+          An array of [FileDialog::Filter](filedialog_filter.html) objects.
+
+  - signature: std::vector<FileDialog::Filter> GetFilters() const
+    lang: ['cpp']
+    description: Return the filters previously set.
+
+  - signature: NativeFileDialog GetNative() const
+    lang: ['cpp']
+    description: Return the native type wrapped by the dialog.
