@@ -226,6 +226,8 @@ component("nativeui") {
     "win/focus_manager.h",
     "win/subwin_view.cc",
     "win/subwin_view.h",
+    "win/clickable.cc",
+    "win/clickable.h",
     "win/app_win.cc",
     "win/lifetime_win.cc",
     "win/accelerator_manager_win.cc",

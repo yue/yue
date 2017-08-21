@@ -10,7 +10,7 @@
 namespace nu {
 
 ScrollbarButton::ScrollbarButton(Type type, Scrollbar* scrollbar)
-    : ViewImpl(ControlType::View, nullptr),
+    : Clickable(ControlType::View, nullptr),
       repeater_([this] { this->OnClick(); }),
       type_(type),
       scrollbar_(scrollbar) {
@@ -19,30 +19,24 @@ ScrollbarButton::ScrollbarButton(Type type, Scrollbar* scrollbar)
 ScrollbarButton::~ScrollbarButton() {
 }
 
-void ScrollbarButton::OnMouseEnter(NativeEvent event) {
-  SetState(ControlState::Hovered);
-  ViewImpl::OnMouseEnter(event);
+void ScrollbarButton::OnClick() {
+  if (type_ == Up || type_ == Left)
+    scrollbar_->LineUp();
+  else
+    scrollbar_->LineDown();
 }
 
 void ScrollbarButton::OnMouseLeave(NativeEvent event) {
-  SetState(ControlState::Normal);
   repeater_.Stop();
-  ViewImpl::OnMouseLeave(event);
+  Clickable::OnMouseLeave(event);
 }
 
 bool ScrollbarButton::OnMouseClick(NativeEvent event) {
-  if (ViewImpl::OnMouseClick(event))
-    return true;
-
-  if (event->message == WM_LBUTTONDOWN) {
-    SetState(ControlState::Pressed);
-    OnClick();
+  if (event->message == WM_LBUTTONDOWN)
     repeater_.Start();
-  } else {
-    SetState(ControlState::Hovered);
+  else
     repeater_.Stop();
-  }
-  return true;
+  return Clickable::OnMouseClick(event);
 }
 
 void ScrollbarButton::Draw(PainterWin* painter, const Rect& dirty) {
@@ -65,13 +59,6 @@ void ScrollbarButton::Draw(PainterWin* painter, const Rect& dirty) {
   params.scrollbar_arrow = params_;
   painter->DrawNativeTheme(
       part, state(), Rect(size_allocation().size()), params);
-}
-
-void ScrollbarButton::OnClick() {
-  if (type_ == Up || type_ == Left)
-    scrollbar_->LineUp();
-  else
-    scrollbar_->LineDown();
 }
 
 }  // namespace nu

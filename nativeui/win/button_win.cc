@@ -9,7 +9,6 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/win/scoped_hdc.h"
 #include "nativeui/container.h"
-#include "nativeui/events/win/event_win.h"
 #include "nativeui/gfx/geometry/insets.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/geometry/vector2d_conversions.h"
@@ -17,8 +16,7 @@
 #include "nativeui/gfx/win/screen_win.h"
 #include "nativeui/gfx/win/text_win.h"
 #include "nativeui/state.h"
-#include "nativeui/win/view_win.h"
-#include "nativeui/win/window_win.h"
+#include "nativeui/win/clickable.h"
 
 namespace nu {
 
@@ -27,13 +25,13 @@ namespace {
 const int kButtonPadding = 3;
 const int kCheckboxPadding = 1;
 
-class ButtonImpl : public ViewImpl {
+class ButtonImpl : public Clickable {
  public:
   ButtonImpl(Button::Type type, Button* delegate)
-      : ViewImpl(type == Button::Type::Normal ? ControlType::Button
-                    : (type == Button::Type::Checkbox ? ControlType::Checkbox
-                                                      : ControlType::Radio),
-                 delegate) {
+      : Clickable(type == Button::Type::Normal ? ControlType::Button
+                     : (type == Button::Type::Checkbox ? ControlType::Checkbox
+                                                       : ControlType::Radio),
+                  delegate) {
     set_focusable(true);
     OnDPIChanged();  // update component size
   }
@@ -72,15 +70,6 @@ class ButtonImpl : public ViewImpl {
     return preferred_size;
   }
 
-  void OnClick() {
-    if (type() == ControlType::Checkbox)
-      SetChecked(!IsChecked());
-    else if (type() == ControlType::Radio && !IsChecked())
-      SetChecked(true);
-    Button* button = static_cast<Button*>(delegate());
-    button->on_click.Emit(button);
-  }
-
   void SetChecked(bool checked) {
     if (IsChecked() == checked)
       return;
@@ -104,6 +93,16 @@ class ButtonImpl : public ViewImpl {
 
   bool IsChecked() const {
     return params_.checked;
+  }
+
+  // Clickable:
+  void OnClick() override {
+    if (type() == ControlType::Checkbox)
+      SetChecked(!IsChecked());
+    else if (type() == ControlType::Radio && !IsChecked())
+      SetChecked(true);
+    Button* button = static_cast<Button*>(delegate());
+    button->on_click.Emit(button);
   }
 
   // ViewImpl:
@@ -201,52 +200,6 @@ class ButtonImpl : public ViewImpl {
       image_size_ = SizeF();
   }
 
-  void OnMouseMove(NativeEvent event) override {
-    if (!is_capturing_)
-      return ViewImpl::OnMouseMove(event);
-
-    bool mouse_in_view = size_allocation().Contains(Point(event->l_param));
-    if (is_hovering_ && !mouse_in_view)
-      OnMouseLeave(event);
-    else if (!is_hovering_ && mouse_in_view)
-      OnMouseEnter(event);
-    else
-      ViewImpl::OnMouseMove(event);
-  }
-
-  void OnMouseEnter(NativeEvent event) override {
-    is_hovering_ = true;
-    SetState(is_capturing_ ? ControlState::Pressed : ControlState::Hovered);
-    ViewImpl::OnMouseEnter(event);
-  }
-
-  void OnMouseLeave(NativeEvent event) override {
-    is_hovering_ = false;
-    SetState(is_capturing_ ? ControlState::Hovered : ControlState::Normal);
-    ViewImpl::OnMouseLeave(event);
-  }
-
-  bool OnMouseClick(NativeEvent event) override {
-    if (ViewImpl::OnMouseClick(event))
-      return true;
-
-    if (event->message == WM_LBUTTONDOWN) {
-      is_capturing_ = true;
-      window()->SetCapture(this);
-      SetState(ControlState::Pressed);
-    } else {
-      if (event->message == WM_LBUTTONUP && state() == ControlState::Pressed)
-        OnClick();
-      window()->ReleaseCapture();
-    }
-    return true;
-  }
-
-  void OnCaptureLost() override {
-    is_capturing_ = false;
-    SetState(is_hovering_ ? ControlState::Hovered : ControlState::Normal);
-  }
-
   NativeTheme::ButtonExtraParams* params() { return &params_; }
 
  private:
@@ -260,12 +213,6 @@ class ButtonImpl : public ViewImpl {
 
   // Size of the image.
   SizeF image_size_;
-
-  // Whether the button is capturing the mouse.
-  bool is_capturing_ = false;
-
-  // Whether the mouse is hovering the button.
-  bool is_hovering_ = false;
 
   Image* image_ = nullptr;  // managed by delegate
   base::string16 title_;
