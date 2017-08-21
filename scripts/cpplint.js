@@ -37,12 +37,15 @@ const sourceFiles = listFiles([
 
 // Call cpplint.
 const cpplint = path.join('tools', 'cpplint.py')
-const child = exec(`python ${cpplint} ${sourceFiles.join(' ')}`)
-child.stderr.on('data', (chunck) => {
-  if (chunck.startsWith('Done processing'))
-    return
-  process.stdout.write(chunck)
-})
+while (sourceFiles.length) {
+  const chunck = sourceFiles.splice(0, 100)
+  const child = exec(`python ${cpplint} ${chunck.join(' ')}`)
+  child.stderr.on('data', (chunck) => {
+    if (chunck.startsWith('Done processing'))
+      return
+    process.stdout.write(chunck)
+  })
+}
 
 // Util function to list files recursively
 function listFiles(dirs) {
