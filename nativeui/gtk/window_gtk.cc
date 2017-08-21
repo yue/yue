@@ -462,6 +462,14 @@ bool Window::IsMovable() const {
   return true;
 }
 
+void Window::SetTitle(const std::string& title) {
+  gtk_window_set_title(window_, title.c_str());
+}
+
+std::string Window::GetTitle() const {
+  return gtk_window_get_title(window_);
+}
+
 void Window::SetBackgroundColor(Color color) {
   GdkRGBA gcolor = color.ToGdkRGBA();
   gtk_widget_override_background_color(GTK_WIDGET(window_),

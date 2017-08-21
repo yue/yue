@@ -155,6 +155,12 @@ methods:
   - signature: bool IsMovable() const
     description: Return whether window can be moved.
 
+  - signature: void SetTitle(const std::string& title)
+    description: Set window title.
+
+  - signature: std::string GetTitle() const
+    description: Get window title.
+
   - signature: void SetBackgroundColor(Color color)
     description: Set the background color of the window.
 

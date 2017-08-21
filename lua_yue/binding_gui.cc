@@ -857,6 +857,8 @@ struct Type<nu::Window> {
            "setmenubar", &nu::Window::SetMenuBar,
            "getmenubar", &nu::Window::GetMenuBar,
 #endif
+           "settitle", &nu::Window::SetTitle,
+           "gettitle", &nu::Window::GetTitle,
            "setbackgroundcolor", &nu::Window::SetBackgroundColor);
     RawSetProperty(state, metatable,
                    "onclose", &nu::Window::on_close,

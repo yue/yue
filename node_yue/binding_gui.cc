@@ -921,6 +921,8 @@ struct Type<nu::Window> {
         "setMenuBar", &nu::Window::SetMenuBar,
         "getMenuBar", &nu::Window::GetMenuBar,
 #endif
+        "setTitle", &nu::Window::SetTitle,
+        "getTitle", &nu::Window::GetTitle,
         "setBackgroundColor", &nu::Window::SetBackgroundColor);
     SetProperty(context, templ,
                 "onClose", &nu::Window::on_close,

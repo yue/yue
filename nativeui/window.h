@@ -89,6 +89,8 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
   void SetMovable(bool movable);
   bool IsMovable() const;
 
+  void SetTitle(const std::string& title);
+  std::string GetTitle() const;
   void SetBackgroundColor(Color color);
 
 #if defined(OS_WIN) || defined(OS_LINUX)

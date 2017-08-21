@@ -11,6 +11,7 @@
 #include <memory>
 #include <tuple>
 
+#include "base/strings/utf_string_conversions.h"
 #include "base/win/windows_version.h"
 #include "nativeui/accelerator.h"
 #include "nativeui/accelerator_manager.h"
@@ -790,6 +791,14 @@ bool Window::IsMovable() const {
   HMENU menu = ::GetSystemMenu(window_->hwnd(), FALSE);
   ::GetMenuItemInfo(menu, SC_MOVE, FALSE, &mii);
   return (mii.fState & MFS_DISABLED) == 0;
+}
+
+void Window::SetTitle(const std::string& title) {
+  ::SetWindowTextW(window_->hwnd(), base::UTF8ToUTF16(title).c_str());
+}
+
+std::string Window::GetTitle() const {
+  return base::UTF16ToUTF8(GetWindowString(window_->hwnd()));
 }
 
 void Window::SetBackgroundColor(Color color) {

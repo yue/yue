@@ -7,6 +7,7 @@
 #import <Cocoa/Cocoa.h>
 
 #include "base/mac/mac_util.h"
+#include "base/strings/sys_string_conversions.h"
 #include "nativeui/gfx/mac/coordinate_conversion.h"
 #include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/nu_view.h"
@@ -309,6 +310,14 @@ void Window::SetMovable(bool movable) {
 
 bool Window::IsMovable() const {
   return [window_ isMovable];
+}
+
+void Window::SetTitle(const std::string& title) {
+  [window_ setTitle:base::SysUTF8ToNSString(title)];
+}
+
+std::string Window::GetTitle() const {
+  return base::SysNSStringToUTF8([window_ title]);
 }
 
 void Window::SetBackgroundColor(Color color) {
