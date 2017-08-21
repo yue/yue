@@ -222,7 +222,7 @@ class ButtonImpl : public ViewImpl {
 
   void OnMouseLeave(NativeEvent event) override {
     is_hovering_ = false;
-    SetState(ControlState::Normal);
+    SetState(is_capturing_ ? ControlState::Hovered : ControlState::Normal);
     ViewImpl::OnMouseLeave(event);
   }
 

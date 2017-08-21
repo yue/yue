@@ -47,7 +47,7 @@ int GetWindowsState(NativeTheme::Part part, ControlState state) {
         case ControlState::Hovered:
           return PBS_HOT;
         case ControlState::Normal:
-          return PBS_NORMAL;
+          return PBS_DEFAULTED;
         case ControlState::Pressed:
           return PBS_PRESSED;
         case ControlState::Size:
