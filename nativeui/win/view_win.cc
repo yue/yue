@@ -81,8 +81,10 @@ void ViewImpl::Invalidate(const Rect& dirty) {
 
 void ViewImpl::SetFocus(bool focus) {
   is_focused_ = focus;
-  if (focus && window_)
-    ::SetFocus(window_->hwnd());
+  if (focus && window()) {
+    ::SetFocus(window()->hwnd());  // need this to take focus from subwin
+    window_->focus_manager()->TakeFocus(this);
+  }
   Invalidate();
 }
 
@@ -144,7 +146,7 @@ bool ViewImpl::OnMouseClick(NativeEvent event) {
   if (is_focusable() && window() && event->message == WM_LBUTTONDOWN &&
       type() != ControlType::Subwin) {  // subwin handles clicking on its own
     ::SetFocus(window()->hwnd());  // need this to take focus from subwin
-    window()->focus_manager()->TakeFocus(this);
+    window_->focus_manager()->TakeFocus(this);
   }
 
   if (!delegate())
@@ -277,8 +279,7 @@ bool View::IsVisible() const {
 }
 
 void View::Focus() {
-  if (GetNative()->window())
-    GetNative()->window()->focus_manager()->TakeFocus(GetNative());
+  GetNative()->SetFocus(true);
 }
 
 bool View::HasFocus() const {
