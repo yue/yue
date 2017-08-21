@@ -200,6 +200,11 @@ void ViewImpl::Invalidate() {
   Invalidate(size_allocation_);
 }
 
+void ViewImpl::SetState(ControlState state) {
+  state_ = state;
+  Invalidate();
+}
+
 void ViewImpl::ParentChanged() {
   // Scale the bounds after moving to a new parent.
   float new_scale_factor = window_ ? window_->scale_factor() : scale_factor_;

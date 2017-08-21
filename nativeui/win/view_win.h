@@ -96,6 +96,10 @@ class ViewImpl {
   // Invalidate the whole view.
   void Invalidate();
 
+  // Set control's state.
+  void SetState(ControlState state);
+  ControlState state() const { return state_; }
+
   // Change the bounds without invalidating.
   void set_size_allocation(const Rect& bounds) { size_allocation_ = bounds; }
   Rect size_allocation() const { return size_allocation_; }
@@ -109,10 +113,6 @@ class ViewImpl {
 
   void set_draggable(bool draggable) { draggable_ = draggable; }
   bool is_draggable() const { return draggable_; }
-
-  // Set control's state.
-  void set_state(ControlState state) { state_ = state; }
-  ControlState state() const { return state_; }
 
   // Set control's viewport, only called by Scroll.
   void set_viewport(ScrollImpl* scroll) { viewport_ = scroll; }

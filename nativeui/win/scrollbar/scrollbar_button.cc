@@ -20,15 +20,13 @@ ScrollbarButton::~ScrollbarButton() {
 }
 
 void ScrollbarButton::OnMouseEnter(NativeEvent event) {
-  set_state(ControlState::Hovered);
-  Invalidate();
+  SetState(ControlState::Hovered);
   ViewImpl::OnMouseEnter(event);
 }
 
 void ScrollbarButton::OnMouseLeave(NativeEvent event) {
-  set_state(ControlState::Normal);
+  SetState(ControlState::Normal);
   repeater_.Stop();
-  Invalidate();
   ViewImpl::OnMouseLeave(event);
 }
 
@@ -37,14 +35,13 @@ bool ScrollbarButton::OnMouseClick(NativeEvent event) {
     return true;
 
   if (event->message == WM_LBUTTONDOWN) {
-    set_state(ControlState::Pressed);
+    SetState(ControlState::Pressed);
     OnClick();
     repeater_.Start();
   } else {
-    set_state(ControlState::Hovered);
+    SetState(ControlState::Hovered);
     repeater_.Stop();
   }
-  Invalidate();
   return true;
 }
 

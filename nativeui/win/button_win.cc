@@ -203,19 +203,13 @@ class ButtonImpl : public ViewImpl {
 
   void OnMouseEnter(NativeEvent event) override {
     is_hovering_ = true;
-    if (!is_capturing_) {
-      set_state(ControlState::Hovered);
-      Invalidate();
-    }
+    SetState(ControlState::Hovered);
     ViewImpl::OnMouseEnter(event);
   }
 
   void OnMouseLeave(NativeEvent event) override {
     is_hovering_ = false;
-    if (!is_capturing_) {
-      set_state(ControlState::Normal);
-      Invalidate();
-    }
+    SetState(ControlState::Normal);
     ViewImpl::OnMouseLeave(event);
   }
 
@@ -226,15 +220,10 @@ class ButtonImpl : public ViewImpl {
     if (event->message == WM_LBUTTONDOWN) {
       is_capturing_ = true;
       window()->SetCapture(this);
-      set_state(ControlState::Pressed);
-      Invalidate();
+      SetState(ControlState::Pressed);
     } else {
-      if (event->message == WM_LBUTTONUP) {
-        if (state() == ControlState::Pressed)
-          OnClick();
-        set_state(ControlState::Hovered);
-        Invalidate();
-      }
+      if (event->message == WM_LBUTTONUP && state() == ControlState::Pressed)
+        OnClick();
       window()->ReleaseCapture();
     }
     return true;
@@ -242,8 +231,7 @@ class ButtonImpl : public ViewImpl {
 
   void OnCaptureLost() override {
     is_capturing_ = false;
-    set_state(is_hovering_ ? ControlState::Hovered : ControlState::Normal);
-    Invalidate();
+    SetState(is_hovering_ ? ControlState::Hovered : ControlState::Normal);
   }
 
   NativeTheme::ButtonExtraParams* params() { return &params_; }

@@ -24,10 +24,8 @@ int ScrollbarThumb::GetSize() const {
 
 void ScrollbarThumb::OnMouseEnter(NativeEvent event) {
   is_hovering_ = true;
-  if (!is_capturing_) {
-    set_state(ControlState::Hovered);
-    Invalidate();
-  }
+  if (!is_capturing_)
+    SetState(ControlState::Hovered);
   ViewImpl::OnMouseEnter(event);
 }
 
@@ -43,10 +41,8 @@ void ScrollbarThumb::OnMouseMove(NativeEvent event) {
 
 void ScrollbarThumb::OnMouseLeave(NativeEvent event) {
   is_hovering_ = false;
-  if (!is_capturing_) {
-    set_state(ControlState::Normal);
-    Invalidate();
-  }
+  if (!is_capturing_)
+    SetState(ControlState::Normal);
   ViewImpl::OnMouseLeave(event);
 }
 
@@ -59,20 +55,17 @@ bool ScrollbarThumb::OnMouseClick(NativeEvent event) {
     pressed_point_ = Point(event->l_param);
     last_value_ = scrollbar_->GetValue();
     window()->SetCapture(this);
-    set_state(ControlState::Pressed);
+    SetState(ControlState::Pressed);
   } else {
     window()->ReleaseCapture();
-    set_state(ControlState::Hovered);
+    SetState(ControlState::Hovered);
   }
-
-  Invalidate();
   return true;
 }
 
 void ScrollbarThumb::OnCaptureLost() {
   is_capturing_ = false;
-  set_state(is_hovering_ ? ControlState::Hovered : ControlState::Normal);
-  Invalidate();
+  SetState(is_hovering_ ? ControlState::Hovered : ControlState::Normal);
 }
 
 void ScrollbarThumb::Draw(PainterWin* painter, const Rect& dirty) {
