@@ -201,9 +201,22 @@ class ButtonImpl : public ViewImpl {
       image_size_ = SizeF();
   }
 
+  void OnMouseMove(NativeEvent event) override {
+    if (!is_capturing_)
+      return ViewImpl::OnMouseMove(event);
+
+    bool mouse_in_view = size_allocation().Contains(Point(event->l_param));
+    if (is_hovering_ && !mouse_in_view)
+      OnMouseLeave(event);
+    else if (!is_hovering_ && mouse_in_view)
+      OnMouseEnter(event);
+    else
+      ViewImpl::OnMouseMove(event);
+  }
+
   void OnMouseEnter(NativeEvent event) override {
     is_hovering_ = true;
-    SetState(ControlState::Hovered);
+    SetState(is_capturing_ ? ControlState::Pressed : ControlState::Hovered);
     ViewImpl::OnMouseEnter(event);
   }
 
