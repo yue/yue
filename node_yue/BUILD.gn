@@ -13,20 +13,15 @@ loadable_module("node_yue") {
     "binding_gui.cc",
     "binding_signal.cc",
     "binding_signal.h",
+    "node_integration.cc",
+    "node_integration.h",
+    "node_integration_linux.cc",
+    "node_integration_linux.h",
+    "node_integration_mac.cc",
+    "node_integration_mac.h",
+    "node_integration_win.cc",
+    "node_integration_win.h",
   ]
-
-  if (node_runtime != "electron") {
-    sources += [
-      "node_integration.cc",
-      "node_integration.h",
-      "node_integration_linux.cc",
-      "node_integration_linux.h",
-      "node_integration_mac.cc",
-      "node_integration_mac.h",
-      "node_integration_win.cc",
-      "node_integration_win.h",
-    ]
-  }
 
   deps = [
     "//base",

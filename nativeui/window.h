@@ -6,6 +6,7 @@
 #define NATIVEUI_WINDOW_H_
 
 #include <functional>
+#include <string>
 #include <tuple>
 
 #include "nativeui/container.h"

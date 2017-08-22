@@ -149,7 +149,6 @@ struct Type<nu::Accelerator> {
   }
 };
 
-#ifndef ELECTRON_BUILD
 template<>
 struct Type<nu::Lifetime> {
   static constexpr const char* name = "yue.Lifetime";
@@ -166,7 +165,6 @@ struct Type<nu::Lifetime> {
                 "onReady", &nu::Lifetime::on_ready);
   }
 };
-#endif
 
 template<>
 struct Type<nu::App::ThemeColor> {
@@ -1413,28 +1411,42 @@ struct Type<nu::Vibrant> {
 
 namespace node_yue {
 
+bool IsElectron(v8::Local<v8::Context> context) {
+  v8::Local<v8::Object> process;
+  if (!vb::Get(context, context->Global(), "process", &process) ||
+      !process->IsObject())
+    return false;
+  v8::Local<v8::Object> versions;
+  if (!vb::Get(context, process, "versions", &versions) ||
+      !versions->IsObject())
+    return false;
+  std::string electron;
+  return vb::Get(context, versions, "electron", &electron) && !electron.empty();
+}
+
 void Initialize(v8::Local<v8::Object> exports) {
-#if defined(OS_WIN) && !defined(ELECTRON_BUILD)
-  // Show system dialog on crash.
-  SetErrorMode(GetErrorMode() & ~SEM_NOGPFAULTERRORBOX);
+  v8::Isolate* isolate = v8::Isolate::GetCurrent();
+  v8::Local<v8::Context> context = isolate->GetCurrentContext();
+  bool is_electron = IsElectron(context);
+
+#if defined(OS_WIN)
+  if (!is_electron) {
+    // Show system dialog on crash.
+    SetErrorMode(GetErrorMode() & ~SEM_NOGPFAULTERRORBOX);
+  }
 #endif
   // Initialize the nativeui and leak it.
   new nu::State;
-#if !defined(ELECTRON_BUILD)
-  new nu::Lifetime;
-  // Initialize node integration and leak it.
-  NodeIntegration* node_integration = NodeIntegration::Create();
-  node_integration->PrepareMessageLoop();
-  node_integration->RunMessageLoop();
-#endif
+  if (!is_electron) {
+    new nu::Lifetime;
+    // Initialize node integration and leak it.
+    NodeIntegration* node_integration = NodeIntegration::Create();
+    node_integration->PrepareMessageLoop();
+    node_integration->RunMessageLoop();
+  }
 
-  v8::Isolate* isolate = v8::Isolate::GetCurrent();
-  v8::Local<v8::Context> context = isolate->GetCurrentContext();
   vb::Set(context, exports,
           // Classes.
-#if !defined(ELECTRON_BUILD)
-          "Lifetime",       vb::Constructor<nu::Lifetime>(),
-#endif
           "App",            vb::Constructor<nu::App>(),
           "Font",           vb::Constructor<nu::Font>(),
           "Color",          vb::Constructor<nu::Color>(),
@@ -1462,10 +1474,12 @@ void Initialize(v8::Local<v8::Object> exports) {
           "Vibrant",        vb::Constructor<nu::Vibrant>(),
 #endif
           // Properties.
-#if !defined(ELECTRON_BUILD)
-          "lifetime", nu::Lifetime::GetCurrent(),
-#endif
           "app",      nu::State::GetCurrent()->GetApp());
+  if (!is_electron) {
+    vb::Set(context, exports,
+            "Lifetime", vb::Constructor<nu::Lifetime>(),
+            "lifetime", nu::Lifetime::GetCurrent());
+  }
 }
 
 }  // namespace node_yue
