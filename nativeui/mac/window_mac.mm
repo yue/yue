@@ -119,11 +119,13 @@ void Window::PlatformSetContentView(View* view) {
   if (content_view_) {
     [content_view_->GetNative() removeFromSuperview];
     [content_view_->GetNative() setWantsLayer:NO];
-    [content_view_->GetNative() nuPrivate]->is_content_view = false;
+    if (IsNUView(content_view_->GetNative()))
+      [content_view_->GetNative() nuPrivate]->is_content_view = false;
   }
 
   NSView* content_view = view->GetNative();
-  [content_view nuPrivate]->is_content_view = true;
+  if (IsNUView(content_view))
+    [content_view nuPrivate]->is_content_view = true;
   [window_ setContentView:content_view];
 
   if (!HasFrame()) {

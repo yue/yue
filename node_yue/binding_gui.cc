@@ -8,6 +8,10 @@
 #include "node_yue/binding_signal.h"
 #include "node_yue/node_integration.h"
 
+#if defined(OS_MACOSX)
+#include "node_yue/chrome_view_mac.h"
+#endif
+
 namespace vb {
 
 template<>
@@ -1405,6 +1409,20 @@ struct Type<nu::Vibrant> {
         "getBlendingMode", &nu::Vibrant::GetBlendingMode);
   }
 };
+
+template<>
+struct Type<node_yue::ChromeView> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.ChromeView";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+        "create", &CreateOnHeap<node_yue::ChromeView, v8::Local<v8::Value>>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+  }
+};
 #endif
 
 }  // namespace vb
@@ -1475,7 +1493,12 @@ void Initialize(v8::Local<v8::Object> exports) {
 #endif
           // Properties.
           "app",      nu::State::GetCurrent()->GetApp());
-  if (!is_electron) {
+  if (is_electron) {
+#if defined(OS_MACOSX)
+    vb::Set(context, exports,
+            "ChromeView", vb::Constructor<node_yue::ChromeView>());
+#endif
+  } else {
     vb::Set(context, exports,
             "Lifetime", vb::Constructor<nu::Lifetime>(),
             "lifetime", nu::Lifetime::GetCurrent());

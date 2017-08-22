@@ -13,6 +13,8 @@ loadable_module("node_yue") {
     "binding_gui.cc",
     "binding_signal.cc",
     "binding_signal.h",
+    "chrome_view_mac.mm",
+    "chrome_view_mac.h",
     "node_integration.cc",
     "node_integration.h",
     "node_integration_linux.cc",
