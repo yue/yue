@@ -5,6 +5,8 @@
 #ifndef LUA_PCALL_H_
 #define LUA_PCALL_H_
 
+#include <utility>
+
 #include "lua/stack.h"
 
 namespace lua {
@@ -23,7 +25,7 @@ inline bool PCall(State* state, ReturnType* result, const ArgTypes&... args) {
   if (!Pop(state, result)) {
     if (GetType(state, -1) == LuaType::Nil) {
       // Use the type's default value for nil.
-      *result = ReturnType();
+      *result = std::move(ReturnType());
       return true;
     } else {
       // Otherwise throw error.

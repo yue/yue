@@ -96,9 +96,17 @@ willBeInsertedIntoToolbar:(BOOL)flag {
     item.image = config.image->GetNative();
   if (config.view)
     item.view = config.view->GetNative();
+  if (!config.max_size.IsEmpty())
+    item.maxSize = config.max_size.ToCGSize();
+  if (!config.min_size.IsEmpty())
+    item.minSize = config.min_size.ToCGSize();
+  if (config.view && config.min_size.IsEmpty())
+    item.minSize = config.view->GetMinimumSize().ToCGSize();
   // Save to map.
-  items_[ident] = std::make_pair(config,
-                                 base::scoped_nsobject<NSToolbarItem>(item));
+  items_.emplace(ident,
+                 std::make_pair(
+                     std::move(config),
+                     base::scoped_nsobject<NSToolbarItem>(item)));
   return item;
 }
 
@@ -129,7 +137,6 @@ namespace nu {
 Toolbar::Toolbar(const std::string& identifier)
     : toolbar_([[NSToolbar alloc]
                    initWithIdentifier:base::SysUTF8ToNSString(identifier)]) {
-  toolbar_.allowsUserCustomization = YES;
   toolbar_.delegate = [[NUToolbarDelegate alloc] initWithShell:this];
 }
 
@@ -148,6 +155,22 @@ void Toolbar::SetAllowedItemIdentifiers(
     const std::vector<std::string>& identifiers) {
   auto* delegate = static_cast<NUToolbarDelegate*>(toolbar_.delegate);
   [delegate setAllowedItemIdentifiers:identifiers];
+}
+
+void Toolbar::SetAllowCustomization(bool allow) {
+  toolbar_.allowsUserCustomization = allow;
+}
+
+void Toolbar::SetDisplayMode(DisplayMode mode) {
+  toolbar_.displayMode = static_cast<NSToolbarDisplayMode>(mode);
+}
+
+void Toolbar::SetVisible(bool visible) {
+  toolbar_.visible = visible;
+}
+
+bool Toolbar::IsVisible() const {
+  return toolbar_.visible;
 }
 
 std::string Toolbar::GetIdentifier() const {

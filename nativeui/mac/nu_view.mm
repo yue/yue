@@ -19,6 +19,8 @@ namespace {
 bool IsFramelessWindow(NSView* view) {
   if (![view window])
     return false;
+  if (![[view window] respondsToSelector:@selector(shell)])
+    return false;
   return ![static_cast<NUWindow*>([view window]) shell]->HasFrame();
 }
 

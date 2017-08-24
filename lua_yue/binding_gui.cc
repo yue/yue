@@ -808,9 +808,37 @@ struct Type<nu::Toolbar::Item> {
     if (RawGetAndPop(state, index, "view", &view))
       out->view = view;
     RawGetAndPop(state, index, "label", &out->label);
+    RawGetAndPop(state, index, "minsize", &out->min_size);
+    RawGetAndPop(state, index, "maxsize", &out->max_size);
     RawGetAndPop(state, index, "subitems", &out->subitems);
     RawGetAndPop(state, index, "onclick", &out->on_click);
     return true;
+  }
+};
+
+template<>
+struct Type<nu::Toolbar::DisplayMode> {
+  static constexpr const char* name = "yue.Toolbar.DisplayMode";
+  static inline bool To(State* state, int index,
+                        nu::Toolbar::DisplayMode* out) {
+    std::string mode;
+    if (!lua::To(state, index, &mode))
+      return false;
+    if (mode == "default") {
+      *out = nu::Toolbar::DisplayMode::Default;
+      return true;
+    } else if (mode == "icon-and-label") {
+      *out = nu::Toolbar::DisplayMode::IconAndLabel;
+      return true;
+    } else if (mode == "icon") {
+      *out = nu::Toolbar::DisplayMode::Icon;
+      return true;
+    } else if (mode == "label") {
+      *out = nu::Toolbar::DisplayMode::Label;
+      return true;
+    } else {
+      return false;
+    }
   }
 };
 
@@ -822,6 +850,10 @@ struct Type<nu::Toolbar> {
            "create", &CreateOnHeap<nu::Toolbar, const std::string&>,
            "setdefaultitemidentifiers", &nu::Toolbar::SetDefaultItemIdentifiers,
            "setalloweditemidentifiers", &nu::Toolbar::SetAllowedItemIdentifiers,
+           "setallowcustomization", &nu::Toolbar::SetAllowCustomization,
+           "setdisplaymode", &nu::Toolbar::SetDisplayMode,
+           "setvisible", &nu::Toolbar::SetVisible,
+           "isvisible", &nu::Toolbar::IsVisible,
            "getidentifier", &nu::Toolbar::GetIdentifier);
     RawSetProperty(state, metatable,
                    "getItem", &nu::Toolbar::get_item);

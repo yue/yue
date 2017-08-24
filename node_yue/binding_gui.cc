@@ -870,9 +870,38 @@ struct Type<nu::Toolbar::Item> {
     if (Get(context, obj, "view", &view))
       out->view = view;
     Get(context, obj, "label", &out->label);
+    Get(context, obj, "minSize", &out->min_size);
+    Get(context, obj, "maxSize", &out->max_size);
     Get(context, obj, "subitems", &out->subitems);
     Get(context, obj, "onClick", &out->on_click);
     return true;
+  }
+};
+
+template<>
+struct Type<nu::Toolbar::DisplayMode> {
+  static constexpr const char* name = "yue.Toolbar.DisplayMode";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::Toolbar::DisplayMode* out) {
+    std::string mode;
+    if (!vb::FromV8(context, value, &mode))
+      return false;
+    if (mode == "default") {
+      *out = nu::Toolbar::DisplayMode::Default;
+      return true;
+    } else if (mode == "icon-and-label") {
+      *out = nu::Toolbar::DisplayMode::IconAndLabel;
+      return true;
+    } else if (mode == "icon") {
+      *out = nu::Toolbar::DisplayMode::Icon;
+      return true;
+    } else if (mode == "label") {
+      *out = nu::Toolbar::DisplayMode::Label;
+      return true;
+    } else {
+      return false;
+    }
   }
 };
 
@@ -887,9 +916,13 @@ struct Type<nu::Toolbar> {
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
-        "getIdentifier", &nu::Toolbar::GetIdentifier,
         "setDefaultItemIdentifiers", &nu::Toolbar::SetDefaultItemIdentifiers,
-        "setAllowedItemIdentifiers", &nu::Toolbar::SetAllowedItemIdentifiers);
+        "setAllowedItemIdentifiers", &nu::Toolbar::SetAllowedItemIdentifiers,
+        "setAllowCustomization", &nu::Toolbar::SetAllowCustomization,
+        "setDisplayMode", &nu::Toolbar::SetDisplayMode,
+        "setVisible", &nu::Toolbar::SetVisible,
+        "isVisible", &nu::Toolbar::IsVisible,
+        "getIdentifier", &nu::Toolbar::GetIdentifier);
     SetProperty(context, templ,
                 "getItem", &nu::Toolbar::get_item);
   }

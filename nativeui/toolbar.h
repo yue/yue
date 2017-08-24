@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "base/memory/ref_counted.h"
-#include "nativeui/nativeui_export.h"
+#include "nativeui/gfx/geometry/size_f.h"
 #include "nativeui/types.h"
 
 namespace nu {
@@ -23,18 +23,33 @@ class NATIVEUI_EXPORT Toolbar : public base::RefCounted<Toolbar> {
 
   struct Item {
     Item();
-    Item(const Item& item);
+    Item(Item&&);
     ~Item();
 
+    Item& operator=(Item&&);
+
     std::string label;
+    SizeF min_size;
+    SizeF max_size;
     scoped_refptr<Image> image;
     scoped_refptr<View> view;
     std::function<void(Toolbar*, const std::string&)> on_click;
     std::vector<std::string> subitems;
   };
 
+  enum class DisplayMode {
+    Default,
+    IconAndLabel,
+    Icon,
+    Label,
+  };
+
   void SetDefaultItemIdentifiers(const std::vector<std::string>& identifiers);
   void SetAllowedItemIdentifiers(const std::vector<std::string>& identifiers);
+  void SetAllowCustomization(bool allow);
+  void SetDisplayMode(DisplayMode mode);
+  void SetVisible(bool visible);
+  bool IsVisible() const;
   std::string GetIdentifier() const;
 
   NativeToolbar GetNative() const { return toolbar_; }

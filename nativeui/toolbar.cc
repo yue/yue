@@ -9,18 +9,9 @@
 
 namespace nu {
 
-Toolbar::Item::Item() {
-}
-
-Toolbar::Item::Item(const Item& item)
-    : label(item.label),
-      image(item.image),
-      view(item.view),
-      on_click(item.on_click),
-      subitems(item.subitems) {
-}
-
-Toolbar::Item::~Item() {
-}
+Toolbar::Item::Item() = default;
+Toolbar::Item::Item(Item&&) = default;
+Toolbar::Item::~Item() = default;
+Toolbar::Item& Toolbar::Item::operator=(Item&&) = default;
 
 }  // namespace nu
