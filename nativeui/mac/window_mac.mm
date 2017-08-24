@@ -335,4 +335,28 @@ void Window::SetToolbar(Toolbar* toolbar) {
   [window_ setToolbar:toolbar->GetNative()];
 }
 
+void Window::SetTitleVisible(bool visible) {
+  if (@available(macOS 10.10, *)) {
+    window_.titleVisibility = visible ? NSWindowTitleVisible
+                                      : NSWindowTitleHidden;
+  }
+}
+
+bool Window::IsTitleVisible() const {
+  if (@available(macOS 10.10, *))
+    return window_.titleVisibility == NSWindowTitleVisible;
+  else
+    return false;
+}
+
+void Window::SetFullSizeContentView(bool full) {
+  [static_cast<NUWindow*>(window_)
+      setWindowStyle:NSFullSizeContentViewWindowMask
+                  on:full];
+}
+
+bool Window::IsFullSizeContentView() const {
+  return [window_ styleMask] & NSFullSizeContentViewWindowMask;
+}
+
 }  // namespace nu

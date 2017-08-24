@@ -7,6 +7,8 @@
 #include "base/mac/sdk_forward_declarations.h"
 #include "nativeui/mac/container_mac.h"
 
+#pragma clang diagnostic ignored "-Wunguarded-availability"
+
 @interface NUVibrant : NSVisualEffectView<NUView> {
  @private
   nu::NUPrivate private_;

@@ -101,6 +101,10 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
 #if defined(OS_MACOSX)
   void SetToolbar(Toolbar* toolbar);
   Toolbar* GetToolbar() const { return toolbar_.get(); }
+  void SetTitleVisible(bool visible);
+  bool IsTitleVisible() const;
+  void SetFullSizeContentView(bool full);
+  bool IsFullSizeContentView() const;
 #endif
 
 #if defined(OS_WIN) || defined(OS_LINUX)

@@ -998,6 +998,10 @@ struct Type<nu::Window> {
 #if defined(OS_MACOSX)
         "setToolbar", &nu::Window::SetToolbar,
         "getToolbar", &nu::Window::GetToolbar,
+        "setTitleVisible", &nu::Window::SetTitleVisible,
+        "isTitleVisible", &nu::Window::IsTitleVisible,
+        "setFullSizeContentView", &nu::Window::SetFullSizeContentView,
+        "isFullSizeContentView", &nu::Window::IsFullSizeContentView,
 #endif
 #if defined(OS_WIN) || defined(OS_LINUX)
         "setMenuBar", &nu::Window::SetMenuBar,
