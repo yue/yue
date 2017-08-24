@@ -853,6 +853,49 @@ void ReadMenuItems(v8::Local<v8::Context> context,
   }
 }
 
+#if defined(OS_MACOSX)
+template<>
+struct Type<nu::Toolbar::Item> {
+  static constexpr const char* name = "yue.Toolbar.Item";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::Toolbar::Item* out) {
+    if (!value->IsObject())
+      return false;
+    v8::Local<v8::Object> obj = value.As<v8::Object>();
+    nu::Image* image;
+    if (Get(context, obj, "image", &image))
+      out->image = image;
+    nu::View* view;
+    if (Get(context, obj, "view", &view))
+      out->view = view;
+    Get(context, obj, "label", &out->label);
+    Get(context, obj, "subitems", &out->subitems);
+    Get(context, obj, "onClick", &out->on_click);
+    return true;
+  }
+};
+
+template<>
+struct Type<nu::Toolbar> {
+  static constexpr const char* name = "yue.Toolbar";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+        "create", &CreateOnHeap<nu::Toolbar, const std::string&>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "getIdentifier", &nu::Toolbar::GetIdentifier,
+        "setDefaultItemIdentifiers", &nu::Toolbar::SetDefaultItemIdentifiers,
+        "setAllowedItemIdentifiers", &nu::Toolbar::SetAllowedItemIdentifiers);
+    SetProperty(context, templ,
+                "getItem", &nu::Toolbar::get_item);
+  }
+};
+#endif
+
 template<>
 struct Type<nu::Window::Options> {
   static constexpr const char* name = "yue.Window.Options";
@@ -919,6 +962,10 @@ struct Type<nu::Window> {
         "isMinimizable", &nu::Window::IsMinimizable,
         "setMovable", &nu::Window::SetMovable,
         "isMovable", &nu::Window::IsMovable,
+#if defined(OS_MACOSX)
+        "setToolbar", &nu::Window::SetToolbar,
+        "getToolbar", &nu::Window::GetToolbar,
+#endif
 #if defined(OS_WIN) || defined(OS_LINUX)
         "setMenuBar", &nu::Window::SetMenuBar,
         "getMenuBar", &nu::Window::GetMenuBar,
@@ -1488,6 +1535,7 @@ void Initialize(v8::Local<v8::Object> exports) {
           "Group",          vb::Constructor<nu::Group>(),
           "Scroll",         vb::Constructor<nu::Scroll>(),
           "TextEdit",       vb::Constructor<nu::TextEdit>(),
+          "Toolbar",        vb::Constructor<nu::Toolbar>(),
 #if defined(OS_MACOSX)
           "Vibrant",        vb::Constructor<nu::Vibrant>(),
 #endif

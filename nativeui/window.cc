@@ -8,6 +8,10 @@
 #include "nativeui/menu_bar.h"
 #include "third_party/yoga/yoga/Yoga.h"
 
+#if defined(OS_MACOSX)
+#include "nativeui/toolbar.h"
+#endif
+
 namespace nu {
 
 Window::Window(const Options& options)
@@ -56,10 +60,6 @@ void Window::SetMenuBar(MenuBar* menu_bar) {
   PlatformSetMenuBar(menu_bar);
   menu_bar_ = menu_bar;
   menu_bar_->SetWindow(this);
-}
-
-MenuBar* Window::GetMenuBar() const {
-  return menu_bar_.get();
 }
 #endif
 

@@ -14,6 +14,10 @@
 #include "nativeui/mac/nu_window.h"
 #include "third_party/yoga/yoga/Yoga.h"
 
+#if defined(OS_MACOSX)
+#include "nativeui/toolbar.h"
+#endif
+
 @interface NUWindowDelegate : NSObject<NSWindowDelegate> {
  @private
   nu::Window* shell_;
@@ -324,6 +328,11 @@ std::string Window::GetTitle() const {
 
 void Window::SetBackgroundColor(Color color) {
   [window_ setBackgroundColor:color.ToNSColor()];
+}
+
+void Window::SetToolbar(Toolbar* toolbar) {
+  toolbar_ = toolbar;
+  [window_ setToolbar:toolbar->GetNative()];
 }
 
 }  // namespace nu

@@ -41,6 +41,7 @@ typedef struct CGContext* CGContextRef;
 @class NSMenu;
 @class NSMenuItem;
 @class NSSavePanel;
+@class NSToolbar;
 @class NSView;
 @class NSWindow;
 #else
@@ -52,6 +53,7 @@ class NSImage;
 class NSMenu;
 class NSMenuItem;
 class NSSavePanel;
+class NSToolbar;
 struct NSView;
 class NSWindow;
 #endif  // __OBJC__
@@ -97,6 +99,7 @@ using nativeGraphicsContext = NSGraphicsContext*;
 using NativeFont = NSFont*;
 using NativeMenu = NSMenu*;
 using NativeMenuItem = NSMenuItem*;
+using NativeToolbar = NSToolbar*;
 #elif defined(OS_LINUX)
 using NativeEvent = GdkEvent*;
 using NativeFileDialog = GtkFileChooser*;

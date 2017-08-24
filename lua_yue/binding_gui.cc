@@ -794,6 +794,41 @@ void ReadMenuItems(State* state, int options, nu::MenuBase* menu) {
   }
 }
 
+#if defined(OS_MACOSX)
+template<>
+struct Type<nu::Toolbar::Item> {
+  static constexpr const char* name = "yue.Toolbar::Item";
+  static inline bool To(State* state, int index, nu::Toolbar::Item* out) {
+    if (GetType(state, index) != LuaType::Table)
+      return false;
+    nu::Image* image;
+    if (RawGetAndPop(state, index, "image", &image))
+      out->image = image;
+    nu::View* view;
+    if (RawGetAndPop(state, index, "view", &view))
+      out->view = view;
+    RawGetAndPop(state, index, "label", &out->label);
+    RawGetAndPop(state, index, "subitems", &out->subitems);
+    RawGetAndPop(state, index, "onclick", &out->on_click);
+    return true;
+  }
+};
+
+template<>
+struct Type<nu::Toolbar> {
+  static constexpr const char* name = "yue.Toolbar";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateOnHeap<nu::Toolbar, const std::string&>,
+           "setdefaultitemidentifiers", &nu::Toolbar::SetDefaultItemIdentifiers,
+           "setalloweditemidentifiers", &nu::Toolbar::SetAllowedItemIdentifiers,
+           "getidentifier", &nu::Toolbar::GetIdentifier);
+    RawSetProperty(state, metatable,
+                   "getItem", &nu::Toolbar::get_item);
+  }
+};
+#endif
+
 template<>
 struct Type<nu::Window::Options> {
   static constexpr const char* name = "yue.Window.Options";
@@ -853,6 +888,10 @@ struct Type<nu::Window> {
            "isminimizable", &nu::Window::IsMinimizable,
            "setmovable", &nu::Window::SetMovable,
            "ismovable", &nu::Window::IsMovable,
+#if defined(OS_MACOSX)
+           "settoolbar", &nu::Window::SetToolbar,
+           "gettoolbar", &nu::Window::GetToolbar,
+#endif
 #if defined(OS_WIN) || defined(OS_LINUX)
            "setmenubar", &nu::Window::SetMenuBar,
            "getmenubar", &nu::Window::GetMenuBar,
@@ -1327,6 +1366,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::Group>(state, "Group");
   BindType<nu::Scroll>(state, "Scroll");
   BindType<nu::TextEdit>(state, "TextEdit");
+  BindType<nu::Toolbar>(state, "Toolbar");
 #if defined(OS_MACOSX)
   BindType<nu::Vibrant>(state, "Vibrant");
 #endif

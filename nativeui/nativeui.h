@@ -32,6 +32,7 @@
 #include "nativeui/window.h"
 
 #if defined(OS_MACOSX)
+#include "nativeui/toolbar.h"
 #include "nativeui/vibrant.h"
 #endif
 

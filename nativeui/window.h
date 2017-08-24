@@ -27,6 +27,10 @@ namespace nu {
 
 class MenuBar;
 
+#if defined(OS_MACOSX)
+class Toolbar;
+#endif
+
 // The native window.
 class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
  public:
@@ -94,9 +98,14 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
   std::string GetTitle() const;
   void SetBackgroundColor(Color color);
 
+#if defined(OS_MACOSX)
+  void SetToolbar(Toolbar* toolbar);
+  Toolbar* GetToolbar() const { return toolbar_.get(); }
+#endif
+
 #if defined(OS_WIN) || defined(OS_LINUX)
   void SetMenuBar(MenuBar* menu_bar);
-  MenuBar* GetMenuBar() const;
+  MenuBar* GetMenuBar() const { return menu_bar_.get(); }
 #endif
 
   // Get the native window object.
@@ -136,6 +145,10 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
 
   // The yoga config for window's children.
   YGConfigRef yoga_config_;
+
+#if defined(OS_MACOSX)
+  scoped_refptr<Toolbar> toolbar_;
+#endif
 
 #if defined(OS_WIN) || defined(OS_LINUX)
   scoped_refptr<MenuBar> menu_bar_;
