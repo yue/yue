@@ -42,13 +42,13 @@
 - (void)setDefaultItemIdentifiers:(const std::vector<std::string>&)identifiers {
   default_identifiers_.reset([NSMutableArray arrayWithCapacity:identifiers.size()]);
   for (const auto& ident : identifiers)
-    [default_identifiers_ addObject:base::SysUTF8ToNSString(ident)];
+    [default_identifiers_ addObject:[self translateIdentifier:ident]];
 }
 
 - (void)setAllowedItemIdentifiers:(const std::vector<std::string>&)identifiers {
   allowed_identifiers_.reset([NSMutableArray arrayWithCapacity:identifiers.size()]);
   for (const auto& ident : identifiers)
-    [allowed_identifiers_ addObject:base::SysUTF8ToNSString(ident)];
+    [allowed_identifiers_ addObject:[self translateIdentifier:ident]];
 }
 
 - (NSToolbarItem*)toolbar:(NSToolbar*)toolbar
@@ -129,6 +129,15 @@ willBeInsertedIntoToolbar:(BOOL)flag {
   // Emit.
   if (it->second.first.on_click)
     it->second.first.on_click(shell_, ident);
+}
+
+- (NSString*)translateIdentifier:(const std::string&)identifier {
+  if (identifier == nu::Toolbar::kFlexibleSpaceItemIdentifier)
+    return NSToolbarFlexibleSpaceItemIdentifier;
+  else if (identifier == nu::Toolbar::kSpaceItemIdentifier)
+    return NSToolbarSpaceItemIdentifier;
+  else
+    return base::SysUTF8ToNSString(identifier);
 }
 
 @end

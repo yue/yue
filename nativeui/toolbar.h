@@ -19,7 +19,9 @@ class View;
 
 class NATIVEUI_EXPORT Toolbar : public base::RefCounted<Toolbar> {
  public:
-  explicit Toolbar(const std::string& identifier);
+  // Standard toolbar item identifiers.
+  static const char kFlexibleSpaceItemIdentifier[];
+  static const char kSpaceItemIdentifier[];
 
   struct Item {
     Item();
@@ -43,6 +45,8 @@ class NATIVEUI_EXPORT Toolbar : public base::RefCounted<Toolbar> {
     Icon,
     Label,
   };
+
+  explicit Toolbar(const std::string& identifier);
 
   void SetDefaultItemIdentifiers(const std::vector<std::string>& identifiers);
   void SetAllowedItemIdentifiers(const std::vector<std::string>& identifiers);

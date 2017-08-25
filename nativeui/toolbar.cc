@@ -9,6 +9,10 @@
 
 namespace nu {
 
+// static
+const char Toolbar::kFlexibleSpaceItemIdentifier[] = "FlexibleSpaceItem";
+const char Toolbar::kSpaceItemIdentifier[] = "SpaceItem";
+
 Toolbar::Item::Item() = default;
 Toolbar::Item::Item(Item&&) = default;
 Toolbar::Item::~Item() = default;
