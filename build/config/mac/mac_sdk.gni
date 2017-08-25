@@ -3,19 +3,13 @@
 # found in the LICENSE file.
 
 import("//build/config/chrome_build.gni")
+import("//build/config/mac/mac_sdk_overrides.gni")
 import("//build/toolchain/toolchain.gni")
 
-# See https://bugs.chromium.org/p/webrtc/issues/detail?id=5453.
-# We can drop the rtc_require_mac_10_7_deployment flag when Chromium
-# also requires a 10.7 deployment target.
-import("//build_overrides/build.gni")
-
 declare_args() {
-  # Minimum supported version of the Mac SDK.
-  mac_sdk_min = mac_sdk_min_build_override
-
-  # Minimum supported version of OSX.
-  mac_deployment_target = "10.9"
+  # Minimum supported version of macOS. Must be of the form x.x.x for
+  # Info.plist files.
+  mac_deployment_target = "10.9.0"
 
   # Path to a specific version of the Mac SDK, not including a slash at the end.
   # If empty, the path to the lowest version greater than or equal to
@@ -79,7 +73,7 @@ xcode_version = _mac_sdk_result.xcode_version
 xcode_build = _mac_sdk_result.xcode_build
 machine_os_build = _mac_sdk_result.machine_os_build
 
-if (mac_sdk_version != mac_sdk_min_build_override &&
+if (mac_sdk_version != mac_sdk_min &&
     exec_script("//build/check_return_value.py",
                 [
                   "test",
@@ -95,7 +89,7 @@ if (mac_sdk_version != mac_sdk_min_build_override &&
   print(
       "          either upgrade Xcode to the latest version or install the Mac OS X")
   print(
-      "          $mac_sdk_min_build_override SDK. For more information, see https://crbug.com/620127.")
+      "          $mac_sdk_min SDK. For more information, see https://crbug.com/620127.")
   print()
   print(" Current SDK Version:   $mac_sdk_version")
   print(" Current Xcode Version: $xcode_version ($xcode_build)")
