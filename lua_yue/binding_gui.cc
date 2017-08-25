@@ -1402,8 +1402,8 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::Group>(state, "Group");
   BindType<nu::Scroll>(state, "Scroll");
   BindType<nu::TextEdit>(state, "TextEdit");
-  BindType<nu::Toolbar>(state, "Toolbar");
 #if defined(OS_MACOSX)
+  BindType<nu::Toolbar>(state, "Toolbar");
   BindType<nu::Vibrant>(state, "Vibrant");
 #endif
   // Properties.

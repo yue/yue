@@ -1572,8 +1572,8 @@ void Initialize(v8::Local<v8::Object> exports) {
           "Group",          vb::Constructor<nu::Group>(),
           "Scroll",         vb::Constructor<nu::Scroll>(),
           "TextEdit",       vb::Constructor<nu::TextEdit>(),
-          "Toolbar",        vb::Constructor<nu::Toolbar>(),
 #if defined(OS_MACOSX)
+          "Toolbar",        vb::Constructor<nu::Toolbar>(),
           "Vibrant",        vb::Constructor<nu::Vibrant>(),
 #endif
           // Properties.

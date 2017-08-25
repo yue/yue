@@ -57,7 +57,6 @@ component("nativeui") {
     "state.h",
     "text_edit.cc",
     "text_edit.h",
-    "toolbar.cc",
     "toolbar.h",
     "types.h",
     "view.cc",
