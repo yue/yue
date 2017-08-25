@@ -1,0 +1,24 @@
+name: Toolbar::Item
+header: nativeui/toolbar.h
+type: struct
+namespace: nu
+description: Represent an item of `Toolbar`.
+
+properties:
+  - property: std::string label
+    description: Item's label.
+
+  - property: SizeF min_size
+    description: Item's minimum size.
+
+  - property: SizeF max_size
+    description: Item's maximum size.
+
+  - property: scoped_refptr<Image> image
+    description: Item's image.
+
+  - property: scoped_refptr<View> view
+    description: Item's custom view.
+
+  - property: std::function<void(Toolbar*, const std::string&)> on_click
+    description: Function called when item is clicked.

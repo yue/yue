@@ -56,11 +56,6 @@ methods:
         [FileDialog::Option](filedialog_option.html).
 
   - signature: void SetFilters(const std::vector<FileDialog::Filter>& filters)
-    lang: ['cpp']
-    description: Set the file types that the dialog can open or save.
-
-  - signature: void SetFilters(Array filters)
-    lang: ['lua', 'js']
     description: Set the file types that the dialog can open or save.
     parameters:
       filters:

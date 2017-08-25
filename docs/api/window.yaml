@@ -164,13 +164,41 @@ methods:
   - signature: void SetBackgroundColor(Color color)
     description: Set the background color of the window.
 
+  - signature: void SetToolbar(Toolbar* toolbar)
+    platform: ['macOS']
+    description: Set the window toolbar.
+
+  - signature: Toolbar* GetToolbar() const
+    platform: ['macOS']
+    description: Return the window toolbar.
+
+  - signature: void SetTitleVisible(bool visible)
+    platform: ['macOS']
+    description: |
+      Set whether the title is visible, when title was hidden the toolber would
+      be moved into the area previously occupied by the title.
+
+  - signature: bool IsTitleVisible() const;
+    platform: ['macOS']
+    description: Return whether title is visible.
+
+  - signature: void SetFullSizeContentView(bool full)
+    platform: ['macOS']
+    description: |
+      Set the `NSFullSizeContentViewWindowMask` style on the window.
+
+  - signature: bool IsFullSizeContentView() const
+    platform: ['macOS']
+    description: |
+      Return whether the window has `NSFullSizeContentViewWindowMask` style.
+
   - signature: void SetMenuBar(MenuBar* menubar)
     platform: ['Windows', 'Linux']
     description: Set the window menu bar.
 
   - signature: MenuBar* GetMenuBar() const
     platform: ['Windows', 'Linux']
-    description: Return the  window menu bar.
+    description: Return the window menu bar.
 
   - signature: NativeWindow GetNative() const
     lang: ['cpp']

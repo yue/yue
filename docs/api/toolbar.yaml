@@ -1,0 +1,76 @@
+name: Toolbar
+platform: ['macOS']
+component: gui
+header: nativeui/toolbar.h
+type: refcounted
+namespace: nu
+description: Window toolbar.
+
+detail: |
+  This view is only implemented for macOS by wrapping
+  [`NSToolbar`](https://developer.apple.com/documentation/appkit/nstoolbar).
+
+constructors:
+  - signature: Toolbar(const std::string& identifier)
+    lang: ['cpp']
+    description: &ref |
+      Create a new `Toolbar` view with `identifier`.
+
+      Within the application all toolbars with the same identifier are
+      synchronized to maintain the same state, including for example, the
+      display mode and item order. The identifier is used as the autosave name
+      for toolbars that save their configuration.
+
+class_methods:
+  - signature: Toolbar* Create(const std::string& identifier)
+    lang: ['lua', 'js']
+    description: *ref
+
+class_properties:
+  - property: const char* kFlexibleSpaceItemIdentifier
+    lang: ['cpp']
+    description: The identifier of the Flexible Space toolbar item.
+
+  - property: const char* kSpaceItemIdentifier
+    lang: ['cpp']
+    description: The identifier of the Space toolbar item.
+
+methods:
+  - signature: void SetDefaultItemIdentifiers(const std::vector<std::string>& identifiers)
+    description: |
+      Set the identifiers of default items that would show in toolbar.
+    parameters: &refidents
+      identifiers:
+        description: An array of toolbar items' identifiers.
+
+  - signature: void SetAllowedItemIdentifiers(const std::vector<std::string>& identifiers)
+    description: |
+      Set the identifiers of the items that are allowed to show in toolbar.
+    parameters: *refidents
+
+  - signature: void SetAllowCustomization(bool allow)
+    description: |
+      Set whether users are allowed to customize the toolbar.
+
+  - signature: void SetDisplayMode(Toolbar::DisplayMode mode)
+    description: Set the display mode of the toolbar items.
+
+  - signature: void SetVisible(bool visible)
+    description: Set whether toolbar is visible.
+
+  - signature: bool IsVisible() const
+    description: Return whether toolbar is visible.
+
+  - signature: std::string GetIdentifier() const
+    description: Return the identifier of the toolbar.
+
+  - signature: NativeToolbar GetNative() const
+    lang: ['cpp']
+    description: Return the underlying native view of the toolbar.
+
+delegates:
+  - signature: Toolbar::Item get_item(Toolbar* toolbar, const std::string& identifier)
+    description: |
+      Called lazily when the toolbar is going to get the item with `identifier`.
+
+      You should not cache the item to be returned.

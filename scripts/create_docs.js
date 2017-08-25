@@ -359,6 +359,7 @@ function parseType(lang, str) {
       case 'Array': type.name = 'table'; break
       case 'Function': type.name = 'function'; break
       case 'std::function': type.name = 'function'; break
+      case 'std::vector': type.name = 'table'; break
       case 'base::FilePath': type.name = 'string'; break
       default: builtin = false
     }
@@ -375,6 +376,7 @@ function parseType(lang, str) {
       case 'Array': type.name = 'Array'; break
       case 'Function': type.name = 'Function'; break
       case 'std::function': type.name = 'Function'; break
+      case 'std::vector': type.name = 'Array'; break
       case 'base::FilePath': type.name = 'String'; break
       default: builtin = false
     }
