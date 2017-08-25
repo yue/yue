@@ -37,25 +37,47 @@ if (fs.existsSync(node_dir)) {
 
 const suffix = runtime == 'electron' ? '' : '-headers'
 const url = `${prefix[runtime]}/${version}/node-${version}${suffix}.tar.gz`
-https.get(url, (response) => {
+download(url, (response) => {
   response.pipe(zlib.createGunzip())
           .pipe(cp.exec('tar xf -', {cwd: 'third_party'}).stdin)
 
   // Download node.lib on Windows.
   if (process.platform == 'win32') {
-    response.once('end', () => {
-      downloadNodeLib('x64')
-      downloadNodeLib('x86')
+    response.on('end', () => {
+      downloadNodeLib('x64', () => {
+        downloadNodeLib('x86', () => process.exit(0))
+      })
     })
   }
 })
 
-function downloadNodeLib(arch) {
+function download(url, callback) {
+  https.get(url, (response) => {
+    process.stdout.write(`Downloading ${url} `)
+    let length = 0
+    response.on('end', () => {
+              if (length > 0)
+                process.stdout.write('.')
+              console.log(' Done')
+            })
+            .on('data', (chunk) => {
+              length += chunk.length
+              while (length >= 1024 * 1024) {
+                process.stdout.write('.')
+                length %= 1024 * 1024
+              }
+            })
+    callback(response)
+  })
+}
+
+function downloadNodeLib(arch, callback) {
   const name = runtime == 'electron' ? 'iojs' : 'node'
   const lib = `${prefix[runtime]}/${version}/win-${arch}/${name}.lib`
-  return https.get(lib, (response) => {
+  download(lib, (response) => {
     const lib_dir = path.join(node_dir, arch)
     fs.mkdirSync(lib_dir)
-    response.pipe(fs.createWriteStream(path.join(lib_dir, 'node.lib')))
+    response.on('end', callback)
+            .pipe(fs.createWriteStream(path.join(lib_dir, 'node.lib')))
   })
 }
