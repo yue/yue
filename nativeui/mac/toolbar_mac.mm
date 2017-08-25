@@ -94,14 +94,15 @@ willBeInsertedIntoToolbar:(BOOL)flag {
   item.label = base::SysUTF8ToNSString(config.label);
   if (config.image)
     item.image = config.image->GetNative();
-  if (config.view)
-    item.view = config.view->GetNative();
   if (!config.max_size.IsEmpty())
     item.maxSize = config.max_size.ToCGSize();
   if (!config.min_size.IsEmpty())
     item.minSize = config.min_size.ToCGSize();
-  if (config.view && config.min_size.IsEmpty())
-    item.minSize = config.view->GetMinimumSize().ToCGSize();
+  if (config.view) {
+    item.view = config.view->GetNative();
+    // Align the items.
+    item.view.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+  }
   // Save to map.
   items_.emplace(ident,
                  std::make_pair(
