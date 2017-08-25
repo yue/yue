@@ -5,7 +5,7 @@ notifications:
 
 language: node_js
 node_js:
-  - "7"
+  - "8"
 os:
   - osx
   - linux
