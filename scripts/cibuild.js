@@ -39,8 +39,8 @@ execSync(`node ./scripts/create_dist.js`)
 // Build node extensions.
 const runtimes = {
   node: [
-    'v8.0.0',
-    'v7.0.0',
+    'v8.4.0',
+    'v7.10.1',
   ],
   electron: [
     'v1.7.0',
