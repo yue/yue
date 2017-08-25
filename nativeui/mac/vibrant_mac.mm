@@ -4,10 +4,10 @@
 
 #include "nativeui/vibrant.h"
 
+#pragma clang diagnostic ignored "-Wunguarded-availability"
+
 #include "base/mac/sdk_forward_declarations.h"
 #include "nativeui/mac/container_mac.h"
-
-#pragma clang diagnostic ignored "-Wunguarded-availability"
 
 @interface NUVibrant : NSVisualEffectView<NUView> {
  @private

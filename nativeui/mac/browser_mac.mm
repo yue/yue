@@ -4,13 +4,15 @@
 
 #include "nativeui/browser.h"
 
-#import <WebKit/WebKit.h>
+#pragma clang diagnostic ignored "-Wunguarded-availability"
+
+#include <WebKit/WebKit.h>
 
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/nu_view.h"
 
-@interface NUWebView : WebView<NUView> {
+@interface NUWebView : WKWebView<NUView> {
  @private
   nu::NUPrivate private_;
 }
@@ -37,12 +39,12 @@
 
 @end
 
-@interface NUWebUIDelegate : NSObject<WebUIDelegate>
+@interface NUWebUIDelegate : NSObject<WKUIDelegate>
 @end
 
 @implementation NUWebUIDelegate
 
-- (void)webViewClose:(WebView*)sender {
+- (void)webViewDidClose:(WKWebView*)sender {
   auto* browser = static_cast<nu::Browser*>([sender shell]);
   browser->on_close.Emit(browser);
 }
@@ -53,7 +55,7 @@ namespace nu {
 
 Browser::Browser() {
   NUWebView* webview = [[NUWebView alloc] initWithFrame:NSZeroRect];
-  [webview setUIDelegate:[[NUWebUIDelegate alloc] init]];
+  webview.UIDelegate = [[NUWebUIDelegate alloc] init];
   TakeOverView(webview);
 }
 
@@ -64,7 +66,9 @@ Browser::~Browser() {
 
 void Browser::LoadURL(const std::string& url) {
   auto* webview = static_cast<NUWebView*>(GetNative());
-  [webview setMainFrameURL:base::SysUTF8ToNSString(url)];
+  NSURL* nsurl = [NSURL URLWithString:base::SysUTF8ToNSString(url)];
+  NSURLRequest* request = [NSURLRequest requestWithURL:nsurl];
+  [webview loadRequest:request];
 }
 
 }  // namespace nu
