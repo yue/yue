@@ -12,6 +12,13 @@
 #include "node_yue/chrome_view_mac.h"
 #endif
 
+namespace {
+
+bool is_electron = false;
+bool is_yode = false;
+
+}  // namespace
+
 namespace vb {
 
 template<>
@@ -161,12 +168,15 @@ struct Type<nu::Lifetime> {
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
-        "run", &nu::Lifetime::Run,
         "quit", &nu::Lifetime::Quit,
         "postTask", &nu::Lifetime::PostTask,
         "postDelayedTask", &nu::Lifetime::PostDelayedTask);
     SetProperty(context, templ,
                 "onReady", &nu::Lifetime::on_ready);
+    // The "run" method should never be used in yode runtime.
+    if (!is_yode) {
+      Set(context, templ, "run", &nu::Lifetime::Run);
+    }
   }
 };
 
@@ -1513,7 +1523,8 @@ struct Type<node_yue::ChromeView> {
 
 namespace node_yue {
 
-bool IsElectron(v8::Local<v8::Context> context) {
+bool GetRuntime(
+    v8::Local<v8::Context> context, bool* is_electron, bool* is_yode) {
   v8::Local<v8::Object> process;
   if (!vb::Get(context, context->Global(), "process", &process) ||
       !process->IsObject())
@@ -1522,14 +1533,16 @@ bool IsElectron(v8::Local<v8::Context> context) {
   if (!vb::Get(context, process, "versions", &versions) ||
       !versions->IsObject())
     return false;
-  std::string electron;
-  return vb::Get(context, versions, "electron", &electron) && !electron.empty();
+  std::string tmp;
+  *is_electron =  vb::Get(context, versions, "electron", &tmp) && !tmp.empty();
+  *is_yode =  vb::Get(context, versions, "yode", &tmp) && !tmp.empty();
+  return true;
 }
 
 void Initialize(v8::Local<v8::Object> exports) {
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::Local<v8::Context> context = isolate->GetCurrentContext();
-  bool is_electron = IsElectron(context);
+  CHECK(GetRuntime(context, &is_electron, &is_yode));
 
 #if defined(OS_WIN)
   if (!is_electron) {
@@ -1539,8 +1552,12 @@ void Initialize(v8::Local<v8::Object> exports) {
 #endif
   // Initialize the nativeui and leak it.
   new nu::State;
+  // Non-Electron platforms needs the lifetime API.
   if (!is_electron) {
     new nu::Lifetime;
+  }
+  // Official node platform needs node integration.
+  if (!is_electron && !is_yode) {
     // Initialize node integration and leak it.
     NodeIntegration* node_integration = NodeIntegration::Create();
     node_integration->PrepareMessageLoop();
