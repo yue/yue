@@ -15,6 +15,7 @@ loadable_module("node_yue") {
     "binding_signal.h",
     "chrome_view_mac.mm",
     "chrome_view_mac.h",
+    "delay_load_hook_win.cc",
     "node_integration.cc",
     "node_integration.h",
     "node_integration_linux.cc",
@@ -33,5 +34,13 @@ loadable_module("node_yue") {
 
   if (is_linux && is_component_build) {
     configs += [ "//build/config/gcc:rpath_for_built_shared_libraries" ]
+  }
+
+  if (is_win) {
+    ldflags = [
+      "/DELAYLOAD:node.exe",
+      "/DELAYLOAD:node.dll",
+      "/DELAYLOAD:yode.exe",
+    ]
   }
 }
