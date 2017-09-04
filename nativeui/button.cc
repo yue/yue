@@ -4,12 +4,15 @@
 
 #include "nativeui/button.h"
 
+#include "nativeui/gfx/image.h"
+
 namespace nu {
 
 // static
 const char Button::kClassName[] = "Button";
 
 void Button::SetImage(Image* image) {
+  image_ = image;
   PlatformSetImage(image);
   UpdateDefaultStyle();
 }
