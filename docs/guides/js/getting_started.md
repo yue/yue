@@ -1,90 +1,123 @@
 ---
 priority: 100
-description: How to use Yue in Node.js and Electron.
+description: How to use Yue with Node.js and Electron.
 ---
 
 # Getting started
 
-Yue provides V8 bindings that can be used in Node.js and Electron to create
-native GUI. Currently only it is only supported in Node.js v7 and above, and
-Electron v1.6.x and above.
+Yue is a library for creating native GUI programs, by using its V8 bindings you
+can easily build a desktop app with Node.js.
 
-## Install Yue
+## Installing
 
-The V8 bindings of Yue can be downloaded by installing the `gui` npm module.
+The V8 bindings of Yue exists as the `gui` npm module.
 
 ### Node.js
 
-For Node.js it can be simply done with `npm i gui`, but when you switch between
-different major versions of Node.js, you have to reinstall the module because
-it downloads prebuilt binaries that are targeted for a certain version of
-Node.js.
+Installing Yue in Node.js is as easy as:
+
+```bash
+npm i gui
+```
+
+But note that `gui` is a native module, you have to reinstall it whenever you
+change Node.js versions or platforms.
+
+Only Node.js v7 and above are supported.
 
 ### Electron
 
 For Electron you must follow the [Using Native Node Modules][native-module]
-guide on installing `gui` module, because the module downloads prebuilt binaries
-that are targeted for different runtimes and versions.
+guide on installing the `gui` module:
 
 ```bash
 # Runtime is electron.
 export npm_config_runtime=electron
 # Electron's version.
-export npm_config_target=1.6.0
+export npm_config_target=1.8.0
 # The architecture of Electron, can be ia32, arm or x64.
 export npm_config_arch=x64
 # Install the module, and store cache to ~/.electron-gyp.
 HOME=~/.electron-gyp npm i gui
 ```
 
+Only Electron v1.6.x and above are supported.
+
 ## Using Yue
 
-You can use Yue by simply `require('gui')`, but depending on the runtime you
-use, you may have to take over the event loop.
+Like other Node.js modules, Yue can be used with a simple `require('gui')`, but
+depending on the runtime you use, there are some extra work to make GUI message
+loop run.
 
 ### Node.js
 
-Node.js uses libuv for its event loop, which unfortunately does not work together
-with GUI programs, so to use Yue in Node.js, you have to take over the control of
-event loop by using the `Lifetime` API:
+Because Node.js was not designed for desktop apps, it is using libuv event loop
+that is not compatible with GUI message loops.
+
+In order to make GUI work in Node.js, you have to take over the control of event
+loop by using the `Lifetime` API, which would run native GUI message loop while
+still handling libuv events:
 
 ```js
 const gui = require('gui')
 
-const win = gui.Window.create({})
-win.onClose = () => gui.lifetime.quit()
-win.setContentView(gui.Label.create('Content View'))
-win.setContentSize({width: 400, height: 400})
-win.center()
-win.activate()
-
-gui.lifetime.run()
-process.exit(0)
+if (!process.versions.yode) {
+  gui.lifetime.run()  // block until gui.lifetime.quit() is called
+  process.exit(0)
+}
 ```
 
-Please note that this feature is not stable (and may never be), so do not use
-Yue in Node.js in any production environment.
+To quit the message loop, you can call the `lifetime.quit()` API, which would
+break the blocking `lifetime.run()` call and continue the script, usually you
+should exit the process after that.
+
+Note that this hack does not work perfectly, you should never use it in
+production.
+
+#### Yode
+
+To solve the problem of incompatible event loop, you can use the
+[Yode](https://github.com/yue/yode) project as a replacement of Node.js. Yode
+is a fork of Node.js that replaces libuv event loop with native GUI message
+loops, so there would be no need to use the `lifetime.run()` hack.
+
+Unlike Node.js which would quit the process when there is no work to do, the
+processes of Yode would keep running forever, until you call the
+`lifetime.quit()` API to quit current message loop.
+
+After quitting the GUI message loop, the libuv event loop is still running, and
+the process will exit when all pending Node.js requests have finished.
+
+The code example above also showed how to make the script run under both Yode
+and Node.js.
 
 ### Electron
 
-Electron uses GUI message loop as its event loop, so you can just use Yue
-without worrying about event loop.
+Since the main process of Electron uses GUI message loops, there is no need to
+use the `Lifetime` API, and the `Lifetime` API of Yue is not available when
+running under Electron. You should always use the `app` API of Electron to
+manage the process's lifetime.
 
 ```js
-const electron = require('electron')
 const gui = require('gui')
+const electron = require('electron')
 
-const win = gui.Window.create({})
-win.onClose = () => electron.app.quit()
-win.setContentView(gui.Label.create('Content View'))
-win.setContentSize({width: 400, height: 400})
-win.center()
-
-electron.app.on('ready', () => {
-  win.activate()
+electron.app.once('ready', () => {
+  // Do work here...
 })
 ```
 
-Please note that you can only use Yue in the main process of Electron.
+## Example: Text editor
+
+This example shows how to create windows and views in Yue, and how to manage
+their layout.
+
+## Example: Float widget
+
+This example shows how to use frameless window and how to draw things.
+
+## More
+
+* [FAQ](https://github.com/yue/help#faq)
 
 [native-module]: https://github.com/electron/electron/blob/master/docs/tutorial/using-native-node-modules.md
