@@ -10,7 +10,7 @@ programs, currently it includes:
 
 * Chromium's [`base`][base] library for basic cross platform APIs like
   string manipulation and filesystem operations;
-* The `nativeui` library for cross platform GUI APIs.
+* The `nativeui` library for cross platform GUI.
 
 Please note that there is no documentation on the `base` library, you have to
 read the header files on how to use it.
@@ -82,6 +82,46 @@ The libyue zip archive includes following files:
 
 If you are interested in integrating Yue into a build system, you can look into
 the `CMakeLists.txt` on which compilation options should be used.
+
+### Quick start with CMake
+
+CMake can generate projects according to your preferences, this is a quick start
+tutorial if you are too lazy to learn CMake.
+
+1. [Download CMake](https://cmake.org/download/).
+
+2. Enter the directory of libyue and create a `build` sub-directory for
+   building.
+
+    ```bash
+    cd libyue_VERSION_PLATFORM_ARCH
+    mkdir build
+    cd build
+    ```
+
+3. Generate project and then build.
+
+  __macOS__
+
+  ```bash
+  cmake .. -G Xcode
+  open YueSampleApp.xcodeproj
+  ```
+
+  __Linux__
+
+  ```bash
+  cmake -D CMAKE_BUILD_TYPE=Release ..
+  make
+  ./sample_app
+  ```
+
+  __Windows__
+
+  ```cmd
+  cmake ..
+  start YueSampleApp.sln
+  ```
 
 [base]: https://chromium.googlesource.com/chromium/src/base/
 [releases]: https://github.com/yue/yue/releases
