@@ -13,4 +13,8 @@ under the MS-PL license, but you could only use the versions published before
 expiration date of your subscription.
 
 The price of the paid plan is: __5000 U.S. dollars per month__, please
-contact Cheng Zhao (zcbenz@gmail.com) on how to pay.
+discuss with Cheng Zhao (zcbenz@gmail.com) on how to pay.
+
+If you are looking for technical support, or interested in having bugs fixed or
+features implmented, you can discuss with me on how much to pay depending on
+what you want and the size of your orgnization.
