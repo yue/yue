@@ -42,8 +42,6 @@ const componentConfig = [
 const debugConfig = [
   'is_component_build=false',
   'is_debug=true',
-  // This flag caused weird compilation errors when building on Linux.
-  'enable_iterator_debugging=false',
 ]
 const releaseConfig = [
   'is_component_build=false',
@@ -56,9 +54,12 @@ const releaseConfig = [
 if (targetOs != 'win')
   releaseConfig.push('is_official_build=true')
 
-// Generate linker map for Linux.
-if (targetOs == 'linux')
+if (targetOs == 'linux') {
+  // Generate linker map for Linux.
   releaseConfig.push('generate_linker_map=true')
+  // This flag caused weird compilation errors when building on Linux.
+  debugConfig.push('enable_iterator_debugging=false')
+}
 
 gen('out/Component', componentConfig)
 gen('out/Debug', debugConfig)
