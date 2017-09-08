@@ -278,6 +278,76 @@ win.center()
 win.activate()
 ```
 
+## Example: Float heart
+
+This example shows how to use frameless window and how to draw things.
+
+Full code of this example can be found at
+https://github.com/yue/yue-app-samples/tree/master/floating_heart.
+
+  macOS          |       Linux       |  Windows
+:---------------:|:------------------:-------------------------:
+<img src="https://cdn.rawgit.com/yue/yue-app-samples/196cfee8/floating_heart/screenshots/mac_heart.png" width="154" height="162" />    | <img src="https://cdn.rawgit.com/yue/yue-app-samples/196cfee8/floating_heart/screenshots/linux_heart.png" width="203" height="168" />  | <img src="https://cdn.rawgit.com/yue/yue-app-samples/196cfee8/floating_heart/screenshots/win_heart.png" width="146" height="166" />
+
+### Frameless and transparent window
+
+By using the `frame` and `transparent` options, you can control whether a window
+would have the native chrome, and whether the window is transparent.
+
+```js
+const win = gui.Window.create({frame: false, transparent: true})
+win.setAlwaysOnTop(true)
+```
+
+### Dragging window
+
+`View`s in Yue can be made draggable, so dragging the view would also drag the
+window. In this example we make the whole window draggable.
+
+```js
+const contentview = gui.Container.create()
+contentview.setMouseDownCanMoveWindow(true)
+win.setContentView(contentview)
+```
+
+### Drawable area
+
+While the `Container` view is mostly used for layout, you can also use it as
+drawable area by using the `onDraw` event.
+
+In the `onDraw` event an instance of `Painter` is passed, which can be used to
+draw things directly on the view.
+
+```js
+contentview.onDraw = (self, painter) => {
+  // Draw the shadow of heart.
+  painter.setFillColor('#3000')
+  drawHeart(painter)
+  // Draw heart.
+  painter.translate({x: -5, y: -5})
+  painter.setFillColor('#D46A6A')
+  drawHeart(painter)
+}
+```
+
+### Painter
+
+The `Painter` class represents native graphics context, it provides methods for
+drawing. This example uses paths and bezier curves to draw a heart.
+
+```js
+function drawHeart(painter) {
+  painter.beginPath()
+  painter.moveTo({x: 75, y: 40})
+  painter.bezierCurveTo({x: 75, y: 37}, {x: 70, y: 25}, {x: 50, y: 25})
+  painter.bezierCurveTo({x: 20, y: 25}, {x: 20, y: 62.5}, {x: 20, y: 62.5})
+  painter.bezierCurveTo({x: 20, y: 80}, {x: 40, y: 102}, {x: 75, y: 120})
+  painter.bezierCurveTo({x: 110, y: 102}, {x: 130, y: 80}, {x: 130, y: 62.5})
+  painter.bezierCurveTo({x: 130, y: 62.5}, {x: 130, y: 25}, {x: 100, y: 25})
+  painter.bezierCurveTo({x: 85, y: 25}, {x: 75, y: 37}, {x: 75, y: 40})
+  painter.fill()
+}
+```
 
 ## More
 
@@ -286,4 +356,6 @@ win.activate()
 [mac-editor]: https://cdn.rawgit.com/yue/yue-app-samples/10cc39d9/editor/screenshots/mac_editor.png
 [linux-editor]: https://cdn.rawgit.com/yue/yue-app-samples/10cc39d9/editor/screenshots/linux_editor.png
 [win-editor]: https://cdn.rawgit.com/yue/yue-app-samples/10cc39d9/editor/screenshots/win_editor.png
+[linux-heart]: https://cdn.rawgit.com/yue/yue-app-samples/196cfee8/floating_heart/screenshots/linux_heart.png
+[win-heart]: https://cdn.rawgit.com/yue/yue-app-samples/196cfee8/floating_heart/screenshots/win_heart.png
 [native-module]: https://github.com/electron/electron/blob/master/docs/tutorial/using-native-node-modules.md
