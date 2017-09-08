@@ -352,6 +352,7 @@ function drawHeart(painter) {
 ## More
 
 * [FAQ](https://github.com/yue/help#faq)
+* [Embedding Electron's WebContents](embedding_webcontents.html)
 
 [mac-editor]: https://cdn.rawgit.com/yue/yue-app-samples/10cc39d9/editor/screenshots/mac_editor.png
 [linux-editor]: https://cdn.rawgit.com/yue/yue-app-samples/10cc39d9/editor/screenshots/linux_editor.png
