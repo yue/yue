@@ -115,9 +115,9 @@ their layout.
 Full code of this example can be found at
 https://github.com/yue/yue-app-samples/tree/master/editor.
 
-  macOS          |       Linux       |  Windows
-:---------------:|:------------------:-------------------------:
-![][mac-editor]  |![][linux-editor]  |![][win-editor]
+|  macOS            |    Linux          |  Windows          |
+| ----------------- | ----------------- | ----------------- |
+| ![][mac-editor]   | ![][linux-editor] | ![][win-editor]   |
 
 ### Creating a window
 
@@ -285,9 +285,9 @@ This example shows how to use frameless window and how to draw things.
 Full code of this example can be found at
 https://github.com/yue/yue-app-samples/tree/master/floating_heart.
 
-  macOS          |       Linux       |  Windows
-:---------------:|:------------------:-------------------------:
-<img src="https://cdn.rawgit.com/yue/yue-app-samples/196cfee8/floating_heart/screenshots/mac_heart.png" width="154" height="162" />    | <img src="https://cdn.rawgit.com/yue/yue-app-samples/196cfee8/floating_heart/screenshots/linux_heart.png" width="203" height="168" />  | <img src="https://cdn.rawgit.com/yue/yue-app-samples/196cfee8/floating_heart/screenshots/win_heart.png" width="146" height="166" />
+|  macOS          |    Linux        |  Windows        |
+| --------------- | --------------- | --------------- |
+| <img src="https://cdn.rawgit.com/yue/yue-app-samples/196cfee8/floating_heart/screenshots/mac_heart.png" width="154" height="162" />    | <img src="https://cdn.rawgit.com/yue/yue-app-samples/196cfee8/floating_heart/screenshots/linux_heart.png" width="203" height="168" />  | <img src="https://cdn.rawgit.com/yue/yue-app-samples/196cfee8/floating_heart/screenshots/win_heart.png" width="146" height="166" /> |
 
 ### Frameless and transparent window
 
