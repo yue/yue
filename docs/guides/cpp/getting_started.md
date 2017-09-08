@@ -126,5 +126,8 @@ tutorial if you are too lazy to learn CMake.
    start YueSampleApp.sln
    ```
 
+   For certain versions of Visual Studio you also need to manually set the
+   "sample_app" as startup project.
+
 [base]: https://chromium.googlesource.com/chromium/src/base/
 [releases]: https://github.com/yue/yue/releases

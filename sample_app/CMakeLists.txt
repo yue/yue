@@ -29,6 +29,8 @@ endif()
 # win32 configuration
 if(WIN32)
   target_compile_definitions(${APP_NAME} PUBLIC NOMINMAX)
+  set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+               PROPERTY VS_STARTUP_PROJECT ${APP_NAME})
   set_target_properties(${APP_NAME} PROPERTIES LINK_FLAGS
                         "/DELAYLOAD:setupapi.dll \
                          /DELAYLOAD:powrprof.dll \
