@@ -118,8 +118,11 @@ tutorial if you are too lazy to learn CMake.
 
    __Windows__
 
+   Note that on Windows you need to manually speicfy the version of Visual
+   Studio and the architecture to build for.
+
    ```cmd
-   cmake ..
+   cmake .. -G "Visual Studio 14 Win64"
    start YueSampleApp.sln
    ```
 
