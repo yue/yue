@@ -112,12 +112,178 @@ electron.app.once('ready', () => {
 This example shows how to create windows and views in Yue, and how to manage
 their layout.
 
-## Example: Float widget
+Full code of this example can be found at
+https://github.com/yue/yue-app-samples/tree/master/editor.
 
-This example shows how to use frameless window and how to draw things.
+  macOS          |       Linux       |  Windows
+:---------------:|:------------------:-------------------------:
+![][mac-editor]  |![][linux-editor]  |![][win-editor]
+
+### Creating a window
+
+Each creatable type in Yue has a `create` class method can be used to create
+instances of the type, constructors are not used because JavaScript does not
+support function overloading while certain types can have multiple `createXXX`
+class methods.
+
+```js
+const win = gui.Window.create({})
+```
+
+### MenuBar
+
+With `gui.MenuBar` and `gui.MenuItem` APIs you can create menu bars, their
+`create` methods also accept object descriptors to make the APIs easier to use.
+
+By adding a menu bar, you can bind keyboard shortcuts to actions, and for some
+very common actions there are also stock items can be used.
+
+Note that macOS differs from other platforms that it has one application menu
+instead of window menu bars, so your code should be aware of this difference.
+
+```js
+const menu = gui.MenuBar.create([
+  {
+    label: 'File',
+    submenu: [
+      {
+        label: 'Quit',
+        accelerator: 'CmdOrCtrl+Q',
+        onClick: () => gui.lifetime.quit()
+      },
+    ],
+  },
+  {
+    label: 'Edit',
+    submenu: [
+      { role: 'copy' },
+      { role: 'cut' },
+      { role: 'paste' },
+      { role: 'select-all' },
+      { type: 'separator' },
+      { role: 'undo' },
+      { role: 'redo' },
+    ],
+  },
+])
+
+if (process.platform == 'darwin')
+  gui.app.setApplicationMenu(menu)
+else
+  win.setMenuBar(menu)
+```
+
+### Content view
+
+Each window in Yue has one content view, which fills the client area of the
+window.
+
+```js
+const edit = gui.TextEdit.create()
+win.setContentView(edit)
+```
+
+### Container and layout
+
+The `Container` view can have multiple views and it can automatically layout
+the child views according to the flexbox style properties assigned.
+
+Following code creates a vertical sidebar on the left of the text edit view,
+the sidebar stretches vertically and takes fixed width, while the text edit view
+would fill all remaining space.
+
+```js
+// The content view has its children arranged horizontally.
+const contentView = gui.Container.create()
+contentView.setStyle({flexDirection: 'row'})
+win.setContentView(contentView)
+
+// The sidebar is a child of content view and has 5px paddings.
+const sidebar = gui.Container.create()
+sidebar.setStyle({padding: 5})
+contentView.addChildView(sidebar)
+
+// Make the sidebar have a fixed width which is enough to show all the buttons.
+sidebar.setStyle({width: sidebar.getPreferredSize().width})
+
+// The text edit view would take all remaining spaces.
+const edit = gui.TextEdit.create()
+edit.setStyle({flex: 1})
+contentView.addChildView(edit)
+```
+
+### Vibrant view
+
+On macOS views can be semi-transparent to show contents under the window, our
+example makes use of this by using the `Vibrant` view for sidebar.
+
+```js
+let sidebar
+if (process.platform == 'darwin') {
+  sidebar = gui.Vibrant.create()
+  sidebar.setBlendingMode('behind-window')
+  sidebar.setMaterial('dark')
+} else {
+  sidebar = gui.Container.create()
+}
+```
+
+### Buttons and HiDPI images
+
+Following code creates image buttons without title, the `@2x` suffix in the
+filenames of images means they have a scale factor of 2, and the images would
+show without blur in HiDPI environments.
+
+```js
+// The buttons in the sidebar, they shows images instead of text.
+const open = gui.Button.create('')
+open.setImage(gui.Image.createFromPath(__dirname + '/eopen@2x.png'))
+open.setStyle({marginBottom: 5})
+sidebar.addChildView(open)
+const save = gui.Button.create('')
+save.setImage(gui.Image.createFromPath(__dirname + '/esave@2x.png'))
+sidebar.addChildView(save)
+```
+
+### Dialogs
+
+With `FileOpenDialog` and `FileSaveDialog` APIs, you can show system dialogs to
+get inputs from users.
+
+```js
+save.onClick = () => {
+  const dialog = gui.FileSaveDialog.create()
+  dialog.setFolder(folder)
+  dialog.setFilename(filename)
+  if (dialog.runForWindow(win)) {
+    fs.writeFileSync(String(dialog.getResult()), edit.getText())
+  }
+}
+```
+
+### Showing window
+
+The events of types exist as properties of instances, to add a listener to an
+event, you can call the `connect()` method of the event, or simply do an
+assignment.
+
+```js
+// Quit when window is closed.
+win.onClose = () => gui.lifetime.quit()
+// The size of content view.
+win.setContentSize({width: 400, height: 400})
+// Put the window in the center of screen.
+win.center()
+// Show and activate the window.
+win.activate()
+```
+
 
 ## More
 
 * [FAQ](https://github.com/yue/help#faq)
 
+[mac-editor]: https://cdn.rawgit.com/yue/yue-app-samples/10cc39d9/editor/screenshots/mac_editor.png
+[linux-editor]: https://cdn.rawgit.com/yue/yue-app-samples/10cc39d9/editor/screenshots/linux_editor.png
+[win-editor]: https://cdn.rawgit.com/yue/yue-app-samples/10cc39d9/editor/screenshots/win_editor.png
 [native-module]: https://github.com/electron/electron/blob/master/docs/tutorial/using-native-node-modules.md
