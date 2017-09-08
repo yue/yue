@@ -101,27 +101,27 @@ tutorial if you are too lazy to learn CMake.
 
 3. Generate project and then build.
 
-  __macOS__
+   __macOS__
 
-  ```bash
-  cmake .. -G Xcode
-  open YueSampleApp.xcodeproj
-  ```
+   ```bash
+   cmake .. -G Xcode
+   open YueSampleApp.xcodeproj
+   ```
 
-  __Linux__
+   __Linux__
 
-  ```bash
-  cmake -D CMAKE_BUILD_TYPE=Release ..
-  make
-  ./sample_app
-  ```
+   ```bash
+   cmake -D CMAKE_BUILD_TYPE=Release ..
+   make
+   ./sample_app
+   ```
 
-  __Windows__
+   __Windows__
 
-  ```cmd
-  cmake ..
-  start YueSampleApp.sln
-  ```
+   ```cmd
+   cmake ..
+   start YueSampleApp.sln
+   ```
 
 [base]: https://chromium.googlesource.com/chromium/src/base/
 [releases]: https://github.com/yue/yue/releases
