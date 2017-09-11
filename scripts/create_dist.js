@@ -98,6 +98,8 @@ function generateZip(name, list, zip = new JSZip()) {
   const zipname = `${name}_${version}_${targetOs}_${targetCpu}`
   for (let file of list)
     addFileToZip(zip, `out/Release/${file}`, 'out/Release')
+  addFileToZip(zip, 'LICENSE', '')
+  addFileToZip(zip, 'LICENSE.chromium', '')
   zip.generateNodeStream({streamFiles:true})
      .pipe(fs.createWriteStream(`out/Dist/${zipname}.zip`))
 }
