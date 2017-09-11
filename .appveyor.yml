@@ -12,7 +12,7 @@ environment:
     - TARGET_CPU: x86
 
 install:
-  - ps: Install-Product node 8
+  - ps: Install-Product node 8.2.1
   - cmd: SET PATH=C:\Program Files (x86)\MSBuild\14.0\bin\;%PATH%
   - cmd: SET PATH=C:\python27;%PATH%
   - cmd: node scripts/cibuild.js --target-cpu=%TARGET_CPU%

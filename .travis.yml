@@ -5,7 +5,7 @@ notifications:
 
 language: node_js
 node_js:
-  - "8"
+  - "8.2.1"
 os:
   - osx
   - linux
