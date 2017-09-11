@@ -2,6 +2,12 @@
 
 A library to create cross-platform GUI apps.
 
+## Getting started
+
+* [Documentations](http://libyue.com)
+* [FAQ](https://github.com/yue/help#faq)
+* [Sample Apps](https://github.com/yue/yue-sample-apps)
+
 ## Issues
 
 The issues page of this repo is disabled on purpose, for help please go to the
@@ -14,10 +20,6 @@ problem, or you can choose to subscribe to [paid plans][paid-plans].
 
 By sending a pull request, you are agreeing to transfer the copyright of your
 code to Cheng Zhao.
-
-## Development
-
-* [Roadmap](./docs/development/roadmap.md)
 
 ## License
 
