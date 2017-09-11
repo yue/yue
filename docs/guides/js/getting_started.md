@@ -91,6 +91,22 @@ the process will exit when all pending Node.js requests have finished.
 The code example above also showed how to make the script run under both Yode
 and Node.js.
 
+#### Why other GUI toolkit bindings do not work
+
+Having read so far, you might have understood why people were not using Node.js
+for native desktop apps. This was because the design of Node.js natually does
+not allow integrating the GUI message loops of native toolkits.
+
+So even though it is not hard to write V8 bindings for GTK+ or Qt, it is
+impossible to run their message loops together with the event loop of Node.js.
+The most common trick of keep iterating events of GUI message loops, results in
+high CPU usage. While the trick used by Yue's `Lifetime` API to replace the
+event loop, has various problems with the events queue of Node.js.
+
+Luckily with Yode the problem with message loop has been solved cleanly, even if
+you are not intersted in Yue, it is still possible to use GTK+ and Cocoa
+bindings in Yode.
+
 ### Electron
 
 Since the main process of Electron uses GUI message loops, there is no need to
