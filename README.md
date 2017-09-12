@@ -18,8 +18,11 @@ problem, or you can choose to subscribe to [paid plans][paid-plans].
 
 ## Contributions
 
-By sending a pull request, you are agreeing to transfer the copyright of your
-code to Cheng Zhao.
+By sending a pull request, you hereby grant to owners and users of Yue project a
+perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+copyright license to reproduce, prepare derivative works of, publicly display,
+publicly perform, sublicense, and distribute your contributions and such
+derivative works.
 
 ## License
 
