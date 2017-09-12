@@ -1,10 +1,4 @@
 // Copyright 2016 Cheng Zhao. All rights reserved.
-// Copyright 2005, 2007 Apple Inc.
-// Copyright 2004, 2005, 2006 Nikolas Zimmermann <wildfox@kde.org>
-//           2004, 2005, 2006 Rob Buis <buis@kde.org>
-//           2007 Alp Toker <alp@atoker.com>
-//           2007 Krzysztof Kowalczyk <kkowalczyk@gmail.com>
-//           2008 Dirk Schulze <krit@webkit.org>
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
@@ -22,18 +16,6 @@
 #include "nativeui/gfx/image.h"
 
 namespace nu {
-
-namespace {
-
-inline float AreaOfTriangleFormedByPoints(const PointF& p1,
-                                          const PointF& p2,
-                                          const PointF& p3) {
-  return p1.x() * (p2.y() - p3.y()) +
-         p2.x() * (p3.y() - p1.y()) +
-         p3.x() * (p1.y() - p2.y());
-}
-
-}  // namespace
 
 PainterGtk::PainterGtk(cairo_t* context)
     : context_(context),
@@ -85,91 +67,6 @@ void PainterGtk::BezierCurveTo(const PointF& cp1,
                                const PointF& ep) {
   cairo_curve_to(
       context_, cp1.x(), cp1.y(), cp2.x(), cp2.y(), ep.x(), ep.y());
-}
-
-void PainterGtk::ArcTo(const PointF& p1, const PointF& p2, float radius) {
-  // Current position.
-  double x0, y0;
-  cairo_get_current_point(context_, &x0, &y0);
-  PointF p0(x0, y0);
-
-  // Draw only a straight line to p1 if any of the points are equal or the
-  // radius is zero or the points are collinear (triangle that the points form
-  // has area of zero value).
-  if (p0 == p1 || p1 == p2 || radius == 0 ||
-      AreaOfTriangleFormedByPoints(p0, p1, p2) == 0) {
-    cairo_line_to(context_, p1.x(), p1.y());
-    return;
-  }
-
-  PointF p1p0(p0.x() - p1.x(), p0.y() - p1.y());
-  PointF p1p2(p2.x() - p1.x(), p2.y() - p1.y());
-  float p1p0_length = sqrtf(p1p0.x() * p1p0.x() + p1p0.y() * p1p0.y());
-  float p1p2_length = sqrtf(p1p2.x() * p1p2.x() + p1p2.y() * p1p2.y());
-
-  double cos_phi = (p1p0.x() * p1p2.x() + p1p0.y() * p1p2.y()) /
-                   (p1p0_length * p1p2_length);
-  // All points on a line logic.
-  if (cos_phi == -1) {
-    cairo_line_to(context_, p1.x(), p1.y());
-    return;
-  }
-  if (cos_phi == 1) {
-    // Add infinite far away point.
-    unsigned int max_length = 65535;
-    double factor_max = max_length / p1p0_length;
-    PointF ep(p0.x() + factor_max * p1p0.x(), p0.y() + factor_max * p1p0.y());
-    cairo_line_to(context_, ep.x(), ep.y());
-    return;
-  }
-
-  float tangent = radius / tan(acos(cos_phi) / 2);
-  float factor_p1p0 = tangent / p1p0_length;
-  PointF t_p1p0(p1.x() + factor_p1p0 * p1p0.x(),
-                p1.y() + factor_p1p0 * p1p0.y());
-
-  PointF orth_p1p0(p1p0.y(), -p1p0.x());
-  float orth_p1p0_length = sqrt(orth_p1p0.x() * orth_p1p0.x() +
-                                orth_p1p0.y() * orth_p1p0.y());
-  float factor_ra = radius / orth_p1p0_length;
-
-  // Angle between orth_p1p0 and p1p2 to get the right vector orthographic to
-  // p1p0.
-  double cos_alpha = (orth_p1p0.x() * p1p2.x() + orth_p1p0.y() * p1p2.y()) /
-                     (orth_p1p0_length * p1p2_length);
-  if (cos_alpha < 0.f)
-    orth_p1p0 = PointF(-orth_p1p0.x(), -orth_p1p0.y());
-
-  PointF p(t_p1p0.x() + factor_ra * orth_p1p0.x(),
-           t_p1p0.y() + factor_ra * orth_p1p0.y());
-
-  // Calculate angles for addArc.
-  orth_p1p0 = PointF(-orth_p1p0.x(), -orth_p1p0.y());
-  float sa = acos(orth_p1p0.x() / orth_p1p0_length);
-  if (orth_p1p0.y() < 0.f)
-    sa = 2 * M_PI - sa;
-
-  // Anti-clockwise logic.
-  bool anticlockwise = false;
-
-  float factor_p1p2 = tangent / p1p2_length;
-  PointF t_p1p2(p1.x() + factor_p1p2 * p1p2.x(),
-                p1.y() + factor_p1p2 * p1p2.y());
-  PointF orth_p1p2(t_p1p2.x() - p.x(), t_p1p2.y() - p.y());
-  float orth_p1p2_length = sqrtf(orth_p1p2.x() * orth_p1p2.x() +
-                                 orth_p1p2.y() * orth_p1p2.y());
-  float ea = acos(orth_p1p2.x() / orth_p1p2_length);
-  if (orth_p1p2.y() < 0)
-    ea = 2 * M_PI - ea;
-  if ((sa > ea) && ((sa - ea) < M_PI))
-    anticlockwise = true;
-  if ((sa < ea) && ((ea - sa) > M_PI))
-    anticlockwise = true;
-
-  if (anticlockwise)
-    cairo_arc_negative(context_, p.x(), p.y(), radius, sa, ea);
-  else
-    cairo_arc(context_, p.x(), p.y(), radius, sa, ea);
 }
 
 void PainterGtk::Arc(const PointF& point, float radius, float sa, float ea) {

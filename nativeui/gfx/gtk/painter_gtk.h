@@ -31,7 +31,6 @@ class PainterGtk : public Painter {
   void BezierCurveTo(const PointF& cp1,
                      const PointF& cp2,
                      const PointF& ep) override;
-  void ArcTo(const PointF& cp1, const PointF& cp2, float radius) override;
   void Arc(const PointF& point, float radius, float sa, float ea) override;
   void Rect(const RectF& rect) override;
   void Clip() override;

@@ -1,10 +1,4 @@
 // Copyright 2016 Cheng Zhao. All rights reserved.
-// Copyright 2005, 2007 Apple Inc.
-// Copyright 2004, 2005, 2006 Nikolas Zimmermann <wildfox@kde.org>
-//           2004, 2005, 2006 Rob Buis <buis@kde.org>
-//           2007 Alp Toker <alp@atoker.com>
-//           2007 Krzysztof Kowalczyk <kkowalczyk@gmail.com>
-//           2008 Dirk Schulze <krit@webkit.org>
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
@@ -117,12 +111,6 @@ void PainterWin::BezierCurveTo(const PointF& cp1,
   BezierCurveToPixel(ScalePoint(cp1, scale_factor_),
                      ScalePoint(cp2, scale_factor_),
                      ScalePoint(ep, scale_factor_));
-}
-
-void PainterWin::ArcTo(const PointF& cp1, const PointF& cp2, float radius) {
-  ArcToPixel(ScalePoint(cp1, scale_factor_),
-             ScalePoint(cp2, scale_factor_),
-             radius * scale_factor_);
 }
 
 void PainterWin::Arc(const PointF& point, float radius, float sa, float ea) {
@@ -268,88 +256,6 @@ void PainterWin::BezierCurveToPixel(const PointF& cp1,
   }
   use_gdi_current_point_ = true;
   path_.AddBezier(start, ToGdi(cp1), ToGdi(cp2), ToGdi(ep));
-}
-
-void PainterWin::ArcToPixel(const PointF& p1, const PointF& p2, float radius) {
-  // Current position.
-  Gdiplus::PointF tp;
-  GetCurrentPoint(&tp);
-  PointF p0(tp.X, tp.Y);
-
-  // Draw only a straight line to p1 if any of the points are equal or the
-  // radius is zero or the points are collinear (triangle that the points form
-  // has area of zero value).
-  if (p0 == p1 || p1 == p2 || radius == 0 ||
-      AreaOfTriangleFormedByPoints(p0, p1, p2) == 0) {
-    LineToPixel(p1);
-    return;
-  }
-
-  PointF p1p0(p0.x() - p1.x(), p0.y() - p1.y());
-  PointF p1p2(p2.x() - p1.x(), p2.y() - p1.y());
-  float p1p0_length = sqrtf(p1p0.x() * p1p0.x() + p1p0.y() * p1p0.y());
-  float p1p2_length = sqrtf(p1p2.x() * p1p2.x() + p1p2.y() * p1p2.y());
-
-  double cos_phi = (p1p0.x() * p1p2.x() + p1p0.y() * p1p2.y()) /
-                   (p1p0_length * p1p2_length);
-  // All points on a line logic.
-  if (cos_phi == -1) {
-    LineToPixel(p1);
-    return;
-  }
-  if (cos_phi == 1) {
-    // Add infinite far away point.
-    unsigned int max_length = 65535;
-    double factor_max = max_length / p1p0_length;
-    PointF ep(p0.x() + factor_max * p1p0.x(), p0.y() + factor_max * p1p0.y());
-    LineToPixel(ep);
-    return;
-  }
-
-  float tangent = radius / tan(acos(cos_phi) / 2);
-  float factor_p1p0 = tangent / p1p0_length;
-  PointF t_p1p0(p1.x() + factor_p1p0 * p1p0.x(),
-                p1.y() + factor_p1p0 * p1p0.y());
-
-  PointF orth_p1p0(p1p0.y(), -p1p0.x());
-  float orth_p1p0_length = sqrt(orth_p1p0.x() * orth_p1p0.x() +
-                                orth_p1p0.y() * orth_p1p0.y());
-  float factor_ra = radius / orth_p1p0_length;
-
-  // Angle between orth_p1p0 and p1p2 to get the right vector orthographic to
-  // p1p0.
-  double cos_alpha = (orth_p1p0.x() * p1p2.x() + orth_p1p0.y() * p1p2.y()) /
-                     (orth_p1p0_length * p1p2_length);
-  if (cos_alpha < 0.f)
-    orth_p1p0 = PointF(-orth_p1p0.x(), -orth_p1p0.y());
-
-  PointF p(t_p1p0.x() + factor_ra * orth_p1p0.x(),
-           t_p1p0.y() + factor_ra * orth_p1p0.y());
-
-  // Calculate angles for addArc.
-  orth_p1p0 = PointF(-orth_p1p0.x(), -orth_p1p0.y());
-  float sa = acos(orth_p1p0.x() / orth_p1p0_length);
-  if (orth_p1p0.y() < 0.f)
-    sa = 2 * M_PI - sa;
-
-  // Anti-clockwise logic.
-  bool anticlockwise = false;
-
-  float factor_p1p2 = tangent / p1p2_length;
-  PointF t_p1p2(p1.x() + factor_p1p2 * p1p2.x(),
-                p1.y() + factor_p1p2 * p1p2.y());
-  PointF orth_p1p2(t_p1p2.x() - p.x(), t_p1p2.y() - p.y());
-  float orth_p1p2_length = sqrtf(orth_p1p2.x() * orth_p1p2.x() +
-                                 orth_p1p2.y() * orth_p1p2.y());
-  float ea = acos(orth_p1p2.x() / orth_p1p2_length);
-  if (orth_p1p2.y() < 0)
-    ea = 2 * M_PI - ea;
-  if ((sa > ea) && ((sa - ea) < M_PI))
-    anticlockwise = true;
-  if ((sa < ea) && ((ea - sa) > M_PI))
-    anticlockwise = true;
-
-  ArcPixel(p, radius, sa, ea, anticlockwise);
 }
 
 void PainterWin::ArcPixel(const PointF& p, float radius, float sa, float ea,

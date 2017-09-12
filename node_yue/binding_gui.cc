@@ -470,7 +470,6 @@ struct Type<nu::Painter> {
         "moveTo", &nu::Painter::MoveTo,
         "lineTo", &nu::Painter::LineTo,
         "bezierCurveTo", &nu::Painter::BezierCurveTo,
-        "arcTo", &nu::Painter::ArcTo,
         "arc", &nu::Painter::Arc,
         "rect", &nu::Painter::Rect,
         "clip", &nu::Painter::Clip,

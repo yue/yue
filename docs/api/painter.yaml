@@ -39,11 +39,6 @@ methods:
       The first two points are control points and the third one is the end
       point. The starting point is the last point in the current path.
 
-  - signature: void ArcTo(const PointF& cp1, const PointF& cp2, float radius)
-    description: |
-      Add an arc to current path with the given control points and radius.
-      connected to the previous point by a straight line.
-
   - signature: void Arc(const PointF& point, float radius, float sa, float ea)
     description: |
       Add an arc to the path which is centered at `point` with `radius`

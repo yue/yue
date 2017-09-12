@@ -105,10 +105,6 @@ void PainterMac::BezierCurveTo(const PointF& cp1,
       context_, cp1.x(), cp1.y(), cp2.x(), cp2.y(), ep.x(), ep.y());
 }
 
-void PainterMac::ArcTo(const PointF& cp1, const PointF& cp2, float radius) {
-  CGContextAddArcToPoint(context_, cp1.x(), cp1.y(), cp2.x(), cp2.y(), radius);
-}
-
 void PainterMac::Arc(const PointF& point, float radius, float sa, float ea) {
   // We are in a flipped coordianate system, so use anti-clockwise.
   CGContextAddArc(context_, point.x(), point.y(), radius, sa, ea, 0);
