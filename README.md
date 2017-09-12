@@ -1,20 +1,20 @@
 # Yue
 
-A library to create cross-platform GUI apps.
+A library for creating native cross-platform GUI apps.
 
 ## Getting started
 
 * [Documentations](http://libyue.com)
-* [FAQ](https://github.com/yue/help#faq)
-* [Sample Apps](https://github.com/yue/yue-sample-apps)
+* [FAQ](https://github.com/yue/yue/blob/master/docs/guides/faq.md)
+* [Sample apps (with screenshots)](https://github.com/yue/yue-sample-apps)
 
 ## Issues
 
-The issues page of this repo is disabled on purpose, for help please go to the
-[yue/help](https://github.com/yue/help) repo where users help themselves.
+Feel free to ask any kind of questions in the issues page, but please use
+English since other users may find your questions valuable.
 
-To report a bug, you have to create a pull request with a test case of your
-problem, or you can choose to subscribe to [paid plans][paid-plans].
+If you want to get technical support, there are [paid plans][paid-plans]
+available.
 
 ## Contributions
 
@@ -26,22 +26,15 @@ derivative works.
 
 ## License
 
-The Yue project is under the [Microsoft Reciprocal License (MS-RL)][ms-rl]
-with following clarifications:
+The Yue project is licensed under [LGPL v2.1][license] with following exception:
 
-* Using or copying headers of this software is not considered as containing
-  its code.
-* Linking with the code of this software in any form is not considered as
-  containing its code.
-* Using a modified version of this software is considered as containing this
-  software's code, so any code linked to it has to be licensed under MS-RL.
-* Any forked version of the original [yue/yue](https://github.com/yue/yue) repo
-  is considered as a modified version of this software.
+* If you did not modify Yue's source code, you have the permission to statically
+  link Yue with your project, regardless of the license of your project.
 
 ### Alternative license
 
-The source code of Yue is also available under MS-PL license if you subscribe to
-the [paid plans][paid-plans].
+The source code of Yue is also available under the MIT license if you subscribe
+to the [paid plans][paid-plans].
 
-[ms-rl]: https://github.com/yue/yue/blob/master/LICENSE
+[license]: https://github.com/yue/yue/blob/master/LICENSE
 [paid-plans]: https://github.com/yue/yue/tree/master/docs/paid_plans

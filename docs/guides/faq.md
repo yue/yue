@@ -29,7 +29,7 @@ Unless you have modified Yue's source code and linked your project with Yue stat
 
 ### Your website looks shabby.
 
-But it has a good documentation site.
+I have put priority on the documentation site, I'll improve the homepage in future.
 
 ### Will Yue support XAML/QML?
 
