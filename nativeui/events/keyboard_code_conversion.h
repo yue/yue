@@ -1,6 +1,7 @@
 // Copyright 2017 Cheng Zhao. All rights reserved.
-// Use of this source code is governed by the license that can be found in the
-// LICENSE file.
+// Copyright 2014 The Chromium Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE.chromium file.
 
 #ifndef NATIVEUI_EVENTS_KEYBOARD_CODE_CONVERSION_H_
 #define NATIVEUI_EVENTS_KEYBOARD_CODE_CONVERSION_H_
