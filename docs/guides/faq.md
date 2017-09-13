@@ -33,7 +33,7 @@ I have put priority on the documentation site, I'll improve the homepage in futu
 
 ### Will Yue support XAML/QML?
 
-No, Yue will always be a widgets library, there is no plan to implement high level languages like XAML/QML in Yue. The goal of Yue is to provide a low-level library that can be used to easily implement things like Rect Native and XAML/QML.
+No, Yue will always be a widgets library, there is no plan to implement high level languages like XAML/QML in Yue. The goal of Yue is to provide a low-level library that can be used to easily implement things like React Native and XAML/QML.
 
 However Yue will support creating widgets from simple XML descriptions, since it is essential for writing a visual GUI builder.
 
