@@ -19,7 +19,7 @@ When writing GUI programs, I had been searching for a library that:
 * Has good support for High DPI;
 * Uses windowless controls on Windows;
 * Generates small executable size;
-* Friendly license for closed source apps.
+* With friendly license for closed source apps.
 
 There were lots of good GUI toolkits, but I could not find one that meets all above conditions, so I decided to write my own.
 
@@ -37,13 +37,25 @@ No, Yue will always be a widgets library, there is no plan to implement high lev
 
 However Yue will support creating widgets from simple XML descriptions, since it is essential for writing a visual GUI builder.
 
-### Will Yue support CSS?
-
-No.
-
 ### What's the minimum version of Windows supported?
 
 By using Win32 API and GDI+, Yue can work on Windows >= 7. It is also possible to make Yue work on Windows XP with some efforts, but this is not on my roadmap.
+
+### Why using windowless controls on Windows?
+
+The Win32 Common Controls have a few problems:
+
+* most controls can not be nested;
+* with large numbers of controls performance would be slow.
+* it is hard/impossible to make controls transparent;
+* it is hard/impossible to solve the flickering problem;
+* it is hard/impossible to handle controls' mouse and keyboard events;
+
+(Whether it is hard or impossible depends on the types of controls.)
+
+To make the windowless controls still look native, most controls are drawn with the UxTheme API, which should be the same with how Windows itself renders Win32 Common Controls.
+
+However with windowless controls we also lose accessibility by default, my plan is to use the UI Automation provider API to provide accessibility interface for the windowless controls.
 
 ### Are all widgets windowless on Windows?
 
@@ -55,6 +67,8 @@ In future I'll make all widgets windowless, but it might be optional since it ma
 
 Because I was more familiar with GDI+, I'll migrate the painting code to Direct2D in future.
 
+Note that most controls are drawn with UxTheme instead of GDI+, so unless you are doing very heavy custom animation with the drawing API, there is no need to worry about the performance of GDI+.
+
 ### Can I embed a web browser in Yue?
 
 Currently there are efforts on supporting native webview in Yue, e.g. `WebView` on macOS, `webkitgtk` on Linux, and Internet Explorer on Windows.
@@ -62,5 +76,3 @@ Currently there are efforts on supporting native webview in Yue, e.g. `WebView` 
 ### Can I use Yue in NW.js?
 
 No it is not possible, Yue requires to be used in the UI thread of the main process, which is not supported by NW.js.
-
-[paid-plan]: https://github.com/yue/yue/tree/master/docs/paid_plans
