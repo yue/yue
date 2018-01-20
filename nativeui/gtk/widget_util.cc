@@ -4,6 +4,8 @@
 
 #include "nativeui/gtk/widget_util.h"
 
+#include <algorithm>
+
 #include "base/logging.h"
 #include "nativeui/gfx/color.h"
 
