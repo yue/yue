@@ -14,8 +14,8 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/win/registry.h"
 #include "base/win/scoped_bstr.h"
-#include "base/win/scoped_com_initializer.h"
 #include "base/win/scoped_variant.h"
+#include "nativeui/state.h"
 #include "nativeui/win/browser_ole_site.h"
 #include "nativeui/win/subwin_view.h"
 
@@ -27,7 +27,6 @@ const wchar_t* IE_EMULATION_KEY =
     L"Software\\Microsoft\\Internet Explorer\\Main\\FeatureControl\\"
     L"FEATURE_BROWSER_EMULATION";
 const DWORD IE_VERSION = 11000;
-
 
 // Set register key to prevent using compatible mode of IE.
 void FixIECompatibleMode() {
@@ -43,6 +42,7 @@ class BrowserImpl : public SubwinView {
  public:
   explicit BrowserImpl(Browser* delegate)
       : SubwinView(delegate) {
+    State::GetCurrent()->InitializeCOM();
     FixIECompatibleMode();
     Microsoft::WRL::ComPtr<IClassFactory> class_factory;
     if (FAILED(::CoGetClassObject(CLSID_WebBrowser,
@@ -86,7 +86,6 @@ class BrowserImpl : public SubwinView {
   }
 
  private:
-  base::win::ScopedCOMInitializer com_;
   Microsoft::WRL::ComPtr<BrowserOleSite> ole_site_;
   Microsoft::WRL::ComPtr<IWebBrowser2> browser_;
 };

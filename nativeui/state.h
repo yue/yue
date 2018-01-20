@@ -12,6 +12,14 @@
 
 typedef struct YGConfig *YGConfigRef;
 
+#if defined(OS_WIN)
+namespace base {
+namespace win {
+class ScopedCOMInitializer;
+}
+}
+#endif
+
 namespace nu {
 
 #if defined(OS_WIN)
@@ -33,6 +41,7 @@ class NATIVEUI_EXPORT State {
 
   // Internal classes.
 #if defined(OS_WIN)
+  void InitializeCOM();
   HWND GetSubwinHolder();
   ClassRegistrar* GetClassRegistrar();
   NativeTheme* GetNativeTheme();
@@ -46,6 +55,7 @@ class NATIVEUI_EXPORT State {
   void PlatformInit();
 
 #if defined(OS_WIN)
+  std::unique_ptr<base::win::ScopedCOMInitializer> com_initializer_;
   std::unique_ptr<GdiplusHolder> gdiplus_holder_;
   std::unique_ptr<ClassRegistrar> class_registrar_;
   std::unique_ptr<SubwinHolder> subwin_holder_;

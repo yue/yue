@@ -7,6 +7,7 @@
 #include <shellscalingapi.h>
 
 #include "base/logging.h"
+#include "base/win/scoped_com_initializer.h"
 #include "base/win/windows_version.h"
 #include "nativeui/gfx/screen.h"
 #include "nativeui/gfx/win/native_theme.h"
@@ -78,6 +79,11 @@ void State::PlatformInit() {
   ::InitCommonControlsEx(&config);
 
   gdiplus_holder_.reset(new GdiplusHolder);
+}
+
+void State::InitializeCOM() {
+  if (!com_initializer_)
+    com_initializer_.reset(new base::win::ScopedCOMInitializer);
 }
 
 HWND State::GetSubwinHolder() {
