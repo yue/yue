@@ -234,6 +234,8 @@ component("nativeui") {
     "win/lifetime_win.cc",
     "win/accelerator_manager_win.cc",
     "win/browser_win.cc",
+    "win/browser_ole_site.cc",
+    "win/browser_ole_site.h",
     "win/button_win.cc",
     "win/container_win.cc",
     "win/container_win.h",

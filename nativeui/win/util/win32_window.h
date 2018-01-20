@@ -34,9 +34,9 @@ class Win32Window {
   static const DWORD kWindowDefaultStyle;
 
   Win32Window(base::StringPiece16 class_name = L"",
-             HWND parent = NULL,
-             DWORD window_style = kWindowDefaultStyle,
-             DWORD window_ex_style = 0);
+              HWND parent = NULL,
+              DWORD window_style = kWindowDefaultStyle,
+              DWORD window_ex_style = 0);
 
   // Return the default window icon to use for windows of this type.
   virtual HICON GetDefaultWindowIcon() const;
