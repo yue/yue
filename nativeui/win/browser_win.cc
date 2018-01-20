@@ -44,6 +44,7 @@ BrowserImpl::BrowserImpl(Browser* delegate)
   State::GetCurrent()->InitializeCOM();
   // Use the latest IE version.
   FixIECompatibleMode();
+
   // Boring work of creating IE control.
   Microsoft::WRL::ComPtr<IClassFactory> class_factory;
   if (FAILED(::CoGetClassObject(CLSID_WebBrowser,
@@ -76,6 +77,12 @@ BrowserImpl::BrowserImpl(Browser* delegate)
   RECT rc = { 0 };
   ole_object->DoVerb(OLEIVERB_INPLACEACTIVATE, nullptr, ole_site_.Get(), -1,
                      hwnd(), &rc);
+
+  // Get HWND from the IE control.
+  SHANDLE_PTR hwnd;
+  if (FAILED(browser_->get_HWND(&hwnd)))
+    return;
+  browser_hwnd_ = reinterpret_cast<HWND>(hwnd);
 }
 
 void BrowserImpl::LoadURL(const base::string16& str) {
@@ -90,6 +97,22 @@ void BrowserImpl::SizeAllocate(const Rect& bounds) {
     return;
   RECT rc = { 0, 0, bounds.width(), bounds.height() };
   in_place->SetObjectRects(&rc, &rc);
+}
+
+bool BrowserImpl::HasFocus() const {
+  return ::GetFocus() == browser_hwnd_;
+}
+
+void BrowserImpl::OnSetFocus(HWND hwnd) {
+  // Still mark this control as focused.
+  SubwinView::OnSetFocus(hwnd);
+  SetMsgHandled(false);
+  // But move the focus to the IE control.
+  Microsoft::WRL::ComPtr<IOleInPlaceActiveObject> in_place_active;
+  if (FAILED(browser_.As(&in_place_active)))
+    return;
+  in_place_active->OnFrameWindowActivate(TRUE);
+  in_place_active->OnDocWindowActivate(TRUE);
 }
 
 LRESULT BrowserImpl::OnParentNotify(UINT msg, WPARAM w_param, LPARAM l_param) {
