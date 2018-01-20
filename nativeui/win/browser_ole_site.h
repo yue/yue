@@ -89,6 +89,7 @@ class BrowserOleSite : public IOleClientSite,
   IFACEMETHODIMP FilterDataObject(
       _In_ IDataObject *pDO,
       _Outptr_result_maybenull_ IDataObject **ppDORet);
+
  private:
   ULONG ref_;
   HWND hwnd_;

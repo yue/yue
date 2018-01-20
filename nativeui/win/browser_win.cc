@@ -2,11 +2,9 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/browser.h"
+#include "nativeui/win/browser_win.h"
 
-#include <exdisp.h>
-#include <ole2.h>
-#include <wrl.h>
+#include <string>
 
 #include "base/base_paths.h"
 #include "base/files/file_path.h"
@@ -16,8 +14,6 @@
 #include "base/win/scoped_bstr.h"
 #include "base/win/scoped_variant.h"
 #include "nativeui/state.h"
-#include "nativeui/win/browser_ole_site.h"
-#include "nativeui/win/subwin_view.h"
 
 namespace nu {
 
@@ -37,60 +33,64 @@ void FixIECompatibleMode() {
       .WriteValue(exe_path.BaseName().value().c_str(), IE_VERSION);
 }
 
-// Implementation of Browser.
-class BrowserImpl : public SubwinView {
- public:
-  explicit BrowserImpl(Browser* delegate)
-      : SubwinView(delegate) {
-    State::GetCurrent()->InitializeCOM();
-    FixIECompatibleMode();
-    Microsoft::WRL::ComPtr<IClassFactory> class_factory;
-    if (FAILED(::CoGetClassObject(CLSID_WebBrowser,
-                                  CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,
-                                  nullptr,
-                                  IID_PPV_ARGS(&class_factory)))) {
-      PLOG(ERROR) << "Failed to call CoGetClassObject on CLSID_WebBrowser";
-      return;
-    }
-    if (FAILED(class_factory->CreateInstance(nullptr,
-                                             IID_PPV_ARGS(&browser_)))) {
-      PLOG(ERROR) << "Failed to create instance on CLSID_WebBrowser";
-      return;
-    }
-    ole_site_ = new BrowserOleSite(hwnd());
-    Microsoft::WRL::ComPtr<IOleObject> ole_object;
-    if (FAILED(browser_.As(&ole_object)) ||
-        FAILED(ole_object->SetClientSite(ole_site_.Get()))) {
-      PLOG(ERROR) << "Failed to set client site";
-      return;
-    }
-    RECT rc = { 0 };
-    ole_object->DoVerb(OLEIVERB_INPLACEACTIVATE, nullptr, ole_site_.Get(), -1,
-                       hwnd(), &rc);
-  }
-
-  void LoadURL(const base::string16& str) {
-    base::win::ScopedBstr url(str.c_str());
-    browser_->Navigate(url, nullptr, nullptr, nullptr, nullptr);
-  }
-
- protected:
-  // ViewImpl:
-  void SizeAllocate(const Rect& bounds) override {
-    SubwinView::SizeAllocate(bounds);
-    Microsoft::WRL::ComPtr<IOleInPlaceObject> in_place;
-    if (FAILED(browser_.As(&in_place)))
-      return;
-    RECT rc = { 0, 0, bounds.width(), bounds.height() };
-    in_place->SetObjectRects(&rc, &rc);
-  }
-
- private:
-  Microsoft::WRL::ComPtr<BrowserOleSite> ole_site_;
-  Microsoft::WRL::ComPtr<IWebBrowser2> browser_;
-};
-
 }  // namespace
+
+BrowserImpl::BrowserImpl(Browser* delegate)
+    : SubwinView(delegate),
+      ole_site_(new BrowserOleSite(hwnd())),
+      event_sink_(new BrowserEventSink(delegate)) {
+  State::GetCurrent()->InitializeCOM();
+  FixIECompatibleMode();
+  Microsoft::WRL::ComPtr<IClassFactory> class_factory;
+  if (FAILED(::CoGetClassObject(CLSID_WebBrowser,
+                                CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,
+                                nullptr,
+                                IID_PPV_ARGS(&class_factory)))) {
+    PLOG(ERROR) << "Failed to call CoGetClassObject on CLSID_WebBrowser";
+    return;
+  }
+  if (FAILED(class_factory->CreateInstance(nullptr,
+                                           IID_PPV_ARGS(&browser_)))) {
+    PLOG(ERROR) << "Failed to create instance on CLSID_WebBrowser";
+    return;
+  }
+  Microsoft::WRL::ComPtr<IOleObject> ole_object;
+  if (FAILED(browser_.As(&ole_object)) ||
+      FAILED(ole_object->SetClientSite(ole_site_.Get()))) {
+    PLOG(ERROR) << "Failed to set client site";
+    return;
+  }
+  RECT rc = { 0 };
+  ole_object->DoVerb(OLEIVERB_INPLACEACTIVATE, nullptr, ole_site_.Get(), -1,
+                     hwnd(), &rc);
+}
+
+void BrowserImpl::LoadURL(const base::string16& str) {
+  base::win::ScopedBstr url(str.c_str());
+  browser_->Navigate(url, nullptr, nullptr, nullptr, nullptr);
+}
+
+void BrowserImpl::SizeAllocate(const Rect& bounds) {
+  SubwinView::SizeAllocate(bounds);
+  Microsoft::WRL::ComPtr<IOleInPlaceObject> in_place;
+  if (FAILED(browser_.As(&in_place)))
+    return;
+  RECT rc = { 0, 0, bounds.width(), bounds.height() };
+  in_place->SetObjectRects(&rc, &rc);
+}
+
+LRESULT BrowserImpl::OnParentNotify(UINT msg, WPARAM w_param, LPARAM l_param) {
+  if (w_param == WM_DESTROY) {
+    auto* browser = static_cast<Browser*>(delegate());
+    browser->on_close.Emit(browser);
+  } else {
+    SetMsgHandled(false);
+  }
+  return 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Public Browser API implementation.
 
 Browser::Browser() {
   TakeOverView(new BrowserImpl(this));
