@@ -54,6 +54,15 @@ BrowserImpl::BrowserImpl(Browser* delegate)
     PLOG(ERROR) << "Failed to create instance on CLSID_WebBrowser";
     return;
   }
+  Microsoft::WRL::ComPtr<IConnectionPointContainer> cpc;
+  Microsoft::WRL::ComPtr<IConnectionPoint> cp;
+  DWORD cookie;
+  if (FAILED(browser_.As(&cpc)) ||
+      FAILED(cpc->FindConnectionPoint(DIID_DWebBrowserEvents2, &cp)) ||
+      FAILED(cp->Advise(event_sink_.Get(), &cookie))) {
+    PLOG(ERROR) << "Failed to set client site";
+    return;
+  }
   Microsoft::WRL::ComPtr<IOleObject> ole_object;
   if (FAILED(browser_.As(&ole_object)) ||
       FAILED(ole_object->SetClientSite(ole_site_.Get()))) {
