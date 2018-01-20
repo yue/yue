@@ -13,6 +13,7 @@
 #include "nativeui/gfx/win/native_theme.h"
 #include "nativeui/win/util/class_registrar.h"
 #include "nativeui/win/util/gdiplus_holder.h"
+#include "nativeui/win/util/scoped_ole_initializer.h"
 #include "nativeui/win/util/subwin_holder.h"
 #include "third_party/yoga/yoga/Yoga.h"
 
@@ -82,8 +83,10 @@ void State::PlatformInit() {
 }
 
 void State::InitializeCOM() {
-  if (!com_initializer_)
+  if (!com_initializer_) {
     com_initializer_.reset(new base::win::ScopedCOMInitializer);
+    ole_initializer_.reset(new ScopedOleInitializer);
+  }
 }
 
 HWND State::GetSubwinHolder() {

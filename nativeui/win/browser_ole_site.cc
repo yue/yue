@@ -188,8 +188,9 @@ IFACEMETHODIMP BrowserOleSite::TranslateAccelerator(
     LPMSG lpMsg,
     const GUID *pguidCmdGroup,
     DWORD nCmdID) {
-  return E_NOTIMPL;
+  return S_FALSE;
 }
+
 IFACEMETHODIMP BrowserOleSite::GetOptionKeyPath(_Out_ LPOLESTR *pchKey,
                                                 DWORD dw) {
   return E_NOTIMPL;

@@ -1,0 +1,30 @@
+name: Browser
+component: gui
+header: nativeui/browser.h
+type: refcounted
+namespace: nu
+inherit: View
+description: Native webview using system browser.
+
+constructors:
+  - signature: Browser()
+    lang: ['cpp']
+    description: Create a new browser view.
+
+class_methods:
+  - signature: Browser* Create()
+    lang: ['lua', 'js']
+    description: Create a new browser view.
+
+class_properties:
+  - property: const char* kClassName
+    lang: ['cpp']
+    description: The class name of this view.
+
+methods:
+  - signature: void LoadURL(const std::string& url)
+    description: Load the URL.
+
+events:
+  - callback: void on_close(Browser* self)
+    description: Emitted when the web page requests to close.

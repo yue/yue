@@ -39,8 +39,12 @@ BrowserImpl::BrowserImpl(Browser* delegate)
     : SubwinView(delegate),
       ole_site_(new BrowserOleSite(hwnd())),
       event_sink_(new BrowserEventSink(delegate)) {
+  set_focusable(true);
+  // Initialize COM and OLE.
   State::GetCurrent()->InitializeCOM();
+  // Use the latest IE version.
   FixIECompatibleMode();
+  // Boring work of creating IE control.
   Microsoft::WRL::ComPtr<IClassFactory> class_factory;
   if (FAILED(::CoGetClassObject(CLSID_WebBrowser,
                                 CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,
@@ -90,6 +94,7 @@ void BrowserImpl::SizeAllocate(const Rect& bounds) {
 
 LRESULT BrowserImpl::OnParentNotify(UINT msg, WPARAM w_param, LPARAM l_param) {
   if (w_param == WM_DESTROY) {
+    // This is the only way to know when page calls window.close().
     auto* browser = static_cast<Browser*>(delegate());
     browser->on_close.Emit(browser);
   } else {

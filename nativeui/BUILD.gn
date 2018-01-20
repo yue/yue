@@ -280,6 +280,8 @@ component("nativeui") {
     "win/util/hwnd_util.cc",
     "win/util/hwnd_util.h",
     "win/util/msg_util.h",
+    "win/util/scoped_ole_initializer.cc",
+    "win/util/scoped_ole_initializer.h",
     "win/util/subwin_holder.cc",
     "win/util/subwin_holder.h",
     "win/util/win32_window.cc",

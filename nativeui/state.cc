@@ -13,6 +13,7 @@
 #include "nativeui/gfx/win/native_theme.h"
 #include "nativeui/win/util/class_registrar.h"
 #include "nativeui/win/util/gdiplus_holder.h"
+#include "nativeui/win/util/scoped_ole_initializer.h"
 #include "nativeui/win/util/subwin_holder.h"
 #endif
 

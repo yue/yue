@@ -27,6 +27,7 @@ class GdiplusHolder;
 class ClassRegistrar;
 class NativeTheme;
 class SubwinHolder;
+class ScopedOleInitializer;
 #endif
 
 class NATIVEUI_EXPORT State {
@@ -56,6 +57,7 @@ class NATIVEUI_EXPORT State {
 
 #if defined(OS_WIN)
   std::unique_ptr<base::win::ScopedCOMInitializer> com_initializer_;
+  std::unique_ptr<ScopedOleInitializer> ole_initializer_;
   std::unique_ptr<GdiplusHolder> gdiplus_holder_;
   std::unique_ptr<ClassRegistrar> class_registrar_;
   std::unique_ptr<SubwinHolder> subwin_holder_;
