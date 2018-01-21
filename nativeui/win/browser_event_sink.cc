@@ -8,7 +8,6 @@
 #include <exdispid.h>
 #include <shlwapi.h>
 
-#include "base/strings/utf_string_conversions.h"
 #include "nativeui/win/browser_win.h"
 
 namespace nu {
@@ -77,9 +76,7 @@ STDMETHODIMP BrowserEventSink::Invoke(_In_  DISPID dispIdMember,
       browser_->ReceiveBrowserHWND();
       break;
     case DISPID_NAVIGATECOMPLETE2:
-      browser->on_finish_navigation.Emit(
-          browser,
-          base::UTF16ToUTF8(pDispParams->rgvarg[0].pvarVal->bstrVal));
+      browser->on_finish_navigation.Emit(browser);
       break;
     default:
       hr = E_NOTIMPL;

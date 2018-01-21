@@ -25,7 +25,7 @@ class NATIVEUI_EXPORT Browser : public View {
 
   // Events.
   Signal<void(Browser*)> on_close;
-  Signal<void(Browser*, const std::string&)> on_finish_navigation;
+  Signal<void(Browser*)> on_finish_navigation;
 
  protected:
   ~Browser() override;

@@ -15,15 +15,12 @@ class BrowserTest : public testing::Test {
 };
 
 TEST_F(BrowserTest, LoadURL) {
-  const std::string url = "about:blank";
   scoped_refptr<nu::Browser> browser = new nu::Browser;
-  browser->on_finish_navigation.Connect([&](nu::Browser*,
-                                            const std::string& u) {
-    EXPECT_EQ(u, url);
+  browser->on_finish_navigation.Connect([&](nu::Browser*) {
     lifetime_.Quit();
   });
   lifetime_.PostTask([&]() {
-    browser->LoadURL(url);
+    browser->LoadURL("about:blank");
   });
   lifetime_.Run();
 }

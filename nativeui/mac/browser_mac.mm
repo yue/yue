@@ -39,13 +39,25 @@
 
 @end
 
+@interface NUNavigationDelegate : NSObject<WKNavigationDelegate>
+@end
+
+@implementation NUNavigationDelegate
+
+- (void)webView:(WKWebView*)webview didFinishNavigation:(WKNavigation*)navigation {
+  auto* browser = static_cast<nu::Browser*>([webview shell]);
+  browser->on_finish_navigation.Emit(browser);
+}
+
+@end
+
 @interface NUWebUIDelegate : NSObject<WKUIDelegate>
 @end
 
 @implementation NUWebUIDelegate
 
-- (void)webViewDidClose:(WKWebView*)sender {
-  auto* browser = static_cast<nu::Browser*>([sender shell]);
+- (void)webViewDidClose:(WKWebView*)webview {
+  auto* browser = static_cast<nu::Browser*>([webview shell]);
   browser->on_close.Emit(browser);
 }
 
@@ -56,12 +68,14 @@ namespace nu {
 Browser::Browser() {
   NUWebView* webview = [[NUWebView alloc] initWithFrame:NSZeroRect];
   webview.UIDelegate = [[NUWebUIDelegate alloc] init];
+  webview.navigationDelegate = [[NUNavigationDelegate alloc] init];
   TakeOverView(webview);
 }
 
 Browser::~Browser() {
   auto* webview = static_cast<NUWebView*>(GetNative());
   [[webview UIDelegate] release];
+  [[webview navigationDelegate] release];
 }
 
 void Browser::LoadURL(const std::string& url) {
