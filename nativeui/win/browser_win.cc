@@ -179,7 +179,17 @@ LRESULT BrowserImpl::BrowserWndProc(HWND hwnd,
   switch (message) {
     case WM_KEYUP:
     case WM_KEYDOWN:
-      LOG(ERROR) << "OnKeyEvent";
+      // Ask if ViewImpl wants to handle the key.
+      self->OnKeyEvent(message, w_param, l_param);
+      if (self->IsMsgHandled())
+        return true;
+      // Then pass the key as accelerator to browser.
+      Microsoft::WRL::ComPtr<IOleInPlaceActiveObject> in_place_active;
+      if (FAILED(self->browser_.As(&in_place_active)))
+        break;
+      MSG msg = { hwnd, message, w_param, l_param };
+      if (SUCCEEDED(in_place_active->TranslateAccelerator(&msg)))
+        return true;
       break;
   }
   // Return to the original proc.
