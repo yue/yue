@@ -26,6 +26,17 @@ void Lifetime::Run() {
 
 void Lifetime::Quit() {
   [NSApp stop:nil];
+  // Must post an event, otherwise an idle loop may not response to stop.
+  [NSApp postEvent:[NSEvent otherEventWithType:NSApplicationDefined
+                                      location:NSZeroPoint
+                                 modifierFlags:0
+                                     timestamp:0
+                                  windowNumber:0
+                                       context:NULL
+                                       subtype:0
+                                         data1:0
+                                         data2:0]
+           atStart:NO];
 }
 
 void Lifetime::PostTask(const std::function<void()>& task) {
