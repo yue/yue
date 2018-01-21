@@ -11,11 +11,11 @@
 
 namespace nu {
 
-class Browser;
+class BrowserImpl;
 
 class BrowserEventSink : public IDispatch {
  public:
-  explicit BrowserEventSink(Browser* browser);
+  explicit BrowserEventSink(BrowserImpl* browser);
   ~BrowserEventSink();
 
   // IUnknown
@@ -45,7 +45,7 @@ class BrowserEventSink : public IDispatch {
 
  private:
   ULONG ref_;
-  Browser* browser_;
+  BrowserImpl* browser_;
 };
 
 }  // namespace nu

@@ -8,11 +8,11 @@
 #include <exdispid.h>
 #include <shlwapi.h>
 
-#include "nativeui/browser.h"
+#include "nativeui/win/browser_win.h"
 
 namespace nu {
 
-BrowserEventSink::BrowserEventSink(Browser* browser)
+BrowserEventSink::BrowserEventSink(BrowserImpl* browser)
     : ref_(1), browser_(browser) {
 }
 
@@ -69,6 +69,11 @@ STDMETHODIMP BrowserEventSink::Invoke(_In_  DISPID dispIdMember,
                                       _Out_opt_  UINT *puArgErr) {
   HRESULT hr = S_OK;
   switch (dispIdMember) {
+    case DISPID_STATUSTEXTCHANGE:
+      // We don't have a way to know when the IE control creates its HWND, our
+      // only solution is to keep requesting when navigation state changes.
+      browser_->ReceiveBrowserHWND();
+      break;
     case DISPID_DOCUMENTCOMPLETE:
       break;
     default:
