@@ -9,9 +9,9 @@ custom-steps:
         apt-get install -y git xvfb libgtk-3-dev libnotify-dev webkit2gtk-4.0-dev
   - &install-cross-toolchain
     run:
-      name: Install dependencies
+      name: Install cross compile toolchains
       command: |
-        apt-get install -y gcc-4.8-multilib g++-4.8-multilib
+        apt-get install -y gcc-5-multilib g++-5-multilib
   - &install-node
     run:
       name: Install Node.js
@@ -46,9 +46,6 @@ jobs:
     steps:
       - *install-deps
       - *install-cross-toolchain
-      - run:
-          name: Install x86 libs
-          command: apt-get install -y libc6-dev-i386
       - *install-node
       - checkout
       - *run-ci
@@ -63,7 +60,7 @@ jobs:
       - *install-deps
       - *install-cross-toolchain
       - run:
-          name: Install arm libs
+          name: Install ARM libs
           command: apt-get install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf libc6-dev-armhf-cross linux-libc-dev-armhf-cross binutils-aarch64-linux-gnu
       - *install-node
       - checkout
