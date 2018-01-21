@@ -5,7 +5,7 @@ notifications:
 
 language: node_js
 node_js:
-  - "8.2.1"
+  - 8.2.1
 os:
   - osx
 osx_image: xcode8.3
@@ -13,24 +13,11 @@ osx_image: xcode8.3
 env:
   - TARGET_CPU=x64
 
-matrix:
-  include:
-    - os: linux
-      env:
-        - TARGET_CPU=x86
-    - os: linux
-      env:
-        - TARGET_CPU=arm
-
 before_script:
   - export YUE_VERSION=$(git describe --always --tags)
 
 script:
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-      xvfb-run node ./scripts/cibuild.js --target-cpu=$TARGET_CPU;
-    else
-      node ./scripts/cibuild.js --target-cpu=$TARGET_CPU;
-    fi
+  - node ./scripts/cibuild.js --target-cpu=$TARGET_CPU
 
 deploy:
   provider: releases
