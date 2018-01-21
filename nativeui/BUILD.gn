@@ -18,13 +18,15 @@ component("nativeui") {
   sources = [
     "nativeui.h",
     "nativeui_export.h",
-    "app.cc",
-    "app.h",
+    "state.cc",
+    "state.h",
     "lifetime.cc",
     "lifetime.h",
     "accelerator.cc",
     "accelerator.h",
     "accelerator_manager.h",
+    "app.cc",
+    "app.h",
     "browser.cc",
     "browser.h",
     "button.cc",
@@ -53,8 +55,6 @@ component("nativeui") {
     "scroll.cc",
     "scroll.h",
     "signal.h",
-    "state.cc",
-    "state.h",
     "text_edit.cc",
     "text_edit.h",
     "toolbar.h",
@@ -328,7 +328,9 @@ component("nativeui") {
 
 test("nativeui_unittests") {
   sources = [
+    "lifetime_unittest.cc",
     "container_unittest.cc",
+    "browser_unittest.cc",
     "button_unittest.cc",
     "group_unittest.cc",
     "label_unittest.cc",

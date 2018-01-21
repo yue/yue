@@ -28,3 +28,6 @@ methods:
 events:
   - callback: void on_close(Browser* self)
     description: Emitted when the web page requests to close.
+
+  - callback: void on_finish_navigation(Browser* self, const std::string& url)
+    description: Emitted when the navigation is complete.

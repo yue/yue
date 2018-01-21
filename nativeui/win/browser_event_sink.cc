@@ -8,6 +8,7 @@
 #include <exdispid.h>
 #include <shlwapi.h>
 
+#include "base/strings/utf_string_conversions.h"
 #include "nativeui/win/browser_win.h"
 
 namespace nu {
@@ -67,6 +68,7 @@ STDMETHODIMP BrowserEventSink::Invoke(_In_  DISPID dispIdMember,
                                       _Out_opt_  VARIANT *pVarResult,
                                       _Out_opt_  EXCEPINFO *pExcepInfo,
                                       _Out_opt_  UINT *puArgErr) {
+  auto* browser = static_cast<Browser*>(browser_->delegate());
   HRESULT hr = S_OK;
   switch (dispIdMember) {
     case DISPID_STATUSTEXTCHANGE:
@@ -74,7 +76,10 @@ STDMETHODIMP BrowserEventSink::Invoke(_In_  DISPID dispIdMember,
       // only solution is to keep requesting when navigation state changes.
       browser_->ReceiveBrowserHWND();
       break;
-    case DISPID_DOCUMENTCOMPLETE:
+    case DISPID_NAVIGATECOMPLETE2:
+      browser->on_finish_navigation.Emit(
+          browser,
+          base::UTF16ToUTF8(pDispParams->rgvarg[0].pvarVal->bstrVal));
       break;
     default:
       hr = E_NOTIMPL;
