@@ -55,9 +55,6 @@ TEST_F(MenuItemTest, Radio) {
 }
 
 TEST_F(MenuItemTest, RadioGroup) {
-#if defined(OS_LINUX)
-  if (::getenv("TRAVIS")) return;
-#endif
   scoped_refptr<nu::Menu> menu = new nu::Menu;
   menu->Append(new nu::MenuItem(nu::MenuItem::Type::Radio));
   menu->Append(new nu::MenuItem(nu::MenuItem::Type::Separator));

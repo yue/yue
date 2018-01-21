@@ -116,9 +116,6 @@ TEST_F(WindowTest, FramelessWindowResizable) {
 }
 
 TEST_F(WindowTest, TransparentWindowResizable) {
-#if defined(OS_LINUX)
-  if (::getenv("TRAVIS")) return;
-#endif
   nu::Window::Options options;
   options.frame = false;
   options.transparent = true;
