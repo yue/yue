@@ -1,0 +1,25 @@
+version: 2
+
+jobs:
+  build:
+    docker:
+      - image: ubuntu:16.04
+        environment:
+          - TARGET_CPU=x64
+          - DISPLAY=:99.0
+    steps:
+      - run:
+          name: Install dependencies
+          command: |
+            apt-get update
+            apt-get install -y git xvfb libgtk-3-dev libnotify-dev webkit2gtk-4.0-dev
+      - run:
+          name: Install Node.js
+          command: |
+            curl -sL https://deb.nodesource.com/setup_8.x | bash -
+            apt-get install -y nodejs
+      - checkout
+      - run:
+          name: Run cibuild
+          command: |
+            xvfb-run node ./scripts/cibuild.js --target-cpu=$TARGET_CPU
