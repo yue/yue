@@ -23,6 +23,11 @@ custom-steps:
       name: Run cibuild
       command: |
         xvfb-run node ./scripts/cibuild.js --target-cpu=$TARGET_CPU
+  - &store-dists
+    persist_to_workspace:
+      root: .
+      paths:
+        - out/Dist/*.zip
 
 jobs:
   yue-linux-x64:
@@ -36,6 +41,7 @@ jobs:
       - *install-node
       - checkout
       - *run-ci
+      - *store-dists
 
   yue-linux-x86:
     docker:
@@ -49,6 +55,7 @@ jobs:
       - *install-node
       - checkout
       - *run-ci
+      - *store-dists
 
   yue-linux-arm:
     docker:
@@ -65,15 +72,53 @@ jobs:
       - *install-node
       - checkout
       - *run-ci
+      - *store-dists
+
+  yue-linux-deploy:
+    docker:
+      - image: golang:1.9
+    steps:
+      - attach_workspace:
+          at: .
+      - run: apk add --no-cache --no-progress git
+      - run: go get github.com/tcnksm/ghr
+      - run:
+          name: Release packages
+          command: |
+            ghr -t $GITHUB_TOKEN -u yue -r yue -draft $CIRCLE_TAG out/Dist/*.zip
 
 workflows:
   version: 2
   build-x64:
     jobs:
       - yue-linux-x64
+      - yue-linux-deploy:
+          requires:
+            - yue-linux-x64
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/
   build-x86:
     jobs:
       - yue-linux-x86
+      - yue-linux-deploy:
+          requires:
+            - yue-linux-x86
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/
   build-arm:
     jobs:
       - yue-linux-arm
+      - yue-linux-deploy:
+          requires:
+            - yue-linux-arm
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/
