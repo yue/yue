@@ -15,6 +15,22 @@ void OnClose(WebKitWebView* widget, Browser* view) {
   view->on_close.Emit(view);
 }
 
+void OnLoadChanged(WebKitWebView* widget,
+                   WebKitLoadEvent event,
+                   Browser* view) {
+  switch (event) {
+    case WEBKIT_LOAD_STARTED:
+      break;
+    case WEBKIT_LOAD_REDIRECTED:
+      break;
+    case WEBKIT_LOAD_COMMITTED:
+      break;
+    case WEBKIT_LOAD_FINISHED:
+      view->on_finish_navigation.Emit(view);
+      break;
+  }
+}
+
 }  // namespace
 
 Browser::Browser() {
@@ -23,6 +39,7 @@ Browser::Browser() {
 
   // Install events.
   g_signal_connect(webview, "close", G_CALLBACK(OnClose), this);
+  g_signal_connect(webview, "load-changed", G_CALLBACK(OnLoadChanged), this);
 }
 
 Browser::~Browser() {
