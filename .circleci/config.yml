@@ -134,12 +134,3 @@ workflows:
           filters:
             tags:
               only: /.*/
-  build-arm64:
-    jobs:
-      - yue-linux-arm64
-      - yue-linux-deploy:
-          requires:
-            - yue-linux-arm64
-          filters:
-            tags:
-              only: /.*/
