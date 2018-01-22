@@ -28,7 +28,6 @@ execSync('git submodule update --init --recursive')
 execSync(`node scripts/download_node_headers.js node ${process.version}`)
 
 const commonConfig = [
-  'use_allocator_shim=false',
   'fatal_linker_warnings=false',
   `target_cpu="${targetCpu}"`,
   'node_runtime="node"',
@@ -59,6 +58,8 @@ if (targetOs == 'linux') {
   releaseConfig.push('generate_linker_map=true')
   // This flag caused weird compilation errors when building on Linux.
   debugConfig.push('enable_iterator_debugging=false')
+  // Somehow arm64 was not using gold by default.
+  commonConfig.push('use_gold=true')
 }
 
 gen('out/Component', componentConfig)

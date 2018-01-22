@@ -113,11 +113,13 @@ workflows:
       - yue-linux-x64
       - yue-linux-x86
       - yue-linux-arm
+      - yue-linux-arm64
       - yue-linux-deploy:
           requires:
             - yue-linux-x64
             - yue-linux-x86
             - yue-linux-arm
+            - yue-linux-arm64
           filters:
             tags:
               only: /.*/
