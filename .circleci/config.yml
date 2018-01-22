@@ -98,8 +98,6 @@ workflows:
           filters:
             tags:
               only: /.*/
-            branches:
-              ignore: /.*/
   build-x86:
     jobs:
       - yue-linux-x86
@@ -109,8 +107,6 @@ workflows:
           filters:
             tags:
               only: /.*/
-            branches:
-              ignore: /.*/
   build-arm:
     jobs:
       - yue-linux-arm
@@ -120,5 +116,3 @@ workflows:
           filters:
             tags:
               only: /.*/
-            branches:
-              ignore: /.*/
