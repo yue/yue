@@ -108,29 +108,15 @@ jobs:
 
 workflows:
   version: 2
-  build-x64:
+  build:
     jobs:
       - yue-linux-x64
-      - yue-linux-deploy:
-          requires:
-            - yue-linux-x64
-          filters:
-            tags:
-              only: /.*/
-  build-x86:
-    jobs:
       - yue-linux-x86
-      - yue-linux-deploy:
-          requires:
-            - yue-linux-x86
-          filters:
-            tags:
-              only: /.*/
-  build-arm:
-    jobs:
       - yue-linux-arm
       - yue-linux-deploy:
           requires:
+            - yue-linux-x64
+            - yue-linux-x86
             - yue-linux-arm
           filters:
             tags:
