@@ -12,6 +12,11 @@ custom-steps:
       name: Install cross compile toolchains
       command: |
         apt-get install -y gcc-5-multilib g++-5-multilib
+  - &install-arm-toolchain
+    run:
+      name: Install ARM toolchains
+      command: |
+        apt-get install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf libc6-dev-armhf-cross linux-libc-dev-armhf-cross binutils-aarch64-linux-gnu
   - &install-node
     run:
       name: Install Node.js
@@ -66,9 +71,22 @@ jobs:
     steps:
       - *install-deps
       - *install-cross-toolchain
-      - run:
-          name: Install ARM libs
-          command: apt-get install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf libc6-dev-armhf-cross linux-libc-dev-armhf-cross binutils-aarch64-linux-gnu
+      - *install-arm-toolchain
+      - *install-node
+      - checkout
+      - *run-ci
+      - *store-dists
+
+  yue-linux-arm64:
+    docker:
+      - image: ubuntu:16.04
+        environment:
+          - TARGET_CPU=arm64
+          - DISPLAY=:99.0
+    steps:
+      - *install-deps
+      - *install-cross-toolchain
+      - *install-arm-toolchain
       - *install-node
       - checkout
       - *run-ci
@@ -113,6 +131,15 @@ workflows:
       - yue-linux-deploy:
           requires:
             - yue-linux-arm
+          filters:
+            tags:
+              only: /.*/
+  build-arm64:
+    jobs:
+      - yue-linux-arm64
+      - yue-linux-deploy:
+          requires:
+            - yue-linux-arm64
           filters:
             tags:
               only: /.*/
