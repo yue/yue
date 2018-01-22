@@ -46,13 +46,13 @@ TEST_F(BrowserTest, ExecuteJavaScript) {
 TEST_F(BrowserTest, ExecuteJavaScriptComplexResult) {
   scoped_refptr<nu::Browser> browser = new nu::Browser;
   browser->on_finish_navigation.Connect([](nu::Browser* browser) {
-    browser->ExecuteJavaScript("r = {a: 1.0, b: {c: [], d: 'te' + 'st'}}; r",
+    browser->ExecuteJavaScript("r = {a: true, b: {c: [], d: 'te' + 'st'}}; r",
                                [](bool success, base::Value result) {
       EXPECT_EQ(success, true);
       EXPECT_TRUE(result.is_dict());
       std::string json;
       EXPECT_TRUE(base::JSONWriter::Write(result, &json));
-      EXPECT_EQ(json, "{\"a\":1.0,\"b\":{\"c\":[],\"d\":\"test\"}}");
+      EXPECT_EQ(json, "{\"a\":true,\"b\":{\"c\":[],\"d\":\"test\"}}");
       nu::MessageLoop::Quit();
     });
   });

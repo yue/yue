@@ -8,6 +8,8 @@
 #include <JavaScriptCore/JavaScript.h>
 #include <webkit2/webkit2.h>
 
+#include "base/json/json_reader.h"
+
 namespace nu {
 
 namespace {
@@ -19,6 +21,20 @@ std::string JSStringToString(JSStringRef js) {
   size_t length = strlen(str.c_str());
   str.erase(length, max_size - length);
   return str;
+}
+
+base::Value JSValueToBaseValue(JSGlobalContextRef context, JSValueRef value) {
+  // While manually iterating the value should be more efficient, their API is
+  // such a pain to use.
+  JSStringRef json = JSValueCreateJSONString(context, value, 0, nullptr);
+  if (!json)
+    return base::Value();
+  std::string json_str = JSStringToString(json);
+  JSStringRelease(json);
+  std::unique_ptr<base::Value> result = base::JSONReader::Read(json_str);
+  if (!result)
+    return base::Value();
+  return std::move(*result.release());
 }
 
 void OnClose(WebKitWebView* widget, Browser* view) {
@@ -45,18 +61,14 @@ void OnJavaScriptFinish(WebKitWebView* webview,
   if (*callback) {
     auto* js_result = webkit_web_view_run_javascript_finish(
         webview, result, nullptr);
-    if (js_result) {
-      auto* context = webkit_javascript_result_get_global_context(js_result);
-      auto* value = webkit_javascript_result_get_value(js_result);
-      auto* json = JSValueCreateJSONString(context, value, 0, nullptr);
-      if (json) {
-        (*callback)(true, JSStringToString(json));
-        JSStringRelease(json);
-        return;
-      }
-      webkit_javascript_result_unref(js_result);
+    if (!js_result) {
+      (*callback)(false, base::Value());
+      return;
     }
-    (*callback)(false, "");
+    auto* context = webkit_javascript_result_get_global_context(js_result);
+    auto* value = webkit_javascript_result_get_value(js_result);
+    (*callback)(true, JSValueToBaseValue(context, value));
+    webkit_javascript_result_unref(js_result);
   }
   delete callback;
 }
