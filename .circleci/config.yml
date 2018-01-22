@@ -94,16 +94,17 @@ jobs:
 
   yue-linux-deploy:
     docker:
-      - image: golang:1.9
+      - image: circleci/golang:1.9.1
     steps:
       - attach_workspace:
-          at: .
-      - run: apk add --no-cache --no-progress git
-      - run: go get github.com/tcnksm/ghr
+          at: /tmp/workspace
+      - checkout
       - run:
-          name: Release packages
+          name: Release archives
           command: |
-            ghr -t $GITHUB_TOKEN -u yue -r yue -draft $CIRCLE_TAG out/Dist/*.zip
+            export YUE_VERSION=$(git describe --always --tags)
+            go get github.com/zcbenz/ghr
+            ghr -t $GITHUB_TOKEN -u yue -r yue -b "(placeholder)" -name "Yue $YUE_VERSION" -draft $YUE_VERSION /tmp/workspace/out/Dist
 
 workflows:
   version: 2
