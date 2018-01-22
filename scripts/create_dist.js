@@ -137,7 +137,10 @@ function strip(file) {
   if (!file.endsWith('.so') && path.basename(file) != 'yue')
     return
   // TODO(zcbenz): Copy the debug symbols out before striping.
-  const strip = targetCpu.startsWith('arm') ? 'arm-linux-gnueabihf-strip'
-                                            : 'strip'
+  let strip = 'strip'
+  if (targetCpu == 'arm')
+    strip = 'arm-linux-gnueabihf-strip'
+  else if (targetCpu == 'arm64')
+    strip = 'aarch64-linux-gnu-strip'
   execSync(`${strip} ${file}`)
 }
