@@ -43,7 +43,11 @@ const zipname = `node_yue_${runtime}_${shortver}_${version}_${targetOs}_${target
 
 // Strip the binaries on Linux.
 if (targetOs == 'linux') {
-  const strip = targetCpu.startsWith('arm') ? 'arm-linux-gnueabihf-strip' : 'strip'
+  let strip = 'strip'
+  if (targetCpu == 'arm')
+    strip = 'arm-linux-gnueabihf-strip'
+  else if (targetCpu == 'arm64')
+    strip = 'aarch64-linux-gnu-strip'
   execSync(`${strip} out/Node/gui.node`)
 }
 
