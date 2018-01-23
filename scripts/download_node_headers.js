@@ -10,7 +10,7 @@ const path  = require('path')
 const https = require('https')
 const zlib  = require('zlib')
 
-const {argv} = require('./common')
+const {argv, targetCpu} = require('./common')
 
 if (argv.length != 2) {
   console.error('Usage: download_node_headers runtime version')
@@ -44,9 +44,12 @@ download(url, (response) => {
   // Download node.lib on Windows.
   if (process.platform == 'win32') {
     response.on('end', () => {
-      downloadNodeLib('x64', () => {
-        downloadNodeLib('x86', () => process.exit(0))
-      })
+      if (targetCpu == 'x64')
+        downloadNodeLib('x64', () => {})
+      else if (targetCpu == 'x86')
+        downloadNodeLib('x86', () => {})
+      else
+        throw new Error(`Unsupported targetCpu: ${targetCpu}`)
     })
   }
 })
@@ -56,17 +59,17 @@ function download(url, callback) {
     process.stdout.write(`Downloading ${url} `)
     let length = 0
     response.on('end', () => {
-              if (length > 0)
-                process.stdout.write('.')
-              console.log(' Done')
-            })
-            .on('data', (chunk) => {
-              length += chunk.length
-              while (length >= 1024 * 1024) {
-                process.stdout.write('.')
-                length %= 1024 * 1024
-              }
-            })
+      if (length > 0)
+        process.stdout.write('.')
+      console.log(' Done')
+    })
+    .on('data', (chunk) => {
+      length += chunk.length
+      while (length >= 1024 * 1024) {
+        process.stdout.write('.')
+        length %= 1024 * 1024
+      }
+    })
     callback(response)
   })
 }
