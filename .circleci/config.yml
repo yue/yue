@@ -33,6 +33,11 @@ custom-steps:
       root: .
       paths:
         - out/Dist/*.zip
+  - &tags-only
+    tags:
+      only: /.*/
+    branches:
+      ignore: /.*/
 
 jobs:
   yue-linux-x64:
@@ -114,12 +119,20 @@ workflows:
       - yue-linux-x86
       - yue-linux-arm
       - yue-linux-arm64
+  build-tags:
+    jobs:
+      - yue-linux-x64:
+          filters: *tags-only
+      - yue-linux-x86:
+          filters: *tags-only
+      - yue-linux-arm:
+          filters: *tags-only
+      - yue-linux-arm64:
+          filters: *tags-only
       - yue-linux-deploy:
           requires:
             - yue-linux-x64
             - yue-linux-x86
             - yue-linux-arm
             - yue-linux-arm64
-          filters:
-            tags:
-              only: /.*/
+          filters: *tags-only
