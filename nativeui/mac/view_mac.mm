@@ -4,6 +4,7 @@
 
 #include "nativeui/mac/nu_view.h"
 
+#include "nativeui/browser.h"
 #include "nativeui/container.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/gfx/geometry/point_conversions.h"
@@ -38,7 +39,10 @@ void View::TakeOverView(NativeView view) {
   if (!NUViewMethodsInstalled(cl)) {
     InstallNUViewMethods(cl);
     // TODO(zcbenz): Lazily install the event hooks.
-    AddMouseEventHandlerToClass(cl);
+    if (GetClassName() != Browser::kClassName) {
+      // WKWebView does not like having mouse event handlers installed.
+      AddMouseEventHandlerToClass(cl);
+    }
     AddKeyEventHandlerToClass(cl);
   }
 
