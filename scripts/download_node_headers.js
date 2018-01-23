@@ -10,15 +10,16 @@ const path  = require('path')
 const https = require('https')
 const zlib  = require('zlib')
 
-const {argv, targetCpu} = require('./common')
+const {argv} = require('./common')
 
-if (argv.length != 2) {
-  console.error('Usage: download_node_headers runtime version')
+if (argv.length != 3) {
+  console.error('Usage: download_node_headers runtime version cpu')
   process.exit(1)
 }
 
 const runtime = argv[0]
 const version = argv[1]
+const targetCpu = argv[2]
 
 const prefix = {
   electron: 'https://gh-contractor-zcbenz.s3.amazonaws.com/atom-shell/dist',

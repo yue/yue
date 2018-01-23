@@ -28,10 +28,10 @@ const args = [
   `node_runtime="${runtime}"`,
 ]
 
-console.log(`Creating native extension for ${runtime} ${nodever}...`)
+console.log(`Creating native extension for ${runtime} ${nodever} ${targetCpu}...`)
 
 // Build the node module.
-execSync(`node ./scripts/download_node_headers.js ${runtime} ${nodever}`)
+execSync(`node ./scripts/download_node_headers.js ${runtime} ${nodever} ${targetCpu}`)
 spawnSync('gn', ['gen', 'out/Node', `--args=${args.join(' ')}`])
 execSync('ninja -C out/Node node_yue')
 

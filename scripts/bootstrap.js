@@ -25,7 +25,7 @@ if (process.platform === 'linux') {
 
 execSync('git submodule sync --recursive')
 execSync('git submodule update --init --recursive')
-execSync(`node scripts/download_node_headers.js node ${process.version}`)
+execSync(`node scripts/download_node_headers.js node ${process.version} ${targetCpu}`)
 
 const commonConfig = [
   'fatal_linker_warnings=false',
