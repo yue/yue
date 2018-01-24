@@ -85,4 +85,20 @@ void Browser::LoadURL(const std::string& url) {
   [webview loadRequest:request];
 }
 
+void Browser::ExecuteJavaScript(const std::string& code,
+                                const ExecutionCallback& callback) {
+  auto* webview = static_cast<NUWebView*>(GetNative());
+  __block ExecutionCallback copied_callback = callback;
+  // I don't have a good way to convert result from id to JSON, so just wrap
+  // the code with JSON.stringify.
+  [webview evaluateJavaScript:base::SysUTF8ToNSString("JSON.stringify(" + code + ")")
+            completionHandler:^(id result, NSError* error) {
+    if (error || ![result isKindOfClass:[NSString class]]) {
+      copied_callback(false, "");
+      return;
+    }
+    copied_callback(true, base::SysNSStringToUTF8(static_cast<NSString*>(result)));
+  }];
+}
+
 }  // namespace nu

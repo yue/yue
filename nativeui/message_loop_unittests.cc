@@ -15,8 +15,8 @@ class MessageLoopTest : public testing::Test {
 };
 
 TEST_F(MessageLoopTest, PostTask) {
-  nu::MessageLoop::PostTask([this]() {
-      nu::MessageLoop::Quit();
+  nu::MessageLoop::PostTask([]() {
+    nu::MessageLoop::Quit();
   });
   nu::MessageLoop::Run();
 }
