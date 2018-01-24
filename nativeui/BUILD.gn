@@ -332,7 +332,6 @@ component("nativeui") {
 
 test("nativeui_unittests") {
   sources = [
-    "lifetime_unittest.cc",
     "container_unittest.cc",
     "browser_unittest.cc",
     "button_unittest.cc",
@@ -340,6 +339,7 @@ test("nativeui_unittests") {
     "label_unittest.cc",
     "menu_unittests.cc",
     "menu_item_unittests.cc",
+    "message_loop_unittests.cc",
     "text_edit_unittests.cc",
     "view_unittest.cc",
     "window_unittest.cc",

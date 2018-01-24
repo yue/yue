@@ -4,9 +4,7 @@
 
 #include "nativeui/message_loop.h"
 
-#include <gtk/gtk.h>
-
-#include "nativeui/gtk/widget_util.h"
+#import <Cocoa/Cocoa.h>
 
 namespace nu {
 
@@ -34,7 +32,7 @@ void MessageLoop::Quit() {
 // static
 void MessageLoop::PostTask(const std::function<void()>& task) {
   dispatch_async(dispatch_get_main_queue(), ^{
-    callback();
+    task();
   });
 }
 

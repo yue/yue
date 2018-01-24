@@ -5,7 +5,7 @@
 #include "nativeui/nativeui.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-class LifetimeTest : public testing::Test {
+class MessageLoopTest : public testing::Test {
  protected:
   void SetUp() override {
   }
@@ -14,9 +14,9 @@ class LifetimeTest : public testing::Test {
   nu::State state_;
 };
 
-TEST_F(LifetimeTest, PostTask) {
-  lifetime_.PostTask([this]() {
-    lifetime_.Quit();
+TEST_F(MessageLoopTest, PostTask) {
+  nu::MessageLoop::PostTask([this]() {
+      nu::MessageLoop::Quit();
   });
-  lifetime_.Run();
+  nu::MessageLoop::Run();
 }

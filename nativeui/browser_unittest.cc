@@ -17,10 +17,10 @@ class BrowserTest : public testing::Test {
 TEST_F(BrowserTest, LoadURL) {
   scoped_refptr<nu::Browser> browser = new nu::Browser;
   browser->on_finish_navigation.Connect([&](nu::Browser*) {
-    lifetime_.Quit();
+      nu::MessageLoop::Quit();
   });
-  lifetime_.PostTask([&]() {
+  nu::MessageLoop::PostTask([&]() {
     browser->LoadURL("about:blank");
   });
-  lifetime_.Run();
+  nu::MessageLoop::Run();
 }
