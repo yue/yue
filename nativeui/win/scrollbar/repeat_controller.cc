@@ -4,7 +4,7 @@
 
 #include "nativeui/win/scrollbar/repeat_controller.h"
 
-#include "nativeui/lifetime.h"
+#include "nativeui/message_loop.h"
 
 namespace nu {
 
@@ -19,7 +19,6 @@ const int kRepeatDelay = 50;
 
 RepeatController::RepeatController(const std::function<void()>& callback)
     : running_(false),
-      lifetime_(Lifetime::GetCurrent()),
       callback_(callback),
       weak_factory_(this) {
 }
@@ -30,7 +29,7 @@ RepeatController::~RepeatController() {
 void RepeatController::Start() {
   running_ = true;
   auto self = weak_factory_.GetWeakPtr();
-  lifetime_->PostDelayedTask(kInitialRepeatDelay, [self] {
+  MessageLoop::PostDelayedTask(kInitialRepeatDelay, [self] {
     if (self)
       self->Run();
   });
@@ -43,7 +42,7 @@ void RepeatController::Stop() {
 void RepeatController::Run() {
   if (running_) {
     auto self = weak_factory_.GetWeakPtr();
-    lifetime_->PostDelayedTask(kRepeatDelay, [self] {
+    MessageLoop::PostDelayedTask(kRepeatDelay, [self] {
       if (self) {
         self->callback_();
         self->Run();

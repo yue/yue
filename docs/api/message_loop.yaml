@@ -7,35 +7,36 @@ description: Post events to main GUI message loop.
 detail: |
   Depending on the runtime you use, Yue may or may not provide this API.
 
+  Note that `MessageLoop` is a class instead of an instance, the APIs are
+  provided as class methods. This is because the `MessageLoop` does not manage
+  message loop, it just provides wrappers of system GUI message loop APIs.
+
 lang_detail:
   cpp: |
     If you are using Yue in an environment that does not have its own event
     loop, you should use this API to enter message loop.
 
     ```cpp
-    nu::State state;
-    state.GetMessageLoop()->Run();
+    nu::MessageLoop::Run();
     ```
 
   lua: |
-    This class can not be created by user, you can only receive its global
-    instance from the `messageloop` property of the module:
+    This class can not be created by user, you can only call its class methods.
 
     ```lua
     local gui = require('yue.gui')
-    gui.messageloop:run()
+    gui.MessageLoop.run()
     ```
 
   js: |
-    This class can not be created by user, you can only receive its global
-    instance from the `messageLoop` property of the module:
+    This class can not be created by user, you can only call its class methods.
 
     ```js
     const gui = require('gui')
-    gui.messageLoop.run()
+    gui.MessageLoop.run()
     ```
 
-methods:
+class_methods:
   - signature: void Run()
     description: Enter message loop.
 

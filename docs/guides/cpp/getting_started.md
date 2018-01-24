@@ -55,11 +55,11 @@ int main(int argc, const char *argv[]) {
 
   // Quit when window is closed.
   window->on_close.Connect([&state](nu::Window*) {
-    state.GetMessageLoop()->Quit();
+    nu::MessageLoop::Quit();
   });
 
   // Enter message loop.
-  state.GetMessageLoop()->Run();
+  nu::MessageLoop::Run();
 
   return 0;
 }

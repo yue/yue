@@ -5,11 +5,8 @@
 #ifndef NATIVEUI_LIFETIME_H_
 #define NATIVEUI_LIFETIME_H_
 
-#include <memory>
-#include <unordered_map>
-
+#include "base/macros.h"
 #include "base/memory/weak_ptr.h"
-#include "base/synchronization/lock.h"
 #include "nativeui/signal.h"
 
 #if defined(OS_MACOSX)
@@ -32,15 +29,6 @@ class NATIVEUI_EXPORT Lifetime {
 
   static Lifetime* GetCurrent();
 
-  // Function type for tasks.
-  using Task = std::function<void()>;
-
-  // Control message loop.
-  void Run();
-  void Quit();
-  void PostTask(const Task& task);
-  void PostDelayedTask(int ms, const Task& task);
-
   // Events.
   Signal<void()> on_ready;
 
@@ -53,13 +41,6 @@ class NATIVEUI_EXPORT Lifetime {
 #if defined(OS_MACOSX)
   base::mac::ScopedNSAutoreleasePool autorelease_pool_;
   NUApplicationDelegate* app_delegate_;
-#endif
-
-#if defined(OS_WIN)
-  static void CALLBACK OnTimer(HWND, UINT, UINT_PTR event, DWORD);
-
-  static base::Lock lock_;
-  static std::unordered_map<UINT_PTR, Task> tasks_;
 #endif
 
   base::WeakPtrFactory<Lifetime> weak_factory_;

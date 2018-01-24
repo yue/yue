@@ -12,8 +12,6 @@
 
 namespace nu {
 
-class Lifetime;
-
 // An object that handles auto-repeating UI actions. There is a longer initial
 // delay after which point repeats become constant. Users provide a callback
 // that is notified when each repeat occurs so that they can perform the
@@ -34,7 +32,6 @@ class RepeatController {
   void Run();
 
   bool running_;
-  Lifetime* lifetime_;
   std::function<void()> callback_;
 
   base::WeakPtrFactory<RepeatController> weak_factory_;

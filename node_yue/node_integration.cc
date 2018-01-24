@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-#include "nativeui/lifetime.h"
+#include "nativeui/message_loop.h"
 #include "node.h"  // NOLINT(build/include)
 
 namespace node_yue {
@@ -17,7 +17,6 @@ namespace node_yue {
 NodeIntegration::NodeIntegration()
     : uv_loop_(uv_default_loop()),
       embed_closed_(false),
-      lifetime_(nu::Lifetime::GetCurrent()),
       weak_factory_(this) {
 }
 
@@ -60,7 +59,7 @@ void NodeIntegration::UvRunOnce() {
 
 void NodeIntegration::WakeupMainThread() {
   auto self = weak_factory_.GetWeakPtr();
-  lifetime_->PostTask([self] {
+  nu::MessageLoop::PostTask([self] {
     if (self)
       self->UvRunOnce();
   });

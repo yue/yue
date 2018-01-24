@@ -62,7 +62,6 @@ class NodeIntegration {
   // Semaphore to wait for main loop in the embed thread.
   uv_sem_t embed_sem_;
 
-  nu::Lifetime* lifetime_;
   base::WeakPtrFactory<NodeIntegration> weak_factory_;
 
   DISALLOW_COPY_AND_ASSIGN(NodeIntegration);

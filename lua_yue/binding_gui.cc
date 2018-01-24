@@ -158,12 +158,19 @@ template<>
 struct Type<nu::Lifetime> {
   static constexpr const char* name = "yue.Lifetime";
   static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index,
-           "run", &nu::Lifetime::Run,
-           "quit", &nu::Lifetime::Quit,
-           "posttask", &nu::Lifetime::PostTask,
-           "postdelayedtask", &nu::Lifetime::PostDelayedTask);
     RawSetProperty(state, index, "onready", &nu::Lifetime::on_ready);
+  }
+};
+
+template<>
+struct Type<nu::MessageLoop> {
+  static constexpr const char* name = "yue.MessageLoop";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "run", &nu::MessageLoop::Run,
+           "quit", &nu::MessageLoop::Quit,
+           "posttask", &nu::MessageLoop::PostTask,
+           "postdelayedtask", &nu::MessageLoop::PostDelayedTask);
   }
 };
 
@@ -1378,6 +1385,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
 
   // Classes.
   BindType<nu::Lifetime>(state, "Lifetime");
+  BindType<nu::MessageLoop>(state, "MessageLoop");
   BindType<nu::App>(state, "App");
   BindType<nu::Font>(state, "Font");
   BindType<nu::Canvas>(state, "Canvas");

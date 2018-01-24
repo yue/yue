@@ -25,6 +25,7 @@
 #include "nativeui/menu.h"
 #include "nativeui/menu_bar.h"
 #include "nativeui/menu_item.h"
+#include "nativeui/message_loop.h"
 #include "nativeui/progress_bar.h"
 #include "nativeui/scroll.h"
 #include "nativeui/state.h"

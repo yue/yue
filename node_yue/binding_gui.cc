@@ -167,16 +167,27 @@ struct Type<nu::Lifetime> {
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
-    Set(context, templ,
-        "quit", &nu::Lifetime::Quit,
-        "postTask", &nu::Lifetime::PostTask,
-        "postDelayedTask", &nu::Lifetime::PostDelayedTask);
     SetProperty(context, templ,
                 "onReady", &nu::Lifetime::on_ready);
+  }
+};
+
+template<>
+struct Type<nu::MessageLoop> {
+  static constexpr const char* name = "yue.MessageLoop";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+        "quit", &nu::MessageLoop::Quit,
+        "postTask", &nu::MessageLoop::PostTask,
+        "postDelayedTask", &nu::MessageLoop::PostDelayedTask);
     // The "run" method should never be used in yode runtime.
     if (!is_yode) {
-      Set(context, templ, "run", &nu::Lifetime::Run);
+      Set(context, constructor, "run", &nu::MessageLoop::Run);
     }
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
   }
 };
 
@@ -1602,7 +1613,8 @@ void Initialize(v8::Local<v8::Object> exports) {
   } else {
     vb::Set(context, exports,
             "Lifetime", vb::Constructor<nu::Lifetime>(),
-            "lifetime", nu::Lifetime::GetCurrent());
+            "lifetime", nu::Lifetime::GetCurrent(),
+            "MessageLoop", vb::Constructor<nu::MessageLoop>());
   }
 }
 

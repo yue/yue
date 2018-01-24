@@ -4,6 +4,8 @@
 
 #include "nativeui/lifetime.h"
 
+#include "base/logging.h"
+
 namespace nu {
 
 namespace {
