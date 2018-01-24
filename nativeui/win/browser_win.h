@@ -23,6 +23,12 @@ class BrowserImpl : public SubwinView {
   ~BrowserImpl() override;
 
   void LoadURL(const base::string16& str);
+  bool Eval(const base::string16& code, base::string16* result);
+
+  template<typename T>
+  bool GetBrowser(Microsoft::WRL::ComPtr<T>* out) {
+    return SUCCEEDED(browser_.As(out));
+  }
 
  protected:
   // ViewImpl:

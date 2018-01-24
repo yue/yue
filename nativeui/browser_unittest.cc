@@ -16,8 +16,24 @@ class BrowserTest : public testing::Test {
 
 TEST_F(BrowserTest, LoadURL) {
   scoped_refptr<nu::Browser> browser = new nu::Browser;
-  browser->on_finish_navigation.Connect([&](nu::Browser*) {
-      nu::MessageLoop::Quit();
+  browser->on_finish_navigation.Connect([](nu::Browser*) {
+    nu::MessageLoop::Quit();
+  });
+  nu::MessageLoop::PostTask([&]() {
+    browser->LoadURL("about:blank");
+  });
+  nu::MessageLoop::Run();
+}
+
+TEST_F(BrowserTest, ExecuteJavaScript) {
+  scoped_refptr<nu::Browser> browser = new nu::Browser;
+  browser->on_finish_navigation.Connect([](nu::Browser* browser) {
+    browser->ExecuteJavaScript("location.href",
+                               [](bool success, const std::string& result) {
+      EXPECT_EQ(success, true);
+      EXPECT_EQ(result, "\"about:blank\"");
+    });
+    nu::MessageLoop::Quit();
   });
   nu::MessageLoop::PostTask([&]() {
     browser->LoadURL("about:blank");

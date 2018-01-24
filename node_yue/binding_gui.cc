@@ -1264,9 +1264,11 @@ struct Type<nu::Browser> {
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
-        "loadURL", &nu::Browser::LoadURL);
+        "loadURL", &nu::Browser::LoadURL,
+        "executeJavaScript", &nu::Browser::ExecuteJavaScript);
     SetProperty(context, templ,
-                "onClose", &nu::Browser::on_close);
+                "onClose", &nu::Browser::on_close,
+                "onFinishNavigation", &nu::Browser::on_finish_navigation);
   }
 };
 

@@ -67,7 +67,7 @@ STDMETHODIMP BrowserEventSink::Invoke(_In_  DISPID dispIdMember,
                                       _Out_opt_  VARIANT *pVarResult,
                                       _Out_opt_  EXCEPINFO *pExcepInfo,
                                       _Out_opt_  UINT *puArgErr) {
-  auto* browser = static_cast<Browser*>(browser_->delegate());
+  auto* delegate = static_cast<Browser*>(browser_->delegate());
   HRESULT hr = S_OK;
   switch (dispIdMember) {
     case DISPID_STATUSTEXTCHANGE:
@@ -75,8 +75,17 @@ STDMETHODIMP BrowserEventSink::Invoke(_In_  DISPID dispIdMember,
       // only solution is to keep requesting when navigation state changes.
       browser_->ReceiveBrowserHWND();
       break;
+    case DISPID_DOCUMENTCOMPLETE:
+      // Currently we only emit for the main frame.
+      if (pDispParams->cArgs == 2 && pDispParams->rgvarg[1].vt == VT_DISPATCH) {
+        Microsoft::WRL::ComPtr<IDispatch> main_window;
+        if (browser_->GetBrowser<IDispatch>(&main_window) &&
+            main_window.Get() == pDispParams->rgvarg[1].pdispVal) {
+          delegate->on_finish_navigation.Emit(delegate);
+        }
+      }
+      break;
     case DISPID_NAVIGATECOMPLETE2:
-      browser->on_finish_navigation.Emit(browser);
       break;
     default:
       hr = E_NOTIMPL;

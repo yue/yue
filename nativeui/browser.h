@@ -13,6 +13,8 @@ namespace nu {
 
 class NATIVEUI_EXPORT Browser : public View {
  public:
+  using ExecutionCallback = std::function<void(bool, const std::string&)>;
+
   Browser();
 
   // View class name.
@@ -22,6 +24,8 @@ class NATIVEUI_EXPORT Browser : public View {
   const char* GetClassName() const override;
 
   void LoadURL(const std::string& url);
+  void ExecuteJavaScript(const std::string& code,
+                         const ExecutionCallback& callback);
 
   // Events.
   Signal<void(Browser*)> on_close;

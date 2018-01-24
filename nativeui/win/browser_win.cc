@@ -4,6 +4,7 @@
 
 #include "nativeui/win/browser_win.h"
 
+#include <mshtml.h>
 #include <shlguid.h>
 
 #include <string>
@@ -15,7 +16,9 @@
 #include "base/win/registry.h"
 #include "base/win/scoped_bstr.h"
 #include "base/win/scoped_variant.h"
+#include "nativeui/message_loop.h"
 #include "nativeui/state.h"
+#include "nativeui/win/util/dispatch_invoke.h"
 #include "nativeui/win/util/hwnd_util.h"
 
 namespace nu {
@@ -34,6 +37,27 @@ void FixIECompatibleMode() {
     return;
   base::win::RegKey(HKEY_CURRENT_USER, IE_EMULATION_KEY, KEY_ALL_ACCESS)
       .WriteValue(exe_path.BaseName().value().c_str(), IE_VERSION);
+}
+
+// Convert a VARIANT to JSON string.
+bool VARIANTToJSON(IDispatchEx* script,
+                   const base::win::ScopedVariant& value,
+                   base::string16* result) {
+  // Find the javascript JSON object.
+  base::win::ScopedVariant json_var(base::win::ScopedVariant::kEmptyVariant);
+  if (!Invoke(script, L"JSON", DISPATCH_PROPERTYGET, &json_var))
+    return false;
+  Microsoft::WRL::ComPtr<IDispatch> json_disp =
+      static_cast<IDispatch*>(json_var.ptr()->pdispVal);
+  Microsoft::WRL::ComPtr<IDispatchEx> json_obj;
+  if (FAILED(json_disp.As(&json_obj)) || !json_obj)
+    return false;
+  // Invoke the JSON.stringify method.
+  base::win::ScopedVariant str(base::win::ScopedVariant::kEmptyVariant);
+  if (!Invoke(json_obj.Get(), L"stringify", DISPATCH_METHOD, &str, value))
+    return false;
+  *result = str.ptr()->bstrVal;
+  return true;
 }
 
 }  // namespace
@@ -87,9 +111,35 @@ BrowserImpl::~BrowserImpl() {
 }
 
 void BrowserImpl::LoadURL(const base::string16& str) {
+  if (!browser_)
+    return;
   base::win::ScopedBstr url(str.c_str());
   browser_->Navigate(url, nullptr, nullptr, nullptr, nullptr);
   ReceiveBrowserHWND();
+}
+
+bool BrowserImpl::Eval(const base::string16& code, base::string16* result) {
+  if (!browser_)
+    return false;
+  Microsoft::WRL::ComPtr<IDispatch> doc2_disp;
+  if (FAILED(browser_->get_Document(&doc2_disp)) || !doc2_disp)
+    return false;
+  Microsoft::WRL::ComPtr<IHTMLDocument2> doc2;
+  if (FAILED(doc2_disp.As(&doc2)))
+    return false;
+  Microsoft::WRL::ComPtr<IDispatch> script_disp;
+  if (FAILED(doc2->get_Script(&script_disp)) || !script_disp)
+    return false;
+  Microsoft::WRL::ComPtr<IDispatchEx> script;
+  if (FAILED(script_disp.As(&script)))
+    return false;
+  base::win::ScopedVariant arg(code.c_str(), static_cast<UINT>(code.length()));
+  base::win::ScopedVariant ret(base::win::ScopedVariant::kEmptyVariant);
+  if (!Invoke(script.Get(), L"eval", DISPATCH_METHOD, &ret, arg))
+    return false;
+  if (!VARIANTToJSON(script.Get(), ret, result))
+    return false;
+  return true;
 }
 
 void BrowserImpl::SizeAllocate(const Rect& bounds) {
@@ -208,6 +258,14 @@ Browser::~Browser() {
 
 void Browser::LoadURL(const std::string& url) {
   static_cast<BrowserImpl*>(GetNative())->LoadURL(base::UTF8ToUTF16(url));
+}
+
+void Browser::ExecuteJavaScript(const std::string& code,
+                                const ExecutionCallback& callback) {
+  auto* browser = static_cast<BrowserImpl*>(GetNative());
+  base::string16 ret;
+  bool success = browser->Eval(base::UTF8ToUTF16(code), &ret);
+  MessageLoop::PostTask(std::bind(callback, success, base::UTF16ToUTF8(ret)));
 }
 
 }  // namespace nu

@@ -25,6 +25,13 @@ methods:
   - signature: void LoadURL(const std::string& url)
     description: Load the URL.
 
+  - signature: void ExecuteJavaScript(const std::string& code, const std::function<void(bool, const std::string&)>& callback);
+    description: |
+      Evaluate `code` in browser and get the evaluated result.
+
+      The `callback` will be called with `callback(success, result)`, the
+      `result` is a JSON string.
+
 events:
   - callback: void on_close(Browser* self)
     description: Emitted when the web page requests to close.

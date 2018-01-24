@@ -1150,9 +1150,11 @@ struct Type<nu::Browser> {
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::Browser>,
-           "loadurl", &nu::Browser::LoadURL);
+           "loadurl", &nu::Browser::LoadURL,
+           "executejavascript", &nu::Browser::ExecuteJavaScript);
     RawSetProperty(state, metatable,
-                   "onclose", &nu::Browser::on_close);
+                   "onclose", &nu::Browser::on_close,
+                   "onfinishnavigation", &nu::Browser::on_finish_navigation);
   }
 };
 
