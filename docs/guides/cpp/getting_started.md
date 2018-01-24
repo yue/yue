@@ -40,11 +40,11 @@ int main(int argc, const char *argv[]) {
   base::CommandLine::Init(argc, argv);
 #endif
 
+  // Intialize GUI toolkit.
+  nu::Lifetime lifetime;
+
   // Initialize the global instance of nativeui.
   nu::State state;
-
-  // Create GUI message loop.
-  nu::Lifetime lifetime;
 
   // Create window with default options, and then show it.
   scoped_refptr<nu::Window> window(new nu::Window(nu::Window::Options()));
@@ -54,12 +54,12 @@ int main(int argc, const char *argv[]) {
   window->Activate();
 
   // Quit when window is closed.
-  window->on_close.Connect([](nu::Window*) {
-    nu::Lifetime::GetCurrent()->Quit();
+  window->on_close.Connect([&state](nu::Window*) {
+    state.GetMessageLoop()->Quit();
   });
 
   // Enter message loop.
-  lifetime.Run();
+  state.GetMessageLoop()->Run();
 
   return 0;
 }

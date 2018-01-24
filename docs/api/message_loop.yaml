@@ -1,0 +1,52 @@
+name: MessageLoop
+component: gui
+header: nativeui/message_loop.h
+type: class
+namespace: nu
+description: Post events to main GUI message loop.
+detail: |
+  Depending on the runtime you use, Yue may or may not provide this API.
+
+lang_detail:
+  cpp: |
+    If you are using Yue in an environment that does not have its own event
+    loop, you should use this API to enter message loop.
+
+    ```cpp
+    nu::State state;
+    state.GetMessageLoop()->Run();
+    ```
+
+  lua: |
+    This class can not be created by user, you can only receive its global
+    instance from the `messageloop` property of the module:
+
+    ```lua
+    local gui = require('yue.gui')
+    gui.messageloop:run()
+    ```
+
+  js: |
+    This class can not be created by user, you can only receive its global
+    instance from the `messageLoop` property of the module:
+
+    ```js
+    const gui = require('gui')
+    gui.messageLoop.run()
+    ```
+
+methods:
+  - signature: void Run()
+    description: Enter message loop.
+
+  - signature: void Quit()
+    description: Quit message loop.
+
+  - signature: void PostTask(const std::function<void()>& task)
+    description: Post a `task` to message loop.
+
+  - signature: void PostDelayedTask(int ms, const std::function<void()>& task);
+    description: Post a `task` to message loop and execute it after `ms`.
+    parameters:
+      ms:
+        description: The number of milliseconds to wait

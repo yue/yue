@@ -55,21 +55,21 @@ Because Node.js was not designed for desktop apps, it is using libuv event loop
 that is not compatible with GUI message loops.
 
 In order to make GUI work in Node.js, you have to take over the control of event
-loop by using the `Lifetime` API, which would run native GUI message loop while
-still handling libuv events:
+loop by using the `MessageLoop` API, which would run native GUI message loop
+while still handling libuv events:
 
 ```js
 const gui = require('gui')
 
 if (!process.versions.yode) {
-  gui.lifetime.run()  // block until gui.lifetime.quit() is called
+  gui.messageLoop.run()  // block until gui.messageLoop.quit() is called
   process.exit(0)
 }
 ```
 
-To quit the message loop, you can call the `lifetime.quit()` API, which would
-break the blocking `lifetime.run()` call and continue the script, usually you
-should exit the process after that.
+To quit the message loop, you can call the `messageLoop.quit()` API, which
+would break the blocking `messageLoop.run()` call and continue the script,
+usually you should exit the process after that.
 
 Note that this hack does not work perfectly, you should never use it in
 production.
@@ -79,11 +79,11 @@ production.
 To solve the problem of incompatible event loop, you can use the
 [Yode](https://github.com/yue/yode) project as a replacement of Node.js. Yode
 is a fork of Node.js that replaces libuv event loop with native GUI message
-loops, so there would be no need to use the `lifetime.run()` hack.
+loops, so there would be no need to use the `messageLoop.run()` hack.
 
 Unlike Node.js which would quit the process when there is no work to do, the
 processes of Yode would keep running forever, until you call the
-`lifetime.quit()` API to quit current message loop.
+`messageLoop.quit()` API to quit current message loop.
 
 After quitting the GUI message loop, the libuv event loop is still running, and
 the process will exit when all pending Node.js requests have finished.
@@ -104,7 +104,7 @@ with libuv.
 So even though it is not hard to write V8 bindings for Cocoa or Qt, it is
 impossible to run their message loops together with the event loop of Node.js.
 The most common trick of keep iterating events of GUI message loops, results in
-high CPU usage. While the trick used by Yue's `Lifetime` API to replace the
+high CPU usage. While the trick used by Yue's `MessageLoop` API to replace the
 event loop, has various problems with the events queue of Node.js.
 
 Luckily with Yode the problem with message loop has been solved cleanly, even if
@@ -114,9 +114,9 @@ bindings in Yode.
 ### Electron
 
 Since the main process of Electron uses GUI message loops, there is no need to
-use the `Lifetime` API, and the `Lifetime` API of Yue is not available when
-running under Electron. You should always use the `app` API of Electron to
-manage the process's lifetime.
+use the `MessageLoop` API, and the `MessageLoop` API of Yue is not available
+when running under Electron. You should always use the `app` API of Electron to
+manage the process's message loop.
 
 ```js
 const gui = require('gui')
@@ -169,7 +169,7 @@ const menu = gui.MenuBar.create([
       {
         label: 'Quit',
         accelerator: 'CmdOrCtrl+Q',
-        onClick: () => gui.lifetime.quit()
+        onClick: () => gui.messageLoop.quit()
       },
     ],
   },
@@ -289,7 +289,7 @@ assignment.
 
 ```js
 // Quit when window is closed.
-win.onClose = () => gui.lifetime.quit()
+win.onClose = () => gui.messageLoop.quit()
 // The size of content view.
 win.setContentSize({width: 400, height: 400})
 // Put the window in the center of screen.
