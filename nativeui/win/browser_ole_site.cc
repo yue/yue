@@ -20,6 +20,7 @@ STDMETHODIMP BrowserOleSite::QueryInterface(REFIID riid, void **ppvObject) {
   const QITAB QITable[] = {
     QITABENT(BrowserOleSite, IOleClientSite),
     QITABENT(BrowserOleSite, IOleInPlaceSite),
+    QITABENT(BrowserOleSite, IOleCommandTarget),
     QITABENT(BrowserOleSite, IDocHostUIHandler),
     { 0 },
   };
@@ -132,6 +133,31 @@ IFACEMETHODIMP BrowserOleSite::DeactivateAndUndo() {
 
 IFACEMETHODIMP BrowserOleSite::OnPosRectChange(__RPC__in LPCRECT lprcPosRect) {
   return E_NOTIMPL;
+}
+
+IFACEMETHODIMP BrowserOleSite::QueryStatus(const GUID *pguidCmdGroup,
+                                           ULONG cCmds,
+                                           OLECMD prgCmds[],
+                                           OLECMDTEXT *pCmdText) {
+  return pguidCmdGroup ? OLECMDERR_E_UNKNOWNGROUP : OLECMDERR_E_NOTSUPPORTED;
+}
+
+IFACEMETHODIMP BrowserOleSite::Exec(const GUID *pguidCmdGroup,
+                                    DWORD nCmdID,
+                                    DWORD nCmdexecopt,
+                                    VARIANT *pvaIn,
+                                    VARIANT *pvaOut) {
+  if (pguidCmdGroup &&
+      ::IsEqualGUID(*pguidCmdGroup, CGID_DocHostCommandHandler)) {
+    if (nCmdID == OLECMDID_SHOWSCRIPTERROR) {
+      // Continue running scripts on the page.
+      // http://support.microsoft.com/default.aspx?scid=kb;en-us;261003
+      (*pvaOut).vt = VT_BOOL;
+      (*pvaOut).boolVal = VARIANT_TRUE;
+      return S_OK;
+    }
+  }
+  return pguidCmdGroup ? OLECMDERR_E_UNKNOWNGROUP : OLECMDERR_E_NOTSUPPORTED;
 }
 
 IFACEMETHODIMP BrowserOleSite::ShowContextMenu(

@@ -14,6 +14,7 @@ namespace nu {
 
 class BrowserOleSite : public IOleClientSite,
                        public IOleInPlaceSite,
+                       public IOleCommandTarget,
                        public IDocHostUIHandler {
  public:
   explicit BrowserOleSite(HWND hwnd);
@@ -55,6 +56,17 @@ class BrowserOleSite : public IOleClientSite,
   IFACEMETHODIMP DiscardUndoState();
   IFACEMETHODIMP DeactivateAndUndo();
   IFACEMETHODIMP OnPosRectChange(__RPC__in LPCRECT lprcPosRect);
+
+  // IOleCommandTarget
+  IFACEMETHODIMP QueryStatus(const GUID *pguidCmdGroup,
+                             ULONG cCmds,
+                             OLECMD prgCmds[],
+                             OLECMDTEXT *pCmdText);
+  IFACEMETHODIMP Exec(const GUID *pguidCmdGroup,
+                      DWORD nCmdID,
+                      DWORD nCmdexecopt,
+                      VARIANT *pvaIn,
+                      VARIANT *pvaOut);
 
   // IDocHostUIHandler
   IFACEMETHODIMP ShowContextMenu(_In_ DWORD dwID,
