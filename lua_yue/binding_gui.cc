@@ -1380,8 +1380,8 @@ inline void BindType(lua::State* state, const char* name) {
 
 extern "C" int luaopen_yue_gui(lua::State* state) {
   // Initialize nativeui.
-  lua::NewUserData<nu::State>(state);
   lua::NewUserData<nu::Lifetime>(state);
+  lua::NewUserData<nu::State>(state);
   // The exports table.
   lua::NewTable(state);
 

@@ -5,6 +5,7 @@
 #include "nativeui/lifetime.h"
 
 #include "base/logging.h"
+#include "nativeui/state.h"
 
 namespace nu {
 
@@ -20,7 +21,8 @@ Lifetime* Lifetime::GetCurrent() {
 }
 
 Lifetime::Lifetime() : weak_factory_(this) {
-  DCHECK(!g_lifetime) << "Lifetime can not be created twice.";
+  CHECK(!State::GetCurrent()) << "Lifetime must be initailized before State";
+  CHECK(!g_lifetime) << "Lifetime can not be created twice";
   g_lifetime = this;
   PlatformInit();
 }

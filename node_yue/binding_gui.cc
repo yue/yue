@@ -1562,12 +1562,12 @@ void Initialize(v8::Local<v8::Object> exports) {
     SetErrorMode(GetErrorMode() & ~SEM_NOGPFAULTERRORBOX);
   }
 #endif
-  // Initialize the nativeui and leak it.
-  new nu::State;
   // Non-Electron platforms needs the lifetime API.
   if (!is_electron) {
     new nu::Lifetime;
   }
+  // Initialize the nativeui and leak it.
+  new nu::State;
   // Official node platform needs node integration.
   if (!is_electron && !is_yode) {
     // Initialize node integration and leak it.
