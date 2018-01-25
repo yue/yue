@@ -1,5 +1,4 @@
 // Copyright 2018 Cheng Zhao. All rights reserved.
-// Copyright 2017 tokikuch.
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 

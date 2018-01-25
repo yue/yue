@@ -10,6 +10,7 @@
 #include <wrl.h>
 
 #include "nativeui/browser.h"
+#include "nativeui/win/browser_external_sink.h"
 #include "nativeui/win/browser_event_sink.h"
 #include "nativeui/win/browser_ole_site.h"
 #include "nativeui/win/subwin_view.h"
@@ -61,6 +62,7 @@ class BrowserImpl : public SubwinView {
                                          LPARAM l_param);
 
   Microsoft::WRL::ComPtr<IWebBrowser2> browser_;
+  Microsoft::WRL::ComPtr<BrowserExternalSink> external_sink_;
   Microsoft::WRL::ComPtr<BrowserOleSite> ole_site_;
   Microsoft::WRL::ComPtr<BrowserEventSink> event_sink_;
   HWND browser_hwnd_ = NULL;

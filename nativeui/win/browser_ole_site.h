@@ -1,5 +1,4 @@
 // Copyright 2018 Cheng Zhao. All rights reserved.
-// Copyright 2017 tokikuch.
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
@@ -9,15 +8,21 @@
 #include <exdisp.h>
 #include <mshtmhst.h>
 #include <ole2.h>
+#include <wrl.h>
+
+#include "base/macros.h"
+#include "nativeui/win/browser_external_sink.h"
 
 namespace nu {
+
+class BrowserImpl;
 
 class BrowserOleSite : public IOleClientSite,
                        public IOleInPlaceSite,
                        public IOleCommandTarget,
                        public IDocHostUIHandler {
  public:
-  explicit BrowserOleSite(HWND hwnd);
+  BrowserOleSite(BrowserImpl* browser, BrowserExternalSink* external_sink);
   ~BrowserOleSite();
 
   // IUnknown
@@ -104,7 +109,11 @@ class BrowserOleSite : public IOleClientSite,
 
  private:
   ULONG ref_;
-  HWND hwnd_;
+  BrowserImpl* browser_;
+
+  Microsoft::WRL::ComPtr<BrowserExternalSink> external_sink_;
+
+  DISALLOW_COPY_AND_ASSIGN(BrowserOleSite);
 };
 
 }  // namespace nu

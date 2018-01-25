@@ -236,6 +236,8 @@ component("nativeui") {
     "win/app_win.cc",
     "win/lifetime_win.cc",
     "win/accelerator_manager_win.cc",
+    "win/browser_external_sink.cc",
+    "win/browser_external_sink.h",
     "win/browser_event_sink.cc",
     "win/browser_event_sink.h",
     "win/browser_ole_site.cc",

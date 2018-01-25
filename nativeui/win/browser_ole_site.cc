@@ -1,5 +1,4 @@
 // Copyright 2018 Cheng Zhao. All rights reserved.
-// Copyright 2017 tokikuch.
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
@@ -7,10 +6,13 @@
 
 #include <shlwapi.h>
 
+#include "nativeui/win/browser_win.h"
+
 namespace nu {
 
-BrowserOleSite::BrowserOleSite(HWND hwnd)
-    : ref_(1), hwnd_(hwnd) {
+BrowserOleSite::BrowserOleSite(BrowserImpl* browser,
+                               BrowserExternalSink* external_sink)
+    : ref_(1), browser_(browser), external_sink_(external_sink) {
 }
 
 BrowserOleSite::~BrowserOleSite() {
@@ -68,7 +70,7 @@ IFACEMETHODIMP BrowserOleSite::RequestNewObjectLayout() {
 }
 
 IFACEMETHODIMP BrowserOleSite::GetWindow(__RPC__deref_out_opt HWND *phwnd) {
-  *phwnd = hwnd_;
+  *phwnd = browser_->hwnd();
   return S_OK;
 }
 
@@ -99,12 +101,12 @@ IFACEMETHODIMP BrowserOleSite::GetWindowContext(
   if (ppDoc != nullptr)
     *ppDoc = nullptr;
   if (lprcPosRect)
-    GetClientRect(hwnd_, lprcPosRect);
+    GetClientRect(browser_->hwnd(), lprcPosRect);
   if (lprcClipRect)
-    GetClientRect(hwnd_, lprcClipRect);
+    GetClientRect(browser_->hwnd(), lprcClipRect);
   if (lpFrameInfo) {
     lpFrameInfo->fMDIApp = false;
-    lpFrameInfo->hwndFrame = hwnd_;
+    lpFrameInfo->hwndFrame = browser_->hwnd();
     lpFrameInfo->haccel = nullptr;
     lpFrameInfo->cAccelEntries = 0;
   }
@@ -230,7 +232,7 @@ IFACEMETHODIMP BrowserOleSite::GetDropTarget(
 
 IFACEMETHODIMP BrowserOleSite::GetExternal(
     _Outptr_result_maybenull_ IDispatch **ppDispatch) {
-  return E_NOTIMPL;
+  return external_sink_.CopyTo(ppDispatch);
 }
 
 IFACEMETHODIMP BrowserOleSite::TranslateUrl(

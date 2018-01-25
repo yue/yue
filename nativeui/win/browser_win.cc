@@ -64,7 +64,8 @@ bool VARIANTToJSON(IDispatchEx* script,
 
 BrowserImpl::BrowserImpl(Browser* delegate)
     : SubwinView(delegate),
-      ole_site_(new BrowserOleSite(hwnd())),
+      external_sink_(new BrowserExternalSink(this)),
+      ole_site_(new BrowserOleSite(this, external_sink_.Get())),
       event_sink_(new BrowserEventSink(this)) {
   set_focusable(true);
   // Initialize COM and OLE.
