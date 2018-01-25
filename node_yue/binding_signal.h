@@ -88,14 +88,10 @@ struct Type<nu::SignalBase<Sig>*> {
 // Define how the Signal member is converted.
 template<typename Sig>
 struct MemberTraits<nu::Signal<Sig>> {
-  static const bool kShouldCacheValue = false;
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    v8::Local<v8::Object> owner,
-                                   v8::Global<v8::Value>* holder_value,
                                    const nu::Signal<Sig>& signal) {
     v8::Isolate* isolate = context->GetIsolate();
-    if (!holder_value->IsEmpty())
-      return v8::Local<v8::Value>::New(isolate, *holder_value);
     auto result = CallConstructor<nu::Signal<Sig>>(context);
     if (result.IsEmpty())
       return v8::Null(isolate);
@@ -103,7 +99,6 @@ struct MemberTraits<nu::Signal<Sig>> {
     v8::Local<v8::Object> obj = result.ToLocalChecked();
     obj->SetAlignedPointerInInternalField(
         0, const_cast<nu::Signal<Sig>*>(&signal));
-    holder_value->Reset(isolate, obj);
     // Track the lifetime of owner.
     new node_yue::OwnerTracker(isolate, owner, obj);
     return obj;
