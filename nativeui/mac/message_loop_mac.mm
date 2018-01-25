@@ -31,8 +31,9 @@ void MessageLoop::Quit() {
 
 // static
 void MessageLoop::PostTask(const std::function<void()>& task) {
+  __block auto callback = task;
   dispatch_async(dispatch_get_main_queue(), ^{
-    task();
+    callback();
   });
 }
 
