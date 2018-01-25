@@ -32,6 +32,9 @@ methods:
       The `callback` will be called with `callback(success, result)`, the
       `result` is a JSON string.
 
+      Note that due to limitations of system toolkits, the execution may fail if
+      the `result` of `code` can not be fully converted to JSON string.
+
 events:
   - callback: void on_close(Browser* self)
     description: Emitted when the web page requests to close.

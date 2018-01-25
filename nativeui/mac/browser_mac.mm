@@ -65,6 +65,29 @@
 
 namespace nu {
 
+namespace {
+
+// Convert NSValue to JSON string.
+std::string NSValueToJSON(id value) {
+  // Try the default method.
+  if ([NSJSONSerialization isValidJSONObject:value]) {
+    NSData* json_data = [NSJSONSerialization dataWithJSONObject:value
+                                                        options:0
+                                                          error:nil];
+    return std::string(static_cast<const char*>([json_data bytes]),
+                       [json_data length]);
+  }
+  // For other types try to put it into an Array and then strip.
+  NSArray* arr = @[ value ];
+  if ([NSJSONSerialization isValidJSONObject:arr]) {
+    std::string result =  NSValueToJSON(arr);
+    return result.substr(1, result.size() - 2);
+  }
+  return "undefined";
+}
+
+}  // namespace
+
 Browser::Browser() {
   NUWebView* webview = [[NUWebView alloc] initWithFrame:NSZeroRect];
   webview.UIDelegate = [[NUWebUIDelegate alloc] init];
@@ -88,16 +111,17 @@ void Browser::LoadURL(const std::string& url) {
 void Browser::ExecuteJavaScript(const std::string& code,
                                 const ExecutionCallback& callback) {
   auto* webview = static_cast<NUWebView*>(GetNative());
+  if (!callback) {
+    // Shortcut when no callback is passed.
+    [webview evaluateJavaScript:base::SysUTF8ToNSString(code)
+              completionHandler:nil];
+    return;
+  }
+
   __block ExecutionCallback copied_callback = callback;
-  // I don't have a good way to convert result from id to JSON, so just wrap
-  // the code with JSON.stringify.
-  [webview evaluateJavaScript:base::SysUTF8ToNSString("JSON.stringify(" + code + ")")
+  [webview evaluateJavaScript:base::SysUTF8ToNSString(code)
             completionHandler:^(id result, NSError* error) {
-    if (error || ![result isKindOfClass:[NSString class]]) {
-      copied_callback(false, "");
-      return;
-    }
-    copied_callback(true, base::SysNSStringToUTF8(static_cast<NSString*>(result)));
+    copied_callback(!error, result ? NSValueToJSON(result) : "");
   }];
 }
 

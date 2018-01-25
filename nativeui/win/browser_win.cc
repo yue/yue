@@ -265,7 +265,8 @@ void Browser::ExecuteJavaScript(const std::string& code,
   auto* browser = static_cast<BrowserImpl*>(GetNative());
   base::string16 ret;
   bool success = browser->Eval(base::UTF8ToUTF16(code), &ret);
-  MessageLoop::PostTask(std::bind(callback, success, base::UTF16ToUTF8(ret)));
+  if (callback)
+    MessageLoop::PostTask(std::bind(callback, success, base::UTF16ToUTF8(ret)));
 }
 
 }  // namespace nu
