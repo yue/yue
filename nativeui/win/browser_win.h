@@ -10,8 +10,8 @@
 #include <wrl.h>
 
 #include "nativeui/browser.h"
-#include "nativeui/win/browser_external_sink.h"
 #include "nativeui/win/browser_event_sink.h"
+#include "nativeui/win/browser_external_sink.h"
 #include "nativeui/win/browser_ole_site.h"
 #include "nativeui/win/subwin_view.h"
 

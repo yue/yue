@@ -5,8 +5,8 @@
 #include "nativeui/browser.h"
 
 #include <gtk/gtk.h>
-#include <webkit2/webkit2.h>
 #include <JavaScriptCore/JavaScript.h>
+#include <webkit2/webkit2.h>
 
 namespace nu {
 

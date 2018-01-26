@@ -7,13 +7,14 @@
 
 #include <string>
 
+#include "base/values.h"
 #include "nativeui/view.h"
 
 namespace nu {
 
 class NATIVEUI_EXPORT Browser : public View {
  public:
-  using ExecutionCallback = std::function<void(bool, const std::string&)>;
+  using ExecutionCallback = std::function<void(bool, base::Value)>;
 
   Browser();
 

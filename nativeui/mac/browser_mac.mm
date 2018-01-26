@@ -8,6 +8,7 @@
 
 #include <WebKit/WebKit.h>
 
+#include "base/memory/ptr_util.h"
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/nu_view.h"
@@ -67,23 +68,41 @@ namespace nu {
 
 namespace {
 
-// Convert NSValue to JSON string.
-std::string NSValueToJSON(id value) {
-  // Try the default method.
-  if ([NSJSONSerialization isValidJSONObject:value]) {
-    NSData* json_data = [NSJSONSerialization dataWithJSONObject:value
-                                                        options:0
-                                                          error:nil];
-    return std::string(static_cast<const char*>([json_data bytes]),
-                       [json_data length]);
+// Convert common NSValue to base::Value.
+base::Value NSValueToBaseValue(id value) {
+  if (!value || [value isKindOfClass:[NSNull class]]) {
+    return base::Value();
+  } else if ([value isKindOfClass:[NSString class]]) {
+    return base::Value(base::SysNSStringToUTF8(value));
+  } else if ([value isKindOfClass:[NSNumber class]]) {
+    const char* objc_type = [value objCType];
+    if (strcmp(objc_type, @encode(BOOL)) == 0 ||
+        strcmp(objc_type, @encode(char)) == 0)
+      return base::Value(static_cast<bool>([value boolValue]));
+    else if (strcmp(objc_type, @encode(double)) == 0 ||
+             strcmp(objc_type, @encode(float)) == 0)
+      return base::Value([value doubleValue]);
+    else
+      return base::Value([value intValue]);
+  } else if ([value isKindOfClass:[NSArray class]]) {
+    base::ListValue arr;
+    arr.GetList().reserve([value count]);
+    for (id item in value)
+      arr.GetList().push_back(NSValueToBaseValue(item));
+    return std::move(arr);
+  } else if ([value isKindOfClass:[NSDictionary class]]) {
+    base::DictionaryValue dict;
+    for (id key in value) {
+      std::string str_key = base::SysNSStringToUTF8(
+          [key isKindOfClass:[NSString class]] ? key : [key description]);
+      auto vval = base::MakeUnique<base::Value>(
+          NSValueToBaseValue([value objectForKey:key]));
+      dict.SetWithoutPathExpansion(str_key.c_str(), std::move(vval));
+    }
+    return std::move(dict);
+  } else {
+    return base::Value(base::SysNSStringToUTF8([value description]));
   }
-  // For other types try to put it into an Array and then strip.
-  NSArray* arr = @[ value ];
-  if ([NSJSONSerialization isValidJSONObject:arr]) {
-    std::string result =  NSValueToJSON(arr);
-    return result.substr(1, result.size() - 2);
-  }
-  return "undefined";
 }
 
 }  // namespace
@@ -121,7 +140,7 @@ void Browser::ExecuteJavaScript(const std::string& code,
   __block ExecutionCallback copied_callback = callback;
   [webview evaluateJavaScript:base::SysUTF8ToNSString(code)
             completionHandler:^(id result, NSError* error) {
-    copied_callback(!error, result ? NSValueToJSON(result) : "");
+    copied_callback(!error, NSValueToBaseValue(result));
   }];
 }
 
