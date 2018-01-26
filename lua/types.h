@@ -244,7 +244,7 @@ struct Type<std::vector<T>> {
     lua_pushnil(state);
     while (lua_next(state, index) != 0) {
       if (GetType(state, -2) != LuaType::Number ||  // check array type
-          lua_tointeger(state, -2) != static_cast<int>(out->size() - 1))
+          lua_tointeger(state, -2) != static_cast<int>(out->size() + 1))
         return false;
       T value;
       if (!Type<T>::To(state, -1, &value))

@@ -11,6 +11,7 @@
 
 #include "base/command_line.h"
 #include "lua_yue/binding_signal.h"
+#include "lua_yue/binding_values.h"
 #include "nativeui/nativeui.h"
 
 namespace lua {

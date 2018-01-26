@@ -14,8 +14,8 @@
 namespace lua {
 
 // Thin wrapper of lua_createtable.
-inline void NewTable(State* state, int nargs = 0, int nrec = 0) {
-  lua_createtable(state, nargs, nrec);
+inline void NewTable(State* state, int narr = 0, int nrec = 0) {
+  lua_createtable(state, narr, nrec);
 }
 
 // Get length of table (or any other value).

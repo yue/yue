@@ -25,6 +25,28 @@ struct make_void {
 template <typename... Ts>
 using void_t = typename make_void<Ts...>::type;
 
+// Deduce the proper type for callback parameters.
+template<typename T>
+struct CallbackParamTraits {
+  typedef T LocalType;
+};
+template<typename T>
+struct CallbackParamTraits<const T&> {
+  typedef T LocalType;
+};
+template<typename T>
+struct CallbackParamTraits<T*> {
+  typedef T* LocalType;
+};
+template<typename T>
+struct CallbackParamTraits<const T*> {
+  typedef T* LocalType;
+};
+template<>
+struct CallbackParamTraits<const char*> {
+  typedef const char* LocalType;
+};
+
 // Classes for generating and storing an argument pack of integer indices
 // (based on well-known "indices trick", see: http://goo.gl/bKKojn):
 template<size_t... indices>

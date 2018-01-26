@@ -20,7 +20,8 @@ namespace lua {
 // Function template for Type<ArgType>::Push.
 template<typename ArgType>
 inline void Push(State* state, const ArgType& arg) {
-  Type<ArgType>::Push(state, arg);
+  Type<typename internal::CallbackParamTraits<ArgType>::LocalType>::Push(
+      state, arg);
 }
 
 // Optimized version for string iterals.

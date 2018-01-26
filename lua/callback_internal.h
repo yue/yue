@@ -21,28 +21,6 @@ namespace lua {
 
 namespace internal {
 
-// Deduce the proper type for callback parameters.
-template<typename T>
-struct CallbackParamTraits {
-  typedef T LocalType;
-};
-template<typename T>
-struct CallbackParamTraits<const T&> {
-  typedef T LocalType;
-};
-template<typename T>
-struct CallbackParamTraits<T*> {
-  typedef T* LocalType;
-};
-template<typename T>
-struct CallbackParamTraits<const T*> {
-  typedef T* LocalType;
-};
-template<>
-struct CallbackParamTraits<const char*> {
-  typedef const char* LocalType;
-};
-
 // CallbackHolder is used to pass a std::function from PushCFunction through
 // DispatchToCallback, where it is invoked.
 template<typename Sig>

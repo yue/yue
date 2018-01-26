@@ -55,6 +55,8 @@ source_set("lua_yue_gui") {
     "binding_gui.cc",
     "binding_gui.h",
     "binding_signal.h",
+    "binding_values.cc",
+    "binding_values.h",
   ]
 
   deps = [
@@ -82,6 +84,7 @@ source_set("lua_yue_util") {
 test("lua_yue_unittests") {
   sources = [
     "binding_signal_unittest.cc",
+    "binding_values_unittest.cc",
     "test/run_all_unittests.cc",
   ]
 
