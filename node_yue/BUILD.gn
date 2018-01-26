@@ -13,6 +13,8 @@ loadable_module("node_yue") {
     "binding_gui.cc",
     "binding_signal.cc",
     "binding_signal.h",
+    "binding_values.cc",
+    "binding_values.h",
     "chrome_view_mac.mm",
     "chrome_view_mac.h",
     "delay_load_hook_win.cc",
@@ -24,6 +26,9 @@ loadable_module("node_yue") {
     "node_integration_mac.h",
     "node_integration_win.cc",
     "node_integration_win.h",
+    "v8_value_converter.h",
+    "v8_value_converter_impl.cc",
+    "v8_value_converter_impl.h",
   ]
 
   deps = [

@@ -6,6 +6,7 @@
 
 #include "nativeui/nativeui.h"
 #include "node_yue/binding_signal.h"
+#include "node_yue/binding_values.h"
 #include "node_yue/node_integration.h"
 
 #if defined(OS_MACOSX)
