@@ -11,6 +11,7 @@
 
 #include "base/base_paths.h"
 #include "base/files/file_path.h"
+#include "base/json/json_reader.h"
 #include "base/path_service.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/win/registry.h"
@@ -264,10 +265,14 @@ void Browser::LoadURL(const std::string& url) {
 void Browser::ExecuteJavaScript(const std::string& code,
                                 const ExecutionCallback& callback) {
   auto* browser = static_cast<BrowserImpl*>(GetNative());
-  base::string16 ret;
-  bool success = browser->Eval(base::UTF8ToUTF16(code), &ret);
-  if (callback)
-    MessageLoop::PostTask(std::bind(callback, success, base::UTF16ToUTF8(ret)));
+  base::string16 json;
+  bool success = browser->Eval(base::UTF8ToUTF16(code), &json);
+  if (callback) {
+    std::string json_str = base::UTF16ToUTF8(json);
+    std::unique_ptr<base::Value> pv = base::JSONReader::Read(json_str);
+    MessageLoop::PostTask(std::bind(callback, success, pv ? *(pv.release())
+                                                          : base::Value()));
+  }
 }
 
 }  // namespace nu

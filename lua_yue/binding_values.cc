@@ -54,7 +54,7 @@ void Type<base::Value>::Push(State* state, const base::Value& value) {
       return;
     case base::Value::Type::DICTIONARY: {
       const auto* dict = static_cast<const base::DictionaryValue*>(&value);
-      NewTable(state, 0, dict->size());
+      NewTable(state, 0, static_cast<int>(dict->size()));
       for (const auto& it : *dict) {
         lua::Push(state, it.first);
         Type<base::Value>::Push(state, *it.second);
@@ -63,7 +63,7 @@ void Type<base::Value>::Push(State* state, const base::Value& value) {
       return;
     }
     case base::Value::Type::LIST: {
-      NewTable(state, value.GetList().size(), 0);
+      NewTable(state, static_cast<int>(value.GetList().size()), 0);
       for (size_t i = 0; i < value.GetList().size(); ++i) {
         lua::Push(state, static_cast<int>(i + 1));
         Type<base::Value>::Push(state, value.GetList()[i]);

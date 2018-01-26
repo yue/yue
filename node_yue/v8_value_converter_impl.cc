@@ -216,7 +216,8 @@ v8::Local<v8::Value> V8ValueConverterImpl::ToV8ValueImpl(
       std::string val;
       CHECK(value->GetAsString(&val));
       return v8::String::NewFromUtf8(
-          isolate, val.c_str(), v8::String::kNormalString, val.length());
+          isolate, val.c_str(), v8::String::kNormalString,
+          static_cast<int>(val.length()));
     }
 
     case base::Value::Type::LIST:
@@ -242,7 +243,8 @@ v8::Local<v8::Value> V8ValueConverterImpl::ToV8Array(
     v8::Isolate* isolate,
     v8::Local<v8::Object> creation_context,
     const base::ListValue* val) const {
-  v8::Local<v8::Array> result(v8::Array::New(isolate, val->GetSize()));
+  v8::Local<v8::Array> result(v8::Array::New(
+      isolate, static_cast<int>(val->GetSize())));
 
   // TODO(robwu): Callers should pass in the context.
   v8::Local<v8::Context> context = isolate->GetCurrentContext();
@@ -283,7 +285,7 @@ v8::Local<v8::Value> V8ValueConverterImpl::ToV8Object(
     v8::Maybe<bool> maybe = result->CreateDataProperty(
         context,
         v8::String::NewFromUtf8(isolate, key.c_str(), v8::String::kNormalString,
-                                key.length()),
+                                static_cast<int>(key.length())),
         child_v8);
     if (!maybe.IsJust() || !maybe.FromJust())
       LOG(ERROR) << "Failed to set property with key " << key;
