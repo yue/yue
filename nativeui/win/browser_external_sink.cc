@@ -7,9 +7,18 @@
 #include <exdisp.h>
 #include <shlwapi.h>
 
+#include "base/strings/utf_string_conversions.h"
+#include "base/win/scoped_bstr.h"
+#include "base/win/scoped_variant.h"
 #include "nativeui/win/browser_win.h"
 
 namespace nu {
+
+namespace {
+
+const DISPID kInvokeId = 1000;
+
+}  // namespace
 
 BrowserExternalSink::BrowserExternalSink(BrowserImpl* browser)
     : ref_(1), browser_(browser) {
@@ -56,6 +65,10 @@ IFACEMETHODIMP BrowserExternalSink::GetIDsOfNames(
     __RPC__in_range(0, 16384) UINT cNames,
     LCID lcid,
     __RPC__out_ecount_full(cNames) DISPID *rgDispId) {
+  if (cNames == 1 && base::StringPiece16(rgszNames[0]) == L"postMessage") {
+    rgDispId[0] = kInvokeId;
+    return S_OK;
+  }
   return DISP_E_UNKNOWNNAME;
 }
 
@@ -68,7 +81,16 @@ IFACEMETHODIMP BrowserExternalSink::Invoke(
     _Out_opt_ VARIANT *pVarResult,
     _Out_opt_ EXCEPINFO *pExcepInfo,
     _Out_opt_ UINT *puArgErr) {
-  return E_INVALIDARG;
+  if (dispIdMember != kInvokeId || !(wFlags & DISPATCH_METHOD))
+    return E_INVALIDARG;
+  if (pDispParams->cArgs != 2 ||
+      pDispParams->rgvarg[0].vt != VT_BSTR ||
+      pDispParams->rgvarg[1].vt != VT_BSTR)
+    return E_INVALIDARG;
+  static_cast<Browser*>(browser_->delegate())->OnPostMessage(
+      base::UTF16ToUTF8(pDispParams->rgvarg[1].bstrVal),
+      base::UTF16ToUTF8(pDispParams->rgvarg[0].bstrVal));
+  return S_OK;
 }
 
 }  // namespace nu

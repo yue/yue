@@ -5,6 +5,7 @@
 #ifndef NATIVEUI_BROWSER_H_
 #define NATIVEUI_BROWSER_H_
 
+#include <map>
 #include <string>
 
 #include "base/values.h"
@@ -15,6 +16,7 @@ namespace nu {
 class NATIVEUI_EXPORT Browser : public View {
  public:
   using ExecutionCallback = std::function<void(bool, base::Value)>;
+  using BindingFunc = std::function<void(base::Value)>;
 
   Browser();
 
@@ -28,12 +30,23 @@ class NATIVEUI_EXPORT Browser : public View {
   void ExecuteJavaScript(const std::string& code,
                          const ExecutionCallback& callback);
 
+  void AddRawBinding(const std::string& name, const BindingFunc& func);
+  void RemoveBinding(const std::string& name);
+
   // Events.
   Signal<void(Browser*)> on_close;
   Signal<void(Browser*)> on_finish_navigation;
 
+  // Private: Called from web pages to invoke native bindings.
+  void OnPostMessage(const std::string& name, const std::string& json);
+
  protected:
   ~Browser() override;
+
+ private:
+  void InvokeBindings(const std::string& method, base::Value args);
+
+  std::map<std::string, BindingFunc> bindings_;
 };
 
 }  // namespace nu
