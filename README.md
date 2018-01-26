@@ -13,9 +13,6 @@ A library for creating native cross-platform GUI apps.
 Feel free to ask any kind of questions in the issues page, but please use
 English since other users may find your questions valuable.
 
-If you want to get technical support, there are [paid plans][paid-plans]
-available.
-
 ## Contributions
 
 By sending a pull request, you hereby grant to owners and users of Yue project a
