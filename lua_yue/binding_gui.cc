@@ -5,6 +5,7 @@
 #include "lua_yue/binding_gui.h"
 
 #include <map>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -1154,11 +1155,30 @@ struct Type<nu::Browser> {
            "loadurl", &nu::Browser::LoadURL,
            "executejavascript", &nu::Browser::ExecuteJavaScript,
            "setbindingname", &nu::Browser::SetBindingName,
+           "addbinding", &AddBinding,
            "addrawbinding", &nu::Browser::AddRawBinding,
            "removebinding", &nu::Browser::RemoveBinding);
     RawSetProperty(state, metatable,
                    "onclose", &nu::Browser::on_close,
                    "onfinishnavigation", &nu::Browser::on_finish_navigation);
+  }
+  static void AddBinding(CallContext* context,
+                         nu::Browser* browser,
+                         const std::string& name) {
+    State* state = context->state;
+    if (GetType(state, 3) != LuaType::Function) {
+      Push(state, "The arg 3 should be function");
+      context->has_error = true;
+      return;
+    }
+    // Persistent the function and pass it to lambda.
+    std::shared_ptr<Persistent> func_ref = Persistent::New(state, 3);
+    browser->AddRawBinding(name, [state, func_ref](::base::Value value) {
+      func_ref->Push(state);
+      for (const auto& it : value.GetList())
+        Push(state, it);
+      lua_pcall(state, static_cast<int>(value.GetList().size()), 0, 0);
+    });
   }
 };
 
