@@ -13,6 +13,7 @@
 #include "base/files/file_path.h"
 #include "base/json/json_reader.h"
 #include "base/path_service.h"
+#include "base/strings/stringprintf.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/win/registry.h"
 #include "base/win/scoped_bstr.h"
@@ -214,12 +215,14 @@ void BrowserImpl::CleanupBrowserHWND() {
 }
 
 void BrowserImpl::InstallDocumentEvents() {
+  // Get and cache the document object.
   Microsoft::WRL::ComPtr<IDispatch> doc2_disp;
   if (FAILED(browser_->get_Document(&doc2_disp)) || !doc2_disp ||
       FAILED(doc2_disp.As(&document_))) {
     LOG(ERROR) << "Failed to get document";
     return;
   }
+  // Listen to events of document.
   Microsoft::WRL::ComPtr<IConnectionPointContainer> cpc;
   Microsoft::WRL::ComPtr<IConnectionPoint> cp;
   DWORD cookie;
@@ -229,6 +232,20 @@ void BrowserImpl::InstallDocumentEvents() {
     PLOG(ERROR) << "Failed install set document events";
     return;
   }
+  // Add bindings to the document.
+  const auto& bindings = static_cast<Browser*>(delegate())->bindings();
+  base::string16 code = L"(function(binding, external) {";
+  for (const auto& it : bindings) {
+    base::string16 name = base::UTF8ToUTF16(it.first);
+    code += base::StringPrintf(
+        L"binding[\"%ls\"] = function() {"
+        L"  var args = Array.prototype.slice.call(arguments);"
+        L"  external.postMessage(\"%ls\", JSON.stringify(args));"
+        L"};",
+        name.c_str(), name.c_str());
+  }
+  code += L"delete window.external;})(window, window.external);";
+  Eval(code, nullptr);
 }
 
 // static

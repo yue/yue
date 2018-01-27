@@ -8,6 +8,7 @@
 #include <utility>
 
 #include "base/json/json_reader.h"
+#include "base/json/string_escape.h"
 
 namespace nu {
 
@@ -19,11 +20,15 @@ const char* Browser::GetClassName() const {
 }
 
 void Browser::AddRawBinding(const std::string& name, const BindingFunc& func) {
-  bindings_[name] = func;
+  std::string escaped;
+  base::EscapeJSONString(name, false, &escaped);
+  bindings_[escaped] = func;
 }
 
 void Browser::RemoveBinding(const std::string& name) {
-  bindings_.erase(name);
+  std::string escaped;
+  base::EscapeJSONString(name, false, &escaped);
+  bindings_.erase(escaped);
 }
 
 void Browser::OnPostMessage(const std::string& name, const std::string& json) {

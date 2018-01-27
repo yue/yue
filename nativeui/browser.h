@@ -40,6 +40,11 @@ class NATIVEUI_EXPORT Browser : public View {
   // Private: Called from web pages to invoke native bindings.
   void OnPostMessage(const std::string& name, const std::string& json);
 
+  // Private:
+  const std::map<std::string, BindingFunc>& bindings() const {
+    return bindings_;
+  }
+
  protected:
   ~Browser() override;
 
