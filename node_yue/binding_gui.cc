@@ -1268,11 +1268,38 @@ struct Type<nu::Browser> {
         "loadURL", &nu::Browser::LoadURL,
         "executeJavaScript", &nu::Browser::ExecuteJavaScript,
         "setBindingName", &nu::Browser::SetBindingName,
+        "addBinding", &AddBinding,
         "addRawBinding", &nu::Browser::AddRawBinding,
         "removeBinding", &nu::Browser::RemoveBinding);
     SetProperty(context, templ,
                 "onClose", &nu::Browser::on_close,
                 "onFinishNavigation", &nu::Browser::on_finish_navigation);
+  }
+  static void AddBinding(Arguments* args,
+                         const std::string& name,
+                         v8::Local<v8::Function> func) {
+    nu::Browser* browser;
+    if (!args->GetHolder(&browser))
+      return;
+    // The func must be stored in v8::Global and passed via ref-counting.
+    v8::Isolate* isolate = args->isolate();
+    std::shared_ptr<internal::V8FunctionWrapper> func_ref(
+        new internal::V8FunctionWrapper(isolate, func));
+    // Parse base::Value and call func with v8 args.
+    browser->AddRawBinding(name, [isolate, func_ref](::base::Value value) {
+      Locker locker(isolate);
+      v8::HandleScope handle_scope(isolate);
+      v8::MicrotasksScope script_scope(isolate,
+                                       v8::MicrotasksScope::kRunMicrotasks);
+      auto func = func_ref->Get(isolate);
+      auto context = func->CreationContext();
+      std::vector<v8::Local<v8::Value>> args;
+      args.reserve(value.GetList().size());
+      for (const auto& it : value.GetList())
+        args.push_back(ToV8(context, it));
+      node::MakeCallback(isolate, func, func, static_cast<int>(args.size()),
+                         &args.front());
+    });
   }
 };
 
