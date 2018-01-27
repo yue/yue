@@ -45,8 +45,13 @@ void FixIECompatibleMode() {
 bool VARIANTToJSON(IDispatchEx* script,
                    const base::win::ScopedVariant& value,
                    base::string16* result) {
+  // Can't pass empty VARIANT to IE.
+  if (value.type() == VT_EMPTY) {
+    *result = L"undefined";
+    return true;
+  }
   // Find the javascript JSON object.
-  base::win::ScopedVariant json_var(base::win::ScopedVariant::kEmptyVariant);
+  base::win::ScopedVariant json_var;
   if (!Invoke(script, L"JSON", DISPATCH_PROPERTYGET, &json_var))
     return false;
   Microsoft::WRL::ComPtr<IDispatch> json_disp =
@@ -55,7 +60,7 @@ bool VARIANTToJSON(IDispatchEx* script,
   if (FAILED(json_disp.As(&json_obj)) || !json_obj)
     return false;
   // Invoke the JSON.stringify method.
-  base::win::ScopedVariant str(base::win::ScopedVariant::kEmptyVariant);
+  base::win::ScopedVariant str;
   if (!Invoke(json_obj.Get(), L"stringify", DISPATCH_METHOD, &str, value))
     return false;
   *result = str.ptr()->bstrVal;
@@ -132,7 +137,7 @@ bool BrowserImpl::Eval(const base::string16& code, base::string16* result) {
   if (FAILED(script_disp.As(&script)))
     return false;
   base::win::ScopedVariant arg(code.c_str(), static_cast<UINT>(code.length()));
-  base::win::ScopedVariant ret(base::win::ScopedVariant::kEmptyVariant);
+  base::win::ScopedVariant ret;
   if (!Invoke(script.Get(), L"eval", DISPATCH_METHOD, &ret, arg))
     return false;
   if (result && !VARIANTToJSON(script.Get(), ret, result))

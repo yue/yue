@@ -5,6 +5,9 @@
 #ifndef NATIVEUI_UTIL_FUNCTION_CALLER_H_
 #define NATIVEUI_UTIL_FUNCTION_CALLER_H_
 
+#include <string>
+#include <utility>
+
 #include "base/values.h"
 
 namespace nu {
