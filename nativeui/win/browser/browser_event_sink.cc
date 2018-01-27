@@ -2,7 +2,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/win/browser_event_sink.h"
+#include "nativeui/win/browser/browser_event_sink.h"
 
 #include <exdispid.h>
 #include <shlwapi.h>
@@ -66,21 +66,18 @@ STDMETHODIMP BrowserEventSink::Invoke(_In_  DISPID dispIdMember,
                                       _Out_opt_  VARIANT *pVarResult,
                                       _Out_opt_  EXCEPINFO *pExcepInfo,
                                       _Out_opt_  UINT *puArgErr) {
-  auto* delegate = static_cast<Browser*>(browser_->delegate());
   HRESULT hr = S_OK;
   switch (dispIdMember) {
-    case DISPID_STATUSTEXTCHANGE:
+    case DISPID_DOCUMENTCOMPLETE:
       // We don't have a way to know when the IE control creates its HWND, our
       // only solution is to keep requesting when navigation state changes.
       browser_->ReceiveBrowserHWND();
-      break;
-    case DISPID_DOCUMENTCOMPLETE:
-      // Currently we only emit for the main frame.
+      // Notify the browser when document of main frame is ready.
       if (pDispParams->cArgs == 2 && pDispParams->rgvarg[1].vt == VT_DISPATCH) {
         Microsoft::WRL::ComPtr<IDispatch> main_window;
         if (browser_->GetBrowser<IDispatch>(&main_window) &&
             main_window.Get() == pDispParams->rgvarg[1].pdispVal) {
-          delegate->on_finish_navigation.Emit(delegate);
+          browser_->InstallDocumentEventSink();
         }
       }
       break;

@@ -10,9 +10,9 @@
 #include <wrl.h>
 
 #include "nativeui/browser.h"
-#include "nativeui/win/browser_event_sink.h"
-#include "nativeui/win/browser_external_sink.h"
-#include "nativeui/win/browser_ole_site.h"
+#include "nativeui/win/browser/browser_event_sink.h"
+#include "nativeui/win/browser/browser_external_sink.h"
+#include "nativeui/win/browser/browser_ole_site.h"
 #include "nativeui/win/subwin_view.h"
 
 namespace nu {
@@ -54,6 +54,9 @@ class BrowserImpl : public SubwinView {
 
   // Cleanup the hooks on IE control.
   void CleanupBrowserHWND();
+
+  // Called when document is ready.
+  void InstallDocumentEventSink();
 
   // The proc of IE control.
   static LRESULT CALLBACK BrowserWndProc(HWND hwnd,

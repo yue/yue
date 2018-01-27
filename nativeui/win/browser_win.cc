@@ -7,6 +7,7 @@
 #include <mshtml.h>
 #include <shlguid.h>
 
+#include <memory>
 #include <string>
 
 #include "base/base_paths.h"
@@ -216,6 +217,9 @@ void BrowserImpl::ReceiveBrowserHWND() {
 void BrowserImpl::CleanupBrowserHWND() {
   if (browser_hwnd_)
     SetWindowProc(browser_hwnd_, browser_proc_);
+}
+
+void BrowserImpl::InstallDocumentEventSink() {
 }
 
 // static

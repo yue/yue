@@ -4,6 +4,9 @@
 
 #include "nativeui/browser.h"
 
+#include <memory>
+#include <utility>
+
 #include "base/json/json_reader.h"
 
 namespace nu {

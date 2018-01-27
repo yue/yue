@@ -2,10 +2,9 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef NATIVEUI_WIN_BROWSER_EVENT_SINK_H_
-#define NATIVEUI_WIN_BROWSER_EVENT_SINK_H_
+#ifndef NATIVEUI_WIN_BROWSER_BROWSER_EXTERNAL_SINK_H_
+#define NATIVEUI_WIN_BROWSER_BROWSER_EXTERNAL_SINK_H_
 
-#include <exdisp.h>
 #include <ole2.h>
 
 #include "base/macros.h"
@@ -14,10 +13,10 @@ namespace nu {
 
 class BrowserImpl;
 
-class BrowserEventSink : public IDispatch {
+class BrowserExternalSink : public IDispatch {
  public:
-  explicit BrowserEventSink(BrowserImpl* browser);
-  ~BrowserEventSink();
+  explicit BrowserExternalSink(BrowserImpl* browser);
+  ~BrowserExternalSink();
 
   // IUnknown
   STDMETHOD(QueryInterface)(REFIID riid, void **ppvObject);
@@ -48,9 +47,9 @@ class BrowserEventSink : public IDispatch {
   ULONG ref_;
   BrowserImpl* browser_;
 
-  DISALLOW_COPY_AND_ASSIGN(BrowserEventSink);
+  DISALLOW_COPY_AND_ASSIGN(BrowserExternalSink);
 };
 
 }  // namespace nu
 
-#endif  // NATIVEUI_WIN_BROWSER_EVENT_SINK_H_
+#endif  // NATIVEUI_WIN_BROWSER_BROWSER_EXTERNAL_SINK_H_

@@ -2,8 +2,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef NATIVEUI_WIN_BROWSER_OLE_SITE_H_
-#define NATIVEUI_WIN_BROWSER_OLE_SITE_H_
+#ifndef NATIVEUI_WIN_BROWSER_BROWSER_OLE_SITE_H_
+#define NATIVEUI_WIN_BROWSER_BROWSER_OLE_SITE_H_
 
 #include <exdisp.h>
 #include <mshtmhst.h>
@@ -11,7 +11,7 @@
 #include <wrl.h>
 
 #include "base/macros.h"
-#include "nativeui/win/browser_external_sink.h"
+#include "nativeui/win/browser/browser_external_sink.h"
 
 namespace nu {
 
@@ -118,4 +118,4 @@ class BrowserOleSite : public IOleClientSite,
 
 }  // namespace nu
 
-#endif  // NATIVEUI_WIN_BROWSER_OLE_SITE_H_
+#endif  // NATIVEUI_WIN_BROWSER_BROWSER_OLE_SITE_H_
