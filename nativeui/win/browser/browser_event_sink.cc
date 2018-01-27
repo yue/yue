@@ -68,26 +68,34 @@ STDMETHODIMP BrowserEventSink::Invoke(_In_  DISPID dispIdMember,
                                       _Out_opt_  UINT *puArgErr) {
   HRESULT hr = S_OK;
   switch (dispIdMember) {
-    case DISPID_DOCUMENTCOMPLETE:
+    case DISPID_NAVIGATECOMPLETE2:
       // We don't have a way to know when the IE control creates its HWND, our
       // only solution is to keep requesting when navigation state changes.
       browser_->ReceiveBrowserHWND();
-      // Notify the browser when document of main frame is ready.
-      if (pDispParams->cArgs == 2 && pDispParams->rgvarg[1].vt == VT_DISPATCH) {
-        Microsoft::WRL::ComPtr<IDispatch> main_window;
-        if (browser_->GetBrowser<IDispatch>(&main_window) &&
-            main_window.Get() == pDispParams->rgvarg[1].pdispVal) {
-          browser_->InstallDocumentEventSink();
-        }
-      }
+      // https://msdn.microsoft.com/en-us/library/aa768285(v=vs.85).aspx
+      // The viewer for the document has been created.
+      if (IsMainFrame(pDispParams))
+        browser_->InstallDocumentEvents();
       break;
-    case DISPID_NAVIGATECOMPLETE2:
+    case DISPID_DOCUMENTCOMPLETE:
+      if (IsMainFrame(pDispParams)) {
+        auto* delegate = static_cast<Browser*>(browser_->delegate());
+        delegate->on_finish_navigation.Emit(delegate);
+      }
       break;
     default:
       hr = E_NOTIMPL;
       break;
   }
   return hr;
+}
+
+bool BrowserEventSink::IsMainFrame(DISPPARAMS* pDispParams) const {
+  if (pDispParams->cArgs != 2 || pDispParams->rgvarg[1].vt != VT_DISPATCH)
+    return false;
+  Microsoft::WRL::ComPtr<IDispatch> main_window;
+  return browser_->GetBrowser<IDispatch>(&main_window) &&
+         main_window.Get() == pDispParams->rgvarg[1].pdispVal;
 }
 
 }  // namespace nu

@@ -4,7 +4,6 @@
 
 #include "nativeui/win/browser_win.h"
 
-#include <mshtml.h>
 #include <shlguid.h>
 
 #include <memory>
@@ -68,7 +67,8 @@ BrowserImpl::BrowserImpl(Browser* delegate)
     : SubwinView(delegate),
       external_sink_(new BrowserExternalSink(this)),
       ole_site_(new BrowserOleSite(this, external_sink_.Get())),
-      event_sink_(new BrowserEventSink(this)) {
+      event_sink_(new BrowserEventSink(this)),
+      document_events_(new BrowserDocumentEvents(this)) {
   set_focusable(true);
   // Initialize COM and OLE.
   State::GetCurrent()->InitializeCOM();
@@ -122,16 +122,10 @@ void BrowserImpl::LoadURL(const base::string16& str) {
 }
 
 bool BrowserImpl::Eval(const base::string16& code, base::string16* result) {
-  if (!browser_)
-    return false;
-  Microsoft::WRL::ComPtr<IDispatch> doc2_disp;
-  if (FAILED(browser_->get_Document(&doc2_disp)) || !doc2_disp)
-    return false;
-  Microsoft::WRL::ComPtr<IHTMLDocument2> doc2;
-  if (FAILED(doc2_disp.As(&doc2)))
+  if (!document_)
     return false;
   Microsoft::WRL::ComPtr<IDispatch> script_disp;
-  if (FAILED(doc2->get_Script(&script_disp)) || !script_disp)
+  if (FAILED(document_->get_Script(&script_disp)) || !script_disp)
     return false;
   Microsoft::WRL::ComPtr<IDispatchEx> script;
   if (FAILED(script_disp.As(&script)))
@@ -140,7 +134,7 @@ bool BrowserImpl::Eval(const base::string16& code, base::string16* result) {
   base::win::ScopedVariant ret(base::win::ScopedVariant::kEmptyVariant);
   if (!Invoke(script.Get(), L"eval", DISPATCH_METHOD, &ret, arg))
     return false;
-  if (!VARIANTToJSON(script.Get(), ret, result))
+  if (result && !VARIANTToJSON(script.Get(), ret, result))
     return false;
   return true;
 }
@@ -219,7 +213,22 @@ void BrowserImpl::CleanupBrowserHWND() {
     SetWindowProc(browser_hwnd_, browser_proc_);
 }
 
-void BrowserImpl::InstallDocumentEventSink() {
+void BrowserImpl::InstallDocumentEvents() {
+  Microsoft::WRL::ComPtr<IDispatch> doc2_disp;
+  if (FAILED(browser_->get_Document(&doc2_disp)) || !doc2_disp ||
+      FAILED(doc2_disp.As(&document_))) {
+    LOG(ERROR) << "Failed to get document";
+    return;
+  }
+  Microsoft::WRL::ComPtr<IConnectionPointContainer> cpc;
+  Microsoft::WRL::ComPtr<IConnectionPoint> cp;
+  DWORD cookie;
+  if (FAILED(document_.As(&cpc)) ||
+      FAILED(cpc->FindConnectionPoint(DIID_HTMLDocumentEvents2, &cp)) ||
+      FAILED(cp->Advise(document_events_.Get(), &cookie))) {
+    PLOG(ERROR) << "Failed install set document events";
+    return;
+  }
 }
 
 // static
@@ -270,7 +279,8 @@ void Browser::ExecuteJavaScript(const std::string& code,
                                 const ExecutionCallback& callback) {
   auto* browser = static_cast<BrowserImpl*>(GetNative());
   base::string16 json;
-  bool success = browser->Eval(base::UTF8ToUTF16(code), &json);
+  bool success = browser->Eval(base::UTF8ToUTF16(code),
+                               callback ? &json : nullptr);
   if (callback) {
     std::string json_str = base::UTF16ToUTF8(json);
     std::unique_ptr<base::Value> pv = base::JSONReader::Read(json_str);

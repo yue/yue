@@ -6,10 +6,12 @@
 #define NATIVEUI_WIN_BROWSER_WIN_H_
 
 #include <exdisp.h>
+#include <mshtml.h>
 #include <ole2.h>
 #include <wrl.h>
 
 #include "nativeui/browser.h"
+#include "nativeui/win/browser/browser_document_events.h"
 #include "nativeui/win/browser/browser_event_sink.h"
 #include "nativeui/win/browser/browser_external_sink.h"
 #include "nativeui/win/browser/browser_ole_site.h"
@@ -56,7 +58,7 @@ class BrowserImpl : public SubwinView {
   void CleanupBrowserHWND();
 
   // Called when document is ready.
-  void InstallDocumentEventSink();
+  void InstallDocumentEvents();
 
   // The proc of IE control.
   static LRESULT CALLBACK BrowserWndProc(HWND hwnd,
@@ -64,12 +66,15 @@ class BrowserImpl : public SubwinView {
                                          WPARAM w_param,
                                          LPARAM l_param);
 
-  Microsoft::WRL::ComPtr<IWebBrowser2> browser_;
   Microsoft::WRL::ComPtr<BrowserExternalSink> external_sink_;
   Microsoft::WRL::ComPtr<BrowserOleSite> ole_site_;
   Microsoft::WRL::ComPtr<BrowserEventSink> event_sink_;
+  Microsoft::WRL::ComPtr<BrowserDocumentEvents> document_events_;
   HWND browser_hwnd_ = NULL;
   WNDPROC browser_proc_ = nullptr;
+
+  Microsoft::WRL::ComPtr<IWebBrowser2> browser_;
+  Microsoft::WRL::ComPtr<IHTMLDocument2> document_;
 };
 
 }  // namespace nu
