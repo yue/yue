@@ -9,6 +9,7 @@
 #include <string>
 
 #include "base/values.h"
+#include "nativeui/util/function_caller.h"
 #include "nativeui/view.h"
 
 namespace nu {
@@ -33,6 +34,14 @@ class NATIVEUI_EXPORT Browser : public View {
   void SetBindingName(const std::string& name);
   void AddRawBinding(const std::string& name, const BindingFunc& func);
   void RemoveBinding(const std::string& name);
+
+  // Automatically deduce argument types.
+  template<typename Sig>
+  void AddBinding(const std::string& name, const std::function<Sig>& func) {
+    AddRawBinding(name, [func](base::Value args) {
+      internal::Dispatcher<Sig>::DispatchToCallback(func, args);
+    });
+  }
 
   // Events.
   Signal<void(Browser*)> on_close;
