@@ -233,18 +233,25 @@ void BrowserImpl::InstallDocumentEvents() {
     return;
   }
   // Add bindings to the document.
+  InstallBindings();
+}
+
+void BrowserImpl::InstallBindings() {
   const auto& bindings = static_cast<Browser*>(delegate())->bindings();
-  base::string16 code = L"(function(binding, external) {";
+  base::string16 code = L"(function(key, binding, external) {";
   for (const auto& it : bindings) {
     base::string16 name = base::UTF8ToUTF16(it.first);
     code += base::StringPrintf(
         L"binding[\"%ls\"] = function() {"
         L"  var args = Array.prototype.slice.call(arguments);"
-        L"  external.postMessage(\"%ls\", JSON.stringify(args));"
+        L"  external.postMessage(key, \"%ls\", JSON.stringify(args));"
         L"};",
         name.c_str(), name.c_str());
   }
-  code += L"delete window.external;})(window, window.external);";
+  code += base::StringPrintf(
+      L"  delete window.external;"  // this does not work for IE though.
+      L"})(\"%ls\", window, window.external);",
+      external_sink_->security_key().c_str());
   Eval(code, nullptr);
 }
 

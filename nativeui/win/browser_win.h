@@ -60,6 +60,9 @@ class BrowserImpl : public SubwinView {
   // Called when document is ready.
   void InstallDocumentEvents();
 
+  // Insert native bindings into web page.
+  void InstallBindings();
+
   // The proc of IE control.
   static LRESULT CALLBACK BrowserWndProc(HWND hwnd,
                                          UINT message,
