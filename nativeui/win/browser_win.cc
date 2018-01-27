@@ -237,9 +237,19 @@ void BrowserImpl::InstallDocumentEvents() {
 }
 
 void BrowserImpl::InstallBindings() {
-  const auto& bindings = static_cast<Browser*>(delegate())->bindings();
+  auto* browser = static_cast<Browser*>(delegate());
+  // Create window[name] when necessary.
   base::string16 code = L"(function(key, binding, external) {";
-  for (const auto& it : bindings) {
+  base::string16 name = base::UTF8ToUTF16(browser->binding_name());
+  if (name.empty()) {
+    name = L"window";
+  } else {
+    name = base::StringPrintf(L"window[\"%ls\"]", name.c_str());
+    // window[name] = {};
+    code = name + L" = {};" + code;
+  }
+  // Insert bindings.
+  for (const auto& it : browser->bindings()) {
     base::string16 name = base::UTF8ToUTF16(it.first);
     code += base::StringPrintf(
         L"binding[\"%ls\"] = function() {"
@@ -249,9 +259,9 @@ void BrowserImpl::InstallBindings() {
         name.c_str(), name.c_str());
   }
   code += base::StringPrintf(
-      L"  delete window.external;"  // this does not work for IE though.
-      L"})(\"%ls\", window, window.external);",
-      external_sink_->security_key().c_str());
+      L"  delete window.external;"  // this does not really work for IE though.
+      L"})(\"%ls\", %ls, window.external);",
+      external_sink_->security_key().c_str(), name.c_str());
   Eval(code, nullptr);
 }
 

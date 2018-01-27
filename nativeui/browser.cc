@@ -19,13 +19,21 @@ const char* Browser::GetClassName() const {
   return kClassName;
 }
 
+void Browser::SetBindingName(const std::string& name) {
+  base::EscapeJSONString(name, false, &binding_name_);
+}
+
 void Browser::AddRawBinding(const std::string& name, const BindingFunc& func) {
+  if (name.empty())
+    return;
   std::string escaped;
   base::EscapeJSONString(name, false, &escaped);
   bindings_[escaped] = func;
 }
 
 void Browser::RemoveBinding(const std::string& name) {
+  if (name.empty())
+    return;
   std::string escaped;
   base::EscapeJSONString(name, false, &escaped);
   bindings_.erase(escaped);

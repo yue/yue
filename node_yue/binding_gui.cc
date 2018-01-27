@@ -1267,6 +1267,7 @@ struct Type<nu::Browser> {
     Set(context, templ,
         "loadURL", &nu::Browser::LoadURL,
         "executeJavaScript", &nu::Browser::ExecuteJavaScript,
+        "setBindingName", &nu::Browser::SetBindingName,
         "addRawBinding", &nu::Browser::AddRawBinding,
         "removeBinding", &nu::Browser::RemoveBinding);
     SetProperty(context, templ,

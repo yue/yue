@@ -30,6 +30,7 @@ class NATIVEUI_EXPORT Browser : public View {
   void ExecuteJavaScript(const std::string& code,
                          const ExecutionCallback& callback);
 
+  void SetBindingName(const std::string& name);
   void AddRawBinding(const std::string& name, const BindingFunc& func);
   void RemoveBinding(const std::string& name);
 
@@ -41,6 +42,7 @@ class NATIVEUI_EXPORT Browser : public View {
   void OnPostMessage(const std::string& name, const std::string& json);
 
   // Private:
+  const std::string& binding_name() const { return binding_name_; }
   const std::map<std::string, BindingFunc>& bindings() const {
     return bindings_;
   }
@@ -51,6 +53,7 @@ class NATIVEUI_EXPORT Browser : public View {
  private:
   void InvokeBindings(const std::string& method, base::Value args);
 
+  std::string binding_name_;
   std::map<std::string, BindingFunc> bindings_;
 };
 

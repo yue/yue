@@ -1153,6 +1153,7 @@ struct Type<nu::Browser> {
            "create", &CreateOnHeap<nu::Browser>,
            "loadurl", &nu::Browser::LoadURL,
            "executejavascript", &nu::Browser::ExecuteJavaScript,
+           "setbindingname", &nu::Browser::SetBindingName,
            "addrawbinding", &nu::Browser::AddRawBinding,
            "removebinding", &nu::Browser::RemoveBinding);
     RawSetProperty(state, metatable,
