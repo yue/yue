@@ -31,10 +31,10 @@ TEST_F(BrowserTest, ExecuteJavaScript) {
   browser_->on_finish_navigation.Connect([](nu::Browser* browser) {
     browser->ExecuteJavaScript("location.href",
                                [](bool success, base::Value result) {
-      EXPECT_EQ(success, true);
-      EXPECT_TRUE(result.is_string());
-      EXPECT_EQ(result.GetString(), "about:blank");
       nu::MessageLoop::Quit();
+      ASSERT_EQ(success, true);
+      ASSERT_TRUE(result.is_string());
+      ASSERT_EQ(result.GetString(), "about:blank");
     });
   });
   nu::MessageLoop::Run();
@@ -44,12 +44,12 @@ TEST_F(BrowserTest, ExecuteJavaScriptComplexResult) {
   browser_->on_finish_navigation.Connect([](nu::Browser* browser) {
     browser->ExecuteJavaScript("r = {a: true, b: {c: [], d: 'te' + 'st'}}; r",
                                [](bool success, base::Value result) {
-      EXPECT_EQ(success, true);
-      EXPECT_TRUE(result.is_dict());
-      std::string json;
-      EXPECT_TRUE(base::JSONWriter::Write(result, &json));
-      EXPECT_EQ(json, "{\"a\":true,\"b\":{\"c\":[],\"d\":\"test\"}}");
       nu::MessageLoop::Quit();
+      ASSERT_EQ(success, true);
+      ASSERT_TRUE(result.is_dict());
+      std::string json;
+      ASSERT_TRUE(base::JSONWriter::Write(result, &json));
+      ASSERT_EQ(json, "{\"a\":true,\"b\":{\"c\":[],\"d\":\"test\"}}");
     });
   });
   nu::MessageLoop::Run();
@@ -66,11 +66,14 @@ TEST_F(BrowserTest, AddBinding) {
         va = v;
       };
   browser_->AddBinding("method", handler);
-  browser_->on_finish_navigation.Connect([](nu::Browser* browser) {
+  browser_->on_finish_navigation.Connect([&](nu::Browser* browser) {
     browser->ExecuteJavaScript("window.method(true, 'string', {k: 'v'})",
-                               [](bool success, base::Value result) {
-      EXPECT_EQ(success, true);
+                               [&](bool success, base::Value result) {
       nu::MessageLoop::Quit();
+      ASSERT_EQ(success, true);
+      ASSERT_EQ(bo, true);
+      ASSERT_EQ(st, "string");
+      ASSERT_TRUE(va.is_dict());
     });
   });
   nu::MessageLoop::Run();
