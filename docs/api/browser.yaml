@@ -25,6 +25,14 @@ methods:
   - signature: void LoadURL(const std::string& url)
     description: Load the URL.
 
+  - signature: void LoadHTML(const std::string& html, const std::string& baseurl)
+    description: Set the webpage contents and base URL.
+    parameters:
+      html:
+        description: The string to use as the contents of the webpage.
+      baseurl:
+        description: A URL used to resolve relative URLs within the document.
+
   - signature: void ExecuteJavaScript(const std::string& code, const std::function<void(bool, const std::string&)>& callback);
     description: |
       Evaluate `code` in browser and get the evaluated result.

@@ -122,9 +122,20 @@ BrowserImpl::~BrowserImpl() {
 void BrowserImpl::LoadURL(const base::string16& str) {
   if (!browser_)
     return;
+  html_moniker_.Reset();
   base::win::ScopedBstr url(str.c_str());
   browser_->Navigate(url, nullptr, nullptr, nullptr, nullptr);
-  ReceiveBrowserHWND();
+}
+
+void BrowserImpl::LoadHTML(const base::string16& str,
+                           const base::string16& base_url) {
+  if (!browser_)
+    return;
+  html_moniker_ = new BrowserHTMLMoniker;
+  html_moniker_->LoadHTML(str, base_url.empty() ? L"about:blank" : base_url);
+  is_html_loaded_ = false;
+  base::win::ScopedBstr url(L"about:blank");
+  browser_->Navigate(url, nullptr, nullptr, nullptr, nullptr);
 }
 
 bool BrowserImpl::Eval(const base::string16& code, base::string16* result) {
@@ -219,12 +230,22 @@ void BrowserImpl::CleanupBrowserHWND() {
     SetWindowProc(browser_hwnd_, browser_proc_);
 }
 
-void BrowserImpl::InstallDocumentEvents() {
+void BrowserImpl::OnDocumentReady() {
   // Get and cache the document object.
   Microsoft::WRL::ComPtr<IDispatch> doc2_disp;
   if (FAILED(browser_->get_Document(&doc2_disp)) || !doc2_disp ||
       FAILED(doc2_disp.As(&document_))) {
     LOG(ERROR) << "Failed to get document";
+    return;
+  }
+  // Handling the LoadHTML request.
+  if (html_moniker_ && !is_html_loaded_) {
+    is_html_loaded_ = true;
+    Microsoft::WRL::ComPtr<IPersistMoniker> moniker;
+    if (FAILED(document_.As(&moniker)) ||
+        FAILED(moniker->Load(TRUE, html_moniker_.Get(), nullptr, STGM_READ))) {
+      LOG(ERROR) << "Failed to load HTML content";
+    }
     return;
   }
   // Listen to events of document.
@@ -239,6 +260,11 @@ void BrowserImpl::InstallDocumentEvents() {
   }
   // Add bindings to the document.
   InstallBindings();
+}
+
+void BrowserImpl::OnFinishNavigation() {
+  auto* browser = static_cast<Browser*>(delegate());
+  browser->on_finish_navigation.Emit(browser);
 }
 
 void BrowserImpl::InstallBindings() {
@@ -312,6 +338,11 @@ Browser::~Browser() {
 
 void Browser::LoadURL(const std::string& url) {
   static_cast<BrowserImpl*>(GetNative())->LoadURL(base::UTF8ToUTF16(url));
+}
+
+void Browser::LoadHTML(const std::string& html, const std::string& base_url) {
+  auto* browser = static_cast<BrowserImpl*>(GetNative());
+  browser->LoadHTML(base::UTF8ToUTF16(html), base::UTF8ToUTF16(base_url));
 }
 
 void Browser::ExecuteJavaScript(const std::string& code,

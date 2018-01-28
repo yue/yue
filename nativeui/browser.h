@@ -28,6 +28,7 @@ class NATIVEUI_EXPORT Browser : public View {
   const char* GetClassName() const override;
 
   void LoadURL(const std::string& url);
+  void LoadHTML(const std::string& html, const std::string& base_url);
   void ExecuteJavaScript(const std::string& code,
                          const ExecutionCallback& callback);
 

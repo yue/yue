@@ -1266,6 +1266,7 @@ struct Type<nu::Browser> {
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
         "loadURL", &nu::Browser::LoadURL,
+        "loadHTML", &nu::Browser::LoadHTML,
         "executeJavaScript", &nu::Browser::ExecuteJavaScript,
         "setBindingName", &nu::Browser::SetBindingName,
         "addBinding", &AddBinding,

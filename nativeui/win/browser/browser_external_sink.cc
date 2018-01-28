@@ -108,7 +108,7 @@ IFACEMETHODIMP BrowserExternalSink::Invoke(
   std::unique_ptr<base::Value> pv = base::JSONReader::Read(
       base::UTF16ToUTF8(pDispParams->rgvarg[0].bstrVal));
   if (!pv || !pv->is_list()) {
-    LOG(ERROR) << "Invalid message passed: " << json;
+    LOG(ERROR) << "Invalid message passed: " << pDispParams->rgvarg[0].bstrVal;
     return E_INVALIDARG;
   }
   static_cast<Browser*>(browser_->delegate())->InvokeBindings(

@@ -14,6 +14,7 @@
 #include "nativeui/win/browser/browser_document_events.h"
 #include "nativeui/win/browser/browser_event_sink.h"
 #include "nativeui/win/browser/browser_external_sink.h"
+#include "nativeui/win/browser/browser_html_moniker.h"
 #include "nativeui/win/browser/browser_ole_site.h"
 #include "nativeui/win/subwin_view.h"
 
@@ -26,6 +27,7 @@ class BrowserImpl : public SubwinView {
   ~BrowserImpl() override;
 
   void LoadURL(const base::string16& str);
+  void LoadHTML(const base::string16& str, const base::string16& base_url);
   bool Eval(const base::string16& code, base::string16* result);
 
   template<typename T>
@@ -58,7 +60,10 @@ class BrowserImpl : public SubwinView {
   void CleanupBrowserHWND();
 
   // Called when document is ready.
-  void InstallDocumentEvents();
+  void OnDocumentReady();
+
+  // Called when navigation is done.
+  void OnFinishNavigation();
 
   // Insert native bindings into web page.
   void InstallBindings();
@@ -73,11 +78,15 @@ class BrowserImpl : public SubwinView {
   Microsoft::WRL::ComPtr<BrowserOleSite> ole_site_;
   Microsoft::WRL::ComPtr<BrowserEventSink> event_sink_;
   Microsoft::WRL::ComPtr<BrowserDocumentEvents> document_events_;
+  Microsoft::WRL::ComPtr<BrowserHTMLMoniker> html_moniker_;
   HWND browser_hwnd_ = NULL;
   WNDPROC browser_proc_ = nullptr;
 
   Microsoft::WRL::ComPtr<IWebBrowser2> browser_;
   Microsoft::WRL::ComPtr<IHTMLDocument2> document_;
+
+  // Whether we have loaded the HTML.
+  bool is_html_loaded_ = false;
 };
 
 }  // namespace nu

@@ -243,6 +243,8 @@ component("nativeui") {
     "win/browser/browser_external_sink.h",
     "win/browser/browser_event_sink.cc",
     "win/browser/browser_event_sink.h",
+    "win/browser/browser_html_moniker.cc",
+    "win/browser/browser_html_moniker.h",
     "win/browser/browser_ole_site.cc",
     "win/browser/browser_ole_site.h",
     "win/browser_win.cc",

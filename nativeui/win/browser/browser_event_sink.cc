@@ -75,13 +75,11 @@ STDMETHODIMP BrowserEventSink::Invoke(_In_  DISPID dispIdMember,
       // https://msdn.microsoft.com/en-us/library/aa768285(v=vs.85).aspx
       // The viewer for the document has been created.
       if (IsMainFrame(pDispParams))
-        browser_->InstallDocumentEvents();
+        browser_->OnDocumentReady();
       break;
     case DISPID_DOCUMENTCOMPLETE:
-      if (IsMainFrame(pDispParams)) {
-        auto* delegate = static_cast<Browser*>(browser_->delegate());
-        delegate->on_finish_navigation.Emit(delegate);
-      }
+      if (IsMainFrame(pDispParams))
+        browser_->OnFinishNavigation();
       break;
     default:
       hr = E_NOTIMPL;
