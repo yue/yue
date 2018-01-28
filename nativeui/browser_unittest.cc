@@ -10,9 +10,6 @@ class BrowserTest : public testing::Test {
  protected:
   void SetUp() override {
     browser_ = new nu::Browser;
-    nu::MessageLoop::PostTask([&]() {
-      browser_->LoadURL("about:blank");
-    });
   }
 
   nu::Lifetime lifetime_;
@@ -20,9 +17,58 @@ class BrowserTest : public testing::Test {
   scoped_refptr<nu::Browser> browser_;
 };
 
-TEST_F(BrowserTest, OnFishiNavigation) {
+TEST_F(BrowserTest, LoadURL) {
   browser_->on_finish_navigation.Connect([](nu::Browser*) {
     nu::MessageLoop::Quit();
+  });
+  nu::MessageLoop::PostTask([&]() {
+    browser_->LoadURL("about:blank");
+  });
+  nu::MessageLoop::Run();
+}
+
+TEST_F(BrowserTest, LoadHTML) {
+  browser_->on_finish_navigation.Connect([](nu::Browser*) {
+    nu::MessageLoop::Quit();
+  });
+  nu::MessageLoop::PostTask([&]() {
+    browser_->LoadHTML("<html></html>", "about:blank");
+  });
+  nu::MessageLoop::Run();
+}
+
+TEST_F(BrowserTest, LoadHTMLWithScript) {
+  browser_->on_finish_navigation.Connect([](nu::Browser* browser) {
+    browser->ExecuteJavaScript("window.test",
+                               [](bool success, base::Value result) {
+      nu::MessageLoop::Quit();
+      ASSERT_EQ(success, true);
+      ASSERT_TRUE(result.is_string());
+      ASSERT_EQ(result.GetString(), "true");
+    });
+  });
+  nu::MessageLoop::PostTask([&]() {
+    browser_->LoadHTML("<html><script>window.test='true'</script></html>",
+                       "about:blank");
+  });
+  nu::MessageLoop::Run();
+}
+
+TEST_F(BrowserTest, LoadHTMLBaseURL) {
+  browser_->on_finish_navigation.Connect([](nu::Browser* browser) {
+    browser->ExecuteJavaScript("var a = document.createElement('a');"
+                               "a.href = 'relative';"
+                               "a.href",
+                               [](bool success, base::Value result) {
+      nu::MessageLoop::Quit();
+      ASSERT_EQ(success, true);
+      ASSERT_TRUE(result.is_string());
+      ASSERT_EQ(result.GetString(), "https://cheng.guru/relative");
+    });
+  });
+  nu::MessageLoop::PostTask([&]() {
+    browser_->LoadHTML("<html><script>window.test='true'</script></html>",
+                       "https://cheng.guru/");
   });
   nu::MessageLoop::Run();
 }
@@ -36,6 +82,9 @@ TEST_F(BrowserTest, ExecuteJavaScript) {
       ASSERT_TRUE(result.is_string());
       ASSERT_EQ(result.GetString(), "about:blank");
     });
+  });
+  nu::MessageLoop::PostTask([&]() {
+    browser_->LoadURL("about:blank");
   });
   nu::MessageLoop::Run();
 }
@@ -51,6 +100,9 @@ TEST_F(BrowserTest, ExecuteJavaScriptComplexResult) {
       ASSERT_TRUE(base::JSONWriter::Write(result, &json));
       ASSERT_EQ(json, "{\"a\":true,\"b\":{\"c\":[],\"d\":\"test\"}}");
     });
+  });
+  nu::MessageLoop::PostTask([&]() {
+    browser_->LoadURL("about:blank");
   });
   nu::MessageLoop::Run();
 }
@@ -76,6 +128,9 @@ TEST_F(BrowserTest, AddBinding) {
       ASSERT_TRUE(va.is_dict());
     });
   });
+  nu::MessageLoop::PostTask([&]() {
+    browser_->LoadURL("about:blank");
+  });
   nu::MessageLoop::Run();
 }
 
@@ -93,6 +148,9 @@ TEST_F(BrowserTest, SetBindingName) {
       });
     });
   });
+  nu::MessageLoop::PostTask([&]() {
+    browser_->LoadURL("about:blank");
+  });
   nu::MessageLoop::Run();
 }
 
@@ -102,8 +160,15 @@ TEST_F(BrowserTest, MalicousCall) {
     browser->ExecuteJavaScript("window.external.postMessage('', 'method', '')",
                                [=](bool success, base::Value result) {
       EXPECT_EQ(success, false);
-      nu::MessageLoop::Quit();
+      browser->ExecuteJavaScript("window.method()",
+                                 [=](bool success, base::Value result) {
+        nu::MessageLoop::Quit();
+        EXPECT_EQ(success, false);
+      });
     });
+  });
+  nu::MessageLoop::PostTask([&]() {
+    browser_->LoadURL("about:blank");
   });
   nu::MessageLoop::Run();
 }
