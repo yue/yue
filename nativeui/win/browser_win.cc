@@ -328,4 +328,7 @@ void Browser::ExecuteJavaScript(const std::string& code,
   }
 }
 
+void Browser::UpdateBindings() {
+}
+
 }  // namespace nu

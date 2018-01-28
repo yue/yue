@@ -4,10 +4,8 @@
 
 #include "nativeui/browser.h"
 
-#include <memory>
 #include <utility>
 
-#include "base/json/json_reader.h"
 #include "base/json/string_escape.h"
 
 namespace nu {
@@ -21,6 +19,7 @@ const char* Browser::GetClassName() const {
 
 void Browser::SetBindingName(const std::string& name) {
   base::EscapeJSONString(name, false, &binding_name_);
+  UpdateBindings();
 }
 
 void Browser::AddRawBinding(const std::string& name, const BindingFunc& func) {
@@ -29,6 +28,7 @@ void Browser::AddRawBinding(const std::string& name, const BindingFunc& func) {
   std::string escaped;
   base::EscapeJSONString(name, false, &escaped);
   bindings_[escaped] = func;
+  UpdateBindings();
 }
 
 void Browser::RemoveBinding(const std::string& name) {
@@ -37,15 +37,7 @@ void Browser::RemoveBinding(const std::string& name) {
   std::string escaped;
   base::EscapeJSONString(name, false, &escaped);
   bindings_.erase(escaped);
-}
-
-void Browser::OnPostMessage(const std::string& name, const std::string& json) {
-  std::unique_ptr<base::Value> pv = base::JSONReader::Read(json);
-  if (!pv || !pv->is_list()) {
-    LOG(ERROR) << "Invalid message passed: " << json;
-    return;
-  }
-  InvokeBindings(name, std::move(*pv.release()));
+  UpdateBindings();
 }
 
 void Browser::InvokeBindings(const std::string& method, base::Value args) {

@@ -8,63 +8,12 @@
 
 #include <WebKit/WebKit.h>
 
+#include "base/mac/scoped_nsobject.h"
 #include "base/memory/ptr_util.h"
+#include "base/strings/stringprintf.h"
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/nu_view.h"
-
-@interface NUWebView : WKWebView<NUView> {
- @private
-  nu::NUPrivate private_;
-}
-- (nu::NUPrivate*)nuPrivate;
-- (void)setNUFont:(nu::Font*)font;
-- (void)setNUColor:(nu::Color)color;
-- (void)setNUBackgroundColor:(nu::Color)color;
-@end
-
-@implementation NUWebView
-
-- (nu::NUPrivate*)nuPrivate {
-  return &private_;
-}
-
-- (void)setNUFont:(nu::Font*)font {
-}
-
-- (void)setNUColor:(nu::Color)color {
-}
-
-- (void)setNUBackgroundColor:(nu::Color)color {
-}
-
-@end
-
-@interface NUNavigationDelegate : NSObject<WKNavigationDelegate>
-@end
-
-@implementation NUNavigationDelegate
-
-- (void)webView:(WKWebView*)webview didFinishNavigation:(WKNavigation*)navigation {
-  auto* browser = static_cast<nu::Browser*>([webview shell]);
-  browser->on_finish_navigation.Emit(browser);
-}
-
-@end
-
-@interface NUWebUIDelegate : NSObject<WKUIDelegate>
-@end
-
-@implementation NUWebUIDelegate
-
-- (void)webViewDidClose:(WKWebView*)webview {
-  auto* browser = static_cast<nu::Browser*>([webview shell]);
-  browser->on_close.Emit(browser);
-}
-
-@end
-
-namespace nu {
 
 namespace {
 
@@ -107,8 +56,141 @@ base::Value NSValueToBaseValue(id value) {
 
 }  // namespace
 
+@interface NUScriptMessageHandler : NSObject<WKScriptMessageHandler> {
+ @private
+  nu::Browser* shell_;
+}
+- (id)initWithShell:(nu::Browser*)shell;
+@end
+
+@implementation NUScriptMessageHandler
+
+- (id)initWithShell:(nu::Browser*)shell {
+  if ((self = [super init]))
+    shell_ = shell;
+  return self;
+}
+
+- (void)userContentController:(WKUserContentController*)controller
+      didReceiveScriptMessage:(WKScriptMessage*)message {
+  if (![message.name isEqualToString:@"yue"])
+    return;
+  base::Value args = NSValueToBaseValue(message.body);
+  if (!args.is_list() || args.GetList().size() != 3 ||
+      !args.GetList()[0].is_string() ||
+      !args.GetList()[1].is_string() ||
+      !args.GetList()[2].is_list())
+    return;
+  const std::string& name = args.GetList()[1].GetString();
+  shell_->InvokeBindings(name, std::move(args.GetList()[2]));
+}
+
+@end
+
+@interface NUWebView : WKWebView<NUView> {
+ @private
+  nu::NUPrivate private_;
+  nu::Browser* shell_;
+  base::scoped_nsobject<NUScriptMessageHandler> handler_;
+}
+- (nu::NUPrivate*)nuPrivate;
+- (void)setNUFont:(nu::Font*)font;
+- (void)setNUColor:(nu::Color)color;
+- (void)setNUBackgroundColor:(nu::Color)color;
+- (void)updateBindings;
+@end
+
+@implementation NUWebView
+
+- (nu::NUPrivate*)nuPrivate {
+  return &private_;
+}
+
+- (id)initWithShell:(nu::Browser*)shell {
+  shell_ = shell;
+  base::scoped_nsobject<WKWebViewConfiguration> config(
+      [[WKWebViewConfiguration alloc] init]);
+  handler_.reset([[NUScriptMessageHandler alloc] initWithShell:shell]);
+  [[config userContentController] addScriptMessageHandler:handler_.get()
+                                                     name:@"yue"];
+  [super initWithFrame:NSZeroRect configuration:config.get()];
+  return self;
+}
+
+- (void)setNUFont:(nu::Font*)font {
+}
+
+- (void)setNUColor:(nu::Color)color {
+}
+
+- (void)setNUBackgroundColor:(nu::Color)color {
+}
+
+- (void)updateBindings {
+  auto* controller = [[self configuration] userContentController];
+  [controller removeAllUserScripts];
+  [controller addUserScript:[self generateUserScript]];
+}
+
+- (WKUserScript*)generateUserScript {
+  std::string code = "(function(key, binding, external) {";
+  std::string name = shell_->binding_name();
+  if (name.empty()) {
+    name = "window";
+  } else {
+    // window[name] = {};
+    name = base::StringPrintf("window[\"%s\"]", name.c_str());
+    code = name + " = {};" + code;
+  }
+  // Insert bindings.
+  for (const auto& it : shell_->bindings()) {
+    code += base::StringPrintf(
+        "binding[\"%s\"] = function() {"
+        "  var args = Array.prototype.slice.call(arguments);"
+        "  external.postMessage([key, \"%s\", args]);"
+        "};",
+        it.first.c_str(), it.first.c_str());
+  }
+  code += base::StringPrintf("})(\"%s\", %s, %s);",
+                             "security_key",
+                             name.c_str(),
+                             "window.webkit.messageHandlers.yue");
+  return [[[WKUserScript alloc]
+      initWithSource:base::SysUTF8ToNSString(code)
+       injectionTime:WKUserScriptInjectionTimeAtDocumentStart
+    forMainFrameOnly:YES] autorelease];
+}
+
+@end
+
+@interface NUNavigationDelegate : NSObject<WKNavigationDelegate>
+@end
+
+@implementation NUNavigationDelegate
+
+- (void)webView:(WKWebView*)webview didFinishNavigation:(WKNavigation*)navigation {
+  auto* browser = static_cast<nu::Browser*>([webview shell]);
+  browser->on_finish_navigation.Emit(browser);
+}
+
+@end
+
+@interface NUWebUIDelegate : NSObject<WKUIDelegate>
+@end
+
+@implementation NUWebUIDelegate
+
+- (void)webViewDidClose:(WKWebView*)webview {
+  auto* browser = static_cast<nu::Browser*>([webview shell]);
+  browser->on_close.Emit(browser);
+}
+
+@end
+
+namespace nu {
+
 Browser::Browser() {
-  NUWebView* webview = [[NUWebView alloc] initWithFrame:NSZeroRect];
+  NUWebView* webview = [[NUWebView alloc] initWithShell:this];
   webview.UIDelegate = [[NUWebUIDelegate alloc] init];
   webview.navigationDelegate = [[NUNavigationDelegate alloc] init];
   TakeOverView(webview);
@@ -142,6 +224,11 @@ void Browser::ExecuteJavaScript(const std::string& code,
             completionHandler:^(id result, NSError* error) {
     copied_callback(!error, NSValueToBaseValue(result));
   }];
+}
+
+void Browser::UpdateBindings() {
+  auto* webview = static_cast<NUWebView*>(GetNative());
+  [webview updateBindings];
 }
 
 }  // namespace nu

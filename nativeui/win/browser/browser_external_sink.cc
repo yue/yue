@@ -7,6 +7,10 @@
 #include <exdisp.h>
 #include <shlwapi.h>
 
+#include <memory>
+#include <utility>
+
+#include "base/json/json_reader.h"
 #include "base/rand_util.h"
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/utf_string_conversions.h"
@@ -101,9 +105,15 @@ IFACEMETHODIMP BrowserExternalSink::Invoke(
     stop_serving_ = true;
     return E_INVALIDARG;
   }
-  static_cast<Browser*>(browser_->delegate())->OnPostMessage(
-      base::UTF16ToUTF8(pDispParams->rgvarg[1].bstrVal),
+  std::unique_ptr<base::Value> pv = base::JSONReader::Read(
       base::UTF16ToUTF8(pDispParams->rgvarg[0].bstrVal));
+  if (!pv || !pv->is_list()) {
+    LOG(ERROR) << "Invalid message passed: " << json;
+    return E_INVALIDARG;
+  }
+  static_cast<Browser*>(browser_->delegate())->InvokeBindings(
+      base::UTF16ToUTF8(pDispParams->rgvarg[1].bstrVal),
+      std::move(*pv.release()));
   return S_OK;
 }
 
