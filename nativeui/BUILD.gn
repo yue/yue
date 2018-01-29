@@ -314,6 +314,9 @@ component("nativeui") {
       ":webkitgtk",
     ]
 
+    # Not sure why it is not added in base.
+    libs = [ "atomic" ]
+
     # Do not warn on using deprecated GTK APIs.
     cflags_cc = [ "-Wno-deprecated-declarations" ]
   } else if (is_mac) {

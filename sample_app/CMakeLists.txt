@@ -55,7 +55,7 @@ if(UNIX AND NOT APPLE)
   pkg_search_module(GTK3 REQUIRED gtk+-3.0)
   pkg_search_module(X11 REQUIRED x11)
   target_link_libraries(${APP_NAME}
-                        pthread dl ${GTK3_LIBRARIES} ${X11_LIBRARIES})
+                        pthread dl atomic ${GTK3_LIBRARIES} ${X11_LIBRARIES})
   target_include_directories(${APP_NAME} PUBLIC
                              ${GTK3_INCLUDE_DIRS} ${X11_INCLUDE_DIRS})
   target_compile_options(${APP_NAME} PUBLIC
