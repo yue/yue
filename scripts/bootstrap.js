@@ -53,6 +53,11 @@ const releaseConfig = [
 if (targetOs != 'win')
   releaseConfig.push('is_official_build=true')
 
+if (targetOs == 'mac') {
+  commonConfig.push('mac_deployment_target="10.10.0"',
+                    'mac_sdk_min="10.12"')
+}
+
 if (targetOs == 'linux') {
   // Generate linker map for Linux.
   releaseConfig.push('generate_linker_map=true')

@@ -1150,6 +1150,9 @@ config("default_warnings") {
 
       # TODO(hans): Get this cleaned up, http://crbug.com/428099
       "-Wno-inconsistent-missing-override",
+
+      # Yue: This is causing base library to complain.
+      "-Wno-deprecated-declarations",
     ]
 
     # use_xcode_clang only refers to the iOS toolchain, host binaries use

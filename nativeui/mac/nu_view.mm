@@ -63,16 +63,6 @@ void DisableTracking(NSView* self, SEL _cmd) {
   }
 }
 
-void UpdateTrackingAreas(NSView* self, SEL _cmd) {
-  // [super updateTrackingAreas]
-  auto super_impl = reinterpret_cast<void (*)(NSView*, SEL)>(
-      [[self superclass] instanceMethodForSelector:_cmd]);
-  super_impl(self, _cmd);
-
-  [self disableTracking];
-  [self enableTracking];
-}
-
 // Following methods are overrided in NUView to make sure that content view
 // of frameless always takes the size of its parent view.
 
@@ -130,15 +120,6 @@ void InstallNUViewMethods(Class cl) {
                   (IMP)SetFrameSize, "v@:{_NSSize=ff}");
   class_addMethod(cl, @selector(viewDidMoveToSuperview),
                   (IMP)ViewDidMoveToSuperview, "v@:");
-
-  // NSTrackingInVisibleRect doesn't work correctly with Lion's window resizing,
-  // http://crbug.com/176725 / http://openradar.appspot.com/radar?id=2773401 .
-  // Work around it by reinstalling the tracking area after window resize.
-  // This AppKit bug is fixed on Yosemite, so we only apply this workaround on
-  // 10.9.
-  if (base::mac::IsOS10_9())
-    class_addMethod(cl, @selector(updateTrackingAreas),
-                    (IMP)UpdateTrackingAreas, "v@:");
 }
 
 }  // namespace nu

@@ -67,18 +67,6 @@ void Window::PlatformInit(const Options& options) {
     // The fullscreen button should always be hidden for frameless window.
     [[window_ standardWindowButton:NSWindowFullScreenButton] setHidden:YES];
 
-    // Showing traffic lights for macOS 10.9 requires special work.
-    if (options.show_traffic_lights && base::mac::IsOS10_9()) {
-      NSButton* b;
-      b = [window_ standardWindowButton:NSWindowZoomButton];
-      [[b superview] addSubview:b positioned:NSWindowAbove relativeTo:nil];
-      b = [window_ standardWindowButton:NSWindowMiniaturizeButton];
-      [[b superview] addSubview:b positioned:NSWindowAbove relativeTo:nil];
-      b = [window_ standardWindowButton:NSWindowCloseButton];
-      [[b superview] addSubview:b positioned:NSWindowAbove relativeTo:nil];
-      return;
-    }
-
     if (!options.show_traffic_lights) {
       // Hide the window buttons.
       [[window_ standardWindowButton:NSWindowZoomButton] setHidden:YES];
