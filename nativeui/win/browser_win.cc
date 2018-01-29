@@ -13,7 +13,6 @@
 #include "base/files/file_path.h"
 #include "base/json/json_reader.h"
 #include "base/path_service.h"
-#include "base/strings/stringprintf.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/win/registry.h"
 #include "base/win/scoped_bstr.h"
@@ -71,7 +70,7 @@ bool VARIANTToJSON(IDispatchEx* script,
 
 BrowserImpl::BrowserImpl(Browser* delegate)
     : SubwinView(delegate),
-      external_sink_(new BrowserExternalSink(this)),
+      external_sink_(new BrowserExternalSink(delegate)),
       ole_site_(new BrowserOleSite(this, external_sink_.Get())),
       event_sink_(new BrowserEventSink(this)),
       document_events_(new BrowserDocumentEvents(this)) {
@@ -259,41 +258,13 @@ void BrowserImpl::OnDocumentReady() {
     return;
   }
   // Add bindings to the document.
-  InstallBindings();
+  auto* browser = static_cast<Browser*>(delegate());
+  Eval(base::UTF8ToUTF16(browser->GetBindingScript()), nullptr);
 }
 
 void BrowserImpl::OnFinishNavigation() {
   auto* browser = static_cast<Browser*>(delegate());
   browser->on_finish_navigation.Emit(browser);
-}
-
-void BrowserImpl::InstallBindings() {
-  auto* browser = static_cast<Browser*>(delegate());
-  // Create window[name] when necessary.
-  base::string16 code = L"(function(key, binding, external) {";
-  base::string16 name = base::UTF8ToUTF16(browser->binding_name());
-  if (name.empty()) {
-    name = L"window";
-  } else {
-    name = base::StringPrintf(L"window[\"%ls\"]", name.c_str());
-    // window[name] = {};
-    code = name + L" = {};" + code;
-  }
-  // Insert bindings.
-  for (const auto& it : browser->bindings()) {
-    base::string16 name = base::UTF8ToUTF16(it.first);
-    code += base::StringPrintf(
-        L"binding[\"%ls\"] = function() {"
-        L"  var args = Array.prototype.slice.call(arguments);"
-        L"  external.postMessage(key, \"%ls\", JSON.stringify(args));"
-        L"};",
-        name.c_str(), name.c_str());
-  }
-  code += base::StringPrintf(
-      L"  delete window.external;"  // this does not really work for IE though.
-      L"})(\"%ls\", %ls, window.external);",
-      external_sink_->security_key().c_str(), name.c_str());
-  Eval(code, nullptr);
 }
 
 // static
@@ -329,11 +300,11 @@ LRESULT BrowserImpl::BrowserWndProc(HWND hwnd,
 ///////////////////////////////////////////////////////////////////////////////
 // Public Browser API implementation.
 
-Browser::Browser() {
+void Browser::PlatformInit() {
   TakeOverView(new BrowserImpl(this));
 }
 
-Browser::~Browser() {
+void Browser::PlatformDestroy() {
 }
 
 void Browser::LoadURL(const std::string& url) {
@@ -359,7 +330,7 @@ void Browser::ExecuteJavaScript(const std::string& code,
   }
 }
 
-void Browser::UpdateBindings() {
+void Browser::PlatformUpdateBindings() {
 }
 
 }  // namespace nu

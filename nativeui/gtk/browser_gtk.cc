@@ -75,7 +75,7 @@ void OnJavaScriptFinish(WebKitWebView* webview,
 
 }  // namespace
 
-Browser::Browser() {
+void Browser::PlatformInit() {
   GtkWidget* webview = webkit_web_view_new();
   TakeOverView(webview);
 
@@ -84,7 +84,7 @@ Browser::Browser() {
   g_signal_connect(webview, "load-changed", G_CALLBACK(OnLoadChanged), this);
 }
 
-Browser::~Browser() {
+void Browser::PlatformDestroy() {
 }
 
 void Browser::LoadURL(const std::string& url) {

@@ -49,19 +49,27 @@ class NATIVEUI_EXPORT Browser : public View {
   Signal<void(Browser*)> on_finish_navigation;
 
   // Private: Called from web pages to invoke native bindings.
-  void InvokeBindings(const std::string& name, base::Value args);
+  bool InvokeBindings(const std::string& key,
+                      const std::string& name,
+                      base::Value args);
 
-  // Private:
-  const std::string& binding_name() const { return binding_name_; }
-  const std::map<std::string, BindingFunc>& bindings() const {
-    return bindings_;
-  }
+  // Private: Generate the user script to inject bindings.
+  std::string GetBindingScript();
+
+  // Private: Access to bindings properties.
+  bool stop_serving() const { return stop_serving_; }
 
  protected:
   ~Browser() override;
 
  private:
-  void UpdateBindings();
+  void PlatformInit();
+  void PlatformDestroy();
+  void PlatformUpdateBindings();
+
+  // Prevent malicous calls to native bindings.
+  std::string security_key_;
+  bool stop_serving_ = false;
 
   std::string binding_name_;
   std::map<std::string, BindingFunc> bindings_;

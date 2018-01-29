@@ -8,18 +8,15 @@
 #include <ole2.h>
 
 #include "base/macros.h"
-#include "base/strings/string16.h"
 
 namespace nu {
 
-class BrowserImpl;
+class Browser;
 
 class BrowserExternalSink : public IDispatch {
  public:
-  explicit BrowserExternalSink(BrowserImpl* browser);
+  explicit BrowserExternalSink(Browser* browser);
   ~BrowserExternalSink();
-
-  const base::string16& security_key() const { return security_key_; }
 
   // IUnknown
   STDMETHOD(QueryInterface)(REFIID riid, void **ppvObject);
@@ -48,13 +45,7 @@ class BrowserExternalSink : public IDispatch {
 
  private:
   ULONG ref_;
-  BrowserImpl* browser_;
-
-  // A unique key for invoking native functions.
-  base::string16 security_key_;
-
-  // Whether we should provide native bindings.
-  bool stop_serving_ = false;
+  Browser* browser_;
 
   DISALLOW_COPY_AND_ASSIGN(BrowserExternalSink);
 };

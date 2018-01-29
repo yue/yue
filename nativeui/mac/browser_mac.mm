@@ -10,7 +10,6 @@
 
 #include "base/mac/scoped_nsobject.h"
 #include "base/memory/ptr_util.h"
-#include "base/strings/stringprintf.h"
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/nu_view.h"
@@ -73,7 +72,7 @@ base::Value NSValueToBaseValue(id value) {
 
 - (void)userContentController:(WKUserContentController*)controller
       didReceiveScriptMessage:(WKScriptMessage*)message {
-  if (![message.name isEqualToString:@"yue"])
+  if (shell_->stop_serving() || ![message.name isEqualToString:@"yue"])
     return;
   base::Value args = NSValueToBaseValue(message.body);
   if (!args.is_list() || args.GetList().size() != 3 ||
@@ -81,8 +80,9 @@ base::Value NSValueToBaseValue(id value) {
       !args.GetList()[1].is_string() ||
       !args.GetList()[2].is_list())
     return;
-  const std::string& name = args.GetList()[1].GetString();
-  shell_->InvokeBindings(name, std::move(args.GetList()[2]));
+  shell_->InvokeBindings(args.GetList()[0].GetString(),
+                         args.GetList()[1].GetString(),
+                         std::move(args.GetList()[2]));
 }
 
 @end
@@ -133,30 +133,8 @@ base::Value NSValueToBaseValue(id value) {
 }
 
 - (WKUserScript*)generateUserScript {
-  std::string code = "(function(key, binding, external) {";
-  std::string name = shell_->binding_name();
-  if (name.empty()) {
-    name = "window";
-  } else {
-    // window[name] = {};
-    name = base::StringPrintf("window[\"%s\"]", name.c_str());
-    code = name + " = {};" + code;
-  }
-  // Insert bindings.
-  for (const auto& it : shell_->bindings()) {
-    code += base::StringPrintf(
-        "binding[\"%s\"] = function() {"
-        "  var args = Array.prototype.slice.call(arguments);"
-        "  external.postMessage([key, \"%s\", args]);"
-        "};",
-        it.first.c_str(), it.first.c_str());
-  }
-  code += base::StringPrintf("})(\"%s\", %s, %s);",
-                             "security_key",
-                             name.c_str(),
-                             "window.webkit.messageHandlers.yue");
   return [[[WKUserScript alloc]
-      initWithSource:base::SysUTF8ToNSString(code)
+      initWithSource:base::SysUTF8ToNSString(shell_->GetBindingScript())
        injectionTime:WKUserScriptInjectionTimeAtDocumentStart
     forMainFrameOnly:YES] autorelease];
 }
@@ -189,14 +167,14 @@ base::Value NSValueToBaseValue(id value) {
 
 namespace nu {
 
-Browser::Browser() {
+void Browser::PlatformInit() {
   NUWebView* webview = [[NUWebView alloc] initWithShell:this];
   webview.UIDelegate = [[NUWebUIDelegate alloc] init];
   webview.navigationDelegate = [[NUNavigationDelegate alloc] init];
   TakeOverView(webview);
 }
 
-Browser::~Browser() {
+void Browser::PlatformDestroy() {
   auto* webview = static_cast<NUWebView*>(GetNative());
   [[webview UIDelegate] release];
   [[webview navigationDelegate] release];
@@ -226,7 +204,7 @@ void Browser::ExecuteJavaScript(const std::string& code,
   }];
 }
 
-void Browser::UpdateBindings() {
+void Browser::PlatformUpdateBindings() {
   auto* webview = static_cast<NUWebView*>(GetNative());
   [webview updateBindings];
 }

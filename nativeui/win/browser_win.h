@@ -65,9 +65,6 @@ class BrowserImpl : public SubwinView {
   // Called when navigation is done.
   void OnFinishNavigation();
 
-  // Insert native bindings into web page.
-  void InstallBindings();
-
   // The proc of IE control.
   static LRESULT CALLBACK BrowserWndProc(HWND hwnd,
                                          UINT message,

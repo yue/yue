@@ -6,12 +6,25 @@
 
 #include <utility>
 
+#include "base/base64.h"
 #include "base/json/string_escape.h"
+#include "base/rand_util.h"
+#include "base/strings/stringprintf.h"
 
 namespace nu {
 
 // static
 const char Browser::kClassName[] = "Browser";
+
+Browser::Browser() {
+  PlatformInit();
+  // Generate a random number as security key.
+  base::Base64Encode(base::RandBytesAsString(16), &security_key_);
+}
+
+Browser::~Browser() {
+  PlatformDestroy();
+}
 
 const char* Browser::GetClassName() const {
   return kClassName;
@@ -19,7 +32,7 @@ const char* Browser::GetClassName() const {
 
 void Browser::SetBindingName(const std::string& name) {
   base::EscapeJSONString(name, false, &binding_name_);
-  UpdateBindings();
+  PlatformUpdateBindings();
 }
 
 void Browser::AddRawBinding(const std::string& name, const BindingFunc& func) {
@@ -28,7 +41,7 @@ void Browser::AddRawBinding(const std::string& name, const BindingFunc& func) {
   std::string escaped;
   base::EscapeJSONString(name, false, &escaped);
   bindings_[escaped] = func;
-  UpdateBindings();
+  PlatformUpdateBindings();
 }
 
 void Browser::RemoveBinding(const std::string& name) {
@@ -37,16 +50,61 @@ void Browser::RemoveBinding(const std::string& name) {
   std::string escaped;
   base::EscapeJSONString(name, false, &escaped);
   bindings_.erase(escaped);
-  UpdateBindings();
+  PlatformUpdateBindings();
 }
 
-void Browser::InvokeBindings(const std::string& method, base::Value args) {
+bool Browser::InvokeBindings(const std::string& key,
+                             const std::string& method,
+                             base::Value args) {
+  if (stop_serving_)
+    return false;
+  if (key != security_key_) {
+    stop_serving_ = true;
+    LOG(ERROR) << "Recevied invalid key, stop serving navite bindings";
+    return false;
+  }
   auto it = bindings_.find(method);
   if (it == bindings_.end()) {
     LOG(ERROR) << "Invoking invalid method: " << method;
-    return;
+    return false;
   }
   it->second(std::move(args));
+  return true;
+}
+
+std::string Browser::GetBindingScript() {
+  std::string code = "(function(key, external, binding) {";
+  std::string name = binding_name_;
+  if (name.empty()) {
+    name = "window";
+  } else {
+    // window[name] = {};
+    name = base::StringPrintf("window[\"%s\"]", name.c_str());
+    code = name + " = {};" + code;
+  }
+  // Insert bindings.
+  for (const auto& it : bindings_) {
+    code += base::StringPrintf(
+        "binding[\"%s\"] = function() {"
+        "  var args = Array.prototype.slice.call(arguments);"
+#if defined(OS_WIN)
+        // On WebKit we can only pass one argument.
+        "  external.postMessage(key, \"%s\", JSON.stringify(args));"
+#else
+        "  external.postMessage([key, \"%s\", args]);"
+#endif
+        "};",
+        it.first.c_str(), it.first.c_str());
+  }
+  code += base::StringPrintf("})(\"%s\", %s, %s);",
+                             security_key_.c_str(),
+#if defined(OS_WIN)
+                             "window.external",
+#else
+                             "window.webkit.messageHandlers.yue",
+#endif
+                             name.c_str());
+  return code;
 }
 
 }  // namespace nu
