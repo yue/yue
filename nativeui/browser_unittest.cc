@@ -129,7 +129,7 @@ TEST_F(BrowserTest, AddBinding) {
     });
   });
   nu::MessageLoop::PostTask([&]() {
-    browser_->LoadURL("about:blank");
+    browser_->LoadHTML("<body><script></script></body>", "about:blank");
   });
   nu::MessageLoop::Run();
 }
@@ -149,31 +149,32 @@ TEST_F(BrowserTest, SetBindingName) {
     });
   });
   nu::MessageLoop::PostTask([&]() {
-    browser_->LoadURL("about:blank");
+    browser_->LoadHTML("<body><script></script></body>", "about:blank");
   });
   nu::MessageLoop::Run();
 }
 
 TEST_F(BrowserTest, MalicousCall) {
-  browser_->AddRawBinding("method", [](base::Value) {});
-  browser_->on_finish_navigation.Connect([](nu::Browser* browser) {
+  bool called = false;
+  browser_->AddRawBinding("method", [&called](base::Value) { called = true; });
+  browser_->on_finish_navigation.Connect([&called](nu::Browser* browser) {
     browser->ExecuteJavaScript(
 #if defined(OS_WIN)
         "window.external.postMessage('1', 'method', '[]')",
 #else
-        "window.webkit.messageHandlers.yue.postMessage('1', 'method', '[]')",
+        "window.webkit.messageHandlers.yue.postMessage(['1', 'method', []])",
 #endif
-        [=](bool success, base::Value result) {
-      EXPECT_EQ(success, false);
+        [&called, browser](bool success, base::Value result) {
+      EXPECT_EQ(called, false);
       browser->ExecuteJavaScript("window.method()",
-                                 [=](bool success, base::Value result) {
+                                 [&called](bool success, base::Value result) {
         nu::MessageLoop::Quit();
-        EXPECT_EQ(success, false);
+        EXPECT_EQ(called, false);
       });
     });
   });
   nu::MessageLoop::PostTask([&]() {
-    browser_->LoadURL("about:blank");
+    browser_->LoadHTML("<body><script></script></body>", "about:blank");
   });
   nu::MessageLoop::Run();
 }

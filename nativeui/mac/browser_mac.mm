@@ -187,6 +187,14 @@ void Browser::LoadURL(const std::string& url) {
   [webview loadRequest:request];
 }
 
+void Browser::LoadHTML(const std::string& str,
+                       const std::string& base_url) {
+  auto* webview = static_cast<NUWebView*>(GetNative());
+  NSURL* nsurl = [NSURL URLWithString:base::SysUTF8ToNSString(base_url)];
+  [webview loadHTMLString:base::SysUTF8ToNSString(str)
+                  baseURL:nsurl];
+}
+
 void Browser::ExecuteJavaScript(const std::string& code,
                                 const ExecutionCallback& callback) {
   auto* webview = static_cast<NUWebView*>(GetNative());
