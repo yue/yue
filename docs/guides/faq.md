@@ -68,11 +68,3 @@ In future I'll make all widgets windowless, but it might be optional since it ma
 Because I was more familiar with GDI+, I'll migrate the painting code to Direct2D in future.
 
 Note that most controls are drawn with UxTheme instead of GDI+, so unless you are doing very heavy custom animation with the drawing API, there is no need to worry about the performance of GDI+.
-
-### Can I embed a web browser in Yue?
-
-Currently there are efforts on supporting native webview in Yue, e.g. `WebView` on macOS, `webkitgtk` on Linux, and Internet Explorer on Windows.
-
-### Can I use Yue in NW.js?
-
-No it is not possible, Yue requires to be used in the UI thread of the main process, which is not supported by NW.js.

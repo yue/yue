@@ -5,6 +5,10 @@ type: refcounted
 namespace: nu
 inherit: View
 description: Native webview using system browser.
+detail: |
+  Using `Browser` requires relatively new operating systems, for macOS the
+  minimum version required is 10.10, for Linux it is required to install the
+  `webkit2gtk` library with at least version 2.8.
 
 constructors:
   - signature: Browser()
