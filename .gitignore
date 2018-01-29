@@ -3,10 +3,10 @@
 /out/
 /third_party/llvm-build/
 /third_party/node-*/
-/build/linux/debian_jessie_amd64-sysroot/
-/build/linux/debian_jessie_i386-sysroot/
-/build/linux/debian_jessie_arm-sysroot/
-/build/linux/debian_jessie_arm64-sysroot/
+/build/linux/debian_stretch_amd64-sysroot/
+/build/linux/debian_stretch_i386-sysroot/
+/build/linux/debian_stretch_arm-sysroot/
+/build/linux/debian_stretch_arm64-sysroot/
 node_modules/
 *.xcodeproj
 *.swp

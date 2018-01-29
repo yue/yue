@@ -113,6 +113,11 @@ config("debug") {
     defines += [ "DYNAMIC_ANNOTATIONS_PREFIX=NACL_" ]
   }
 
+  if (is_linux) {
+    # Yue: We want to be backward compatible.
+    defines += [ "_GLIBCXX_USE_CXX11_ABI=0" ]
+  }
+
   if (is_win) {
     if (!enable_iterator_debugging) {
       # Iterator debugging is enabled by default by the compiler on debug
@@ -142,6 +147,11 @@ config("release") {
       # 1 for all .nexes.
       defines += [ "DYNAMIC_ANNOTATIONS_ENABLED=0" ]
     }
+  }
+
+  if (is_linux) {
+    # Yue: We want to be backward compatible.
+    defines += [ "_GLIBCXX_USE_CXX11_ABI=0" ]
   }
 
   if (is_ios) {

@@ -161,7 +161,7 @@ def main(args):
 def InstallDefaultSysrootForArch(target_arch):
   if target_arch not in VALID_ARCHS:
     raise Error('Unknown architecture: %s' % target_arch)
-  InstallSysroot('Jessie', target_arch)
+  InstallSysroot('Stretch', target_arch)
 
 
 def InstallSysroot(target_platform, target_arch):
