@@ -23,7 +23,9 @@ std::string JSStringToString(JSStringRef js) {
   return str;
 }
 
-base::Value JSValueToBaseValue(JSGlobalContextRef context, JSValueRef value) {
+base::Value JSResultToBaseValue(WebKitJavascriptResult* js_result) {
+  auto* context = webkit_javascript_result_get_global_context(js_result);
+  auto* value = webkit_javascript_result_get_value(js_result);
   // While manually iterating the value should be more efficient, their API is
   // such a pain to use.
   JSStringRef json = JSValueCreateJSONString(context, value, 0, nullptr);
@@ -65,18 +67,39 @@ void OnJavaScriptFinish(WebKitWebView* webview,
       (*callback)(false, base::Value());
       return;
     }
-    auto* context = webkit_javascript_result_get_global_context(js_result);
-    auto* value = webkit_javascript_result_get_value(js_result);
-    (*callback)(true, JSValueToBaseValue(context, value));
+    (*callback)(true, JSResultToBaseValue(js_result));
     webkit_javascript_result_unref(js_result);
   }
   delete callback;
 }
 
+void OnScriptMessage(WebKitUserContentManager* manager,
+                     WebKitJavascriptResult* js_result,
+                     Browser* browser) {
+  if (browser->stop_serving() || !js_result)
+    return;
+  base::Value args = JSResultToBaseValue(js_result);
+  if (!args.is_list() || args.GetList().size() != 3 ||
+      !args.GetList()[0].is_string() ||
+      !args.GetList()[1].is_string() ||
+      !args.GetList()[2].is_list())
+    return;
+  browser->InvokeBindings(args.GetList()[0].GetString(),
+                          args.GetList()[1].GetString(),
+                          std::move(args.GetList()[2]));
+}
+
 }  // namespace
 
 void Browser::PlatformInit() {
-  GtkWidget* webview = webkit_web_view_new();
+  // Install native bindings script.
+  WebKitUserContentManager* manager = webkit_user_content_manager_new();
+  g_signal_connect(manager, "script-message-received::yue",
+                   G_CALLBACK(OnScriptMessage), this);
+  webkit_user_content_manager_register_script_message_handler(manager, "yue");
+
+  // Create webview
+  GtkWidget* webview = webkit_web_view_new_with_user_content_manager(manager);
   TakeOverView(webview);
 
   // Install events.
@@ -85,10 +108,19 @@ void Browser::PlatformInit() {
 }
 
 void Browser::PlatformDestroy() {
+  WebKitUserContentManager* manager =
+      webkit_web_view_get_user_content_manager(WEBKIT_WEB_VIEW(GetNative()));
+  g_object_unref(manager);
 }
 
 void Browser::LoadURL(const std::string& url) {
   webkit_web_view_load_uri(WEBKIT_WEB_VIEW(GetNative()), url.c_str());
+}
+
+void Browser::LoadHTML(const std::string& str,
+                       const std::string& base_url) {
+  webkit_web_view_load_html(WEBKIT_WEB_VIEW(GetNative()),
+                            str.c_str(), base_url.c_str());
 }
 
 void Browser::ExecuteJavaScript(const std::string& code,
@@ -99,6 +131,20 @@ void Browser::ExecuteJavaScript(const std::string& code,
       nullptr,
       reinterpret_cast<GAsyncReadyCallback>(&OnJavaScriptFinish),
       new ExecutionCallback(callback));
+}
+
+void Browser::PlatformUpdateBindings() {
+  WebKitUserContentManager* manager =
+      webkit_web_view_get_user_content_manager(WEBKIT_WEB_VIEW(GetNative()));
+  webkit_user_content_manager_remove_all_scripts(manager);
+  WebKitUserScript* script = webkit_user_script_new(
+      GetBindingScript().c_str(),
+      WEBKIT_USER_CONTENT_INJECT_TOP_FRAME,
+      WEBKIT_USER_SCRIPT_INJECT_AT_DOCUMENT_START,
+      nullptr,
+      nullptr);
+  webkit_user_content_manager_add_script(manager, script);
+  webkit_user_script_unref(script);
 }
 
 }  // namespace nu
