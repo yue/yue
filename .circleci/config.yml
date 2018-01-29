@@ -5,6 +5,8 @@ custom-steps:
     run:
       name: Install dependencies
       command: |
+        apt-get update
+        apt-get install -y software-properties-common
         add-apt-repository -y ppa:webkit-team/ppa
         apt-get update
         apt-get install -y git xvfb libgtk-3-dev libnotify-dev webkit2gtk-4.0-dev
