@@ -19,7 +19,7 @@ if (process.platform !== 'win32') {
 }
 if (process.platform === 'linux') {
   // TODO(zcbenz): Support more arch.
-  execSync(`python build/linux/sysroot_scripts/install-sysroot.py --arch ${sysrootArch}`)
+  execSync(`python tools/install-sysroot.py --arch ${sysrootArch}`)
   execSync('node scripts/update_gold.js')
 }
 

@@ -3,10 +3,10 @@
 /out/
 /third_party/llvm-build/
 /third_party/node-*/
-/build/linux/debian_stretch_amd64-sysroot/
-/build/linux/debian_stretch_i386-sysroot/
-/build/linux/debian_stretch_arm-sysroot/
-/build/linux/debian_stretch_arm64-sysroot/
+/third_party/debian_stretch_amd64-sysroot/
+/third_party/debian_stretch_i386-sysroot/
+/third_party/debian_stretch_arm-sysroot/
+/third_party/debian_stretch_arm64-sysroot/
 /tools/gn/
 *.xcodeproj
 *.swp
