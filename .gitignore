@@ -7,7 +7,7 @@
 /build/linux/debian_stretch_i386-sysroot/
 /build/linux/debian_stretch_arm-sysroot/
 /build/linux/debian_stretch_arm64-sysroot/
-node_modules/
+/tools/gn/
 *.xcodeproj
 *.swp
 *.pyc

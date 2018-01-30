@@ -4,6 +4,7 @@
 
 const fs = require('fs')
 const path = require('path')
+const https = require('https')
 const {execSync, spawnSync} = require('child_process')
 
 // Switch to root dir.
@@ -13,8 +14,8 @@ process.chdir(path.dirname(__dirname))
 process.env.DEPOT_TOOLS_WIN_TOOLCHAIN = 0
 
 // Expose ninja and gn to PATH.
-const binaries_dir = path.resolve('tools', 'build', process.platform)
-process.env.PATH = `${binaries_dir}${path.delimiter}${process.env.PATH}`
+const gnDir = path.resolve('tools', 'gn')
+process.env.PATH = `${gnDir}${path.delimiter}${process.env.PATH}`
 
 // Get yue's version.
 const version = String(execSync('git describe --always --tags')).trim()
@@ -56,6 +57,33 @@ function mkdir(dir) {
   fs.mkdirSync(dir)
 }
 
+// Helper to download an URL.
+const download = (url, callback, log=true) => {
+  https.get(url, (response) => {
+    if (log) {
+      process.stdout.write(`Downloading ${url} `)
+    }
+    if (response.statusCode == 302) {
+      download(response.headers.location, callback, false)
+      return
+    }
+    let length = 0
+    response.on('end', () => {
+      if (length > 0)
+        process.stdout.write('.')
+      console.log(' Done')
+    })
+    .on('data', (chunk) => {
+      length += chunk.length
+      while (length >= 1024 * 1024) {
+        process.stdout.write('.')
+        length %= 1024 * 1024
+      }
+    })
+    callback(response)
+  })
+}
+
 // Helper around execSync.
 const execSyncWrapper = (command, options = {}) => {
   // Print command output by default.
@@ -93,6 +121,7 @@ module.exports = {
   targetCpu,
   targetOs,
   mkdir,
+  download,
   execSync: execSyncWrapper,
   spawnSync: spawnSyncWrapper,
 }

@@ -7,10 +7,9 @@
 const cp    = require('child_process')
 const fs    = require('fs')
 const path  = require('path')
-const https = require('https')
 const zlib  = require('zlib')
 
-const {argv} = require('./common')
+const {argv, download} = require('./common')
 
 if (argv.length != 3) {
   console.error('Usage: download_node_headers runtime version cpu')
@@ -36,6 +35,12 @@ if (fs.existsSync(node_dir)) {
   process.exit(0)
 }
 
+// Expose tar to PATH.
+if (process.platform == 'win32') {
+  const bindir = path.resolve('tools', 'win')
+  process.env.PATH = `${bindir}${path.delimiter}${process.env.PATH}`
+}
+
 const suffix = runtime == 'electron' ? '' : '-headers'
 const url = `${prefix[runtime]}/${version}/node-${version}${suffix}.tar.gz`
 download(url, (response) => {
@@ -46,42 +51,21 @@ download(url, (response) => {
   if (process.platform == 'win32') {
     response.on('end', () => {
       if (targetCpu == 'x64')
-        downloadNodeLib('x64', () => {})
+        downloadNodeLib('x64')
       else if (targetCpu == 'x86')
-        downloadNodeLib('x86', () => {})
+        downloadNodeLib('x86')
       else
         throw new Error(`Unsupported targetCpu: ${targetCpu}`)
     })
   }
 })
 
-function download(url, callback) {
-  https.get(url, (response) => {
-    process.stdout.write(`Downloading ${url} `)
-    let length = 0
-    response.on('end', () => {
-      if (length > 0)
-        process.stdout.write('.')
-      console.log(' Done')
-    })
-    .on('data', (chunk) => {
-      length += chunk.length
-      while (length >= 1024 * 1024) {
-        process.stdout.write('.')
-        length %= 1024 * 1024
-      }
-    })
-    callback(response)
-  })
-}
-
-function downloadNodeLib(arch, callback) {
+function downloadNodeLib(arch) {
   const name = runtime == 'electron' ? 'iojs' : 'node'
   const lib = `${prefix[runtime]}/${version}/win-${arch}/${name}.lib`
   download(lib, (response) => {
     const lib_dir = path.join(node_dir, arch)
     fs.mkdirSync(lib_dir)
-    response.on('end', callback)
-            .pipe(fs.createWriteStream(path.join(lib_dir, 'node.lib')))
+    response.pipe(fs.createWriteStream(path.join(lib_dir, 'node.lib')))
   })
 }
