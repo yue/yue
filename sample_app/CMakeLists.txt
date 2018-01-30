@@ -63,7 +63,6 @@ if(UNIX AND NOT APPLE)
   target_link_libraries(${APP_NAME}
                         optimized ${CMAKE_SOURCE_DIR}/lib/libyue.a
                         debug ${CMAKE_SOURCE_DIR}/lib/libyued.a)
-  target_compile_definitions(${APP_NAME} PUBLIC _GLIBCXX_USE_CXX11_ABI=0)
   set_target_properties(${APP_NAME} PROPERTIES LINK_FLAGS
                         "-fdata-sections -ffunction-sections -Wl,--gc-section")
 endif()
