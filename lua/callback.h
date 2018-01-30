@@ -33,7 +33,7 @@ struct Type<std::function<ReturnType(ArgTypes...)>> {
     auto handle = Persistent::New(state, index);
     *out = [state, handle](ArgTypes... args) -> ReturnType {
       return internal::PCallHelper<ReturnType, ArgTypes...>::Run(
-          state, handle, args...);
+          state, handle, std::move(args)...);
     };
     return true;
   }

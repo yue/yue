@@ -46,8 +46,6 @@ const debugConfig = [
 const releaseConfig = [
   'is_component_build=false',
   'is_debug=false',
-  // This flag makes the library incompatible with other versions of clang.
-  'allow_posix_link_time_opt=false',
 ]
 
 // Don't set official build for Windows, which increases the size of libyue.
@@ -55,7 +53,7 @@ if (targetOs != 'win')
   releaseConfig.push('is_official_build=true')
 
 if (targetOs == 'mac') {
-  commonConfig.push('mac_deployment_target="10.10.0"',
+  commonConfig.push('mac_deployment_target="10.9.0"',
                     'mac_sdk_min="10.12"')
 }
 

@@ -45,45 +45,45 @@ struct IndicesGenerator<0, indices...> {
 
 // Converters for various types.
 template<typename T>
-inline void GetArgument(const base::Value& arg, T* value) {
+inline void GetArgument(base::Value arg, T* value) {
   // Just use default value by default.
 }
 
-inline void GetArgument(const base::Value& arg, base::Value* value) {
-  *value = arg;
+inline void GetArgument(base::Value arg, base::Value* value) {
+  *value = std::move(arg);
 }
 
-inline void GetArgument(const base::Value& arg, base::ListValue* value) {
+inline void GetArgument(base::Value arg, base::ListValue* value) {
   if (arg.is_list())
-    *value = *static_cast<const base::ListValue*>(&arg);
+    *value = std::move(*static_cast<base::ListValue*>(&arg));
 }
 
-inline void GetArgument(const base::Value& arg, base::DictionaryValue* value) {
+inline void GetArgument(base::Value arg, base::DictionaryValue* value) {
   if (arg.is_dict())
-    *value = *static_cast<const base::DictionaryValue*>(&arg);
+    *value = std::move(*static_cast<base::DictionaryValue*>(&arg));
 }
 
-inline void GetArgument(const base::Value& arg, bool* value) {
+inline void GetArgument(base::Value arg, bool* value) {
   if (arg.is_bool())
     *value = arg.GetBool();
 }
 
-inline void GetArgument(const base::Value& arg, double* value) {
+inline void GetArgument(base::Value arg, double* value) {
   if (arg.is_double())
     *value = arg.GetDouble();
 }
 
-inline void GetArgument(const base::Value& arg, float* value) {
+inline void GetArgument(base::Value arg, float* value) {
   if (arg.is_double())
     *value = arg.GetDouble();
 }
 
-inline void GetArgument(const base::Value& arg, int* value) {
+inline void GetArgument(base::Value arg, int* value) {
   if (arg.is_int())
     *value = arg.GetInt();
 }
 
-inline void GetArgument(const base::Value& arg, std::string* value) {
+inline void GetArgument(base::Value arg, std::string* value) {
   if (arg.is_string())
     *value = arg.GetString();
 }
@@ -98,7 +98,7 @@ struct ArgumentHolder {
 
   explicit ArgumentHolder(const base::Value& value) {
     if (value.GetList().size() > index)
-      GetArgument(value.GetList()[index], &arg);
+      GetArgument(std::move(value.GetList()[index]), &arg);
   }
 };
 

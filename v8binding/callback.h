@@ -54,7 +54,7 @@ struct Type<std::function<ReturnType(ArgTypes...)>> {
         isolate, val.As<v8::Function>());
     *out = [isolate, wrapper](ArgTypes... args) -> ReturnType {
       return internal::V8FunctionInvoker<ReturnType(ArgTypes...)>::Go(
-          isolate, wrapper, args...);
+          isolate, wrapper, std::move(args)...);
     };
     return true;
   }
