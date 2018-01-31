@@ -111,21 +111,21 @@ TEST_F(BrowserTest, AddBinding) {
   bool bo = false;
   std::string st;
   base::Value va;
-  std::function<void(bool, const std::string&, const base::Value&)> handler =
-      [&](bool b, const std::string& s, const base::Value& v) {
+  std::function<void(bool, const std::string&, base::Value)> handler =
+      [&](bool b, const std::string& s, base::Value v) {
         bo = b;
         st = s;
-        va = v;
+        va = std::move(v);
       };
   browser_->AddBinding("method", handler);
   browser_->on_finish_navigation.Connect([&](nu::Browser* browser) {
     browser->ExecuteJavaScript("window.method(true, 'string', {k: 'v'})",
                                [&](bool success, base::Value result) {
       nu::MessageLoop::Quit();
-      ASSERT_EQ(success, true);
-      ASSERT_EQ(bo, true);
-      ASSERT_EQ(st, "string");
-      ASSERT_TRUE(va.is_dict());
+      EXPECT_EQ(success, true);
+      EXPECT_EQ(bo, true);
+      EXPECT_EQ(st, "string");
+      EXPECT_TRUE(va.is_dict());
     });
   });
   nu::MessageLoop::PostTask([&]() {

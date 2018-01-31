@@ -96,9 +96,9 @@ struct ArgumentHolder {
 
   ArgLocalType arg;
 
-  explicit ArgumentHolder(const base::Value& value) {
-    if (value.GetList().size() > index)
-      GetArgument(std::move(value.GetList()[index]), &arg);
+  explicit ArgumentHolder(base::Value* value) {
+    if (value->GetList().size() > index)
+      GetArgument(std::move(value->GetList()[index]), &arg);
   }
 };
 
@@ -111,8 +111,8 @@ template<size_t... indices, typename... ArgTypes>
 class Invoker<IndicesHolder<indices...>, ArgTypes...>
     : public ArgumentHolder<indices, ArgTypes>... {
  public:
-  explicit Invoker(const base::Value& args)
-      : ArgumentHolder<indices, ArgTypes>(args)... {
+  explicit Invoker(base::Value args)
+      : ArgumentHolder<indices, ArgTypes>(&args)... {
   }
 
   void DispatchToCallback(const std::function<void(ArgTypes...)>& callback) {
@@ -128,10 +128,10 @@ struct Dispatcher {};
 template<typename... ArgTypes>
 struct Dispatcher<void(ArgTypes...)> {
   static void DispatchToCallback(const std::function<void(ArgTypes...)>& func,
-                                 const base::Value& args) {
+                                 base::Value args) {
     DCHECK(args.is_list());
     using Indices = typename IndicesGenerator<sizeof...(ArgTypes)>::type;
-    Invoker<Indices, ArgTypes...> invoker(args);
+    Invoker<Indices, ArgTypes...> invoker(std::move(args));
     invoker.DispatchToCallback(func);
   }
 };

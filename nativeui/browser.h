@@ -40,7 +40,7 @@ class NATIVEUI_EXPORT Browser : public View {
   template<typename Sig>
   void AddBinding(const std::string& name, const std::function<Sig>& func) {
     AddRawBinding(name, [func](base::Value args) {
-      internal::Dispatcher<Sig>::DispatchToCallback(func, args);
+      internal::Dispatcher<Sig>::DispatchToCallback(func, std::move(args));
     });
   }
 
