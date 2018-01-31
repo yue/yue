@@ -324,9 +324,10 @@ void Browser::ExecuteJavaScript(const std::string& code,
                                callback ? &json : nullptr);
   if (callback) {
     std::string json_str = base::UTF16ToUTF8(json);
-    std::unique_ptr<base::Value> pv = base::JSONReader::Read(json_str);
-    MessageLoop::PostTask(std::bind(callback, success, pv ? *(pv.release())
-                                                          : base::Value()));
+    MessageLoop::PostTask([=]() {
+      std::unique_ptr<base::Value> pv = base::JSONReader::Read(json_str);
+      callback(success, pv ? std::move(*(pv.release())) : base::Value());
+    });
   }
 }
 

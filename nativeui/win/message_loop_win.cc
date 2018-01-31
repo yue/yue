@@ -4,6 +4,8 @@
 
 #include "nativeui/message_loop.h"
 
+#include <windows.h>
+
 namespace nu {
 
 // static
