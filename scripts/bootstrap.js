@@ -18,9 +18,7 @@ if (process.platform !== 'win32') {
   execSync('python tools/clang/scripts/update.py')
 }
 if (process.platform === 'linux') {
-  // TODO(zcbenz): Support more arch.
   execSync(`python tools/install-sysroot.py --arch ${sysrootArch}`)
-  execSync('node scripts/update_gold.js')
 }
 
 execSync('git submodule sync --recursive')
@@ -61,12 +59,10 @@ if (targetOs == 'mac') {
 }
 
 if (targetOs == 'linux') {
-  // Generate linker map for Linux.
-  releaseConfig.push('generate_linker_map=true')
   // This flag caused weird compilation errors when building on Linux.
   debugConfig.push('enable_iterator_debugging=false')
-  // Somehow arm64 was not using gold by default.
-  commonConfig.push('use_gold=true')
+  // We are not putting sysroots in default path.
+  commonConfig.push('target_sysroot_dir="//third_party/"')
 }
 
 gen('out/Component', componentConfig)

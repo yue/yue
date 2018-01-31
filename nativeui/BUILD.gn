@@ -308,9 +308,11 @@ component("nativeui") {
   defines = [ "NATIVEUI_IMPLEMENTATION" ]
 
   if (is_linux) {
+    public_deps = [
+      "//build/config/linux/gtk3",
+    ]
     public_configs = [
       "//build/config/linux:x11",
-      "//build/config/linux/gtk3",
       ":webkitgtk",
     ]
 

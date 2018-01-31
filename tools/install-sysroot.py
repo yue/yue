@@ -32,8 +32,8 @@ import urllib2
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
-URL_PREFIX = 'https://commondatastorage.googleapis.com'
-URL_PATH = 'chrome-linux-sysroot/toolchain'
+URL_PREFIX = 'http://s3.amazonaws.com'
+URL_PATH = 'gh-contractor-zcbenz/toolchain'
 
 VALID_ARCHS = ('arm', 'arm64', 'i386', 'amd64', 'mips', 'mips64el')
 
@@ -217,7 +217,8 @@ def InstallSysroot(target_platform, target_arch):
   if sha1sum != tarball_sha1sum:
     raise Error('Tarball sha1sum is wrong.'
                 'Expected %s, actual: %s' % (tarball_sha1sum, sha1sum))
-  subprocess.check_call(['tar', 'xf', tarball, '-C', sysroot])
+  subprocess.check_call(['tar', '--no-same-owner', '--no-same-permissions',
+                         '-xf', tarball, '-C', sysroot])
   os.remove(tarball)
 
   with open(stamp, 'w') as s:
