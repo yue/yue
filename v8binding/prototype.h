@@ -99,7 +99,7 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
 template<typename T>
 struct Type<T*, typename std::enable_if<std::is_base_of<
                     base::internal::WeakPtrBase,
-                    decltype(((T*)nullptr)->GetWeakPtr())>::value>::type> {
+                    decltype(((T*)nullptr)->GetWeakPtr())>::value>::type> {  // NOLINT
   static constexpr const char* name = Type<T>::name;
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context, T* ptr) {
     v8::Isolate* isolate = context->GetIsolate();

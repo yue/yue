@@ -32,7 +32,7 @@ struct UserData<T, typename std::enable_if<std::is_base_of<
 template<typename T>
 struct UserData<T, typename std::enable_if<std::is_base_of<
                        base::internal::WeakPtrBase,
-                       decltype(((T*)nullptr)->GetWeakPtr())>::value>::type> {
+                       decltype(((T*)nullptr)->GetWeakPtr())>::value>::type> {  // NOLINT
   using Type = base::WeakPtr<T>;
   static inline void Construct(State* state, base::WeakPtr<T>* data, T* ptr) {
     new(data) base::WeakPtr<T>(ptr->GetWeakPtr());
@@ -103,7 +103,7 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
 template<typename T>
 struct Type<T*, typename std::enable_if<std::is_base_of<
                     base::internal::WeakPtrBase,
-                    decltype(((T*)nullptr)->GetWeakPtr())>::value>::type> {
+                    decltype(((T*)nullptr)->GetWeakPtr())>::value>::type> {  // NOLINT
   static constexpr const char* name = Type<T>::name;
   static bool To(State* state, int index, T** out) {
     index = AbsIndex(state, index);
