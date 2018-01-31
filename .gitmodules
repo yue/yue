@@ -7,9 +7,6 @@
 [submodule "third_party/zlib"]
 	path = third_party/zlib
 	url = https://chromium.googlesource.com/chromium/src/third_party/zlib
-[submodule "tools/gyp"]
-	path = tools/gyp
-	url = https://chromium.googlesource.com/external/gyp
 [submodule "third_party/tcmalloc/chromium"]
 	path = third_party/tcmalloc/chromium
 	url = https://chromium.googlesource.com/chromium/src/third_party/tcmalloc/chromium

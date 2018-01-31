@@ -42,10 +42,12 @@ const componentConfig = [
 const debugConfig = [
   'is_component_build=false',
   'is_debug=true',
+  'use_sysroot=true',
 ]
 const releaseConfig = [
   'is_component_build=false',
   'is_debug=false',
+  'use_sysroot=true',
 ]
 
 // Don't set official build for Windows, which increases the size of libyue.
@@ -54,7 +56,8 @@ if (targetOs != 'win')
 
 if (targetOs == 'mac') {
   commonConfig.push('mac_deployment_target="10.9.0"',
-                    'mac_sdk_min="10.12"')
+                    'mac_sdk_min="10.12"',
+                    'use_xcode_clang=false')
 }
 
 if (targetOs == 'linux') {
