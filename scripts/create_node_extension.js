@@ -22,11 +22,18 @@ const args = [
   'is_component_build=false',
   'is_debug=false',
   'is_official_build=true',
+  'use_sysroot=true',
   `target_cpu="${targetCpu}"`,
   // Set node nodever and runtime.
   `node_version="${nodever}"`,
   `node_runtime="${runtime}"`,
 ]
+
+if (targetOs == 'mac') {
+  args.push('mac_deployment_target="10.9.0"',
+            'mac_sdk_min="10.12"',
+            'use_xcode_clang=false')
+}
 
 console.log(`Creating native extension for ${runtime} ${nodever} ${targetCpu}...`)
 
