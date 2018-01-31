@@ -10,7 +10,7 @@ const extract = require('./libs/extract-zip')
 
 const {targetOs, download} = require('./common')
 
-const version = 'v0.1.0'
+const version = 'v0.2.0'
 const url = `https://github.com/yue/build-gn/releases/download/${version}/gn_${version}_${targetOs}_x64.zip`
 
 const gnDir = path.resolve('tools', 'gn')
