@@ -59,10 +59,11 @@ if (targetOs == 'mac') {
 }
 
 if (targetOs == 'linux') {
+  // Use custom clang and sysroot.
+  commonConfig.push('target_sysroot_dir="//third_party/"',
+                    'is_clang=true')
   // This flag caused weird compilation errors when building on Linux.
   debugConfig.push('enable_iterator_debugging=false')
-  // We are not putting sysroots in default path.
-  commonConfig.push('target_sysroot_dir="//third_party/"')
 }
 
 gen('out/Component', componentConfig)

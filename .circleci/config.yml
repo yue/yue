@@ -14,7 +14,7 @@ custom-steps:
     run:
       name: Install cross compile toolchains
       command: |
-        apt-get install -y gcc-5-multilib g++-5-multilib
+        apt-get install -y gcc-6-multilib g++-6-multilib
   - &install-arm-toolchain
     run:
       name: Install ARM toolchains
