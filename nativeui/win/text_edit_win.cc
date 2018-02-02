@@ -110,7 +110,7 @@ void TextEdit::InsertTextAt(const std::string& text, int pos) {
 
 void TextEdit::Delete() {
   HWND hwnd = static_cast<SubwinView*>(GetNative())->hwnd();
-  ::SendMessage(hwnd, EM_REPLACESEL, TRUE, reinterpret_cast<LPARAM>(""));
+  ::SendMessage(hwnd, EM_REPLACESEL, TRUE, reinterpret_cast<LPARAM>(L""));
 }
 
 void TextEdit::DeleteRange(int start, int end) {

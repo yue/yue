@@ -208,7 +208,7 @@ HWND GetWindowToParentTo(bool get_real_hwnd) {
 
 base::string16 GetWindowString(HWND hwnd) {
   base::string16 title;
-  int len = ::GetWindowTextLengthW(hwnd);
+  int len = ::GetWindowTextLengthW(hwnd) + 1;
   if (len > 1)
     ::GetWindowTextW(hwnd, base::WriteInto(&title, len), len);
   return title;

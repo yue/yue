@@ -66,6 +66,7 @@ TEST_F(TextEditTest, Delete) {
   edit_->SetText("abcde");
   edit_->SelectRange(0, 1);
   edit_->Delete();
+  LOG(ERROR) << edit_->GetText();
   EXPECT_EQ(edit_->GetText(), "bcde");
   edit_->DeleteRange(0, 1);
   EXPECT_EQ(edit_->GetText(), "cde");
