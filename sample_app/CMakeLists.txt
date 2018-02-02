@@ -1,6 +1,7 @@
-# This file is published under public domain.
+cmake_minimum_required(VERSION 3.10)
 
-cmake_minimum_required(VERSION 3.1)
+# Have to set this before creating project.
+set(CMAKE_OSX_DEPLOYMENT_TARGET 10.10)
 
 if((CMAKE_GENERATOR STREQUAL "Unix Makefiles") AND (NOT CMAKE_BUILD_TYPE))
   message(FATAL_ERROR "You must specify a build type.")
@@ -10,16 +11,21 @@ project(YueSampleApp)
 set(APP_NAME "sample_app")
 
 add_executable(${APP_NAME} ${APP_NAME}/main.cc)
-set_property(TARGET ${APP_NAME} PROPERTY CXX_STANDARD 11)
+
 target_include_directories(${APP_NAME} PRIVATE "include")
+set_target_properties(${APP_NAME} PROPERTIES
+                      CXX_STANDARD 14
+                      CXX_STANDARD_REQUIRED ON
+                      CXX_EXTENSIONS ON)
 
 # macOS configuration.
 if(APPLE)
   find_library(APPKIT AppKit)
   find_library(IOKIT IOKit)
   find_library(SECURITY Security)
+  find_library(WEBKIT WebKit)
   target_link_libraries(${APP_NAME}
-                        ${APPKIT} ${IOKIT} ${SECURITY}
+                        ${APPKIT} ${IOKIT} ${SECURITY} ${WEBKIT}
                         optimized ${CMAKE_SOURCE_DIR}/lib/libyue.a
                         debug ${CMAKE_SOURCE_DIR}/lib/libyued.a)
   set_target_properties(${APP_NAME} PROPERTIES LINK_FLAGS
