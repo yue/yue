@@ -35,6 +35,11 @@ if (targetOs == 'mac') {
             'use_xcode_clang=false')
 }
 
+if (targetOs == 'linux') {
+  args.push('target_sysroot_dir="//third_party/"',
+            'is_clang=true')
+}
+
 console.log(`Creating native extension for ${runtime} ${nodever} ${targetCpu}...`)
 
 // Build the node module.
