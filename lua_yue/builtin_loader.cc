@@ -17,11 +17,17 @@ namespace yue {
 namespace {
 
 // The search table, it must be manually kept in sorted order.
-std::pair<const char*, lua_CFunction> loaders_map[] = {
+std::pair<const char*, lua_CFunction> kLoadersMap[] = {
   std::make_pair("yue.gui", luaopen_yue_gui),
   std::make_pair("yue.sys", luaopen_yue_sys),
   std::make_pair("yue.util", luaopen_yue_util),
 };
+
+// Compare function to compare elements.
+template<typename T>
+bool ElementCompare(const T& e1, const T& e2) {
+  return base::StringPiece(std::get<0>(e1)) < std::get<0>(e2);
+}
 
 // Use the first element of tuple as comparing key.
 bool TupleCompare(const std::pair<const char*, lua_CFunction>& element,
@@ -30,13 +36,14 @@ bool TupleCompare(const std::pair<const char*, lua_CFunction>& element,
 }
 
 int SearchBuiltin(lua::State* state) {
-  DCHECK(std::is_sorted(std::begin(loaders_map), std::end(loaders_map)))
+  DCHECK(std::is_sorted(std::begin(kLoadersMap), std::end(kLoadersMap),
+                        ElementCompare<std::pair<const char*, lua_CFunction>>))
       << "The builtin loaders map must be in sorted order";
   std::string name;
   lua::To(state, 1, &name);
-  auto* iter = std::lower_bound(std::begin(loaders_map), std::end(loaders_map),
+  auto* iter = std::lower_bound(std::begin(kLoadersMap), std::end(kLoadersMap),
                                 name, TupleCompare);
-  if (iter == std::end(loaders_map) || name != iter->first) {
+  if (iter == std::end(kLoadersMap) || name != iter->first) {
     lua::PushFormatedString(state, "\n\tno builtin '%s'", name.c_str());
     return 1;
   } else {

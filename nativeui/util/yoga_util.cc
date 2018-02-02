@@ -303,7 +303,7 @@ const std::tuple<const char*, YGEdge, EdgeSetter> edge_percent_setters[] = {
 // Compare function to compare elements.
 template<typename T>
 bool ElementCompare(const T& e1, const T& e2) {
-  return std::string(std::get<0>(e1)) < std::get<0>(e2);
+  return base::StringPiece(std::get<0>(e1)) < std::get<0>(e2);
 }
 
 // Check if the array is sorted.
