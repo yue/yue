@@ -60,15 +60,14 @@ if(UNIX AND NOT APPLE)
   find_package(PkgConfig)
   pkg_search_module(GTK3 REQUIRED gtk+-3.0)
   pkg_search_module(X11 REQUIRED x11)
-  target_link_libraries(${APP_NAME}
-                        pthread dl atomic ${GTK3_LIBRARIES} ${X11_LIBRARIES})
   target_include_directories(${APP_NAME} PUBLIC
                              ${GTK3_INCLUDE_DIRS} ${X11_INCLUDE_DIRS})
   target_compile_options(${APP_NAME} PUBLIC
                          ${GTK3_CFLAGS_OTHER} ${X11_CFLAGS_OTHER})
   target_link_libraries(${APP_NAME}
                         optimized ${CMAKE_SOURCE_DIR}/lib/libyue.a
-                        debug ${CMAKE_SOURCE_DIR}/lib/libyued.a)
+                        debug ${CMAKE_SOURCE_DIR}/lib/libyued.a
+                        pthread dl atomic ${GTK3_LIBRARIES} ${X11_LIBRARIES})
   set_target_properties(${APP_NAME} PROPERTIES LINK_FLAGS
                         "-fdata-sections -ffunction-sections -Wl,--gc-section")
 endif()
