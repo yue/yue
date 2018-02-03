@@ -34,7 +34,7 @@ endif()
 
 # win32 configuration
 if(WIN32)
-  target_compile_definitions(${APP_NAME} PUBLIC NOMINMAX)
+  target_compile_definitions(${APP_NAME} PUBLIC NOMINMAX UNICODE _UNICODE)
   set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                PROPERTY VS_STARTUP_PROJECT ${APP_NAME})
   set_target_properties(${APP_NAME} PROPERTIES LINK_FLAGS
@@ -45,7 +45,7 @@ if(WIN32)
   target_link_libraries(${APP_NAME}
                         setupapi.lib powrprof.lib ws2_32.lib dbghelp.lib
                         shlwapi.lib version.lib winmm.lib psapi.lib dwmapi.lib
-                        comctl32.lib gdi32.lib gdiplus.lib
+                        propsys.lib comctl32.lib gdi32.lib gdiplus.lib
                         optimized ${CMAKE_SOURCE_DIR}/lib/libyue.lib
                         debug ${CMAKE_SOURCE_DIR}/lib/libyued.lib)
   foreach(flag_var

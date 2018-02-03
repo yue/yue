@@ -75,7 +75,7 @@ inline void GetArgument(base::Value arg, double* value) {
 
 inline void GetArgument(base::Value arg, float* value) {
   if (arg.is_double())
-    *value = arg.GetDouble();
+    *value = static_cast<float>(arg.GetDouble());
 }
 
 inline void GetArgument(base::Value arg, int* value) {
