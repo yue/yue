@@ -48,9 +48,9 @@ function generateProject() {
   } else if (process.platform == 'win32') {
     mkdir('build')
     if (targetCpu == 'x64')
-      execSync('cmake .. -G "Visual Studio 15 Win64"', {cwd: 'build'})
+      execSync('cmake .. -G "Visual Studio 15 2017 Win64"', {cwd: 'build'})
     else if (targetCpu == 'x86')
-      execSync('cmake .. -G "Visual Studio 15"', {cwd: 'build'})
+      execSync('cmake .. -G "Visual Studio 15 2017"', {cwd: 'build'})
   }
 }
 
@@ -62,7 +62,7 @@ function buildProject() {
     execSync('xcodebuild -configuration Release', {cwd: 'build'})
     execSync('xcodebuild -configuration Debug', {cwd: 'build'})
   } else if (process.platform == 'win32') {
-    const platform = targetCpu == 'x64' ? 'Win64' : 'Win32'
+    const platform = targetCpu == 'x64' ? 'x64' : 'Win32'
     execSync(`msbuild YueSampleApp.sln /p:Configuration=Release /p:Platform=${platform}`,
              {cwd: 'build'})
     execSync(`msbuild YueSampleApp.sln /p:Configuration=Debug /p:Platform=${platform}`,
