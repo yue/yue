@@ -63,9 +63,10 @@ function buildProject() {
     execSync('xcodebuild -configuration Debug', {cwd: 'build'})
   } else if (process.platform == 'win32') {
     const platform = targetCpu == 'x64' ? 'x64' : 'Win32'
-    execSync(`msbuild YueSampleApp.sln /p:Configuration=Release /p:Platform=${platform}`,
+    const msbuild = 'C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\MSBuild\\15.0\\Bin\\MSBuild.exe'
+    execSync(`"${msbuild}" YueSampleApp.sln /p:Configuration=Release /p:Platform=${platform}`,
              {cwd: 'build'})
-    execSync(`msbuild YueSampleApp.sln /p:Configuration=Debug /p:Platform=${platform}`,
+    execSync(`"${msbuild}" YueSampleApp.sln /p:Configuration=Debug /p:Platform=${platform}`,
              {cwd: 'build'})
   }
 }
