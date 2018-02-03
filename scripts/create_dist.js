@@ -114,11 +114,24 @@ function addFileToZip(zip, file, base, prefix = '', suffix = '') {
     for (let sub of subfiles)
       addFileToZip(zip, `${file}/${sub}`, base)
   } else if (stat.isFile()) {
+    let options = {binary: true}
+    if (process.platform !== 'win32') {
+      try {
+        fs.accessSync(file, fs.constants.X_OK)
+        options.unixPermissions = '755'
+      } catch (e) {
+        options.unixPermissions = '644'
+      }
+    }
     const extname = path.extname(file)
     const filename = path.basename(file, extname) + suffix + extname
-    let p = path.relative(base, file)
-    p = path.join(prefix, path.dirname(p), filename)
-    zip.file(p, fs.readFileSync(file))
+    let rp = path.relative(base, file)
+    rp = path.join(prefix, path.dirname(rp), filename)
+    if (process.platform === 'win32') {
+      // Some unzip tools force using / as file delimiter.
+      rp = rp.replace(/\\/g, '/')
+    }
+    zip.file(rp, fs.readFileSync(file), options)
   }
   return zip
 }
