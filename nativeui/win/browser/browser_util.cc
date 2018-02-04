@@ -16,8 +16,6 @@ namespace {
 #define IE_FEATURE_CONTROL \
     L"Software\\Microsoft\\Internet Explorer\\Main\\FeatureControl\\"
 
-#define IE_BROWSER_EMULATION ;
-
 const DWORD IE_VERSION = 11000;
 
 inline void WriteKey(const wchar_t* exe, const wchar_t* key, DWORD value) {
@@ -37,28 +35,33 @@ void FixIECompatibleMode() {
   // feature defines the default emulation mode for Internet Explorer and
   // supports the following values.
   // Webpages containing standards-based !DOCTYPE directives are displayed
-  //in IE10 Standards mode.
-  WriteKey(exe_name.c_str(), L"FEATURE_BROWSER_EMULATION", IE_VERSION);
+  // in IE10 Standards mode.
+  WriteKey(exe_name.c_str(),
+           IE_FEATURE_CONTROL L"FEATURE_BROWSER_EMULATION", IE_VERSION);
 
   // Internet Explorer 8 or later. The FEATURE_AJAX_CONNECTIONEVENTS feature
   // enables events that occur when the value of the online property of the
   // navigator object changes, such as when the user chooses to work offline.
   // For more information, see the ononline and onoffline events.
-  WriteKey(exe_name.c_str(), L"FEATURE_AJAX_CONNECTIONEVENTS", 1);
+  WriteKey(exe_name.c_str(),
+           IE_FEATURE_CONTROL L"FEATURE_AJAX_CONNECTIONEVENTS", 1);
 
   // Internet Explorer 9. The FEATURE_GPU_RENDERING feature enables Internet
   // Explorer to use a graphics processing unit (GPU) to render content. This
   // dramatically improves performance for webpages that are rich in graphics.
-  WriteKey(exe_name.c_str(), L"FEATURE_GPU_RENDERING", 1);
+  WriteKey(exe_name.c_str(),
+           IE_FEATURE_CONTROL L"FEATURE_GPU_RENDERING", 1);
 
   // Internet Explorer 8 and later. When enabled, the
   // FEATURE_DISABLE_NAVIGATION_SOUNDS feature disables the sounds played when
   // you open a link in a webpage.
-  WriteKey(exe_name.c_str(), L"FEATURE_DISABLE_NAVIGATION_SOUNDS", 1);
+  WriteKey(exe_name.c_str(),
+           IE_FEATURE_CONTROL L"FEATURE_DISABLE_NAVIGATION_SOUNDS", 1);
 
   // When enabled, the FEATURE_STATUS_BAR_THROTTLING feature limits the
   // frequency of status bar updates to one update every 200 milliseconds.
-  WriteKey(exe_name.c_str(), L"FEATURE_STATUS_BAR_THROTTLING", 1);
+  WriteKey(exe_name.c_str(),
+           IE_FEATURE_CONTROL L"FEATURE_STATUS_BAR_THROTTLING", 1);
 }
 
 }  // namespace nu

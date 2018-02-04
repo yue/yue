@@ -156,6 +156,34 @@ bool BrowserImpl::Eval(const base::string16& code, base::string16* result) {
   return true;
 }
 
+void BrowserImpl::GoBack() {
+  if (browser_)
+    browser_->GoBack();
+}
+
+bool BrowserImpl::CanGoBack() {
+  return can_go_back_;
+}
+
+void BrowserImpl::GoForward() {
+  if (browser_)
+    browser_->GoForward();
+}
+
+bool BrowserImpl::CanGoForward() {
+  return can_go_forward_;
+}
+
+void BrowserImpl::Reload() {
+  if (browser_)
+    browser_->Refresh();
+}
+
+void BrowserImpl::Stop() {
+  if (browser_)
+    browser_->Stop();
+}
+
 void BrowserImpl::SizeAllocate(const Rect& bounds) {
   SubwinView::SizeAllocate(bounds);
   Microsoft::WRL::ComPtr<IOleInPlaceObject> in_place;
@@ -342,6 +370,30 @@ void Browser::ExecuteJavaScript(const std::string& code,
       callback(success, pv ? std::move(*(pv.release())) : base::Value());
     });
   }
+}
+
+void Browser::GoBack() {
+  static_cast<BrowserImpl*>(GetNative())->GoBack();
+}
+
+bool Browser::CanGoBack() {
+  return static_cast<BrowserImpl*>(GetNative())->CanGoBack();
+}
+
+void Browser::GoForward() {
+  static_cast<BrowserImpl*>(GetNative())->GoForward();
+}
+
+bool Browser::CanGoForward() {
+  return static_cast<BrowserImpl*>(GetNative())->CanGoForward();
+}
+
+void Browser::Reload() {
+  static_cast<BrowserImpl*>(GetNative())->Reload();
+}
+
+void Browser::Stop() {
+  static_cast<BrowserImpl*>(GetNative())->Stop();
 }
 
 void Browser::PlatformUpdateBindings() {

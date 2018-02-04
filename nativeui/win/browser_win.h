@@ -32,10 +32,20 @@ class BrowserImpl : public SubwinView {
   base::string16 GetTitle();
   bool Eval(const base::string16& code, base::string16* result);
 
+  void GoBack();
+  bool CanGoBack();
+  void GoForward();
+  bool CanGoForward();
+  void Reload();
+  void Stop();
+
   template<typename T>
   bool GetBrowser(Microsoft::WRL::ComPtr<T>* out) {
     return SUCCEEDED(browser_.As(out));
   }
+
+  void set_can_go_back(bool b) { can_go_back_ = b; }
+  void set_can_go_forward(bool b) { can_go_forward_ = b; }
 
  protected:
   // ViewImpl:
@@ -83,6 +93,10 @@ class BrowserImpl : public SubwinView {
 
   // Whether we have loaded the HTML.
   bool is_html_loaded_ = false;
+
+  // Browser states.
+  bool can_go_back_ = false;
+  bool can_go_forward_ = false;
 };
 
 }  // namespace nu

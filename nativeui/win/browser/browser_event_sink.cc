@@ -133,6 +133,12 @@ STDMETHODIMP BrowserEventSink::Invoke(_In_  DISPID dispIdMember,
             base::UTF16ToUTF8(pDispParams->rgvarg[0].bstrVal));
       }
       break;
+    case DISPID_COMMANDSTATECHANGE:
+      if (pDispParams->rgvarg[1].lVal == CSC_NAVIGATEFORWARD)
+        browser_->set_can_go_forward(pDispParams->rgvarg[0].boolVal);
+      else if (pDispParams->rgvarg[1].lVal == CSC_NAVIGATEBACK)
+        browser_->set_can_go_back(pDispParams->rgvarg[0].boolVal);
+      break;
     default:
       hr = E_NOTIMPL;
       break;
