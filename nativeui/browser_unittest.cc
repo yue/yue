@@ -18,10 +18,11 @@ class BrowserTest : public testing::Test {
 };
 
 TEST_F(BrowserTest, LoadURL) {
-  browser_->on_finish_navigation.Connect([](nu::Browser*,
+  browser_->on_finish_navigation.Connect([](nu::Browser* browser,
                                             const std::string& url) {
     nu::MessageLoop::Quit();
     EXPECT_EQ(url, "about:blank");
+    EXPECT_EQ(url, browser->GetURL());
   });
   nu::MessageLoop::PostTask([&]() {
     browser_->LoadURL("about:blank");
@@ -64,6 +65,32 @@ TEST_F(BrowserTest, Navigation) {
   });
   nu::MessageLoop::PostTask([&]() {
     browser_->LoadURL(u);
+  });
+  nu::MessageLoop::Run();
+}
+
+TEST_F(BrowserTest, LoadHTMLNavigation) {
+  bool start_called = false;
+  bool commit_called = false;
+  bool finish_called = false;
+  browser_->on_start_navigation.Connect([&](nu::Browser*,
+                                            const std::string& url) {
+    EXPECT_FALSE(start_called);
+    start_called = true;
+  });
+  browser_->on_commit_navigation.Connect([&](nu::Browser*,
+                                             const std::string& url) {
+    EXPECT_FALSE(commit_called);
+    commit_called = true;
+  });
+  browser_->on_finish_navigation.Connect([&](nu::Browser*,
+                                             const std::string& url) {
+    nu::MessageLoop::Quit();
+    EXPECT_FALSE(finish_called);
+    finish_called = true;
+  });
+  nu::MessageLoop::PostTask([&]() {
+    browser_->LoadHTML("<html></html>", "about:blank");
   });
   nu::MessageLoop::Run();
 }
@@ -120,6 +147,32 @@ TEST_F(BrowserTest, LoadHTMLBaseURL) {
   nu::MessageLoop::PostTask([&]() {
     browser_->LoadHTML("<html><script>window.test='true'</script></html>",
                        "https://cheng.guru/");
+  });
+  nu::MessageLoop::Run();
+}
+
+TEST_F(BrowserTest, Title) {
+  std::string next_title = "t1";
+  browser_->on_update_title.Connect([&](nu::Browser* browser,
+                                        const std::string& title) {
+    EXPECT_EQ(browser->GetTitle(), title);
+    EXPECT_EQ(title, next_title);
+    if (next_title == "t1") {
+      next_title = "t2";
+      browser->on_finish_navigation.Connect([](nu::Browser* browser,
+                                               const std::string& url) {
+        browser->ExecuteJavaScript("document.title = 't2'",
+                                   [=](bool, base::Value) {
+          EXPECT_EQ(browser->GetTitle(), "t2");
+        });
+      });
+    } else {
+      nu::MessageLoop::Quit();
+    }
+  });
+  nu::MessageLoop::PostTask([&]() {
+    browser_->LoadHTML("<html><head><title>t1</title></head></html>",
+                       "about:blank");
   });
   nu::MessageLoop::Run();
 }

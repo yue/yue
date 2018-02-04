@@ -123,6 +123,7 @@ void BrowserImpl::LoadURL(const base::string16& str) {
   if (!browser_)
     return;
   html_moniker_.Reset();
+  event_sink_->set_load_html(false);
   base::win::ScopedBstr url(str.c_str());
   browser_->Navigate(url, nullptr, nullptr, nullptr, nullptr);
 }
@@ -133,9 +134,25 @@ void BrowserImpl::LoadHTML(const base::string16& str,
     return;
   html_moniker_ = new BrowserHTMLMoniker;
   html_moniker_->LoadHTML(str, base_url.empty() ? L"about:blank" : base_url);
+  event_sink_->set_load_html(true);
   is_html_loaded_ = false;
   base::win::ScopedBstr url(L"about:blank");
   browser_->Navigate(url, nullptr, nullptr, nullptr, nullptr);
+}
+
+base::string16 BrowserImpl::GetURL() {
+  base::win::ScopedBstr url;
+  browser_->get_LocationURL(url.Receive());
+  return url.Length() == 0 ? L"about:blank" : url;
+}
+
+base::string16 BrowserImpl::GetTitle() {
+  base::win::ScopedBstr title;
+  if (document_)
+    document_->get_title(title.Receive());
+  if (!title)
+    return base::string16();
+  return base::string16(title);
 }
 
 bool BrowserImpl::Eval(const base::string16& code, base::string16* result) {
@@ -310,6 +327,19 @@ void Browser::LoadURL(const std::string& url) {
 void Browser::LoadHTML(const std::string& html, const std::string& base_url) {
   auto* browser = static_cast<BrowserImpl*>(GetNative());
   browser->LoadHTML(base::UTF8ToUTF16(html), base::UTF8ToUTF16(base_url));
+}
+
+std::string Browser::GetURL() {
+  auto* browser = static_cast<BrowserImpl*>(GetNative());
+  return base::UTF16ToUTF8(browser->GetURL());
+}
+
+std::string Browser::GetTitle() {
+  auto* browser = static_cast<BrowserImpl*>(GetNative());
+  return base::UTF16ToUTF8(browser->GetTitle());
+}
+
+void Browser::SetUserAgent(const std::string& user_agent) {
 }
 
 void Browser::ExecuteJavaScript(const std::string& code,

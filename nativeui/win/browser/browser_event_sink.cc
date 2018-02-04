@@ -84,7 +84,7 @@ STDMETHODIMP BrowserEventSink::Invoke(_In_  DISPID dispIdMember,
   HRESULT hr = S_OK;
   switch (dispIdMember) {
     case DISPID_BEFORENAVIGATE2:
-      if (IsMainFrame(pDispParams)) {
+      if (IsMainFrame(pDispParams) && !is_load_html_) {
         delegate->on_start_navigation.Emit(
             delegate,
             URLToString(pDispParams->rgvarg[5].pvarVal->bstrVal));
@@ -100,9 +100,13 @@ STDMETHODIMP BrowserEventSink::Invoke(_In_  DISPID dispIdMember,
         browser_->OnDocumentReady();
         // IE does not seem to have the concept of "commit navigation", this is
         // probably the best place to simulate it.
-        delegate->on_commit_navigation.Emit(
-            delegate,
-            URLToString(pDispParams->rgvarg[0].pvarVal->bstrVal));
+        if (!is_load_html_) {
+          delegate->on_commit_navigation.Emit(
+              delegate,
+              URLToString(pDispParams->rgvarg[0].pvarVal->bstrVal));
+        }
+        // End loading HTML.
+        is_load_html_ = false;
       }
       break;
     case DISPID_DOCUMENTCOMPLETE:
@@ -121,6 +125,13 @@ STDMETHODIMP BrowserEventSink::Invoke(_In_  DISPID dispIdMember,
       }
       // Don't continue to the error page.
       *pDispParams->rgvarg[0].pboolVal = VARIANT_TRUE;
+      break;
+    case DISPID_TITLECHANGE:
+      if (!is_load_html_) {
+        delegate->on_update_title.Emit(
+            delegate,
+            base::UTF16ToUTF8(pDispParams->rgvarg[0].bstrVal));
+      }
       break;
     default:
       hr = E_NOTIMPL;

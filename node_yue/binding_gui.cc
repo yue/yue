@@ -1267,6 +1267,8 @@ struct Type<nu::Browser> {
     Set(context, templ,
         "loadURL", &nu::Browser::LoadURL,
         "loadHTML", &nu::Browser::LoadHTML,
+        "getURL", &nu::Browser::GetURL,
+        "getTitle", &nu::Browser::GetTitle,
         "executeJavaScript", &nu::Browser::ExecuteJavaScript,
         "setBindingName", &nu::Browser::SetBindingName,
         "addBinding", &AddBinding,
@@ -1274,8 +1276,11 @@ struct Type<nu::Browser> {
         "removeBinding", &nu::Browser::RemoveBinding);
     SetProperty(context, templ,
                 "onClose", &nu::Browser::on_close,
-                "onFailNavigation", &nu::Browser::on_fail_navigation,
-                "onFinishNavigation", &nu::Browser::on_finish_navigation);
+                "onUpdateTitle", &nu::Browser::on_update_title,
+                "onStartNavigation", &nu::Browser::on_start_navigation,
+                "onCommitNavigation", &nu::Browser::on_commit_navigation,
+                "onFinishNavigation", &nu::Browser::on_finish_navigation,
+                "onFailNavigation", &nu::Browser::on_fail_navigation);
   }
   static void AddBinding(Arguments* args,
                          const std::string& name,

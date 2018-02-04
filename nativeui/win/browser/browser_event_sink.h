@@ -19,6 +19,9 @@ class BrowserEventSink : public IDispatch {
   explicit BrowserEventSink(BrowserImpl* browser);
   ~BrowserEventSink();
 
+  // Mark we are loading html string.
+  void set_load_html(bool is) { is_load_html_ = is; }
+
   // IUnknown
   STDMETHOD(QueryInterface)(REFIID riid, void **ppvObject);
   STDMETHOD_(ULONG, AddRef)();
@@ -49,6 +52,8 @@ class BrowserEventSink : public IDispatch {
 
   ULONG ref_;
   BrowserImpl* browser_;
+
+  bool is_load_html_ = false;
 
   DISALLOW_COPY_AND_ASSIGN(BrowserEventSink);
 };

@@ -28,6 +28,8 @@ class BrowserImpl : public SubwinView {
 
   void LoadURL(const base::string16& str);
   void LoadHTML(const base::string16& str, const base::string16& base_url);
+  base::string16 GetURL();
+  base::string16 GetTitle();
   bool Eval(const base::string16& code, base::string16* result);
 
   template<typename T>

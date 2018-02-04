@@ -30,8 +30,18 @@ class NATIVEUI_EXPORT Browser : public View {
 
   void LoadURL(const std::string& url);
   void LoadHTML(const std::string& html, const std::string& base_url);
+  std::string GetURL();
+  std::string GetTitle();
+  void SetUserAgent(const std::string& user_agent);
   void ExecuteJavaScript(const std::string& code,
                          const ExecutionCallback& callback);
+
+  void GoBack();
+  bool CanGoBack();
+  void GoForward();
+  bool CanGoForward();
+  void Reload();
+  void Stop();
 
   void SetBindingName(const std::string& name);
   void AddRawBinding(const std::string& name, const BindingFunc& func);
@@ -47,6 +57,7 @@ class NATIVEUI_EXPORT Browser : public View {
 
   // Events.
   Signal<void(Browser*)> on_close;
+  Signal<void(Browser*, const std::string&)> on_update_title;
   Signal<void(Browser*, const std::string&)> on_start_navigation;
   Signal<void(Browser*, const std::string&)> on_commit_navigation;
   Signal<void(Browser*, const std::string&, int)> on_fail_navigation;

@@ -1154,6 +1154,8 @@ struct Type<nu::Browser> {
            "create", &CreateOnHeap<nu::Browser>,
            "loadurl", &nu::Browser::LoadURL,
            "loadhtml", &nu::Browser::LoadHTML,
+           "geturl", &nu::Browser::GetURL,
+           "gettitle", &nu::Browser::GetTitle,
            "executejavascript", &nu::Browser::ExecuteJavaScript,
            "setbindingname", &nu::Browser::SetBindingName,
            "addbinding", &AddBinding,
@@ -1161,8 +1163,11 @@ struct Type<nu::Browser> {
            "removebinding", &nu::Browser::RemoveBinding);
     RawSetProperty(state, metatable,
                    "onclose", &nu::Browser::on_close,
-                   "onfailnavigation", &nu::Browser::on_fail_navigation,
-                   "onfinishnavigation", &nu::Browser::on_finish_navigation);
+                   "onupdatetitle", &nu::Browser::on_update_title,
+                   "onstartnavigation", &nu::Browser::on_start_navigation,
+                   "oncommitnavigation", &nu::Browser::on_commit_navigation,
+                   "onfinishnavigation", &nu::Browser::on_finish_navigation,
+                   "onfailnavigation", &nu::Browser::on_fail_navigation);
   }
   static void AddBinding(CallContext* context,
                          nu::Browser* browser,
