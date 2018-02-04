@@ -46,6 +46,7 @@ if(WIN32)
                         setupapi.lib powrprof.lib ws2_32.lib dbghelp.lib
                         shlwapi.lib version.lib winmm.lib psapi.lib dwmapi.lib
                         propsys.lib comctl32.lib gdi32.lib gdiplus.lib
+                        urlmon.lib
                         optimized ${CMAKE_SOURCE_DIR}/lib/libyue.lib
                         debug ${CMAKE_SOURCE_DIR}/lib/libyued.lib)
   foreach(flag_var

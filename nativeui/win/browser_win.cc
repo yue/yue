@@ -80,6 +80,10 @@ BrowserImpl::BrowserImpl(Browser* delegate)
   State::GetCurrent()->InitializeCOM();
   // Use the latest IE version.
   FixIECompatibleMode();
+  // Disable the navigation sound.
+  ::CoInternetSetFeatureEnabled(FEATURE_DISABLE_NAVIGATION_SOUNDS,
+                                SET_FEATURE_ON_PROCESS,
+                                true);
 
   // Boring work of creating IE control.
   Microsoft::WRL::ComPtr<IClassFactory> class_factory;

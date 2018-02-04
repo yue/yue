@@ -334,6 +334,7 @@ component("nativeui") {
       "dwmapi.lib",
       "gdi32.lib",
       "gdiplus.lib",
+      "urlmon.lib",
     ]
     ldflags = [
       "/DELAYLOAD:dwmapi.dll",
