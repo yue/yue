@@ -1156,6 +1156,7 @@ struct Type<nu::Browser> {
            "loadhtml", &nu::Browser::LoadHTML,
            "geturl", &nu::Browser::GetURL,
            "gettitle", &nu::Browser::GetTitle,
+           "setuseragent", &nu::Browser::SetUserAgent,
            "executejavascript", &nu::Browser::ExecuteJavaScript,
            "setbindingname", &nu::Browser::SetBindingName,
            "addbinding", &AddBinding,

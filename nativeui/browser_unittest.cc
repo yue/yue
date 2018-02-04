@@ -177,6 +177,24 @@ TEST_F(BrowserTest, Title) {
   nu::MessageLoop::Run();
 }
 
+TEST_F(BrowserTest, UserAgent) {
+  std::string user_agent = "MyBrowser v1.0";
+  browser_->SetUserAgent(user_agent);
+  browser_->on_finish_navigation.Connect([&](nu::Browser* browser,
+                                             const std::string& url) {
+    browser->ExecuteJavaScript("navigator.userAgent",
+                               [&](bool success, base::Value result) {
+      nu::MessageLoop::Quit();
+      ASSERT_TRUE(result.is_string());
+      ASSERT_EQ(result.GetString(), user_agent);
+    });
+  });
+  nu::MessageLoop::PostTask([&]() {
+    browser_->LoadURL("about:blank");
+  });
+  nu::MessageLoop::Run();
+}
+
 TEST_F(BrowserTest, ExecuteJavaScript) {
   browser_->on_finish_navigation.Connect([](nu::Browser* browser,
                                             const std::string& url) {

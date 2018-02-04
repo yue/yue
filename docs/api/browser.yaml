@@ -37,6 +37,18 @@ methods:
       baseurl:
         description: A URL used to resolve relative URLs within the document.
 
+  - signature: std::string GetURL()
+    description: Return current URL.
+
+  - signature: std::string GetTitle()
+    description: Return the title of document.
+
+  - signature: void SetUserAgent(const std::string& user_agent)
+    description: Change browser's user agent.
+    detail: |
+      On Windows, due to Internet Explorer's limitations, calling `SetUserAgent`
+      would change all web pages' user agents in current process.
+
   - signature: void ExecuteJavaScript(const std::string& code, const std::function<void(bool, const std::string&)>& callback);
     description: |
       Evaluate `code` in browser and get the evaluated result.
@@ -50,6 +62,9 @@ methods:
 events:
   - callback: void on_close(Browser* self)
     description: Emitted when the web page requests to close.
+
+  - callback: void on_update_title(Browser* self, const std::string& title)
+    description: Emitted when document's title is changed.
 
   - callback: void on_start_navigation(Browser* self, const std::string& url)
     description: Emitted when the browser begins provisional navigation.

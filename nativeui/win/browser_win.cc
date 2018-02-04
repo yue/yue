@@ -343,7 +343,11 @@ std::string Browser::GetTitle() {
   return base::UTF16ToUTF8(browser->GetTitle());
 }
 
-void Browser::SetUserAgent(const std::string& user_agent) {
+void Browser::SetUserAgent(const std::string& ua) {
+  // Unfortunately we can only set global user agent.
+  ::UrlMkSetSessionOption(URLMON_OPTION_USERAGENT_REFRESH, NULL, 0, 0);
+  ::UrlMkSetSessionOption(URLMON_OPTION_USERAGENT,
+                          (LPVOID)ua.c_str(), (WORD)ua.size(), 0);  // NOLINT
 }
 
 void Browser::ExecuteJavaScript(const std::string& code,
