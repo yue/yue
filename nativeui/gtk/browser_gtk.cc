@@ -14,6 +14,8 @@ namespace nu {
 
 namespace {
 
+const char* kIgnoreNextFinish = "ignore-next-finish";
+
 std::string JSStringToString(JSStringRef js) {
   size_t max_size = JSStringGetMaximumUTF8CStringSize(js);
   std::string str(max_size, '\0');
@@ -43,18 +45,35 @@ void OnClose(WebKitWebView* widget, Browser* view) {
   view->on_close.Emit(view);
 }
 
-void OnLoadChanged(WebKitWebView*, WebKitLoadEvent event, Browser* view) {
+void OnLoadChanged(WebKitWebView* widget, WebKitLoadEvent event,
+                   Browser* view) {
   switch (event) {
     case WEBKIT_LOAD_STARTED:
+      view->on_start_navigation.Emit(view, webkit_web_view_get_uri(widget));
+      break;
+    case WEBKIT_LOAD_COMMITTED:
+      view->on_commit_navigation.Emit(view, webkit_web_view_get_uri(widget));
+      break;
+    case WEBKIT_LOAD_FINISHED:
+      // Do not emit when navigation fails.
+      if (g_object_get_data(G_OBJECT(widget), kIgnoreNextFinish)) {
+        g_object_set_data(G_OBJECT(widget), kIgnoreNextFinish, nullptr);
+        break;
+      }
+      view->on_finish_navigation.Emit(view, webkit_web_view_get_uri(widget));
       break;
     case WEBKIT_LOAD_REDIRECTED:
       break;
-    case WEBKIT_LOAD_COMMITTED:
-      break;
-    case WEBKIT_LOAD_FINISHED:
-      view->on_finish_navigation.Emit(view);
-      break;
   }
+}
+
+gboolean OnLoadFailed(WebKitWebView* widget, WebKitLoadEvent event,
+                      const gchar* url, GError* error, Browser* view) {
+  view->on_fail_navigation.Emit(view, url, error->code);
+  // WebKitGTK always emits "finished" event even when navigation fails, so we
+  // need to ignore the next "finished" event.
+  g_object_set_data(G_OBJECT(widget), kIgnoreNextFinish, view);
+  return TRUE;
 }
 
 void OnJavaScriptFinish(WebKitWebView* webview,
@@ -105,6 +124,7 @@ void Browser::PlatformInit() {
   // Install events.
   g_signal_connect(webview, "close", G_CALLBACK(OnClose), this);
   g_signal_connect(webview, "load-changed", G_CALLBACK(OnLoadChanged), this);
+  g_signal_connect(webview, "load-failed", G_CALLBACK(OnLoadFailed), this);
 }
 
 void Browser::PlatformDestroy() {

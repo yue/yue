@@ -76,7 +76,7 @@ TEST_F(BrowserTest, FailNavigation) {
                                           const std::string& url,
                                           int code) {
     nu::MessageLoop::Quit();
-    EXPECT_LT(code, 0);
+    EXPECT_NE(code, 0);
     EXPECT_EQ(url, "http://0.0.0.123/");
   });
   nu::MessageLoop::PostTask([&]() {
