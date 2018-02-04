@@ -10,36 +10,19 @@
 #include <string>
 #include <utility>
 
-#include "base/base_paths.h"
-#include "base/files/file_path.h"
 #include "base/json/json_reader.h"
-#include "base/path_service.h"
 #include "base/strings/utf_string_conversions.h"
-#include "base/win/registry.h"
 #include "base/win/scoped_bstr.h"
 #include "base/win/scoped_variant.h"
 #include "nativeui/message_loop.h"
 #include "nativeui/state.h"
+#include "nativeui/win/browser/browser_util.h"
 #include "nativeui/win/util/dispatch_invoke.h"
 #include "nativeui/win/util/hwnd_util.h"
 
 namespace nu {
 
 namespace {
-
-const wchar_t* IE_EMULATION_KEY =
-    L"Software\\Microsoft\\Internet Explorer\\Main\\FeatureControl\\"
-    L"FEATURE_BROWSER_EMULATION";
-const DWORD IE_VERSION = 11000;
-
-// Set register key to prevent using compatible mode of IE.
-void FixIECompatibleMode() {
-  base::FilePath exe_path;
-  if (!PathService::Get(base::FILE_EXE, &exe_path))
-    return;
-  base::win::RegKey(HKEY_CURRENT_USER, IE_EMULATION_KEY, KEY_ALL_ACCESS)
-      .WriteValue(exe_path.BaseName().value().c_str(), IE_VERSION);
-}
 
 // Convert a VARIANT to JSON string.
 bool VARIANTToJSON(IDispatchEx* script,
@@ -80,10 +63,6 @@ BrowserImpl::BrowserImpl(Browser* delegate)
   State::GetCurrent()->InitializeCOM();
   // Use the latest IE version.
   FixIECompatibleMode();
-  // Disable the navigation sound.
-  ::CoInternetSetFeatureEnabled(FEATURE_DISABLE_NAVIGATION_SOUNDS,
-                                SET_FEATURE_ON_PROCESS,
-                                true);
 
   // Boring work of creating IE control.
   Microsoft::WRL::ComPtr<IClassFactory> class_factory;

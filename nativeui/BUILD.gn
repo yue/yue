@@ -249,6 +249,8 @@ component("nativeui") {
     "win/browser/browser_html_moniker.h",
     "win/browser/browser_ole_site.cc",
     "win/browser/browser_ole_site.h",
+    "win/browser/browser_util.cc",
+    "win/browser/browser_util.h",
     "win/browser_win.cc",
     "win/browser_win.h",
     "win/button_win.cc",
