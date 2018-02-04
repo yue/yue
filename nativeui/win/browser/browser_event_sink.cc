@@ -87,7 +87,7 @@ STDMETHODIMP BrowserEventSink::Invoke(_In_  DISPID dispIdMember,
       if (IsMainFrame(pDispParams)) {
         delegate->on_start_navigation.Emit(
             delegate,
-            URLToString(pDispParams->rgvarg[5].bstrVal));
+            URLToString(pDispParams->rgvarg[5].pvarVal->bstrVal));
       }
       break;
     case DISPID_NAVIGATECOMPLETE2:
@@ -102,14 +102,14 @@ STDMETHODIMP BrowserEventSink::Invoke(_In_  DISPID dispIdMember,
         // probably the best place to simulate it.
         delegate->on_commit_navigation.Emit(
             delegate,
-            URLToString(pDispParams->rgvarg[0].bstrVal));
+            URLToString(pDispParams->rgvarg[0].pvarVal->bstrVal));
       }
       break;
     case DISPID_DOCUMENTCOMPLETE:
       if (IsMainFrame(pDispParams)) {
         delegate->on_finish_navigation.Emit(
             delegate,
-            URLToString(pDispParams->rgvarg[0].bstrVal));
+            URLToString(pDispParams->rgvarg[0].pvarVal->bstrVal));
       }
       break;
     case DISPID_NAVIGATEERROR:
