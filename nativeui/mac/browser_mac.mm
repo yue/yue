@@ -147,9 +147,48 @@ base::Value NSValueToBaseValue(id value) {
 
 @implementation NUNavigationDelegate
 
-- (void)webView:(WKWebView*)webview didFinishNavigation:(WKNavigation*)navigation {
+- (void)webView:(WKWebView*)webview
+    didStartProvisionalNavigation:(WKNavigation*)navigation {
   auto* browser = static_cast<nu::Browser*>([webview shell]);
-  browser->on_finish_navigation.Emit(browser);
+  browser->on_start_navigation.Emit(
+      browser,
+      base::SysNSStringToUTF8([[webview URL] absoluteString]));
+}
+
+- (void)webView:(WKWebView*)webview
+    didCommitNavigation:(WKNavigation*)navigation {
+  auto* browser = static_cast<nu::Browser*>([webview shell]);
+  browser->on_commit_navigation.Emit(
+      browser,
+      base::SysNSStringToUTF8([[webview URL] absoluteString]));
+}
+
+- (void)webView:(WKWebView*)webview
+    didFinishNavigation:(WKNavigation*)navigation {
+  auto* browser = static_cast<nu::Browser*>([webview shell]);
+  browser->on_finish_navigation.Emit(
+      browser,
+      base::SysNSStringToUTF8([[webview URL] absoluteString]));
+}
+
+- (void)webView:(WKWebView*)webview
+    didFailNavigation:(WKNavigation*)navigation
+            withError:(NSError*)error {
+  auto* browser = static_cast<nu::Browser*>([webview shell]);
+  browser->on_fail_navigation.Emit(
+      browser,
+      base::SysNSStringToUTF8(error.userInfo[NSURLErrorFailingURLStringErrorKey]),
+      [error code]);
+}
+
+- (void)webView:(WKWebView*)webview
+    didFailProvisionalNavigation:(WKNavigation*)navigation
+                       withError:(NSError*)error {
+  auto* browser = static_cast<nu::Browser*>([webview shell]);
+  browser->on_fail_navigation.Emit(
+      browser,
+      base::SysNSStringToUTF8(error.userInfo[NSURLErrorFailingURLStringErrorKey]),
+      [error code]);
 }
 
 @end
