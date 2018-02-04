@@ -203,6 +203,8 @@ component("nativeui") {
     "mac/app_mac.mm",
     "mac/lifetime_mac.mm",
     "mac/accelerator_manager_mac.mm",
+    "mac/browser/nu_web_ui_delegate.h",
+    "mac/browser/nu_web_ui_delegate.mm",
     "mac/browser_mac.mm",
     "mac/button_mac.mm",
     "mac/container_mac.h",

@@ -11,6 +11,7 @@
 #include "base/mac/scoped_nsobject.h"
 #include "base/memory/ptr_util.h"
 #include "base/strings/sys_string_conversions.h"
+#include "nativeui/mac/browser/nu_web_ui_delegate.h"
 #include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/nu_view.h"
 
@@ -149,18 +150,6 @@ base::Value NSValueToBaseValue(id value) {
 - (void)webView:(WKWebView*)webview didFinishNavigation:(WKNavigation*)navigation {
   auto* browser = static_cast<nu::Browser*>([webview shell]);
   browser->on_finish_navigation.Emit(browser);
-}
-
-@end
-
-@interface NUWebUIDelegate : NSObject<WKUIDelegate>
-@end
-
-@implementation NUWebUIDelegate
-
-- (void)webViewDidClose:(WKWebView*)webview {
-  auto* browser = static_cast<nu::Browser*>([webview shell]);
-  browser->on_close.Emit(browser);
 }
 
 @end
