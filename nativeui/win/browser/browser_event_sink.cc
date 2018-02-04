@@ -7,9 +7,23 @@
 #include <exdispid.h>
 #include <shlwapi.h>
 
+#include <string>
+
+#include "base/strings/utf_string_conversions.h"
 #include "nativeui/win/browser_win.h"
 
 namespace nu {
+
+namespace {
+
+// IE might return empty URL for "about:blank";
+std::string URLToString(BSTR str) {
+  if (::SysStringLen(str) == 0)
+    return "about:blank";
+  return base::UTF16ToUTF8(str);
+}
+
+}  // namespace
 
 BrowserEventSink::BrowserEventSink(BrowserImpl* browser)
     : ref_(1), browser_(browser) {
@@ -66,20 +80,47 @@ STDMETHODIMP BrowserEventSink::Invoke(_In_  DISPID dispIdMember,
                                       _Out_opt_  VARIANT *pVarResult,
                                       _Out_opt_  EXCEPINFO *pExcepInfo,
                                       _Out_opt_  UINT *puArgErr) {
+  auto* delegate = static_cast<Browser*>(browser_->delegate());
   HRESULT hr = S_OK;
   switch (dispIdMember) {
+    case DISPID_BEFORENAVIGATE2:
+      if (IsMainFrame(pDispParams)) {
+        delegate->on_start_navigation.Emit(
+            delegate,
+            URLToString(pDispParams->rgvarg[5].bstrVal));
+      }
+      break;
     case DISPID_NAVIGATECOMPLETE2:
       // We don't have a way to know when the IE control creates its HWND, our
       // only solution is to keep requesting when navigation state changes.
       browser_->ReceiveBrowserHWND();
-      // https://msdn.microsoft.com/en-us/library/aa768285(v=vs.85).aspx
-      // The viewer for the document has been created.
-      if (IsMainFrame(pDispParams))
+      if (IsMainFrame(pDispParams)) {
+        // https://msdn.microsoft.com/en-us/library/aa768285(v=vs.85).aspx
+        // The viewer for the document has been created.
         browser_->OnDocumentReady();
+        // IE does not seem to have the concept of "commit navigation", this is
+        // probably the best place to simulate it.
+        delegate->on_commit_navigation.Emit(
+            delegate,
+            URLToString(pDispParams->rgvarg[0].bstrVal));
+      }
       break;
     case DISPID_DOCUMENTCOMPLETE:
-      if (IsMainFrame(pDispParams))
-        browser_->OnFinishNavigation();
+      if (IsMainFrame(pDispParams)) {
+        delegate->on_finish_navigation.Emit(
+            delegate,
+            URLToString(pDispParams->rgvarg[0].bstrVal));
+      }
+      break;
+    case DISPID_NAVIGATEERROR:
+      if (IsMainFrame(pDispParams)) {
+        delegate->on_fail_navigation.Emit(
+            delegate,
+            URLToString(pDispParams->rgvarg[3].pvarVal->bstrVal),
+            pDispParams->rgvarg[1].pvarVal->intVal);
+      }
+      // Don't continue to the error page.
+      *pDispParams->rgvarg[0].pboolVal = VARIANT_TRUE;
       break;
     default:
       hr = E_NOTIMPL;
@@ -89,11 +130,12 @@ STDMETHODIMP BrowserEventSink::Invoke(_In_  DISPID dispIdMember,
 }
 
 bool BrowserEventSink::IsMainFrame(DISPPARAMS* pDispParams) const {
-  if (pDispParams->cArgs != 2 || pDispParams->rgvarg[1].vt != VT_DISPATCH)
+  size_t last = pDispParams->cArgs - 1;
+  if (pDispParams->rgvarg[last].vt != VT_DISPATCH)
     return false;
   Microsoft::WRL::ComPtr<IDispatch> main_window;
   return browser_->GetBrowser<IDispatch>(&main_window) &&
-         main_window.Get() == pDispParams->rgvarg[1].pdispVal;
+         main_window.Get() == pDispParams->rgvarg[last].pdispVal;
 }
 
 }  // namespace nu

@@ -263,11 +263,6 @@ void BrowserImpl::OnDocumentReady() {
   Eval(base::UTF8ToUTF16(browser->GetBindingScript()), nullptr);
 }
 
-void BrowserImpl::OnFinishNavigation() {
-  auto* browser = static_cast<Browser*>(delegate());
-  browser->on_finish_navigation.Emit(browser);
-}
-
 // static
 LRESULT BrowserImpl::BrowserWndProc(HWND hwnd,
                                     UINT message,

@@ -62,9 +62,6 @@ class BrowserImpl : public SubwinView {
   // Called when document is ready.
   void OnDocumentReady();
 
-  // Called when navigation is done.
-  void OnFinishNavigation();
-
   // The proc of IE control.
   static LRESULT CALLBACK BrowserWndProc(HWND hwnd,
                                          UINT message,

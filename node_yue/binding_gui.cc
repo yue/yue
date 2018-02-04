@@ -1274,6 +1274,7 @@ struct Type<nu::Browser> {
         "removeBinding", &nu::Browser::RemoveBinding);
     SetProperty(context, templ,
                 "onClose", &nu::Browser::on_close,
+                "onFailNavigation", &nu::Browser::on_fail_navigation,
                 "onFinishNavigation", &nu::Browser::on_finish_navigation);
   }
   static void AddBinding(Arguments* args,

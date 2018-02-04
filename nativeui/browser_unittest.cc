@@ -18,8 +18,10 @@ class BrowserTest : public testing::Test {
 };
 
 TEST_F(BrowserTest, LoadURL) {
-  browser_->on_finish_navigation.Connect([](nu::Browser*) {
+  browser_->on_finish_navigation.Connect([](nu::Browser*,
+                                            const std::string& url) {
     nu::MessageLoop::Quit();
+    EXPECT_EQ(url, "about:blank");
   });
   nu::MessageLoop::PostTask([&]() {
     browser_->LoadURL("about:blank");
@@ -28,8 +30,10 @@ TEST_F(BrowserTest, LoadURL) {
 }
 
 TEST_F(BrowserTest, LoadHTML) {
-  browser_->on_finish_navigation.Connect([](nu::Browser*) {
+  browser_->on_finish_navigation.Connect([](nu::Browser*,
+                                            const std::string& url) {
     nu::MessageLoop::Quit();
+    EXPECT_EQ(url, "about:blank");
   });
   nu::MessageLoop::PostTask([&]() {
     browser_->LoadHTML("<html></html>", "about:blank");
@@ -37,8 +41,54 @@ TEST_F(BrowserTest, LoadHTML) {
   nu::MessageLoop::Run();
 }
 
+TEST_F(BrowserTest, Navigation) {
+  int state = 0;
+  const std::string u = "about:blank";
+  browser_->on_start_navigation.Connect([&](nu::Browser*,
+                                            const std::string& url) {
+    EXPECT_EQ(state, 0);
+    EXPECT_EQ(url, u);
+    state++;
+  });
+  browser_->on_commit_navigation.Connect([&](nu::Browser*,
+                                             const std::string& url) {
+    EXPECT_EQ(state, 1);
+    EXPECT_EQ(url, u);
+    state++;
+  });
+  browser_->on_finish_navigation.Connect([&](nu::Browser*,
+                                             const std::string& url) {
+    nu::MessageLoop::Quit();
+    EXPECT_EQ(state, 2);
+    EXPECT_EQ(url, u);
+  });
+  nu::MessageLoop::PostTask([&]() {
+    browser_->LoadURL(u);
+  });
+  nu::MessageLoop::Run();
+}
+
+TEST_F(BrowserTest, FailNavigation) {
+  browser_->on_finish_navigation.Connect([](nu::Browser*, const std::string&) {
+    ASSERT_TRUE(false) << "Should not emit FinishNavigation";
+  });
+  browser_->on_fail_navigation.Connect([](nu::Browser*,
+                                          const std::string& url,
+                                          int code) {
+    nu::MessageLoop::Quit();
+    EXPECT_LT(code, 0);
+    EXPECT_EQ(url, "http://0.0.0.123/");
+  });
+  nu::MessageLoop::PostTask([&]() {
+    // Load an invalid IP to fail quickly.
+    browser_->LoadURL("http://0.0.0.123/");
+  });
+  nu::MessageLoop::Run();
+}
+
 TEST_F(BrowserTest, LoadHTMLWithScript) {
-  browser_->on_finish_navigation.Connect([](nu::Browser* browser) {
+  browser_->on_finish_navigation.Connect([](nu::Browser* browser,
+                                            const std::string& url) {
     browser->ExecuteJavaScript("window.test",
                                [](bool success, base::Value result) {
       nu::MessageLoop::Quit();
@@ -55,7 +105,8 @@ TEST_F(BrowserTest, LoadHTMLWithScript) {
 }
 
 TEST_F(BrowserTest, LoadHTMLBaseURL) {
-  browser_->on_finish_navigation.Connect([](nu::Browser* browser) {
+  browser_->on_finish_navigation.Connect([](nu::Browser* browser,
+                                            const std::string& url) {
     browser->ExecuteJavaScript("var a = document.createElement('a');"
                                "a.href = 'relative';"
                                "a.href",
@@ -74,7 +125,8 @@ TEST_F(BrowserTest, LoadHTMLBaseURL) {
 }
 
 TEST_F(BrowserTest, ExecuteJavaScript) {
-  browser_->on_finish_navigation.Connect([](nu::Browser* browser) {
+  browser_->on_finish_navigation.Connect([](nu::Browser* browser,
+                                            const std::string& url) {
     browser->ExecuteJavaScript("location.href",
                                [](bool success, base::Value result) {
       nu::MessageLoop::Quit();
@@ -90,7 +142,8 @@ TEST_F(BrowserTest, ExecuteJavaScript) {
 }
 
 TEST_F(BrowserTest, ExecuteJavaScriptComplexResult) {
-  browser_->on_finish_navigation.Connect([](nu::Browser* browser) {
+  browser_->on_finish_navigation.Connect([](nu::Browser* browser,
+                                            const std::string& url) {
     browser->ExecuteJavaScript("r = {a: true, b: {c: [], d: 'te' + 'st'}}; r",
                                [](bool success, base::Value result) {
       nu::MessageLoop::Quit();
@@ -118,7 +171,8 @@ TEST_F(BrowserTest, AddBinding) {
         va = std::move(v);
       };
   browser_->AddBinding("method", handler);
-  browser_->on_finish_navigation.Connect([&](nu::Browser* browser) {
+  browser_->on_finish_navigation.Connect([&](nu::Browser* browser,
+                                             const std::string& url) {
     browser->ExecuteJavaScript("window.method(true, 'string', {k: 'v'})",
                                [&](bool success, base::Value result) {
       nu::MessageLoop::Quit();
@@ -137,7 +191,8 @@ TEST_F(BrowserTest, AddBinding) {
 TEST_F(BrowserTest, SetBindingName) {
   browser_->SetBindingName("binding");
   browser_->AddRawBinding("method", [](base::Value) {});
-  browser_->on_finish_navigation.Connect([](nu::Browser* browser) {
+  browser_->on_finish_navigation.Connect([](nu::Browser* browser,
+                                            const std::string& url) {
     browser->ExecuteJavaScript("window.method()",
                                [=](bool success, base::Value result) {
       EXPECT_EQ(success, false);
@@ -157,7 +212,8 @@ TEST_F(BrowserTest, SetBindingName) {
 TEST_F(BrowserTest, MalicousCall) {
   bool called = false;
   browser_->AddRawBinding("method", [&called](base::Value) { called = true; });
-  browser_->on_finish_navigation.Connect([&called](nu::Browser* browser) {
+  browser_->on_finish_navigation.Connect([&called](nu::Browser* browser,
+                                                   const std::string& url) {
     browser->ExecuteJavaScript(
 #if defined(OS_WIN)
         "window.external.postMessage('1', 'method', '[]')",

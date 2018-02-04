@@ -1161,6 +1161,7 @@ struct Type<nu::Browser> {
            "removebinding", &nu::Browser::RemoveBinding);
     RawSetProperty(state, metatable,
                    "onclose", &nu::Browser::on_close,
+                   "onfailnavigation", &nu::Browser::on_fail_navigation,
                    "onfinishnavigation", &nu::Browser::on_finish_navigation);
   }
   static void AddBinding(CallContext* context,
