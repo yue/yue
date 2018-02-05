@@ -103,19 +103,45 @@ base::Value NSValueToBaseValue(id value) {
 
 @implementation NUWebView
 
-- (nu::NUPrivate*)nuPrivate {
-  return &private_;
-}
-
 - (id)initWithShell:(nu::Browser*)shell {
   shell_ = shell;
+  // Initialize with configuration.
   base::scoped_nsobject<WKWebViewConfiguration> config(
       [[WKWebViewConfiguration alloc] init]);
   handler_.reset([[NUScriptMessageHandler alloc] initWithShell:shell]);
   [[config userContentController] addScriptMessageHandler:handler_.get()
                                                      name:@"yue"];
   [super initWithFrame:NSZeroRect configuration:config.get()];
+
+  // Watch the change of "title".
+  [self addObserver:self
+         forKeyPath:@"title"
+            options:NSKeyValueObservingOptionNew
+            context:nil];
   return self;
+}
+
+- (void)willDestroy {
+  // Unsubscribe before destroying the webview.
+  [self removeObserver:self forKeyPath:@"title"];
+}
+
+- (void)observeValueForKeyPath:(NSString*)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary*)change
+                       context:(void*)context {
+  if (![keyPath isEqualToString:@"title"] || object != self) {
+    [super observeValueForKeyPath:keyPath
+                         ofObject:object
+                           change:change
+                          context:context];
+    return;
+  }
+  shell_->on_update_title.Emit(shell_, shell_->GetTitle());
+}
+
+- (nu::NUPrivate*)nuPrivate {
+  return &private_;
 }
 
 - (void)setNUFont:(nu::Font*)font {
@@ -197,8 +223,8 @@ namespace nu {
 
 void Browser::PlatformInit() {
   NUWebView* webview = [[NUWebView alloc] initWithShell:this];
-  webview.UIDelegate = [[NUWebUIDelegate alloc] init];
-  webview.navigationDelegate = [[NUNavigationDelegate alloc] init];
+  [webview setUIDelegate:[[NUWebUIDelegate alloc] init]];
+  [webview setNavigationDelegate:[[NUNavigationDelegate alloc] init]];
   TakeOverView(webview);
 }
 
@@ -206,6 +232,9 @@ void Browser::PlatformDestroy() {
   auto* webview = static_cast<NUWebView*>(GetNative());
   [[webview UIDelegate] release];
   [[webview navigationDelegate] release];
+  [webview setUIDelegate:nil];
+  [webview setNavigationDelegate:nil];
+  [webview willDestroy];
 }
 
 void Browser::LoadURL(const std::string& url) {
@@ -223,6 +252,21 @@ void Browser::LoadHTML(const std::string& str,
                   baseURL:nsurl];
 }
 
+std::string Browser::GetURL() {
+  auto* webview = static_cast<NUWebView*>(GetNative());
+  return base::SysNSStringToUTF8([[webview URL] absoluteString]);
+}
+
+std::string Browser::GetTitle() {
+  auto* webview = static_cast<NUWebView*>(GetNative());
+  return base::SysNSStringToUTF8([webview title]);
+}
+
+void Browser::SetUserAgent(const std::string& user_agent) {
+  auto* webview = static_cast<NUWebView*>(GetNative());
+  [webview setCustomUserAgent:base::SysUTF8ToNSString(user_agent)];
+}
+
 void Browser::ExecuteJavaScript(const std::string& code,
                                 const ExecutionCallback& callback) {
   auto* webview = static_cast<NUWebView*>(GetNative());
@@ -238,6 +282,30 @@ void Browser::ExecuteJavaScript(const std::string& code,
             completionHandler:^(id result, NSError* error) {
     copied_callback(!error, NSValueToBaseValue(result));
   }];
+}
+
+void Browser::GoBack() {
+  [static_cast<NUWebView*>(GetNative()) goBack:nil];
+}
+
+bool Browser::CanGoBack() {
+  return [static_cast<NUWebView*>(GetNative()) canGoBack];
+}
+
+void Browser::GoForward() {
+  [static_cast<NUWebView*>(GetNative()) goForward:nil];
+}
+
+bool Browser::CanGoForward() {
+  return [static_cast<NUWebView*>(GetNative()) canGoForward];
+}
+
+void Browser::Reload() {
+  [static_cast<NUWebView*>(GetNative()) reload:nil];
+}
+
+void Browser::Stop() {
+  [static_cast<NUWebView*>(GetNative()) stopLoading:nil];
 }
 
 void Browser::PlatformUpdateBindings() {

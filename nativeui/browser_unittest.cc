@@ -161,10 +161,7 @@ TEST_F(BrowserTest, Title) {
       next_title = "t2";
       browser->on_finish_navigation.Connect([](nu::Browser* browser,
                                                const std::string& url) {
-        browser->ExecuteJavaScript("document.title = 't2'",
-                                   [=](bool, base::Value) {
-          EXPECT_EQ(browser->GetTitle(), "t2");
-        });
+        browser->ExecuteJavaScript("document.title = 't2'", nullptr);
       });
     } else {
       nu::MessageLoop::Quit();
