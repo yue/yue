@@ -41,7 +41,11 @@ base::Value JSResultToBaseValue(WebKitJavascriptResult* js_result) {
   return std::move(*result.release());
 }
 
-void OnClose(WebKitWebView* widget, Browser* view) {
+void OnNotifyTitle(WebKitWebView*, GParamSpec*, Browser* view) {
+  view->on_update_title.Emit(view, view->GetTitle());
+}
+
+void OnClose(WebKitWebView*, Browser* view) {
   view->on_close.Emit(view);
 }
 
@@ -121,7 +125,11 @@ void Browser::PlatformInit() {
   GtkWidget* webview = webkit_web_view_new_with_user_content_manager(manager);
   TakeOverView(webview);
 
+  // Assign a new settings to avoid affecting other webviews.
+  webkit_web_view_set_settings(WEBKIT_WEB_VIEW(webview), webkit_settings_new());
+
   // Install events.
+  g_signal_connect(webview, "notify::title", G_CALLBACK(OnNotifyTitle), this);
   g_signal_connect(webview, "close", G_CALLBACK(OnClose), this);
   g_signal_connect(webview, "load-changed", G_CALLBACK(OnLoadChanged), this);
   g_signal_connect(webview, "load-failed", G_CALLBACK(OnLoadFailed), this);
@@ -143,6 +151,19 @@ void Browser::LoadHTML(const std::string& str,
                             str.c_str(), base_url.c_str());
 }
 
+std::string Browser::GetURL() {
+  return webkit_web_view_get_uri(WEBKIT_WEB_VIEW(GetNative()));
+}
+
+std::string Browser::GetTitle() {
+  return webkit_web_view_get_title(WEBKIT_WEB_VIEW(GetNative()));
+}
+
+void Browser::SetUserAgent(const std::string& user_agent) {
+  auto* settings = webkit_web_view_get_settings(WEBKIT_WEB_VIEW(GetNative()));
+  webkit_settings_set_user_agent(settings, user_agent.c_str());
+}
+
 void Browser::ExecuteJavaScript(const std::string& code,
                                 const ExecutionCallback& callback) {
   webkit_web_view_run_javascript(
@@ -151,6 +172,30 @@ void Browser::ExecuteJavaScript(const std::string& code,
       nullptr,
       reinterpret_cast<GAsyncReadyCallback>(&OnJavaScriptFinish),
       new ExecutionCallback(callback));
+}
+
+void Browser::GoBack() {
+  webkit_web_view_go_back(WEBKIT_WEB_VIEW(GetNative()));
+}
+
+bool Browser::CanGoBack() {
+  return webkit_web_view_can_go_back(WEBKIT_WEB_VIEW(GetNative()));
+}
+
+void Browser::GoForward() {
+  webkit_web_view_go_forward(WEBKIT_WEB_VIEW(GetNative()));
+}
+
+bool Browser::CanGoForward() {
+  return webkit_web_view_can_go_forward(WEBKIT_WEB_VIEW(GetNative()));
+}
+
+void Browser::Reload() {
+  webkit_web_view_reload(WEBKIT_WEB_VIEW(GetNative()));
+}
+
+void Browser::Stop() {
+  webkit_web_view_stop_loading(WEBKIT_WEB_VIEW(GetNative()));
 }
 
 void Browser::PlatformUpdateBindings() {
