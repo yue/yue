@@ -297,7 +297,20 @@ function parseDetail(lang, node) {
 // Parse parameters.
 function parseParameters(lang, str) {
   if (str == '') return []
-  let parameters = str.split(',').map(parseParam.bind(null, lang))
+  let parameters = []
+  let first = 0;
+  let depth = 0
+  for (let i = 0; i < str.length; ++i) {
+    if (str[i] == '(') {
+      depth++;
+    } else if (str[i] == ')') {
+      depth--;
+    } else if (depth == 0 && str[i] == ',') {
+      parameters.push(parseParam(lang, str.substring(first, i)))
+      first = i + 1
+    }
+  }
+  parameters.push(parseParam(lang, str.substring(first)))
   return parameters
 }
 

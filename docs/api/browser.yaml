@@ -93,7 +93,7 @@ methods:
     detail: |
       The `func` will be called with automatically converted arguments.
 
-  - signature: void AddBinding(const std::string& name, const Function& func)
+  - signature: void AddBinding(const std::string& name, const std::function<void(...)>& func)
     lang: ['cpp']
     description: Add a native binding to web page with `name`.
     detail: |
