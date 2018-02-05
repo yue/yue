@@ -155,6 +155,8 @@ TEST_F(BrowserTest, Title) {
   std::string next_title = "t1";
   browser_->on_update_title.Connect([&](nu::Browser* browser,
                                         const std::string& title) {
+    if (title.empty() || title == "about:blank")
+      return;
     EXPECT_EQ(browser->GetTitle(), title);
     EXPECT_EQ(title, next_title);
     if (next_title == "t1") {
