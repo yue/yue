@@ -49,15 +49,90 @@ methods:
       On Windows, due to Internet Explorer's limitations, calling `SetUserAgent`
       would change all web pages' user agents in current process.
 
-  - signature: void ExecuteJavaScript(const std::string& code, const std::function<void(bool, const std::string&)>& callback);
-    description: |
-      Evaluate `code` in browser and get the evaluated result.
-
+  - signature: void ExecuteJavaScript(const std::string& code, const std::function<void(bool, base::Value)>& callback);
+    description: Evaluate `code` in browser and get the evaluated result.
+    detail: |
       The `callback` will be called with `callback(success, result)`, the
-      `result` is a JSON string.
+      `result` argument is a generic value that created from the result of
+      `code`.
 
       Note that due to limitations of system toolkits, the execution may fail if
-      the `result` of `code` can not be fully converted to JSON string.
+      the result of `code` can not be fully converted to JSON.
+
+  - signature: void GoBack()
+    description: Navigate to the back item in the back-forward list.
+
+  - signature: bool CanGoBack()
+    description: |
+      Return whether there is a back item in the back-forward list that can be
+      navigated to.
+
+  - signature: void GoForward()
+    description: Navigate to the forward item in the back-forward list.
+
+  - signature: bool CanGoForward()
+    description: |
+      Return whether there is a forward item in the back-forward list that can
+      be navigated to.
+
+  - signature: void Reload()
+    description: Reload the current page.
+
+  - signature: void Stop()
+    description: Stop loading all resources on the current page.
+
+  - signature: void SetBindingName(const std::string& name)
+    description: Set the `name` of object which would have the native bindings.
+    detail: |
+      By default native bindings are added to the `window` object, by calling
+      this API, native bindings will be added to the `window[name]` object.
+
+  - signature: void AddBinding(const std::string& name, const Function& func)
+    lang: ['lua', 'js']
+    description: Add a native binding to web page with `name`.
+    detail: |
+      The `func` will be called with automatically converted arguments.
+
+  - signature: void AddBinding(const std::string& name, const Function& func)
+    lang: ['cpp']
+    description: Add a native binding to web page with `name`.
+    detail: |
+      You can pass an arbitrary function as long as the parameters can be
+      converted from `base::Value`, othewise compilation error would happen.
+
+      For example, following native binding:
+
+      ```cpp
+      browser->AddBinding("AddRecord", [](const std::string&key, int value) {
+      });
+      ```
+
+      accepts following calls:
+
+      ```
+      window.addRecord('Books', 4);
+      window.addRecord('Videos', 8);
+      ```
+
+      You can also use `base::Value` directly to accept arbitrary argument:
+
+      ```cpp
+      browser->AddBinding("AddRecord2", [](const std::string&key, base::Value value) {
+      })
+      ```
+
+      ```
+      window.addRecord2('PI', 3.14);
+      window.addRecord2('The Best Animal', 'Panda');
+      ```
+
+  - signature: void AddRawBinding(const std::string& name, const std::function<void(base::Value)>& func)
+    description: Add a raw handler to web page with `name`.
+    detail: |
+      The `func` will be called with a list of arguments passed from JavaScript.
+
+  - signature: void RemoveBinding(const std::string& name)
+    description: Remove the native binding with `name`.
 
 events:
   - callback: void on_close(Browser* self)
