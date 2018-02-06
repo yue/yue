@@ -6,6 +6,7 @@
 
 #include <shlguid.h>
 
+#include <map>
 #include <memory>
 #include <string>
 #include <utility>
@@ -24,6 +25,10 @@
 namespace nu {
 
 namespace {
+
+// Stores the protocol factories.
+std::map<base::string16,
+         Microsoft::WRL::ComPtr<BrowserProtocolFactory>> g_protocol_factories;
 
 // Convert a VARIANT to JSON string.
 bool VARIANTToJSON(IDispatchEx* script,
@@ -408,11 +413,22 @@ bool Browser::RegisterProtocol(const std::string& scheme,
     return false;
   Microsoft::WRL::ComPtr<BrowserProtocolFactory> factory =
       new BrowserProtocolFactory(handler);
+  base::string16 name = base::UTF8ToUTF16(scheme);
+  g_protocol_factories[name] = factory;
   session->RegisterNameSpace(factory.Get(),
                              BrowserProtocolFactory::CLSID_BROWSER_PROTOCOL,
-                             base::UTF8ToUTF16(scheme).c_str(),
+                             name.c_str(),
                              0, NULL, 0);
   return true;
+}
+
+// static
+void Browser::UnregisterProtocol(const std::string& scheme) {
+  Microsoft::WRL::ComPtr<IInternetSession> session;
+  if (FAILED(::CoInternetGetSession(0, &session, 0)))
+    return;
+  base::string16 name = base::UTF8ToUTF16(scheme);
+  session->UnregisterNameSpace(g_protocol_factories[name].Get(), name.c_str());
 }
 
 }  // namespace nu

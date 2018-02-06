@@ -2,6 +2,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
+#include "base/files/file_util.h"
+#include "base/files/scoped_temp_dir.h"
 #include "base/json/json_writer.h"
 #include "nativeui/nativeui.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -301,6 +303,58 @@ TEST_F(BrowserTest, MalicousCall) {
   });
   nu::MessageLoop::PostTask([&]() {
     browser_->LoadHTML("<body><script></script></body>", "about:blank");
+  });
+  nu::MessageLoop::Run();
+}
+
+TEST_F(BrowserTest, StringProtocol) {
+  browser_->on_finish_navigation.Connect([](nu::Browser* browser,
+                                            const std::string& url) {
+    EXPECT_EQ(url, "str://host/path");
+    browser->ExecuteJavaScript("document.body.textContent",
+                               [=](bool success, base::Value result) {
+      nu::Browser::UnregisterProtocol("str");
+      nu::MessageLoop::Quit();
+      ASSERT_TRUE(result.is_string());
+      EXPECT_EQ(result.GetString(), "str://host/path");
+    });
+  });
+  nu::Browser::RegisterProtocol("str", [](const std::string& url) {
+    EXPECT_EQ(url, "str://host/path");
+    return new nu::ProtocolStringJob("text/html",
+                                     "<html><body>" + url + "</body></html>");
+  });
+  nu::MessageLoop::PostTask([&]() {
+    browser_->LoadURL("str://host/path");
+  });
+  nu::MessageLoop::Run();
+}
+
+TEST_F(BrowserTest, FileProtocol) {
+  // Write html to file.
+  base::ScopedTempDir dir;
+  ASSERT_TRUE(dir.CreateUniqueTempDir());
+  base::FilePath file = dir.GetPath().Append(FILE_PATH_LITERAL("index.html"));
+  std::string content = "<html><body>file</body></html>";
+  base::WriteFile(file, content.c_str(), static_cast<int>(content.size()));
+  // Register handler to read file.
+  nu::Browser::RegisterProtocol("wenjian", [](const std::string& url) {
+    std::string path = url.substr(15);
+    return new nu::ProtocolFileJob(base::FilePath::FromUTF8Unsafe(path));
+  });
+  // Start test.
+  browser_->on_finish_navigation.Connect([](nu::Browser* browser,
+                                            const std::string& url) {
+    browser->ExecuteJavaScript("document.body.textContent",
+                               [](bool success, base::Value result) {
+      nu::Browser::UnregisterProtocol("str");
+      nu::MessageLoop::Quit();
+      ASSERT_TRUE(result.is_string());
+      EXPECT_EQ(result.GetString(), "file");
+    });
+  });
+  nu::MessageLoop::PostTask([=]() {
+    browser_->LoadURL("wenjian://read/" + file.AsUTF8Unsafe());
   });
   nu::MessageLoop::Run();
 }

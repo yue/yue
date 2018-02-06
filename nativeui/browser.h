@@ -30,6 +30,7 @@ class NATIVEUI_EXPORT Browser : public View {
   // Protocol APIs.
   static bool RegisterProtocol(const std::string& scheme,
                                const ProtocolHandler& handler);
+  static void UnregisterProtocol(const std::string& scheme);
 
   // View:
   const char* GetClassName() const override;
