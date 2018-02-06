@@ -170,7 +170,10 @@ void ProtocolFileJob::Kill() {
 }
 
 bool ProtocolFileJob::GetMimeType(std::string* mime_type) {
-  return GetMimeTypeFromExtension(path_.Extension(), mime_type);
+  base::FilePath::StringType ext = path_.Extension();
+  if (ext.empty())
+    return false;
+  return GetMimeTypeFromExtension(ext.substr(1), mime_type);
 }
 
 size_t ProtocolFileJob::Read(void* buf, size_t buf_size) {

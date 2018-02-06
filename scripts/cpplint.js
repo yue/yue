@@ -15,6 +15,7 @@ const blacklist = [
   path.join('nativeui', 'gtk', 'util', 'x11_types.h'),
   path.join('nativeui', 'gtk', 'util', 'x11_util.cc'),
   path.join('nativeui', 'gtk', 'util', 'x11_util.h'),
+  path.join('nativeui', 'mac', 'browser', 'nu_custom_protocol.h'),
   path.join('nativeui', 'mac', 'container_mac.h'),
   path.join('nativeui', 'mac', 'nu_application_delegate.h'),
   path.join('nativeui', 'mac', 'nu_view.h'),

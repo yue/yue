@@ -11,6 +11,8 @@
 #include "base/rand_util.h"
 #include "base/strings/stringprintf.h"
 
+#include "nativeui/protocol_file_job.h"
+
 namespace nu {
 
 // static

@@ -17,12 +17,14 @@ namespace nu {
 class NATIVEUI_EXPORT ProtocolFileJob : public ProtocolJob {
  public:
   explicit ProtocolFileJob(const base::FilePath& path);
-  ~ProtocolFileJob() override;
 
   bool Start() override;
   void Kill() override;
   bool GetMimeType(std::string* mime_type) override;
   size_t Read(void* buf, size_t buf_size) override;
+
+ protected:
+  ~ProtocolFileJob() override;
 
  private:
   base::FilePath path_;

@@ -11,6 +11,7 @@
 #include "base/mac/scoped_nsobject.h"
 #include "base/memory/ptr_util.h"
 #include "base/strings/sys_string_conversions.h"
+#include "nativeui/mac/browser/nu_custom_protocol.h"
 #include "nativeui/mac/browser/nu_web_ui_delegate.h"
 #include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/nu_view.h"
@@ -311,6 +312,18 @@ void Browser::Stop() {
 void Browser::PlatformUpdateBindings() {
   auto* webview = static_cast<NUWebView*>(GetNative());
   [webview updateBindings];
+}
+
+// static
+bool Browser::RegisterProtocol(const std::string& scheme,
+                               const ProtocolHandler& handler) {
+  return [NUCustomProtocol registerProtocol:base::SysUTF8ToNSString(scheme)
+                                withHandler:handler];
+}
+
+// static
+void Browser::UnregisterProtocol(const std::string& scheme) {
+  [NUCustomProtocol unregisterProtocol:base::SysUTF8ToNSString(scheme)];
 }
 
 }  // namespace nu
