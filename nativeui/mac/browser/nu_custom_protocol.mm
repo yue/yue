@@ -70,7 +70,7 @@ std::map<std::string, nu::Browser::ProtocolHandler> g_handlers;
 
   // Start.
   protocol_job_->Plug([&](size_t size) {
-    std::string mime_type = "text/html";
+    std::string mime_type;
     protocol_job_->GetMimeType(&mime_type);
     // Send response.
     base::scoped_nsobject<NSURLResponse> response(
