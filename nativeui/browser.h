@@ -10,6 +10,7 @@
 #include <utility>
 
 #include "base/values.h"
+#include "nativeui/protocol_job.h"
 #include "nativeui/util/function_caller.h"
 #include "nativeui/view.h"
 
@@ -17,6 +18,7 @@ namespace nu {
 
 class NATIVEUI_EXPORT Browser : public View {
  public:
+  using ProtocolHandler = std::function<ProtocolJob*(const std::string&)>;
   using ExecutionCallback = std::function<void(bool, base::Value)>;
   using BindingFunc = std::function<void(base::Value)>;
 
@@ -26,7 +28,8 @@ class NATIVEUI_EXPORT Browser : public View {
   static const char kClassName[];
 
   // Protocol APIs.
-  static bool RegisterProtocol(const std::string& scheme);
+  static bool RegisterProtocol(const std::string& scheme,
+                               const ProtocolHandler& handler);
 
   // View:
   const char* GetClassName() const override;

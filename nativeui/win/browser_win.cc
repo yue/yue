@@ -401,12 +401,13 @@ void Browser::PlatformUpdateBindings() {
 }
 
 // static
-bool Browser::RegisterProtocol(const std::string& scheme) {
+bool Browser::RegisterProtocol(const std::string& scheme,
+                               const ProtocolHandler& handler) {
   Microsoft::WRL::ComPtr<IInternetSession> session;
   if (FAILED(::CoInternetGetSession(0, &session, 0)))
     return false;
   Microsoft::WRL::ComPtr<BrowserProtocolFactory> factory =
-      new BrowserProtocolFactory;
+      new BrowserProtocolFactory(handler);
   session->RegisterNameSpace(factory.Get(),
                              BrowserProtocolFactory::CLSID_BROWSER_PROTOCOL,
                              base::UTF8ToUTF16(scheme).c_str(),

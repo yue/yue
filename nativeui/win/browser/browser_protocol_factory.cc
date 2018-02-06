@@ -22,8 +22,10 @@ const GUID BrowserProtocolFactory::CLSID_BROWSER_PROTOCOL =
     { 0xa70680fd, 0x7612, 0x4d2e,
       { 0x85, 0x35, 0x23, 0x32, 0xfb, 0x91, 0x73, 0x96 } };
 
-BrowserProtocolFactory::BrowserProtocolFactory()
-    : ref_(1) {
+BrowserProtocolFactory::BrowserProtocolFactory(
+    const Browser::ProtocolHandler& handler)
+    : ref_(1),
+      handler_(handler) {
 }
 
 BrowserProtocolFactory::~BrowserProtocolFactory() {
@@ -55,7 +57,7 @@ HRESULT STDMETHODCALLTYPE BrowserProtocolFactory::CreateInstance(
   if (pUnkOuter != nullptr)
     return CLASS_E_NOAGGREGATION;
   Microsoft::WRL::ComPtr<BrowserProtocol> protocol =
-      new BrowserProtocol;
+      new BrowserProtocol(handler_);
   return protocol->QueryInterface(riid, ppvObject);
 }
 

@@ -5,13 +5,18 @@
 #include "nativeui/win/browser/browser_protocol.h"
 
 #include <shlwapi.h>
+#include <wrl.h>
+
+#include <string>
 
 #include "base/logging.h"
+#include "base/strings/utf_string_conversions.h"
 
 namespace nu {
 
-BrowserProtocol::BrowserProtocol()
-    : ref_(1) {
+BrowserProtocol::BrowserProtocol(const Browser::ProtocolHandler& handler)
+    : ref_(1),
+      handler_(handler) {
 }
 
 BrowserProtocol::~BrowserProtocol() {
@@ -44,15 +49,29 @@ IFACEMETHODIMP BrowserProtocol::Start(LPCWSTR szUrl,
                                       IInternetBindInfo *pIBindInfo,
                                       DWORD grfSTI,
                                       HANDLE_PTR dwReserved) {
+  // Request the handler for protocol job.
   if (!szUrl || !pIProtSink)
     return E_POINTER;
-  pIProtSink->ReportProgress(BINDSTATUS_VERIFIEDMIMETYPEAVAILABLE,
-                             L"text/html");
-  pIProtSink->ReportData(BSCF_FIRSTDATANOTIFICATION |
-                         BSCF_LASTDATANOTIFICATION |
-                         BSCF_DATAFULLYAVAILABLE,
-                         5, 5);
-  pIProtSink->ReportResult(S_OK, 0, 0);
+  if (!handler_)
+    return E_NOTIMPL;
+  protocol_job_ = handler_(base::UTF16ToUTF8(szUrl));
+  if (!protocol_job_)
+    return E_NOTIMPL;
+
+  // Start the job.
+  Microsoft::WRL::ComPtr<IInternetProtocolSink> sink(pIProtSink);
+  protocol_job_->Plug([sink](size_t size) {
+    sink->ReportData(BSCF_FIRSTDATANOTIFICATION |
+                     BSCF_LASTDATANOTIFICATION |
+                     BSCF_DATAFULLYAVAILABLE,
+                     0, static_cast<int>(size));
+  });
+  std::string mime_type;
+  if (protocol_job_->GetMimeType(&mime_type)) {
+    sink->ReportProgress(BINDSTATUS_VERIFIEDMIMETYPEAVAILABLE,
+                         base::UTF8ToUTF16(mime_type).c_str());
+  }
+  protocol_job_->Start();
   return S_OK;
 }
 
@@ -61,11 +80,13 @@ IFACEMETHODIMP BrowserProtocol::Continue(PROTOCOLDATA *pStateInfo) {
 }
 
 IFACEMETHODIMP BrowserProtocol::Abort(HRESULT hrReason, DWORD dwOptions) {
+  protocol_job_->Kill();
+  protocol_job_ = nullptr;
   return E_NOTIMPL;
 }
 
 IFACEMETHODIMP BrowserProtocol::Terminate(DWORD dwOptions) {
-  sink_.Reset();
+  protocol_job_ = nullptr;
   return E_NOTIMPL;
 }
 
@@ -78,13 +99,11 @@ IFACEMETHODIMP BrowserProtocol::Resume() {
 }
 
 IFACEMETHODIMP BrowserProtocol::Read(void *pv, ULONG cb, ULONG *pcbRead) {
-  static bool r = false;
-  if (r)
-    return S_FALSE;
-  *pcbRead = 5;
-  memcpy(pv, "hello", 5);
-  r = true;
-  return S_OK;
+  size_t nread = protocol_job_->Read(pv, cb);
+  if (nread == 0)
+    return S_OK;
+  *pcbRead = static_cast<ULONG>(nread);
+  return S_FALSE;
 }
 
 IFACEMETHODIMP BrowserProtocol::Seek(LARGE_INTEGER dlibMove,

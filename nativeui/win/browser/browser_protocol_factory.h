@@ -7,7 +7,7 @@
 
 #include <ole2.h>
 
-#include "base/macros.h"
+#include "nativeui/browser.h"
 
 namespace nu {
 
@@ -15,7 +15,7 @@ class BrowserProtocolFactory : public IClassFactory {
  public:
   static const GUID CLSID_BROWSER_PROTOCOL;
 
-  BrowserProtocolFactory();
+  explicit BrowserProtocolFactory(const Browser::ProtocolHandler& handler);
   ~BrowserProtocolFactory();
 
   // IUnknown
@@ -31,6 +31,7 @@ class BrowserProtocolFactory : public IClassFactory {
 
  private:
   ULONG ref_;
+  Browser::ProtocolHandler handler_;
 
   DISALLOW_COPY_AND_ASSIGN(BrowserProtocolFactory);
 };

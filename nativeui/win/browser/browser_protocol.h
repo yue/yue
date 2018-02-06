@@ -7,16 +7,16 @@
 
 #include <ole2.h>
 #include <urlmon.h>
-#include <wrl.h>
 
-#include "base/macros.h"
+#include "nativeui/browser.h"
+#include "nativeui/protocol_job.h"
 
 namespace nu {
 
 class BrowserProtocol : public IInternetProtocol,
                         public IInternetProtocolInfo {
  public:
-  BrowserProtocol();
+  explicit BrowserProtocol(const Browser::ProtocolHandler& handler);
   ~BrowserProtocol();
 
   // IUnknown
@@ -71,7 +71,8 @@ class BrowserProtocol : public IInternetProtocol,
  private:
   ULONG ref_;
 
-  Microsoft::WRL::ComPtr<IInternetProtocolSink> sink_;
+  Browser::ProtocolHandler handler_;
+  scoped_refptr<ProtocolJob> protocol_job_;
 
   DISALLOW_COPY_AND_ASSIGN(BrowserProtocol);
 };
