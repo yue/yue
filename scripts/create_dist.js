@@ -75,6 +75,10 @@ const buildHeaders =
   ['tools/gn/build/build_config.h', 'tools/gn/build/buildflag.h'])
 for (const h of buildHeaders)
   addFileToZip(yuezip, h, 'tools/gn', 'include')
+const genHeaders =
+  searchFiles('out/Release/gen/base/debug', '.h')
+for (const h of genHeaders)
+  addFileToZip(yuezip, h, 'out/Release/gen', 'include')
 for (const file of staticLibs[targetOs]) {
   addFileToZip(yuezip, `out/Release/${file}`, 'out/Release', 'lib')
   addFileToZip(yuezip, `out/Debug/${file}`, 'out/Debug', 'lib', 'd')
