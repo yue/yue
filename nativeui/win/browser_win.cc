@@ -16,6 +16,7 @@
 #include "base/win/scoped_variant.h"
 #include "nativeui/message_loop.h"
 #include "nativeui/state.h"
+#include "nativeui/win/browser/browser_protocol_factory.h"
 #include "nativeui/win/browser/browser_util.h"
 #include "nativeui/win/util/dispatch_invoke.h"
 #include "nativeui/win/util/hwnd_util.h"
@@ -397,6 +398,20 @@ void Browser::Stop() {
 }
 
 void Browser::PlatformUpdateBindings() {
+}
+
+// static
+bool Browser::RegisterProtocol(const std::string& scheme) {
+  Microsoft::WRL::ComPtr<IInternetSession> session;
+  if (FAILED(::CoInternetGetSession(0, &session, 0)))
+    return false;
+  Microsoft::WRL::ComPtr<BrowserProtocolFactory> factory =
+      new BrowserProtocolFactory;
+  session->RegisterNameSpace(factory.Get(),
+                             BrowserProtocolFactory::CLSID_BROWSER_PROTOCOL,
+                             base::UTF8ToUTF16(scheme).c_str(),
+                             0, NULL, 0);
+  return true;
 }
 
 }  // namespace nu

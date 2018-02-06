@@ -25,6 +25,9 @@ class NATIVEUI_EXPORT Browser : public View {
   // View class name.
   static const char kClassName[];
 
+  // Protocol APIs.
+  static bool RegisterProtocol(const std::string& scheme);
+
   // View:
   const char* GetClassName() const override;
 
