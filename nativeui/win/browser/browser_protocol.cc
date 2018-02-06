@@ -51,12 +51,12 @@ IFACEMETHODIMP BrowserProtocol::Start(LPCWSTR szUrl,
                                       HANDLE_PTR dwReserved) {
   // Request the handler for protocol job.
   if (!szUrl || !pIProtSink)
-    return E_POINTER;
+    return E_INVALIDARG;
   if (!handler_)
-    return E_NOTIMPL;
+    return E_FAIL;
   protocol_job_ = handler_(base::UTF16ToUTF8(szUrl));
   if (!protocol_job_)
-    return E_NOTIMPL;
+    return E_FAIL;
 
   // Start the job.
   Microsoft::WRL::ComPtr<IInternetProtocolSink> sink(pIProtSink);
@@ -71,8 +71,7 @@ IFACEMETHODIMP BrowserProtocol::Start(LPCWSTR szUrl,
     sink->ReportProgress(BINDSTATUS_VERIFIEDMIMETYPEAVAILABLE,
                          base::UTF8ToUTF16(mime_type).c_str());
   }
-  protocol_job_->Start();
-  return S_OK;
+  return protocol_job_->Start() ? S_OK : E_FAIL;
 }
 
 IFACEMETHODIMP BrowserProtocol::Continue(PROTOCOLDATA *pStateInfo) {

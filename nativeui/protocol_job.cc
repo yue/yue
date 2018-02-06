@@ -18,8 +18,9 @@ ProtocolJob::ProtocolJob() {
 ProtocolJob::~ProtocolJob() {
 }
 
-void ProtocolJob::Start() {
+bool ProtocolJob::Start() {
   notify_data_available(0);
+  return true;
 }
 
 void ProtocolJob::Kill() {
@@ -41,8 +42,9 @@ ProtocolStringJob::ProtocolStringJob(const std::string& mime_type,
 ProtocolStringJob::~ProtocolStringJob() {
 }
 
-void ProtocolStringJob::Start() {
+bool ProtocolStringJob::Start() {
   notify_data_available(content_.size());
+  return true;
 }
 
 bool ProtocolStringJob::GetMimeType(std::string* mime_type) {

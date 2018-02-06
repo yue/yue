@@ -18,7 +18,7 @@ namespace nu {
 class NATIVEUI_EXPORT ProtocolJob : public base::RefCounted<ProtocolJob> {
  public:
   // Subclasses should implement this.
-  virtual void Start();
+  virtual bool Start();
   virtual void Kill();
   virtual bool GetMimeType(std::string* mime_type) = 0;
   virtual size_t Read(void* buf, size_t buf_size) = 0;
@@ -44,7 +44,7 @@ class NATIVEUI_EXPORT ProtocolStringJob : public ProtocolJob {
  public:
   ProtocolStringJob(const std::string& mime_type, const std::string& content);
 
-  void Start() override;
+  bool Start() override;
   bool GetMimeType(std::string* mime_type) override;
   size_t Read(void* buf, size_t buf_size) override;
 

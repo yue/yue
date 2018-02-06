@@ -53,6 +53,8 @@ component("nativeui") {
     "message_loop.h",
     "progress_bar.cc",
     "progress_bar.h",
+    "protocol_file_job.cc",
+    "protocol_file_job.h",
     "protocol_job.cc",
     "protocol_job.h",
     "scroll.cc",

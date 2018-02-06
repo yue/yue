@@ -1,0 +1,34 @@
+// Copyright 2018 Cheng Zhao. All rights reserved.
+// Use of this source code is governed by the license that can be found in the
+// LICENSE file.
+
+#ifndef NATIVEUI_PROTOCOL_FILE_JOB_H_
+#define NATIVEUI_PROTOCOL_FILE_JOB_H_
+
+#include <string>
+
+#include "base/files/file.h"
+#include "base/files/file_path.h"
+#include "nativeui/protocol_job.h"
+
+namespace nu {
+
+// Serve file for the protocol request.
+class NATIVEUI_EXPORT ProtocolFileJob : public ProtocolJob {
+ public:
+  explicit ProtocolFileJob(const base::FilePath& path);
+  ~ProtocolFileJob() override;
+
+  bool Start() override;
+  void Kill() override;
+  bool GetMimeType(std::string* mime_type) override;
+  size_t Read(void* buf, size_t buf_size) override;
+
+ private:
+  base::FilePath path_;
+  base::File file_;
+};
+
+}  // namespace nu
+
+#endif  // NATIVEUI_PROTOCOL_FILE_JOB_H_
