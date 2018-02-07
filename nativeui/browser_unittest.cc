@@ -7,6 +7,7 @@
 #include "base/files/scoped_temp_dir.h"
 #include "base/json/json_writer.h"
 #include "base/path_service.h"
+#include "base/strings/stringprintf.h"
 #include "nativeui/nativeui.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
@@ -379,12 +380,14 @@ TEST_F(BrowserTest, LargeFileProtocol) {
   });
   browser_->on_finish_navigation.Connect([&content](nu::Browser* browser,
                                                     const std::string& url) {
-    browser->ExecuteJavaScript("document.getElementById('s').textContent.length",
-                               [&content](bool success, base::Value result) {
+    std::string command = base::StringPrintf(
+        "document.getElementById('s').textContent.length == %d",
+        static_cast<int>(content.size()));
+    browser->ExecuteJavaScript(command, [](bool success, base::Value result) {
       nu::Browser::UnregisterProtocol("large");
       nu::MessageLoop::Quit();
-      ASSERT_TRUE(result.is_int());
-      EXPECT_EQ(result.GetInt(), content.size());
+      ASSERT_TRUE(result.is_bool());
+      EXPECT_TRUE(result.GetBool());
     });
   });
   nu::MessageLoop::PostTask([=]() {
