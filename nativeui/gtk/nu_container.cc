@@ -204,7 +204,7 @@ static void nu_container_init(NUContainer* widget) {
 }
 
 GtkWidget* nu_container_new(Container* delegate) {
-  void* widget = g_object_new(NU_TYPE_CONTAINER, NULL);
+  void* widget = g_object_new(NU_TYPE_CONTAINER, nullptr);
   NU_CONTAINER(widget)->priv->delegate = delegate;
   NU_CONTAINER(widget)->priv->event_window = nullptr;
   return GTK_WIDGET(widget);

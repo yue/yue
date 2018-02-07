@@ -4,11 +4,12 @@
 
 #include "nativeui/browser.h"
 
-#include <gtk/gtk.h>
 #include <JavaScriptCore/JavaScript.h>
 #include <webkit2/webkit2.h>
 
 #include "base/json/json_reader.h"
+#include "nativeui/gtk/nu_protocol_stream.h"
+#include "nativeui/gtk/widget_util.h"
 
 namespace nu {
 
@@ -112,6 +113,56 @@ void OnScriptMessage(WebKitUserContentManager* manager,
                           std::move(args.GetList()[2]));
 }
 
+void OnNullProtocolRequest(WebKitURISchemeRequest* request, gpointer) {
+  GError* error = g_error_new_literal(
+      g_quark_from_static_string("yue"),
+      WEBKIT_NETWORK_ERROR_UNKNOWN_PROTOCOL,
+      "The protocol has been unregistered");
+  webkit_uri_scheme_request_finish_error(request, error);
+  g_error_free(error);
+}
+
+void OnProtocolRequest(WebKitURISchemeRequest* request,
+                       Browser::ProtocolHandler* handler) {
+  // Create job.
+  ProtocolJob* protocol_job =
+      (*handler)(webkit_uri_scheme_request_get_uri(request));
+  if (!protocol_job) {
+    GError* error = g_error_new_literal(
+        g_quark_from_static_string("yue"),
+        WEBKIT_NETWORK_ERROR_FAILED,
+        "The protocol handler did not return a request job");
+    webkit_uri_scheme_request_finish_error(request, error);
+    g_error_free(error);
+    return;
+  }
+  // Manage the protocol_job with the stream.
+  // DO NOT pass protocol_job to the lambda, it would cause circular ref.
+  GInputStream* protocol_stream = nu_protocol_stream_new(protocol_job);
+  std::string mime_type;
+  protocol_job->GetMimeType(&mime_type);
+  // Start.
+  g_object_ref(request);
+  protocol_job->Plug([protocol_stream, request, mime_type](size_t size) {
+    webkit_uri_scheme_request_finish(
+        request, protocol_stream, size,
+        mime_type.empty() ? nullptr : mime_type.c_str());
+    g_object_unref(protocol_stream);
+    g_object_unref(request);
+  });
+  if (!protocol_job->Start()) {
+    GError* error = g_error_new_literal(
+        g_quark_from_static_string("yue"),
+        WEBKIT_NETWORK_ERROR_FAILED,
+        "The protocol request job failed to start");
+    webkit_uri_scheme_request_finish_error(request, error);
+    g_error_free(error);
+    // Free on failure.
+    g_object_unref(protocol_stream);
+    g_object_unref(request);
+  }
+}
+
 }  // namespace
 
 void Browser::PlatformInit() {
@@ -210,6 +261,27 @@ void Browser::PlatformUpdateBindings() {
       nullptr);
   webkit_user_content_manager_add_script(manager, script);
   webkit_user_script_unref(script);
+}
+
+// static
+bool Browser::RegisterProtocol(const std::string& scheme,
+                               const ProtocolHandler& handler) {
+  WebKitWebContext* context = webkit_web_context_get_default();
+  webkit_web_context_register_uri_scheme(
+      context,
+      scheme.c_str(),
+      reinterpret_cast<WebKitURISchemeRequestCallback>(&OnProtocolRequest),
+      new ProtocolHandler(handler),
+      Delete<ProtocolHandler>);
+  return true;
+}
+
+// static
+void Browser::UnregisterProtocol(const std::string& scheme) {
+  // There is no unregister API, just replace with a handler to return error.
+  WebKitWebContext* context = webkit_web_context_get_default();
+  webkit_web_context_register_uri_scheme(
+      context, scheme.c_str(), &OnNullProtocolRequest, nullptr, nullptr);
 }
 
 }  // namespace nu

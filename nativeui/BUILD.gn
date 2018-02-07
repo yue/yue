@@ -165,6 +165,8 @@ component("nativeui") {
     "gtk/nu_container.h",
     "gtk/nu_image.cc",
     "gtk/nu_image.h",
+    "gtk/nu_protocol_stream.cc",
+    "gtk/nu_protocol_stream.h",
     "gtk/undoable_text_buffer.cc",
     "gtk/undoable_text_buffer.h",
     "gtk/widget_util.cc",

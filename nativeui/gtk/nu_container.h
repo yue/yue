@@ -13,7 +13,7 @@ namespace nu {
 
 class Container;
 
-#define NU_TYPE_CONTAINER (nu_container_get_type ())
+#define NU_TYPE_CONTAINER (nu_container_get_type())
 #define NU_CONTAINER(obj) (G_TYPE_CHECK_INSTANCE_CAST((obj), \
                            NU_TYPE_CONTAINER, NUContainer))
 

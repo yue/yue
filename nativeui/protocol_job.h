@@ -34,9 +34,6 @@ class NATIVEUI_EXPORT ProtocolJob : public base::RefCounted<ProtocolJob> {
 
   // Used by subclasses to notify the browser.
   std::function<void(size_t)> notify_data_available;
-
- private:
-  DISALLOW_COPY_AND_ASSIGN(ProtocolJob);
 };
 
 // Use string as response.
