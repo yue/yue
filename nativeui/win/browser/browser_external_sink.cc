@@ -25,7 +25,7 @@ const DISPID kInvokeId = 1000;
 }  // namespace
 
 BrowserExternalSink::BrowserExternalSink(Browser* browser)
-    : ref_(1), browser_(browser) {
+    : ref_(0), browser_(browser) {
 }
 
 BrowserExternalSink::~BrowserExternalSink() {

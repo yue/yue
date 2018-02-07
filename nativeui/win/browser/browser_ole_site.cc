@@ -12,7 +12,7 @@ namespace nu {
 
 BrowserOleSite::BrowserOleSite(BrowserImpl* browser,
                                BrowserExternalSink* external_sink)
-    : ref_(1), browser_(browser), external_sink_(external_sink) {
+    : ref_(0), browser_(browser), external_sink_(external_sink) {
 }
 
 BrowserOleSite::~BrowserOleSite() {

@@ -11,7 +11,7 @@
 namespace nu {
 
 BrowserHTMLMoniker::BrowserHTMLMoniker()
-    : ref_(1) {
+    : ref_(0) {
 }
 
 BrowserHTMLMoniker::~BrowserHTMLMoniker() {

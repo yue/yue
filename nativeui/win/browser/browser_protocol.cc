@@ -15,7 +15,7 @@
 namespace nu {
 
 BrowserProtocol::BrowserProtocol(const Browser::ProtocolHandler& handler)
-    : ref_(1),
+    : ref_(0),
       handler_(handler) {
 }
 

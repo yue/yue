@@ -100,12 +100,19 @@ BrowserImpl::BrowserImpl(Browser* delegate)
     return;
   }
   RECT rc = { 0 };
-  ole_object->DoVerb(OLEIVERB_INPLACEACTIVATE, nullptr, ole_site_.Get(), -1,
-                     hwnd(), &rc);
+  ole_object->DoVerb(OLEIVERB_SHOW, nullptr, ole_site_.Get(), -1, hwnd(), &rc);
 }
 
 BrowserImpl::~BrowserImpl() {
   CleanupBrowserHWND();
+  // IE does not automatically cleanup.
+  Microsoft::WRL::ComPtr<IOleObject> ole_object;
+  if (FAILED(browser_.As(&ole_object)))
+    return;
+  ole_object->DoVerb(OLEIVERB_HIDE, nullptr, ole_site_.Get(), -1,
+                     hwnd(), nullptr);
+  ole_object->Close(OLECLOSE_NOSAVE);
+  ole_object->SetClientSite(nullptr);
 }
 
 void BrowserImpl::LoadURL(const base::string16& str) {
@@ -429,6 +436,7 @@ void Browser::UnregisterProtocol(const std::string& scheme) {
     return;
   base::string16 name = base::UTF8ToUTF16(scheme);
   session->UnregisterNameSpace(g_protocol_factories[name].Get(), name.c_str());
+  g_protocol_factories.erase(name);
 }
 
 }  // namespace nu

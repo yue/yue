@@ -26,7 +26,7 @@ std::string URLToString(BSTR str) {
 }  // namespace
 
 BrowserEventSink::BrowserEventSink(BrowserImpl* browser)
-    : ref_(1), browser_(browser) {
+    : ref_(0), browser_(browser) {
 }
 
 BrowserEventSink::~BrowserEventSink() {

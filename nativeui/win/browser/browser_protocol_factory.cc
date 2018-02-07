@@ -24,7 +24,7 @@ const GUID BrowserProtocolFactory::CLSID_BROWSER_PROTOCOL =
 
 BrowserProtocolFactory::BrowserProtocolFactory(
     const Browser::ProtocolHandler& handler)
-    : ref_(1),
+    : ref_(0),
       handler_(handler) {
 }
 
