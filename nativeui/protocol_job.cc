@@ -12,10 +12,21 @@ namespace nu {
 ///////////////////////////////////////////////////////////////////////////////
 // ProtocolJob implementation.
 
+#ifndef NDEBUG
+// static
+int ProtocolJob::jobs_count_ = 0;
+#endif
+
 ProtocolJob::ProtocolJob() {
+#ifndef NDEBUG
+  jobs_count_++;
+#endif
 }
 
 ProtocolJob::~ProtocolJob() {
+#ifndef NDEBUG
+  jobs_count_--;
+#endif
 }
 
 bool ProtocolJob::Start() {

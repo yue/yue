@@ -17,6 +17,10 @@
 #include "nativeui/win/util/subwin_holder.h"
 #endif
 
+#ifndef NDEBUG
+#include "nativeui/protocol_job.h"
+#endif
+
 namespace nu {
 
 namespace {
@@ -40,6 +44,10 @@ State::~State() {
 
   DCHECK_EQ(GetCurrent(), this);
   lazy_tls_ptr.Pointer()->Set(nullptr);
+
+#ifndef NDEBUG
+  DCHECK_EQ(ProtocolJob::jobs_count(), 0) << "ProtocolJob is leaked";
+#endif
 }
 
 // static

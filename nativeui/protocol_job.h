@@ -26,11 +26,20 @@ class NATIVEUI_EXPORT ProtocolJob : public base::RefCounted<ProtocolJob> {
   // Private: Used by Browser implementations to plug adapters.
   void Plug(std::function<void(size_t)> data_available);
 
+#ifndef NDEBUG
+  // Private: Return how manage jobs are still alive.
+  static int jobs_count() { return jobs_count_; }
+#endif
+
  protected:
   friend class base::RefCounted<ProtocolJob>;
 
   ProtocolJob();
   virtual ~ProtocolJob();
+
+#ifndef NDEBUG
+  static int jobs_count_;
+#endif
 
   // Used by subclasses to notify the browser.
   std::function<void(size_t)> notify_data_available;
