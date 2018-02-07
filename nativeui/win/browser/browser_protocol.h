@@ -7,6 +7,7 @@
 
 #include <ole2.h>
 #include <urlmon.h>
+#include <wrl.h>
 
 #include "nativeui/browser.h"
 #include "nativeui/protocol_job.h"
@@ -71,7 +72,10 @@ class BrowserProtocol : public IInternetProtocol,
  private:
   ULONG ref_;
 
-  Browser::ProtocolHandler handler_;
+  // Managed by BrowserProtocolFactory.
+  const Browser::ProtocolHandler& handler_;
+
+  Microsoft::WRL::ComPtr<IInternetProtocolSink> sink_;
   scoped_refptr<ProtocolJob> protocol_job_;
 
   DISALLOW_COPY_AND_ASSIGN(BrowserProtocol);

@@ -5,7 +5,6 @@
 #include "nativeui/win/browser/browser_protocol.h"
 
 #include <shlwapi.h>
-#include <wrl.h>
 
 #include <string>
 
@@ -59,17 +58,17 @@ IFACEMETHODIMP BrowserProtocol::Start(LPCWSTR szUrl,
     return E_FAIL;
 
   // Start the job.
-  Microsoft::WRL::ComPtr<IInternetProtocolSink> sink(pIProtSink);
-  protocol_job_->Plug([sink](size_t size) {
-    sink->ReportData(BSCF_FIRSTDATANOTIFICATION |
-                     BSCF_LASTDATANOTIFICATION |
-                     BSCF_DATAFULLYAVAILABLE,
-                     0, static_cast<int>(size));
+  sink_ = pIProtSink;
+  protocol_job_->Plug([this](size_t size) {
+    sink_->ReportData(BSCF_FIRSTDATANOTIFICATION |
+                      BSCF_LASTDATANOTIFICATION |
+                      BSCF_DATAFULLYAVAILABLE,
+                      0, static_cast<int>(size));
   });
   std::string mime_type;
   if (protocol_job_->GetMimeType(&mime_type)) {
-    sink->ReportProgress(BINDSTATUS_VERIFIEDMIMETYPEAVAILABLE,
-                         base::UTF8ToUTF16(mime_type).c_str());
+    sink_->ReportProgress(BINDSTATUS_VERIFIEDMIMETYPEAVAILABLE,
+                          base::UTF8ToUTF16(mime_type).c_str());
   }
   return protocol_job_->Start() ? S_OK : E_FAIL;
 }
@@ -81,11 +80,13 @@ IFACEMETHODIMP BrowserProtocol::Continue(PROTOCOLDATA *pStateInfo) {
 IFACEMETHODIMP BrowserProtocol::Abort(HRESULT hrReason, DWORD dwOptions) {
   protocol_job_->Kill();
   protocol_job_ = nullptr;
+  sink_.Reset();
   return E_NOTIMPL;
 }
 
 IFACEMETHODIMP BrowserProtocol::Terminate(DWORD dwOptions) {
   protocol_job_ = nullptr;
+  sink_.Reset();
   return E_NOTIMPL;
 }
 
@@ -99,8 +100,10 @@ IFACEMETHODIMP BrowserProtocol::Resume() {
 
 IFACEMETHODIMP BrowserProtocol::Read(void *pv, ULONG cb, ULONG *pcbRead) {
   size_t nread = protocol_job_->Read(pv, cb);
-  if (nread == 0)
+  if (nread == 0) {
+    sink_->ReportResult(S_OK, 0, NULL);
     return S_OK;
+  }
   *pcbRead = static_cast<ULONG>(nread);
   return S_FALSE;
 }
