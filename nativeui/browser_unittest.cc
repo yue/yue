@@ -2,9 +2,11 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
+#include "base/base_paths.h"
 #include "base/files/file_util.h"
 #include "base/files/scoped_temp_dir.h"
 #include "base/json/json_writer.h"
+#include "base/path_service.h"
 #include "nativeui/nativeui.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
@@ -355,6 +357,38 @@ TEST_F(BrowserTest, FileProtocol) {
   });
   nu::MessageLoop::PostTask([=]() {
     browser_->LoadURL("wenjian://read/" + file.AsUTF8Unsafe());
+  });
+  nu::MessageLoop::Run();
+}
+
+TEST_F(BrowserTest, LargeFileProtocol) {
+  // Serve the pug.js, which should be large enough.
+  base::FilePath exe_path;
+  PathService::Get(base::FILE_EXE, &exe_path);
+  base::FilePath file = exe_path.DirName().DirName().DirName()
+                                .Append(FILE_PATH_LITERAL("scripts"))
+                                .Append(FILE_PATH_LITERAL("libs"))
+                                .Append(FILE_PATH_LITERAL("pug.js"));
+  std::string content;
+  LOG(ERROR) << file.value();
+  ASSERT_TRUE(base::ReadFileToString(file, &content));
+  nu::Browser::RegisterProtocol("large", [&](const std::string& url) {
+    return new nu::ProtocolStringJob(
+        "text/html",
+        "<html><body><script id='s'>" + content + "</script></body></html>");
+  });
+  browser_->on_finish_navigation.Connect([&content](nu::Browser* browser,
+                                                    const std::string& url) {
+    browser->ExecuteJavaScript("document.getElementById('s').textContent.length",
+                               [&content](bool success, base::Value result) {
+      nu::Browser::UnregisterProtocol("large");
+      nu::MessageLoop::Quit();
+      ASSERT_TRUE(result.is_int());
+      EXPECT_EQ(result.GetInt(), content.size());
+    });
+  });
+  nu::MessageLoop::PostTask([=]() {
+    browser_->LoadURL("large://file");
   });
   nu::MessageLoop::Run();
 }
