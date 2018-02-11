@@ -1146,12 +1146,44 @@ struct Type<nu::Button> {
 };
 
 template<>
+struct Type<nu::ProtocolJob> {
+  static constexpr const char* name = "yue.ProtocolJob";
+  static void BuildMetaTable(State* state, int metatable) {
+  }
+};
+
+template<>
+struct Type<nu::ProtocolStringJob> {
+  using base = nu::ProtocolJob;
+  static constexpr const char* name = "yue.ProtocolStringJob";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateOnHeap<nu::ProtocolStringJob,
+                                   const std::string&,
+                                   const std::string&>);
+  }
+};
+
+template<>
+struct Type<nu::ProtocolFileJob> {
+  using base = nu::ProtocolJob;
+  static constexpr const char* name = "yue.ProtocolFileJob";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateOnHeap<nu::ProtocolFileJob,
+                                   const ::base::FilePath&>);
+  }
+};
+
+template<>
 struct Type<nu::Browser> {
   using base = nu::View;
   static constexpr const char* name = "yue.Browser";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::Browser>,
+           "registerprotocol", &nu::Browser::RegisterProtocol,
+           "unregisterprotocol", &nu::Browser::UnregisterProtocol,
            "loadurl", &nu::Browser::LoadURL,
            "loadhtml", &nu::Browser::LoadHTML,
            "geturl", &nu::Browser::GetURL,
@@ -1442,6 +1474,8 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::Window>(state, "Window");
   BindType<nu::Container>(state, "Container");
   BindType<nu::Button>(state, "Button");
+  BindType<nu::ProtocolStringJob>(state, "ProtocolStringJob");
+  BindType<nu::ProtocolFileJob>(state, "ProtocolFileJob");
   BindType<nu::Browser>(state, "Browser");
   BindType<nu::Entry>(state, "Entry");
   BindType<nu::Label>(state, "Label");

@@ -1255,12 +1255,57 @@ struct Type<nu::Button> {
 };
 
 template<>
+struct Type<nu::ProtocolJob> {
+  static constexpr const char* name = "yue.ProtocolJob";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+  }
+};
+
+template<>
+struct Type<nu::ProtocolStringJob> {
+  using base = nu::ProtocolJob;
+  static constexpr const char* name = "yue.ProtocolStringJob";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+        "create", &CreateOnHeap<nu::ProtocolStringJob,
+                                const std::string&,
+                                const std::string&>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+  }
+};
+
+template<>
+struct Type<nu::ProtocolFileJob> {
+  using base = nu::ProtocolJob;
+  static constexpr const char* name = "yue.ProtocolFileJob";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+        "create", &CreateOnHeap<nu::ProtocolFileJob,
+                                const ::base::FilePath&>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+  }
+};
+
+template<>
 struct Type<nu::Browser> {
   using base = nu::View;
   static constexpr const char* name = "yue.Browser";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
-    Set(context, constructor, "create", &CreateOnHeap<nu::Browser>);
+    Set(context, constructor,
+        "create", &CreateOnHeap<nu::Browser>,
+        "registerProtocol", &nu::Browser::RegisterProtocol,
+        "unregisterProtocol", &nu::Browser::UnregisterProtocol);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
@@ -1623,33 +1668,35 @@ void Initialize(v8::Local<v8::Object> exports) {
 
   vb::Set(context, exports,
           // Classes.
-          "App",            vb::Constructor<nu::App>(),
-          "Font",           vb::Constructor<nu::Font>(),
-          "Canvas",         vb::Constructor<nu::Canvas>(),
-          "Color",          vb::Constructor<nu::Color>(),
-          "Image",          vb::Constructor<nu::Image>(),
-          "Painter",        vb::Constructor<nu::Painter>(),
-          "Event",          vb::Constructor<nu::Event>(),
-          "FileDialog",     vb::Constructor<nu::FileDialog>(),
-          "FileOpenDialog", vb::Constructor<nu::FileOpenDialog>(),
-          "FileSaveDialog", vb::Constructor<nu::FileSaveDialog>(),
-          "MenuBar",        vb::Constructor<nu::MenuBar>(),
-          "Menu",           vb::Constructor<nu::Menu>(),
-          "MenuItem",       vb::Constructor<nu::MenuItem>(),
-          "Window",         vb::Constructor<nu::Window>(),
-          "View",           vb::Constructor<nu::View>(),
-          "Container",      vb::Constructor<nu::Container>(),
-          "Button",         vb::Constructor<nu::Button>(),
-          "Browser",        vb::Constructor<nu::Browser>(),
-          "Entry",          vb::Constructor<nu::Entry>(),
-          "Label",          vb::Constructor<nu::Label>(),
-          "ProgressBar",    vb::Constructor<nu::ProgressBar>(),
-          "Group",          vb::Constructor<nu::Group>(),
-          "Scroll",         vb::Constructor<nu::Scroll>(),
-          "TextEdit",       vb::Constructor<nu::TextEdit>(),
+          "App",               vb::Constructor<nu::App>(),
+          "Font",              vb::Constructor<nu::Font>(),
+          "Canvas",            vb::Constructor<nu::Canvas>(),
+          "Color",             vb::Constructor<nu::Color>(),
+          "Image",             vb::Constructor<nu::Image>(),
+          "Painter",           vb::Constructor<nu::Painter>(),
+          "Event",             vb::Constructor<nu::Event>(),
+          "FileDialog",        vb::Constructor<nu::FileDialog>(),
+          "FileOpenDialog",    vb::Constructor<nu::FileOpenDialog>(),
+          "FileSaveDialog",    vb::Constructor<nu::FileSaveDialog>(),
+          "MenuBar",           vb::Constructor<nu::MenuBar>(),
+          "Menu",              vb::Constructor<nu::Menu>(),
+          "MenuItem",          vb::Constructor<nu::MenuItem>(),
+          "Window",            vb::Constructor<nu::Window>(),
+          "View",              vb::Constructor<nu::View>(),
+          "Container",         vb::Constructor<nu::Container>(),
+          "Button",            vb::Constructor<nu::Button>(),
+          "ProtocolStringJob", vb::Constructor<nu::ProtocolStringJob>(),
+          "ProtocolFileJob",   vb::Constructor<nu::ProtocolFileJob>(),
+          "Browser",           vb::Constructor<nu::Browser>(),
+          "Entry",             vb::Constructor<nu::Entry>(),
+          "Label",             vb::Constructor<nu::Label>(),
+          "ProgressBar",       vb::Constructor<nu::ProgressBar>(),
+          "Group",             vb::Constructor<nu::Group>(),
+          "Scroll",            vb::Constructor<nu::Scroll>(),
+          "TextEdit",          vb::Constructor<nu::TextEdit>(),
 #if defined(OS_MACOSX)
-          "Toolbar",        vb::Constructor<nu::Toolbar>(),
-          "Vibrant",        vb::Constructor<nu::Vibrant>(),
+          "Toolbar",           vb::Constructor<nu::Toolbar>(),
+          "Vibrant",           vb::Constructor<nu::Vibrant>(),
 #endif
           // Properties.
           "app",      nu::State::GetCurrent()->GetApp());
