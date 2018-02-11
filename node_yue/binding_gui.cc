@@ -1625,6 +1625,7 @@ void Initialize(v8::Local<v8::Object> exports) {
           // Classes.
           "App",            vb::Constructor<nu::App>(),
           "Font",           vb::Constructor<nu::Font>(),
+          "Canvas",         vb::Constructor<nu::Canvas>(),
           "Color",          vb::Constructor<nu::Color>(),
           "Image",          vb::Constructor<nu::Image>(),
           "Painter",        vb::Constructor<nu::Painter>(),
