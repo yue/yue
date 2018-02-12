@@ -8,6 +8,7 @@
 
 #include "base/mac/scoped_nsobject.h"
 #include "base/strings/sys_string_conversions.h"
+#include "base/synchronization/lock.h"
 
 namespace {
 
@@ -16,6 +17,9 @@ bool g_initailized = false;
 
 // A map of schemes and handlers.
 std::map<std::string, nu::Browser::ProtocolHandler> g_handlers;
+
+// Lock to guard the handlers map.
+base::Lock g_lock;
 
 }  // namespace
 
@@ -27,7 +31,10 @@ std::map<std::string, nu::Browser::ProtocolHandler> g_handlers;
     [NSURLProtocol registerClass:[NUCustomProtocol class]];
     g_initailized = true;
   }
-  g_handlers[[scheme UTF8String]] = std::move(handler);
+  {
+    base::AutoLock auto_lock(g_lock);
+    g_handlers[[scheme UTF8String]] = std::move(handler);
+  }
   // This private API can make WKWebview aware of our custom protocol class.
   Class cls = NSClassFromString(@"WKBrowsingContextController");
   SEL sel = NSSelectorFromString(@"registerSchemeForCustomProtocol:");
@@ -38,7 +45,10 @@ std::map<std::string, nu::Browser::ProtocolHandler> g_handlers;
 }
 
 + (bool)unregisterProtocol:(NSString*)scheme {
-  g_handlers.erase([scheme UTF8String]);
+  {
+    base::AutoLock auto_lock(g_lock);
+    g_handlers.erase([scheme UTF8String]);
+  }
   // The private API to unregister protocol.
   Class cls = NSClassFromString(@"WKBrowsingContextController");
   SEL sel = NSSelectorFromString(@"unregisterSchemeForCustomProtocol:");
@@ -48,7 +58,10 @@ std::map<std::string, nu::Browser::ProtocolHandler> g_handlers;
   return true;
 }
 
+#pragma mark - NSURLProtocol
+
 + (BOOL)canInitWithRequest:(NSURLRequest*)request {
+  base::AutoLock auto_lock(g_lock);
   return g_handlers.find([request.URL.scheme UTF8String]) != g_handlers.end();
 }
 
@@ -57,9 +70,23 @@ std::map<std::string, nu::Browser::ProtocolHandler> g_handlers;
 }
 
 - (void)startLoading {
-  // Create job.
-  protocol_job_ = g_handlers[[self.request.URL.scheme UTF8String]](
-      [[self.request.URL absoluteString] UTF8String]);
+  // Create job in main thread.
+  __block nu::ProtocolJob* job = nullptr;
+  __block std::string scheme([self.request.URL.scheme UTF8String]);
+  __block std::string url([[self.request.URL absoluteString] UTF8String]);
+  dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+  dispatch_async(dispatch_get_main_queue(), ^{
+    base::AutoLock auto_lock(g_lock);
+    auto it = g_handlers.find(scheme);
+    if (it != g_handlers.end())
+      job = it->second(url);
+    // Wake up the thread that waits for the job.
+    dispatch_semaphore_signal(semaphore);
+  });
+
+  // Wait for the protocol job.
+  dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+  protocol_job_ = job;
   if (!protocol_job_) {
     NSError* error = [NSError errorWithDomain:NSURLErrorDomain
                                          code:NSURLErrorUnsupportedURL
