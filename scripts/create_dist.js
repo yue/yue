@@ -104,8 +104,7 @@ function generateZip(name, list, zip = new JSZip()) {
   const zipname = `${name}_${version}_${targetOs}_${targetCpu}`
   for (let file of list)
     addFileToZip(zip, `out/Release/${file}`, 'out/Release')
-  addFileToZip(zip, 'LICENSE', '')
-  addFileToZip(zip, 'LICENSE.chromium', '')
+  zip.file('LICENSES', combineLicense(['LICENSE', 'LICENSE.chromium']))
   zip.generateNodeStream({streamFiles:true})
      .pipe(fs.createWriteStream(`out/Dist/${zipname}.zip`))
 }
@@ -162,4 +161,9 @@ function strip(file) {
   else if (targetCpu == 'arm64')
     strip = 'aarch64-linux-gnu-strip'
   execSync(`${strip} ${file}`)
+}
+
+function combineLicense(list) {
+  const separator = '-'.repeat(80)
+  return list.map(f => fs.readFileSync(f)).join(`\n\n${separator}\n\n\n`)
 }

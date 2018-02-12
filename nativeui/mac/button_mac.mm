@@ -13,8 +13,6 @@
 
 namespace {
 
-// The insets numbers are from wxWidgets:
-// wxWidgets/src/osx/cocoa/button.mm
 nu::InsetsF GetButtonInsets(NSButton* button) {
   if ([button bezelStyle] == NSSmallSquareBezelStyle) {
     return nu::InsetsF(1, 0, 1, 0);
