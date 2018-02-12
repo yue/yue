@@ -11,6 +11,11 @@ executable("luac") {
   deps = [ ":lua" ]
 }
 
+executable("lua53") {
+  sources = [ "src/lua.c" ]
+  deps = [ ":lua" ]
+}
+
 source_set("lua") {
   sources = [
     "src/lapi.c",
