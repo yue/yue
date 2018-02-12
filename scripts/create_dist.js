@@ -89,8 +89,7 @@ generateZip('libyue', [], yuezip)
 
 // Zip other binaries.
 generateZip('yue', exeFiles[targetOs])
-if (targetOs != 'win')
-  generateZip('lua_yue_lua_5.3', luaFiles[targetOs])
+generateZip('lua_yue_lua_5.3', luaFiles[targetOs])
 
 // Zip docs, but only do it for linux/x64 when running on CI, to avoid uploading
 // docs for multiple times.

@@ -14,10 +14,13 @@ let sysrootArch = {
   arm64: 'arm64',
 }[targetCpu]
 
-if (process.platform !== 'win32') {
+if (process.platform != 'win32') {
   execSync('python tools/clang/scripts/update.py')
 }
-if (process.platform === 'linux') {
+if (process.platform == 'win32') {
+  execSync(`node scripts/download_lua_libs.js 5.3.4 ${targetCpu}`)
+}
+if (process.platform == 'linux') {
   execSync(`python tools/install-sysroot.py --arch ${sysrootArch}`)
 }
 

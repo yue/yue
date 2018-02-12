@@ -3,6 +3,7 @@
 /out/
 /third_party/llvm-build/
 /third_party/node-*/
+/third_party/lua_binaries_*/
 /third_party/debian_stretch_amd64-sysroot/
 /third_party/debian_stretch_i386-sysroot/
 /third_party/debian_stretch_arm-sysroot/

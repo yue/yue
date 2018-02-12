@@ -12,7 +12,4 @@ group("default") {
   if (!is_component_build) {
     deps += [ "//nativeui:libyue" ]
   }
-  if (!is_win) {
-    deps += [ "//lua_yue:lua_yue" ]
-  }
 }
