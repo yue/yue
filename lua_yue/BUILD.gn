@@ -50,9 +50,6 @@ loadable_module("lua_yue") {
     } else if (current_cpu == "x64") {
       libs = [ rebase_path("//third_party/lua_binaries_5.3.4_Win64/lua53.lib") ]
     }
-    ldflags = [
-      "/NODEFAULTLIB:libcmtd.lib",
-    ]
   }
 }
 
