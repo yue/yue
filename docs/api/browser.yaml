@@ -20,6 +20,18 @@ class_methods:
     lang: ['lua', 'js']
     description: Create a new browser view.
 
+  - signature: bool RegisterProtocol(const std::string& scheme, const std::function<ProtocolJob*(const std::string&)>& handler)
+    description: Register a custom protocol with `scheme` and `handler`.
+    detail: |
+      When the browser sends a request with `scheme`, the `handler` will be
+      called with `handler(url)`, and the `handler` must return an instance of
+      class that inherits from [`ProtocolJob`](./protocoljob.html).
+
+      The `handler` is guaranteed to be called in the main thread.
+
+  - signature: void UnregisterProtocol(const std::string& scheme);
+    description: Unregister the custom protocol with `scheme`.
+
 class_properties:
   - property: const char* kClassName
     lang: ['cpp']

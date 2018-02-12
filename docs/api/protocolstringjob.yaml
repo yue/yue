@@ -1,0 +1,18 @@
+name: ProtocolStringJob
+component: gui
+header: nativeui/protocol_job.h
+type: refcounted
+namespace: nu
+inherit: ProtocolJob
+description: Use string as response to custom protocol requests.
+
+constructors:
+  - signature: ProtocolStringJob(const std::string& mimetype, const std::string& content)
+    lang: ['cpp']
+    description: &ref1 |
+      Create a `ProtocolStringJob` with `mimetype` and `content`.
+
+class_methods:
+  - signature: ProtocolStringJob* Create(const std::string& mimetype, const std::string& content)
+    lang: ['lua', 'js']
+    description: *ref1

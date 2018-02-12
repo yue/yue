@@ -1,0 +1,19 @@
+name: ProtocolFileJob
+component: gui
+header: nativeui/protocol_file_job.h
+type: refcounted
+namespace: nu
+inherit: ProtocolJob
+description: Read file to serve custom protocol requests.
+
+constructors:
+  - signature: ProtocolFileJob(const base::FilePath& path)
+    lang: ['cpp']
+    description: &ref1 |
+      Create a `ProtocolFileJob` with `path` to a local file.
+
+class_methods:
+  - signature: ProtocolFileJob* Create(const base::FilePath& path)
+    lang: ['lua', 'js']
+    description: *ref1
+

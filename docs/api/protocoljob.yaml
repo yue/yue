@@ -1,0 +1,53 @@
+name: ProtocolJob
+component: gui
+header: nativeui/protocol_job.h
+type: refcounted
+namespace: nu
+description: Response to custom protocol requests.
+
+detail: |
+  This class can not be used to create instances, you must use its sub-classes
+  instead.
+lang_detail:
+  cpp: |
+    Note that the interface of this class will be modified in future for
+    extensions.
+
+methods:
+  - signature: bool Start()
+    lang: ['cpp']
+    description: Called when the loading of request should start.
+    detail: |
+      Returning `false` would cancel the request.
+
+      This method is asynchronous, when the request is ready to be read, the
+      `notify_content_length` function property of this class should be called
+      with `notify_content_length(size)`. The `size` is the expected length
+      of the data to be read, pass `-1` if uncertain.
+
+  - signature: void Kill()
+    lang: ['cpp']
+    description: Called when the loading should be stopped.
+
+  - signature: bool GetMimeType(std::string* mimetype)
+    lang: ['cpp']
+    description: Called when browser wants to get mime type of the request.
+    detail: |
+      Returning `false` would leave the browser to guess the mime type.
+
+      Depending on the platform, this method may be called before and after the
+      request is started, and it may be called in a different thread from the
+      one it was created.
+
+  - signature: size_t Read(void* buffer, size_t bytes)
+    lang: ['cpp']
+    description: Called when browser wants to read data.
+    detail: |
+      The data should be written to the `buffer`, which has the size of `bytes`.
+      It should return size of data written, returning `0` means there is no
+      more data.
+
+properties:
+  - property: std::function<void(int)> notify_content_length
+    lang: ['cpp']
+    description: Called by sub-classes when it is ready to read data.
