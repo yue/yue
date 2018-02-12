@@ -96,7 +96,7 @@ base::Lock g_lock;
   }
 
   // Start.
-  protocol_job_->Plug([&](size_t size) {
+  protocol_job_->Plug([&](int size) {
     std::string mime_type;
     protocol_job_->GetMimeType(&mime_type);
     // Send response.

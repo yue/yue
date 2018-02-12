@@ -59,11 +59,11 @@ IFACEMETHODIMP BrowserProtocol::Start(LPCWSTR szUrl,
 
   // Start the job.
   sink_ = pIProtSink;
-  protocol_job_->Plug([this](size_t size) {
+  protocol_job_->Plug([this](int size) {
     sink_->ReportData(BSCF_FIRSTDATANOTIFICATION |
                       BSCF_LASTDATANOTIFICATION |
                       BSCF_DATAFULLYAVAILABLE,
-                      0, static_cast<int>(size));
+                      0, size);
   });
   std::string mime_type;
   if (protocol_job_->GetMimeType(&mime_type)) {

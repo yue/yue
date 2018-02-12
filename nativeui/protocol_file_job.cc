@@ -161,7 +161,7 @@ ProtocolFileJob::~ProtocolFileJob() {
 bool ProtocolFileJob::Start() {
   if (!file_.IsValid())
     return false;
-  notify_data_available(file_.GetLength());
+  notify_content_length(static_cast<int>(file_.GetLength()));
   return true;
 }
 

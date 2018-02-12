@@ -143,7 +143,7 @@ void OnProtocolRequest(WebKitURISchemeRequest* request,
   protocol_job->GetMimeType(&mime_type);
   // Start.
   g_object_ref(request);
-  protocol_job->Plug([protocol_stream, request, mime_type](size_t size) {
+  protocol_job->Plug([protocol_stream, request, mime_type](int size) {
     webkit_uri_scheme_request_finish(
         request, protocol_stream, size,
         mime_type.empty() ? nullptr : mime_type.c_str());

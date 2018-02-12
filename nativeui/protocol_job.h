@@ -24,7 +24,7 @@ class NATIVEUI_EXPORT ProtocolJob : public base::RefCounted<ProtocolJob> {
   virtual size_t Read(void* buf, size_t buf_size) = 0;
 
   // Private: Used by Browser implementations to plug adapters.
-  void Plug(std::function<void(size_t)> data_available);
+  void Plug(std::function<void(int)> start);
 
 #ifndef NDEBUG
   // Private: Return how manage jobs are still alive.
@@ -42,7 +42,7 @@ class NATIVEUI_EXPORT ProtocolJob : public base::RefCounted<ProtocolJob> {
 #endif
 
   // Used by subclasses to notify the browser.
-  std::function<void(size_t)> notify_data_available;
+  std::function<void(int)> notify_content_length;
 };
 
 // Use string as response.

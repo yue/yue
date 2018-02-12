@@ -30,15 +30,15 @@ ProtocolJob::~ProtocolJob() {
 }
 
 bool ProtocolJob::Start() {
-  notify_data_available(0);
+  notify_content_length(0);
   return true;
 }
 
 void ProtocolJob::Kill() {
 }
 
-void ProtocolJob::Plug(std::function<void(size_t)> data_available) {
-  notify_data_available = std::move(data_available);
+void ProtocolJob::Plug(std::function<void(int)> func) {
+  notify_content_length = std::move(func);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -54,7 +54,7 @@ ProtocolStringJob::~ProtocolStringJob() {
 }
 
 bool ProtocolStringJob::Start() {
-  notify_data_available(content_.size());
+  notify_content_length(static_cast<int>(content_.size()));
   return true;
 }
 
