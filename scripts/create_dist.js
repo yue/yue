@@ -104,7 +104,7 @@ function generateZip(name, list, zip = new JSZip()) {
   const zipname = `${name}_${version}_${targetOs}_${targetCpu}`
   for (let file of list)
     addFileToZip(zip, `out/Release/${file}`, 'out/Release')
-  zip.file('LICENSES', combineLicense(['LICENSE', 'LICENSE.chromium']))
+  zip.file('LICENSE', collectLicenses())
   zip.generateNodeStream({streamFiles:true})
      .pipe(fs.createWriteStream(`out/Dist/${zipname}.zip`))
 }
@@ -163,7 +163,29 @@ function strip(file) {
   execSync(`${strip} ${file}`)
 }
 
-function combineLicense(list) {
+function collectLicenses() {
+  const licenses = [
+    { path: 'LICENSE' },
+    { path: 'LICENSE.chromium' },
+  ]
+  const places = [
+    'third_party',
+    'base/third_party',
+  ]
+  for (const place of places) {
+    for (const lib of fs.readdirSync(place)) {
+      const license = path.join(place, lib, 'LICENSE')
+      if (!fs.existsSync(license))
+        continue
+      licenses.push({path: license, name: `${place}/${lib}`})
+    }
+  }
   const separator = '-'.repeat(80)
-  return list.map(f => fs.readFileSync(f)).join(`\n\n${separator}\n\n\n`)
+  return licenses.map((f) => {
+    const content = fs.readFileSync(f.path)
+    if (f.name)
+      return f.name + ':\n\n' + content
+    else
+      return content
+  }).join(`\n\n${separator}\n\n\n`)
 }
