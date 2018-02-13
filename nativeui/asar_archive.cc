@@ -12,22 +12,28 @@
 #include "base/pickle.h"
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/string_split.h"
+#include "base/strings/utf_string_conversions.h"
 
 namespace nu {
 
 namespace {
 
+// Convert the path into Value's key path.
 std::vector<std::string> FilePathToValuePath(const base::FilePath& path) {
-  std::string str = path.AsUTF8Unsafe();
-  std::vector<std::string> components = base::SplitString(
-      str, "/\\", base::KEEP_WHITESPACE, base::SPLIT_WANT_NONEMPTY);
-  std::vector<std::string> result;
-  result.reserve(components.size() * 2);
-  for (std::string& c : components) {
-    result.push_back("files");
-    result.push_back(std::move(c));
+  std::vector<base::FilePath::StringType> components = base::SplitString(
+      path.value(), FILE_PATH_LITERAL("/\\"),
+      base::KEEP_WHITESPACE, base::SPLIT_WANT_NONEMPTY);
+  std::vector<std::string> key;
+  key.reserve(components.size() * 2);
+  for (auto& c : components) {
+    key.push_back("files");
+#if defined(OS_WIN)
+    key.push_back(base::UTF16ToUTF8(c));
+#else
+    key.push_back(c);
+#endif
   }
-  return result;
+  return key;
 }
 
 }  // namespace
