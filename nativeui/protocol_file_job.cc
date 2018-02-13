@@ -152,7 +152,8 @@ bool GetMimeTypeFromExtension(const base::FilePath::StringType& ext,
 
 ProtocolFileJob::ProtocolFileJob(const base::FilePath& path)
     : path_(path),
-      file_(path, base::File::FLAG_OPEN | base::File::FLAG_READ) {
+      file_(path, base::File::FLAG_OPEN | base::File::FLAG_READ),
+      content_length_(file_.IsValid() ? file_.GetLength() : 0) {
 }
 
 ProtocolFileJob::~ProtocolFileJob() {
@@ -161,7 +162,7 @@ ProtocolFileJob::~ProtocolFileJob() {
 bool ProtocolFileJob::Start() {
   if (!file_.IsValid())
     return false;
-  notify_content_length(static_cast<int>(file_.GetLength()));
+  notify_content_length(content_length_);
   return true;
 }
 
@@ -177,9 +178,19 @@ bool ProtocolFileJob::GetMimeType(std::string* mime_type) {
 }
 
 size_t ProtocolFileJob::Read(void* buf, size_t buf_size) {
+  if (content_length_ == 0)
+    return 0;
+  if (content_length_ < static_cast<int64_t>(buf_size))
+    buf_size = content_length_;
   int nread = file_.ReadAtCurrentPos(static_cast<char*>(buf),
                                      static_cast<int>(buf_size));
-  return nread < 0 ? 0 : nread;
+  if (nread > 0) {
+    content_length_ -= nread;
+    return nread;
+  } else {
+    content_length_ = 0;
+    return 0;
+  }
 }
 
 }  // namespace nu

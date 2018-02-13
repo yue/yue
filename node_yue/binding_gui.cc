@@ -1297,6 +1297,21 @@ struct Type<nu::ProtocolFileJob> {
 };
 
 template<>
+struct Type<nu::ProtocolAsarJob> {
+  using base = nu::ProtocolFileJob;
+  static constexpr const char* name = "yue.ProtocolAsarJob";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+        "create", &CreateOnHeap<nu::ProtocolAsarJob,
+                                const ::base::FilePath&>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+  }
+};
+
+template<>
 struct Type<nu::Browser> {
   using base = nu::View;
   static constexpr const char* name = "yue.Browser";
@@ -1687,6 +1702,7 @@ void Initialize(v8::Local<v8::Object> exports) {
           "Button",            vb::Constructor<nu::Button>(),
           "ProtocolStringJob", vb::Constructor<nu::ProtocolStringJob>(),
           "ProtocolFileJob",   vb::Constructor<nu::ProtocolFileJob>(),
+          "ProtocolAsarJob",   vb::Constructor<nu::ProtocolAsarJob>(),
           "Browser",           vb::Constructor<nu::Browser>(),
           "Entry",             vb::Constructor<nu::Entry>(),
           "Label",             vb::Constructor<nu::Label>(),

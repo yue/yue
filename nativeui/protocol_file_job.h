@@ -26,9 +26,9 @@ class NATIVEUI_EXPORT ProtocolFileJob : public ProtocolJob {
  protected:
   ~ProtocolFileJob() override;
 
- private:
   base::FilePath path_;
   base::File file_;
+  int64_t content_length_ = 0;
 };
 
 }  // namespace nu

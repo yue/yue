@@ -27,7 +27,7 @@
 #include "nativeui/menu_item.h"
 #include "nativeui/message_loop.h"
 #include "nativeui/progress_bar.h"
-#include "nativeui/protocol_file_job.h"
+#include "nativeui/protocol_asar_job.h"
 #include "nativeui/scroll.h"
 #include "nativeui/state.h"
 #include "nativeui/text_edit.h"

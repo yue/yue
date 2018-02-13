@@ -1176,6 +1176,17 @@ struct Type<nu::ProtocolFileJob> {
 };
 
 template<>
+struct Type<nu::ProtocolAsarJob> {
+  using base = nu::ProtocolFileJob;
+  static constexpr const char* name = "yue.ProtocolAsarJob";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateOnHeap<nu::ProtocolAsarJob,
+                                   const ::base::FilePath&>);
+  }
+};
+
+template<>
 struct Type<nu::Browser> {
   using base = nu::View;
   static constexpr const char* name = "yue.Browser";
@@ -1476,6 +1487,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::Button>(state, "Button");
   BindType<nu::ProtocolStringJob>(state, "ProtocolStringJob");
   BindType<nu::ProtocolFileJob>(state, "ProtocolFileJob");
+  BindType<nu::ProtocolAsarJob>(state, "ProtocolAsarJob");
   BindType<nu::Browser>(state, "Browser");
   BindType<nu::Entry>(state, "Entry");
   BindType<nu::Label>(state, "Label");
