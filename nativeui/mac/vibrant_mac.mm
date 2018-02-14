@@ -67,11 +67,9 @@ Vibrant::Material Vibrant::GetMaterial() const {
 }
 
 void Vibrant::SetBlendingMode(BlendingMode mode) {
-  NUVibrant* vibrant = static_cast<NUVibrant*>(GetNative());
-  BOOL wantsLayer = mode == BlendingMode::WithinWindow;
-  [vibrant nuPrivate]->wants_layer = wantsLayer;
-  [vibrant setWantsLayer:wantsLayer];
-  [vibrant setBlendingMode:static_cast<NSVisualEffectBlendingMode>(mode)];
+  SetWantsLayer(mode == BlendingMode::WithinWindow);
+  static_cast<NUVibrant*>(GetNative()).blendingMode =
+      static_cast<NSVisualEffectBlendingMode>(mode);
 }
 
 Vibrant::BlendingMode Vibrant::GetBlendingMode() const {

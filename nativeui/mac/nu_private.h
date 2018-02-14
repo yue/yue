@@ -28,7 +28,8 @@ struct NUPrivate {
   bool focusable = true;
   bool draggable = false;
   bool is_content_view = false;
-  bool wants_layer = false;
+  bool wants_layer = false;  // default value for wantsLayer
+  bool wants_layer_infected = false;  // infects the wantsLayer property
   base::scoped_nsobject<NSTrackingArea> tracking_area;
   std::unique_ptr<MouseCapture> mouse_capture;
 };

@@ -50,10 +50,31 @@ void Container::PlatformDestroy() {
 
 void Container::PlatformAddChildView(View* child) {
   [GetNative() addSubview:child->GetNative()];
+  // Handle the wants_layer_infected routine, which makes every view in
+  // relationship with this view has wantsLayer set to true.
+  NUPrivate* priv = [GetNative() nuPrivate];
+  if (priv->wants_layer_infected) {
+    [child->GetNative() setWantsLayer:YES];
+  } else {
+    if (IsNUView(child->GetNative()) &&
+        [child->GetNative() nuPrivate]->wants_layer_infected) {
+      // Just got infected, set wantsLayer on all children.
+      priv->wants_layer_infected = true;
+      SetWantsLayer(true);
+      for (int i = 0; i < ChildCount(); ++i)
+        [ChildAt(i)->GetNative() setWantsLayer:YES];
+    }
+  }
 }
 
 void Container::PlatformRemoveChildView(View* child) {
   [child->GetNative() removeFromSuperview];
+  // Revert wantsLayer to default.
+  NSView* nc = child->GetNative();
+  if (IsNUView(nc))
+    [nc setWantsLayer:[nc nuPrivate]->wants_layer];
+  else
+    [nc setWantsLayer:NO];
 }
 
 }  // namespace nu
