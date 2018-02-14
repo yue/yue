@@ -5,13 +5,15 @@
 #ifndef NATIVEUI_PROTOCOL_ASAR_JOB_H_
 #define NATIVEUI_PROTOCOL_ASAR_JOB_H_
 
+#include <string>
+
 #include "nativeui/protocol_file_job.h"
 
 namespace nu {
 
 class NATIVEUI_EXPORT ProtocolAsarJob : public ProtocolFileJob {
  public:
-  explicit ProtocolAsarJob(const base::FilePath& path);
+  ProtocolAsarJob(const base::FilePath& asar, const std::string& path);
 
  protected:
   ~ProtocolAsarJob() override;

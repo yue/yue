@@ -1186,7 +1186,8 @@ struct Type<nu::ProtocolAsarJob> {
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::ProtocolAsarJob,
-                                   const ::base::FilePath&>);
+                                   const ::base::FilePath&,
+                                   const std::string&>);
   }
 };
 

@@ -1308,7 +1308,8 @@ struct Type<nu::ProtocolAsarJob> {
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
         "create", &CreateOnHeap<nu::ProtocolAsarJob,
-                                const ::base::FilePath&>);
+                                const ::base::FilePath&,
+                                const std::string&>);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {

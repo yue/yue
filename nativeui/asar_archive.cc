@@ -16,37 +16,8 @@
 
 namespace nu {
 
-namespace {
-
-// Convert the path into Value's key path.
-std::vector<std::string> FilePathToValuePath(const base::FilePath& path) {
-  std::vector<base::FilePath::StringType> components = base::SplitString(
-      path.value(), FILE_PATH_LITERAL("/\\"),
-      base::KEEP_WHITESPACE, base::SPLIT_WANT_NONEMPTY);
-  std::vector<std::string> key;
-  key.reserve(components.size() * 2);
-  for (auto& c : components) {
-    key.push_back("files");
-#if defined(OS_WIN)
-    key.push_back(base::UTF16ToUTF8(c));
-#else
-    key.push_back(c);
-#endif
-  }
-  return key;
-}
-
-}  // namespace
-
-// static
-scoped_refptr<AsarArchive> AsarArchive::Create(const base::FilePath& path) {
-  scoped_refptr<AsarArchive> archive(new AsarArchive(path));
-  return archive->IsValid() ? archive : nullptr;
-}
-
-AsarArchive::AsarArchive(const base::FilePath& path)
-    : path_(path),
-      file_(path, base::File::FLAG_OPEN | base::File::FLAG_READ) {
+AsarArchive::AsarArchive(base::File file)
+    : file_(std::move(file)) {
   // Read size.
   char size_buf[8];
   if (file_.ReadAtCurrentPos(size_buf, 8) != 8)
@@ -75,19 +46,34 @@ AsarArchive::AsarArchive(const base::FilePath& path)
 AsarArchive::~AsarArchive() {
 }
 
-bool AsarArchive::GetFileInfo(const base::FilePath& path, FileInfo* info) {
+bool AsarArchive::IsValid() const {
+  return file_.IsValid() && header_.is_dict();
+}
+
+bool AsarArchive::GetFileInfo(const std::string& path, FileInfo* info) {
   if (!header_.is_dict())
     return false;
 
-  std::vector<std::string> key = FilePathToValuePath(path);
-  std::vector<base::StringPiece> pk(key.begin(), key.end());
-  const base::Value* node = header_.FindPath(pk);
+  // Convert file path to value search path.
+  // path/to/image.jpg => { files, path, files, to, files, image.jpg }
+  std::vector<base::StringPiece> components = base::SplitStringPiece(
+      path, "/\\", base::KEEP_WHITESPACE, base::SPLIT_WANT_NONEMPTY);
+  std::vector<base::StringPiece> key;
+  key.reserve(components.size() * 2);
+  for (const base::StringPiece& c : components) {
+    key.push_back("files");
+    key.push_back(c);
+  }
+
+  // Search for the node representing path.
+  const base::Value* node = header_.FindPath(key);
   if (!node)
     return false;
 
+  // Read file information.
   const base::Value* link = node->FindKey("link");
   if (link && link->is_string())
-    return GetFileInfo(base::FilePath::FromUTF8Unsafe(link->GetString()), info);
+    return GetFileInfo(link->GetString(), info);
 
   const base::Value* size = node->FindKey("size");
   if (!size || !size->is_int())
@@ -101,10 +87,6 @@ bool AsarArchive::GetFileInfo(const base::FilePath& path, FileInfo* info) {
 
   info->offset += content_offset_;
   return true;
-}
-
-bool AsarArchive::IsValid() const {
-  return file_.IsValid() && header_.is_dict();
 }
 
 }  // namespace nu

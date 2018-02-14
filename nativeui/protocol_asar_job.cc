@@ -8,57 +8,26 @@
 
 namespace nu {
 
-namespace {
-
-const base::FilePath::CharType kAsarExtension[] = FILE_PATH_LITERAL(".asar");
-
-bool GetAsarArchivePath(const base::FilePath& full_path,
-                        base::FilePath* asar_path,
-                        base::FilePath* relative_path) {
-  base::FilePath iter = full_path;
-  while (true) {
-    base::FilePath dirname = iter.DirName();
-    if (iter.MatchesExtension(kAsarExtension))
-      break;
-    else if (iter == dirname)
-      return false;
-    iter = dirname;
-  }
-
-  base::FilePath tail;
-  if (!iter.AppendRelativePath(full_path, &tail))
-    return false;
-
-  *asar_path = iter;
-  *relative_path = tail;
-  return true;
-}
-
-}  // namespace
-
-ProtocolAsarJob::ProtocolAsarJob(const base::FilePath& path)
-    : ProtocolFileJob(path) {
-  // Do nothing if it is actually a real path.
-  if (file_.IsValid())
+ProtocolAsarJob::ProtocolAsarJob(const base::FilePath& asar,
+                                 const std::string& path)
+    : ProtocolFileJob(asar) {
+  // Do nothing if the asar file does not exist.
+  if (!file_.IsValid())
     return;
 
   // Read asar.
-  base::FilePath asar_path, relative_path;
-  if (!GetAsarArchivePath(path, &asar_path, &relative_path))
-    return;
-  scoped_refptr<AsarArchive> archive = AsarArchive::Create(asar_path);
-  if (!archive)
-    return;
+  AsarArchive archive(file_.Duplicate());
   AsarArchive::FileInfo info;
-  if (!archive->GetFileInfo(relative_path, &info))
+  if (!archive.IsValid() ||
+      !archive.GetFileInfo(path, &info)) {
+    file_.Close();
     return;
-
-  // Redirect the file to read from asar.
-  file_.Initialize(asar_path, base::File::FLAG_OPEN | base::File::FLAG_READ);
-  if (file_.IsValid()) {
-    file_.Seek(base::File::FROM_BEGIN, info.offset);
-    content_length_ = info.size;
   }
+
+  // Seek to the position of the path.
+  file_.Seek(base::File::FROM_BEGIN, info.offset);
+  path_ = base::FilePath::FromUTF8Unsafe(path);
+  content_length_ = info.size;
 }
 
 ProtocolAsarJob::~ProtocolAsarJob() {
