@@ -23,11 +23,11 @@ class NATIVEUI_EXPORT ProtocolJob : public base::RefCounted<ProtocolJob> {
   virtual bool GetMimeType(std::string* mime_type) = 0;
   virtual size_t Read(void* buf, size_t buf_size) = 0;
 
-  // Private: Used by Browser implementations to plug adapters.
+  // Internal: Used by Browser implementations to plug adapters.
   void Plug(std::function<void(int)> start);
 
 #ifndef NDEBUG
-  // Private: Return how manage jobs are still alive.
+  // Internal: Return how manage jobs are still alive.
   static int jobs_count() { return jobs_count_; }
 #endif
 

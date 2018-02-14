@@ -70,15 +70,15 @@ class NATIVEUI_EXPORT Browser : public View {
   Signal<void(Browser*, const std::string&, int)> on_fail_navigation;
   Signal<void(Browser*, const std::string&)> on_finish_navigation;
 
-  // Private: Called from web pages to invoke native bindings.
+  // Internal: Called from web pages to invoke native bindings.
   bool InvokeBindings(const std::string& key,
                       const std::string& name,
                       base::Value args);
 
-  // Private: Generate the user script to inject bindings.
+  // Internal: Generate the user script to inject bindings.
   std::string GetBindingScript();
 
-  // Private: Access to bindings properties.
+  // Internal: Access to bindings properties.
   bool stop_serving() const { return stop_serving_; }
 
  protected:
