@@ -110,9 +110,14 @@ bool Window::HasShadow() const {
 void Window::PlatformSetContentView(View* view) {
   if (content_view_) {
     [content_view_->GetNative() removeFromSuperview];
-    [content_view_->GetNative() setWantsLayer:NO];
-    if (IsNUView(content_view_->GetNative()))
-      [content_view_->GetNative() nuPrivate]->is_content_view = false;
+    if (IsNUView(content_view_->GetNative())) {
+      NUPrivate* priv = [content_view_->GetNative() nuPrivate];
+      priv->is_content_view = false;
+      // Revert wantsLayer to default.
+      [content_view_->GetNative() setWantsLayer:priv->wants_layer];
+    } else {
+      [content_view_->GetNative() setWantsLayer:NO];
+    }
   }
 
   NSView* content_view = view->GetNative();
@@ -123,8 +128,7 @@ void Window::PlatformSetContentView(View* view) {
   if (!HasFrame()) {
     [content_view setFrame:[[[window_ contentView] superview] bounds]];
     // Make sure top corners are rounded:
-    if (!IsTransparent())
-      [content_view setWantsLayer:YES];
+    [content_view setWantsLayer:!IsTransparent()];
   }
 }
 

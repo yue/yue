@@ -183,6 +183,7 @@ void View::SetBackgroundColor(Color color) {
 }
 
 void View::SetWantsLayer(bool wants) {
+  [view_ nuPrivate]->wants_layer = wants;
   [view_ setWantsLayer:wants];
 }
 

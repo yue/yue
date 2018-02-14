@@ -28,6 +28,7 @@ struct NUPrivate {
   bool focusable = true;
   bool draggable = false;
   bool is_content_view = false;
+  bool wants_layer = false;
   base::scoped_nsobject<NSTrackingArea> tracking_area;
   std::unique_ptr<MouseCapture> mouse_capture;
 };

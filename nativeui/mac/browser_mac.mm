@@ -226,6 +226,8 @@ void Browser::PlatformInit() {
   NUWebView* webview = [[NUWebView alloc] initWithShell:this];
   [webview setUIDelegate:[[NUWebUIDelegate alloc] init]];
   [webview setNavigationDelegate:[[NUNavigationDelegate alloc] init]];
+  [webview nuPrivate]->wants_layer = true;
+  [webview setWantsLayer:YES];
   TakeOverView(webview);
 }
 
