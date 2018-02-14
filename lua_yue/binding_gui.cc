@@ -977,8 +977,10 @@ struct Type<nu::View> {
            "setstyle", &SetStyle,
            "printstyle", &nu::View::PrintStyle,
            "getminimumsize", &nu::View::GetMinimumSize,
+#if defined(OS_MACOSX)
            "setwantslayer", &nu::View::SetWantsLayer,
            "wantslayer", &nu::View::WantsLayer,
+#endif
            "getparent", &nu::View::GetParent,
            "getwindow", &nu::View::GetWindow);
     RawSetProperty(state, metatable,
