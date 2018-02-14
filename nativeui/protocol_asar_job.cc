@@ -8,6 +8,13 @@
 
 namespace nu {
 
+namespace {
+
+// The old asar extension name.
+const base::FilePath::CharType kOldAsarExt[] = FILE_PATH_LITERAL(".asar");
+
+}  // namespace
+
 ProtocolAsarJob::ProtocolAsarJob(const base::FilePath& asar,
                                  const std::string& path)
     : ProtocolFileJob(asar) {
@@ -16,7 +23,7 @@ ProtocolAsarJob::ProtocolAsarJob(const base::FilePath& asar,
     return;
 
   // Read asar.
-  AsarArchive archive(file_.Duplicate());
+  AsarArchive archive(file_.Duplicate(), !asar.MatchesExtension(kOldAsarExt));
   AsarArchive::FileInfo info;
   if (!archive.IsValid() ||
       !archive.GetFileInfo(path, &info)) {

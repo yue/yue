@@ -16,8 +16,22 @@
 
 namespace nu {
 
-AsarArchive::AsarArchive(base::File file)
+namespace {
+
+// The version of asar format we supports.
+const uint8_t kSupportedAsarVersion = 2;
+
+}  // namespace
+
+AsarArchive::AsarArchive(base::File file, bool extended_format)
     : file_(std::move(file)) {
+  if (!file_.IsValid())
+    return;
+
+  // If it is an extended type of asar, search from the end of file.
+  if (extended_format && !ReadExtendedMeta())
+    return;
+
   // Read size.
   char size_buf[8];
   if (file_.ReadAtCurrentPos(size_buf, 8) != 8)
@@ -39,7 +53,7 @@ AsarArchive::AsarArchive(base::File file)
   std::unique_ptr<base::Value> value = base::JSONReader::Read(header);
   if (!value || !value->is_dict())
     return;
-  content_offset_ = 8 + size;
+  content_offset_ += 8 + size;
   header_ = std::move(*value.release());
 }
 
@@ -86,6 +100,27 @@ bool AsarArchive::GetFileInfo(const std::string& path, FileInfo* info) {
     return false;
 
   info->offset += content_offset_;
+  return true;
+}
+
+bool AsarArchive::ReadExtendedMeta() {
+  // Read last 13 bytes, which are | size(8) | version(1) | magic(4) |.
+  char magic[5] = { 0 };
+  if (file_.Seek(base::File::FROM_END, -4) == -1 ||
+      file_.ReadAtCurrentPos(magic, 4) != 4 ||
+      base::StringPiece(magic) != "ASAR")
+    return false;
+  uint8_t version;
+  if (file_.Seek(base::File::FROM_END, -5) == -1 ||
+      file_.ReadAtCurrentPos(reinterpret_cast<char*>(&version), 1) != 1 ||
+      version != kSupportedAsarVersion)
+    return false;
+  double size;
+  if (file_.Seek(base::File::FROM_END, -13) == -1 ||
+      file_.ReadAtCurrentPos(reinterpret_cast<char*>(&size), 8) != 8)
+    return false;
+  content_offset_ = file_.GetLength() - static_cast<uint64_t>(size);
+  file_.Seek(base::File::FROM_BEGIN, content_offset_);
   return true;
 }
 

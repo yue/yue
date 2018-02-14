@@ -20,13 +20,15 @@ class NATIVEUI_EXPORT AsarArchive {
     uint64_t offset = 0;
   };
 
-  explicit AsarArchive(base::File file);
+  AsarArchive(base::File file, bool extended_format);
   virtual ~AsarArchive();
 
   bool IsValid() const;
   bool GetFileInfo(const std::string& path, FileInfo* info);
 
  private:
+  bool ReadExtendedMeta();
+
   base::File file_;
   base::Value header_;
   uint64_t content_offset_ = 0;
