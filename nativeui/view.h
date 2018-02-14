@@ -110,6 +110,11 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   // Return the minimum size of view.
   virtual SizeF GetMinimumSize() const;
 
+#if defined(OS_MACOSX)
+  void SetWantsLayer(bool wants);
+  bool WantsLayer() const;
+#endif
+
   // Get parent.
   View* GetParent() const { return parent_; }
 

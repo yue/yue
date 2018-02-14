@@ -182,4 +182,12 @@ void View::SetBackgroundColor(Color color) {
     [view_ setNUBackgroundColor:color];
 }
 
+void View::SetWantsLayer(bool wants) {
+  [view_ setWantsLayer:wants];
+}
+
+bool View::WantsLayer() const {
+  return [view_ wantsLayer];
+}
+
 }  // namespace nu

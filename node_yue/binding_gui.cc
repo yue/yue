@@ -1069,6 +1069,8 @@ struct Type<nu::View> {
         "setStyle", &SetStyle,
         "printStyle", &nu::View::PrintStyle,
         "getMinimumSize", &nu::View::GetMinimumSize,
+        "setWantsLayer", &nu::View::SetWantsLayer,
+        "wantsLayer", &nu::View::WantsLayer,
         "getParent", &nu::View::GetParent,
         "getWindow", &nu::View::GetWindow);
     SetProperty(context, templ,
