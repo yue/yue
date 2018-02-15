@@ -111,13 +111,27 @@ struct Type<std::string> {
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      std::string* out) {
-    if (!value->IsString())
-      return false;
-    v8::Local<v8::String> str = v8::Local<v8::String>::Cast(value);
-    int length = str->Utf8Length();
-    out->resize(length);
-    str->WriteUtf8(&(*out)[0], length, NULL, v8::String::NO_NULL_TERMINATION);
-    return true;
+    if (value->IsString()) {
+      v8::Local<v8::String> str = v8::Local<v8::String>::Cast(value);
+      int length = str->Utf8Length();
+      out->resize(length);
+      str->WriteUtf8(&out->front(), length, nullptr,
+                     v8::String::NO_NULL_TERMINATION);
+      return true;
+    } else if (value->IsArrayBuffer()) {
+      v8::ArrayBuffer::Contents contents =
+          v8::Local<v8::ArrayBuffer>::Cast(value)->GetContents();
+      out->resize(contents.ByteLength());
+      memcpy(&out->front(), contents.Data(), contents.ByteLength());
+      return true;
+    } else if (value->IsArrayBufferView()) {
+      v8::Local<v8::ArrayBufferView> buffer =
+          v8::Local<v8::ArrayBufferView>::Cast(value);
+      out->resize(buffer->ByteLength());
+      buffer->CopyContents(&out->front(), buffer->ByteLength());
+      return true;
+    }
+    return false;
   }
 };
 

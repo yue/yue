@@ -1187,7 +1187,8 @@ struct Type<nu::ProtocolAsarJob> {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::ProtocolAsarJob,
                                    const ::base::FilePath&,
-                                   const std::string&>);
+                                   const std::string&>,
+           "setdecipher", &nu::ProtocolAsarJob::SetDecipher);
   }
 };
 

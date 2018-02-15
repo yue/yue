@@ -21,6 +21,8 @@ const blacklist = [
   path.join('nativeui', 'mac', 'nu_view.h'),
   path.join('nativeui', 'mac', 'nu_window.h'),
   path.join('nativeui', 'win', 'util', 'msg_util.h'),
+  path.join('nativeui', 'util', 'aes.cc'),
+  path.join('nativeui', 'util', 'aes.h'),
 ]
 
 const sourceFiles = listFiles([

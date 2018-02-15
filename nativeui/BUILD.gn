@@ -73,6 +73,8 @@ component("nativeui") {
     "vibrant.h",
     "window.cc",
     "window.h",
+    "util/aes.cc",
+    "util/aes.h",
     "util/function_caller.h",
     "util/yoga_util.cc",
     "util/yoga_util.h",

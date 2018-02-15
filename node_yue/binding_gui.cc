@@ -1313,6 +1313,8 @@ struct Type<nu::ProtocolAsarJob> {
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "setDecipher", &nu::ProtocolAsarJob::SetDecipher);
   }
 };
 

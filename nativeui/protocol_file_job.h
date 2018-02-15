@@ -18,6 +18,7 @@ class NATIVEUI_EXPORT ProtocolFileJob : public ProtocolJob {
  public:
   explicit ProtocolFileJob(const base::FilePath& path);
 
+  // ProtocolJob:
   bool Start() override;
   void Kill() override;
   bool GetMimeType(std::string* mime_type) override;
