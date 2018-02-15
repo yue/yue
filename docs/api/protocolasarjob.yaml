@@ -1,0 +1,34 @@
+name: ProtocolAsarJob
+component: gui
+header: nativeui/protocol_file_job.h
+type: refcounted
+namespace: nu
+inherit: ProtocolJob
+description: Read asar archives to serve custom protocol requests.
+detail: |
+  The asar format is a simple extensive archive format, information of it can be
+  found at https://github.com/electron/asar.
+
+  As an experimental feature, Yue supports reading from encrypted asar archives,
+  which has not been a standard feature of asar yet but will probably be in
+  future. More about this can be found at https://github.com/yue/muban.
+
+constructors:
+  - signature: ProtocolAsarJob(const base::FilePath& asar, const std::string& path)
+    lang: ['cpp']
+    description: &ref1 |
+      Create a `ProtocolAsarJob` with `path` to a file inside an `asar` archive.
+
+class_methods:
+  - signature: ProtocolAsarJob* Create(const base::FilePath& asar, const std::string& path)
+    lang: ['lua', 'js']
+    description: *ref1
+
+methods:
+  - signature: bool SetDecipher(const std::string& key, const std::string& iv)
+    description: |
+      Set the `key` and `iv` used to read from an encrypted asar archive, return
+      `false` when the `key` and `iv` are not 16 bytes length.
+    detail: |
+      The encrypted asar archives use AES128 ECB algorithm for encryption, with
+      PKCS#7 padding.
