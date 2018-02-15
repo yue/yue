@@ -4,6 +4,8 @@
 
 #include "nativeui/protocol_job.h"
 
+#include <string.h>
+
 #include <algorithm>
 #include <utility>
 

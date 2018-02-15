@@ -4,6 +4,8 @@
 
 #include "nativeui/protocol_asar_job.h"
 
+#include <string.h>
+
 #include "nativeui/asar_archive.h"
 
 namespace nu {

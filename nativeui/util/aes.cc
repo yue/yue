@@ -30,6 +30,8 @@
 
 #include "nativeui/util/aes.h"
 
+#include <string.h>
+
 // The number of columns comprising a state in AES.
 // This is a constant in AES. Value=4.
 #define Nb 4
