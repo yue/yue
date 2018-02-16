@@ -76,10 +76,15 @@ base::Lock g_lock;
   __block std::string url([[self.request.URL absoluteString] UTF8String]);
   dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
   dispatch_async(dispatch_get_main_queue(), ^{
-    base::AutoLock auto_lock(g_lock);
-    auto it = g_handlers.find(scheme);
-    if (it != g_handlers.end())
-      job = it->second(url);
+    nu::Browser::ProtocolHandler handler;
+    {
+      base::AutoLock auto_lock(g_lock);
+      auto it = g_handlers.find(scheme);
+      if (it != g_handlers.end())
+        handler = it->second;
+    }
+    if (handler)
+      job = handler(url);
     // Wake up the thread that waits for the job.
     dispatch_semaphore_signal(semaphore);
   });
