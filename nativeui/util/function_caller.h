@@ -136,6 +136,14 @@ struct Dispatcher<void(ArgTypes...)> {
   }
 };
 
+template<>
+struct Dispatcher<void()> {
+  static void DispatchToCallback(const std::function<void()>& func,
+                                 base::Value args) {
+    func();
+  }
+};
+
 }  // namespace internal
 
 }  // namespace nu
