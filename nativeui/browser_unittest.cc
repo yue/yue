@@ -239,12 +239,12 @@ TEST_F(BrowserTest, AddBinding) {
   bool bo = false;
   std::string st;
   base::Value va;
-  std::function<void(bool, const std::string&, base::Value)> handler =
-      [&](bool b, const std::string& s, base::Value v) {
-        bo = b;
-        st = s;
-        va = std::move(v);
-      };
+  std::function<void(nu::Browser*, bool, const std::string&, base::Value)>
+      handler = [&](nu::Browser*, bool b, const std::string& s, base::Value v) {
+    bo = b;
+    st = s;
+    va = std::move(v);
+  };
   browser_->AddBinding("method", handler);
   browser_->on_finish_navigation.Connect([&](nu::Browser* browser,
                                              const std::string& url) {

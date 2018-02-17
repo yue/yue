@@ -46,43 +46,59 @@ struct IndicesGenerator<0, indices...> {
   using type = IndicesHolder<indices...>;
 };
 
+// A struct holding current arg.
+struct CallContext {
+  nu::Browser* browser;
+  size_t current_arg = 0;
+};
+
 // Converters for various types.
 template<typename T>
-inline void GetArgument(Browser* browser, base::Value arg, T* value) {
+inline bool GetArgument(CallContext* context, base::Value arg, T* value) {
   // Just use default value by default.
+  context->current_arg++;
 }
 
-inline void GetArgument(Browser* browser, base::Value arg, Browser** value) {
-  *value = browser;
+inline void GetArgument(CallContext* context, base::Value arg,
+                        Browser** value) {
+  *value = context->browser;
 }
 
-inline void GetArgument(Browser* browser, base::Value arg, base::Value* value) {
+inline void GetArgument(CallContext* context, base::Value arg,
+                        base::Value* value) {
   *value = std::move(arg);
+  context->current_arg++;
 }
 
-inline void GetArgument(Browser* browser, base::Value arg, bool* value) {
+inline void GetArgument(CallContext* context, base::Value arg, bool* value) {
   if (arg.is_bool())
     *value = arg.GetBool();
+  context->current_arg++;
 }
 
-inline void GetArgument(Browser* browser, base::Value arg, double* value) {
+inline void GetArgument(CallContext* context, base::Value arg, double* value) {
   if (arg.is_double())
     *value = arg.GetDouble();
+  context->current_arg++;
 }
 
-inline void GetArgument(Browser* browser, base::Value arg, float* value) {
+inline void GetArgument(CallContext* context, base::Value arg, float* value) {
   if (arg.is_double())
     *value = static_cast<float>(arg.GetDouble());
+  context->current_arg++;
 }
 
-inline void GetArgument(Browser* browser, base::Value arg, int* value) {
+inline void GetArgument(CallContext* context, base::Value arg, int* value) {
   if (arg.is_int())
     *value = arg.GetInt();
+  context->current_arg++;
 }
 
-inline void GetArgument(Browser* browser, base::Value arg, std::string* value) {
+inline void GetArgument(CallContext* context, base::Value arg,
+                        std::string* value) {
   if (arg.is_string())
     *value = arg.GetString();
+  context->current_arg++;
 }
 
 // Class template for extracting and storing single argument for callback
@@ -93,9 +109,10 @@ struct ArgumentHolder {
 
   ArgLocalType arg;
 
-  ArgumentHolder(Browser* browser, base::Value* value) {
-    if (value->GetList().size() > index)
-      GetArgument(browser, std::move(value->GetList()[index]), &arg);
+  ArgumentHolder(CallContext* context, base::Value* value) {
+    size_t current_arg = context->current_arg;
+    if (current_arg < value->GetList().size())
+      GetArgument(context, std::move(value->GetList()[current_arg]), &arg);
   }
 };
 
@@ -108,8 +125,8 @@ template<size_t... indices, typename... ArgTypes>
 class Invoker<IndicesHolder<indices...>, ArgTypes...>
     : public ArgumentHolder<indices, ArgTypes>... {
  public:
-  Invoker(Browser* browser, base::Value args)
-      : ArgumentHolder<indices, ArgTypes>(browser, &args)... {
+  Invoker(CallContext* context, base::Value args)
+      : ArgumentHolder<indices, ArgTypes>(context, &args)... {
   }
 
   void DispatchToCallback(const std::function<void(ArgTypes...)>& callback) {
@@ -128,18 +145,10 @@ struct Dispatcher<void(ArgTypes...)> {
                                  Browser* browser,
                                  base::Value args) {
     DCHECK(args.is_list());
+    CallContext context = { browser, 0 };
     using Indices = typename IndicesGenerator<sizeof...(ArgTypes)>::type;
-    Invoker<Indices, ArgTypes...> invoker(browser, std::move(args));
+    Invoker<Indices, ArgTypes...> invoker(&context, std::move(args));
     invoker.DispatchToCallback(func);
-  }
-};
-
-template<>
-struct Dispatcher<void()> {
-  static void DispatchToCallback(const std::function<void()>& func,
-                                 Browser* browser,
-                                 base::Value args) {
-    func();
   }
 };
 
