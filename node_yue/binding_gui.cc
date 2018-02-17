@@ -1367,7 +1367,8 @@ struct Type<nu::Browser> {
     std::shared_ptr<internal::V8FunctionWrapper> func_ref(
         new internal::V8FunctionWrapper(isolate, func));
     // Parse base::Value and call func with v8 args.
-    browser->AddRawBinding(name, [isolate, func_ref](::base::Value value) {
+    browser->AddRawBinding(name, [isolate, func_ref](nu::Browser* browser,
+                                                     ::base::Value value) {
       Locker locker(isolate);
       v8::HandleScope handle_scope(isolate);
       v8::MicrotasksScope script_scope(isolate,

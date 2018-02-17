@@ -265,7 +265,7 @@ TEST_F(BrowserTest, AddBinding) {
 
 TEST_F(BrowserTest, SetBindingName) {
   browser_->SetBindingName("binding");
-  browser_->AddRawBinding("method", [](base::Value) {});
+  browser_->AddRawBinding("method", [](nu::Browser*, base::Value) {});
   browser_->on_finish_navigation.Connect([](nu::Browser* browser,
                                             const std::string& url) {
     browser->ExecuteJavaScript("window.method()",
@@ -286,7 +286,9 @@ TEST_F(BrowserTest, SetBindingName) {
 
 TEST_F(BrowserTest, MalicousCall) {
   bool called = false;
-  browser_->AddRawBinding("method", [&called](base::Value) { called = true; });
+  browser_->AddRawBinding("method", [&called](nu::Browser*, base::Value) {
+    called = true;
+  });
   browser_->on_finish_navigation.Connect([&called](nu::Browser* browser,
                                                    const std::string& url) {
     browser->ExecuteJavaScript(

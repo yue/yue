@@ -73,7 +73,7 @@ bool Browser::InvokeBindings(const std::string& key,
     LOG(ERROR) << "Invoking invalid method: " << method;
     return false;
   }
-  it->second(std::move(args));
+  it->second(this, std::move(args));
   return true;
 }
 

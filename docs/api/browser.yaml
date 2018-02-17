@@ -138,7 +138,7 @@ methods:
       window.addRecord2('The Best Animal', 'Panda');
       ```
 
-  - signature: void AddRawBinding(const std::string& name, const std::function<void(base::Value)>& func)
+  - signature: void AddRawBinding(const std::string& name, const std::function<void(Browser*, base::Value)>& func)
     description: Add a raw handler to web page with `name`.
     detail: |
       The `func` will be called with a list of arguments passed from JavaScript.
