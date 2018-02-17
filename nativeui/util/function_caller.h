@@ -54,50 +54,50 @@ struct CallContext {
 
 // Converters for various types.
 template<typename T>
-inline bool GetArgument(CallContext* context, base::Value arg, T* value) {
+inline bool GetArgument(CallContext* context, base::Value* arg, T* value) {
   // Just use default value by default.
   context->current_arg++;
 }
 
-inline void GetArgument(CallContext* context, base::Value arg,
+inline void GetArgument(CallContext* context, base::Value* arg,
                         Browser** value) {
   *value = context->browser;
 }
 
-inline void GetArgument(CallContext* context, base::Value arg,
+inline void GetArgument(CallContext* context, base::Value* arg,
                         base::Value* value) {
-  *value = std::move(arg);
+  *value = std::move(*arg);
   context->current_arg++;
 }
 
-inline void GetArgument(CallContext* context, base::Value arg, bool* value) {
-  if (arg.is_bool())
-    *value = arg.GetBool();
-  context->current_arg++;
-}
-
-inline void GetArgument(CallContext* context, base::Value arg, double* value) {
-  if (arg.is_double())
-    *value = arg.GetDouble();
-  context->current_arg++;
-}
-
-inline void GetArgument(CallContext* context, base::Value arg, float* value) {
-  if (arg.is_double())
-    *value = static_cast<float>(arg.GetDouble());
-  context->current_arg++;
-}
-
-inline void GetArgument(CallContext* context, base::Value arg, int* value) {
-  if (arg.is_int())
-    *value = arg.GetInt();
-  context->current_arg++;
-}
-
-inline void GetArgument(CallContext* context, base::Value arg,
+inline void GetArgument(CallContext* context, base::Value* arg,
                         std::string* value) {
-  if (arg.is_string())
-    *value = arg.GetString();
+  if (arg->is_string())
+    *value = arg->GetString();
+  context->current_arg++;
+}
+
+inline void GetArgument(CallContext* context, base::Value* arg, bool* value) {
+  if (arg->is_bool())
+    *value = arg->GetBool();
+  context->current_arg++;
+}
+
+inline void GetArgument(CallContext* context, base::Value* arg, double* value) {
+  if (arg->is_double())
+    *value = arg->GetDouble();
+  context->current_arg++;
+}
+
+inline void GetArgument(CallContext* context, base::Value* arg, float* value) {
+  if (arg->is_double())
+    *value = static_cast<float>(arg->GetDouble());
+  context->current_arg++;
+}
+
+inline void GetArgument(CallContext* context, base::Value* arg, int* value) {
+  if (arg->is_int())
+    *value = arg->GetInt();
   context->current_arg++;
 }
 
@@ -112,7 +112,7 @@ struct ArgumentHolder {
   ArgumentHolder(CallContext* context, base::Value* value) {
     size_t current_arg = context->current_arg;
     if (current_arg < value->GetList().size())
-      GetArgument(context, std::move(value->GetList()[current_arg]), &arg);
+      GetArgument(context, &value->GetList()[current_arg], &arg);
   }
 };
 
