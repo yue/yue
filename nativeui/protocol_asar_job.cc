@@ -47,6 +47,17 @@ bool ProtocolAsarJob::SetDecipher(const std::string& key,
   return aes_.Init(key, iv);
 }
 
+bool ProtocolAsarJob::Start() {
+  if (!aes_.IsValid())
+    return ProtocolFileJob::Start();
+  if (!file_.IsValid())
+    return false;
+  // Don't pass content length when stream is encrypted, since the decrypted
+  // size might be smaller.
+  notify_content_length(-1);
+  return true;
+}
+
 size_t ProtocolAsarJob::Read(void* buf, size_t buf_size) {
   if (!aes_.IsValid())
     return ProtocolFileJob::Read(buf, buf_size);

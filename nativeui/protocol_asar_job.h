@@ -24,6 +24,7 @@ class NATIVEUI_EXPORT ProtocolAsarJob : public ProtocolFileJob {
   ~ProtocolAsarJob() override;
 
   // ProtocolJob:
+  bool Start() override;
   size_t Read(void* buf, size_t buf_size) override;
 
   AES aes_;
