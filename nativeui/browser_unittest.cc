@@ -263,6 +263,17 @@ TEST_F(BrowserTest, AddBinding) {
   nu::MessageLoop::Run();
 }
 
+void DummyFunction(const std::string&) {
+}
+
+TEST_F(BrowserTest, AddBindingFunctionPointer) {
+  browser_->AddBinding("method", &DummyFunction);
+}
+
+TEST_F(BrowserTest, AddBindingCapturelessLabmda) {
+  browser_->AddBinding("method", []() {});
+}
+
 TEST_F(BrowserTest, SetBindingName) {
   browser_->SetBindingName("binding");
   browser_->AddRawBinding("method", [](nu::Browser*, base::Value) {});

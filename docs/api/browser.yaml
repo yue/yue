@@ -138,6 +138,11 @@ methods:
       window.addRecord2('The Best Animal', 'Panda');
       ```
 
+      Note that only functors, function pointers, `std::function` and
+      captureless labmda functions are accepted in `AddBinding`. Labmda
+      functions with captures can not have their types deduced automatically, so
+      you have to convert them to `std::function` first .
+
   - signature: void AddRawBinding(const std::string& name, const std::function<void(Browser*, base::Value)>& func)
     description: Add a raw handler to web page with `name`.
     detail: |

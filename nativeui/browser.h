@@ -62,6 +62,12 @@ class NATIVEUI_EXPORT Browser : public View {
           func, browser, std::move(args));
     });
   }
+  // Automatically convert function pointer to std::function.
+  template<typename T>
+  void AddBinding(const std::string& name, T func) {
+    using RunType = typename internal::FunctorTraits<T>::RunType;
+    AddBinding(name, std::function<RunType>(func));
+  }
 
   // Events.
   Signal<void(Browser*)> on_close;
