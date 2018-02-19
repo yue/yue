@@ -84,8 +84,6 @@ bool JustifyValue(const std::string& value, int* out) {
     *out = static_cast<int>(YGJustifySpaceAround);
   else if (value == "space-between")
     *out = static_cast<int>(YGJustifySpaceBetween);
-  else if (value == "space-evenly")
-    *out = static_cast<int>(YGJustifySpaceEvenly);
   else if (value == "flex-start")
     *out = static_cast<int>(YGJustifyFlexStart);
   else if (value == "flex-end")
