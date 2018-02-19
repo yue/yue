@@ -22,6 +22,12 @@ using IntConverter = bool(*)(const std::string&, int*);
 bool AlignValue(const std::string& value, int* out) {
   if (value == "auto")
     *out = static_cast<int>(YGAlignAuto);
+  else if (value == "base-line")
+    *out = static_cast<int>(YGAlignBaseline);
+  else if (value == "space-between")
+    *out = static_cast<int>(YGAlignSpaceBetween);
+  else if (value == "space-around")
+    *out = static_cast<int>(YGAlignSpaceAround);
   else if (value == "center")
     *out = static_cast<int>(YGAlignCenter);
   else if (value == "stretch")
@@ -78,6 +84,8 @@ bool JustifyValue(const std::string& value, int* out) {
     *out = static_cast<int>(YGJustifySpaceAround);
   else if (value == "space-between")
     *out = static_cast<int>(YGJustifySpaceBetween);
+  else if (value == "space-evenly")
+    *out = static_cast<int>(YGJustifySpaceEvenly);
   else if (value == "flex-start")
     *out = static_cast<int>(YGJustifyFlexStart);
   else if (value == "flex-end")
@@ -112,6 +120,8 @@ bool WrapValue(const std::string& value, int* out) {
     *out = static_cast<int>(YGWrapWrap);
   else if (value == "nowrap")
     *out = static_cast<int>(YGWrapNoWrap);
+  else if (value == "wrap-reverse")
+    *out = static_cast<int>(YGWrapWrapReverse);
   else
     return false;
   return true;
