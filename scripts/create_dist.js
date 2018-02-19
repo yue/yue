@@ -75,13 +75,19 @@ const buildHeaders =
   ['tools/gn/build/build_config.h', 'tools/gn/build/buildflag.h'])
 for (const h of buildHeaders)
   addFileToZip(yuezip, h, 'tools/gn', 'include')
-const genHeaders =
-  searchFiles('out/Release/gen/base/debug', '.h')
-for (const h of genHeaders)
-  addFileToZip(yuezip, h, 'out/Release/gen', 'include')
 for (const file of staticLibs[targetOs]) {
-  addFileToZip(yuezip, `out/Release/${file}`, 'out/Release', 'lib')
-  addFileToZip(yuezip, `out/Debug/${file}`, 'out/Debug', 'lib', 'd')
+  addFileToZip(yuezip, `out/Release/${file}`, 'out/Release', 'Release')
+  addFileToZip(yuezip, `out/Debug/${file}`, 'out/Debug', 'Debug')
+}
+for (const config of ['Debug', 'Release']) {
+  if (targetOs == 'win') {
+    const pdbs = searchFiles(`out/${config}/obj`, '.pdb')
+    for (const p of pdbs)
+      addFileToZip(yuezip, p, path.dirname(p), config)
+  }
+  const gens = searchFiles(`out/${config}/gen`, '.h')
+  for (const h of gens)
+    addFileToZip(yuezip, h, `out/${config}/gen`, `${config}/include`)
 }
 addFileToZip(yuezip, 'sample_app/CMakeLists.txt', 'sample_app')
 addFileToZip(yuezip, 'sample_app/main.cc', '')
