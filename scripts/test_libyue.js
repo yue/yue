@@ -18,6 +18,7 @@ const tmppath = path.join(os.tmpdir(), zipname)
 // Bulid and package.
 console.log('Building libyue...')
 execSync('node scripts/build.js out/Release')
+execSync('node scripts/build.js out/Debug')
 console.log('Zipping and unzipping libyue...')
 execSync('node scripts/create_dist.js')
 extract(`out/Dist/${zipname}.zip`, {dir: tmppath}, runTests)
