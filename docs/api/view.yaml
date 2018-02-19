@@ -56,7 +56,9 @@ methods:
 
   - signature: void SetEnabled(bool enable)
     description: Set whether the view is enabled.
-    detail: Depending the type of view, this method may have no effect.
+    detail: |
+      The enabled state of each view is not affected by its parent, disabling
+      a container-like view does not have any effect.
 
   - signature: bool IsEnabled() const
     description: Return whether the view is enabled.

@@ -110,7 +110,7 @@ bool View::IsVisible() const {
 
 void View::SetEnabled(bool enable) {
   if ([view_ respondsToSelector:@selector(setEnabled:)])
-    [static_cast<NSControl*>(view_) setEnabled:YES];
+    [static_cast<NSControl*>(view_) setEnabled:enable];
 }
 
 bool View::IsEnabled() const {

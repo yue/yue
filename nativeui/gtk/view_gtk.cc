@@ -204,6 +204,9 @@ bool View::IsVisible() const {
 }
 
 void View::SetEnabled(bool enable) {
+  // Do not support disabling a container, to match other platforms' behavior.
+  if (GTK_IS_CONTAINER(view_) && !GTK_IS_BIN(view_))
+    return;
   gtk_widget_set_sensitive(view_, enable);
 }
 
@@ -230,7 +233,7 @@ bool View::IsFocusable() const {
 void View::SetCapture() {
   // Get the GDK window.
   GdkWindow* window;
-  if (GetClassName() == Container::kClassName)
+  if (NU_IS_CONTAINER(view_))
     window = nu_container_get_window(NU_CONTAINER(view_));
   else
     window = gtk_widget_get_window(view_);
