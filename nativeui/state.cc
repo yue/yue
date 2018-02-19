@@ -46,6 +46,7 @@ State::~State() {
   lazy_tls_ptr.Pointer()->Set(nullptr);
 
 #ifndef NDEBUG
+  DCHECK_EQ(YGNodeGetInstanceCount(), 0) << "Yoga Node is leaked";
   DCHECK_EQ(ProtocolJob::jobs_count(), 0) << "ProtocolJob is leaked";
 #endif
 }

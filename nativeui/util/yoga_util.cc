@@ -47,6 +47,16 @@ bool DirectionValue(const std::string& value, int* out) {
   return true;
 }
 
+bool DisplayValue(const std::string& value, int* out) {
+  if (value == "flex")
+    *out = static_cast<int>(YGDisplayFlex);
+  else if (value == "none")
+    *out = static_cast<int>(YGDisplayNone);
+  else
+    return false;
+  return true;
+}
+
 bool FlexDirectionValue(const std::string& value, int* out) {
   if (value == "row")
     *out = static_cast<int>(YGFlexDirectionRow);
@@ -168,6 +178,7 @@ void SetBorderWidth(const YGNodeRef node, float border) {
 // We use int to represent enums.
 using IntSetter = void(*)(const YGNodeRef, int);
 using FloatSetter = void(*)(const YGNodeRef, float);
+using AutoSetter = void(*)(const YGNodeRef);
 using EdgeSetter = void(*)(const YGNodeRef, const YGEdge, float);
 
 // Sorted list of CSS node properties.
@@ -180,6 +191,8 @@ const std::tuple<const char*, IntConverter, IntSetter> int_setters[] = {
                   reinterpret_cast<IntSetter>(YGNodeStyleSetAlignSelf)),
   std::make_tuple("direction", DirectionValue,
                   reinterpret_cast<IntSetter>(YGNodeStyleSetDirection)),
+  std::make_tuple("display", DisplayValue,
+                  reinterpret_cast<IntSetter>(YGNodeStyleSetDisplay)),
   std::make_tuple("flexdirection", FlexDirectionValue,
                   reinterpret_cast<IntSetter>(YGNodeStyleSetFlexDirection)),
   std::make_tuple("flexwrap", WrapValue,
@@ -192,6 +205,8 @@ const std::tuple<const char*, IntConverter, IntSetter> int_setters[] = {
                   reinterpret_cast<IntSetter>(YGNodeStyleSetPositionType)),
 };
 const std::pair<const char*, FloatSetter> float_setters[] = {
+  std::make_pair("aspectratio",
+                 reinterpret_cast<FloatSetter>(YGNodeStyleSetAspectRatio)),
   std::make_pair("border",
                  reinterpret_cast<FloatSetter>(SetBorderWidth)),
   std::make_pair("flex",
@@ -218,6 +233,11 @@ const std::pair<const char*, FloatSetter> float_setters[] = {
                  reinterpret_cast<FloatSetter>(SetPadding)),
   std::make_pair("width",
                  reinterpret_cast<FloatSetter>(YGNodeStyleSetWidth)),
+};
+const std::pair<const char*, AutoSetter> auto_setters[] = {
+  std::make_pair("flexbasis", YGNodeStyleSetFlexBasisAuto),
+  std::make_pair("height", YGNodeStyleSetHeightAuto),
+  std::make_pair("width", YGNodeStyleSetWidthAuto),
 };
 const std::pair<const char*, FloatSetter> percent_setters[] = {
   std::make_pair("flexbasis",
@@ -354,10 +374,23 @@ bool SetFloatStyle(YGNodeRef node, const std::string& name, float value) {
   return true;
 }
 
-bool SetFloatStyle(YGNodeRef node,
-                   const std::string& name,
-                   const std::string& value) {
-  return SetFloatStyle(node, name, PixelValue(value));
+// Set "auto" property for styles.
+bool SetAutoStyle(YGNodeRef node, const std::string& name) {
+  auto* tup = Find(auto_setters, name);
+  if (!tup)
+    return false;
+  std::get<1>(*tup)(node);
+  return true;
+}
+
+// Dispatch to float for auto depending on the value.
+bool SetUnitStyle(YGNodeRef node,
+                  const std::string& name,
+                  const std::string& value) {
+  if (value == "auto")
+    return SetAutoStyle(node, name);
+  else
+    return SetFloatStyle(node, name, PixelValue(value));
 }
 
 // Set style for percent properties.
@@ -416,15 +449,16 @@ void SetYogaProperty(YGNodeRef node,
                      const std::string& value) {
   DCHECK(IsSorted(int_setters) &&
          IsSorted(float_setters) &&
+         IsSorted(auto_setters) &&
          IsSorted(percent_setters) &&
          IsSorted(edge_setters) &&
-         IsSorted(edge_percent_setters))<< "Property setters must be sorted";
+         IsSorted(edge_percent_setters)) << "Property setters must be sorted";
   if (IsPercentValue(value)) {
     SetPercentStyle(node, name, value) ||
     SetEdgePercentStyle(node, name, value);
   } else {
     SetIntStyle(node, name, value) ||
-    SetFloatStyle(node, name, value) ||
+    SetUnitStyle(node, name, value) ||
     SetEdgeStyle(node, name, value);
   }
 }

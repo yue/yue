@@ -177,9 +177,6 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
 
   // The node recording CSS styles.
   YGNodeRef node_;
-
-  // Saved state of node's style.
-  int node_position_ = 0;
 };
 
 }  // namespace nu

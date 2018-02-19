@@ -6,12 +6,17 @@ config("yoga_config") {
 
 source_set("yoga") {
   sources = [
-    "yoga/YGEnums.c",
+    "yoga/Utils.cpp",
+    "yoga/Utils.h",
+    "yoga/YGEnums.cpp",
     "yoga/YGEnums.h",
     "yoga/YGMacros.h",
-    "yoga/YGNodeList.c",
-    "yoga/YGNodeList.h",
-    "yoga/Yoga.c",
+    "yoga/YGNode.cpp",
+    "yoga/YGNode.h",
+    "yoga/YGNodePrint.cpp",
+    "yoga/YGNodePrint.h",
+    "yoga/Yoga-internal.h",
+    "yoga/Yoga.cpp",
     "yoga/Yoga.h",
   ]
 
