@@ -46,8 +46,11 @@ State::~State() {
   lazy_tls_ptr.Pointer()->Set(nullptr);
 
 #ifndef NDEBUG
-  DCHECK_EQ(YGNodeGetInstanceCount(), 0) << "Yoga Node is leaked";
-  DCHECK_EQ(ProtocolJob::jobs_count(), 0) << "ProtocolJob is leaked";
+  DCHECK_EQ(YGNodeGetInstanceCount(), 0) <<
+      "There are instances of nu::View leaked on exit";
+  DCHECK_EQ(ProtocolJob::jobs_count(), 0) <<
+      "There are instances of nu::ProtocolJob still alive on exit, it is very"
+      "likely your code has a memory leak.";
 #endif
 }
 
