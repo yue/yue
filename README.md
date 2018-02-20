@@ -7,6 +7,7 @@ A library for creating native cross-platform GUI apps.
 * [Documentations](http://libyue.com)
 * [FAQ](https://github.com/yue/yue/blob/master/docs/guides/faq.md)
 * [Sample apps (with screenshots)](https://github.com/yue/yue-sample-apps)
+* [Muban - a template project](https://github.com/yue/muban)
 
 ## Issues
 
