@@ -102,8 +102,13 @@ generateZip('lua_yue_lua_5.3', luaFiles[targetOs])
 if (process.env.CI != 'true' || (targetOs == 'linux' && targetCpu == 'x64')) {
   execSync('node ./scripts/create_docs.js')
   addFileToZip(new JSZip(), 'out/Dist/docs', 'out/Dist/docs')
-    .generateNodeStream({streamFiles:true})
-    .pipe(fs.createWriteStream(`out/Dist/yue_docs_${version}.zip`))
+    .generateNodeStream({
+      streamFiles:true,
+      compression: 'DEFLATE',
+      compressionOptions: {
+        level: 9
+      }
+    }).pipe(fs.createWriteStream(`out/Dist/yue_docs_${version}.zip`))
 }
 
 function generateZip(name, list, zip = new JSZip()) {
@@ -111,8 +116,12 @@ function generateZip(name, list, zip = new JSZip()) {
   for (let file of list)
     addFileToZip(zip, `out/Release/${file}`, 'out/Release')
   zip.file('LICENSE', collectLicenses())
-  zip.generateNodeStream({streamFiles:true})
-     .pipe(fs.createWriteStream(`out/Dist/${zipname}.zip`))
+  zip.generateNodeStream({
+      streamFiles:true,
+      compression: 'DEFLATE',
+      compressionOptions: {
+        level: 9
+      }}).pipe(fs.createWriteStream(`out/Dist/${zipname}.zip`))
 }
 
 function addFileToZip(zip, file, base, prefix = '', suffix = '') {

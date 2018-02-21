@@ -67,5 +67,10 @@ if (targetOs == 'linux') {
 mkdir('out/Dist')
 let zip = new JSZip()
 zip.file('gui.node', fs.readFileSync('out/Node/gui.node'))
-zip.generateNodeStream({streamFiles:true})
-   .pipe(fs.createWriteStream(`out/Dist/${zipname}.zip`))
+zip.generateNodeStream({
+  streamFiles:true,
+  compression: 'DEFLATE',
+  compressionOptions: {
+    level: 9
+  }
+}).pipe(fs.createWriteStream(`out/Dist/${zipname}.zip`))
