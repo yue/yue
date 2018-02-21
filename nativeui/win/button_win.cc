@@ -22,8 +22,7 @@ namespace nu {
 
 namespace {
 
-const int kButtonPadding = 3;
-const int kCheckboxPadding = 1;
+const int kButtonPadding = 1;
 
 class ButtonImpl : public Clickable {
  public:
@@ -63,10 +62,7 @@ class ButtonImpl : public Clickable {
       preferred_size.Enlarge(box_size_.width(), 0);
     }
     preferred_size = ScaleSize(preferred_size, 1.f / scale_factor());
-    if (type() == ControlType::Button)
-      preferred_size.Enlarge(kButtonPadding * 2, kButtonPadding * 2);
-    else
-      preferred_size.Enlarge(kCheckboxPadding * 2, kCheckboxPadding * 2);
+    preferred_size.Enlarge(kButtonPadding * 2, kButtonPadding * 2);
     return preferred_size;
   }
 
@@ -153,9 +149,7 @@ class ButtonImpl : public Clickable {
 
     // The bounds of text.
     Rect text_bounds(origin, preferred_size);
-    int padding = std::ceil(
-        (type() == ControlType::Button ? kButtonPadding : kCheckboxPadding) *
-        scale_factor());
+    int padding = std::ceil(kButtonPadding * scale_factor());
     text_bounds.Inset(padding, padding);
     if (type() == ControlType::Button || image_)
       text_bounds.Inset(image_size_.width(), 0, 0, 0);
