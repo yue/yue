@@ -108,6 +108,17 @@ bool View::IsVisible() const {
   return ![view_ isHidden];
 }
 
+void View::SetEnabled(bool enable) {
+  if ([view_ respondsToSelector:@selector(setEnabled:)])
+    [static_cast<NSControl*>(view_) setEnabled:YES];
+}
+
+bool View::IsEnabled() const {
+  if ([view_ respondsToSelector:@selector(isEnabled)])
+    return [static_cast<NSControl*>(view_) isEnabled];
+  return true;
+}
+
 void View::Focus() {
   if (view_.window && IsFocusable())
     [view_.window makeFirstResponder:view_];

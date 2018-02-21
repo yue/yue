@@ -60,6 +60,10 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   void SetVisible(bool visible);
   bool IsVisible() const;
 
+  // Enable/disable the view.
+  void SetEnabled(bool enable);
+  bool IsEnabled() const;
+
   // Move the keyboard focus to the view.
   void Focus();
   bool HasFocus() const;

@@ -107,6 +107,9 @@ class ViewImpl {
   // Whether the view is visible.
   bool is_visible() const { return is_visible_; }
 
+  // Whether the view is disabled.
+  bool is_disabled() const { return state_ == ControlState::Disabled; }
+
   // Whether the view can get focus.
   void set_focusable(bool focusable) { focusable_ = focusable; }
   bool is_focusable() const { return focusable_; }

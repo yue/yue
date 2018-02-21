@@ -18,7 +18,8 @@ Clickable::~Clickable() {
 
 void Clickable::OnMouseEnter(NativeEvent event) {
   is_hovering_ = true;
-  SetState(is_capturing_ ? ControlState::Pressed : ControlState::Hovered);
+  if (!is_disabled())
+    SetState(is_capturing_ ? ControlState::Pressed : ControlState::Hovered);
   ViewImpl::OnMouseEnter(event);
 }
 
@@ -37,7 +38,8 @@ void Clickable::OnMouseMove(NativeEvent event) {
 
 void Clickable::OnMouseLeave(NativeEvent event) {
   is_hovering_ = false;
-  SetState(is_capturing_ ? ControlState::Hovered : ControlState::Normal);
+  if (!is_disabled())
+    SetState(is_capturing_ ? ControlState::Hovered : ControlState::Normal);
   ViewImpl::OnMouseLeave(event);
 }
 

@@ -54,6 +54,13 @@ methods:
   - signature: bool IsVisible() const
     description: Return whether the view is visible.
 
+  - signature: void SetEnabled(bool enable)
+    description: Set whether the view is enabled.
+    detail: Depending the type of view, this method may have no effect.
+
+  - signature: bool IsEnabled() const
+    description: Return whether the view is enabled.
+
   - signature: void Focus()
     description: Move the keyboard focus to the view.
 

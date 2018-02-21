@@ -203,6 +203,14 @@ bool View::IsVisible() const {
   return gtk_widget_get_visible(view_);
 }
 
+void View::SetEnabled(bool enable) {
+  gtk_widget_set_sensitive(view_, enable);
+}
+
+bool View::IsEnabled() const {
+  return gtk_widget_get_sensitive(view_);
+}
+
 void View::Focus() {
   gtk_widget_grab_focus(view_);
 }

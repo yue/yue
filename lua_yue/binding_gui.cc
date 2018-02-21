@@ -962,6 +962,8 @@ struct Type<nu::View> {
            "schedulepaint", &nu::View::SchedulePaint,
            "setvisible", &nu::View::SetVisible,
            "isvisible", &nu::View::IsVisible,
+           "setenabled", &nu::View::SetEnabled,
+           "isenabled", &nu::View::IsEnabled,
            "focus", &nu::View::Focus,
            "hasfocus", &nu::View::HasFocus,
            "setfocusable", &nu::View::SetFocusable,

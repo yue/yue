@@ -140,6 +140,10 @@ void ViewImpl::OnMouseLeave(NativeEvent event) {
 }
 
 bool ViewImpl::OnMouseClick(NativeEvent event) {
+  // If the view is disabled, prevent future processes.
+  if (is_disabled())
+    return true;
+
   // Clicking a view should move the focus to it.
   // This has to be done before handling the mouse event, because user may
   // want to move focus to other view later.
@@ -276,6 +280,14 @@ void View::PlatformSetVisible(bool visible) {
 
 bool View::IsVisible() const {
   return GetNative()->is_visible();
+}
+
+void View::SetEnabled(bool enable) {
+  GetNative()->SetState(enable ? ControlState::Normal : ControlState::Disabled);
+}
+
+bool View::IsEnabled() const {
+  return !GetNative()->is_disabled();
 }
 
 void View::Focus() {
