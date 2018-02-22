@@ -44,11 +44,12 @@ class NATIVEUI_EXPORT Browser : public View {
                          const ExecutionCallback& callback);
 
   void GoBack();
-  bool CanGoBack();
+  bool CanGoBack() const;
   void GoForward();
-  bool CanGoForward();
+  bool CanGoForward() const;
   void Reload();
   void Stop();
+  bool IsLoading() const;
 
   void SetBindingName(const std::string& name);
   void AddRawBinding(const std::string& name, const BindingFunc& func);
@@ -71,6 +72,8 @@ class NATIVEUI_EXPORT Browser : public View {
 
   // Events.
   Signal<void(Browser*)> on_close;
+  Signal<void(Browser*)> on_update_command;
+  Signal<void(Browser*)> on_change_loading;
   Signal<void(Browser*, const std::string&)> on_update_title;
   Signal<void(Browser*, const std::string&)> on_start_navigation;
   Signal<void(Browser*, const std::string&)> on_commit_navigation;

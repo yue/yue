@@ -114,9 +114,21 @@ base::Value NSValueToBaseValue(id value) {
                                                      name:@"yue"];
   [super initWithFrame:NSZeroRect configuration:config.get()];
 
-  // Watch the change of "title".
+  // Watch the webview events
   [self addObserver:self
          forKeyPath:@"title"
+            options:NSKeyValueObservingOptionNew
+            context:nil];
+  [self addObserver:self
+         forKeyPath:@"loading"
+            options:NSKeyValueObservingOptionNew
+            context:nil];
+  [self addObserver:self
+         forKeyPath:@"canGoBack"
+            options:NSKeyValueObservingOptionNew
+            context:nil];
+  [self addObserver:self
+         forKeyPath:@"canGoForward"
             options:NSKeyValueObservingOptionNew
             context:nil];
   return self;
@@ -125,20 +137,27 @@ base::Value NSValueToBaseValue(id value) {
 - (void)willDestroy {
   // Unsubscribe before destroying the webview.
   [self removeObserver:self forKeyPath:@"title"];
+  [self removeObserver:self forKeyPath:@"loading"];
+  [self removeObserver:self forKeyPath:@"canGoBack"];
+  [self removeObserver:self forKeyPath:@"canGoForward"];
 }
 
 - (void)observeValueForKeyPath:(NSString*)keyPath
                       ofObject:(id)object
                         change:(NSDictionary*)change
                        context:(void*)context {
-  if (![keyPath isEqualToString:@"title"] || object != self) {
+  if ([keyPath isEqualToString:@"title"])
+    shell_->on_update_title.Emit(shell_, shell_->GetTitle());
+  else if ([keyPath isEqualToString:@"loading"])
+    shell_->on_change_loading.Emit(shell_);
+  else if ([keyPath isEqualToString:@"canGoBack"] ||
+           [keyPath isEqualToString:@"canGoForward"])
+    shell_->on_update_command.Emit(shell_);
+  else
     [super observeValueForKeyPath:keyPath
                          ofObject:object
                            change:change
                           context:context];
-    return;
-  }
-  shell_->on_update_title.Emit(shell_, shell_->GetTitle());
 }
 
 - (nu::NUPrivate*)nuPrivate {
@@ -292,7 +311,7 @@ void Browser::GoBack() {
   [static_cast<NUWebView*>(GetNative()) goBack:nil];
 }
 
-bool Browser::CanGoBack() {
+bool Browser::CanGoBack() const {
   return [static_cast<NUWebView*>(GetNative()) canGoBack];
 }
 
@@ -300,7 +319,7 @@ void Browser::GoForward() {
   [static_cast<NUWebView*>(GetNative()) goForward:nil];
 }
 
-bool Browser::CanGoForward() {
+bool Browser::CanGoForward() const {
   return [static_cast<NUWebView*>(GetNative()) canGoForward];
 }
 
@@ -310,6 +329,10 @@ void Browser::Reload() {
 
 void Browser::Stop() {
   [static_cast<NUWebView*>(GetNative()) stopLoading:nil];
+}
+
+bool Browser::IsLoading() const {
+  return [static_cast<NUWebView*>(GetNative()) isLoading];
 }
 
 void Browser::PlatformUpdateBindings() {

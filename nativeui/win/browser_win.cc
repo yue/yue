@@ -174,7 +174,7 @@ void BrowserImpl::GoBack() {
     browser_->GoBack();
 }
 
-bool BrowserImpl::CanGoBack() {
+bool BrowserImpl::CanGoBack() const {
   return can_go_back_;
 }
 
@@ -183,7 +183,7 @@ void BrowserImpl::GoForward() {
     browser_->GoForward();
 }
 
-bool BrowserImpl::CanGoForward() {
+bool BrowserImpl::CanGoForward() const {
   return can_go_forward_;
 }
 
@@ -389,7 +389,7 @@ void Browser::GoBack() {
   static_cast<BrowserImpl*>(GetNative())->GoBack();
 }
 
-bool Browser::CanGoBack() {
+bool Browser::CanGoBack() const {
   return static_cast<BrowserImpl*>(GetNative())->CanGoBack();
 }
 
@@ -397,7 +397,7 @@ void Browser::GoForward() {
   static_cast<BrowserImpl*>(GetNative())->GoForward();
 }
 
-bool Browser::CanGoForward() {
+bool Browser::CanGoForward() const {
   return static_cast<BrowserImpl*>(GetNative())->CanGoForward();
 }
 

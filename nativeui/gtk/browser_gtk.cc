@@ -46,6 +46,10 @@ void OnNotifyTitle(WebKitWebView*, GParamSpec*, Browser* view) {
   view->on_update_title.Emit(view, view->GetTitle());
 }
 
+void OnNotifyLoading(WebKitWebView*, GParamSpec*, Browser* view) {
+  view->on_change_loading.Emit(view);
+}
+
 void OnClose(WebKitWebView*, Browser* view) {
   view->on_close.Emit(view);
 }
@@ -79,6 +83,13 @@ gboolean OnLoadFailed(WebKitWebView* widget, WebKitLoadEvent event,
   // need to ignore the next "finished" event.
   g_object_set_data(G_OBJECT(widget), kIgnoreNextFinish, view);
   return TRUE;
+}
+
+void OnBackForwadListChanged(WebKitBackForwardList* backforward_list,
+                             WebKitBackForwardListItem* added,
+                             GList* removed,
+                             Browser *view) {
+  view->on_update_command.Emit(view);
 }
 
 void OnJavaScriptFinish(WebKitWebView* webview,
@@ -181,9 +192,15 @@ void Browser::PlatformInit() {
 
   // Install events.
   g_signal_connect(webview, "notify::title", G_CALLBACK(OnNotifyTitle), this);
+  g_signal_connect(webview, "notify::loading", G_CALLBACK(OnNotifyLoading),
+                   this);
   g_signal_connect(webview, "close", G_CALLBACK(OnClose), this);
   g_signal_connect(webview, "load-changed", G_CALLBACK(OnLoadChanged), this);
   g_signal_connect(webview, "load-failed", G_CALLBACK(OnLoadFailed), this);
+  WebKitBackForwardList* backforward_list =
+      webkit_web_view_get_back_forward_list(WEBKIT_WEB_VIEW(webview));
+  g_signal_connect(backforward_list, "changed",
+                   G_CALLBACK(OnBackForwadListChanged), this);
 }
 
 void Browser::PlatformDestroy() {
@@ -229,7 +246,7 @@ void Browser::GoBack() {
   webkit_web_view_go_back(WEBKIT_WEB_VIEW(GetNative()));
 }
 
-bool Browser::CanGoBack() {
+bool Browser::CanGoBack() const {
   return webkit_web_view_can_go_back(WEBKIT_WEB_VIEW(GetNative()));
 }
 
@@ -237,7 +254,7 @@ void Browser::GoForward() {
   webkit_web_view_go_forward(WEBKIT_WEB_VIEW(GetNative()));
 }
 
-bool Browser::CanGoForward() {
+bool Browser::CanGoForward() const {
   return webkit_web_view_can_go_forward(WEBKIT_WEB_VIEW(GetNative()));
 }
 
@@ -247,6 +264,10 @@ void Browser::Reload() {
 
 void Browser::Stop() {
   webkit_web_view_stop_loading(WEBKIT_WEB_VIEW(GetNative()));
+}
+
+bool Browser::IsLoading() const {
+  return webkit_web_view_is_loading(WEBKIT_WEB_VIEW(GetNative()));
 }
 
 void Browser::PlatformUpdateBindings() {

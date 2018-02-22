@@ -33,9 +33,9 @@ class BrowserImpl : public SubwinView {
   bool Eval(const base::string16& code, base::string16* result);
 
   void GoBack();
-  bool CanGoBack();
+  bool CanGoBack() const;
   void GoForward();
-  bool CanGoForward();
+  bool CanGoForward() const;
   void Reload();
   void Stop();
 
