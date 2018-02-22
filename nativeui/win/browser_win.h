@@ -38,6 +38,7 @@ class BrowserImpl : public SubwinView {
   bool CanGoForward() const;
   void Reload();
   void Stop();
+  bool IsLoading() const;
 
   template<typename T>
   bool GetBrowser(Microsoft::WRL::ComPtr<T>* out) {

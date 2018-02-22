@@ -138,6 +138,11 @@ STDMETHODIMP BrowserEventSink::Invoke(_In_  DISPID dispIdMember,
         browser_->set_can_go_forward(pDispParams->rgvarg[0].boolVal);
       else if (pDispParams->rgvarg[1].lVal == CSC_NAVIGATEBACK)
         browser_->set_can_go_back(pDispParams->rgvarg[0].boolVal);
+      delegate->on_update_command.Emit(delegate);
+      break;
+    case DISPID_DOWNLOADBEGIN:
+    case DISPID_DOWNLOADCOMPLETE:
+      delegate->on_change_loading.Emit(delegate);
       break;
     default:
       hr = E_NOTIMPL;

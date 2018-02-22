@@ -197,6 +197,13 @@ void BrowserImpl::Stop() {
     browser_->Stop();
 }
 
+bool BrowserImpl::IsLoading() const {
+  VARIANT_BOOL loading = false;
+  if (browser_)
+    browser_->get_Busy(&loading);
+  return loading;
+}
+
 void BrowserImpl::SizeAllocate(const Rect& bounds) {
   SubwinView::SizeAllocate(bounds);
   Microsoft::WRL::ComPtr<IOleInPlaceObject> in_place;
@@ -407,6 +414,10 @@ void Browser::Reload() {
 
 void Browser::Stop() {
   static_cast<BrowserImpl*>(GetNative())->Stop();
+}
+
+bool Browser::IsLoading() const {
+  return static_cast<BrowserImpl*>(GetNative())->IsLoading();
 }
 
 void Browser::PlatformUpdateBindings() {
