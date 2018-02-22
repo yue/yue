@@ -157,7 +157,9 @@ class ButtonImpl : public Clickable {
       text_bounds.Inset(box_size_.width(), 0, 0, 0);
 
     // The text.
-    TextAttributes attributes(font(), color(), TextAlign::Center,
+    Color text_color = is_disabled() ?
+        App::GetCurrent()->GetColor(App::ThemeColor::DisabledText) : color();
+    TextAttributes attributes(font(), text_color, TextAlign::Center,
                               TextAlign::Center);
     painter->DrawTextPixel(title_, text_bounds, attributes);
 
