@@ -203,6 +203,8 @@ struct Type<nu::App::ThemeColor> {
       return false;
     if (id == "text")
       *out = nu::App::ThemeColor::Text;
+    else if (id == "disabled-text")
+      *out = nu::App::ThemeColor::DisabledText;
     else
       return false;
     return true;

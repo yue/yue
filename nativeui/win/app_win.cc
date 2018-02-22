@@ -10,6 +10,8 @@ Color App::PlatformGetColor(ThemeColor name) {
   int index = 0;
   if (name == ThemeColor::Text)
     index = COLOR_WINDOWTEXT;
+  else if (name == ThemeColor::DisabledText)
+    index = COLOR_GRAYTEXT;
   DWORD color = ::GetSysColor(index);
   return Color(GetRValue(color), GetGValue(color), GetBValue(color));
 }

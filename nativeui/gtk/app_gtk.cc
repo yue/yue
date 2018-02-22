@@ -204,6 +204,8 @@ Color GetFgColor(const std::string& css_selector) {
 Color App::PlatformGetColor(ThemeColor name) {
   if (name == ThemeColor::Text)
     return GetFgColor("GtkLabel");
+  else if (name == ThemeColor::DisabledText)
+    return GetFgColor("GtkLabel:disabled");
   else
     return Color();
 }

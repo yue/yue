@@ -23,6 +23,7 @@ class NATIVEUI_EXPORT App {
   // Available theme names of colors.
   enum class ThemeColor {
     Text,
+    DisabledText,
   };
 
   // Return color of a theme component.

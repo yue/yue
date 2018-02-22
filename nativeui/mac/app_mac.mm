@@ -14,6 +14,8 @@ Color App::PlatformGetColor(ThemeColor name) {
   NSColor* color;
   if (name == ThemeColor::Text)
     color = [NSColor textColor];
+  else if (name == ThemeColor::DisabledText)
+    color = [NSColor disabledControlTextColor];
   else
     color = [NSColor blackColor];
   CGFloat red, green, blue, alpha;

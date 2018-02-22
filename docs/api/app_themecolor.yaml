@@ -8,9 +8,11 @@ lang_detail:
   cpp: |
     This type is an `enum class` with following values:
       * `App::ThemeColor::Text`
+      * `App::ThemeColor::DisabledText`
 
   lua: &ref |
     This type is a string with following possible values:
     * `"text"`
+    * `"disabled-text"`
 
   js: *ref
