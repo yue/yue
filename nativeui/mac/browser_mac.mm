@@ -183,7 +183,7 @@ base::Value NSValueToBaseValue(id value) {
 
 - (void)willOpenMenu:(NSMenu*)menu withEvent:(NSEvent*)event {
   if (options_.context_menu)
-    [super willOpenMenu:menu withError:event];
+    [super willOpenMenu:menu withEvent:event];
   else
     [menu removeAllItems];
 }
