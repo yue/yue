@@ -45,6 +45,8 @@ void ContainerImpl::SetVisible(bool visible) {
 }
 
 void ContainerImpl::Draw(PainterWin* painter, const Rect& dirty) {
+  if (!is_visible())
+    return;
   ViewImpl::Draw(painter, dirty);
   adapter_->OnDraw(painter, dirty);
   adapter_->ForEach([&](ViewImpl* child) {
