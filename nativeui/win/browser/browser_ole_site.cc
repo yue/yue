@@ -222,6 +222,8 @@ IFACEMETHODIMP BrowserOleSite::TranslateAccelerator(
     LPMSG lpMsg,
     const GUID *pguidCmdGroup,
     DWORD nCmdID) {
+  if (lpMsg->message == WM_KEYDOWN && lpMsg->wParam == VK_F5)
+    return S_OK;
   return S_FALSE;
 }
 

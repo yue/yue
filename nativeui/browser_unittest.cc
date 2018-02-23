@@ -14,7 +14,7 @@
 class BrowserTest : public testing::Test {
  protected:
   void SetUp() override {
-    browser_ = new nu::Browser;
+    browser_ = new nu::Browser(nu::Browser::Options());
   }
 
   nu::Lifetime lifetime_;
