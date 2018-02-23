@@ -11,7 +11,7 @@ constructors:
     description: Create a new window with `options`.
 
 class_methods:
-  - signature: Button* Create(Window::Options options)
+  - signature: Window* Create(Window::Options options)
     lang: ['lua', 'js']
     description: Create a new window with `options`.
 

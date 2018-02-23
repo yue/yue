@@ -1,0 +1,11 @@
+name: Browser::Options
+header: nativeui/browser.h
+type: struct
+namespace: nu
+description: Options for creating browser.
+
+properties:
+  - property: bool enable_devtools
+    description: |
+      Whether the browser can show devtools, default is `false`. Currently this
+      option is not working on Windows.

@@ -344,7 +344,7 @@ LRESULT BrowserImpl::BrowserWndProc(HWND hwnd,
 ///////////////////////////////////////////////////////////////////////////////
 // Public Browser API implementation.
 
-void Browser::PlatformInit() {
+void Browser::PlatformInit(const Options& options) {
   TakeOverView(new BrowserImpl(this));
 }
 

@@ -22,7 +22,11 @@ class NATIVEUI_EXPORT Browser : public View {
   using ExecutionCallback = std::function<void(bool, base::Value)>;
   using BindingFunc = std::function<void(Browser*, base::Value)>;
 
-  Browser();
+  struct Options {
+    bool enable_devtools = false;
+  };
+
+  explicit Browser(const Options& options);
 
   // View class name.
   static const char kClassName[];
@@ -95,7 +99,7 @@ class NATIVEUI_EXPORT Browser : public View {
   ~Browser() override;
 
  private:
-  void PlatformInit();
+  void PlatformInit(const Options& options);
   void PlatformDestroy();
   void PlatformUpdateBindings();
 

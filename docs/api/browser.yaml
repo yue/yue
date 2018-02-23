@@ -15,12 +15,12 @@ detail: |
   environment variable to disable hardware acceleration.
 
 constructors:
-  - signature: Browser()
+  - signature: Browser(const Browser::Options& options)
     lang: ['cpp']
     description: Create a new browser view.
 
 class_methods:
-  - signature: Browser* Create()
+  - signature: Browser* Create(Browser::Options options)
     lang: ['lua', 'js']
     description: Create a new browser view.
 

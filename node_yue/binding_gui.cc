@@ -1323,13 +1323,27 @@ struct Type<nu::ProtocolAsarJob> {
 };
 
 template<>
+struct Type<nu::Browser::Options> {
+  static constexpr const char* name = "yue.Browser.Options";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::Browser::Options* out) {
+    auto obj = value.As<v8::Object>();
+    if (obj.IsEmpty())
+      return false;
+    Get(context, obj, "enableDevtools", &out->enable_devtools);
+    return true;
+  }
+};
+
+template<>
 struct Type<nu::Browser> {
   using base = nu::View;
   static constexpr const char* name = "yue.Browser";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
-        "create", &CreateOnHeap<nu::Browser>,
+        "create", &CreateOnHeap<nu::Browser, const nu::Browser::Options&>,
         "registerProtocol", &nu::Browser::RegisterProtocol,
         "unregisterProtocol", &nu::Browser::UnregisterProtocol);
   }

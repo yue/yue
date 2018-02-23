@@ -176,19 +176,25 @@ void OnProtocolRequest(WebKitURISchemeRequest* request,
 
 }  // namespace
 
-void Browser::PlatformInit() {
+void Browser::PlatformInit(const Options& options) {
   // Install native bindings script.
   WebKitUserContentManager* manager = webkit_user_content_manager_new();
   g_signal_connect(manager, "script-message-received::yue",
                    G_CALLBACK(OnScriptMessage), this);
   webkit_user_content_manager_register_script_message_handler(manager, "yue");
 
-  // Create webview
+  // Create webview.
   GtkWidget* webview = webkit_web_view_new_with_user_content_manager(manager);
   TakeOverView(webview);
 
   // Assign a new settings to avoid affecting other webviews.
-  webkit_web_view_set_settings(WEBKIT_WEB_VIEW(webview), webkit_settings_new());
+  WebKitSettings* settings = webkit_settings_new();
+  // Configurations.
+  if (options.enable_devtools) {
+    webkit_settings_set_enable_write_console_messages_to_stdout(settings, true);
+    webkit_settings_set_enable_developer_extras(settings, true);
+  }
+  webkit_web_view_set_settings(WEBKIT_WEB_VIEW(webview), settings);
 
   // Install events.
   g_signal_connect(webview, "notify::title", G_CALLBACK(OnNotifyTitle), this);

@@ -104,12 +104,15 @@ base::Value NSValueToBaseValue(id value) {
 
 @implementation NUWebView
 
-- (id)initWithShell:(nu::Browser*)shell {
+- (id)initWithShell:(nu::Browser*)shell
+            options:(const nu::Browser::Options&)options {
   shell_ = shell;
   // Initialize with configuration.
+  handler_.reset([[NUScriptMessageHandler alloc] initWithShell:shell]);
   base::scoped_nsobject<WKWebViewConfiguration> config(
       [[WKWebViewConfiguration alloc] init]);
-  handler_.reset([[NUScriptMessageHandler alloc] initWithShell:shell]);
+  if (options.enable_devtools)
+    [[config preferences] setValue:@YES forKey:@"developerExtrasEnabled"];
   [[config userContentController] addScriptMessageHandler:handler_.get()
                                                      name:@"yue"];
   [super initWithFrame:NSZeroRect configuration:config.get()];
@@ -241,8 +244,8 @@ base::Value NSValueToBaseValue(id value) {
 
 namespace nu {
 
-void Browser::PlatformInit() {
-  NUWebView* webview = [[NUWebView alloc] initWithShell:this];
+void Browser::PlatformInit(const Options& options) {
+  NUWebView* webview = [[NUWebView alloc] initWithShell:this options:options];
   [webview setUIDelegate:[[NUWebUIDelegate alloc] init]];
   [webview setNavigationDelegate:[[NUNavigationDelegate alloc] init]];
   TakeOverView(webview);

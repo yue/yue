@@ -18,8 +18,8 @@ namespace nu {
 // static
 const char Browser::kClassName[] = "Browser";
 
-Browser::Browser() {
-  PlatformInit();
+Browser::Browser(const Options& options) {
+  PlatformInit(options);
   // Generate a random number as security key.
   base::Base64Encode(base::RandBytesAsString(16), &security_key_);
 }

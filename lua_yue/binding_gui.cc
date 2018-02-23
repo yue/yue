@@ -1197,12 +1197,23 @@ struct Type<nu::ProtocolAsarJob> {
 };
 
 template<>
+struct Type<nu::Browser::Options> {
+  static constexpr const char* name = "yue.Browser.Options";
+  static inline bool To(State* state, int index, nu::Browser::Options* out) {
+    if (GetType(state, index) == LuaType::Table) {
+      RawGetAndPop(state, index, "enabledevtools", &out->enable_devtools);
+    }
+    return true;
+  }
+};
+
+template<>
 struct Type<nu::Browser> {
   using base = nu::View;
   static constexpr const char* name = "yue.Browser";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
-           "create", &CreateOnHeap<nu::Browser>,
+           "create", &CreateOnHeap<nu::Browser, const nu::Browser::Options&>,
            "registerprotocol", &nu::Browser::RegisterProtocol,
            "unregisterprotocol", &nu::Browser::UnregisterProtocol,
            "loadurl", &nu::Browser::LoadURL,
