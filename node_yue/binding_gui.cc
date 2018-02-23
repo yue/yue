@@ -1332,6 +1332,7 @@ struct Type<nu::Browser::Options> {
     if (obj.IsEmpty())
       return false;
     Get(context, obj, "enableDevtools", &out->enable_devtools);
+    Get(context, obj, "contextMenu", &out->context_menu);
     return true;
   }
 };

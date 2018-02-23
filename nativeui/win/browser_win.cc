@@ -58,12 +58,13 @@ bool VARIANTToJSON(IDispatchEx* script,
 
 }  // namespace
 
-BrowserImpl::BrowserImpl(Browser* delegate)
+BrowserImpl::BrowserImpl(const Browser::Options& options, Browser* delegate)
     : SubwinView(delegate),
       external_sink_(new BrowserExternalSink(delegate)),
       ole_site_(new BrowserOleSite(this, external_sink_.Get())),
       event_sink_(new BrowserEventSink(this)),
-      document_events_(new BrowserDocumentEvents(this)) {
+      document_events_(new BrowserDocumentEvents(this)),
+      options_(options) {
   set_focusable(true);
   // Initialize COM and OLE.
   State::GetCurrent()->InitializeCOM();
@@ -345,7 +346,7 @@ LRESULT BrowserImpl::BrowserWndProc(HWND hwnd,
 // Public Browser API implementation.
 
 void Browser::PlatformInit(const Options& options) {
-  TakeOverView(new BrowserImpl(this));
+  TakeOverView(new BrowserImpl(options, this));
 }
 
 void Browser::PlatformDestroy() {

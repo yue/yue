@@ -6,6 +6,16 @@ description: Options for creating browser.
 
 properties:
   - property: bool enable_devtools
-    description: |
-      Whether the browser can show devtools, default is `false`. Currently this
-      option is not working on Windows.
+    description: Whether the browser can show devtools, default is `false`.
+    detail: |
+      Depending on platform, the option to show devtools is usually in the
+      context menu, so you should also enable builtin context menu when using
+      this option.
+
+      Currently this option is not working on Windows.
+
+  - property: bool context_menu
+    description: Whether to use builtin context menu, default is `false`.
+    detail: |
+      On macOS due to the limitation of system APIs, right-clicking certain
+      elements would still popup a menu with Services items.

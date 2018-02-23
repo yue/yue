@@ -42,6 +42,14 @@ base::Value JSResultToBaseValue(WebKitJavascriptResult* js_result) {
   return std::move(*result.release());
 }
 
+gboolean OnContextMenu(WebKitWebView* widget,
+                       GtkWidget *default_menu,
+                       WebKitHitTestResult* hit_test_result,
+                       gboolean triggered_with_keyboard,
+                       Browser* view) {
+  return TRUE;
+}
+
 void OnNotifyTitle(WebKitWebView*, GParamSpec*, Browser* view) {
   view->on_update_title.Emit(view, view->GetTitle());
 }
@@ -195,6 +203,11 @@ void Browser::PlatformInit(const Options& options) {
     webkit_settings_set_enable_developer_extras(settings, true);
   }
   webkit_web_view_set_settings(WEBKIT_WEB_VIEW(webview), settings);
+
+  // Disable the context menu.
+  if (!options.context_menu) {
+    g_signal_connect(webview, "context-menu", G_CALLBACK(OnContextMenu), this);
+  }
 
   // Install events.
   g_signal_connect(webview, "notify::title", G_CALLBACK(OnNotifyTitle), this);

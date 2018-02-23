@@ -1202,6 +1202,7 @@ struct Type<nu::Browser::Options> {
   static inline bool To(State* state, int index, nu::Browser::Options* out) {
     if (GetType(state, index) == LuaType::Table) {
       RawGetAndPop(state, index, "enabledevtools", &out->enable_devtools);
+      RawGetAndPop(state, index, "contextmenu", &out->context_menu);
     }
     return true;
   }

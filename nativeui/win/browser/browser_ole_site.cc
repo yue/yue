@@ -167,7 +167,10 @@ IFACEMETHODIMP BrowserOleSite::ShowContextMenu(
     _In_ POINT *ppt,
     _In_ IUnknown *pcmdtReserved,
     _In_ IDispatch *pdispReserved) {
-  return E_NOTIMPL;
+  if (browser_->options().context_menu)
+    return S_FALSE;
+  else
+    return S_OK;
 }
 
 IFACEMETHODIMP BrowserOleSite::GetHostInfo(_Inout_ DOCHOSTUIINFO *pInfo) {

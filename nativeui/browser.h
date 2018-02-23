@@ -24,6 +24,7 @@ class NATIVEUI_EXPORT Browser : public View {
 
   struct Options {
     bool enable_devtools = false;
+    bool context_menu = false;
   };
 
   explicit Browser(const Options& options);

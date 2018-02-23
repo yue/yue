@@ -92,20 +92,25 @@ base::Value NSValueToBaseValue(id value) {
 @interface NUWebView : WKWebView<NUView> {
  @private
   nu::NUPrivate private_;
+  nu::Browser::Options options_;
   nu::Browser* shell_;
   base::scoped_nsobject<NUScriptMessageHandler> handler_;
 }
+- (id)initWithShell:(nu::Browser*)shell
+            options:(const nu::Browser::Options&)options;
+- (void)willDestroy;
+- (void)updateBindings;
 - (nu::NUPrivate*)nuPrivate;
 - (void)setNUFont:(nu::Font*)font;
 - (void)setNUColor:(nu::Color)color;
 - (void)setNUBackgroundColor:(nu::Color)color;
-- (void)updateBindings;
 @end
 
 @implementation NUWebView
 
 - (id)initWithShell:(nu::Browser*)shell
             options:(const nu::Browser::Options&)options {
+  options_ = options;
   shell_ = shell;
   // Initialize with configuration.
   handler_.reset([[NUScriptMessageHandler alloc] initWithShell:shell]);
@@ -145,6 +150,19 @@ base::Value NSValueToBaseValue(id value) {
   [self removeObserver:self forKeyPath:@"canGoForward"];
 }
 
+- (void)updateBindings {
+  auto* controller = [[self configuration] userContentController];
+  [controller removeAllUserScripts];
+  [controller addUserScript:[self generateUserScript]];
+}
+
+- (WKUserScript*)generateUserScript {
+  return [[[WKUserScript alloc]
+      initWithSource:base::SysUTF8ToNSString(shell_->GetBindingScript())
+       injectionTime:WKUserScriptInjectionTimeAtDocumentStart
+    forMainFrameOnly:YES] autorelease];
+}
+
 - (void)observeValueForKeyPath:(NSString*)keyPath
                       ofObject:(id)object
                         change:(NSDictionary*)change
@@ -163,6 +181,13 @@ base::Value NSValueToBaseValue(id value) {
                           context:context];
 }
 
+- (void)willOpenMenu:(NSMenu*)menu withEvent:(NSEvent*)event {
+  if (options_.context_menu)
+    [super willOpenMenu:menu withError:event];
+  else
+    [menu removeAllItems];
+}
+
 - (nu::NUPrivate*)nuPrivate {
   return &private_;
 }
@@ -174,19 +199,6 @@ base::Value NSValueToBaseValue(id value) {
 }
 
 - (void)setNUBackgroundColor:(nu::Color)color {
-}
-
-- (void)updateBindings {
-  auto* controller = [[self configuration] userContentController];
-  [controller removeAllUserScripts];
-  [controller addUserScript:[self generateUserScript]];
-}
-
-- (WKUserScript*)generateUserScript {
-  return [[[WKUserScript alloc]
-      initWithSource:base::SysUTF8ToNSString(shell_->GetBindingScript())
-       injectionTime:WKUserScriptInjectionTimeAtDocumentStart
-    forMainFrameOnly:YES] autorelease];
 }
 
 @end

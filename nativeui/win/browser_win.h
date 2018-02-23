@@ -23,7 +23,7 @@ namespace nu {
 // Implementation of Browser.
 class BrowserImpl : public SubwinView {
  public:
-  explicit BrowserImpl(Browser* delegate);
+  BrowserImpl(const Browser::Options& options, Browser* delegate);
   ~BrowserImpl() override;
 
   void LoadURL(const base::string16& str);
@@ -47,6 +47,7 @@ class BrowserImpl : public SubwinView {
 
   void set_can_go_back(bool b) { can_go_back_ = b; }
   void set_can_go_forward(bool b) { can_go_forward_ = b; }
+  const Browser::Options& options() const { return options_; }
 
  protected:
   // ViewImpl:
@@ -91,6 +92,8 @@ class BrowserImpl : public SubwinView {
 
   Microsoft::WRL::ComPtr<IWebBrowser2> browser_;
   Microsoft::WRL::ComPtr<IHTMLDocument2> document_;
+
+  Browser::Options options_;
 
   // Whether we have loaded the HTML.
   bool is_html_loaded_ = false;
