@@ -54,7 +54,7 @@ void OnNotifyTitle(WebKitWebView*, GParamSpec*, Browser* view) {
   view->on_update_title.Emit(view, view->GetTitle());
 }
 
-void OnNotifyLoading(WebKitWebView*, GParamSpec*, Browser* view) {
+void OnNotifyIsLoading(WebKitWebView*, GParamSpec*, Browser* view) {
   view->on_change_loading.Emit(view);
 }
 
@@ -211,8 +211,8 @@ void Browser::PlatformInit(const Options& options) {
 
   // Install events.
   g_signal_connect(webview, "notify::title", G_CALLBACK(OnNotifyTitle), this);
-  g_signal_connect(webview, "notify::loading", G_CALLBACK(OnNotifyLoading),
-                   this);
+  g_signal_connect(webview, "notify::is-loading",
+                   G_CALLBACK(OnNotifyIsLoading), this);
   g_signal_connect(webview, "close", G_CALLBACK(OnClose), this);
   g_signal_connect(webview, "load-changed", G_CALLBACK(OnLoadChanged), this);
   g_signal_connect(webview, "load-failed", G_CALLBACK(OnLoadFailed), this);
