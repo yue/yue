@@ -1331,7 +1331,7 @@ struct Type<nu::Browser::Options> {
     auto obj = value.As<v8::Object>();
     if (obj.IsEmpty())
       return false;
-    Get(context, obj, "enableDevtools", &out->enable_devtools);
+    Get(context, obj, "devtools", &out->devtools);
     Get(context, obj, "contextMenu", &out->context_menu);
     return true;
   }

@@ -198,7 +198,7 @@ void Browser::PlatformInit(const Options& options) {
   // Assign a new settings to avoid affecting other webviews.
   WebKitSettings* settings = webkit_settings_new();
   // Configurations.
-  if (options.enable_devtools) {
+  if (options.devtools) {
     webkit_settings_set_enable_write_console_messages_to_stdout(settings, true);
     webkit_settings_set_enable_developer_extras(settings, true);
   }

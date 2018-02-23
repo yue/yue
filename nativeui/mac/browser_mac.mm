@@ -116,7 +116,7 @@ base::Value NSValueToBaseValue(id value) {
   handler_.reset([[NUScriptMessageHandler alloc] initWithShell:shell]);
   base::scoped_nsobject<WKWebViewConfiguration> config(
       [[WKWebViewConfiguration alloc] init]);
-  if (options.enable_devtools)
+  if (options.devtools)
     [[config preferences] setValue:@YES forKey:@"developerExtrasEnabled"];
   [[config userContentController] addScriptMessageHandler:handler_.get()
                                                      name:@"yue"];

@@ -5,7 +5,7 @@ namespace: nu
 description: Options for creating browser.
 
 properties:
-  - property: bool enable_devtools
+  - property: bool devtools
     description: Whether the browser can show devtools, default is `false`.
     detail: |
       Depending on platform, the option to show devtools is usually in the

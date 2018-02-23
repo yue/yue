@@ -23,7 +23,7 @@ class NATIVEUI_EXPORT Browser : public View {
   using BindingFunc = std::function<void(Browser*, base::Value)>;
 
   struct Options {
-    bool enable_devtools = false;
+    bool devtools = false;
     bool context_menu = false;
   };
 
