@@ -94,6 +94,7 @@ bool ViewImpl::HasFocus() const {
 
 void ViewImpl::SetVisible(bool visible) {
   is_visible_ = visible;
+  Invalidate();
 }
 
 void ViewImpl::SetFont(Font* font) {
