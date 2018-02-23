@@ -161,7 +161,7 @@ class ButtonImpl : public Clickable {
         App::GetCurrent()->GetColor(App::ThemeColor::DisabledText) : color();
     TextAttributes attributes(font(), text_color, TextAlign::Center,
                               TextAlign::Center);
-    painter->DrawTextPixel(title_, text_bounds, attributes);
+    painter->DrawTextPixel(title_, text_bounds.origin(), attributes);
 
     // Draw focused ring.
     if (HasFocus()) {
