@@ -18,10 +18,8 @@ Please note that the items are __not__ prioritized.
 * Select
 * Slider
 * Date chooser
-* Multiline edit
 * Rich edit
 * Tray
-* Browser
 * List view
 * Tree view
 * Image viewer with GIF support
@@ -39,12 +37,10 @@ Please note that the items are __not__ prioritized.
 
 ### macOS
 
-* Toolbar
 * More Button types
 
 ### Windows
 
-* Per-monitor DPI support
 * Optional font rendering with DirectWrite
 * Custom draw all widgets
 * ICO file format support
@@ -53,10 +49,6 @@ Please note that the items are __not__ prioritized.
 
 * Add LuaRocks module
 * Improve our Yue-integrated lua runtime
-
-### Node.js
-
-* Provide a custom distribution of Node.js which uses a GUI event loop
 
 ## v2.0
 
