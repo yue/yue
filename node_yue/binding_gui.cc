@@ -500,7 +500,10 @@ struct Type<nu::Painter> {
         "strokeRect", &nu::Painter::StrokeRect,
         "fillRect", &nu::Painter::FillRect,
         "measureText", &nu::Painter::MeasureText,
-        "drawText", &nu::Painter::DrawText);
+        "drawText", &nu::Painter::DrawText,
+        "drawCanvas", &nu::Painter::DrawCanvas,
+        "drawCanvasFromRect", &nu::Painter::DrawCanvasFromRect,
+        "drawImage", &nu::Painter::DrawImage);
   }
 };
 
