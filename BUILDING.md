@@ -29,4 +29,19 @@ probably fill it out further.
 
     $ node scripts/build.js
 
-Now take a nap while ninja does its thing.
+## Building the node extension
+
+
+    $ node scripts/create_node_extension {runtime} {version}
+
+For example:
+
+    $ node scripts/create_node_extension node v9.7.1
+
+## Building the lua library
+
+    $ TODO
+    
+## Building the C++ library
+
+    $ TODO
