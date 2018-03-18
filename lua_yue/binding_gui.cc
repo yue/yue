@@ -199,7 +199,8 @@ struct Type<nu::App> {
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
 #if defined(OS_MACOSX)
-           "setapplicationmenu", &nu::App::SetApplicationMenu,
+           "setapplicationmenu",
+           RefMethod(&nu::App::SetApplicationMenu, 1, true),
 #endif
            "getcolor", &nu::App::GetColor,
            "getdefaultfont", &nu::App::GetDefaultFont);
@@ -939,7 +940,7 @@ struct Type<nu::Window> {
            "isfullsizecontentview", &nu::Window::IsFullSizeContentView,
 #endif
 #if defined(OS_WIN) || defined(OS_LINUX)
-           "setmenubar", &nu::Window::SetMenuBar,
+           "setmenubar", RefMethod(&nu::Window::SetMenuBar, 1, true),
            "getmenubar", &nu::Window::GetMenuBar,
 #endif
            "settitle", &nu::Window::SetTitle,
@@ -1018,9 +1019,10 @@ struct Type<nu::Container> {
            &nu::Container::GetPreferredWidthForHeight,
            "getpreferredheightforwidth",
            &nu::Container::GetPreferredHeightForWidth,
-           "addchildview", &nu::Container::AddChildView,
-           "addchildviewat", &AddChildViewAt,
-           "removechildview", &nu::Container::RemoveChildView,
+           "addchildview", RefMethod(&nu::Container::AddChildView, 1, true),
+           "addchildviewat", RefMethod(&AddChildViewAt, 1, true),
+           "removechildview",
+           RefMethod(&nu::Container::RemoveChildView, 1, false),
            "childcount", &nu::Container::ChildCount,
            "childat", &ChildAt);
     RawSetProperty(state, index, "ondraw", &nu::Container::on_draw);

@@ -19,9 +19,12 @@ source_set("lua") {
     "metatable.h",
     "metatable_internal.h",
     "pcall.h",
+    "ref_method.cc",
+    "ref_method.h",
     "stack.h",
     "stack_auto_reset.h",
     "state.h",
+    "table.cc",
     "table.h",
     "table_internal.h",
     "types.h",
@@ -42,6 +45,7 @@ source_set("lua") {
 
 test("lua_unittests") {
   sources = [
+    "ref_method_unittest.cc",
     "handle_unittest.cc",
     "index_unittest.cc",
     "lua_unittest.cc",

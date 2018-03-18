@@ -190,6 +190,9 @@ inline void PushWeakTable(State* state, const char* name, const char* mode) {
   }
 }
 
+// Helper to attach a table to a variable.
+void PushCustomDataTable(State* state, int key);
+
 }  // namespace lua
 
 #endif  // LUA_TABLE_H_

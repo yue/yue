@@ -15,21 +15,8 @@ namespace {
 const int kMaxLoop  = 2000;
 
 const char* kWrapperTableName = "yue.internal.wrappertable";
-const char* kCustomDataTableName = "yue.internal.customdatatable";
 
 }  // namespace
-
-void PushCustomDataTable(State* state, int key) {
-  int top = GetTop(state);
-  PushWeakTable(state, kCustomDataTableName, "k");
-  RawGet(state, -1, ValueOnStack(state, key));
-  if (GetType(state, -1) == LuaType::Nil) {
-    NewTable(state);
-    RawSet(state, top + 1, ValueOnStack(state, key), ValueOnStack(state, -1));
-  }
-  lua_insert(state, top + 1);
-  SetTop(state, top + 1);
-}
 
 bool WrapperTableGet(State* state, void* key) {
   int top = GetTop(state);

@@ -153,6 +153,7 @@ struct FunctorTraits<
 template <typename R, typename... Args>
 struct FunctorTraits<R (*)(Args...)> {
   using RunType = R(Args...);
+  using ReturnType = R;
   static constexpr bool is_method = false;
   static constexpr bool is_nullable = true;
 
@@ -168,6 +169,7 @@ struct FunctorTraits<R (*)(Args...)> {
 template <typename R, typename... Args>
 struct FunctorTraits<R(__stdcall*)(Args...)> {
   using RunType = R(Args...);
+  using ReturnType = R;
   static constexpr bool is_method = false;
   static constexpr bool is_nullable = true;
 
@@ -181,6 +183,7 @@ struct FunctorTraits<R(__stdcall*)(Args...)> {
 template <typename R, typename... Args>
 struct FunctorTraits<R(__fastcall*)(Args...)> {
   using RunType = R(Args...);
+  using ReturnType = R;
   static constexpr bool is_method = false;
   static constexpr bool is_nullable = true;
 
@@ -196,6 +199,7 @@ struct FunctorTraits<R(__fastcall*)(Args...)> {
 template <typename R, typename Receiver, typename... Args>
 struct FunctorTraits<R (Receiver::*)(Args...)> {
   using RunType = R(Receiver*, Args...);
+  using ReturnType = R;
   static constexpr bool is_method = true;
   static constexpr bool is_nullable = true;
 
@@ -211,6 +215,7 @@ struct FunctorTraits<R (Receiver::*)(Args...)> {
 template <typename R, typename Receiver, typename... Args>
 struct FunctorTraits<R (Receiver::*)(Args...) const> {
   using RunType = R(const Receiver*, Args...);
+  using ReturnType = R;
   static constexpr bool is_method = true;
   static constexpr bool is_nullable = true;
 
