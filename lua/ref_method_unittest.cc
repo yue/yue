@@ -33,6 +33,7 @@ class HostClass : public base::RefCounted<HostClass> {
 
   void Add(ParamClass*) {}
   void Remove(ParamClass*) {}
+  void Set(ParamClass*) {}
 
  protected:
   friend class base::RefCounted<HostClass>;
@@ -55,15 +56,15 @@ struct Type<HostClass> {
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
            "new", &CreateOnHeap<HostClass>,
-           "add", RefMethod(&HostClass::Add, 1, true),
-           "remove", RefMethod(&HostClass::Remove, 1, false));
+           "add", RefMethod(&HostClass::Add, RefType::Ref),
+           "remove", RefMethod(&HostClass::Remove, RefType::Deref),
+           "set", RefMethod(&HostClass::Set, RefType::Reset, "key"));
   }
 };
 
 }  // namespace lua
 
-
-TEST_F(RefMethodTest, AddRef) {
+TEST_F(RefMethodTest, AddRemove) {
   int result = 0;
   ParamClass* float_ptr = new ParamClass(&result);
   lua::Push(state_, new HostClass);
@@ -83,4 +84,32 @@ TEST_F(RefMethodTest, AddRef) {
 
   lua::CollectGarbage(state_);
   ASSERT_EQ(result, 88);
+}
+
+TEST_F(RefMethodTest, Set) {
+  int result = 0;
+  lua::Push(state_, new HostClass);
+
+  ASSERT_TRUE(lua::PGet(state_, 1, "set"));
+  ASSERT_TRUE(lua::PCall(state_, nullptr,
+                         lua::ValueOnStack(state_, 1),
+                         new ParamClass(&result)));
+
+  lua::CollectGarbage(state_);
+  ASSERT_EQ(result, 0);
+
+  int new_result = 0;
+
+  ASSERT_TRUE(lua::PGet(state_, 1, "set"));
+  ASSERT_TRUE(lua::PCall(state_, nullptr,
+                         lua::ValueOnStack(state_, 1),
+                         new ParamClass(&new_result)));
+
+  lua::CollectGarbage(state_);
+  ASSERT_EQ(result, 88);
+  ASSERT_EQ(new_result, 0);
+
+  lua::SetTop(state_, 0);
+  lua::CollectGarbage(state_);
+  ASSERT_EQ(new_result, 88);
 }

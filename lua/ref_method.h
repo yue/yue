@@ -9,35 +9,42 @@
 
 namespace lua {
 
+enum class RefType {
+  Ref,
+  Deref,
+  Reset,
+};
+
 namespace internal {
 
 // Helper class to store information about the method.
 template<typename T>
 struct RefMethodRef {
-  RefMethodRef(T func, int ref_arg, bool ref)
-      : func(func), ref_arg(ref_arg), ref(ref) {}
+  RefMethodRef(T func, int ref_arg, RefType ref_type, const char* ref_key)
+      : func(func), ref_arg(ref_arg), ref_type(ref_type), ref_key(ref_key) {}
 
   T func;
   int ref_arg;
-  bool ref;
+  RefType ref_type;
+  const char* ref_key;
 };
 
 // Store the |arg| into the object at index |1|.
-void StoreArg(State* state, int arg, bool ref);
+void StoreArg(State* state, int ref_arg, RefType ref_type, const char* ref_key);
 
 // Wrapper of the method to automatically store a reference of argument.
 template<typename T>
 int RefMethodWrapper(State* state) {
   // DO NOT USE ANY C++ STACK.
-  RefMethodRef<T>* method = static_cast<RefMethodRef<T>*>(
+  RefMethodRef<T>* ref = static_cast<RefMethodRef<T>*>(
       lua_touserdata(state, lua_upvalueindex(1)));
   // Add reference to the argument.
-  StoreArg(state, method->ref_arg + 1, method->ref);
+  StoreArg(state, ref->ref_arg + 1, ref->ref_type, ref->ref_key);
   // Call the method.
   using ReturnType = typename FunctorTraits<T>::ReturnType;
   int nargs = GetTop(state);
   int nresults = Values<ReturnType>::count;
-  Push(state, method->func);
+  Push(state, ref->func);
   lua_insert(state, 1);
   lua_call(state, nargs, nresults);
   return nresults;
@@ -49,8 +56,11 @@ int RefMethodWrapper(State* state) {
 // argument in the object.
 // This helper function is used for automatically deducing T.
 template<typename T>
-internal::RefMethodRef<T> RefMethod(T func, int ref_arg, bool ref) {
-  return internal::RefMethodRef<T>(func, ref_arg, ref);
+internal::RefMethodRef<T> RefMethod(
+    T func, RefType ref_type, const char* ref_key = nullptr) {
+  CHECK((ref_type == RefType::Reset && ref_key != nullptr) ||
+        (ref_type != RefType::Reset && ref_key == nullptr));
+  return internal::RefMethodRef<T>(func, 1, ref_type, ref_key);
 }
 
 // Converter for RefMethodRef.

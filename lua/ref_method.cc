@@ -8,7 +8,7 @@ namespace lua {
 
 namespace internal {
 
-void StoreArg(State* state, int arg, bool ref) {
+void StoreArg(State* state, int arg, RefType ref_type, const char* ref_key) {
   // DO NOT USE ANY C++ STACK BEFORE THE UNSAFE CALLS.
   CHECK_EQ(GetType(state, 1), LuaType::UserData);
   // this.__yuerefs ?= {}
@@ -17,11 +17,23 @@ void StoreArg(State* state, int arg, bool ref) {
     NewTable(state, 0, 1);
     UnsafeSet(state, 1, "__yuerefs", ValueOnStack(state, -1));
   }
-  // this.__yuerefs[arg] = ref ? 1 : nil
-  if (ref)
-    RawSet(state, -1, ValueOnStack(state, arg), 1);
-  else
-    RawSet(state, -1, ValueOnStack(state, arg), nullptr);
+  // if (reftype == "ref")
+  //   this.__yuerefs[arg] = true
+  // else if (reftype == "deref")
+  //   this.__yuerefs[arg] = nil
+  // else if (reftype == "reset")
+  //   this.__yuerefs[key] = arg
+  switch (ref_type) {
+    case RefType::Ref:
+      RawSet(state, -1, ValueOnStack(state, arg), 1);
+      break;
+    case RefType::Deref:
+      RawSet(state, -1, ValueOnStack(state, arg), nullptr);
+      break;
+    case RefType::Reset:
+      RawSet(state, -1, ref_key, ValueOnStack(state, arg));
+      break;
+  }
   // Cleanup stack.
   PopAndIgnore(state, 1);
 }

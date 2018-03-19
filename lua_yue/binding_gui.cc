@@ -200,7 +200,7 @@ struct Type<nu::App> {
     RawSet(state, metatable,
 #if defined(OS_MACOSX)
            "setapplicationmenu",
-           RefMethod(&nu::App::SetApplicationMenu, 1, true),
+           RefMethod(&nu::App::SetApplicationMenu, RefType::Reset, "appmenu"),
 #endif
            "getcolor", &nu::App::GetColor,
            "getdefaultfont", &nu::App::GetDefaultFont);
@@ -898,7 +898,8 @@ struct Type<nu::Window> {
            "sethasshadow", &nu::Window::SetHasShadow,
            "hasshadow", &nu::Window::HasShadow,
            "center", &nu::Window::Center,
-           "setcontentview", &nu::Window::SetContentView,
+           "setcontentview",
+           RefMethod(&nu::Window::SetContentView, RefType::Reset, "content"),
            "getcontentview", &nu::Window::GetContentView,
            "setcontentsize", &nu::Window::SetContentSize,
            "getcontentsize", &nu::Window::GetContentSize,
@@ -940,7 +941,8 @@ struct Type<nu::Window> {
            "isfullsizecontentview", &nu::Window::IsFullSizeContentView,
 #endif
 #if defined(OS_WIN) || defined(OS_LINUX)
-           "setmenubar", RefMethod(&nu::Window::SetMenuBar, 1, true),
+           "setmenubar",
+           RefMethod(&nu::Window::SetMenuBar, RefType::Reset, "menubar"),
            "getmenubar", &nu::Window::GetMenuBar,
 #endif
            "settitle", &nu::Window::SetTitle,
@@ -1019,10 +1021,12 @@ struct Type<nu::Container> {
            &nu::Container::GetPreferredWidthForHeight,
            "getpreferredheightforwidth",
            &nu::Container::GetPreferredHeightForWidth,
-           "addchildview", RefMethod(&nu::Container::AddChildView, 1, true),
-           "addchildviewat", RefMethod(&AddChildViewAt, 1, true),
+           "addchildview",
+           RefMethod(&nu::Container::AddChildView, RefType::Ref),
+           "addchildviewat",
+           RefMethod(&AddChildViewAt, RefType::Ref),
            "removechildview",
-           RefMethod(&nu::Container::RemoveChildView, 1, false),
+           RefMethod(&nu::Container::RemoveChildView, RefType::Deref),
            "childcount", &nu::Container::ChildCount,
            "childat", &ChildAt);
     RawSetProperty(state, index, "ondraw", &nu::Container::on_draw);
@@ -1315,7 +1319,8 @@ struct Type<nu::Group> {
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::Group, const std::string&>,
-           "setcontentview", &nu::Group::SetContentView,
+           "setcontentview",
+           RefMethod(&nu::Group::SetContentView, RefType::Reset, "content"),
            "getcontentview", &nu::Group::GetContentView,
            "settitle", &nu::Group::SetTitle,
            "gettitle", &nu::Group::GetTitle);
@@ -1363,7 +1368,8 @@ struct Type<nu::Scroll> {
            "getscrollbarpolicy", &nu::Scroll::GetScrollbarPolicy,
            "setcontentsize", &nu::Scroll::SetContentSize,
            "getcontentsize", &nu::Scroll::GetContentSize,
-           "setcontentview", &nu::Scroll::SetContentView,
+           "setcontentview",
+           RefMethod(&nu::Scroll::SetContentView, RefType::Reset, "content"),
            "getcontentview", &nu::Scroll::GetContentView);
   }
 };
