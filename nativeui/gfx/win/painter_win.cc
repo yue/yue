@@ -331,12 +331,12 @@ void PainterWin::DrawTextPixel(const base::string16& text, const nu::Rect& rect,
       attributes.font->GetNative(), ToGdi(RectF(rect)), &format, &brush);
 }
 
-void PainterWin::DrawTextPixel(const base::string16& text, const Point& point,
+void PainterWin::DrawTextPixel(const base::string16& text, const PointF& point,
                                const TextAttributes& attributes) {
   Gdiplus::SolidBrush brush(ToGdi(attributes.color));
   graphics_.DrawString(
       text.c_str(), static_cast<int>(text.size()),
-      attributes.font->GetNative(), ToGdi(PointF(point)), &brush);
+      attributes.font->GetNative(), ToGdi(point), &brush);
 }
 
 void PainterWin::Initialize(float scale_factor) {

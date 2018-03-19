@@ -19,7 +19,9 @@ SizeF MeasureText(HDC dc, const base::string16& text, Font* font) {
   Gdiplus::RectF rect;
   graphics.MeasureString(text.data(), static_cast<int>(text.length()),
                          font->GetNative(), Gdiplus::PointF(0., 0.), &rect);
-  return SizeF(rect.Width, rect.Height);
+  // The height returned by MeasureString is the bounding height, while we
+  // usually want the exact height.
+  return SizeF(rect.Width, font->GetNative()->GetHeight(&graphics));
 }
 
 }  // namespace nu

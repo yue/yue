@@ -8,7 +8,7 @@
 #include "base/win/scoped_hdc.h"
 #include "nativeui/gfx/color.h"
 #include "nativeui/gfx/geometry/insets.h"
-#include "nativeui/gfx/geometry/size_conversions.h"
+#include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/gfx/geometry/vector2d.h"
 #include "nativeui/gfx/win/text_win.h"
 #include "nativeui/win/container_win.h"
@@ -60,7 +60,7 @@ class GroupImpl : public ContainerImpl,
   // ViewImpl:
   void Draw(PainterWin* painter, const Rect& dirty) override {
     // Draw title.
-    if (dirty.Intersects(title_bounds_)) {
+    if (dirty.Intersects(ToEnclosedRect(title_bounds_))) {
       TextAttributes attributes(font(), color(), TextAlign::Center,
                                 TextAlign::Center);
       painter->DrawTextPixel(title_, title_bounds_.origin(), attributes);
@@ -104,13 +104,13 @@ class GroupImpl : public ContainerImpl,
   void OnDPIChanged() override {
     base::win::ScopedGetDC dc(window() ? window()->hwnd() : NULL);
     // Update the rect of the title.
-    title_bounds_ = Rect(Point(kTitleLeftMargin * scale_factor(), 0),
-                         ToCeiledSize(MeasureText(dc, title_, font())));
+    title_bounds_ = RectF(PointF(kTitleLeftMargin * scale_factor(), 0),
+                          MeasureText(dc, title_, font()));
   }
 
  private:
   Group* delegate_;
-  Rect title_bounds_;
+  RectF title_bounds_;
   base::string16 title_;
 };
 

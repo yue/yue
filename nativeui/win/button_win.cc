@@ -10,6 +10,8 @@
 #include "base/win/scoped_hdc.h"
 #include "nativeui/container.h"
 #include "nativeui/gfx/geometry/insets.h"
+#include "nativeui/gfx/geometry/point_conversions.h"
+#include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/geometry/vector2d_conversions.h"
 #include "nativeui/gfx/image.h"
@@ -103,9 +105,8 @@ class ButtonImpl : public Clickable {
 
   // ViewImpl:
   void Draw(PainterWin* painter, const Rect& dirty) override {
-    Size size = size_allocation().size();
-    Size preferred_size =
-        ToCeiledSize(ScaleSize(GetDIPPreferredSize(), scale_factor()));
+    SizeF size(size_allocation().size());
+    SizeF preferred_size = ScaleSize(GetDIPPreferredSize(), scale_factor());
 
     NativeTheme::ExtraParams params;
     params.button = params_;
@@ -113,14 +114,14 @@ class ButtonImpl : public Clickable {
     // Draw the button background,
     if (type() == ControlType::Button)
       painter->DrawNativeTheme(NativeTheme::Part::Button,
-                               state(), Rect(size), params);
+                               state(), Rect(ToCeiledSize(size)), params);
 
     // Draw control background as a layer on button background.
     if (!background_color().transparent())
       ViewImpl::Draw(painter, dirty);
 
     // Checkbox and radio are left aligned.
-    Point origin;
+    PointF origin;
     if (type() == ControlType::Button) {
       origin.Offset((size.width() - preferred_size.width()) / 2,
                     (size.height() - preferred_size.height()) / 2);
@@ -137,19 +138,19 @@ class ButtonImpl : public Clickable {
       painter->DrawImage(image_, RectF(image_origin, image_->GetSize()));
     } else {
       // Draw the box.
-      Point box_origin = origin;
+      PointF box_origin = origin;
       box_origin.Offset(0, (preferred_size.height() - box_size_.height()) / 2);
-      if (type() == ControlType::Checkbox)
-        painter->DrawNativeTheme(NativeTheme::Part::Checkbox,
-                                 state(), Rect(box_origin, box_size_), params);
-      else if (type() == ControlType::Radio)
-        painter->DrawNativeTheme(NativeTheme::Part::Radio,
-                                 state(), Rect(box_origin, box_size_), params);
+      painter->DrawNativeTheme(type() == ControlType::Checkbox
+                                  ? NativeTheme::Part::Checkbox
+                                  : NativeTheme::Part::Radio,
+                               state(),
+                               Rect(ToFlooredPoint(box_origin), box_size_),
+                               params);
     }
 
     // The bounds of text.
-    Rect text_bounds(origin, preferred_size);
-    int padding = std::ceil(kButtonPadding * scale_factor());
+    RectF text_bounds(origin, preferred_size);
+    float padding = kButtonPadding * scale_factor();
     text_bounds.Inset(padding, padding);
     if (type() == ControlType::Button || image_)
       text_bounds.Inset(image_size_.width(), 0, 0, 0);
@@ -167,11 +168,11 @@ class ButtonImpl : public Clickable {
     if (HasFocus()) {
       Rect rect;
       if (type() == ControlType::Button) {
-        rect = Rect(size);
+        rect = Rect(size_allocation().size());
         rect.Inset(Insets(std::ceil(1 * scale_factor())));
       } else {
-        rect = text_bounds;
-        rect.Inset(Insets(padding));
+        rect = ToEnclosingRect(text_bounds);
+        rect.Inset(-Insets(padding));
       }
       painter->DrawFocusRect(rect);
     }
