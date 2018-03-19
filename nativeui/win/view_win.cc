@@ -220,8 +220,10 @@ void ViewImpl::ParentChanged() {
         ToNearestRect(ScaleRect(RectF(size_allocation_),
                                 new_scale_factor / scale_factor_));
     scale_factor_ = new_scale_factor;
-    OnDPIChanged();
   }
+  // Always notify when parent is changed, since certain measurements are done
+  // based on the native window.
+  OnDPIChanged();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
