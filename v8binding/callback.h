@@ -25,6 +25,9 @@ template<typename Sig>
 v8::Local<v8::FunctionTemplate> CreateFunctionTemplate(
     v8::Local<v8::Context> context, const std::function<Sig>& callback,
     int callback_flags = 0) {
+#ifndef NDEBUG
+  internal::FunctionTemplateCreated();
+#endif
   v8::Isolate* isolate = context->GetIsolate();
   typedef internal::CallbackHolder<Sig> HolderT;
   HolderT* holder = new HolderT(isolate, callback, callback_flags);

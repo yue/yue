@@ -49,7 +49,10 @@ struct ToV8Data<RefMethodRef<T>,
                 typename std::enable_if<
                     std::is_member_function_pointer<T>::value>::type> {
   static inline v8::Local<v8::Data> Do(v8::Local<v8::Context> context,
-                                       RefMethodRef<T> callback) {
+                                       const RefMethodRef<T>& callback) {
+#ifndef NDEBUG
+    internal::FunctionTemplateCreated();
+#endif
     v8::Isolate* isolate = context->GetIsolate();
     auto* holder = new internal::RefMethodRefHolder<T>(isolate, callback);
     v8::Local<v8::FunctionTemplate> tmpl = v8::FunctionTemplate::New(

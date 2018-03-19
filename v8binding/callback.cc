@@ -4,9 +4,22 @@
 
 #include "v8binding/callback.h"
 
+#include "base/time/time.h"
+
 namespace vb {
 
 namespace internal {
+
+#ifndef NDEBUG
+void FunctionTemplateCreated() {
+  static base::Time first_time;
+  if (first_time.is_null())
+    first_time = base::Time::Now();
+  if ((base::Time::Now() - first_time).InSeconds() > 10)
+    NOTREACHED() << "Creating FunctionTemplate after program has started for a "
+                    "while, it is very likely we are leaking FunctionTemplate.";
+}
+#endif
 
 CallbackHolderBase::CallbackHolderBase(v8::Isolate* isolate)
     : v8_ref_(isolate, v8::External::New(isolate, this)) {

@@ -81,7 +81,7 @@ void RefMethodWrapper(const v8::FunctionCallbackInfo<v8::Value>& info) {
   args.reserve(info.Length());
   for (int i = 0; i < info.Length(); ++i)
     args.push_back(info[i]);
-  callback->Call(context, info.This(), args.size(),
+  callback->Call(context, info.This(), static_cast<int>(args.size()),
                  args.empty() ? nullptr : &args.front()).IsEmpty();
 }
 

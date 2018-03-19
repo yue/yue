@@ -46,6 +46,11 @@ struct CallbackParamTraits<const T*> {
   typedef T* LocalType;
 };
 
+#ifndef NDEBUG
+// Counting the function template created to avoid leaking.
+void FunctionTemplateCreated();
+#endif
+
 // CallbackHolder and CallbackHolderBase are used to pass a std::function from
 // CreateFunctionTemplate through v8 (via v8::FunctionTemplate) to
 // DispatchToCallback, where it is invoked.
