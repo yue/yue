@@ -39,6 +39,7 @@ class RefMethodRefHolder : public CallbackHolderBase {
       : CallbackHolderBase(isolate), ref(ref) {}
 
   RefMethodRef<T> ref;
+  v8::Global<v8::Function> v8_func;
 
  private:
   virtual ~RefMethodRefHolder() {}
@@ -67,9 +68,15 @@ void RefMethodWrapper(const v8::FunctionCallbackInfo<v8::Value>& info) {
            info[holder->ref.ref_arg],
            holder->ref.ref_type,
            holder->ref.ref_key);
+  // Create v8 function from the native function. Note that we need to cache
+  // the function otherwise we would have a leak of FunctionTemplate.
+  if (holder->v8_func.IsEmpty()) {
+    auto func = v8::Local<v8::Function>::Cast(ToV8(context, holder->ref.func));
+    holder->v8_func = v8::Global<v8::Function>(info.GetIsolate(), func);
+  }
   // Call the original callback.
   v8::Local<v8::Function> callback =
-      v8::Local<v8::Function>::Cast(ToV8(context, holder->ref.func));
+      v8::Local<v8::Function>::New(info.GetIsolate(), holder->v8_func);
   std::vector<v8::Local<v8::Value>> args;
   args.reserve(info.Length());
   for (int i = 0; i < info.Length(); ++i)
