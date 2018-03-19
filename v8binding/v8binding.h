@@ -5,10 +5,10 @@
 #ifndef V8BINDING_V8BINDING_H_
 #define V8BINDING_V8BINDING_H_
 
-#include "v8binding/callback.h"
 #include "v8binding/dict.h"
 #include "v8binding/property.h"
 #include "v8binding/prototype.h"
+#include "v8binding/ref_method.h"
 #include "v8binding/util.h"
 
 #endif  // V8BINDING_V8BINDING_H_

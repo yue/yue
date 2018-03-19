@@ -220,7 +220,8 @@ struct Type<nu::App> {
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
 #if defined(OS_MACOSX)
-        "setApplicationMenu", &nu::App::SetApplicationMenu,
+        "setApplicationMenu",
+        RefMethod(&nu::App::SetApplicationMenu, RefType::Reset, "appMenu"),
 #endif
         "getColor", &nu::App::GetColor,
         "getDefaultFont", &nu::App::GetDefaultFont);
@@ -988,7 +989,8 @@ struct Type<nu::Window> {
         "setHasShadow", &nu::Window::SetHasShadow,
         "hasShadow", &nu::Window::HasShadow,
         "center", &nu::Window::Center,
-        "setContentView", &nu::Window::SetContentView,
+        "setContentView",
+        RefMethod(&nu::Window::SetContentView, RefType::Reset, "contentView"),
         "getContentView", &nu::Window::GetContentView,
         "setContentSize", &nu::Window::SetContentSize,
         "getContentSize", &nu::Window::GetContentSize,
@@ -1030,7 +1032,8 @@ struct Type<nu::Window> {
         "isFullSizeContentView", &nu::Window::IsFullSizeContentView,
 #endif
 #if defined(OS_WIN) || defined(OS_LINUX)
-        "setMenuBar", &nu::Window::SetMenuBar,
+        "setMenuBar",
+        RefMethod(&nu::Window::SetMenuBar, RefType::Reset, "menuBar"),
         "getMenuBar", &nu::Window::GetMenuBar,
 #endif
         "setTitle", &nu::Window::SetTitle,
@@ -1126,9 +1129,12 @@ struct Type<nu::Container> {
         &nu::Container::GetPreferredWidthForHeight,
         "getPreferredHeightForWidth",
         &nu::Container::GetPreferredHeightForWidth,
-        "addChildView", &nu::Container::AddChildView,
-        "addChildViewAt", &nu::Container::AddChildViewAt,
-        "removeChildView", &nu::Container::RemoveChildView,
+        "addChildView",
+        RefMethod(&nu::Container::AddChildView, RefType::Ref),
+        "addChildViewAt",
+        RefMethod(&nu::Container::AddChildViewAt, RefType::Ref),
+        "removeChildView",
+        RefMethod(&nu::Container::RemoveChildView, RefType::Deref),
         "childCount", &nu::Container::ChildCount,
         "childAt", &nu::Container::ChildAt);
     SetProperty(context, templ,
@@ -1476,7 +1482,8 @@ struct Type<nu::Group> {
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
-        "setContentView", &nu::Group::SetContentView,
+        "setContentView",
+        RefMethod(&nu::Group::SetContentView, RefType::Reset, "contentView"),
         "getContentView", &nu::Group::GetContentView,
         "setTitle", &nu::Group::SetTitle,
         "getTitle", &nu::Group::GetTitle);
@@ -1531,7 +1538,8 @@ struct Type<nu::Scroll> {
         "getScrollbarPolicy", &nu::Scroll::GetScrollbarPolicy,
         "setContentSize", &nu::Scroll::SetContentSize,
         "getContentSize", &nu::Scroll::GetContentSize,
-        "setContentView", &nu::Scroll::SetContentView,
+        "setContentView",
+        RefMethod(&nu::Scroll::SetContentView, RefType::Reset, "contentView"),
         "getContentView", &nu::Scroll::GetContentView);
   }
 };

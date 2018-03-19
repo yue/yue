@@ -5,7 +5,7 @@
 #ifndef V8BINDING_DICT_H_
 #define V8BINDING_DICT_H_
 
-#include "v8binding/callback.h"
+#include "v8binding/ref_method.h"
 
 namespace vb {
 
@@ -40,6 +40,22 @@ struct ToV8Data<T, typename std::enable_if<
     using RunType = typename FunctorTraits<T>::RunType;
     return CreateFunctionTemplate(context, std::function<RunType>(callback),
                                   HolderIsFirstArgument);
+  }
+};
+
+// Specialize for ref method.
+template<typename T>
+struct ToV8Data<RefMethodRef<T>,
+                typename std::enable_if<
+                    std::is_member_function_pointer<T>::value>::type> {
+  static inline v8::Local<v8::Data> Do(v8::Local<v8::Context> context,
+                                       RefMethodRef<T> callback) {
+    v8::Isolate* isolate = context->GetIsolate();
+    auto* holder = new internal::RefMethodRefHolder<T>(isolate, callback);
+    v8::Local<v8::FunctionTemplate> tmpl = v8::FunctionTemplate::New(
+        isolate, &internal::RefMethodWrapper<T>, holder->GetHandle(isolate));
+    tmpl->RemovePrototype();
+    return tmpl;
   }
 };
 

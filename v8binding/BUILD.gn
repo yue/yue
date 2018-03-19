@@ -58,6 +58,8 @@ source_set("v8binding") {
     "prototype.cc",
     "prototype.h",
     "prototype_internal.h",
+    "ref_method.cc",
+    "ref_method.h",
     "template_util.h",
     "types.h",
     "util.h",

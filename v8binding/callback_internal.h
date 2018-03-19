@@ -207,11 +207,8 @@ struct Dispatcher<ReturnType(ArgTypes...)> {
     Arguments args(info);
     v8::Local<v8::External> v8_holder;
     args.GetData(&v8_holder);
-    CallbackHolderBase* holder_base = reinterpret_cast<CallbackHolderBase*>(
-        v8_holder->Value());
-
     typedef CallbackHolder<ReturnType(ArgTypes...)> HolderT;
-    HolderT* holder = static_cast<HolderT*>(holder_base);
+    HolderT* holder = static_cast<HolderT*>(v8_holder->Value());
 
     using Indices = typename IndicesGenerator<sizeof...(ArgTypes)>::type;
     Invoker<Indices, ArgTypes...> invoker(&args, holder->flags);
