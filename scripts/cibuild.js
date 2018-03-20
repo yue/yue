@@ -24,9 +24,9 @@ if (targetOs != 'linux' || targetCpu == 'x64') {
     'lua_unittests',
     'lua_yue_unittests',
   ]
-  execSync(`node ./scripts/build.js out/Component ${tests.join(' ')}`)
+  execSync(`node ./scripts/build.js out/Debug ${tests.join(' ')}`)
   for (test of tests)
-    execSync(`${path.join('out', 'Component', test)}`)
+    execSync(`${path.join('out', 'Debug', test)}`)
 }
 
 // Build common targets.
