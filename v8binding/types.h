@@ -114,21 +114,33 @@ struct Type<std::string> {
     if (value->IsString()) {
       v8::Local<v8::String> str = v8::Local<v8::String>::Cast(value);
       int length = str->Utf8Length();
-      out->resize(length);
-      str->WriteUtf8(&out->front(), length, nullptr,
-                     v8::String::NO_NULL_TERMINATION);
+      if (length > 0) {
+        out->resize(length);
+        str->WriteUtf8(&out->front(), length, nullptr,
+                       v8::String::NO_NULL_TERMINATION);
+      } else {
+        out->clear();
+      }
       return true;
     } else if (value->IsArrayBuffer()) {
       v8::ArrayBuffer::Contents contents =
           v8::Local<v8::ArrayBuffer>::Cast(value)->GetContents();
-      out->resize(contents.ByteLength());
-      memcpy(&out->front(), contents.Data(), contents.ByteLength());
+      if (contents.ByteLength() > 0) {
+        out->resize(contents.ByteLength());
+        memcpy(&out->front(), contents.Data(), contents.ByteLength());
+      } else {
+        out->clear();
+      }
       return true;
     } else if (value->IsArrayBufferView()) {
       v8::Local<v8::ArrayBufferView> buffer =
           v8::Local<v8::ArrayBufferView>::Cast(value);
-      out->resize(buffer->ByteLength());
-      buffer->CopyContents(&out->front(), buffer->ByteLength());
+      if (buffer->ByteLength() > 0) {
+        out->resize(buffer->ByteLength());
+        buffer->CopyContents(&out->front(), buffer->ByteLength());
+      } else {
+        out->clear();
+      }
       return true;
     }
     return false;
