@@ -38,6 +38,11 @@ source_set("lua") {
     ]
   }
 
+  if (is_linux) {
+    # Not sure why it is not added in base.
+    libs = [ "atomic" ]
+  }
+
   deps = [
     "//base",
   ]
