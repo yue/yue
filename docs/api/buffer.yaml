@@ -1,0 +1,29 @@
+name: Buffer
+lang: ['cpp']
+header: nativeui/buffer.h
+type: class
+namespace: nu
+description: A chunk of memory.
+detail: |
+  This type is move-only, you should pass instances by value and use `std::move`
+  when necessary.
+
+class_methods:
+  - signature: Buffer Wrap(const void* content, size_t size)
+    description: |
+      Return a `Buffer` with `content` of `size`. The `content` is not managed
+      by the returned `Buffer`, it is caller's reposnsibility to manage the
+      lifetime of `content` and ensure `content` is valid during `Buffer`'s
+      lifetime.
+
+  - signature: Buffer TakeOver(void* content, size_t size, std::function<void(void*)> free)
+    description: |
+      Return a `Buffer` with `content` of `size`, when destroyed the `content`
+      would be released with `free`.
+
+methods:
+  - signature: void* content() const
+    description: Return the pointer to underlying memory.
+
+  - signature: size_t size() const
+    description: Return the size of pointed memory.

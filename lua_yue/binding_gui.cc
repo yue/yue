@@ -33,6 +33,25 @@ struct Type<base::FilePath> {
 };
 
 template<>
+struct Type<nu::Buffer> {
+  static constexpr const char* name = "yue.Buffer";
+  static inline void Push(State* state, const nu::Buffer& value) {
+    lua_pushlstring(state, static_cast<char*>(value.content()), value.size());
+  }
+  static inline bool To(State* state, int index, nu::Buffer* out) {
+    if (GetType(state, index) != LuaType::String)
+      return false;
+    size_t size = 0;
+    const char* str = lua_tolstring(state, index, &size);
+    if (!str)
+      return false;
+    // We are assuming the Buffer is consumed immediately.
+    *out = nu::Buffer::Wrap(str, size);
+    return true;
+  }
+};
+
+template<>
 struct Type<nu::Size> {
   static constexpr const char* name = "yue.Size";
   static inline void Push(State* state, const nu::Size& size) {
@@ -374,6 +393,9 @@ struct Type<nu::Image> {
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
            "createfrompath", &CreateOnHeap<nu::Image, const base::FilePath&>,
+           "createfrombuffer", &CreateOnHeap<nu::Image,
+                                             const nu::Buffer&,
+                                             float>,
            "getsize", &nu::Image::GetSize,
            "getscalefactor", &nu::Image::GetScaleFactor);
   }

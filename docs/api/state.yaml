@@ -27,7 +27,6 @@ detail: |
   It is safe to leak it if you can't or don't want to clean up resources on
   exit.
 
-
 constructors:
   - signature: State()
     description: Create global state, each thread can only have one `State`.

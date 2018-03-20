@@ -13,6 +13,8 @@
 #include "node_yue/chrome_view_mac.h"
 #endif
 
+#include "node_buffer.h"  // NOLINT(build/include)
+
 namespace {
 
 bool is_electron = false;
@@ -36,6 +38,27 @@ struct Type<base::FilePath> {
     if (!vb::FromV8(context, value, &str))
       return false;
     *out = base::FilePath(str);
+    return true;
+  }
+};
+
+template<>
+struct Type<nu::Buffer> {
+  static constexpr const char* name = "yue.Buffer";
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   const nu::Buffer& value) {
+    return node::Buffer::Copy(context->GetIsolate(),
+                              static_cast<char*>(value.content()),
+                              value.size()).ToLocalChecked();
+  }
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::Buffer* out) {
+    if (!node::Buffer::HasInstance(value))
+      return false;
+    // We are assuming the Buffer is consumed immediately.
+    *out = nu::Buffer::Wrap(node::Buffer::Data(value),
+                            node::Buffer::Length(value));
     return true;
   }
 };
@@ -408,7 +431,8 @@ struct Type<nu::Image> {
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
-        "createFromPath", &CreateOnHeap<nu::Image, const base::FilePath&>);
+        "createFromPath", &CreateOnHeap<nu::Image, const base::FilePath&>,
+        "createFromBuffer", &CreateOnHeap<nu::Image, const nu::Buffer&, float>);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {

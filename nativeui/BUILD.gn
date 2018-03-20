@@ -222,6 +222,7 @@ component("nativeui") {
     "mac/browser/nu_custom_protocol.h",
     "mac/browser/nu_custom_protocol.mm",
     "mac/browser_mac.mm",
+    "mac/buffer_mac.mm",
     "mac/button_mac.mm",
     "mac/container_mac.h",
     "mac/container_mac.mm",

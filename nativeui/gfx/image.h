@@ -7,6 +7,7 @@
 
 #include "base/files/file_path.h"
 #include "base/memory/ref_counted.h"
+#include "nativeui/buffer.h"
 #include "nativeui/gfx/geometry/size_f.h"
 #include "nativeui/types.h"
 
@@ -17,6 +18,9 @@ class NATIVEUI_EXPORT Image : public base::RefCounted<Image> {
   // Create an image by reading from |path|.
   // The @2x suffix in basename will make the image have scale factor.
   explicit Image(const base::FilePath& path);
+
+  // Create an image from memory.
+  Image(const Buffer& buffer, float scale_factor);
 
   // Get the size of image.
   SizeF GetSize() const;

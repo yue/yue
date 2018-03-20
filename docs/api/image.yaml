@@ -10,10 +10,19 @@ constructors:
     lang: ['cpp']
     description: &ref1 Create an image by reading from `path`.
 
+  - signature: Image(const Buffer& buffer, float scale_factor)
+    lang: ['cpp']
+    description: &ref2 |
+      Create an image from `buffer` in memory, with `scale_factor`.
+
 class_methods:
   - signature: Image CreateFromPath(const base::FilePath& path)
     lang: ['lua', 'js']
     description: *ref1
+
+  - signature: Image CreateFromBuffer(const nu::Buffer& buffer, float scale_factor)
+    lang: ['lua', 'js']
+    description: *ref2
 
 methods:
   - signature: SizeF GetSize() const

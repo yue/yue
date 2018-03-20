@@ -33,6 +33,20 @@ Image::Image(const base::FilePath& p)
   }
 }
 
+Image::Image(const Buffer& buffer, float scale_factor)
+    : scale_factor_(scale_factor),
+      image_([[NSImage alloc] initWithData:buffer.ToNSData()]) {
+  if (scale_factor_ != 1.f) {
+    // Set the scale factor.
+    NSArray* reps = [image_ representations];
+    if ([reps count] > 0) {
+      NSImageRep* rep = static_cast<NSImageRep*>([reps objectAtIndex:0]);
+      [image_ setSize:NSMakeSize([rep pixelsWide] / scale_factor_,
+                                 [rep pixelsHigh] / scale_factor_)];
+    }
+  }
+}
+
 Image::~Image() {
   [image_ release];
 }
