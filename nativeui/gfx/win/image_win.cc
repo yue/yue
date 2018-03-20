@@ -4,6 +4,10 @@
 
 #include "nativeui/gfx/image.h"
 
+#include <shlwapi.h>
+#include <wrl.h>
+
+#include "base/win/scoped_hglobal.h"
 #include "nativeui/gfx/win/gdiplus.h"
 
 namespace nu {
@@ -11,6 +15,18 @@ namespace nu {
 Image::Image(const base::FilePath& path)
     : scale_factor_(GetScaleFactorFromFilePath(path)),
       image_(new Gdiplus::Image(path.value().c_str())) {
+}
+
+Image::Image(const Buffer& buffer, float scale_factor)
+    : scale_factor_(scale_factor) {
+  HGLOBAL glob = ::GlobalAlloc(GPTR, buffer.size());
+  {
+    base::win::ScopedHGlobal<void*> global_lock(glob);
+    memcpy(global_lock.get(), buffer.content(), buffer.size());
+  }
+  Microsoft::WRL::ComPtr<IStream> stream;
+  ::CreateStreamOnHGlobal(glob, TRUE, &stream);
+  image_ = new Gdiplus::Image(stream.Get());
 }
 
 Image::~Image() {

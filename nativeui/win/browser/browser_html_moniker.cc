@@ -21,8 +21,10 @@ void BrowserHTMLMoniker::LoadHTML(const base::string16& str,
                                   const base::string16& base_url) {
   base_url_ = base_url;
   HGLOBAL glob = ::GlobalAlloc(GPTR, sizeof(wchar_t) * (str.size() + 1));
-  base::win::ScopedHGlobal<wchar_t*> global_lock(glob);
-  wcscpy_s(global_lock.get(), str.size() + 1, str.c_str());
+  {
+    base::win::ScopedHGlobal<wchar_t*> global_lock(glob);
+    wcscpy_s(global_lock.get(), str.size() + 1, str.c_str());
+  }
   ::CreateStreamOnHGlobal(glob, TRUE, &stream_);
 }
 
