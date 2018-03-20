@@ -9,16 +9,29 @@
 #include <memory>
 
 #include "base/macros.h"
+#include "build/build_config.h"
+#include "nativeui/nativeui_export.h"
+
+#if defined(OS_MACOSX)
+#ifdef __OBJC__
+@class NSData;
+#else
+class NSData;
+#endif
+#endif
 
 namespace nu {
 
 // A move-only class to manage memory.
-class Buffer {
+// Note: Currently for language bindings we are assuming the buffer passed to
+// APIs are consumed immediately, so memory passed from language bindings are
+// NOT copied. Keep this in mind when designing new APIs.
+class NATIVEUI_EXPORT Buffer {
  public:
   using FreeFunc = std::function<void(void*)>;
 
   // Wrap the memory but do not free it.
-  static Buffer Wrap(void* content, size_t size);
+  static Buffer Wrap(const void* content, size_t size);
 
   // Take over the memory and free it when done.
   static Buffer TakeOver(void* content, size_t size, FreeFunc free);
@@ -28,8 +41,15 @@ class Buffer {
 
   ~Buffer();
 
+  Buffer& operator=(Buffer&& other) noexcept;
+
   void* content() const { return content_; }
   size_t size() const { return size_; }
+
+#if defined(OS_MACOSX)
+  // Return an autoreleased NSData which does not manage the memory.
+  NSData* ToNSData() const;
+#endif
 
  private:
   Buffer(void* content, size_t size, FreeFunc free);
