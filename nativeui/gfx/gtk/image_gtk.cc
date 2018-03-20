@@ -18,6 +18,16 @@ Image::Image(const base::FilePath& path)
     image_ = gdk_pixbuf_new(GDK_COLORSPACE_RGB, true, 8, 1, 1);
 }
 
+Image::Image(const Buffer& buffer, float scale_factor)
+    : scale_factor_(scale_factor) {
+  GInputStream* stream = g_memory_input_stream_new_from_data(
+      buffer.content(), buffer.size(), nullptr);
+  image_ = gdk_pixbuf_new_from_stream(stream, nullptr, nullptr);
+  if (!image_)
+    image_ = gdk_pixbuf_new(GDK_COLORSPACE_RGB, true, 8, 1, 1);
+  g_object_unref(stream);
+}
+
 Image::~Image() {
   g_object_unref(image_);
 }
