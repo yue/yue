@@ -31,6 +31,8 @@ component("nativeui") {
     "asar_archive.h",
     "browser.cc",
     "browser.h",
+    "buffer.cc",
+    "buffer.h",
     "button.cc",
     "button.h",
     "container.cc",
