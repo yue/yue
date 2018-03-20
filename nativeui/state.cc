@@ -6,6 +6,7 @@
 
 #include "base/lazy_instance.h"
 #include "base/threading/thread_local.h"
+#include "nativeui/protocol_job.h"
 #include "third_party/yoga/yoga/Yoga.h"
 
 #if defined(OS_WIN)
@@ -15,10 +16,6 @@
 #include "nativeui/win/util/gdiplus_holder.h"
 #include "nativeui/win/util/scoped_ole_initializer.h"
 #include "nativeui/win/util/subwin_holder.h"
-#endif
-
-#ifndef NDEBUG
-#include "nativeui/protocol_job.h"
 #endif
 
 namespace nu {
@@ -45,13 +42,9 @@ State::~State() {
   DCHECK_EQ(GetCurrent(), this);
   lazy_tls_ptr.Pointer()->Set(nullptr);
 
-#ifndef NDEBUG
   DCHECK_EQ(YGNodeGetInstanceCount(), 0) <<
       "There are instances of nu::View leaked on exit";
-  DCHECK_EQ(ProtocolJob::jobs_count(), 0) <<
-      "There are instances of nu::ProtocolJob still alive on exit, it is very"
-      "likely your code has a memory leak.";
-#endif
+  base::debug::LeakTracker<ProtocolJob>::CheckForLeaks();
 }
 
 // static
