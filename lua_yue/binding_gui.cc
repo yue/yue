@@ -950,7 +950,7 @@ struct Type<nu::Window> {
            "isresizable", &nu::Window::IsResizable,
            "setmaximizable", &nu::Window::SetMaximizable,
            "ismaximizable", &nu::Window::IsMaximizable,
-           "setminimizable", &nu::Window::SetMaximizable,
+           "setminimizable", &nu::Window::SetMinimizable,
            "isminimizable", &nu::Window::IsMinimizable,
            "setmovable", &nu::Window::SetMovable,
            "ismovable", &nu::Window::IsMovable,
