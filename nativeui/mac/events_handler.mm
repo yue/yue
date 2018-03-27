@@ -80,6 +80,7 @@ void AddKeyEventHandlerToClass(Class cl) {
 
 bool DispatchMouseEvent(View* view, NSEvent* event) {
   bool prevent_default = false;
+  NUPrivate* priv = [view->GetNative() nuPrivate];
   MouseEvent mouse_event(event, view->GetNative());
   switch (mouse_event.type) {
     case EventType::MouseDown:
@@ -93,10 +94,12 @@ bool DispatchMouseEvent(View* view, NSEvent* event) {
       prevent_default = true;
       break;
     case EventType::MouseEnter:
+      priv->hovered = true;
       view->on_mouse_enter.Emit(view, mouse_event);
       prevent_default = true;
       break;
     case EventType::MouseLeave:
+      priv->hovered = false;
       view->on_mouse_leave.Emit(view, mouse_event);
       prevent_default = true;
       break;

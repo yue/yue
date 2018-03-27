@@ -27,6 +27,7 @@ struct NUPrivate {
   View* shell = nullptr;
   bool focusable = true;
   bool draggable = false;
+  bool hovered = false;
   bool is_content_view = false;
   bool wants_layer = false;  // default value for wantsLayer
   bool wants_layer_infected = false;  // infects the wantsLayer property
