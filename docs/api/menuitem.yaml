@@ -10,6 +10,10 @@ constructors:
     lang: ['cpp']
     description: Create a menu item.
 
+  - signature: MenuItem(MenuItem::Role role)
+    lang: ['cpp']
+    description: Create a menu item with specified `role`.
+
 class_methods:
   - signature: MenuItem create(MenuItem::Type type)
     lang: ['lua', 'js']
@@ -22,6 +26,7 @@ class_methods:
       options:
         properties:
           - property: MenuItem::Type type
+          - property: MenuItem::Role role
           - property: bool checked
           - property: Menu submenu
           - property: bool visible
