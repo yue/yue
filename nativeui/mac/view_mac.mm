@@ -109,14 +109,11 @@ bool View::IsVisible() const {
 }
 
 void View::SetEnabled(bool enable) {
-  if ([view_ respondsToSelector:@selector(setEnabled:)])
-    [static_cast<NSControl*>(view_) setEnabled:enable];
+  [view_ setNUEnabled:enable];
 }
 
 bool View::IsEnabled() const {
-  if ([view_ respondsToSelector:@selector(isEnabled)])
-    return [static_cast<NSControl*>(view_) isEnabled];
-  return true;
+  return [view_ isNUEnabled];
 }
 
 void View::Focus() {

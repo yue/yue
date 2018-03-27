@@ -20,6 +20,11 @@ class TextEditTest : public testing::Test {
   scoped_refptr<nu::Window> window_;
 };
 
+TEST_F(TextEditTest, Disable) {
+  edit_->SetEnabled(false);
+  EXPECT_EQ(edit_->IsEnabled(), false);
+}
+
 TEST_F(TextEditTest, SetText) {
   edit_->SetText("test");
   EXPECT_EQ(edit_->GetText(), "test");

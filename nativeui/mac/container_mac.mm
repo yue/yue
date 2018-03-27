@@ -24,6 +24,13 @@
   [self setNeedsDisplay:YES];
 }
 
+- (void)setNUEnabled:(BOOL)enabled {
+}
+
+- (BOOL)isNUEnabled {
+  return YES;
+}
+
 - (BOOL)isFlipped {
   return YES;
 }

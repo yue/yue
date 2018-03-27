@@ -14,10 +14,6 @@
   nu::NUPrivate private_;
   nu::Color background_color_;
 }
-- (nu::NUPrivate*)nuPrivate;
-- (void)setNUFont:(nu::Font*)font;
-- (void)setNUColor:(nu::Color)color;
-- (void)setNUBackgroundColor:(nu::Color)color;
 @end
 
 #endif  // NATIVEUI_MAC_CONTAINER_MAC_H_

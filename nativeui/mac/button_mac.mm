@@ -33,10 +33,6 @@ nu::InsetsF GetButtonInsets(NSButton* button) {
  @private
   nu::NUPrivate private_;
 }
-- (nu::NUPrivate*)nuPrivate;
-- (void)setNUFont:(nu::Font*)font;
-- (void)setNUColor:(nu::Color)color;
-- (void)setNUBackgroundColor:(nu::Color)color;
 @end
 
 @implementation NUButton
@@ -61,6 +57,14 @@ nu::InsetsF GetButtonInsets(NSButton* button) {
 
 - (void)setNUBackgroundColor:(nu::Color)color {
   [self.cell setBackgroundColor:color.ToNSColor()];
+}
+
+- (void)setNUEnabled:(BOOL)enabled {
+  [self setEnabled:enabled];
+}
+
+- (BOOL)isNUEnabled {
+  return [self isEnabled];
 }
 
 // The default NSButton includes the button's shadow area as its frame, and it

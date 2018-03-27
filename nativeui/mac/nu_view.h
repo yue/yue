@@ -21,6 +21,8 @@ struct NUPrivate;
 - (void)setNUFont:(nu::Font*)font;
 - (void)setNUColor:(nu::Color)color;
 - (void)setNUBackgroundColor:(nu::Color)color;
+- (void)setNUEnabled:(BOOL)enabled;
+- (BOOL)isNUEnabled;
 @end
 
 // Extended methods of NUView.

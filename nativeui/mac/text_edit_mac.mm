@@ -38,10 +38,6 @@
   nu::NUPrivate private_;
 }
 - (id)initWithShell:(nu::TextEdit*)shell;
-- (nu::NUPrivate*)nuPrivate;
-- (void)setNUFont:(nu::Font*)font;
-- (void)setNUColor:(nu::Color)color;
-- (void)setNUBackgroundColor:(nu::Color)color;
 @end
 
 @implementation NUTextEdit
@@ -77,6 +73,14 @@
 
 - (void)setNUBackgroundColor:(nu::Color)color {
   [textView_ setBackgroundColor:color.ToNSColor()];
+}
+
+- (void)setNUEnabled:(BOOL)enabled {
+  [textView_ setEditable:enabled];
+}
+
+- (BOOL)isNUEnabled {
+  return [textView_ isEditable];
 }
 
 @end

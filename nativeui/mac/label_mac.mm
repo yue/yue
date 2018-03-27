@@ -21,10 +21,6 @@
   nu::Color color_;
   nu::Color background_color_;
 }
-- (nu::NUPrivate*)nuPrivate;
-- (void)setNUFont:(nu::Font*)font;
-- (void)setNUColor:(nu::Color)color;
-- (void)setNUBackgroundColor:(nu::Color)color;
 - (void)setText:(const std::string&)text;
 - (std::string)text;
 @end
@@ -48,6 +44,13 @@
 - (void)setNUBackgroundColor:(nu::Color)color {
   background_color_ = color;
   [self setNeedsDisplay:YES];
+}
+
+- (void)setNUEnabled:(BOOL)enabled {
+}
+
+- (BOOL)isNUEnabled {
+  return YES;
 }
 
 - (void)setText:(const std::string&)text {

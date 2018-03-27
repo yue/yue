@@ -100,10 +100,6 @@ base::Value NSValueToBaseValue(id value) {
             options:(const nu::Browser::Options&)options;
 - (void)willDestroy;
 - (void)updateBindings;
-- (nu::NUPrivate*)nuPrivate;
-- (void)setNUFont:(nu::Font*)font;
-- (void)setNUColor:(nu::Color)color;
-- (void)setNUBackgroundColor:(nu::Color)color;
 @end
 
 @implementation NUWebView
@@ -199,6 +195,13 @@ base::Value NSValueToBaseValue(id value) {
 }
 
 - (void)setNUBackgroundColor:(nu::Color)color {
+}
+
+- (void)setNUEnabled:(BOOL)enabled {
+}
+
+- (BOOL)isNUEnabled {
+  return YES;
 }
 
 @end

@@ -13,10 +13,6 @@
  @private
   nu::NUPrivate private_;
 }
-- (nu::NUPrivate*)nuPrivate;
-- (void)setNUFont:(nu::Font*)font;
-- (void)setNUColor:(nu::Color)color;
-- (void)setNUBackgroundColor:(nu::Color)color;
 @end
 
 @implementation NUEntry
@@ -35,6 +31,14 @@
 
 - (void)setNUBackgroundColor:(nu::Color)color {
   [self setBackgroundColor:color.ToNSColor()];
+}
+
+- (void)setNUEnabled:(BOOL)enabled {
+  [self setEditable:enabled];
+}
+
+- (BOOL)isNUEnabled {
+  return [self isEditable];
 }
 
 @end
