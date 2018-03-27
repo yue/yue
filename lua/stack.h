@@ -11,11 +11,15 @@
 #include <tuple>
 
 #include "base/compiler_specific.h"
-#include "lua/inline.h"
 #include "lua/template_util.h"
 #include "lua/types.h"
 
 namespace lua {
+
+// Think wrapper of lua_absindex.
+inline int AbsIndex(State* state, int index) {
+  return lua_absindex(state, index);
+}
 
 // Function template for Type<ArgType>::Push.
 template<typename ArgType>

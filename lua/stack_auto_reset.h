@@ -5,13 +5,17 @@
 #ifndef LUA_STACK_AUTO_RESET_H_
 #define LUA_STACK_AUTO_RESET_H_
 
-#include "lua/inline.h"
+#include "lua/state.h"
 
 namespace lua {
 
 // Thin wrappers of settop.
 inline void SetTop(State* state, int index) {
   lua_settop(state, index);
+}
+
+inline int GetTop(State* state) {
+  return lua_gettop(state);
 }
 
 // Automatically clear the values on stack.
