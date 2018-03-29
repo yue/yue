@@ -122,13 +122,17 @@ int EventModifiersFromNS(NSEventModifierFlags flags) {
 
 PointF GetPosInView(NSEvent* event, NSView* view) {
   NSPoint point = [view convertPoint:[event locationInWindow] fromView:nil];
+  if ([view isFlipped])
+    return PointF(point);
   NSRect frame = [view frame];
   return PointF(point.x, NSHeight(frame) - point.y);
 }
 
-PointF GetPosInWindow(NSEvent* event) {
-  NSWindow* window = [event window];
+PointF GetPosInWindow(NSEvent* event, NSView* view) {
   NSPoint point = [event locationInWindow];
+  if ([view isFlipped])
+    return PointF(point);
+  NSWindow* window = [event window];
   NSRect frame = [window contentRectForFrameRect:[window frame]];
   return PointF(point.x, NSHeight(frame) - point.y);
 }
@@ -146,7 +150,7 @@ MouseEvent::MouseEvent(NativeEvent event, NativeView view)
     : Event(event, view),
       button([event buttonNumber] + 1),
       position_in_view(GetPosInView(event, view)),
-      position_in_window(GetPosInWindow(event)) {
+      position_in_window(GetPosInWindow(event, view)) {
 }
 
 KeyEvent::KeyEvent(NativeEvent event, NativeView view)
