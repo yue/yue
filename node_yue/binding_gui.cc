@@ -710,8 +710,9 @@ struct Type<nu::MenuBase> {
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
-        "append", &nu::MenuBase::Append,
-        "insert", &nu::MenuBase::Insert,
+        "append", RefMethod(&nu::MenuBase::Append, RefType::Ref),
+        "insert", RefMethod(&nu::MenuBase::Insert, RefType::Ref),
+        "remove", RefMethod(&nu::MenuBase::Remove, RefType::Deref),
         "itemCount", &nu::MenuBase::ItemCount,
         "itemAt", &nu::MenuBase::ItemAt);
   }

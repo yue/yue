@@ -638,8 +638,9 @@ struct Type<nu::MenuBase> {
   static constexpr const char* name = "yue.MenuBase";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
-           "append", &nu::MenuBase::Append,
-           "insert", &Insert,
+           "append", RefMethod(&nu::MenuBase::Append, RefType::Ref),
+           "insert", RefMethod(&Insert, RefType::Ref),
+           "remove", RefMethod(&nu::MenuBase::Remove, RefType::Deref),
            "itemcount", &nu::MenuBase::ItemCount,
            "itemat", &ItemAt);
   }
