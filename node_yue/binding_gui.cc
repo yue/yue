@@ -1027,7 +1027,7 @@ struct Type<nu::Window> {
         "getContentSizeConstraints", &nu::Window::GetContentSizeConstraints,
         "activate", &nu::Window::Activate,
         "deactivate", &nu::Window::Deactivate,
-        "isactive", &nu::Window::IsActive,
+        "isActive", &nu::Window::IsActive,
         "setVisible", &nu::Window::SetVisible,
         "isVisible", &nu::Window::IsVisible,
         "setAlwaysOnTop", &nu::Window::SetAlwaysOnTop,
