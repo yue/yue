@@ -191,11 +191,11 @@ inline void PushCFunction(State* state, const std::function<Sig>& callback) {
 // Call PCall for the gloal handle.
 template<typename ReturnType, typename...ArgTypes>
 struct PCallHelper {
-  static ReturnType Run(State* state, const std::shared_ptr<Persistent>& handle,
+  static ReturnType Run(State* state, const std::shared_ptr<int>& handle,
                         ArgTypes... args) {
     ReturnType result = ReturnType();
     int top = GetTop(state);
-    handle->Push(state);
+    PushWeakReference(state, handle.get());
     if (!PCall(state, &result, args...)) {
       std::string error;
       lua::Pop(state, &error);
@@ -209,10 +209,10 @@ struct PCallHelper {
 // The void return type version for PCallHelper.
 template<typename...ArgTypes>
 struct PCallHelper<void, ArgTypes...> {
-  static void Run(State* state, const std::shared_ptr<Persistent>& handle,
+  static void Run(State* state, const std::shared_ptr<int>& handle,
                   ArgTypes... args) {
     int top = GetTop(state);
-    handle->Push(state);
+    PushWeakReference(state, handle.get());
     if (!PCall(state, nullptr, args...)) {
       std::string error;
       lua::Pop(state, &error);

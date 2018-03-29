@@ -54,7 +54,8 @@ TEST_F(HandleTest, Weak) {
   lua::RawSet(state_, 2, "__gc", on_gc);
   lua::SetMetaTable(state_, 1);
   ASSERT_EQ(lua::GetTop(state_), 1);
-  int ref = lua::CreateWeakReference(state_, -1);
+  int* ref = &changed;
+  lua::CreateWeakReference(state_, ref, -1);
   ASSERT_EQ(lua::GetTop(state_), 1);
 
   lua::PushWeakReference(state_, ref);

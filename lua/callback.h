@@ -7,6 +7,7 @@
 #ifndef LUA_CALLBACK_H_
 #define LUA_CALLBACK_H_
 
+#include <memory>
 #include <utility>
 
 #include "lua/callback_internal.h"
@@ -14,6 +15,9 @@
 namespace lua {
 
 // Define how callbacks are converted.
+// Note that lua callbacks are always stored as weak reference when converted to
+// C++ function, otherwise we would have unresolvable cyclic reference leading
+// to memory leak.
 template<typename ReturnType, typename... ArgTypes>
 struct Type<std::function<ReturnType(ArgTypes...)>> {
   static constexpr const char* name = "function";
@@ -30,7 +34,11 @@ struct Type<std::function<ReturnType(ArgTypes...)>> {
     }
     if (GetType(state, index) != LuaType::Function)
       return false;
-    auto handle = Persistent::New(state, index);
+    // The address of handle is used as unique key to the weak reference of the
+    // lua function. The handle has the same lifetime with the converted C++
+    // function.
+    std::shared_ptr<int> handle(new int);
+    CreateWeakReference(state, handle.get(), index);
     *out = [state, handle](ArgTypes... args) -> ReturnType {
       return internal::PCallHelper<ReturnType, ArgTypes...>::Run(
           state, handle, std::move(args)...);

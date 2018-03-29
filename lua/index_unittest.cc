@@ -94,3 +94,25 @@ TEST_F(IndexTest, CustomData) {
   ASSERT_TRUE(lua::PGetAndPop(state_, 1, "custom", &data));
   EXPECT_EQ(data, "data");
 }
+
+TEST_F(IndexTest, MemberCanBeGarbageCollected) {
+  PropertiesClass* inst = new PropertiesClass;
+  lua::Push(state_, inst);
+  std::function<int(int)> func = [](int i) { return i; };
+  lua::Push(state_, func);
+
+  ASSERT_TRUE(lua::PSet(state_, 1, "func", lua::ValueOnStack(state_, 2)));
+  ASSERT_TRUE(lua::PGet(state_, 1, "func"));
+  int ret = -1;
+  ASSERT_TRUE(lua::PCall(state_, &ret, 123));
+  EXPECT_EQ(ret, 123);
+
+  lua::SetTop(state_, 1);
+  lua::CollectGarbage(state_);
+  lua::CollectGarbage(state_);
+
+  ASSERT_TRUE(lua::PGet(state_, 1, "func"));
+  ret = -1;
+  ASSERT_TRUE(lua::PCall(state_, &ret, 123));
+  EXPECT_EQ(ret, 123);
+}

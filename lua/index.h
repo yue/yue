@@ -13,9 +13,9 @@ namespace lua {
 // Describe how a member T can be converted.
 template<typename T, typename Enable = void>
 struct MemberTraits {
-  // Decides should we return cached value or converted value.
-  static const bool kShouldCacheValue = true;
-  // Converter used when we decide not to use cached value.
+  // Decides should we return store a reference to the value.
+  static const bool kShouldReferenceValue = true;
+  // Converter used when we do not store reference.
   static inline void Push(State* state, int cache, const T& ptr) {
     lua::Push(state, nullptr);
   }
@@ -25,16 +25,13 @@ struct MemberTraits {
 template<typename T>
 struct MemberTraits<T, typename std::enable_if<
                            std::is_fundamental<T>::value>::type> {
-  static const bool kShouldCacheValue = false;
+  static const bool kShouldReferenceValue = false;
   static inline void Push(State* state, int cache, const T& ptr) {
     lua::Push(state, ptr);
   }
 };
 
 namespace internal {
-
-// Push a table that acts as cache.
-void PushCacheTable(State* state, int key);
 
 // Get type from member pointer.
 template<typename T> struct ExtractMemberPointer;
@@ -77,12 +74,12 @@ int MemberHolder<T>::Index(State* state) {
   ClassType* owner;
   if (!To(state, 1, &owner))
     return 0;
-  PushCacheTable(state, 1);
-  int cache = AbsIndex(state, -1);
-  if (MemberTraits<MemberType>::kShouldCacheValue) {
-    RawGet(state, cache, ValueOnStack(state, 2));
+  PushRefsTable(state, "__yuemembers", 1);
+  int refs = AbsIndex(state, -1);
+  if (MemberTraits<MemberType>::kShouldReferenceValue) {
+    RawGet(state, refs, ValueOnStack(state, 2));
   } else {
-    MemberTraits<MemberType>::Push(state, cache, owner->*ptr_);
+    MemberTraits<MemberType>::Push(state, refs, owner->*ptr_);
   }
   return 1;
 }
@@ -98,8 +95,8 @@ int MemberHolder<T>::NewIndex(State* state) {
     lua_error(state);
     NOTREACHED() << "Code after lua_error() gets called";
   }
-  if (MemberTraits<MemberType>::kShouldCacheValue) {
-    PushCacheTable(state, 1);
+  if (MemberTraits<MemberType>::kShouldReferenceValue) {
+    PushRefsTable(state, "__yuemembers", 1);
     RawSet(state, -1, ValueOnStack(state, 2), ValueOnStack(state, 3));
   }
   return 1;

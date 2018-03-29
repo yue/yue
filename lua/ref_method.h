@@ -35,7 +35,6 @@ void StoreArg(State* state, int ref_arg, RefType ref_type, const char* ref_key);
 // Wrapper of the method to automatically store a reference of argument.
 template<typename T>
 int RefMethodWrapper(State* state) {
-  // DO NOT USE ANY C++ STACK.
   RefMethodRef<T>* ref = static_cast<RefMethodRef<T>*>(
       lua_touserdata(state, lua_upvalueindex(1)));
   // Add reference to the argument.

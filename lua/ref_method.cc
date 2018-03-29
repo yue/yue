@@ -12,11 +12,7 @@ void StoreArg(State* state, int arg, RefType ref_type, const char* ref_key) {
   // DO NOT USE ANY C++ STACK BEFORE THE UNSAFE CALLS.
   CHECK_EQ(GetType(state, 1), LuaType::UserData);
   // this.__yuerefs ?= {}
-  UnsafeGet(state, 1, "__yuerefs");
-  if (GetType(state, -1) != LuaType::Table) {
-    NewTable(state, 0, 1);
-    UnsafeSet(state, 1, "__yuerefs", ValueOnStack(state, -1));
-  }
+  PushRefsTable(state, "__yuerefs", 1);
   // if (reftype == "ref")
   //   this.__yuerefs[arg] = true
   // else if (reftype == "deref")

@@ -14,26 +14,25 @@ const char* kWeakTableName = "yue.internal.weaktable";
 
 }  // namespace
 
-int CreateWeakReference(State* state, int index) {
+void CreateWeakReference(State* state, void* key, int index) {
   index = AbsIndex(state, index);
   StackAutoReset reset(state);
   PushWeakTable(state, kWeakTableName, "v");
-  lua::Push(state, ValueOnStack(state, index));
-  return luaL_ref(state, -2);
+  RawSet(state, -1, key, ValueOnStack(state, index));
 }
 
-void PushWeakReference(State* state, int ref) {
+void PushWeakReference(State* state, void* key) {
   luaL_getmetatable(state, kWeakTableName);
   DCHECK_EQ(GetType(state, -1), LuaType::Table);
-  lua_rawgeti(state, -1, ref);
+  RawGet(state, -1, key);
   lua_remove(state, -2);
 }
 
-bool WeakReferenceExists(State* state, int ref) {
+bool WeakReferenceExists(State* state, void* key) {
   StackAutoReset reset(state);
   luaL_getmetatable(state, kWeakTableName);
   DCHECK_EQ(GetType(state, -1), LuaType::Table);
-  lua_rawgeti(state, -1, ref);
+  RawGet(state, -1, key);
   return GetType(state, -1) != LuaType::Nil;
 }
 

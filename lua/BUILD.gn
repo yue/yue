@@ -12,7 +12,6 @@ source_set("lua") {
     "callback_internal.h",
     "handle.cc",
     "handle.h",
-    "index.cc",
     "index.h",
     "metatable.cc",
     "metatable.h",
@@ -49,6 +48,7 @@ source_set("lua") {
 
 test("lua_unittests") {
   sources = [
+    "callback_unittest.cc",
     "ref_method_unittest.cc",
     "handle_unittest.cc",
     "index_unittest.cc",

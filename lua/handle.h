@@ -58,9 +58,12 @@ class Persistent {
 };
 
 // The weak reference.
-int CreateWeakReference(State* state, int index);
-void PushWeakReference(State* state, int ref);
-bool WeakReferenceExists(State* state, int ref);
+// It is impossible in lua to get a always unique key for weak references, so
+// it is caller's reponsibility to provide an unique key. Usually should just
+// pick the address of the native object that stores the reference.
+void CreateWeakReference(State* state, void* key, int val);
+void PushWeakReference(State* state, void* key);
+bool WeakReferenceExists(State* state, void* key);
 
 }  // namespace lua
 
