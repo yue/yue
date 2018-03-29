@@ -65,6 +65,7 @@ void Scroll::PlatformInit() {
     scroll.hasHorizontalScroller = YES;
     scroll.hasVerticalScroller = YES;
   }
+  [scroll.contentView setCopiesOnScroll:NO];
   TakeOverView(scroll);
 }
 
