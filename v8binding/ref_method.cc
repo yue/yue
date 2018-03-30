@@ -4,6 +4,8 @@
 
 #include "v8binding/ref_method.h"
 
+#include "v8binding/dict.h"
+
 namespace vb {
 
 namespace internal {
@@ -14,11 +16,7 @@ void StoreArg(v8::Local<v8::Context> context,
               RefType ref_type,
               const char* ref_key) {
   v8::Isolate* isolate = context->GetIsolate();
-  auto key = v8::Private::ForApi(isolate, ToV8Symbol(context, "refs"));
-  if (!object->HasPrivate(context, key).ToChecked())
-    object->SetPrivate(context, key, v8::Map::New(isolate));
-  v8::Local<v8::Map> refs = v8::Local<v8::Map>::Cast(
-      object->GetPrivate(context, key).ToLocalChecked());
+  v8::Local<v8::Map> refs = GetAttachedTable(context, object, "refs");
   switch (ref_type) {
     case RefType::Reset:
       refs->Set(context, ToV8(context, ref_key), ref_arg).IsEmpty();

@@ -57,6 +57,8 @@ V8FunctionWrapper::~V8FunctionWrapper() {
 }
 
 v8::Local<v8::Function> V8FunctionWrapper::Get(v8::Isolate* isolate) const {
+  if (v8_ref_.IsEmpty())
+    return v8::Local<v8::Function>();
   return v8::Local<v8::Function>::New(isolate, v8_ref_);
 }
 

@@ -39,6 +39,28 @@ v8::Local<v8::FunctionTemplate> CreateFunctionTemplate(
   return tmpl;
 }
 
+// Get function from v8, but does not keep a reference of it.
+template<typename ReturnType, typename... ArgTypes>
+bool WeakFunctionFromV8(v8::Local<v8::Context> context,
+                        v8::Local<v8::Value> val,
+                        std::function<ReturnType(ArgTypes...)>* out) {
+  if (val->IsNull()) {
+    *out = nullptr;
+    return true;
+  }
+  if (!val->IsFunction())
+    return false;
+  v8::Isolate* isolate = context->GetIsolate();
+  auto wrapper = std::make_shared<internal::V8FunctionWrapper>(
+      isolate, val.As<v8::Function>());
+  wrapper->SetWeak();
+  *out = [isolate, wrapper](ArgTypes... args) -> ReturnType {
+    return internal::V8FunctionInvoker<ReturnType(ArgTypes...)>::Go(
+        isolate, wrapper, std::move(args)...);
+  };
+  return true;
+}
+
 // Define how callbacks are converted.
 template<typename ReturnType, typename... ArgTypes>
 struct Type<std::function<ReturnType(ArgTypes...)>> {

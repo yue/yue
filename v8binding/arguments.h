@@ -40,6 +40,14 @@ class Arguments {
     return FromV8(isolate_->GetCurrentContext(), val, out);
   }
 
+  v8::Local<v8::Object> This() const {
+    return info_->This();
+  }
+
+  v8::Local<v8::Context> GetContext() const {
+    return isolate_->GetCurrentContext();
+  }
+
   int Length() const {
     return info_->Length();
   }
@@ -50,6 +58,8 @@ class Arguments {
   }
 
   void ThrowError(const char* target_type_name) const;
+
+  const v8::FunctionCallbackInfo<v8::Value>& info() const { return *info_; }
 
   v8::Isolate* isolate() const { return isolate_; }
 

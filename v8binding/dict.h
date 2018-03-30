@@ -108,6 +108,14 @@ inline bool Get(v8::Local<v8::Context> context, v8::Local<v8::Object> object,
          Get(context, object, args...);
 }
 
+// Return a hidden map attached to object.
+v8::Local<v8::Map> GetAttachedTable(v8::Local<v8::Context> context,
+                                    v8::Local<v8::Object> object,
+                                    const base::StringPiece& key);
+v8::Local<v8::Map> GetAttachedTable(v8::Local<v8::Context> context,
+                                    v8::Local<v8::Object> object,
+                                    void* key);
+
 }  // namespace vb
 
 #endif  // V8BINDING_DICT_H_

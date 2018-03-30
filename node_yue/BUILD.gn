@@ -11,7 +11,6 @@ loadable_module("node_yue") {
 
   sources = [
     "binding_gui.cc",
-    "binding_signal.cc",
     "binding_signal.h",
     "binding_values.cc",
     "binding_values.h",

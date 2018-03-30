@@ -733,11 +733,21 @@ struct Type<nu::MenuBar> {
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
   }
-  static nu::MenuBar* Create(v8::Local<v8::Context> context,
-                             v8::Local<v8::Array> options) {
+  static nu::MenuBar* CreateRaw(v8::Local<v8::Context> context,
+                                v8::Local<v8::Array> options) {
     nu::MenuBar* menu = new nu::MenuBar;
     ReadMenuItems(context, options, menu);
     return menu;
+  }
+  static v8::Local<v8::Value> Create(v8::Local<v8::Context> context,
+                                     v8::Local<v8::Array> options) {
+    nu::MenuBar* menu = CreateRaw(context, options);
+    // Remember the options.
+    v8::Local<v8::Value> ret = vb::ToV8(context, menu);
+    auto key = v8::Private::ForApi(context->GetIsolate(),
+                                   ToV8(context, "options").As<v8::String>());
+    ret.As<v8::Object>()->SetPrivate(context, key, options);
+    return ret;
   }
 };
 
@@ -754,11 +764,21 @@ struct Type<nu::Menu> {
     Set(context, templ,
         "popup", &nu::Menu::Popup);
   }
-  static nu::Menu* Create(v8::Local<v8::Context> context,
-                          v8::Local<v8::Array> options) {
+  static nu::Menu* CreateRaw(v8::Local<v8::Context> context,
+                             v8::Local<v8::Array> options) {
     nu::Menu* menu = new nu::Menu;
     ReadMenuItems(context, options, menu);
     return menu;
+  }
+  static v8::Local<v8::Value> Create(v8::Local<v8::Context> context,
+                                     v8::Local<v8::Array> options) {
+    nu::Menu* menu = CreateRaw(context, options);
+    // Remember the options.
+    v8::Local<v8::Value> ret = vb::ToV8(context, menu);
+    auto key = v8::Private::ForApi(context->GetIsolate(),
+                                   ToV8(context, "options").As<v8::String>());
+    ret.As<v8::Object>()->SetPrivate(context, key, options);
+    return ret;
   }
 };
 
@@ -845,8 +865,8 @@ struct Type<nu::MenuItem> {
     SetProperty(context, templ,
                 "onClick", &nu::MenuItem::on_click);
   }
-  static nu::MenuItem* Create(v8::Local<v8::Context> context,
-                              v8::Local<v8::Value> value) {
+  static nu::MenuItem* CreateRaw(v8::Local<v8::Context> context,
+                                 v8::Local<v8::Value> value) {
     nu::MenuItem::Type type = nu::MenuItem::Type::Label;
     if (FromV8(context, value, &type) || !value->IsObject())
       return new nu::MenuItem(type);
@@ -869,7 +889,7 @@ struct Type<nu::MenuItem> {
     v8::Local<v8::Array> options;
     if (Get(context, obj, "submenu", &submenu) ||
         (Get(context, obj, "submenu", &options) && options->IsArray())) {
-      if (!submenu) submenu = Type<nu::Menu>::Create(context, options);
+      if (!submenu) submenu = Type<nu::Menu>::CreateRaw(context, options);
       if (!item) item = new nu::MenuItem(nu::MenuItem::Type::Submenu);
       item->SetSubmenu(submenu);
     }
@@ -885,8 +905,23 @@ struct Type<nu::MenuItem> {
     nu::Accelerator accelerator;
     if (Get(context, obj, "accelerator", &accelerator))
       item->SetAccelerator(accelerator);
-    Get(context, obj, "onClick", &item->on_click);
+    // The signal handler must not be referenced by C++.
+    v8::Local<v8::Value> on_click_val;
+    std::function<void(nu::MenuItem*)> on_click;
+    if (Get(context, obj, "onClick", &on_click_val) &&
+        WeakFunctionFromV8(context, on_click_val, &on_click))
+      item->on_click.Connect(on_click);
     return item;
+  }
+  static v8::Local<v8::Value> Create(v8::Local<v8::Context> context,
+                                     v8::Local<v8::Value> value) {
+    nu::MenuItem* item = CreateRaw(context, value);
+    // Remember the options.
+    v8::Local<v8::Value> ret = vb::ToV8(context, item);
+    auto key = v8::Private::ForApi(context->GetIsolate(),
+                                   ToV8(context, "options").As<v8::String>());
+    ret.As<v8::Object>()->SetPrivate(context, key, value);
+    return ret;
   }
 };
 
@@ -899,7 +934,7 @@ void ReadMenuItems(v8::Local<v8::Context> context,
       // Create the item if an object is passed.
       nu::MenuItem* item;
       if (!vb::FromV8(context, obj, &item))
-        item = Type<nu::MenuItem>::Create(context, obj);
+        item = Type<nu::MenuItem>::CreateRaw(context, obj);
       menu->Append(item);
     }
   }

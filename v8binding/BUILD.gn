@@ -49,6 +49,7 @@ source_set("v8binding") {
     "callback.cc",
     "callback.h",
     "callback_internal.h",
+    "dict.cc",
     "dict.h",
     "property.h",
     "locker.cc",

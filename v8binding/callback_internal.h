@@ -230,6 +230,10 @@ class V8FunctionWrapper {
 
   v8::Local<v8::Function> Get(v8::Isolate* isolate) const;
 
+  void SetWeak() {
+    v8_ref_.SetWeak();
+  }
+
  private:
   v8::Global<v8::Function> v8_ref_;
 };
@@ -249,6 +253,10 @@ struct V8FunctionInvoker<v8::Local<v8::Value>(ArgTypes...)> {
     v8::MicrotasksScope script_scope(isolate,
                                      v8::MicrotasksScope::kRunMicrotasks);
     auto func = wrapper->Get(isolate);
+    if (func.IsEmpty()) {
+      ThrowError(isolate, "The function has been garbage collected");
+      return v8::Null(isolate);
+    }
     auto context = func->CreationContext();
     std::vector<v8::Local<v8::Value>> args = { ToV8(context, raw)... };
     return handle_scope.Escape(node::MakeCallback(
@@ -268,6 +276,10 @@ struct V8FunctionInvoker<void(ArgTypes...)> {
     v8::MicrotasksScope script_scope(isolate,
                                      v8::MicrotasksScope::kRunMicrotasks);
     auto func = wrapper->Get(isolate);
+    if (func.IsEmpty()) {
+      ThrowError(isolate, "The function has been garbage collected");
+      return;
+    }
     auto context = func->CreationContext();
     std::vector<v8::Local<v8::Value>> args = { ToV8(context, raw)... };
     node::MakeCallback(isolate, func, func,
@@ -285,14 +297,18 @@ struct V8FunctionInvoker<ReturnType(ArgTypes...)> {
     v8::HandleScope handle_scope(isolate);
     v8::MicrotasksScope script_scope(isolate,
                                      v8::MicrotasksScope::kRunMicrotasks);
+    ReturnType ret = ReturnType();
     auto func = wrapper->Get(isolate);
+    if (func.IsEmpty()) {
+      ThrowError(isolate, "The function has been garbage collected");
+      return ret;
+    }
     auto context = func->CreationContext();
     std::vector<v8::Local<v8::Value>> args = { ToV8(context, raw)... };
     v8::Local<v8::Value> val = node::MakeCallback(
         isolate, func, func,
         static_cast<int>(args.size()),
         args.empty() ? nullptr : &args.front());
-    ReturnType ret = ReturnType();
     FromV8(context, val, &ret);
     return ret;
   }

@@ -361,9 +361,19 @@ inline v8::Local<v8::String> ToV8Symbol(v8::Local<v8::Context> context,
 
 // Helper to throw errors.
 inline void ThrowTypeError(v8::Local<v8::Context> context,
-                           base::StringPiece message) {
+                           const base::StringPiece& message) {
   context->GetIsolate()->ThrowException(v8::Exception::TypeError(
       ToV8(context, message).As<v8::String>()));
+}
+
+inline void ThrowError(v8::Isolate* isolate,
+                       const base::StringPiece& message) {
+  isolate->ThrowException(v8::Exception::Error(
+      v8::String::NewFromUtf8(
+          isolate,
+          message.data(),
+          v8::NewStringType::kNormal,
+          static_cast<uint32_t>(message.length())).ToLocalChecked()));
 }
 
 }  // namespace vb

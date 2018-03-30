@@ -10,16 +10,70 @@
 
 namespace node_yue {
 
-// Tracks owner's lifetime and releases the holder on GC.
-class OwnerTracker : public vb::internal::ObjectTracker {
+template<typename Sig>
+class SignalWrapper : public base::RefCounted<SignalWrapper<Sig>> {
  public:
-  OwnerTracker(v8::Isolate* isolate,
-               v8::Local<v8::Object> owner,
-               v8::Local<v8::Object> holder);
-  ~OwnerTracker() override;
+  SignalWrapper(v8::Isolate* isolate,
+                v8::Local<v8::Object> owner,
+                nu::Signal<Sig>* signal)
+      : owner_(isolate, owner), signal_(signal) {
+    owner_.SetWeak();
+  }
+
+  int Connect(vb::Arguments* args, v8::Local<v8::Value> value) {
+    v8::Isolate* isolate = args->isolate();
+    if (owner_.IsEmpty()) {
+      vb::ThrowError(isolate, "Signal owner is garbage collected");
+      return -1;
+    }
+    // The signal handler must not be referenced by C++.
+    v8::Local<v8::Context> context = args->GetContext();
+    std::function<Sig> slot;
+    if (!vb::WeakFunctionFromV8(context, value, &slot)) {
+      args->ThrowError("Function");
+      return -1;
+    }
+    int id = signal_->Connect(slot);
+    // this.signals[signal][id] = slot.
+    v8::Local<v8::Map> refs = vb::GetAttachedTable(
+        context, args->This(), signal_);
+    refs->Set(context, v8::Integer::New(isolate, id), value).IsEmpty();
+    return id;
+  }
+
+  void Disconnect(vb::Arguments* args, int id) {
+    v8::Isolate* isolate = args->isolate();
+    if (owner_.IsEmpty()) {
+      vb::ThrowError(isolate, "Signal owner is garbage collected");
+      return;
+    }
+    signal_->Disconnect(id);
+    // delete this.signals[signal][id]
+    v8::Local<v8::Context> context = args->GetContext();
+    v8::Local<v8::Map> refs = vb::GetAttachedTable(
+        context, args->This(), signal_);
+    refs->Delete(context, v8::Integer::New(isolate, id)).FromJust();
+  }
+
+  void DisconnectAll(vb::Arguments* args) {
+    v8::Isolate* isolate = args->isolate();
+    if (owner_.IsEmpty()) {
+      vb::ThrowError(isolate, "Signal owner is garbage collected");
+      return;
+    }
+    signal_->DisconnectAll();
+    // this.signals[signal] = {]
+    v8::Local<v8::Context> context = args->GetContext();
+    vb::GetAttachedTable(context, args->This(), signal_)->Clear();
+  }
 
  private:
-  v8::Global<v8::Object> holder_ref_;
+  ~SignalWrapper() {}
+
+  friend class base::RefCounted<SignalWrapper<Sig>>;
+
+  v8::Global<v8::Object> owner_;
+  nu::Signal<Sig>* signal_;
 };
 
 }  // namespace node_yue
@@ -28,80 +82,47 @@ namespace vb {
 
 // Converter for Signal.
 template<typename Sig>
-struct Type<nu::Signal<Sig>> {
+struct Type<node_yue::SignalWrapper<Sig>> {
   static constexpr const char* name = "yue.Signal";
   static void BuildConstructor(v8::Local<v8::Context>, v8::Local<v8::Object>) {
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
-        "connect", &nu::Signal<Sig>::Connect,
-        "disconnect", &nu::Signal<Sig>::Disconnect,
-        "disconnectAll", &nu::Signal<Sig>::DisconnectAll);
-  }
-  static bool FromV8(v8::Local<v8::Context> context,
-                     v8::Local<v8::Value> value,
-                     nu::Signal<Sig>* out) {
-    if (!value->IsFunction())
-      return false;
-    std::function<Sig> callback;
-    if (!vb::FromV8(context, value, &callback))
-      return false;
-    out->Connect(callback);
-    return true;
-  }
-};
-
-template<typename Sig>
-struct Type<nu::Signal<Sig>*> {
-  static constexpr const char* name = "yue.Signal";
-  static bool FromV8(v8::Local<v8::Context> context,
-                     v8::Local<v8::Value> value,
-                     nu::Signal<Sig>** out) {
-    // Verify the type.
-    if (!value->IsObject())
-      return false;
-    v8::Local<v8::Object> obj = v8::Local<v8::Object>::Cast(value);
-    if (obj->InternalFieldCount() != 1)
-      return false;
-    // Convert pointer to actual class.
-    auto* ptr = static_cast<nu::Signal<Sig>*>(
-        obj->GetAlignedPointerFromInternalField(0));
-    if (!ptr)
-      return false;
-    *out = ptr;
-    return true;
-  }
-};
-
-template<typename Sig>
-struct Type<nu::SignalBase<Sig>*> {
-  static constexpr const char* name = "yue.Signal";
-  static bool FromV8(v8::Local<v8::Context> context,
-                     v8::Local<v8::Value> value,
-                     nu::SignalBase<Sig>** out) {
-    return Type<nu::Signal<Sig>*>::FromV8(
-        context, value, reinterpret_cast<nu::Signal<Sig>**>(out));
+        "connect", &node_yue::SignalWrapper<Sig>::Connect,
+        "disconnect", &node_yue::SignalWrapper<Sig>::Disconnect,
+        "disconnectAll", &node_yue::SignalWrapper<Sig>::DisconnectAll);
   }
 };
 
 // Define how the Signal member is converted.
 template<typename Sig>
 struct MemberTraits<nu::Signal<Sig>> {
+  static const bool kShouldReferenceValue = false;
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    v8::Local<v8::Object> owner,
                                    const nu::Signal<Sig>& signal) {
     v8::Isolate* isolate = context->GetIsolate();
-    auto result = CallConstructor<nu::Signal<Sig>>(context);
-    if (result.IsEmpty())
-      return v8::Null(isolate);
-    // Store the pointer of signal in the object.
-    v8::Local<v8::Object> obj = result.ToLocalChecked();
-    obj->SetAlignedPointerInInternalField(
-        0, const_cast<nu::Signal<Sig>*>(&signal));
-    // Track the lifetime of owner.
-    new node_yue::OwnerTracker(isolate, owner, obj);
-    return obj;
+    return vb::ToV8(context, new node_yue::SignalWrapper<Sig>(
+        isolate, owner, const_cast<nu::Signal<Sig>*>(&signal)));
+  }
+  static inline bool FromV8(v8::Local<v8::Context> context,
+                            v8::Local<v8::Object> owner,
+                            v8::Local<v8::Value> value,
+                            nu::Signal<Sig>* out) {
+    if (!value->IsFunction())
+      return false;
+    // The signal handler must not be referenced by C++.
+    std::function<Sig> slot;
+    if (!vb::WeakFunctionFromV8(context, value, &slot))
+      return false;
+    int id = out->Connect(slot);
+    // this.signals[signal][id] = slot.
+    v8::Local<v8::Map> refs = vb::GetAttachedTable(context, owner, out);
+    refs->Set(context,
+              v8::Integer::New(context->GetIsolate(), id),
+              value).IsEmpty();
+    return true;
   }
 };
 
