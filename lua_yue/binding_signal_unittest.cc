@@ -121,3 +121,42 @@ TEST_F(YueSignalTest, DelegateAssignment) {
       "win:close()"));
   EXPECT_TRUE(closed);
 }
+
+TEST_F(YueSignalTest, SignalReference) {
+  ASSERT_FALSE(luaL_dostring(state_,
+      // Weak table.
+      "t = {}\n"
+      "setmetatable(t, { __mode = 'v' })\n"
+      // Put function to weak table and signal.
+      "c = function() end\n"
+      "t.c = c\n"
+      "win.onclose = c\n"
+      // It should live through grabage collection.
+      "c = nil\n"
+      "collectgarbage()\n"
+      "assert(t.c)\n"));
+  ASSERT_FALSE(luaL_dostring(state_,
+      // It should disappear after removing ref.
+      "win.onclose:disconnectall()\n"
+      "collectgarbage()\n"
+      "assert(t.c == nil)\n"));
+}
+
+TEST_F(YueSignalTest, SignalCyclicReference) {
+  ASSERT_FALSE(luaL_dostring(state_,
+      // Weak table.
+      "t = {}\n"
+      "setmetatable(t, { __mode = 'v' })\n"
+      // Wrapper object includes win.
+      "w = {}\n"
+      "w.window = w\n"
+      "w.draw = function() w.window.getbounds() end\n"
+      "win.onclose:connect(function() w.draw() end)\n"
+      // Put object to weak table.
+      "t.w = w\n"
+      // Wrapper object and win can be garbage collected.
+      "w = nil\n"
+      "win = nil\n"
+      "collectgarbage()\n"
+      "assert(t.w == nil)\n"));
+}

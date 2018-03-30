@@ -14,10 +14,25 @@
 
 namespace lua {
 
+// Convert a lua function to C++ without keeping a reference to it.
+template<typename ReturnType, typename... ArgTypes>
+bool ToWeakFunction(State* state, int index,
+                    std::function<ReturnType(ArgTypes...)>* out) {
+  if (GetType(state, index) == LuaType::Nil) {
+    *out = nullptr;
+    return true;
+  }
+  if (GetType(state, index) != LuaType::Function)
+    return false;
+  std::shared_ptr<Handle> handle = Weak::New(state, index);
+  *out = [state, handle](ArgTypes... args) -> ReturnType {
+    return internal::PCallHelper<ReturnType, ArgTypes...>::Run(
+        state, handle, std::move(args)...);
+  };
+  return true;
+}
+
 // Define how callbacks are converted.
-// Note that lua callbacks are always stored as weak reference when converted to
-// C++ function, otherwise we would have unresolvable cyclic reference leading
-// to memory leak.
 template<typename ReturnType, typename... ArgTypes>
 struct Type<std::function<ReturnType(ArgTypes...)>> {
   static constexpr const char* name = "function";
@@ -34,7 +49,7 @@ struct Type<std::function<ReturnType(ArgTypes...)>> {
     }
     if (GetType(state, index) != LuaType::Function)
       return false;
-    std::shared_ptr<Handle> handle = Weak::New(state, index);
+    std::shared_ptr<Handle> handle = Persistent::New(state, index);
     *out = [state, handle](ArgTypes... args) -> ReturnType {
       return internal::PCallHelper<ReturnType, ArgTypes...>::Run(
           state, handle, std::move(args)...);

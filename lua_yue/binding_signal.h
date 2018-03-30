@@ -20,9 +20,18 @@ class SignalWrapper : public base::RefCounted<SignalWrapper<Sig>> {
       : ref_(state, owner), signal_(signal) {
   }
 
-  int Connect(lua::CallContext* context, const std::function<Sig>& slot) {
+  int Connect(lua::CallContext* context) {
     if (!PushOwner(context))
       return -1;
+    // Must not reference signal handler in C++.
+    std::function<Sig> slot;
+    if (!lua::ToWeakFunction(context->state, 2, &slot)) {
+      context->has_error = true;
+      lua::PushFormatedString(
+          context->state, "error converting arg at index %d from %s to %s",
+          2, lua::GetTypeName(context->state, 2), "function");
+      return -1;
+    }
     int id = signal_->Connect(slot);
     // self.__yuesignals[signal][id] = slot
     lua::PushRefsTable(context->state, "__yuesignals", -1);
@@ -99,18 +108,20 @@ struct MemberTraits<nu::Signal<Sig>> {
               new yue::SignalWrapper<Sig>(
                   state, owner, const_cast<nu::Signal<Sig>*>(&signal)));
   }
+
   static inline bool To(State* state, int owner, int value,
                         nu::Signal<Sig>* out) {
     if (lua::GetType(state, value) != lua::LuaType::Function)
       return false;
-    std::function<Sig> callback;
-    if (!lua::To(state, value, &callback))
+    // Must not reference signal handler in C++.
+    std::function<Sig> slot;
+    if (!lua::ToWeakFunction(state, value, &slot))
       return false;
-    int id = out->Connect(callback);
+    int id = out->Connect(slot);
     // self.__yuesignals[signal][id] = slot
     lua::PushRefsTable(state, "__yuesignals", owner);
     lua::RawGetOrCreateTable(state, -1, static_cast<void*>(out));
-    lua::RawSet(state, -1, id, lua::ValueOnStack(state, 3));
+    lua::RawSet(state, -1, id, lua::ValueOnStack(state, value));
     return true;
   }
 };

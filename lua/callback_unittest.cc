@@ -199,10 +199,20 @@ TEST_F(CallbackTest, CallbackWithMultipleReturns) {
   EXPECT_EQ(lua::GetTop(state_), 1);
 }
 
-TEST_F(CallbackTest, CallbackIsStoredWeak) {
+TEST_F(CallbackTest, CallbackIsStoredStrong) {
   lua::Push(state_, &FunctionReturnsInt);
   std::function<int(int)> callback;
   ASSERT_TRUE(lua::To(state_, 1, &callback));
+  EXPECT_EQ(callback(123), 123);
+  lua::SetTop(state_, 0);
+  lua::CollectGarbage(state_);
+  EXPECT_EQ(callback(123), 123);
+}
+
+TEST_F(CallbackTest, WeakFunctionIsStoredWeak) {
+  lua::Push(state_, &FunctionReturnsInt);
+  std::function<int(int)> callback;
+  ASSERT_TRUE(lua::ToWeakFunction(state_, 1, &callback));
   EXPECT_EQ(callback(123), 123);
   lua::SetTop(state_, 0);
   lua::CollectGarbage(state_);
