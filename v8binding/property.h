@@ -9,11 +9,17 @@
 
 namespace vb {
 
+enum class RefMode {
+  Always,
+  Never,
+  FirstAssign,
+};
+
 // Describe how a member T can be converted.
 template<typename T, typename Enable = void>
 struct MemberTraits {
   // Decides should we return store a reference to the value.
-  static const bool kShouldReferenceValue = true;
+  static const RefMode kRefMode = RefMode::Always;
   static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                           v8::Local<v8::Object> owner,
                                           const T&) {
@@ -31,7 +37,7 @@ struct MemberTraits {
 template<typename T>
 struct MemberTraits<T, typename std::enable_if<
                            std::is_fundamental<T>::value>::type> {
-  static const bool kShouldReferenceValue = false;
+  static const RefMode kRefMode = RefMode::Never;
   static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                           v8::Local<v8::Object> owner,
                                           const T& value) {
@@ -95,16 +101,21 @@ void MemberHolder<T>::Getter(v8::Local<v8::String> property,
     return;
   }
 
-  if (MemberTraits<MemberType>::kShouldReferenceValue) {
-    v8::Local<v8::Map> refs = GetAttachedTable(context, info.This(), "members");
-    if (refs->Has(context, property).FromJust()) {
+  v8::Local<v8::Map> refs;
+  if (MemberTraits<MemberType>::kRefMode != RefMode::Never) {
+     refs = GetAttachedTable(context, info.This(), "members");
+    if (refs->Has(context, property).FromJust() ||
+        MemberTraits<MemberType>::kRefMode == RefMode::Always) {
       info.GetReturnValue().Set(refs->Get(context, property).ToLocalChecked());
       return;
     }
-  } else {
-    info.GetReturnValue().Set(MemberTraits<MemberType>::ToV8(
-        context, info.This(), instance->*(holder->ptr_)));
   }
+
+  v8::Local<v8::Value> ret = MemberTraits<MemberType>::ToV8(
+      context, info.This(), instance->*(holder->ptr_));
+  if (MemberTraits<MemberType>::kRefMode == RefMode::FirstAssign)
+    refs->Set(context, property, ret).IsEmpty();
+  info.GetReturnValue().Set(ret);
 }
 
 // static
@@ -130,7 +141,7 @@ void MemberHolder<T>::Setter(v8::Local<v8::String> property,
     return;
   }
 
-  if (MemberTraits<MemberType>::kShouldReferenceValue) {
+  if (MemberTraits<MemberType>::kRefMode != RefMode::Never) {
     v8::Local<v8::Map> refs = GetAttachedTable(context, info.This(), "members");
     refs->Set(context, property, value).IsEmpty();
   }

@@ -98,7 +98,7 @@ struct Type<node_yue::SignalWrapper<Sig>> {
 // Define how the Signal member is converted.
 template<typename Sig>
 struct MemberTraits<nu::Signal<Sig>> {
-  static const bool kShouldReferenceValue = false;
+  static const RefMode kRefMode = RefMode::FirstAssign;
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    v8::Local<v8::Object> owner,
                                    const nu::Signal<Sig>& signal) {
