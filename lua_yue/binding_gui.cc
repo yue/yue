@@ -805,7 +805,9 @@ struct Type<nu::MenuItem> {
     nu::Accelerator accelerator;
     if (RawGetAndPop(state, options, "accelerator", &accelerator))
       item->SetAccelerator(accelerator);
-    RawGetAndPop(state, options, "onclick", &item->on_click);
+    std::function<void(nu::MenuItem*)> onclick;
+    if (RawGetAndPop(state, options, "onclick", &onclick))
+      item->on_click.Connect(onclick);
     return item;
   }
 };
@@ -890,7 +892,7 @@ struct Type<nu::Toolbar> {
            "isvisible", &nu::Toolbar::IsVisible,
            "getidentifier", &nu::Toolbar::GetIdentifier);
     RawSetProperty(state, metatable,
-                   "getItem", &nu::Toolbar::get_item);
+                   "getitem", &nu::Toolbar::get_item);
   }
 };
 #endif

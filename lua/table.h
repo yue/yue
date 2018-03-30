@@ -190,7 +190,19 @@ inline void PushWeakTable(State* state, const char* name, const char* mode) {
   }
 }
 
-// Helper to attach a table to a variable.
+// Return or create a table for key.
+template<typename T>
+void RawGetOrCreateTable(State* state, int table, const T& key) {
+  table = AbsIndex(state, table);
+  RawGet(state, table, key);
+  if (GetType(state, -1) != LuaType::Table) {
+    PopAndIgnore(state, 1);
+    NewTable(state, 0, 1);
+    RawSet(state, table, key, ValueOnStack(state, -1));
+  }
+}
+
+// Attach a table to a variable.
 void PushCustomDataTable(State* state, int key);
 
 // Push a table that stores references.

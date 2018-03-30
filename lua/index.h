@@ -10,14 +10,23 @@
 
 namespace lua {
 
+enum class RefMode {
+  Always,
+  Never,
+  FirstAssign,
+};
+
 // Describe how a member T can be converted.
 template<typename T, typename Enable = void>
 struct MemberTraits {
   // Decides should we return store a reference to the value.
-  static const bool kShouldReferenceValue = true;
+  static const RefMode kRefMode = RefMode::Always;
   // Converter used when we do not store reference.
-  static inline void Push(State* state, int cache, const T& ptr) {
+  static inline void Push(State* state, int owner, const T& ptr) {
     lua::Push(state, nullptr);
+  }
+  static inline bool To(State* state, int onwer, int value, T* out) {
+    return lua::To(state, value, out);
   }
 };
 
@@ -25,9 +34,12 @@ struct MemberTraits {
 template<typename T>
 struct MemberTraits<T, typename std::enable_if<
                            std::is_fundamental<T>::value>::type> {
-  static const bool kShouldReferenceValue = false;
-  static inline void Push(State* state, int cache, const T& ptr) {
+  static const RefMode kRefMode = RefMode::Never;
+  static inline void Push(State* state, int owner, const T& ptr) {
     lua::Push(state, ptr);
+  }
+  static inline bool To(State* state, int owner, int value, T* out) {
+    return lua::To(state, value, out);
   }
 };
 
@@ -74,13 +86,16 @@ int MemberHolder<T>::Index(State* state) {
   ClassType* owner;
   if (!To(state, 1, &owner))
     return 0;
-  PushRefsTable(state, "__yuemembers", 1);
-  int refs = AbsIndex(state, -1);
-  if (MemberTraits<MemberType>::kShouldReferenceValue) {
-    RawGet(state, refs, ValueOnStack(state, 2));
-  } else {
-    MemberTraits<MemberType>::Push(state, refs, owner->*ptr_);
+  PushRefsTable(state, "__yuemembers", 1);  // index == 3
+  if (MemberTraits<MemberType>::kRefMode != RefMode::Never) {
+    RawGet(state, 3, ValueOnStack(state, 2));
+    if (GetType(state, -1) != LuaType::Nil ||
+        MemberTraits<MemberType>::kRefMode == RefMode::Always)
+      return 1;
   }
+  MemberTraits<MemberType>::Push(state, 1, owner->*ptr_);
+  if (MemberTraits<MemberType>::kRefMode == RefMode::FirstAssign)
+    RawSet(state, 3, ValueOnStack(state, 2), ValueOnStack(state, -1));
   return 1;
 }
 
@@ -89,13 +104,13 @@ int MemberHolder<T>::NewIndex(State* state) {
   ClassType* owner;
   if (!To(state, 1, &owner))
     return 0;
-  if (!To(state, 3, &(owner->*ptr_))) {
+  if (!MemberTraits<MemberType>::To(state, 1, 3, &(owner->*ptr_))) {
     PushFormatedString(state, "error converting %s to %s",
                        GetTypeName(state, 3), Type<MemberType>::name);
     lua_error(state);
     NOTREACHED() << "Code after lua_error() gets called";
   }
-  if (MemberTraits<MemberType>::kShouldReferenceValue) {
+  if (MemberTraits<MemberType>::kRefMode != RefMode::Never) {
     PushRefsTable(state, "__yuemembers", 1);
     RawSet(state, -1, ValueOnStack(state, 2), ValueOnStack(state, 3));
   }
