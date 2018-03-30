@@ -23,4 +23,12 @@
   shell_->on_ready.Emit();
 }
 
+- (BOOL)applicationShouldHandleReopen:(NSApplication*)sender
+                    hasVisibleWindows:(BOOL)flag {
+  if (flag)
+    return YES;
+  shell_->on_activate.Emit();
+  return NO;
+}
+
 @end

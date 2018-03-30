@@ -179,7 +179,11 @@ template<>
 struct Type<nu::Lifetime> {
   static constexpr const char* name = "yue.Lifetime";
   static void BuildMetaTable(State* state, int index) {
-    RawSetProperty(state, index, "onready", &nu::Lifetime::on_ready);
+#if defined(OS_MACOSX)
+    RawSetProperty(state, index,
+                   "onready", &nu::Lifetime::on_ready,
+                   "onactivate", &nu::Lifetime::on_activate);
+#endif
   }
 };
 

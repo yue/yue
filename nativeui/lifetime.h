@@ -30,7 +30,10 @@ class NATIVEUI_EXPORT Lifetime {
   static Lifetime* GetCurrent();
 
   // Events.
+#if defined(OS_MACOSX)
   Signal<void()> on_ready;
+  Signal<void()> on_activate;
+#endif
 
   base::WeakPtr<Lifetime> GetWeakPtr() { return weak_factory_.GetWeakPtr(); }
 

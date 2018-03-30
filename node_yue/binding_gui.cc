@@ -191,8 +191,11 @@ struct Type<nu::Lifetime> {
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
+#if defined(OS_MACOSX)
     SetProperty(context, templ,
-                "onReady", &nu::Lifetime::on_ready);
+                "onReady", &nu::Lifetime::on_ready,
+                "onActivate", &nu::Lifetime::on_activate);
+#endif
   }
 };
 

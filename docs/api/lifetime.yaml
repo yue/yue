@@ -22,3 +22,10 @@ events:
     platform: ['macOS']
     description: |
       Emitted when received `applicationDidFinishLaunching` notification.
+
+  - callback: void on_activate()
+    platform: ['macOS']
+    description: |
+      Emitted when received `applicationShouldHandleReopen` notification and
+      there is no visible windows. This usually happens when the app is
+      activated by Finder, or user clicks on the dock icon.
