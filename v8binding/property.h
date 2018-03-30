@@ -12,7 +12,7 @@ namespace vb {
 enum class RefMode {
   Always,
   Never,
-  FirstAssign,
+  FirstGet,
 };
 
 // Describe how a member T can be converted.
@@ -113,7 +113,7 @@ void MemberHolder<T>::Getter(v8::Local<v8::String> property,
 
   v8::Local<v8::Value> ret = MemberTraits<MemberType>::ToV8(
       context, info.This(), instance->*(holder->ptr_));
-  if (MemberTraits<MemberType>::kRefMode == RefMode::FirstAssign)
+  if (MemberTraits<MemberType>::kRefMode == RefMode::FirstGet)
     refs->Set(context, property, ret).IsEmpty();
   info.GetReturnValue().Set(ret);
 }
@@ -141,7 +141,7 @@ void MemberHolder<T>::Setter(v8::Local<v8::String> property,
     return;
   }
 
-  if (MemberTraits<MemberType>::kRefMode != RefMode::Never) {
+  if (MemberTraits<MemberType>::kRefMode == RefMode::Always) {
     v8::Local<v8::Map> refs = GetAttachedTable(context, info.This(), "members");
     refs->Set(context, property, value).IsEmpty();
   }

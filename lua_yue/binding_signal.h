@@ -92,7 +92,7 @@ struct Type<nu::Signal<Sig>> {
 // Define how the Signal member is converted.
 template<typename Sig>
 struct MemberTraits<nu::Signal<Sig>> {
-  static const RefMode kRefMode = RefMode::FirstAssign;
+  static const RefMode kRefMode = RefMode::FirstGet;
   static inline void Push(State* state, int owner,
                           const nu::Signal<Sig>& signal) {
     lua::Push(state,

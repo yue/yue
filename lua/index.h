@@ -13,7 +13,7 @@ namespace lua {
 enum class RefMode {
   Always,
   Never,
-  FirstAssign,
+  FirstGet,
 };
 
 // Describe how a member T can be converted.
@@ -94,7 +94,7 @@ int MemberHolder<T>::Index(State* state) {
       return 1;
   }
   MemberTraits<MemberType>::Push(state, 1, owner->*ptr_);
-  if (MemberTraits<MemberType>::kRefMode == RefMode::FirstAssign)
+  if (MemberTraits<MemberType>::kRefMode == RefMode::FirstGet)
     RawSet(state, 3, ValueOnStack(state, 2), ValueOnStack(state, -1));
   return 1;
 }
@@ -110,7 +110,7 @@ int MemberHolder<T>::NewIndex(State* state) {
     lua_error(state);
     NOTREACHED() << "Code after lua_error() gets called";
   }
-  if (MemberTraits<MemberType>::kRefMode != RefMode::Never) {
+  if (MemberTraits<MemberType>::kRefMode == RefMode::Always) {
     PushRefsTable(state, "__yuemembers", 1);
     RawSet(state, -1, ValueOnStack(state, 2), ValueOnStack(state, 3));
   }
