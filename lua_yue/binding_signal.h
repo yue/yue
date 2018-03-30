@@ -17,23 +17,14 @@ template<typename Sig>
 class SignalWrapper : public base::RefCounted<SignalWrapper<Sig>> {
  public:
   SignalWrapper(lua::State* state, int owner, nu::Signal<Sig>* signal)
-      : signal_(signal) {
-    lua::CreateWeakReference(state, this, owner);
-  }
-
-  bool IsOwnerAlive(lua::State* state) {
-    return lua::WeakReferenceExists(state, this);
+      : ref_(state, owner), signal_(signal) {
   }
 
   int Connect(lua::CallContext* context, const std::function<Sig>& slot) {
-    if (!IsOwnerAlive(context->state)) {
-      context->has_error = true;
-      lua::Push(context->state, "Owner of signal is gone");
+    if (!PushOwner(context))
       return -1;
-    }
     int id = signal_->Connect(slot);
     // self.__yuesignals[signal][id] = slot
-    lua::PushWeakReference(context->state, this);
     lua::PushRefsTable(context->state, "__yuesignals", -1);
     lua::RawGetOrCreateTable(context->state, -1, static_cast<void*>(signal_));
     lua::RawSet(context->state, -1, id, lua::ValueOnStack(context->state, 2));
@@ -41,28 +32,20 @@ class SignalWrapper : public base::RefCounted<SignalWrapper<Sig>> {
   }
 
   void Disconnect(lua::CallContext* context, int id) {
-    if (!IsOwnerAlive(context->state)) {
-      context->has_error = true;
-      lua::Push(context->state, "Owner of signal is gone");
+    if (!PushOwner(context))
       return;
-    }
     signal_->Disconnect(id);
     // self.__yuesignals[signal][id] = nil
-    lua::PushWeakReference(context->state, this);
     lua::PushRefsTable(context->state, "__yuesignals", -1);
     lua::RawGetOrCreateTable(context->state, -1, static_cast<void*>(signal_));
     lua::RawSet(context->state, -1, id, nullptr);
   }
 
   void DisconnectAll(lua::CallContext* context) {
-    if (!IsOwnerAlive(context->state)) {
-      context->has_error = true;
-      lua::Push(context->state, "Owner of signal is gone");
+    if (!PushOwner(context))
       return;
-    }
     signal_->DisconnectAll();
     // self.__yuesignals[signal] = {}
-    lua::PushWeakReference(context->state, this);
     lua::PushRefsTable(context->state, "__yuesignals", -1);
     lua::RawSet(context->state, -1, static_cast<void*>(signal_), nullptr);
   }
@@ -70,8 +53,19 @@ class SignalWrapper : public base::RefCounted<SignalWrapper<Sig>> {
  private:
   ~SignalWrapper() {}
 
+  bool PushOwner(lua::CallContext* context) {
+    ref_.Push();
+    if (lua::GetType(context->state, -1) == lua::LuaType::Nil) {
+      context->has_error = true;
+      lua::Push(context->state, "Owner of signal is gone");
+      return false;
+    }
+    return true;
+  }
+
   friend class base::RefCounted<SignalWrapper<Sig>>;
 
+  lua::Weak ref_;
   nu::Signal<Sig>* signal_;
 };
 

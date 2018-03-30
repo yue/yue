@@ -34,11 +34,7 @@ struct Type<std::function<ReturnType(ArgTypes...)>> {
     }
     if (GetType(state, index) != LuaType::Function)
       return false;
-    // The address of handle is used as unique key to the weak reference of the
-    // lua function. The handle has the same lifetime with the converted C++
-    // function.
-    std::shared_ptr<int> handle(new int);
-    CreateWeakReference(state, handle.get(), index);
+    std::shared_ptr<Handle> handle = Weak::New(state, index);
     *out = [state, handle](ArgTypes... args) -> ReturnType {
       return internal::PCallHelper<ReturnType, ArgTypes...>::Run(
           state, handle, std::move(args)...);

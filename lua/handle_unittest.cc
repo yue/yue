@@ -25,7 +25,7 @@ TEST_F(HandleTest, Persistent) {
   ASSERT_EQ(lua::GetTop(state_), 0);
   lua::CollectGarbage(state_);
   lua::CollectGarbage(state_);
-  handle->Push(state_);
+  handle->Push();
   ASSERT_EQ(lua::GetTop(state_), 1);
   ASSERT_EQ(lua::GetType(state_, -1), lua::LuaType::Table);
   handle.reset();
@@ -54,11 +54,11 @@ TEST_F(HandleTest, Weak) {
   lua::RawSet(state_, 2, "__gc", on_gc);
   lua::SetMetaTable(state_, 1);
   ASSERT_EQ(lua::GetTop(state_), 1);
-  int* ref = &changed;
-  lua::CreateWeakReference(state_, ref, -1);
+
+  lua::Weak ref(state_, -1);
   ASSERT_EQ(lua::GetTop(state_), 1);
 
-  lua::PushWeakReference(state_, ref);
+  ref.Push();
   EXPECT_EQ(lua::GetTop(state_), 2);
   EXPECT_TRUE(lua::Compare(state_, 1, 2, lua::CompareOp::EQ));
   lua::SetTop(state_, 0);
