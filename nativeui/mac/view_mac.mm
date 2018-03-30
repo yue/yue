@@ -100,6 +100,10 @@ void View::SchedulePaint() {
   [view_ setNeedsDisplay:YES];
 }
 
+void View::SchedulePaintRect(const RectF& rect) {
+  [view_ setNeedsDisplayInRect:rect.ToCGRect()];
+}
+
 void View::PlatformSetVisible(bool visible) {
   [view_ setHidden:!visible];
 }

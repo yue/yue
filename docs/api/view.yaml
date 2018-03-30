@@ -48,6 +48,9 @@ methods:
   - signature: void SchedulePaint()
     description: Schedule to repaint the whole view.
 
+  - signature: void SchedulePaintRect(const RectF& rect)
+    description: Schedule to repaint the `rect` area in view.
+
   - signature: void SetVisible(bool visible)
     description: Show/Hide the view.
 

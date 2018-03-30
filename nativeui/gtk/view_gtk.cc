@@ -195,6 +195,11 @@ void View::SchedulePaint() {
   gtk_widget_queue_draw(view_);
 }
 
+void View::SchedulePaintRect(const RectF& rect) {
+  gtk_widget_queue_draw_area(view_,
+                             rect.x(), rect.y(), rect.width(), rect.height());
+}
+
 void View::PlatformSetVisible(bool visible) {
   gtk_widget_set_visible(view_, visible);
 }

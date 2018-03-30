@@ -277,6 +277,11 @@ void View::SchedulePaint() {
   GetNative()->Invalidate();
 }
 
+void View::SchedulePaintRect(const RectF& rect) {
+  GetNative()->Invalidate(
+      ToEnclosedRect(ScaleRect(rect, GetNative()->scale_factor())));
+}
+
 void View::PlatformSetVisible(bool visible) {
   GetNative()->SetVisible(visible);
 }

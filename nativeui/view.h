@@ -56,6 +56,9 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   // Mark the whole view as dirty.
   void SchedulePaint();
 
+  // Repaint the rect
+  void SchedulePaintRect(const RectF& rect);
+
   // Show/Hide the view.
   void SetVisible(bool visible);
   bool IsVisible() const;

@@ -1120,6 +1120,7 @@ struct Type<nu::View> {
         "getBounds", &nu::View::GetBounds,
         "layout", &nu::View::Layout,
         "schedulePaint", &nu::View::SchedulePaint,
+        "schedulePaintRect", &nu::View::SchedulePaintRect,
         "setVisible", &nu::View::SetVisible,
         "isVisible", &nu::View::IsVisible,
         "setEnabled", &nu::View::SetEnabled,
