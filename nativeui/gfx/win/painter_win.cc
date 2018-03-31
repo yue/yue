@@ -276,13 +276,6 @@ void PainterWin::ArcPixel(const PointF& p, float radius, float sa, float ea,
     angle = ea - sa;
   }
 
-  // Should draw a line connecting previous point.
-  LineToPixel(PointF(p.x() + radius * cos(sa), p.y() + radius * sin(sa)));
-
-  // AddArc would connect to the previous point under some cases, but not
-  // always, we have to disable this behavior via starting a sub-path.
-  path_.StartFigure();
-
   use_gdi_current_point_ = true;
   path_.AddArc(p.x() - radius, p.y() - radius, 2.0f * radius, 2.0f * radius,
                sa / M_PI * 180.0f,
