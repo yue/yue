@@ -74,6 +74,7 @@ void ScrollImpl::Layout() {
     if (content_alloc.height() < viewport_size.height())
       content_alloc.set_height(viewport_size.height());
     delegate_->GetContentView()->GetNative()->SizeAllocate(content_alloc);
+    delegate_->GetContentView()->Layout();
   }
 }
 
