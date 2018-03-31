@@ -138,6 +138,8 @@ void Container::RemoveChildView(View* view) {
 
 void Container::SetChildBoundsFromCSS() {
   dirty_ = false;
+  if (!IsVisible())
+    return;
   for (int i = 0; i < ChildCount(); ++i) {
     View* child = ChildAt(i);
     if (child->IsVisible())
