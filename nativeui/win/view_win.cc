@@ -179,6 +179,8 @@ bool ViewImpl::OnKeyEvent(NativeEvent event) {
   // Pass to parent if this view ignores the event.
   if (delegate()->GetParent())
     return delegate()->GetParent()->GetNative()->OnKeyEvent(event);
+  else if (window())
+    return window()->HandleKeyEvent(client_event);
   return false;
 }
 

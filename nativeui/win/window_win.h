@@ -22,6 +22,8 @@ class WindowImpl : public Win32Window {
 
   void AdvanceFocus();
 
+  bool HandleKeyEvent(const KeyEvent& event);
+
   void SetCapture(ViewImpl* view);
   void ReleaseCapture();
 

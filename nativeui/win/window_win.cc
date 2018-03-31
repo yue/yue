@@ -115,6 +115,18 @@ void WindowImpl::AdvanceFocus() {
                               IsShiftPressed());
 }
 
+bool WindowImpl::HandleKeyEvent(const KeyEvent& event) {
+  if (event.type == EventType::KeyDown && delegate_->GetMenuBar()) {
+    Accelerator accelerator(event);
+    int id = delegate_->GetMenuBar()->accel_manager()->Process(accelerator);
+    if (id != -1) {
+      DispatchCommandToItem(delegate_->GetMenuBar(), id);
+      return true;
+    }
+  }
+  return false;
+}
+
 void WindowImpl::SetCapture(ViewImpl* view) {
   captured_view_ = view;
   ::SetCapture(hwnd());
@@ -317,16 +329,8 @@ LRESULT WindowImpl::OnKeyEvent(UINT message, WPARAM w_param, LPARAM l_param) {
     return 0;
 
   // If no one handles it then pass the event to menu.
-  KeyEvent event(&msg, delegate_->GetContentView()->GetNative());
-  if (event.type == EventType::KeyDown && delegate_->GetMenuBar()) {
-    Accelerator accelerator(event);
-    int id = delegate_->GetMenuBar()->accel_manager()->Process(accelerator);
-    if (id != -1) {
-      DispatchCommandToItem(delegate_->GetMenuBar(), id);
-      return 0;
-    }
-  }
-  SetMsgHandled(false);
+  if (!HandleKeyEvent(KeyEvent(&msg, delegate_->GetContentView()->GetNative())))
+    SetMsgHandled(false);
   return 0;
 }
 
