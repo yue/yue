@@ -69,7 +69,7 @@ void Window::PlatformInit(const Options& options) {
   [window_ setReleasedWhenClosed:NO];
 
   // Disable tab menu items.
-  if (@available(macOS 10.12, *))
+  if (base::mac::IsAtLeastOS10_12())
     [window_ setTabbingMode:NSWindowTabbingModeDisallowed];
 
   YGConfigSetPointScaleFactor(yoga_config_,
@@ -340,14 +340,14 @@ void Window::SetToolbar(Toolbar* toolbar) {
 }
 
 void Window::SetTitleVisible(bool visible) {
-  if (@available(macOS 10.10, *)) {
+  if (base::mac::IsAtLeastOS10_10()) {
     window_.titleVisibility = visible ? NSWindowTitleVisible
                                       : NSWindowTitleHidden;
   }
 }
 
 bool Window::IsTitleVisible() const {
-  if (@available(macOS 10.10, *))
+  if (base::mac::IsAtLeastOS10_10())
     return window_.titleVisibility == NSWindowTitleVisible;
   else
     return false;
