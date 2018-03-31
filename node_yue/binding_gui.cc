@@ -1104,6 +1104,8 @@ struct Type<nu::Window> {
         "setBackgroundColor", &nu::Window::SetBackgroundColor);
     SetProperty(context, templ,
                 "onClose", &nu::Window::on_close,
+                "onFocus", &nu::Window::on_focus,
+                "onBlur", &nu::Window::on_blur,
                 "shouldClose", &nu::Window::should_close);
   }
 };

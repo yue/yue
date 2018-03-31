@@ -53,6 +53,8 @@ class WindowImpl : public Win32Window {
     CR_MSG_WM_CLOSE(OnClose)
     CR_MSG_WM_COMMAND(OnCommand)
     CR_MSG_WM_SIZE(OnSize)
+    CR_MSG_WM_SETFOCUS(OnFocus)
+    CR_MSG_WM_KILLFOCUS(OnBlur)
     CR_MESSAGE_HANDLER_EX(WM_DPICHANGED, OnDPIChanged)
 
     // Input events.
@@ -82,6 +84,8 @@ class WindowImpl : public Win32Window {
   void OnClose();
   void OnCommand(UINT code, int command, HWND window);
   void OnSize(UINT param, const Size& size);
+  void OnFocus(HWND old);
+  void OnBlur(HWND old);
   LRESULT OnDPIChanged(UINT msg, WPARAM w_param, LPARAM l_param);
   LRESULT OnMouseMove(UINT message, WPARAM w_param, LPARAM l_param);
   LRESULT OnMouseLeave(UINT message, WPARAM w_param, LPARAM l_param);

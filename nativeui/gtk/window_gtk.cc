@@ -72,6 +72,14 @@ gboolean OnWindowState(GtkWidget* widget, GdkEvent* event,
   return FALSE;
 }
 
+// When is-active property has changed.
+void OnIsActiveChanged(GtkWidget* widget, GParamSpec*, Window* window) {
+  if (window->IsActive())
+    window->on_focus.Emit(window);
+  else
+    window->on_blur.Emit(window);
+}
+
 // Make window support alpha channel for the screen.
 void OnScreenChanged(GtkWidget* widget, GdkScreen* old_screen, Window* window) {
   GdkScreen* screen = gtk_widget_get_screen(widget);
@@ -121,6 +129,8 @@ void Window::PlatformInit(const Options& options) {
   g_signal_connect(window_, "map-event", G_CALLBACK(OnMap), priv);
   g_signal_connect(window_, "window-state-event",
                    G_CALLBACK(OnWindowState), priv);
+  g_signal_connect(window_, "notify::is-active",
+                   G_CALLBACK(OnIsActiveChanged), this);
 
   if (!options.frame) {
     // Rely on client-side decoration to provide window features for frameless

@@ -41,6 +41,14 @@
   shell_->on_close.Emit(shell_);
 }
 
+- (void)windowDidBecomeMain:(NSNotification*)notification {
+  shell_->on_focus.Emit(shell_);
+}
+
+- (void)windowDidResignMain:(NSNotification*)notification {
+  shell_->on_blur.Emit(shell_);
+}
+
 @end
 
 namespace nu {

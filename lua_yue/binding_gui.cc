@@ -979,6 +979,8 @@ struct Type<nu::Window> {
            "setbackgroundcolor", &nu::Window::SetBackgroundColor);
     RawSetProperty(state, metatable,
                    "onclose", &nu::Window::on_close,
+                   "onfocus", &nu::Window::on_focus,
+                   "onblur", &nu::Window::on_blur,
                    "shouldclose", &nu::Window::should_close);
   }
 };

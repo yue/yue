@@ -120,6 +120,8 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
 
   // Events.
   Signal<void(Window*)> on_close;
+  Signal<void(Window*)> on_focus;
+  Signal<void(Window*)> on_blur;
 
   // Delegate methods.
   std::function<bool(Window*)> should_close;

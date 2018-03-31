@@ -234,6 +234,16 @@ void WindowImpl::OnSize(UINT param, const Size& size) {
   RedrawWindow(hwnd(), NULL, NULL, RDW_INVALIDATE | RDW_ALLCHILDREN);
 }
 
+void WindowImpl::OnFocus(HWND old) {
+  delegate_->on_focus.Emit(delegate_);
+  SetMsgHandled(false);
+}
+
+void WindowImpl::OnBlur(HWND old) {
+  delegate_->on_blur.Emit(delegate_);
+  SetMsgHandled(false);
+}
+
 LRESULT WindowImpl::OnDPIChanged(UINT msg, WPARAM w_param, LPARAM l_param) {
   float new_scale_factor = GetScalingFactorFromDPI(LOWORD(w_param));
   if (new_scale_factor != scale_factor_) {
