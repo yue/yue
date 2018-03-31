@@ -64,6 +64,7 @@ void Scroll::SetContentSize(const SizeF& size) {
   // Viewport calculates the content view according to child's size request.
   gtk_widget_set_size_request(GetContentView()->GetNative(),
                               size.width(), size.height());
+  GetContentView()->Layout();
   // Scroll to top-left after setting content size.
   auto* h_adjust = gtk_scrolled_window_get_hadjustment(
       GTK_SCROLLED_WINDOW(GetNative()));
