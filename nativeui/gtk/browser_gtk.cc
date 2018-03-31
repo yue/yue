@@ -239,11 +239,19 @@ void Browser::LoadHTML(const std::string& str,
 }
 
 std::string Browser::GetURL() {
-  return webkit_web_view_get_uri(WEBKIT_WEB_VIEW(GetNative()));
+  const char* url = webkit_web_view_get_uri(WEBKIT_WEB_VIEW(GetNative()));
+  if (url)
+    return url;
+  else
+    return std::string();
 }
 
 std::string Browser::GetTitle() {
-  return webkit_web_view_get_title(WEBKIT_WEB_VIEW(GetNative()));
+  const char* title = webkit_web_view_get_title(WEBKIT_WEB_VIEW(GetNative()));
+  if (title)
+    return title;
+  else
+    return std::string();
 }
 
 void Browser::SetUserAgent(const std::string& user_agent) {
