@@ -54,10 +54,9 @@ void Scroll::PlatformSetContentView(View* view) {
     gtk_container_remove(GTK_CONTAINER(viewport), child);
     gtk_widget_set_size_request(child, -1, -1);
   }
-  child = view->GetNative();
-  gtk_container_add(GTK_CONTAINER(viewport), child);
 
-  gtk_widget_set_size_request(child, csize.width(), csize.height());
+  gtk_container_add(GTK_CONTAINER(viewport), view->GetNative());
+  gtk_widget_set_size_request(view->GetNative(), csize.width(), csize.height());
 }
 
 void Scroll::SetContentSize(const SizeF& size) {
@@ -65,6 +64,13 @@ void Scroll::SetContentSize(const SizeF& size) {
   // Viewport calculates the content view according to child's size request.
   gtk_widget_set_size_request(GetContentView()->GetNative(),
                               size.width(), size.height());
+  // Scroll to top-left after setting content size.
+  auto* h_adjust = gtk_scrolled_window_get_hadjustment(
+      GTK_SCROLLED_WINDOW(GetNative()));
+  gtk_adjustment_set_value(h_adjust, gtk_adjustment_get_lower(h_adjust));
+  auto* v_adjust = gtk_scrolled_window_get_vadjustment(
+      GTK_SCROLLED_WINDOW(GetNative()));
+  gtk_adjustment_set_value(v_adjust, gtk_adjustment_get_lower(v_adjust));
 }
 
 void Scroll::SetScrollbarPolicy(Policy h_policy, Policy v_policy) {
