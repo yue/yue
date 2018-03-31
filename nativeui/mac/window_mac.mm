@@ -68,6 +68,10 @@ void Window::PlatformInit(const Options& options) {
   [window_ setDelegate:[[NUWindowDelegate alloc] initWithShell:this]];
   [window_ setReleasedWhenClosed:NO];
 
+  // Disable tab menu items.
+  if (@available(macOS 10.12, *))
+    [window_ setTabbingMode:NSWindowTabbingModeDisallowed];
+
   YGConfigSetPointScaleFactor(yoga_config_,
                               [window_ screen].backingScaleFactor);
 
