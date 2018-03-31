@@ -49,12 +49,14 @@ bool Clickable::OnMouseClick(NativeEvent event) {
 
   if (event->message == WM_LBUTTONDOWN) {
     is_capturing_ = true;
-    window()->SetCapture(this);
+    if (window())
+      window()->SetCapture(this);
     SetState(ControlState::Pressed);
   } else {
     if (event->message == WM_LBUTTONUP && state() == ControlState::Pressed)
       OnClick();
-    window()->ReleaseCapture();
+    if (window())
+      window()->ReleaseCapture();
   }
   return true;
 }

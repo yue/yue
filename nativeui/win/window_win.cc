@@ -623,6 +623,8 @@ bool Window::HasShadow() const {
 }
 
 void Window::PlatformSetContentView(View* view) {
+  if (content_view_)
+    content_view_->GetNative()->BecomeContentView(nullptr);
   view->GetNative()->BecomeContentView(window_);
   view->SetPixelBounds(Rect(window_->GetContentPixelBounds().size()));
 }
