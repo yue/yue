@@ -301,6 +301,7 @@ LRESULT WindowImpl::OnMouseLeave(UINT message, WPARAM w_param, LPARAM l_param) {
 }
 
 LRESULT WindowImpl::OnMouseWheel(UINT message, WPARAM w_param, LPARAM l_param) {
+  // WM_MOUSEWHEEL uses screen coord, but in View we use client coord.
   POINT p = { CR_GET_X_LPARAM(l_param), CR_GET_Y_LPARAM(l_param) };
   ::ScreenToClient(hwnd(), &p);
   Win32Message msg = {message, w_param, MAKELPARAM(p.x, p.y)};

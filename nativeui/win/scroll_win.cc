@@ -111,7 +111,7 @@ void ScrollImpl::Draw(PainterWin* painter, const Rect& dirty) {
 }
 
 bool ScrollImpl::OnMouseWheel(NativeEvent event) {
-  WORD delta = static_cast<WORD>(HIWORD(event->w_param));
+  int16_t delta = static_cast<int16_t>(HIWORD(event->w_param));
   if (event->message == WM_MOUSEWHEEL)
     OnScroll(0, delta);
   else
