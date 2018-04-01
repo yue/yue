@@ -171,9 +171,8 @@ void Scrollbar::Draw(PainterWin* painter, const Rect& dirty) {
 
 void Scrollbar::UpdateThumbPosition() {
   // The size of contents and viewport.
-  ViewImpl* contents = scroll_->delegate()->GetContentView()->GetNative();
-  contents_size_ = vertical_ ? contents->size_allocation().height()
-                             : contents->size_allocation().width();
+  Size content_size = scroll_->content_size();
+  contents_size_ = vertical_ ? content_size.height() : content_size.width();
   Rect viewport(scroll_->GetViewportRect());
   viewport_size_ = vertical_ ? viewport.height() : viewport.width();
 
