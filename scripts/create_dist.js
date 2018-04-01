@@ -32,6 +32,7 @@ const luaFiles = {
     'yue.so',
   ],
   win: [
+    'yue.dll',
   ],
 }
 
