@@ -280,8 +280,9 @@ void View::SchedulePaint() {
 }
 
 void View::SchedulePaintRect(const RectF& rect) {
-  GetNative()->Invalidate(
-      ToEnclosedRect(ScaleRect(rect, GetNative()->scale_factor())));
+  Rect relative = ToEnclosedRect(ScaleRect(rect, GetNative()->scale_factor()));
+  GetNative()->Invalidate(relative +
+                          GetNative()->size_allocation().OffsetFromOrigin());
 }
 
 void View::PlatformSetVisible(bool visible) {
