@@ -130,9 +130,11 @@ void ScrollImpl::UpdateScrollbar() {
                            height < content_size_.height());
   if (show_h_scrollbar != show_v_scrollbar) {
     if (show_h_scrollbar)
-      show_v_scrollbar = height < content_size_.height() + scrollbar_height_;
+      show_v_scrollbar = v_policy_ != Scroll::Policy::Never &&
+                         height < content_size_.height() + scrollbar_height_;
     if (show_v_scrollbar)
-      show_h_scrollbar = width < content_size_.width() + scrollbar_height_;
+      show_h_scrollbar = h_policy_ != Scroll::Policy::Never &&
+                         width < content_size_.width() + scrollbar_height_;
   }
   if (show_h_scrollbar && !h_scrollbar_) {
     h_scrollbar_.reset(new Scrollbar(false, this));
