@@ -39,7 +39,10 @@ void ContainerImpl::BecomeContentView(WindowImpl* parent) {
 void ContainerImpl::SetVisible(bool visible) {
   ViewImpl::SetVisible(visible);
   adapter_->ForEach([=](ViewImpl* child) {
-    child->SetVisible(visible);
+    if (child->delegate())
+      child->delegate()->SetVisible(visible);
+    else
+      child->SetVisible(visible);
     return true;
   });
 }

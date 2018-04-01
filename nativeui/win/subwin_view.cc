@@ -40,9 +40,16 @@ void SubwinView::SizeAllocate(const Rect& size_allocation) {
 
   // Implement clipping by setting window region.
   clipped.Offset(-size_allocation.x(), -size_allocation.y());
-  HRGN region = ::CreateRectRgn(clipped.x(), clipped.y(),
-                                clipped.right(), clipped.bottom());
-  ::SetWindowRgn(hwnd(), region, FALSE);  // SetWindowRgn takes ownership
+  if (clipped.x() > 0 ||
+      clipped.y() > 0 ||
+      clipped.width() < size_allocation.width() ||
+      clipped.height() < size_allocation.height()) {
+    HRGN region = ::CreateRectRgn(clipped.x(), clipped.y(),
+                                  clipped.right(), clipped.bottom());
+    ::SetWindowRgn(hwnd(), region, FALSE);  // SetWindowRgn takes ownership
+  } else {
+    SetWindowRgn(hwnd(), NULL, FALSE);
+  }
 
   ::ShowWindow(hwnd(), SW_SHOWNOACTIVATE);
   SetWindowPos(hwnd(), NULL,
