@@ -62,7 +62,7 @@ class WindowImpl : public Win32Window {
     // Input events.
     CR_MESSAGE_HANDLER_EX(WM_MOUSEMOVE, OnMouseMove)
     CR_MESSAGE_HANDLER_EX(WM_MOUSELEAVE, OnMouseLeave)
-    CR_MSG_WM_MOUSEWHEEL(OnMouseWheel)
+    CR_MESSAGE_RANGE_HANDLER_EX(WM_MOUSEWHEEL, WM_MOUSEHWHEEL, OnMouseWheel)
     CR_MESSAGE_RANGE_HANDLER_EX(WM_LBUTTONDOWN, WM_MBUTTONDBLCLK, OnMouseClick)
     CR_MESSAGE_RANGE_HANDLER_EX(WM_KEYDOWN, WM_KEYUP, OnKeyEvent)
     CR_MESSAGE_RANGE_HANDLER_EX(WM_SYSKEYDOWN, WM_SYSKEYUP, OnKeyEvent)
@@ -91,7 +91,7 @@ class WindowImpl : public Win32Window {
   LRESULT OnDPIChanged(UINT msg, WPARAM w_param, LPARAM l_param);
   LRESULT OnMouseMove(UINT message, WPARAM w_param, LPARAM l_param);
   LRESULT OnMouseLeave(UINT message, WPARAM w_param, LPARAM l_param);
-  BOOL OnMouseWheel(bool vertical, UINT flags, int delta, const Point& point);
+  LRESULT OnMouseWheel(UINT message, WPARAM w_param, LPARAM l_param);
   LRESULT OnMouseClick(UINT message, WPARAM w_param, LPARAM l_param);
   LRESULT OnKeyEvent(UINT message, WPARAM w_param, LPARAM l_param);
   void OnChar(UINT ch, UINT repeat, UINT flags);

@@ -84,11 +84,10 @@ void ContainerImpl::OnMouseLeave(NativeEvent event) {
   ViewImpl::OnMouseLeave(event);
 }
 
-bool ContainerImpl::OnMouseWheel(bool vertical, UINT flags, int delta,
-                                 const Point& point) {
-  ViewImpl* child = FindChildFromPoint(point);
+bool ContainerImpl::OnMouseWheel(NativeEvent event) {
+  ViewImpl* child = FindChildFromPoint(Point(event->l_param));
   if (child)
-    return child->OnMouseWheel(vertical, flags, delta, point);
+    return child->OnMouseWheel(event);
   return false;
 }
 

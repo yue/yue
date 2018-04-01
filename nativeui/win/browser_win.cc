@@ -15,6 +15,7 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/win/scoped_bstr.h"
 #include "base/win/scoped_variant.h"
+#include "nativeui/events/win/event_win.h"
 #include "nativeui/message_loop.h"
 #include "nativeui/state.h"
 #include "nativeui/win/browser/browser_protocol_factory.h"
@@ -216,6 +217,33 @@ void BrowserImpl::SizeAllocate(const Rect& bounds) {
 
 bool BrowserImpl::HasFocus() const {
   return ::GetFocus() == browser_hwnd_;
+}
+
+bool BrowserImpl::OnMouseWheel(NativeEvent event) {
+  // For WM_MOUSEWHEEL received from the parent window, forward it to the
+  // browser hwnd.
+  if (!browser_hwnd_ || !window())
+    return false;
+  POINT p = { CR_GET_X_LPARAM(event->l_param),
+              CR_GET_Y_LPARAM(event->l_param) };
+  ::ClientToScreen(window()->hwnd(), &p);
+  ::SendMessage(browser_hwnd_, event->message, event->w_param,
+                MAKELPARAM(p.x, p.y));
+  return true;
+}
+
+LRESULT BrowserImpl::OnMouseWheelFromSelf(
+    UINT message, WPARAM w_param, LPARAM l_param) {
+  // We might receive WM_MOUSEWHEEL in the shell hwnd when scrolled to edges,
+  // do not pass the event to SubwinView otherwise we will have stack overflow.
+  if (window()) {
+    // Do nothing if the event happened inside the view.
+    POINT p = { CR_GET_X_LPARAM(l_param), CR_GET_Y_LPARAM(l_param) };
+    ::ScreenToClient(window()->hwnd(), &p);
+    if (size_allocation().Contains(Point(p)))
+      return 0;
+  }
+  return ::DefWindowProc(hwnd(), message, w_param, l_param);
 }
 
 void BrowserImpl::OnDestroy() {

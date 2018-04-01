@@ -38,8 +38,7 @@ class ScrollImpl : public ContainerImpl,
   // ViewImpl:
   void SizeAllocate(const Rect& size_allocation) override;
   void Draw(PainterWin* painter, const Rect& dirty) override;
-  bool OnMouseWheel(bool vertical, UINT flags, int delta,
-                    const Point& point) override;
+  bool OnMouseWheel(NativeEvent event) override;
 
   Scroll::Policy h_policy() const { return h_policy_; }
   Scroll::Policy v_policy() const { return v_policy_; }

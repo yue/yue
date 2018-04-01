@@ -53,6 +53,11 @@ class BrowserImpl : public SubwinView {
   // ViewImpl:
   void SizeAllocate(const Rect& bounds) override;
   bool HasFocus() const override;
+  bool OnMouseWheel(NativeEvent event) override;
+
+  // SubwinView:
+  LRESULT OnMouseWheelFromSelf(
+      UINT message, WPARAM w_param, LPARAM l_param) override;
 
   CR_BEGIN_MSG_MAP_EX(BrowserImpl, SubwinView)
     CR_MSG_WM_DESTROY(OnDestroy)
@@ -66,6 +71,7 @@ class BrowserImpl : public SubwinView {
   void OnDestroy();
   void OnSetFocus(HWND hwnd);
   LRESULT OnParentNotify(UINT msg, WPARAM w_param, LPARAM l_param);
+  LRESULT IgnoreEvent(UINT msg, WPARAM w_param, LPARAM l_param);
 
   // Get the HWND of the IE control and add hooks.
   void ReceiveBrowserHWND();

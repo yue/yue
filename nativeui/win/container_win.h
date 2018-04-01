@@ -39,8 +39,7 @@ class ContainerImpl : public ViewImpl {
   void Draw(PainterWin* painter, const Rect& dirty) override;
   void OnMouseMove(NativeEvent event) override;
   void OnMouseLeave(NativeEvent event) override;
-  bool OnMouseWheel(bool vertical, UINT flags, int delta,
-                    const Point& point) override;
+  bool OnMouseWheel(NativeEvent event) override;
   bool OnMouseClick(NativeEvent event) override;
 
   Adapter* adapter() const { return adapter_; }

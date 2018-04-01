@@ -300,12 +300,13 @@ LRESULT WindowImpl::OnMouseLeave(UINT message, WPARAM w_param, LPARAM l_param) {
   return 0;
 }
 
-BOOL WindowImpl::OnMouseWheel(bool vertical, UINT flags, int delta,
-                                  const Point& point) {
-  POINT p = point.ToPOINT();
-  ScreenToClient(hwnd(), &p);
-  return delegate_->GetContentView()->GetNative()->OnMouseWheel(
-      vertical, flags, delta, Point(p));
+LRESULT WindowImpl::OnMouseWheel(UINT message, WPARAM w_param, LPARAM l_param) {
+  POINT p = { CR_GET_X_LPARAM(l_param), CR_GET_Y_LPARAM(l_param) };
+  ::ScreenToClient(hwnd(), &p);
+  Win32Message msg = {message, w_param, MAKELPARAM(p.x, p.y)};
+  if (!delegate_->GetContentView()->GetNative()->OnMouseWheel(&msg))
+    SetMsgHandled(false);
+  return 0;
 }
 
 LRESULT WindowImpl::OnMouseClick(UINT message, WPARAM w_param, LPARAM l_param) {

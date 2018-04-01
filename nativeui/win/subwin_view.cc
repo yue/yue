@@ -144,6 +144,21 @@ LRESULT SubwinView::OnKeyEvent(UINT message, WPARAM w_param, LPARAM l_param) {
   return 0;
 }
 
+LRESULT SubwinView::OnMouseWheelFromSelf(
+    UINT message, WPARAM w_param, LPARAM l_param) {
+  if (window()) {
+    // Pass the event to window if not happened inside the control.
+    POINT p = { CR_GET_X_LPARAM(l_param), CR_GET_Y_LPARAM(l_param) };
+    ::ScreenToClient(window()->hwnd(), &p);
+    if (!size_allocation().Contains(Point(p))) {
+      ::SendMessage(window()->hwnd(), message, w_param, l_param);
+      return 0;
+    }
+  }
+  SetMsgHandled(false);
+  return 0;
+}
+
 // static
 LRESULT SubwinView::WndProc(HWND hwnd,
                             UINT message,

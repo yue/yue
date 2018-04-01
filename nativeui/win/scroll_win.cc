@@ -6,6 +6,7 @@
 
 #include <tuple>
 
+#include "nativeui/events/win/event_win.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/win/scrollbar/scrollbar.h"
 
@@ -109,9 +110,9 @@ void ScrollImpl::Draw(PainterWin* painter, const Rect& dirty) {
   DrawChild(delegate_->GetContentView()->GetNative(), painter, dirty);
 }
 
-bool ScrollImpl::OnMouseWheel(bool vertical, UINT flags, int delta,
-                              const Point& point) {
-  if (vertical)
+bool ScrollImpl::OnMouseWheel(NativeEvent event) {
+  WORD delta = static_cast<WORD>(HIWORD(event->w_param));
+  if (event->message == WM_MOUSEWHEEL)
     OnScroll(0, delta);
   else
     OnScroll(-delta, 0);

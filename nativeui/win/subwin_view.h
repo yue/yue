@@ -33,6 +33,8 @@ class SubwinView : public Win32Window, public ViewImpl {
   // Change behaviors.
   void set_switch_focus_on_tab(bool s) { switch_focus_on_tab_ = s; }
 
+  WNDPROC proc() const { return proc_; }
+
   // Rerouted from parent window
   virtual void OnCommand(UINT code, int command) {}
   virtual bool OnCtlColor(HDC dc, HBRUSH* brush);
@@ -44,12 +46,16 @@ class SubwinView : public Win32Window, public ViewImpl {
     CR_MESSAGE_RANGE_HANDLER_EX(WM_LBUTTONDOWN, WM_MBUTTONDBLCLK, OnMouseClick)
     CR_MESSAGE_RANGE_HANDLER_EX(WM_KEYDOWN, WM_KEYUP, OnKeyEvent)
     CR_MESSAGE_RANGE_HANDLER_EX(WM_SYSKEYDOWN, WM_SYSKEYUP, OnKeyEvent)
+    CR_MESSAGE_RANGE_HANDLER_EX(WM_MOUSEWHEEL, WM_MOUSEHWHEEL,
+                                OnMouseWheelFromSelf)
   CR_END_MSG_MAP()
 
   void OnChar(UINT ch, UINT repeat, UINT flags);
   void OnSetFocus(HWND hwnd);
   LRESULT OnMouseClick(UINT message, WPARAM w_param, LPARAM l_param);
   LRESULT OnKeyEvent(UINT message, WPARAM w_param, LPARAM l_param);
+  virtual LRESULT OnMouseWheelFromSelf(
+      UINT message, WPARAM w_param, LPARAM l_param);
 
  private:
   // Subclass-ed window procedure.
