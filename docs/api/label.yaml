@@ -27,3 +27,9 @@ methods:
 
   - signature: std::string GetText() const
     description: Return the text displayed.
+
+  - signature: void SetAlign(TextAlign align)
+    description: Set horizontal text alignment.
+
+  - signature: void SetVAlign(TextAlign align)
+    description: Set vertical text alignment.

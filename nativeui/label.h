@@ -7,6 +7,7 @@
 
 #include <string>
 
+#include "nativeui/gfx/text.h"
 #include "nativeui/view.h"
 
 namespace nu {
@@ -20,6 +21,8 @@ class NATIVEUI_EXPORT Label : public View {
 
   void SetText(const std::string& text);
   std::string GetText() const;
+  void SetAlign(TextAlign align);
+  void SetVAlign(TextAlign align);
 
   // View:
   const char* GetClassName() const override;

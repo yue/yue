@@ -1549,7 +1549,9 @@ struct Type<nu::Label> {
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
         "setText", &nu::Label::SetText,
-        "getText", &nu::Label::GetText);
+        "getText", &nu::Label::GetText,
+        "setAlign", &nu::Label::SetAlign,
+        "setVAlign", &nu::Label::SetVAlign);
   }
 };
 

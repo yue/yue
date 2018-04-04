@@ -17,15 +17,54 @@
  @private
   nu::NUPrivate private_;
   std::string text_;
+  nu::TextAlign align_;
+  nu::TextAlign valign_;
   scoped_refptr<nu::Font> font_;
   nu::Color color_;
   nu::Color background_color_;
 }
 - (void)setText:(const std::string&)text;
 - (std::string)text;
+- (void)setTextAlign:(nu::TextAlign)align;
+- (void)setTextVAlign:(nu::TextAlign)align;
 @end
 
 @implementation NULabel
+
+- (id)init {
+  if (self = [super init]) {
+    align_ = nu::TextAlign::Center;
+    valign_ = nu::TextAlign::Center;
+  }
+  return self;
+}
+
+- (void)setText:(const std::string&)text {
+  text_ = text;
+  [self setNeedsDisplay:YES];
+}
+
+- (std::string)text {
+  return text_;
+}
+
+- (void)setTextAlign:(nu::TextAlign)align {
+  align_ = align;
+  [self setNeedsDisplay:YES];
+}
+
+- (void)setTextVAlign:(nu::TextAlign)align {
+  valign_ = align;
+  [self setNeedsDisplay:YES];
+}
+
+- (void)drawRect:(NSRect)dirtyRect {
+  nu::PainterMac painter;
+  painter.SetColor(background_color_);
+  painter.FillRect(nu::RectF(dirtyRect));
+  nu::TextAttributes attributes(font_.get(), color_, align_, valign_);
+  painter.DrawText(text_, nu::RectF(nu::SizeF([self frame].size)), attributes);
+}
 
 - (nu::NUPrivate*)nuPrivate {
   return &private_;
@@ -53,24 +92,6 @@
   return YES;
 }
 
-- (void)setText:(const std::string&)text {
-  text_ = text;
-  [self setNeedsDisplay:YES];
-}
-
-- (std::string)text {
-  return text_;
-}
-
-- (void)drawRect:(NSRect)dirtyRect {
-  nu::PainterMac painter;
-  painter.SetColor(background_color_);
-  painter.FillRect(nu::RectF(dirtyRect));
-  nu::TextAttributes attributes(font_.get(), color_, nu::TextAlign::Center,
-                                nu::TextAlign::Center);
-  painter.DrawText(text_, nu::RectF(nu::SizeF([self frame].size)), attributes);
-}
-
 @end
 
 namespace nu {
@@ -93,6 +114,14 @@ void Label::PlatformSetText(const std::string& text) {
 
 std::string Label::GetText() const {
   return [static_cast<NULabel*>(GetNative()) text];
+}
+
+void Label::SetAlign(TextAlign align) {
+  [static_cast<NULabel*>(GetNative()) setTextAlign:align];
+}
+
+void Label::SetVAlign(TextAlign align) {
+  [static_cast<NULabel*>(GetNative()) setTextVAlign:align];
 }
 
 SizeF Label::GetMinimumSize() const {

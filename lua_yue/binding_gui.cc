@@ -1326,7 +1326,9 @@ struct Type<nu::Label> {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::Label, const std::string&>,
            "settext", &nu::Label::SetText,
-           "gettext", &nu::Label::GetText);
+           "gettext", &nu::Label::GetText,
+           "setalign", &nu::Label::SetAlign,
+           "setvalign", &nu::Label::SetVAlign);
   }
 };
 

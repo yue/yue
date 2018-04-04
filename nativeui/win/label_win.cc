@@ -28,16 +28,27 @@ class LabelImpl : public ViewImpl {
     return text_;
   }
 
+  void SetAlign(TextAlign align) {
+    align_ = align;
+    Invalidate();
+  }
+
+  void SetVAlign(TextAlign align) {
+    valign_ = align;
+    Invalidate();
+  }
+
   // ViewImpl:
   void Draw(PainterWin* painter, const Rect& dirty) override {
     ViewImpl::Draw(painter, dirty);
-    TextAttributes attributes(font(), color(), TextAlign::Center,
-                              TextAlign::Center);
+    TextAttributes attributes(font(), color(), align_, valign_);
     painter->DrawTextPixel(text_, Rect(size_allocation().size()), attributes);
   }
 
  private:
   base::string16 text_;
+  TextAlign align_ = TextAlign::Center;
+  TextAlign valign_ = TextAlign::Center;
 };
 
 }  // namespace
@@ -59,6 +70,16 @@ void Label::PlatformSetText(const std::string& text) {
 std::string Label::GetText() const {
   LabelImpl* label = static_cast<LabelImpl*>(GetNative());
   return base::UTF16ToUTF8(label->GetText());
+}
+
+void Label::SetAlign(TextAlign align) {
+  LabelImpl* label = static_cast<LabelImpl*>(GetNative());
+  label->SetAlign(align);
+}
+
+void Label::SetVAlign(TextAlign align) {
+  LabelImpl* label = static_cast<LabelImpl*>(GetNative());
+  label->SetVAlign(align);
 }
 
 SizeF Label::GetMinimumSize() const {
