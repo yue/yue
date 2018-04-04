@@ -43,6 +43,41 @@
 
 @end
 
+// It is sad that with Object-C we have to repeat the code.
+@interface NUSecureEntry : NSSecureTextField<NUView> {
+ @private
+  nu::NUPrivate private_;
+}
+@end
+
+@implementation NUSecureEntry
+
+- (nu::NUPrivate*)nuPrivate {
+  return &private_;
+}
+
+- (void)setNUFont:(nu::Font*)font {
+  [self setFont:font->GetNative()];
+}
+
+- (void)setNUColor:(nu::Color)color {
+  [self setTextColor:color.ToNSColor()];
+}
+
+- (void)setNUBackgroundColor:(nu::Color)color {
+  [self setBackgroundColor:color.ToNSColor()];
+}
+
+- (void)setNUEnabled:(BOOL)enabled {
+  [self setEditable:enabled];
+}
+
+- (BOOL)isNUEnabled {
+  return [self isEditable];
+}
+
+@end
+
 @interface NUEntryDelegate : NSObject<NSTextFieldDelegate> {
  @private
   nu::Entry* shell_;
@@ -71,8 +106,9 @@
 
 namespace nu {
 
-Entry::Entry() {
-  NSTextField* entry = [[NUEntry alloc] init];
+Entry::Entry(Type type) {
+  NSTextField* entry = type == Type::Normal ? [[NUEntry alloc] init]
+                                            : [[NUSecureEntry alloc] init];
   [entry setBezelStyle:NSTextFieldSquareBezel];
   [entry setBezeled:YES];
   [entry setTarget:[[NUEntryDelegate alloc] initWithShell:this]];

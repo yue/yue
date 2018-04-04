@@ -13,7 +13,12 @@ namespace nu {
 
 class NATIVEUI_EXPORT Entry : public View {
  public:
-  Entry();
+  enum class Type {
+    Normal,
+    Password,
+  };
+
+  explicit Entry(Type type = Type::Normal);
 
   // View class name.
   static const char kClassName[];

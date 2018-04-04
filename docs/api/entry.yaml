@@ -7,14 +7,19 @@ inherit: View
 description: Single-line text input view.
 
 constructors:
-  - signature: Entry()
+  - signature: Entry(Entry::Type type)
     lang: ['cpp']
-    description: Create a new `Entry`.
+    description: Create a new `Entry` with `type`.
+    detail: By default `type` is `Normal`.
 
 class_methods:
   - signature: Entry* Create()
     lang: ['lua', 'js']
-    description: Create a new `Entry`.
+    description: Create a normal `Entry`.
+
+  - signature: Entry* CreateType(Entry::Type type)
+    lang: ['lua', 'js']
+    description: Create an `Entry` with `type`.
 
 class_properties:
   - property: const char* kClassName

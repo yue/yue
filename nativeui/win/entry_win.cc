@@ -52,10 +52,15 @@ class EntryImpl : public EditView {
 
 }  // namespace
 
-Entry::Entry() {
+Entry::Entry(Type type) {
   auto* edit = new EntryImpl(this);
   TakeOverView(edit);
   UpdateDefaultStyle();
+
+  if (type == Type::Password) {
+    WPARAM asterisk = static_cast<WPARAM>('*');
+    ::SendMessage(edit->hwnd(), EM_SETPASSWORDCHAR, asterisk, 0L);
+  }
 }
 
 Entry::~Entry() {

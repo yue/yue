@@ -22,9 +22,15 @@ void OnTextChange(GtkEditable*, Entry* entry) {
 
 }  // namespace
 
-Entry::Entry() {
+Entry::Entry(Type type) {
   TakeOverView(gtk_entry_new());
   UpdateDefaultStyle();
+
+  if (type == Type::Password) {
+    gtk_entry_set_visibility(GTK_ENTRY(GetNative()), false);
+    gtk_entry_set_input_purpose(GTK_ENTRY(GetNative()),
+                                GTK_INPUT_PURPOSE_PASSWORD);
+  }
 
   g_signal_connect(GetNative(), "activate", G_CALLBACK(OnActivate), this);
   g_signal_connect(GetNative(), "changed", G_CALLBACK(OnTextChange), this);

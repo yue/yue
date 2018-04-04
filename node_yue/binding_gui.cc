@@ -1518,12 +1518,33 @@ struct Type<nu::Browser> {
 };
 
 template<>
+struct Type<nu::Entry::Type> {
+  static constexpr const char* name = "yue.Entry.Type";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::Entry::Type* out) {
+    std::string type;
+    if (!vb::FromV8(context, value, &type))
+      return false;
+    if (type == "normal")
+      *out = nu::Entry::Type::Normal;
+    else if (type == "password")
+      *out = nu::Entry::Type::Password;
+    else
+      return false;
+    return true;
+  }
+};
+
+template<>
 struct Type<nu::Entry> {
   using base = nu::View;
   static constexpr const char* name = "yue.Entry";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
-    Set(context, constructor, "create", &CreateOnHeap<nu::Entry>);
+    Set(context, constructor,
+        "create", &CreateOnHeap<nu::Entry>,
+        "createType", &CreateOnHeap<nu::Entry, nu::Entry::Type>);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {

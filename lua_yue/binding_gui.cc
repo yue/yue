@@ -1304,12 +1304,30 @@ struct Type<nu::Browser> {
 };
 
 template<>
+struct Type<nu::Entry::Type> {
+  static constexpr const char* name = "yue.Entry.Type";
+  static bool To(State* state, int index, nu::Entry::Type* out) {
+    std::string type;
+    if (!lua::To(state, index, &type))
+      return false;
+    if (type == "normal")
+      *out = nu::Entry::Type::Normal;
+    else if (type == "password")
+      *out = nu::Entry::Type::Password;
+    else
+      return false;
+    return true;
+  }
+};
+
+template<>
 struct Type<nu::Entry> {
   using base = nu::View;
   static constexpr const char* name = "yue.Entry";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::Entry>,
+           "createtype", &CreateOnHeap<nu::Entry, nu::Entry::Type>,
            "settext", &nu::Entry::SetText,
            "gettext", &nu::Entry::GetText);
     RawSetProperty(state, metatable,
