@@ -1821,6 +1821,12 @@ bool GetRuntime(
   return true;
 }
 
+void MemoryPressureNotification(v8::Local<v8::Context> context, int level) {
+  level = std::max(0, std::min(level, 2));
+  context->GetIsolate()->MemoryPressureNotification(
+      static_cast<v8::MemoryPressureLevel>(level));
+}
+
 void Initialize(v8::Local<v8::Object> exports) {
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::Local<v8::Context> context = isolate->GetCurrentContext();
@@ -1880,7 +1886,9 @@ void Initialize(v8::Local<v8::Object> exports) {
           "Vibrant",           vb::Constructor<nu::Vibrant>(),
 #endif
           // Properties.
-          "app",      nu::State::GetCurrent()->GetApp());
+          "app",      nu::State::GetCurrent()->GetApp(),
+          // Functions.
+          "memoryPressureNotification", &MemoryPressureNotification);
   if (is_electron) {
 #if defined(OS_MACOSX)
     vb::Set(context, exports,
