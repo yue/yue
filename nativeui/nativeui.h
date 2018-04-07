@@ -31,6 +31,7 @@
 #include "nativeui/scroll.h"
 #include "nativeui/state.h"
 #include "nativeui/text_edit.h"
+#include "nativeui/tray.h"
 #include "nativeui/window.h"
 
 #if defined(OS_MACOSX)

@@ -836,6 +836,21 @@ void ReadMenuItems(State* state, int options, nu::MenuBase* menu) {
   }
 }
 
+template<>
+struct Type<nu::Tray> {
+  static constexpr const char* name = "yue.Tray";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+#if defined(OS_MACOSX)
+           "createwithtitle", &CreateOnHeap<nu::Tray, const std::string&>,
+#endif
+           "createwithimage", &CreateOnHeap<nu::Tray, nu::Image*>,
+           "settitle", &nu::Tray::SetTitle,
+           "setimage", &nu::Tray::SetImage,
+           "setmenu", RefMethod(&nu::Tray::SetMenu, RefType::Reset, "menu"));
+  }
+};
+
 #if defined(OS_MACOSX)
 template<>
 struct Type<nu::Toolbar::Item> {
@@ -1583,6 +1598,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::Group>(state, "Group");
   BindType<nu::Scroll>(state, "Scroll");
   BindType<nu::TextEdit>(state, "TextEdit");
+  BindType<nu::Tray>(state, "Tray");
 #if defined(OS_MACOSX)
   BindType<nu::Toolbar>(state, "Toolbar");
   BindType<nu::Vibrant>(state, "Vibrant");

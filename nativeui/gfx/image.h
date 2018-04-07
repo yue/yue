@@ -5,6 +5,8 @@
 #ifndef NATIVEUI_GFX_IMAGE_H_
 #define NATIVEUI_GFX_IMAGE_H_
 
+#include <string>
+
 #include "base/files/file_path.h"
 #include "base/memory/ref_counted.h"
 #include "nativeui/buffer.h"
@@ -27,6 +29,11 @@ class NATIVEUI_EXPORT Image : public base::RefCounted<Image> {
 
   // Get the scale factor of image.
   float GetScaleFactor() const { return scale_factor_; }
+
+  // Write the image to file.
+  // Note: Do not make it a public API for now, we need to figure out a
+  // universal type conversion API with options first.
+  bool WriteToFile(const std::string& format, const base::FilePath& target);
 
   // Return the native instance of image object.
   NativeImage GetNative() const;

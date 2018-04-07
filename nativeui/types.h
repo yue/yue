@@ -18,6 +18,7 @@
 #endif
 
 #if defined(OS_LINUX)
+typedef struct _AppIndicator AppIndicator;
 typedef struct _GdkPixbuf GdkPixbuf;
 typedef struct _GtkFileChooser GtkFileChooser;
 typedef struct _GtkMenuItem GtkMenuItem;
@@ -41,6 +42,7 @@ typedef struct CGContext* CGContextRef;
 @class NSMenu;
 @class NSMenuItem;
 @class NSSavePanel;
+@class NSStatusItem;
 @class NSToolbar;
 @class NSView;
 @class NSWindow;
@@ -53,6 +55,7 @@ class NSImage;
 class NSMenu;
 class NSMenuItem;
 class NSSavePanel;
+class NSStatusItem;
 class NSToolbar;
 struct NSView;
 class NSWindow;
@@ -100,6 +103,7 @@ using NativeFont = NSFont*;
 using NativeMenu = NSMenu*;
 using NativeMenuItem = NSMenuItem*;
 using NativeToolbar = NSToolbar*;
+using NativeTray = NSStatusItem*;
 #elif defined(OS_LINUX)
 using NativeEvent = GdkEvent*;
 using NativeFileDialog = GtkFileChooser*;
@@ -111,6 +115,7 @@ using nativeGraphicsContext = cairo_t*;
 using NativeFont = PangoFontDescription*;
 using NativeMenu = GtkMenuShell*;
 using NativeMenuItem = GtkMenuItem*;
+using NativeTray = AppIndicator*;
 #elif defined(OS_WIN)
 using NativeEvent = Win32Message*;
 using NativeFileDialog = FileDialogImpl*;
@@ -122,6 +127,7 @@ using nativeGraphicsContext = Gdiplus::Graphics*;
 using NativeImage = Gdiplus::Image*;
 using NativeMenu = HMENU;
 using NativeMenuItem = MenuItemData*;
+using NativeTray = TrayImpl*;
 #elif defined(OS_IOS)
 using NativeView = UIView*;
 using NativeWindow UIWindow*;

@@ -38,6 +38,12 @@ SizeF Image::GetSize() const {
                    1.f / scale_factor_);
 }
 
+bool Image::WriteToFile(const std::string& format,
+                        const base::FilePath& target) {
+  return gdk_pixbuf_save(image_, target.value().c_str(), format.c_str(),
+                         nullptr, nullptr);
+}
+
 NativeImage Image::GetNative() const {
   return image_;
 }

@@ -945,6 +945,26 @@ void ReadMenuItems(v8::Local<v8::Context> context,
   }
 }
 
+template<>
+struct Type<nu::Tray> {
+  static constexpr const char* name = "yue.Tray";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+#if defined(OS_MACOSX)
+        "createWithTitle", &CreateOnHeap<nu::Tray, const std::string&>,
+#endif
+        "createWithImage", &CreateOnHeap<nu::Tray, nu::Image*>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "setTitle", &nu::Tray::SetTitle,
+        "setImage", &nu::Tray::SetImage,
+        "setMenu", RefMethod(&nu::Tray::SetMenu, RefType::Reset, "menu"));
+  }
+};
+
 #if defined(OS_MACOSX)
 template<>
 struct Type<nu::Toolbar::Item> {
@@ -1883,6 +1903,7 @@ void Initialize(v8::Local<v8::Object> exports) {
           "Group",             vb::Constructor<nu::Group>(),
           "Scroll",            vb::Constructor<nu::Scroll>(),
           "TextEdit",          vb::Constructor<nu::TextEdit>(),
+          "Tray",              vb::Constructor<nu::Tray>(),
 #if defined(OS_MACOSX)
           "Toolbar",           vb::Constructor<nu::Toolbar>(),
           "Vibrant",           vb::Constructor<nu::Vibrant>(),
