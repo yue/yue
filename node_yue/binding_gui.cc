@@ -248,6 +248,8 @@ struct Type<nu::App> {
 #if defined(OS_MACOSX)
         "setApplicationMenu",
         RefMethod(&nu::App::SetApplicationMenu, RefType::Reset, "appMenu"),
+        "setDockBadgeLabel", &nu::App::SetDockBadgeLabel,
+        "getDockBadgeLabel", &nu::App::GetDockBadgeLabel,
 #endif
         "getColor", &nu::App::GetColor,
         "getDefaultFont", &nu::App::GetDefaultFont);

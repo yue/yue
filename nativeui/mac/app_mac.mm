@@ -4,6 +4,7 @@
 
 #include "nativeui/app.h"
 
+#include "base/strings/sys_string_conversions.h"
 #include "nativeui/gfx/geometry/safe_integer_conversions.h"
 #include "nativeui/mac/nu_application_delegate.h"
 #include "nativeui/menu_bar.h"
@@ -34,6 +35,14 @@ void App::SetApplicationMenu(MenuBar* menu) {
 
 MenuBar* App::GetApplicationMenu() const {
   return application_menu_.get();
+}
+
+void App::SetDockBadgeLabel(const std::string& text) {
+  [[NSApp dockTile] setBadgeLabel:base::SysUTF8ToNSString(text)];
+}
+
+std::string App::GetDockBadgeLabel() const {
+  return base::SysNSStringToUTF8([[NSApp dockTile] badgeLabel]);
 }
 
 }  // namespace nu

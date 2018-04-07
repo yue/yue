@@ -50,6 +50,14 @@ methods:
     platform: ['macOS']
     description: Return the application menu bar.
 
+  - signature: void SetDockBadgeLabel(const std::string& label)
+    platform: ['macOS']
+    description: Set the `label` to be displayed in dock’s badging area.
+
+  - signature: std::string GetDockBadgeLabel() const
+    platform: ['macOS']
+    description: Get the label displayed in dock’s badging area.
+
   - signature: Color GetColor(App::ThemeColor name)
     description: Return color of a theme component.
 

@@ -5,6 +5,7 @@
 #ifndef NATIVEUI_APP_H_
 #define NATIVEUI_APP_H_
 
+#include <string>
 #include <unordered_map>
 
 #include "base/memory/weak_ptr.h"
@@ -36,6 +37,10 @@ class NATIVEUI_EXPORT App {
   // Set the application menu.
   void SetApplicationMenu(MenuBar* menu);
   MenuBar* GetApplicationMenu() const;
+
+  // Dock functions.
+  void SetDockBadgeLabel(const std::string& text);
+  std::string GetDockBadgeLabel() const;
 #endif
 
   base::WeakPtr<App> GetWeakPtr() { return weak_factory_.GetWeakPtr(); }
