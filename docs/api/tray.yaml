@@ -1,0 +1,55 @@
+name: Tray
+component: gui
+header: nativeui/tray.h
+type: refcounted
+namespace: nu
+description: Tray item displayed in system notification area.
+
+detail: |
+  Platform limitations:
+
+  * On Linux tray items are displayed as app indicators.
+  * On Linux there is no fallback when app indicators are not supported.
+  * On Linux app indicator can only show when it has menu attached.
+
+constructors:
+  - signature: Tray(Image* icon)
+    lang: ['cpp']
+    description: Create a tray item with `icon`.
+
+  - signature: Tray(const std::string& title)
+    lang: ['cpp']
+    platform: ['macOS']
+    description: Create a tray item with only `title`.
+
+class_methods:
+  - signature: Tray* Create(Image* icon)
+    lang: ['lua', 'js']
+    description: Create a tray item with `icon`.
+
+  - signature: Tray* Create(const std::string& title)
+    lang: ['lua', 'js']
+    platform: ['macOS']
+    description: Create a tray item with only `title`.
+
+methods:
+  - signature: void SetTitle(const std::string& title)
+    platform: ['macOS', 'linux']
+    description: Set title to be displayed aside item's icon.
+
+  - signature: void SetImage(Image* icon)
+    description: Set the `icon` of tray item.
+
+  - signature: void SetMenu(Menu* menu)
+    description: Set the menu attached with the tray item.
+    detail: |
+      On most platforms the menu will show when clicking on the icon, while on
+      Windows the menu will only show when when right-clicking on the icon.
+
+  - signature: Menu* GetMenu() const
+    description: Return the menu attached.
+
+events:
+  - callback: void on_click(Button* self)
+    platform: ['Windows']
+    description: Emitted when the tray item is clicked.
