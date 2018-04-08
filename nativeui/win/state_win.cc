@@ -15,6 +15,7 @@
 #include "nativeui/win/util/gdiplus_holder.h"
 #include "nativeui/win/util/scoped_ole_initializer.h"
 #include "nativeui/win/util/subwin_holder.h"
+#include "nativeui/win/util/tray_host.h"
 #include "third_party/yoga/yoga/Yoga.h"
 
 namespace nu {
@@ -105,6 +106,12 @@ NativeTheme* State::GetNativeTheme() {
   if (!native_theme_)
     native_theme_.reset(new NativeTheme);
   return native_theme_.get();
+}
+
+TrayHost* State::GetTrayHost() {
+  if (!tray_host_)
+    tray_host_.reset(new TrayHost);
+  return tray_host_.get();
 }
 
 UINT State::GetNextCommandID() {

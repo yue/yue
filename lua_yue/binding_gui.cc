@@ -848,6 +848,7 @@ struct Type<nu::Tray> {
            "settitle", &nu::Tray::SetTitle,
            "setimage", &nu::Tray::SetImage,
            "setmenu", RefMethod(&nu::Tray::SetMenu, RefType::Reset, "menu"));
+    RawSetProperty(state, metatable, "onclick", &nu::Tray::on_click);
   }
 };
 

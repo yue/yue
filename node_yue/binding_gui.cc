@@ -962,6 +962,7 @@ struct Type<nu::Tray> {
         "setTitle", &nu::Tray::SetTitle,
         "setImage", &nu::Tray::SetImage,
         "setMenu", RefMethod(&nu::Tray::SetMenu, RefType::Reset, "menu"));
+    SetProperty(context, templ, "onClick", &nu::Tray::on_click);
   }
 };
 

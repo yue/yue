@@ -85,6 +85,7 @@ namespace nu {
 
 #if defined(OS_WIN)
 class FileDialogImpl;
+class TrayImpl;
 class ViewImpl;
 class WindowImpl;
 struct Win32Message;

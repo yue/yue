@@ -17,7 +17,7 @@ namespace nu {
 class Image;
 class Menu;
 
-class Tray : public base::RefCounted<Tray> {
+class NATIVEUI_EXPORT Tray : public base::RefCounted<Tray> {
  public:
   explicit Tray(Image* icon);
 
@@ -29,6 +29,9 @@ class Tray : public base::RefCounted<Tray> {
   void SetTitle(const std::string& title);
   void SetImage(Image* icon);
   void SetMenu(Menu* menu);
+  Menu* GetMenu() const { return menu_.get(); }
+
+  Signal<void(Tray*)> on_click;
 
  protected:
   virtual ~Tray();

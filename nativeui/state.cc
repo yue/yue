@@ -16,6 +16,7 @@
 #include "nativeui/win/util/gdiplus_holder.h"
 #include "nativeui/win/util/scoped_ole_initializer.h"
 #include "nativeui/win/util/subwin_holder.h"
+#include "nativeui/win/util/tray_host.h"
 #endif
 
 namespace nu {

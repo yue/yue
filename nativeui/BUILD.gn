@@ -300,6 +300,7 @@ component("nativeui") {
     "win/scroll_win.h",
     "win/state_win.cc",
     "win/tray_win.cc",
+    "win/tray_win.h",
     "win/text_edit_win.cc",
     "win/view_win.cc",
     "win/view_win.h",
@@ -324,6 +325,8 @@ component("nativeui") {
     "win/util/scoped_ole_initializer.h",
     "win/util/subwin_holder.cc",
     "win/util/subwin_holder.h",
+    "win/util/tray_host.cc",
+    "win/util/tray_host.h",
     "win/util/win32_window.cc",
     "win/util/win32_window.h",
   ]

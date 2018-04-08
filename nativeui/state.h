@@ -23,11 +23,12 @@ class ScopedCOMInitializer;
 namespace nu {
 
 #if defined(OS_WIN)
-class GdiplusHolder;
 class ClassRegistrar;
+class GdiplusHolder;
 class NativeTheme;
 class SubwinHolder;
 class ScopedOleInitializer;
+class TrayHost;
 #endif
 
 class NATIVEUI_EXPORT State {
@@ -46,6 +47,7 @@ class NATIVEUI_EXPORT State {
   HWND GetSubwinHolder();
   ClassRegistrar* GetClassRegistrar();
   NativeTheme* GetNativeTheme();
+  TrayHost* GetTrayHost();
   UINT GetNextCommandID();
 #endif
 
@@ -62,6 +64,7 @@ class NATIVEUI_EXPORT State {
   std::unique_ptr<ClassRegistrar> class_registrar_;
   std::unique_ptr<SubwinHolder> subwin_holder_;
   std::unique_ptr<NativeTheme> native_theme_;
+  std::unique_ptr<TrayHost> tray_host_;
 
   // Next ID for custom WM_COMMAND items, the number came from:
   // https://msdn.microsoft.com/en-us/library/11861byt.aspx

@@ -39,7 +39,7 @@ Win32Window::Win32Window(base::StringPiece16 class_name, HWND parent,
                          : class_name.data(),
       NULL, window_style, -1, -1, 1, 1, parent, NULL, NULL, this);
 
-  // For custom window we the hwnd_ is assigned in WM_NCCREATE.
+  // For custom window the hwnd_ is assigned in WM_NCCREATE.
   if (class_name.empty()) {
     // The window procedure should have set the data for us.
     CheckWindowCreated(hwnd_);
