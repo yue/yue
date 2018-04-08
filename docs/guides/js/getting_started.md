@@ -41,7 +41,7 @@ export npm_config_arch=x64
 HOME=~/.electron-gyp npm i gui
 ```
 
-Only Electron v1.6.x and above are supported.
+Only Electron v1.8.x and above are supported.
 
 ## Using Yue
 
@@ -371,7 +371,7 @@ function drawHeart(painter) {
 
 ## More
 
-* [FAQ](https://github.com/yue/help#faq)
+* [App Packaging](app_packaging.html)
 * [Embedding Electron's WebContents](embedding_webcontents.html)
 
 [mac-editor]: https://cdn.rawgit.com/yue/yue-app-samples/10cc39d9/editor/screenshots/mac_editor.png

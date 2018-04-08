@@ -1,5 +1,5 @@
 ---
-priority: 99
+priority: 98
 description: Walkthrough of the event system.
 ---
 
