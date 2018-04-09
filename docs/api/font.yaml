@@ -27,6 +27,10 @@ class_methods:
     description: *ref1
 
 methods:
+  - signature: Font* Derive(float size_delta, Weight weight, Style style) const
+    description: Returns a new Font derived from the existing font.
+    detail: The `size_delta` is the size in DIP to add to the current font.
+
   - signature: std::string GetName() const
     description: Return font's family name.
 

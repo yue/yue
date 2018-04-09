@@ -41,6 +41,10 @@ class NATIVEUI_EXPORT Font : public base::RefCounted<Font> {
   // (encoded in UTF-8), DIP |size|, |weight| and |style|.
   Font(const std::string& name, float size, Weight weight, Style style);
 
+  // Returns a new Font derived from the existing font.
+  // It is caller's responsibility to manage the lifetime of returned font.
+  Font* Derive(float size_delta, Weight weight, Style style) const;
+
   // Return the specified font name in UTF-8.
   std::string GetName() const;
 

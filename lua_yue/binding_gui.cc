@@ -340,6 +340,7 @@ struct Type<nu::Font> {
            "create", &CreateOnHeap<nu::Font, const std::string&, float,
                                    nu::Font::Weight, nu::Font::Style>,
            "default", &GetDefault,
+           "derive", &nu::Font::Derive,
            "getname", &nu::Font::GetName,
            "getsize", &nu::Font::GetSize,
            "getweight", &nu::Font::GetWeight,

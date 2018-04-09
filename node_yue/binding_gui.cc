@@ -368,6 +368,7 @@ struct Type<nu::Font> {
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
+        "derive", &nu::Font::Derive,
         "getName", &nu::Font::GetName,
         "getSize", &nu::Font::GetSize,
         "getWeight", &nu::Font::GetWeight,
