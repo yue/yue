@@ -27,12 +27,12 @@ local gui = require('yue.gui')
 
 -- Create window and show it.
 local win = gui.Window.create{}
-win.onclose = function() gui.lifetime:quit() end
+win.onclose = function() gui.MessageLoop.quit() end
 win:setcontentview(gui.Label.create('Content View'))
 win:setcontentsize{width=400, height=400}
 win:center()
 win:activate()
 
 -- Enter message loop.
-gui.lifetime:run()
+gui.MessageLoop.run()
 ```
