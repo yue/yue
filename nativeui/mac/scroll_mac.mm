@@ -96,4 +96,15 @@ std::tuple<Scroll::Policy, Scroll::Policy> Scroll::GetScrollbarPolicy() const {
   return std::make_tuple(h_policy, v_policy);
 }
 
+void Scroll::SetOverlayScrollbar(bool overlay) {
+  auto* scroll = static_cast<NUScroll*>(GetNative());
+  scroll.scrollerStyle = overlay ? NSScrollerStyleOverlay
+                                 : NSScrollerStyleLegacy;
+}
+
+bool Scroll::IsOverlayScrollbar() const {
+  auto* scroll = static_cast<NUScroll*>(GetNative());
+  return scroll.scrollerStyle == NSScrollerStyleOverlay;
+}
+
 }  // namespace nu

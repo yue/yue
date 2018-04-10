@@ -16,6 +16,8 @@ typedef struct _cairo_region cairo_region_t;
 
 namespace nu {
 
+bool GtkVersionCheck(int major = 0, int minor = 0, int micro = 0);
+
 SizeF GetPreferredSizeForWidget(NativeView widget);
 
 // Like gdk_cairo_region_create_from_surface, but also include semi-transparent

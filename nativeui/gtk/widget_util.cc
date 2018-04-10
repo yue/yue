@@ -33,6 +33,26 @@ bool CairoSurfaceExtents(cairo_surface_t* surface, GdkRectangle* extents) {
 
 }  // namespace
 
+bool GtkVersionCheck(int major = 0, int minor = 0, int micro = 0) {
+  static int actual_major = gtk_get_major_version();
+  if (actual_major > major)
+    return true;
+  else if (actual_major < major)
+    return false;
+
+  static int actual_minor = gtk_get_minor_version();
+  if (actual_minor > minor)
+    return true;
+  else if (actual_minor < minor)
+    return false;
+
+  static int actual_micro = gtk_get_micro_version();
+  if (actual_micro >= micro)
+    return true;
+  else
+    return false;
+}
+
 SizeF GetPreferredSizeForWidget(GtkWidget* widget) {
   GtkRequisition size;
   gtk_widget_get_preferred_size(widget, nullptr, &size);

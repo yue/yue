@@ -53,3 +53,9 @@ methods:
   - signature: std::tuple<Scroll::Policy, Scroll::Policy> GetScrollbarPolicy() const
     description: |
       Return the display policy of horizontal and vertical scrollbars.
+
+  - signature: void SetOverlayScrollbar(bool overlay)
+    description: Set whether to use overlay scrolling.
+
+  - signature: bool IsOverlayScrollbar() const
+    description: Return whether overlay scrolling is used.

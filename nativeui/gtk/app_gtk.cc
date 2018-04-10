@@ -12,6 +12,7 @@
 #include "base/strings/string_split.h"
 #include "base/strings/string_tokenizer.h"
 #include "base/strings/string_util.h"
+#include "nativeui/gtk/widget_util.h"
 
 #if GTK_MAJOR_VERSION > 2
 // These constants are defined in gtk/gtkenums.h in Gtk3.12 or later.
@@ -25,26 +26,6 @@
 namespace nu {
 
 namespace {
-
-bool GtkVersionCheck(int major = 0, int minor = 0, int micro = 0) {
-  static int actual_major = gtk_get_major_version();
-  if (actual_major > major)
-    return true;
-  else if (actual_major < major)
-    return false;
-
-  static int actual_minor = gtk_get_minor_version();
-  if (actual_minor > minor)
-    return true;
-  else if (actual_minor < minor)
-    return false;
-
-  static int actual_micro = gtk_get_micro_version();
-  if (actual_micro >= micro)
-    return true;
-  else
-    return false;
-}
 
 void* GetGtkSharedLibrary() {
   std::string lib_name =

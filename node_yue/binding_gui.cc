@@ -1682,13 +1682,15 @@ struct Type<nu::Scroll> {
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
-        "setScrollbarPolicy", &nu::Scroll::SetScrollbarPolicy,
-        "getScrollbarPolicy", &nu::Scroll::GetScrollbarPolicy,
         "setContentSize", &nu::Scroll::SetContentSize,
         "getContentSize", &nu::Scroll::GetContentSize,
         "setContentView",
         RefMethod(&nu::Scroll::SetContentView, RefType::Reset, "contentView"),
-        "getContentView", &nu::Scroll::GetContentView);
+        "getContentView", &nu::Scroll::GetContentView,
+        "setScrollbarPolicy", &nu::Scroll::SetScrollbarPolicy,
+        "getScrollbarPolicy", &nu::Scroll::GetScrollbarPolicy,
+        "setOverlayScrollbar", &nu::Scroll::SetOverlayScrollbar,
+        "isOverlayScrollbar", &nu::Scroll::IsOverlayScrollbar);
   }
 };
 

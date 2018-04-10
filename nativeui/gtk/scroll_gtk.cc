@@ -6,6 +6,8 @@
 
 #include <gtk/gtk.h>
 
+#include "nativeui/gtk/widget_util.h"
+
 namespace nu {
 
 namespace {
@@ -83,6 +85,21 @@ std::tuple<Scroll::Policy, Scroll::Policy> Scroll::GetScrollbarPolicy() const {
   GtkPolicyType hp, vp;
   gtk_scrolled_window_get_policy(GTK_SCROLLED_WINDOW(GetNative()), &hp, &vp);
   return std::make_tuple(PolicyFromGTK(hp), PolicyFromGTK(vp));
+}
+
+void Scroll::SetOverlayScrollbar(bool overlay) {
+  if (GtkVersionCheck(3, 16))
+    gtk_scrolled_window_set_overlay_scrolling(GTK_SCROLLED_WINDOW(GetNative()),
+                                              overlay);
+}
+
+bool Scroll::IsOverlayScrollbar() const {
+  if (GtkVersionCheck(3, 16)) {
+    return gtk_scrolled_window_get_overlay_scrolling(
+        GTK_SCROLLED_WINDOW(GetNative()));
+  } else {
+    return false;
+  }
 }
 
 }  // namespace nu
