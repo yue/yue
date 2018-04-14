@@ -1440,10 +1440,12 @@ struct Type<nu::Scroll> {
            "setcontentview",
            RefMethod(&nu::Scroll::SetContentView, RefType::Reset, "content"),
            "getcontentview", &nu::Scroll::GetContentView,
-           "setscrollbarpolicy", &nu::Scroll::SetScrollbarPolicy,
-           "getscrollbarpolicy", &nu::Scroll::GetScrollbarPolicy,
+#if !defined(OS_WIN)
            "setOverlayScrollbar", &nu::Scroll::SetOverlayScrollbar,
-           "isOverlayScrollbar", &nu::Scroll::IsOverlayScrollbar);
+           "isOverlayScrollbar", &nu::Scroll::IsOverlayScrollbar,
+#endif
+           "setscrollbarpolicy", &nu::Scroll::SetScrollbarPolicy,
+           "getscrollbarpolicy", &nu::Scroll::GetScrollbarPolicy);
   }
 };
 

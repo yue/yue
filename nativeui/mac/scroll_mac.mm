@@ -81,6 +81,17 @@ void Scroll::SetContentSize(const SizeF& size) {
   [scroll.documentView setFrameSize:content_size];
 }
 
+void Scroll::SetOverlayScrollbar(bool overlay) {
+  auto* scroll = static_cast<NUScroll*>(GetNative());
+  scroll.scrollerStyle = overlay ? NSScrollerStyleOverlay
+                                 : NSScrollerStyleLegacy;
+}
+
+bool Scroll::IsOverlayScrollbar() const {
+  auto* scroll = static_cast<NUScroll*>(GetNative());
+  return scroll.scrollerStyle == NSScrollerStyleOverlay;
+}
+
 void Scroll::SetScrollbarPolicy(Policy h_policy, Policy v_policy) {
   auto* scroll = static_cast<NUScroll*>(GetNative());
   scroll.hasHorizontalScroller = h_policy != Policy::Never;
@@ -94,17 +105,6 @@ std::tuple<Scroll::Policy, Scroll::Policy> Scroll::GetScrollbarPolicy() const {
   Policy v_policy = scroll.hasVerticalScroller ? Policy::Automatic
                                                : Policy::Never;
   return std::make_tuple(h_policy, v_policy);
-}
-
-void Scroll::SetOverlayScrollbar(bool overlay) {
-  auto* scroll = static_cast<NUScroll*>(GetNative());
-  scroll.scrollerStyle = overlay ? NSScrollerStyleOverlay
-                                 : NSScrollerStyleLegacy;
-}
-
-bool Scroll::IsOverlayScrollbar() const {
-  auto* scroll = static_cast<NUScroll*>(GetNative());
-  return scroll.scrollerStyle == NSScrollerStyleOverlay;
 }
 
 }  // namespace nu

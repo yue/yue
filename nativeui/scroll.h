@@ -24,6 +24,11 @@ class NATIVEUI_EXPORT Scroll : public View {
   void SetContentSize(const SizeF& size);
   SizeF GetContentSize() const;
 
+#if !defined(OS_WIN)
+  void SetOverlayScrollbar(bool overlay);
+  bool IsOverlayScrollbar() const;
+#endif
+
   enum class Policy {
     Always,
     Never,
@@ -31,8 +36,6 @@ class NATIVEUI_EXPORT Scroll : public View {
   };
   void SetScrollbarPolicy(Policy h_policy, Policy v_policy);
   std::tuple<Policy, Policy> GetScrollbarPolicy() const;
-  void SetOverlayScrollbar(bool overlay);
-  bool IsOverlayScrollbar() const;
 
   // View:
   const char* GetClassName() const override;

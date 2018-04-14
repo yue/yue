@@ -210,11 +210,4 @@ std::tuple<Scroll::Policy, Scroll::Policy> Scroll::GetScrollbarPolicy() const {
   return std::make_tuple(scroll->h_policy(), scroll->v_policy());
 }
 
-void Scroll::SetOverlayScrollbar(bool overlay) {
-}
-
-bool Scroll::IsOverlayScrollbar() const {
-  return false;
-}
-
 }  // namespace nu

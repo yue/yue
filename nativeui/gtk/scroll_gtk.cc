@@ -76,17 +76,6 @@ void Scroll::SetContentSize(const SizeF& size) {
   gtk_adjustment_set_value(v_adjust, gtk_adjustment_get_lower(v_adjust));
 }
 
-void Scroll::SetScrollbarPolicy(Policy h_policy, Policy v_policy) {
-  gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(GetNative()),
-                                 PolicyToGTK(h_policy), PolicyToGTK(v_policy));
-}
-
-std::tuple<Scroll::Policy, Scroll::Policy> Scroll::GetScrollbarPolicy() const {
-  GtkPolicyType hp, vp;
-  gtk_scrolled_window_get_policy(GTK_SCROLLED_WINDOW(GetNative()), &hp, &vp);
-  return std::make_tuple(PolicyFromGTK(hp), PolicyFromGTK(vp));
-}
-
 void Scroll::SetOverlayScrollbar(bool overlay) {
   if (GtkVersionCheck(3, 16))
     gtk_scrolled_window_set_overlay_scrolling(GTK_SCROLLED_WINDOW(GetNative()),
@@ -100,6 +89,17 @@ bool Scroll::IsOverlayScrollbar() const {
   } else {
     return false;
   }
+}
+
+void Scroll::SetScrollbarPolicy(Policy h_policy, Policy v_policy) {
+  gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(GetNative()),
+                                 PolicyToGTK(h_policy), PolicyToGTK(v_policy));
+}
+
+std::tuple<Scroll::Policy, Scroll::Policy> Scroll::GetScrollbarPolicy() const {
+  GtkPolicyType hp, vp;
+  gtk_scrolled_window_get_policy(GTK_SCROLLED_WINDOW(GetNative()), &hp, &vp);
+  return std::make_tuple(PolicyFromGTK(hp), PolicyFromGTK(vp));
 }
 
 }  // namespace nu
