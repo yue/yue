@@ -33,7 +33,7 @@ bool CairoSurfaceExtents(cairo_surface_t* surface, GdkRectangle* extents) {
 
 }  // namespace
 
-bool GtkVersionCheck(int major = 0, int minor = 0, int micro = 0) {
+bool GtkVersionCheck(int major, int minor, int micro) {
   static int actual_major = gtk_get_major_version();
   if (actual_major > major)
     return true;
