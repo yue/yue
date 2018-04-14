@@ -4,6 +4,7 @@
 
 #include "nativeui/text_edit.h"
 
+#include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
 #include "nativeui/gtk/undoable_text_buffer.h"
@@ -26,10 +27,18 @@ void OnTextChange(GtkTextBuffer*, TextEdit* edit) {
   edit->on_text_change.Emit(edit);
 }
 
+gboolean OnKeyPress(GtkWidget*, GdkEventKey* event, TextEdit* edit) {
+  if (event->type == GDK_KEY_PRESS && event->keyval == GDK_KEY_Return &&
+      edit->should_insert_new_line)
+    return !edit->should_insert_new_line(edit);
+  return FALSE;
+}
+
 }  // namespace
 
 TextEdit::TextEdit() {
   GtkWidget* text_view = gtk_text_view_new();
+  g_signal_connect(text_view, "key-press-event", G_CALLBACK(OnKeyPress), this);
   gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(text_view), GTK_WRAP_CHAR);
   gtk_widget_show(text_view);
 
