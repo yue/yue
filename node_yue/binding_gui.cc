@@ -1729,7 +1729,8 @@ struct Type<nu::TextEdit> {
 #endif
         "setScrollbarPolicy", &nu::TextEdit::SetScrollbarPolicy);
     SetProperty(context, templ,
-                "onTextChange", &nu::TextEdit::on_text_change);
+                "onTextChange", &nu::TextEdit::on_text_change,
+                "shouldInsertNewLine", &nu::TextEdit::should_insert_new_line);
   }
 };
 

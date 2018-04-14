@@ -1478,7 +1478,9 @@ struct Type<nu::TextEdit> {
 #endif
            "setscrollbarpolicy", &nu::TextEdit::SetScrollbarPolicy);
     RawSetProperty(state, metatable,
-                   "ontextchange", &nu::TextEdit::on_text_change);
+                   "ontextchange", &nu::TextEdit::on_text_change,
+                   "shouldinsertnewline",
+                   &nu::TextEdit::should_insert_new_line);
   }
 };
 

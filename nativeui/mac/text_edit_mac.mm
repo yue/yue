@@ -29,6 +29,15 @@
   shell_->on_text_change.Emit(shell_);
 }
 
+- (BOOL)textView:(NSTextView*)textView
+    doCommandBySelector:(SEL)commandSelector {
+  if (commandSelector == @selector(insertNewline:) &&
+      shell_->should_insert_new_line)
+    return shell_->should_insert_new_line(shell_);
+  return YES;
+}
+
+
 @end
 
 @interface NUTextEdit : NSScrollView<NUView> {

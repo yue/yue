@@ -51,6 +51,9 @@ class NATIVEUI_EXPORT TextEdit : public View {
   // Events.
   Signal<void(TextEdit*)> on_text_change;
 
+  // Delegate methods.
+  std::function<bool(TextEdit*)> should_insert_new_line;
+
  protected:
   ~TextEdit() override;
 };
