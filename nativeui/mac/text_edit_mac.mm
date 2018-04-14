@@ -219,8 +219,8 @@ void TextEdit::SetOverlayScrollbar(bool overlay) {
 void TextEdit::SetScrollbarPolicy(Scroll::Policy h_policy,
                                   Scroll::Policy v_policy) {
   auto* scroll = static_cast<NSScrollView*>(GetNative());
-  scroll.hasHorizontalScroller = h_policy != Policy::Never;
-  scroll.hasVerticalScroller = v_policy != Policy::Never;
+  scroll.hasHorizontalScroller = h_policy != Scroll::Policy::Never;
+  scroll.hasVerticalScroller = v_policy != Scroll::Policy::Never;
 }
 
 }  // namespace nu
