@@ -1723,7 +1723,11 @@ struct Type<nu::TextEdit> {
         "insertText", &nu::TextEdit::InsertText,
         "insertTextAt", &nu::TextEdit::InsertTextAt,
         "delete", &nu::TextEdit::Delete,
-        "deleteRange", &nu::TextEdit::DeleteRange);
+        "deleteRange", &nu::TextEdit::DeleteRange,
+#if !defined(OS_WIN)
+        "setOverlayScrollbar", &nu::TextEdit::SetOverlayScrollbar,
+#endif
+        "setScrollbarPolicy", &nu::TextEdit::SetScrollbarPolicy);
     SetProperty(context, templ,
                 "onTextChange", &nu::TextEdit::on_text_change);
   }

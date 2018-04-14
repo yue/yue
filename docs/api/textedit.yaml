@@ -79,6 +79,19 @@ methods:
   - signature: void DeleteRange(int start, int end)
     description: Delete text between `start` and `end` positions.
 
+  - signature: void SetOverlayScrollbar(bool overlay)
+    platform: ['macOS', 'linux']
+    description: Set whether to use overlay scrolling.
+
+  - signature: void SetScrollbarPolicy(Scroll::Policy hpolicy, Scroll::Policy vpolicy)
+    description: |
+      Set the policy for displaying horizontal and vertical scrollbars.
+    parameters:
+      hpolicy:
+        description: Policy for horizontal scrollbar.
+      vpolicy:
+        description: Policy for vertical scrollbar.
+
 events:
   - callback: void on_text_change(TextEdit* self)
     description: Emitted when user has changed text.

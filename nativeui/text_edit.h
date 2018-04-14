@@ -8,7 +8,7 @@
 #include <string>
 #include <tuple>
 
-#include "nativeui/view.h"
+#include "nativeui/scroll.h"
 
 namespace nu {
 
@@ -42,6 +42,11 @@ class NATIVEUI_EXPORT TextEdit : public View {
   void InsertTextAt(const std::string& text, int pos);
   void Delete();
   void DeleteRange(int start, int end);
+
+#if !defined(OS_WIN)
+  void SetOverlayScrollbar(bool overlay);
+#endif
+  void SetScrollbarPolicy(Scroll::Policy h_policy, Scroll::Policy v_policy);
 
   // Events.
   Signal<void(TextEdit*)> on_text_change;

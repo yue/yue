@@ -13,6 +13,15 @@ namespace nu {
 
 namespace {
 
+GtkPolicyType PolicyToGTK(Scroll::Policy policy) {
+  if (policy == Scroll::Policy::Always)
+    return GTK_POLICY_ALWAYS;
+  else if (policy == Scroll::Policy::Never)
+    return GTK_POLICY_NEVER;
+  else
+    return GTK_POLICY_AUTOMATIC;
+}
+
 void OnTextChange(GtkTextBuffer*, TextEdit* edit) {
   edit->on_text_change.Emit(edit);
 }
@@ -160,6 +169,18 @@ void TextEdit::DeleteRange(int start, int end) {
   gtk_text_buffer_get_iter_at_offset(buffer, &start_iter, start);
   gtk_text_buffer_get_iter_at_offset(buffer, &end_iter, end);
   gtk_text_buffer_delete(buffer, &start_iter, &end_iter);
+}
+
+void TextEdit::SetOverlayScrollbar(bool overlay) {
+  if (GtkVersionCheck(3, 16))
+    gtk_scrolled_window_set_overlay_scrolling(GTK_SCROLLED_WINDOW(GetNative()),
+                                              overlay);
+}
+
+void TextEdit::SetScrollbarPolicy(Scroll::Policy h_policy,
+                                  Scroll::Policy v_policy) {
+  gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(GetNative()),
+                                 PolicyToGTK(h_policy), PolicyToGTK(v_policy));
 }
 
 }  // namespace nu

@@ -51,7 +51,7 @@ methods:
 
   - signature: void SetScrollbarPolicy(Scroll::Policy hpolicy, Scroll::Policy vpolicy)
     description: |
-      Change the display policy for horizontal and vertical scrollbars.
+      Set the policy for displaying horizontal and vertical scrollbars.
     parameters:
       hpolicy:
         description: Policy for horizontal scrollbar.

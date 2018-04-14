@@ -4,6 +4,8 @@
 
 #include "nativeui/text_edit.h"
 
+#include <richedit.h>
+
 #include "base/strings/utf_string_conversions.h"
 #include "nativeui/win/edit_view.h"
 
@@ -116,6 +118,21 @@ void TextEdit::Delete() {
 void TextEdit::DeleteRange(int start, int end) {
   SelectRange(start, end);
   InsertText("");
+}
+
+void TextEdit::SetScrollbarPolicy(Scroll::Policy h_policy,
+                                  Scroll::Policy v_policy) {
+  HWND hwnd = static_cast<SubwinView*>(GetNative())->hwnd();
+  DWORD style = ::GetWindowLong(hwnd, GWL_STYLE);
+  style = style & (~WS_VSCROLL) & (~WS_HSCROLL);
+  if (h_policy != Scroll::Policy::Never)
+    style |= WS_HSCROLL;
+  if (v_policy != Scroll::Policy::Never)
+    style |= WS_VSCROLL;
+  if (h_policy == Scroll::Policy::Always &&
+      v_policy == Scroll::Policy::Always)
+    style |= ES_DISABLENOSCROLL;
+  ::SetWindowLong(hwnd, GWL_STYLE, style);
 }
 
 }  // namespace nu

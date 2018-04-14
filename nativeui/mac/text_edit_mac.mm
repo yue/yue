@@ -210,4 +210,17 @@ void TextEdit::DeleteRange(int start, int end) {
        replacementRange:NSMakeRange(start, end - start)];
 }
 
+void TextEdit::SetOverlayScrollbar(bool overlay) {
+  auto* scroll = static_cast<NSScrollView*>(GetNative());
+  scroll.scrollerStyle = overlay ? NSScrollerStyleOverlay
+                                 : NSScrollerStyleLegacy;
+}
+
+void TextEdit::SetScrollbarPolicy(Scroll::Policy h_policy,
+                                  Scroll::Policy v_policy) {
+  auto* scroll = static_cast<NSScrollView*>(GetNative());
+  scroll.hasHorizontalScroller = h_policy != Policy::Never;
+  scroll.hasVerticalScroller = v_policy != Policy::Never;
+}
+
 }  // namespace nu
