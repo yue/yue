@@ -21,6 +21,9 @@ class TextEditImpl : public EditView {
     SetPlainText();
   }
 
+  Rect request_size() const { return request_size_; }
+
+ protected:
   // SubwinView:
   void OnCommand(UINT code, int command) override {
     TextEdit* edit = static_cast<TextEdit*>(delegate());
@@ -28,18 +31,27 @@ class TextEditImpl : public EditView {
       edit->on_text_change.Emit(edit);
   }
 
- protected:
+  LRESULT OnNotify(int id, LPNMHDR pnmh) override {
+    if (pnmh->code == EN_REQUESTRESIZE)
+      request_size_ = Rect(reinterpret_cast<REQRESIZE*>(pnmh)->rc);
+    return 0;
+  }
+
+ private:
   CR_BEGIN_MSG_MAP_EX(TextEditImpl, SubwinView)
     CR_MSG_WM_KEYDOWN(OnKeyDown)
   CR_END_MSG_MAP()
 
   void OnKeyDown(UINT ch, UINT repeat, UINT flags) {
     TextEdit* edit = static_cast<TextEdit*>(delegate());
-    if (ch == VK_RETURN)
+    if (ch == VK_RETURN && edit->should_insert_new_line)
       SetMsgHandled(!edit->should_insert_new_line(edit));
     else
       SetMsgHandled(false);
   }
+
+ private:
+  Rect request_size_;
 };
 
 }  // namespace
@@ -146,6 +158,12 @@ void TextEdit::SetScrollbarPolicy(Scroll::Policy h_policy,
       v_policy == Scroll::Policy::Always)
     style |= ES_DISABLENOSCROLL;
   ::SetWindowLong(hwnd, GWL_STYLE, style);
+}
+
+RectF TextEdit::GetTextBounds() const {
+  auto* edit = static_cast<TextEditImpl*>(GetNative());
+  ::SendMessage(edit->hwnd(), EM_REQUESTRESIZE, 0, 0L);
+  return ScaleRect(RectF(edit->request_size()), 1.0f / edit->scale_factor());
 }
 
 }  // namespace nu

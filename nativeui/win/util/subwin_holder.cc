@@ -22,4 +22,10 @@ void SubwinHolder::OnCommand(UINT code, int command, HWND window) {
   control->OnCommand(code, command);
 }
 
+LRESULT SubwinHolder::OnNotify(int id, LPNMHDR pnmh) {
+  HWND window = pnmh->hwndFrom;
+  auto* control = reinterpret_cast<SubwinView*>(GetWindowUserData(window));
+  return control->OnNotify(id, pnmh);
+}
+
 }  // namespace nu

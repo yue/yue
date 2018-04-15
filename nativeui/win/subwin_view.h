@@ -37,6 +37,7 @@ class SubwinView : public Win32Window, public ViewImpl {
 
   // Rerouted from parent window
   virtual void OnCommand(UINT code, int command) {}
+  virtual LRESULT OnNotify(int code, LPNMHDR pnmh) { return 0; }
   virtual bool OnCtlColor(HDC dc, HBRUSH* brush);
 
  protected:

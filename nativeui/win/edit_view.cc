@@ -18,7 +18,7 @@ EditView::EditView(View* delegate, DWORD styles)
                  WS_CHILD | WS_VISIBLE | styles,
                  WS_EX_CLIENTEDGE) {
   set_focusable(true);
-  ::SendMessage(hwnd(), EM_SETEVENTMASK, 0L, ENM_CHANGE);
+  ::SendMessage(hwnd(), EM_SETEVENTMASK, 0L, ENM_CHANGE | ENM_REQUESTRESIZE);
 }
 
 void EditView::SetPlainText() {

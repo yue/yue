@@ -239,6 +239,14 @@ void WindowImpl::OnCommand(UINT code, int command, HWND window) {
   control->OnCommand(code, command);
 }
 
+LRESULT WindowImpl::OnNotify(int id, LPNMHDR pnmh) {
+  HWND window = pnmh->hwndFrom;
+  if (::GetParent(window) != hwnd())
+    return 0;
+  auto* control = reinterpret_cast<SubwinView*>(GetWindowUserData(window));
+  return control->OnNotify(id, pnmh);
+}
+
 void WindowImpl::OnSize(UINT param, const Size& size) {
   if (!delegate_->GetContentView())
     return;

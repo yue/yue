@@ -54,6 +54,7 @@ class WindowImpl : public Win32Window {
     CR_MSG_WM_CAPTURECHANGED(OnCaptureChanged)
     CR_MSG_WM_CLOSE(OnClose)
     CR_MSG_WM_COMMAND(OnCommand)
+    CR_MSG_WM_NOTIFY(OnNotify)
     CR_MSG_WM_SIZE(OnSize)
     CR_MSG_WM_SETFOCUS(OnFocus)
     CR_MSG_WM_KILLFOCUS(OnBlur)
@@ -85,6 +86,7 @@ class WindowImpl : public Win32Window {
   void OnCaptureChanged(HWND window);
   void OnClose();
   void OnCommand(UINT code, int command, HWND window);
+  LRESULT OnNotify(int id, LPNMHDR pnmh);
   void OnSize(UINT param, const Size& size);
   void OnFocus(HWND old);
   void OnBlur(HWND old);
