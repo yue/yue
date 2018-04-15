@@ -25,6 +25,12 @@ enum class EventType {
 
 // Base event type.
 struct NATIVEUI_EXPORT Event {
+  // Current keyboard states.
+  static bool IsShiftPressed();
+  static bool IsControlPressed();
+  static bool IsAltPressed();
+  static bool IsMetaPressed();
+
   // Event type.
   EventType type;
 

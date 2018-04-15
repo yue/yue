@@ -4,6 +4,20 @@ type: struct
 namespace: nu
 description: Generic input event type.
 
+class_methods:
+  - signature: bool IsShiftPressed()
+    description: Return whether <kbd>Shift</kbd> key is pressed.
+
+  - signature: bool IsControlPressed()
+    description: Return whether <kbd>Control</kbd> key is pressed.
+
+  - signature: bool IsAltPressed()
+    description: Return whether <kbd>Alt</kbd> key is pressed.
+
+  - signature: bool IsMetaPressed()
+    description: |
+      Return whether <kbd>Win</kbd> or <kbd>Command</kbd> key is pressed.
+
 class_properties:
   - property: int MaskShift
     lang: ['lua', 'js']

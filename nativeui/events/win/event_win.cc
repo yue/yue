@@ -88,6 +88,26 @@ PointF GetPosInView(const Point& point, NativeView view) {
 
 }  // namespace
 
+// static
+bool Event::IsShiftPressed() {
+  return ::GetKeyState(VK_SHIFT) & 0x8000;
+}
+
+// static
+bool Event::IsControlPressed() {
+  return ::GetKeyState(VK_CONTROL) & 0x8000;
+}
+
+// static
+bool Event::IsAltPressed() {
+  return ::GetKeyState(VK_MENU) & 0x8000;
+}
+
+// static
+bool Event::IsMetaPressed() {
+  return (::GetKeyState(VK_LWIN) & 0x8000) || (::GetKeyState(VK_RWIN) & 0x8000);
+}
+
 Event::Event(NativeEvent event, NativeView view)
     : type(EventTypeFromMessage(event)),
       modifiers(GetCurrentModifiers()),

@@ -574,7 +574,11 @@ struct Type<nu::Event> {
         "maskShift", static_cast<int>(nu::MASK_SHIFT),
         "maskControl", static_cast<int>(nu::MASK_CONTROL),
         "maskAlt", static_cast<int>(nu::MASK_ALT),
-        "maskMeta", static_cast<int>(nu::MASK_META));
+        "maskMeta", static_cast<int>(nu::MASK_META),
+        "isShiftPressed", &nu::Event::IsShiftPressed,
+        "isControlPressed", &nu::Event::IsControlPressed,
+        "isAltPressed", &nu::Event::IsAltPressed,
+        "isMetaPressed", &nu::Event::IsMetaPressed);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {

@@ -139,6 +139,26 @@ PointF GetPosInWindow(NSEvent* event, NSView* view) {
 
 }  // namespace
 
+// static
+bool Event::IsShiftPressed() {
+  return [NSEvent modifierFlags] & NSShiftKeyMask;
+}
+
+// static
+bool Event::IsControlPressed() {
+  return [NSEvent modifierFlags] & NSControlKeyMask;
+}
+
+// static
+bool Event::IsAltPressed() {
+  return [NSEvent modifierFlags] & NSAlternateKeyMask;
+}
+
+// static
+bool Event::IsMetaPressed() {
+  return [NSEvent modifierFlags] & NSCommandKeyMask;
+}
+
 Event::Event(NativeEvent event, NativeView view)
     : type(EventTypeFromNS(event)),
       modifiers(EventModifiersFromNS([event modifierFlags])),

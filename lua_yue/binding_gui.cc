@@ -529,7 +529,11 @@ struct Type<nu::Event> {
            "maskshift", static_cast<int>(nu::MASK_SHIFT),
            "maskcontrol", static_cast<int>(nu::MASK_CONTROL),
            "maskalt", static_cast<int>(nu::MASK_ALT),
-           "maskmeta", static_cast<int>(nu::MASK_META));
+           "maskmeta", static_cast<int>(nu::MASK_META),
+           "isshiftpressed", &nu::Event::IsShiftPressed,
+           "iscontrolpressed", &nu::Event::IsControlPressed,
+           "isaltpressed", &nu::Event::IsAltPressed,
+           "ismetapressed", &nu::Event::IsMetaPressed);
   }
   // Used by subclasses.
   static void SetEventProperties(State* state,

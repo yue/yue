@@ -96,6 +96,26 @@ PointF ViewPositionToWindowPosition(const PointF& point, NativeView view) {
 
 }  // namespace
 
+// static
+bool Event::IsShiftPressed() {
+  return gdk_keymap_get_modifier_state(gdk_keymap_get_default()) & MASK_SHIFT;
+}
+
+// static
+bool Event::IsControlPressed() {
+  return gdk_keymap_get_modifier_state(gdk_keymap_get_default()) & MASK_CONTROL;
+}
+
+// static
+bool Event::IsAltPressed() {
+  return gdk_keymap_get_modifier_state(gdk_keymap_get_default()) & MASK_ALT;
+}
+
+// static
+bool Event::IsMetaPressed() {
+  return gdk_keymap_get_modifier_state(gdk_keymap_get_default()) & MASK_META;
+}
+
 Event::Event(NativeEvent event, NativeView view)
     : type(EventTypeFromGdk(event->any.type)),
       modifiers(GetCurrentEventModifiers()),
