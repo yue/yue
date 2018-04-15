@@ -48,6 +48,8 @@ class NATIVEUI_EXPORT TextEdit : public View {
 #endif
   void SetScrollbarPolicy(Scroll::Policy h_policy, Scroll::Policy v_policy);
 
+  RectF GetTextBounds() const;
+
   // Events.
   Signal<void(TextEdit*)> on_text_change;
 

@@ -232,4 +232,12 @@ void TextEdit::SetScrollbarPolicy(Scroll::Policy h_policy,
   scroll.hasVerticalScroller = v_policy != Scroll::Policy::Never;
 }
 
+RectF TextEdit::GetTextBounds() const {
+  auto* textView = static_cast<NSTextView*>(
+      [static_cast<NUTextEdit*>(GetNative()) documentView]);
+  [textView.layoutManager ensureLayoutForTextContainer:textView.textContainer];
+  return RectF([textView.layoutManager
+      usedRectForTextContainer:textView.textContainer]);
+}
+
 }  // namespace nu

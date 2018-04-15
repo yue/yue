@@ -1731,7 +1731,8 @@ struct Type<nu::TextEdit> {
 #if !defined(OS_WIN)
         "setOverlayScrollbar", &nu::TextEdit::SetOverlayScrollbar,
 #endif
-        "setScrollbarPolicy", &nu::TextEdit::SetScrollbarPolicy);
+        "setScrollbarPolicy", &nu::TextEdit::SetScrollbarPolicy,
+        "getTextBounds", &nu::TextEdit::GetTextBounds);
     SetProperty(context, templ,
                 "onTextChange", &nu::TextEdit::on_text_change,
                 "shouldInsertNewLine", &nu::TextEdit::should_insert_new_line);

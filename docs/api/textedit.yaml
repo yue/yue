@@ -92,6 +92,9 @@ methods:
       vpolicy:
         description: Policy for vertical scrollbar.
 
+  - signature: RectF GetTextBounds() const
+    description: Return the text extend.
+
 events:
   - callback: void on_text_change(TextEdit* self)
     description: Emitted when user has changed text.
