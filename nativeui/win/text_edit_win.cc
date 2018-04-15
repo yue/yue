@@ -16,7 +16,7 @@ namespace {
 class TextEditImpl : public EditView {
  public:
   explicit TextEditImpl(View* delegate)
-      : EditView(delegate, WS_VSCROLL | ES_MULTILINE) {
+      : EditView(delegate, WS_VSCROLL | ES_MULTILINE | ES_AUTOVSCROLL) {
     set_switch_focus_on_tab(false);
     SetPlainText();
   }
@@ -26,6 +26,19 @@ class TextEditImpl : public EditView {
     TextEdit* edit = static_cast<TextEdit*>(delegate());
     if (code == EN_CHANGE)
       edit->on_text_change.Emit(edit);
+  }
+
+ protected:
+  CR_BEGIN_MSG_MAP_EX(TextEditImpl, SubwinView)
+    CR_MSG_WM_KEYDOWN(OnKeyDown)
+  CR_END_MSG_MAP()
+
+  void OnKeyDown(UINT ch, UINT repeat, UINT flags) {
+    TextEdit* edit = static_cast<TextEdit*>(delegate());
+    if (ch == VK_RETURN)
+      SetMsgHandled(!edit->should_insert_new_line(edit));
+    else
+      SetMsgHandled(false);
   }
 };
 
