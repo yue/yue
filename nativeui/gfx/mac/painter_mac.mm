@@ -251,17 +251,12 @@ void PainterMac::DrawText(const std::string& text, const RectF& rect,
   // Vertical alignment.
   RectF bounds(rect);
   if (attributes.valign != TextAlign::Start) {
-    // Measure text.
-    base::scoped_nsobject<NSAttributedString> attributed_str(
-        [[NSAttributedString alloc] initWithString:str attributes:attrs_dict]);
-    CGRect cg_bounds = [attributed_str
-        boundingRectWithSize:rect.size().ToCGSize()
-                     options:NSStringDrawingUsesLineFragmentOrigin];
+    float text_height = [str sizeWithAttributes:attrs_dict].height;
     // Compute the drawing bounds.
     if (attributes.valign == TextAlign::Center)
-      bounds.Inset(0.f, (rect.height() - cg_bounds.size.height) / 2);
+      bounds.Inset(0.f, (rect.height() - text_height) / 2.f);
     else if (attributes.valign == TextAlign::End)
-      bounds.Inset(0.f, rect.height() - cg_bounds.size.height, 0.f, 0.f);
+      bounds.Inset(0.f, rect.height() - text_height, 0.f, 0.f);
   }
 
   GraphicsContextScope scoped(target_context_);
