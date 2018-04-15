@@ -192,4 +192,14 @@ void TextEdit::SetScrollbarPolicy(Scroll::Policy h_policy,
                                  PolicyToGTK(h_policy), PolicyToGTK(v_policy));
 }
 
+RectF TextEdit::GetTextBounds() const {
+  auto* h_adjust = gtk_scrolled_window_get_hadjustment(
+      GTK_SCROLLED_WINDOW(GetNative()));
+  auto* v_adjust = gtk_scrolled_window_get_vadjustment(
+      GTK_SCROLLED_WINDOW(GetNative()));
+  return RectF(0, 0,
+               gtk_adjustment_get_upper(h_adjust),
+               gtk_adjustment_get_upper(v_adjust));
+}
+
 }  // namespace nu
