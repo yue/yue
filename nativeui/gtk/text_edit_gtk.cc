@@ -7,6 +7,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
+#include "nativeui/gfx/font.h"
 #include "nativeui/gtk/undoable_text_buffer.h"
 #include "nativeui/gtk/widget_util.h"
 
@@ -193,13 +194,20 @@ void TextEdit::SetScrollbarPolicy(Scroll::Policy h_policy,
 }
 
 RectF TextEdit::GetTextBounds() const {
-  auto* h_adjust = gtk_scrolled_window_get_hadjustment(
-      GTK_SCROLLED_WINDOW(GetNative()));
-  auto* v_adjust = gtk_scrolled_window_get_vadjustment(
-      GTK_SCROLLED_WINDOW(GetNative()));
-  return RectF(0, 0,
-               gtk_adjustment_get_upper(h_adjust),
-               gtk_adjustment_get_upper(v_adjust));
+  // There is no reliable way to get the real text extends with GtkTextView
+  // APIs, getting widget preferred size or scroll window upper value does not
+  // work when widget is not mapped, and it returns wrong values with empty
+  // lines.
+  std::string text = GetText();
+  PangoLayout* layout =
+      pango_layout_new(gtk_widget_get_pango_context(GetNative()));
+  if (font())
+    pango_layout_set_font_description(layout, font()->GetNative());
+  pango_layout_set_text(layout, text.c_str(), text.size());
+  int w, h;
+  pango_layout_get_pixel_size(layout, &w, &h);
+  g_object_unref(layout);
+  return RectF(0, 0, w, h);
 }
 
 }  // namespace nu

@@ -141,6 +141,9 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   // Internal: Get the CSS node of the view.
   YGNodeRef node() const { return node_; }
 
+  // Internal: Return the overriden font.
+  Font* font() const { return font_.get(); }
+
   // Events.
   Signal<bool(View*, const MouseEvent&)> on_mouse_down;
   Signal<bool(View*, const MouseEvent&)> on_mouse_up;
