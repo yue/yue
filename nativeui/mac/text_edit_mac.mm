@@ -34,7 +34,7 @@
   if (commandSelector == @selector(insertNewline:) &&
       shell_->should_insert_new_line)
     return !shell_->should_insert_new_line(shell_);
-  return YES;
+  return NO;
 }
 
 
