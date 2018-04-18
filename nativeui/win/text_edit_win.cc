@@ -6,22 +6,53 @@
 
 #include <richedit.h>
 
+#include <algorithm>
+
 #include "base/strings/utf_string_conversions.h"
+#include "base/win/scoped_hdc.h"
+#include "nativeui/gfx/win/gdiplus.h"
 #include "nativeui/win/edit_view.h"
+#include "nativeui/win/util/hwnd_util.h"
 
 namespace nu {
 
 namespace {
 
+const int kTextEditPadding = 2;
+const int kLinePadding = 1;
+
 class TextEditImpl : public EditView {
  public:
   explicit TextEditImpl(View* delegate)
-      : EditView(delegate, WS_VSCROLL | ES_MULTILINE | ES_AUTOVSCROLL) {
+      : EditView(delegate, WS_VSCROLL | ES_MULTILINE) {
     set_switch_focus_on_tab(false);
     SetPlainText();
   }
 
-  Rect request_size() const { return request_size_; }
+  RectF GetTextBounds() const {
+    // Lines in the TextEdit.
+    int lines = ::SendMessageW(hwnd(), EM_GETLINECOUNT, 0, 0L);
+    // MeasureString does not measure last empty line, append a char to force
+    // MeasureString to consider the last line.
+    base::string16 text = GetWindowString(hwnd());
+    if (lines > 1 && text[text.size() - 1] == L'\n')
+      text += L'a';
+    // Calculate the text bounds.
+    base::win::ScopedGetDC dc(window() ? window()->hwnd() : NULL);
+    float width = size_allocation().width();
+    Gdiplus::Graphics graphics(dc);
+    Gdiplus::RectF rect;
+    Gdiplus::StringFormat format;
+    graphics.MeasureString(text.data(), static_cast<int>(text.length()),
+                           font()->GetNative(),
+                           Gdiplus::RectF(0.f, 0.f, width, FLT_MAX),
+                           &format, &rect, nullptr, nullptr);
+    // The richedit adds padding between lines.
+    rect.Height += (lines - 1) * kLinePadding;
+    return RectF(0, 0,
+                 rect.Width + 2 * kTextEditPadding,
+                 rect.Height + 2 * kTextEditPadding);
+  }
 
  protected:
   // SubwinView:
@@ -29,12 +60,6 @@ class TextEditImpl : public EditView {
     TextEdit* edit = static_cast<TextEdit*>(delegate());
     if (code == EN_CHANGE)
       edit->on_text_change.Emit(edit);
-  }
-
-  LRESULT OnNotify(int id, LPNMHDR pnmh) override {
-    if (pnmh->code == EN_REQUESTRESIZE)
-      request_size_ = Rect(reinterpret_cast<REQRESIZE*>(pnmh)->rc);
-    return 0;
   }
 
  private:
@@ -49,9 +74,6 @@ class TextEditImpl : public EditView {
     else
       SetMsgHandled(false);
   }
-
- private:
-  Rect request_size_;
 };
 
 }  // namespace
@@ -162,8 +184,7 @@ void TextEdit::SetScrollbarPolicy(Scroll::Policy h_policy,
 
 RectF TextEdit::GetTextBounds() const {
   auto* edit = static_cast<TextEditImpl*>(GetNative());
-  ::SendMessage(edit->hwnd(), EM_REQUESTRESIZE, 0, 0L);
-  return ScaleRect(RectF(edit->request_size()), 1.0f / edit->scale_factor());
+  return ScaleRect(RectF(edit->GetTextBounds()), 1.0f / edit->scale_factor());
 }
 
 }  // namespace nu
