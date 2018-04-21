@@ -55,8 +55,8 @@ class ViewImpl {
   virtual void SetFocus(bool focus);
   virtual bool HasFocus() const;
 
-  // Show/Hide the view.
-  virtual void SetVisible(bool visible);
+  // This view or parent view has changed its visibility.
+  virtual void VisibilityChanged();
 
   // Set styles.
   virtual void SetFont(Font* font);
@@ -92,6 +92,9 @@ class ViewImpl {
   // Get the size allocation that inside viewport.
   Rect GetClippedRect() const;
 
+  // Show/Hide the view.
+  void SetVisible(bool visible);
+
   // Invalidate the whole view.
   void Invalidate();
 
@@ -105,6 +108,9 @@ class ViewImpl {
 
   // Whether the view is visible.
   bool is_visible() const { return is_visible_; }
+
+  // Whether the view and its parent are visible.
+  bool is_tree_visible() const { return is_tree_visible_; }
 
   // Whether the view is disabled.
   bool is_disabled() const { return state_ == ControlState::Disabled; }
@@ -156,11 +162,17 @@ class ViewImpl {
   // The visible state.
   bool is_visible_ = true;
 
+  // Whether the view and its parent are visible.
+  bool is_tree_visible_ = true;
+
   // The control state.
   ControlState state_ = ControlState::Normal;
 
   // The window that owns the view.
   WindowImpl* window_ = nullptr;
+
+  // The parent view. Weak ref.
+  ViewImpl* parent_ = nullptr;
 
   // The viewport that owns this view.
   ScrollImpl* viewport_ = nullptr;

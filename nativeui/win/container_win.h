@@ -35,7 +35,7 @@ class ContainerImpl : public ViewImpl {
   UINT HitTest(const Point& point) const override;
   void SetParent(ViewImpl* parent) override;
   void BecomeContentView(WindowImpl* parent) override;
-  void SetVisible(bool visible) override;
+  void VisibilityChanged() override;
   void Draw(PainterWin* painter, const Rect& dirty) override;
   void OnMouseMove(NativeEvent event) override;
   void OnMouseLeave(NativeEvent event) override;

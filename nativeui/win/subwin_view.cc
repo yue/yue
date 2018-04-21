@@ -88,9 +88,9 @@ bool SubwinView::HasFocus() const {
   return ::GetFocus() == hwnd();
 }
 
-void SubwinView::SetVisible(bool visible) {
-  ViewImpl::SetVisible(visible);
-  ::ShowWindow(hwnd(), visible ? SW_SHOWNOACTIVATE : SW_HIDE);
+void SubwinView::VisibilityChanged() {
+  ViewImpl::VisibilityChanged();
+  ::ShowWindow(hwnd(), is_tree_visible() ? SW_SHOWNOACTIVATE : SW_HIDE);
 }
 
 void SubwinView::SetFont(Font* new_font) {

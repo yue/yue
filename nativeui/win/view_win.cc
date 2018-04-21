@@ -41,6 +41,7 @@ UINT ViewImpl::HitTest(const Point& point) const {
 
 void ViewImpl::SetParent(ViewImpl* parent) {
   window_ = parent ? parent->window_ : nullptr;
+  parent_ = parent;
 
   if (parent) {
     if (parent->type() == ControlType::Scroll &&
@@ -57,6 +58,7 @@ void ViewImpl::SetParent(ViewImpl* parent) {
 
 void ViewImpl::BecomeContentView(WindowImpl* parent) {
   window_ = parent;
+  parent_ = nullptr;
   viewport_ = nullptr;
 
   ParentChanged();
@@ -92,9 +94,11 @@ bool ViewImpl::HasFocus() const {
   return is_focused_;
 }
 
-void ViewImpl::SetVisible(bool visible) {
-  is_visible_ = visible;
-  Invalidate();
+void ViewImpl::VisibilityChanged() {
+  if (parent_)
+    is_tree_visible_ = is_visible_ && parent_->is_tree_visible_;
+  else
+    is_tree_visible_ = is_visible_;
 }
 
 void ViewImpl::SetFont(Font* font) {
@@ -199,10 +203,18 @@ Point ViewImpl::GetMousePosition() const {
 }
 
 Rect ViewImpl::GetClippedRect() const {
+  if (!is_visible_)
+    return Rect();
   Rect rect(size_allocation());
   if (viewport_)
     rect.Intersect(viewport_->GetViewportRect());
   return rect;
+}
+
+void ViewImpl::SetVisible(bool visible) {
+  is_visible_ = visible;
+  VisibilityChanged();
+  Invalidate();
 }
 
 void ViewImpl::Invalidate() {
@@ -215,6 +227,7 @@ void ViewImpl::SetState(ControlState state) {
 }
 
 void ViewImpl::ParentChanged() {
+  VisibilityChanged();
   // Scale the bounds after moving to a new parent.
   float new_scale_factor = window_ ? window_->scale_factor() : scale_factor_;
   if (new_scale_factor != scale_factor_) {

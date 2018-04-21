@@ -36,13 +36,10 @@ void ContainerImpl::BecomeContentView(WindowImpl* parent) {
   RefreshParentTree();
 }
 
-void ContainerImpl::SetVisible(bool visible) {
-  ViewImpl::SetVisible(visible);
+void ContainerImpl::VisibilityChanged() {
+  ViewImpl::VisibilityChanged();
   adapter_->ForEach([=](ViewImpl* child) {
-    if (child->delegate())
-      child->delegate()->SetVisible(visible);
-    else
-      child->SetVisible(visible);
+    child->VisibilityChanged();
     return true;
   });
 }

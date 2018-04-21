@@ -25,7 +25,7 @@ class SubwinView : public Win32Window, public ViewImpl {
   void Invalidate(const Rect& dirty) override;
   void SetFocus(bool focus) override;
   bool HasFocus() const override;
-  void SetVisible(bool visible) override;
+  void VisibilityChanged() override;
   void SetFont(Font* font) override;
   void SetBackgroundColor(Color color) override;
   void Draw(PainterWin* painter, const Rect& dirty) override;
