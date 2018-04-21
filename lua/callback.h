@@ -11,6 +11,7 @@
 #include <utility>
 
 #include "lua/callback_internal.h"
+#include "lua/index.h"
 
 namespace lua {
 
@@ -31,6 +32,20 @@ bool ToWeakFunction(State* state, int index,
   };
   return true;
 }
+
+// Convert to weak callbacks for properties.
+template<typename Sig>
+struct MemberTraits<std::function<Sig>> {
+  static const RefMode kRefMode = RefMode::Always;
+  static inline void Push(State* state, int owner,
+                          const std::function<Sig>& ptr) {
+    lua::Push(state, nullptr);
+  }
+  static inline bool To(State* state, int owner, int value,
+                        std::function<Sig>* out) {
+    return ToWeakFunction(state, value, out);
+  }
+};
 
 // Define how callbacks are converted.
 template<typename ReturnType, typename... ArgTypes>

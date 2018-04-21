@@ -51,6 +51,23 @@ struct MemberTraits<T, typename std::enable_if<
   }
 };
 
+// Convert to weak callbacks for properties.
+template<typename Sig>
+struct MemberTraits<std::function<Sig>> {
+  static const RefMode kRefMode = RefMode::Always;
+  static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                          v8::Local<v8::Object> owner,
+                                          const std::function<Sig>&) {
+    return v8::Undefined(context->GetIsolate());
+  }
+  static inline bool FromV8(v8::Local<v8::Context> context,
+                            v8::Local<v8::Object> owner,
+                            v8::Local<v8::Value> value,
+                            std::function<Sig>* out) {
+    return WeakFunctionFromV8(context, value, out);
+  }
+};
+
 namespace internal {
 
 // Get type from member pointer.
