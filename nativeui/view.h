@@ -168,6 +168,7 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   void PlatformInit();
   void PlatformDestroy();
   void PlatformSetVisible(bool visible);
+  void PlatformSetFont(Font* font);
 
  private:
   friend class base::RefCounted<View>;

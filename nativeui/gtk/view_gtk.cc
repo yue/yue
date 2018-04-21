@@ -277,8 +277,7 @@ bool View::IsMouseDownCanMoveWindow() const {
   return g_object_get_data(G_OBJECT(view_), "draggable");
 }
 
-void View::SetFont(Font* font) {
-  font_ = font;
+void View::PlatformSetFont(Font* font) {
   gtk_widget_override_font(view_, font->GetNative());
 }
 

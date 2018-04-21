@@ -65,6 +65,13 @@ void View::Layout() {
     static_cast<Container*>(GetParent())->Layout();
 }
 
+void View::SetFont(Font* font) {
+  if (font_.get() == font)
+    return;
+  PlatformSetFont(font);
+  UpdateDefaultStyle();
+}
+
 void View::UpdateDefaultStyle() {
   SizeF min_size = GetMinimumSize();
   YGNodeStyleSetMinWidth(node_, min_size.width());

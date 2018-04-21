@@ -178,8 +178,7 @@ bool View::IsMouseDownCanMoveWindow() const {
   return [view_ mouseDownCanMoveWindow];
 }
 
-void View::SetFont(Font* font) {
-  font_ = font;
+void View::PlatformSetFont(Font* font) {
   if (IsNUView(view_))
     [view_ setNUFont:font];
 }

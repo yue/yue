@@ -340,7 +340,7 @@ bool View::IsMouseDownCanMoveWindow() const {
   return view_->is_draggable();
 }
 
-void View::SetFont(Font* font) {
+void View::PlatformSetFont(Font* font) {
   view_->SetFont(font);
 }
 
