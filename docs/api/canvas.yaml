@@ -17,7 +17,7 @@ constructors:
       Create a new canvas with `size` using default scale factor.
 
       This is strongly discouraged for using, since it does not work well with
-      multi-monitor setup. Only use it when you does not care about per-monitor
+      multi-monitor setup. Only use it when you do not care about per-monitor
       DPI.
 
 class_methods:
