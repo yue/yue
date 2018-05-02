@@ -62,13 +62,13 @@ while still handling libuv events:
 const gui = require('gui')
 
 if (!process.versions.yode) {
-  gui.messageLoop.run()  // block until gui.messageLoop.quit() is called
+  gui.MessageLoop.run()  // block until gui.MessageLoop.quit() is called
   process.exit(0)
 }
 ```
 
-To quit the message loop, you can call the `messageLoop.quit()` API, which
-would break the blocking `messageLoop.run()` call and continue the script,
+To quit the message loop, you can call the `MessageLoop.quit()` API, which
+would break the blocking `MessageLoop.run()` call and continue the script,
 usually you should exit the process after that.
 
 Note that this hack does not work perfectly, you should never use it in
@@ -79,11 +79,11 @@ production.
 To solve the problem of incompatible event loop, you can use the
 [Yode](https://github.com/yue/yode) project as a replacement of Node.js. Yode
 is a fork of Node.js that replaces libuv event loop with native GUI message
-loops, so there would be no need to use the `messageLoop.run()` hack.
+loops, so there would be no need to use the `MessageLoop.run()` hack.
 
 Unlike Node.js which would quit the process when there is no work to do, the
 processes of Yode would keep running forever, until you call the
-`messageLoop.quit()` API to quit current message loop.
+`MessageLoop.quit()` API to quit current message loop.
 
 After quitting the GUI message loop, the libuv event loop is still running, and
 the process will exit when all pending Node.js requests have finished.
