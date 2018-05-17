@@ -59,7 +59,7 @@ methods:
     description: |
       Return the start position and end position of current selection.
 
-      If nothing is selected, (-1, -1) would be returned.
+      If nothing is selected, the cursor position will be returned as both values, ie. (0, 0).
 
   - signature: void SelectRange(int start, int end)
     description: Select text between `start` and `end` positions.

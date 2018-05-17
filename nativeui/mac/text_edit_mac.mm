@@ -171,12 +171,8 @@ std::tuple<int, int> TextEdit::GetSelectionRange() const {
   auto* textView = static_cast<NSTextView*>(
       [static_cast<NUTextEdit*>(GetNative()) documentView]);
   NSRange range = [textView selectedRange];
-  if (range.length > 0) {
-    return std::make_tuple<int, int>(
-        range.location, range.location + range.length);
-  } else {
-    return std::make_tuple(-1, -1);
-  }
+  return std::make_tuple<int, int>(
+      range.location, range.location + range.length);
 }
 
 void TextEdit::SelectRange(int start, int end) {
