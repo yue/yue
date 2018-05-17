@@ -32,7 +32,7 @@ TEST_F(TextEditTest, SetText) {
 
 TEST_F(TextEditTest, EmptySelection) {
   edit_->SetText("test");
-  EXPECT_EQ(edit_->GetSelectionRange(), std::make_tuple(-1, -1));
+  EXPECT_EQ(edit_->GetSelectionRange(), std::make_tuple(4, 4));
 }
 
 TEST_F(TextEditTest, SelectRange) {

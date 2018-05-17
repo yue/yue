@@ -130,10 +130,7 @@ std::tuple<int, int> TextEdit::GetSelectionRange() const {
   int start, end;
   ::SendMessage(hwnd, EM_GETSEL, reinterpret_cast<WPARAM>(&start),
                                  reinterpret_cast<LPARAM>(&end));
-  if (start == end)
-    return std::make_tuple(-1, -1);
-  else
-    return std::make_tuple(start, end);
+  return std::make_tuple(start, end);
 }
 
 void TextEdit::SelectRange(int start, int end) {

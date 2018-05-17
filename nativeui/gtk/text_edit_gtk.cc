@@ -126,11 +126,13 @@ std::tuple<int, int> TextEdit::GetSelectionRange() const {
   GtkTextBuffer* buffer = gtk_text_view_get_buffer(
       GTK_TEXT_VIEW(g_object_get_data(G_OBJECT(GetNative()), "text-view")));
   GtkTextIter start_iter, end_iter;
+  gint pos;
   if (gtk_text_buffer_get_selection_bounds(buffer, &start_iter, &end_iter)) {
     return std::make_tuple(gtk_text_iter_get_offset(&start_iter),
                            gtk_text_iter_get_offset(&end_iter));
   } else {
-    return std::make_tuple(-1, -1);
+    g_object_get(buffer, "cursor-position", &pos, NULL);
+    return std::make_tuple(pos, pos);
   }
 }
 
