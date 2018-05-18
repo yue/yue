@@ -87,6 +87,8 @@ TextEdit::~TextEdit() {
 
 void TextEdit::SetText(const std::string& text) {
   static_cast<EditView*>(GetNative())->SetText(text);
+  int len = text.length();
+  SelectRange(len, len);
 }
 
 std::string TextEdit::GetText() const {
