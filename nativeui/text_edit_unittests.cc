@@ -49,6 +49,7 @@ TEST_F(TextEditTest, InsertText) {
   EXPECT_EQ(edit_->GetText(), "abd");
   edit_->InsertTextAt("c", 2);
   EXPECT_EQ(edit_->GetText(), "abcd");
+  EXPECT_EQ(edit_->GetSelectionRange(), std::make_tuple(3, 3));
 }
 
 TEST_F(TextEditTest, Clipboard) {
