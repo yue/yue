@@ -26,7 +26,11 @@ void EditView::SetPlainText() {
 }
 
 void EditView::SetText(const std::string& text) {
-  ::SetWindowTextW(hwnd(), base::UTF8ToUTF16(text).c_str());
+  base::string16 text16 = base::UTF8ToUTF16(text);
+  ::SetWindowTextW(hwnd(), text16.c_str());
+  // Scroll to end after setting text, this follows the behavior on other
+  // platforms.
+  ::SendMessage(hwnd(), EM_SETSEL, text16.size(), text16.size());
 }
 
 std::string EditView::GetText() const {
