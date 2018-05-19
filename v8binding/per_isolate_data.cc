@@ -32,15 +32,13 @@ PerIsolateData::~PerIsolateData() {
   // This class is simply leaked.
 }
 
-void PerIsolateData::SetFunctionTemplate(
-    const char* name,
-    v8::Local<v8::FunctionTemplate> tmpl) {
-  function_templates_[name] = v8::Eternal<v8::FunctionTemplate>(isolate_, tmpl);
+void PerIsolateData::SetFunctionTemplate(void* key,
+                                         v8::Local<v8::FunctionTemplate> tmpl) {
+  function_templates_[key] = v8::Eternal<v8::FunctionTemplate>(isolate_, tmpl);
 }
 
-v8::Local<v8::FunctionTemplate> PerIsolateData::GetFunctionTemplate(
-    const char* name) {
-  auto it = function_templates_.find(name);
+v8::Local<v8::FunctionTemplate> PerIsolateData::GetFunctionTemplate(void* key) {
+  auto it = function_templates_.find(key);
   if (it == function_templates_.end())
     return v8::Local<v8::FunctionTemplate>();
   return it->second.Get(isolate_);

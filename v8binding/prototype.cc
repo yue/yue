@@ -49,13 +49,13 @@ void ObjectTracker::WeakCallback(
 
 bool GetOrCreateFunctionTemplate(
     v8::Isolate* isolate,
-    const char* name,
+    void* key,
     v8::Local<v8::FunctionTemplate>* templ) {
   auto* per_isolate_data = PerIsolateData::Get(isolate);
-  *templ = per_isolate_data->GetFunctionTemplate(name);
+  *templ = per_isolate_data->GetFunctionTemplate(key);
   if (templ->IsEmpty()) {
     *templ = v8::FunctionTemplate::New(isolate, &DefaultConstructor);
-    per_isolate_data->SetFunctionTemplate(name, *templ);
+    per_isolate_data->SetFunctionTemplate(key, *templ);
     return false;
   } else {
     return true;

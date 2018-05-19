@@ -21,11 +21,9 @@ class PerIsolateData {
   static PerIsolateData* Get(v8::Isolate* isolate);
 
   // Cache template objects.
-  // The |name| has to be a static variable, we are using its pointer address
-  // as key, instead of its string value.
-  void SetFunctionTemplate(const char* name,
+  void SetFunctionTemplate(void* key,
                            v8::Local<v8::FunctionTemplate> function_template);
-  v8::Local<v8::FunctionTemplate> GetFunctionTemplate(const char* name);
+  v8::Local<v8::FunctionTemplate> GetFunctionTemplate(void* key);
 
   // Cache RefPtr wrappers.
   void SetObjectTracker(void* ptr, internal::ObjectTracker* wrapper);
@@ -37,7 +35,7 @@ class PerIsolateData {
 
  private:
   using FunctionTemplateMap =
-      std::unordered_map<const char*, v8::Eternal<v8::FunctionTemplate>>;
+      std::unordered_map<void*, v8::Eternal<v8::FunctionTemplate>>;
   using ObjectTrackerMap =
       std::unordered_map<void*, internal::ObjectTracker*>;
 

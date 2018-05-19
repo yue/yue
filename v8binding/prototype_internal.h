@@ -74,7 +74,7 @@ class WeakPtrObjectTracker : public ObjectTracker {
 // Get or create FunctionTemplate, returns true if the |name| exists.
 bool GetOrCreateFunctionTemplate(
     v8::Isolate* isolate,
-    const char* name,
+    void* key,
     v8::Local<v8::FunctionTemplate>* templ);
 
 // Get populated prototype for T.
@@ -83,7 +83,10 @@ bool GetOrCreatePrototype(
     v8::Local<v8::Context> context,
     const char* name,
     v8::Local<v8::FunctionTemplate>* templ) {
-  if (GetOrCreateFunctionTemplate(context->GetIsolate(), name, templ))
+  // Each type would get its own storage of |key| variable, and we use its
+  // address as the key to the type's FunctionTemplate.
+  static int key = 0xFEE;
+  if (GetOrCreateFunctionTemplate(context->GetIsolate(), &key, templ))
     return true;
   (*templ)->SetClassName(ToV8(context, name).As<v8::String>());
   (*templ)->InstanceTemplate()->SetInternalFieldCount(1);

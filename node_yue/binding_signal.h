@@ -34,9 +34,9 @@ class SignalWrapper : public base::RefCounted<SignalWrapper<Sig>> {
       return -1;
     }
     int id = signal_->Connect(slot);
-    // this[signal][id] = slot.
+    // owner[signal][id] = slot.
     v8::Local<v8::Map> refs = vb::GetAttachedTable(
-        context, args->This(), signal_);
+        context, v8::Local<v8::Object>::New(isolate, owner_), signal_);
     refs->Set(context, v8::Integer::New(isolate, id), value).IsEmpty();
     return id;
   }
@@ -48,10 +48,10 @@ class SignalWrapper : public base::RefCounted<SignalWrapper<Sig>> {
       return;
     }
     signal_->Disconnect(id);
-    // delete this[signal][id]
+    // delete owner[signal][id]
     v8::Local<v8::Context> context = args->GetContext();
     v8::Local<v8::Map> refs = vb::GetAttachedTable(
-        context, args->This(), signal_);
+        context, v8::Local<v8::Object>::New(isolate, owner_), signal_);
     refs->Delete(context, v8::Integer::New(isolate, id)).FromJust();
   }
 
@@ -62,9 +62,11 @@ class SignalWrapper : public base::RefCounted<SignalWrapper<Sig>> {
       return;
     }
     signal_->DisconnectAll();
-    // this.signals[signal] = {]
+    // owner[signal].clear()
     v8::Local<v8::Context> context = args->GetContext();
-    vb::GetAttachedTable(context, args->This(), signal_)->Clear();
+    vb::GetAttachedTable(context,
+                         v8::Local<v8::Object>::New(isolate, owner_),
+                         signal_)->Clear();
   }
 
  private:
@@ -117,7 +119,7 @@ struct MemberTraits<nu::Signal<Sig>> {
     if (!vb::WeakFunctionFromV8(context, value, &slot))
       return false;
     int id = out->Connect(slot);
-    // this[signal][id] = slot.
+    // owner[signal][id] = slot
     v8::Local<v8::Map> refs = vb::GetAttachedTable(context, owner, out);
     refs->Set(context,
               v8::Integer::New(context->GetIsolate(), id),
