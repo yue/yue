@@ -41,8 +41,19 @@ int DereferenceOnGC(lua::State* state) {
 // created.
 template<typename T>
 bool NewMetaTable(State* state) {
-  if (luaL_newmetatable(state, Type<T>::name) == 0)
+  // Each type would get its own storage of |key| variable, and we use its
+  // address as the key to the type's metattable.
+  static int key = 0xFEE;
+  RawGet(state, LUA_REGISTRYINDEX, static_cast<void*>(&key));
+  if (GetType(state, -1) != LuaType::Nil)
     return true;
+
+  // Like luaL_newmetatable, but use pointer as key.
+  PopAndIgnore(state, 1);
+  NewTable(state, 0, 2);
+  RawSet(state, -1, "__name", static_cast<const char*>(Type<T>::name));
+  RawSet(state, LUA_REGISTRYINDEX, static_cast<void*>(&key),
+         ValueOnStack(state, -1));
 
   RawSet(state, -1,
          "__gc", CFunction(&DereferenceOnGC<T>),
