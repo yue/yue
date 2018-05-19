@@ -37,12 +37,21 @@ class NATIVEUI_EXPORT MenuItem : public base::RefCounted<MenuItem> {
     SelectAll,
     Undo,
     Redo,
+#if defined(OS_MACOSX)
+    // macOS only roles.
+    About,
+    Hide,
+    HideOthers,
+    Unhide,
+#endif
     // Indicate number of item roles, should not be used.
     ItemCount,
+#if defined(OS_MACOSX)
     // Submenu roles.
     Help,
     Window,
     Services,
+#endif
     // Indicate a normal item, should not be used.
     None,
   };

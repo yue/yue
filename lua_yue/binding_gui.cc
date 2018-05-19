@@ -738,12 +738,22 @@ struct Type<nu::MenuItem::Role> {
       *out = nu::MenuItem::Role::Undo;
     else if (role == "redo")
       *out = nu::MenuItem::Role::Redo;
+#if defined(OS_MACOSX)
+    else if (role == "about")
+      *out = nu::MenuItem::Role::About;
+    else if (role == "hide")
+      *out = nu::MenuItem::Role::Hide;
+    else if (role == "hide-others")
+      *out = nu::MenuItem::Role::HideOthers;
+    else if (role == "unhide")
+      *out = nu::MenuItem::Role::Unhide;
     else if (role == "help")
       *out = nu::MenuItem::Role::Help;
     else if (role == "window")
       *out = nu::MenuItem::Role::Window;
     else if (role == "services")
       *out = nu::MenuItem::Role::Services;
+#endif
     else
       return false;
     return true;

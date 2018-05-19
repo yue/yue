@@ -22,6 +22,10 @@ lang_detail:
 
     On macOS following values are also available:
 
+    * `MenuItem::Role::About`
+    * `MenuItem::Role::Hide`
+    * `MenuItem::Role::HideOthers`
+    * `MenuItem::Role::Unhide`
     * `MenuItem::Role::Help`
     * `MenuItem::Role::Window`
     * `MenuItem::Role::Services`
@@ -37,6 +41,10 @@ lang_detail:
 
     On macOS following values are also available:
 
+    * `"about"`
+    * `"hide"`
+    * `"hide-others"`
+    * `"unhide"`
     * `"help"`
     * `"window"`
     * `"services"`

@@ -29,6 +29,12 @@ struct {
   { "Select All", VKEY_A, CONTROL_OR_COMMAND },
   { "Undo",       VKEY_Z, CONTROL_OR_COMMAND },
   { "Redo",       VKEY_Z, CONTROL_OR_COMMAND | MASK_SHIFT },
+#if defined(OS_MACOSX)
+  { "About",       VKEY_UNKNOWN, 0 },
+  { "Hide",        VKEY_H, CONTROL_OR_COMMAND },
+  { "Hide Others", VKEY_H, CONTROL_OR_COMMAND | MASK_ALT },
+  { "Unhide",      VKEY_UNKNOWN, 0 },
+#endif
 };
 
 static_assert(

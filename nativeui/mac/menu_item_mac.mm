@@ -47,6 +47,10 @@ SEL g_sels_map[] = {
   @selector(selectAll:),
   @selector(undo:),
   @selector(redo:),
+  @selector(about:),
+  @selector(hide:),
+  @selector(hideOtherApplications:),
+  @selector(unhideAllApplications:),
 };
 
 static_assert(
