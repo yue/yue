@@ -23,11 +23,11 @@ constructors:
     description: Create a tray item with only `title`.
 
 class_methods:
-  - signature: Tray* Create(Image* icon)
+  - signature: Tray* CreateWithImage(Image* icon)
     lang: ['lua', 'js']
     description: Create a tray item with `icon`.
 
-  - signature: Tray* Create(const std::string& title)
+  - signature: Tray* CreateWithTitle(const std::string& title)
     lang: ['lua', 'js']
     platform: ['macOS']
     description: Create a tray item with only `title`.
