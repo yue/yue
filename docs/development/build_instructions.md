@@ -75,7 +75,7 @@ runtimes, you can use the `scripts/create_node_extension.js` script.
 node scripts/create_node_extension.js {runtime} {version}
 ```
 
-Currently we only support using `electron` and `node` as `runtime`.
+Currently we only support using `node` as `runtime`.
 
 ### Generating documentaions
 

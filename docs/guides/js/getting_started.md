@@ -1,6 +1,6 @@
 ---
 priority: 100
-description: How to use Yue with Node.js and Electron.
+description: How to use Yue in Node.js
 ---
 
 # Getting started
@@ -10,11 +10,8 @@ can easily build a desktop app with Node.js.
 
 ## Installing
 
-The V8 bindings of Yue exists as the `gui` npm module.
-
-### Node.js
-
-Installing Yue in Node.js is as easy as:
+The V8 bindings of Yue exists as the `gui` npm module, installing Yue in Node.js
+is as easy as:
 
 ```bash
 npm i gui
@@ -24,24 +21,6 @@ But note that `gui` is a native module, you have to reinstall it whenever you
 change Node.js versions or platforms.
 
 Only Node.js v7 and above are supported.
-
-### Electron
-
-For Electron you must follow the [Using Native Node Modules][native-module]
-guide on installing the `gui` module:
-
-```bash
-# Runtime is electron.
-export npm_config_runtime=electron
-# Electron's version.
-export npm_config_target=1.8.0
-# The architecture of Electron, can be ia32, arm or x64.
-export npm_config_arch=x64
-# Install the module, and store cache to ~/.electron-gyp.
-HOME=~/.electron-gyp npm i gui
-```
-
-Only Electron v1.8.x and above are supported.
 
 ## Using Yue
 
@@ -110,22 +89,6 @@ event loop, has various problems with the events queue of Node.js.
 Luckily with Yode the problem with message loop has been solved cleanly, even if
 you are not intersted in Yue, it is still possible to use Win32 and Cocoa
 bindings in Yode.
-
-### Electron
-
-Since the main process of Electron uses GUI message loops, there is no need to
-use the `MessageLoop` API, and the `MessageLoop` API of Yue is not available
-when running under Electron. You should always use the `app` API of Electron to
-manage the process's message loop.
-
-```js
-const gui = require('gui')
-const electron = require('electron')
-
-electron.app.once('ready', () => {
-  // Do work here...
-})
-```
 
 ## Example: Text editor
 
@@ -372,11 +335,9 @@ function drawHeart(painter) {
 ## More
 
 * [App Packaging](app_packaging.html)
-* [Embedding Electron's WebContents](embedding_webcontents.html)
 
 [mac-editor]: https://cdn.rawgit.com/yue/yue-app-samples/10cc39d9/editor/screenshots/mac_editor.png
 [linux-editor]: https://cdn.rawgit.com/yue/yue-app-samples/10cc39d9/editor/screenshots/linux_editor.png
 [win-editor]: https://cdn.rawgit.com/yue/yue-app-samples/10cc39d9/editor/screenshots/win_editor.png
 [linux-heart]: https://cdn.rawgit.com/yue/yue-app-samples/196cfee8/floating_heart/screenshots/linux_heart.png
 [win-heart]: https://cdn.rawgit.com/yue/yue-app-samples/196cfee8/floating_heart/screenshots/win_heart.png
-[native-module]: https://github.com/electron/electron/blob/master/docs/tutorial/using-native-node-modules.md

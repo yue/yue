@@ -43,8 +43,6 @@ const runtimes = {
     'v8.9.4',
   ],
   electron: [
-    'v1.8.0',
-    'v1.7.0',
   ],
 }
 for (let runtime in runtimes) {
