@@ -162,6 +162,9 @@ void Window::Close() {
   if (should_close && !should_close(this))
     return;
 
+  // GTK does not close child windows automatically.
+  CloseAllChildWindows();
+
   on_close.Emit(this);
   gtk_widget_destroy(GTK_WIDGET(window_));
 
