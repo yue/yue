@@ -994,6 +994,9 @@ struct Type<nu::Window> {
            "isminimizable", &nu::Window::IsMinimizable,
            "setmovable", &nu::Window::SetMovable,
            "ismovable", &nu::Window::IsMovable,
+           "settitle", &nu::Window::SetTitle,
+           "gettitle", &nu::Window::GetTitle,
+           "setbackgroundcolor", &nu::Window::SetBackgroundColor,
 #if defined(OS_MACOSX)
            "settoolbar", &nu::Window::SetToolbar,
            "gettoolbar", &nu::Window::GetToolbar,
@@ -1007,9 +1010,11 @@ struct Type<nu::Window> {
            RefMethod(&nu::Window::SetMenuBar, RefType::Reset, "menubar"),
            "getmenubar", &nu::Window::GetMenuBar,
 #endif
-           "settitle", &nu::Window::SetTitle,
-           "gettitle", &nu::Window::GetTitle,
-           "setbackgroundcolor", &nu::Window::SetBackgroundColor);
+           "addchildwindow",
+           RefMethod(&nu::Window::AddChildWindow, RefType::Ref),
+           "removechildview",
+           RefMethod(&nu::Window::RemoveChildWindow, RefType::Deref),
+           "getchildwindows", &nu::Window::GetChildWindows);
     RawSetProperty(state, metatable,
                    "onclose", &nu::Window::on_close,
                    "onfocus", &nu::Window::on_focus,

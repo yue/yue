@@ -507,4 +507,12 @@ void Window::PlatformSetMenuBar(MenuBar* menu_bar) {
   ForceSizeAllocation(window_, GTK_WIDGET(vbox));
 }
 
+void Window::PlatformAddChildWindow(Window* child) {
+  gtk_window_set_transient_for(child->GetNative(), window_);
+}
+
+void Window::PlatformRemoveChildWindow(Window* child) {
+  gtk_window_set_transient_for(child->GetNative(), nullptr);
+}
+
 }  // namespace nu

@@ -836,4 +836,12 @@ void Window::PlatformSetMenuBar(MenuBar* menu_bar) {
   ::SetMenu(window_->hwnd(), menu_bar ? menu_bar->GetNative() : NULL);
 }
 
+void Window::PlatformAddChildWindow(Window* child) {
+  ::SetParent(child->GetNative()->hwnd(), window_->hwnd());
+}
+
+void Window::PlatformRemoveChildWindow(Window* child) {
+  ::SetParent(child->GetNative()->hwnd(), NULL);
+}
+
 }  // namespace nu

@@ -38,6 +38,8 @@
 }
 
 - (void)windowWillClose:(NSNotification*)notification {
+  // Cocoa does not automatically close child windows.
+  shell_->CloseAllChildWindows();
   shell_->on_close.Emit(shell_);
 }
 
@@ -361,6 +363,14 @@ void Window::SetFullSizeContentView(bool full) {
 
 bool Window::IsFullSizeContentView() const {
   return [window_ styleMask] & NSFullSizeContentViewWindowMask;
+}
+
+void Window::PlatformAddChildWindow(Window* child) {
+  [window_ addChildWindow:child->GetNative() ordered:NSWindowAbove];
+}
+
+void Window::PlatformRemoveChildWindow(Window* child) {
+  [window_ removeChildWindow:child->GetNative()];
 }
 
 }  // namespace nu

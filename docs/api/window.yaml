@@ -200,6 +200,24 @@ methods:
     platform: ['Windows', 'Linux']
     description: Return the window menu bar.
 
+  - signature: void SetFullSizeContentView(bool full)
+    platform: ['macOS']
+    description: |
+      Set the `NSFullSizeContentViewWindowMask` style on the window.
+
+  - signature: Window* GetParentWindow() const
+    description: Return the parent window.
+
+  - signature: void AddChildWindow(Window* child)
+    description: Make `child` a child window of this window.
+    detail: This method will do nothing if `child` already has a parent window.
+
+  - signature: void RemoveChildWindow(Window* child)
+    description: Remove this window as `child`'s parent window.
+
+  - signature: std::vector<Window*> GetChildWindows() const
+    description: Return all the child windows of this window.
+
   - signature: NativeWindow GetNative() const
     lang: ['cpp']
     description: Return the native instance wrapped the window.

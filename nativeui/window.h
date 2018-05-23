@@ -8,6 +8,7 @@
 #include <functional>
 #include <string>
 #include <tuple>
+#include <vector>
 
 #include "nativeui/container.h"
 #include "nativeui/gfx/color.h"
@@ -112,6 +113,14 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
   MenuBar* GetMenuBar() const { return menu_bar_.get(); }
 #endif
 
+  Window* GetParentWindow() const { return parent_; }
+  void AddChildWindow(Window* child);
+  void RemoveChildWindow(Window* child);
+  std::vector<Window*> GetChildWindows() const;
+
+  // Internal: Destroy all child windows.
+  void CloseAllChildWindows();
+
   // Get the native window object.
   NativeWindow GetNative() const { return window_; }
 
@@ -139,6 +148,8 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
 #if defined(OS_WIN) || defined(OS_LINUX)
   void PlatformSetMenuBar(MenuBar* menu_bar);
 #endif
+  void PlatformAddChildWindow(Window* child);
+  void PlatformRemoveChildWindow(Window* child);
 
   // Whether window has a native chrome.
   bool has_frame_;
@@ -159,6 +170,9 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
 #if defined(OS_WIN) || defined(OS_LINUX)
   scoped_refptr<MenuBar> menu_bar_;
 #endif
+
+  Window* parent_ = nullptr;
+  std::vector<scoped_refptr<Window>> child_windows_;
 
   NativeWindow window_ = nullptr;
   scoped_refptr<View> content_view_;

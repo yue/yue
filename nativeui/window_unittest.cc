@@ -128,3 +128,24 @@ TEST_F(WindowTest, TransparentWindowResizable) {
   window_->SetResizable(true);
   EXPECT_EQ(window_->GetContentSize(), size);
 }
+
+TEST_F(WindowTest, ChildWindow) {
+  EXPECT_TRUE(window_->GetChildWindows().empty());
+  scoped_refptr<nu::Window> child = new nu::Window(nu::Window::Options());
+  EXPECT_EQ(child->GetParentWindow(), nullptr);
+  window_->AddChildWindow(child.get());
+  EXPECT_EQ(child->GetParentWindow(), window_.get());
+  EXPECT_FALSE(window_->GetChildWindows().empty());
+  window_->RemoveChildWindow(child.get());
+  EXPECT_EQ(child->GetParentWindow(), nullptr);
+  EXPECT_TRUE(window_->GetChildWindows().empty());
+}
+
+TEST_F(WindowTest, ParentWindowCloseChild) {
+  scoped_refptr<nu::Window> child = new nu::Window(nu::Window::Options());
+  window_->AddChildWindow(child.get());
+  bool closed = false;
+  child->on_close.Connect([&closed](nu::Window*) { closed = true; });
+  window_->Close();
+  EXPECT_EQ(closed, true);
+}

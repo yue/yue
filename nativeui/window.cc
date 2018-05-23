@@ -63,4 +63,41 @@ void Window::SetMenuBar(MenuBar* menu_bar) {
 }
 #endif
 
+void Window::AddChildWindow(Window* child) {
+  if (child->GetParentWindow())
+    return;
+  auto it = std::find(child_windows_.begin(), child_windows_.end(), child);
+  if (it == child_windows_.end()) {
+    child->parent_ = this;
+    child_windows_.emplace_back(child);
+    PlatformAddChildWindow(child);
+  }
+}
+
+void Window::RemoveChildWindow(Window* child) {
+  if (child->GetParentWindow() != this)
+    return;
+  auto it = std::find(child_windows_.begin(), child_windows_.end(), child);
+  if (it != child_windows_.end()) {
+    PlatformRemoveChildWindow(child);
+    child->parent_ = nullptr;
+    child_windows_.erase(it);
+  }
+}
+
+std::vector<Window*> Window::GetChildWindows() const {
+  std::vector<Window*> result;
+  result.reserve(child_windows_.size());
+  for (const auto& i : child_windows_)
+    result.push_back(i.get());
+  return result;
+}
+
+void Window::CloseAllChildWindows() {
+  for (const auto& i : child_windows_) {
+    i->should_close = nullptr;  // don't give user a chance to cancel.
+    i->Close();
+  }
+}
+
 }  // namespace nu
