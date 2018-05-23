@@ -40,9 +40,25 @@ class LabelImpl : public ViewImpl {
 
   // ViewImpl:
   void Draw(PainterWin* painter, const Rect& dirty) override {
+    // Due to float calculation error, the bounds of the view may be slightly
+    // smaller than required to display full text. In that case GDI+ will not
+    // draw full text when passing the bounds.
+    // To work around it we calculate the origin of text manually, and then make
+    // GDI+ draw the full text without passing a bounding rect.
+    SizeF size = MeasureText(text_, font());
+    PointF origin;
+    if (align_ == TextAlign::Center)
+      origin.set_x((size_allocation().size().width() - size.width()) / 2);
+    else if (align_ == TextAlign::End)
+      origin.set_x(size_allocation().size().width() - size.width());
+    if (valign_ == TextAlign::Center)
+      origin.set_y((size_allocation().size().height() - size.height()) / 2);
+    else if (valign_ == TextAlign::End)
+      origin.set_y(size_allocation().size().height() - size.height());
+    // Draw.
     ViewImpl::Draw(painter, dirty);
     TextAttributes attributes(font(), color(), align_, valign_);
-    painter->DrawTextPixel(text_, Rect(size_allocation().size()), attributes);
+    painter->DrawTextPixel(text_, origin, attributes);
   }
 
  private:
