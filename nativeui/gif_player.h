@@ -49,11 +49,11 @@ class NATIVEUI_EXPORT GifPlayer : public View {
   void PlatformSetImage(Image* image);
 
 #if defined(OS_LINUX)
-  bool is_animating_ = false;
   GdkPixbufAnimationIter* iter_ = nullptr;
   guint timer_ = 0;
 #endif
 
+  bool is_animating_ = false;
   scoped_refptr<Image> image_;
 };
 

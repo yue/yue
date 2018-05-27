@@ -16,6 +16,13 @@
 
 @implementation NUGifPlayer
 
+- (void)setHidden:(BOOL)hidden {
+  [super setHidden:hidden];
+  // Start/stop animation when view visibility is changed.
+  if (static_cast<nu::GifPlayer*>([self shell])->IsAnimating())
+    [self setAnimates:!hidden];
+}
+
 - (nu::NUPrivate*)nuPrivate {
   return &private_;
 }
@@ -49,16 +56,27 @@ GifPlayer::~GifPlayer() {
 }
 
 void GifPlayer::PlatformSetImage(Image* image) {
-  NSImage* nsimage = image ? image->GetNative() : nullptr;
-  static_cast<NUGifPlayer*>(GetNative()).image = nsimage;
+  auto* gif = static_cast<NUGifPlayer*>(GetNative());
+  gif.image = image ? image->GetNative() : nullptr;
+  // Update property.
+  is_animating_ = gif.animates;
+  // Stop animation if view is hidden.
+  if (gif.hidden)
+    gif.animates = NO;
 }
 
 void GifPlayer::SetAnimating(bool animates) {
-  static_cast<NUGifPlayer*>(GetNative()).animates = animates;
+  auto* gif = static_cast<NUGifPlayer*>(GetNative());
+  // We don't know if an image can animate, just set and read.
+  gif.animates = animates;
+  is_animating_ = gif.animates;
+  // Stop animation if view is hidden.
+  if (gif.hidden)
+    gif.animates = NO;
 }
 
 bool GifPlayer::IsAnimating() const {
-  return static_cast<NUGifPlayer*>(GetNative()).animates;
+  return is_animating_;
 }
 
 }  // namespace nu
