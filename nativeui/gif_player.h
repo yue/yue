@@ -35,7 +35,10 @@ class NATIVEUI_EXPORT GifPlayer : public View {
   // Internal: Return current animation frame.
   GdkPixbufAnimationIter* GetFrame();
 
-  // Internal: Advance the animation frame and schedule next frame.
+  // Internal: Pause the animation.
+  void StopAnimationTimer();
+
+  // Internal: Schedule to draw next animation frame.
   static gboolean ScheduleFrame(GifPlayer* self);
 #endif
 

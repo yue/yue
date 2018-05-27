@@ -46,11 +46,25 @@ gboolean OnDraw(GtkWidget* widget, cairo_t* cr, GifPlayer* view) {
   return FALSE;
 }
 
+// Callback when widget is show.
+void OnShow(GtkWidget* widget, GifPlayer* view) {
+  if (view->IsAnimating())
+    view->ScheduleFrame(view);
+}
+
+// Callback when widget is hidden.
+void OnHide(GtkWidget* widget, GifPlayer* view) {
+  if (view->IsAnimating())
+    view->StopAnimationTimer();
+}
+
 }  // namespace
 
 GifPlayer::GifPlayer() {
   TakeOverView(gtk_drawing_area_new());
   g_signal_connect(GetNative(), "draw", G_CALLBACK(OnDraw), this);
+  g_signal_connect(GetNative(), "show", G_CALLBACK(OnShow), this);
+  g_signal_connect(GetNative(), "hide", G_CALLBACK(OnHide), this);
 }
 
 GifPlayer::~GifPlayer() {
@@ -73,10 +87,7 @@ void GifPlayer::PlatformSetImage(Image* image) {
 
 void GifPlayer::SetAnimating(bool animates) {
   // Reset timer.
-  if (timer_ > 0) {
-    g_source_remove(timer_);
-    timer_ = 0;
-  }
+  StopAnimationTimer();
   // Do not animate static image.
   if (!CanImageAnimate(image_.get())) {
     is_animating_ = false;
@@ -84,7 +95,7 @@ void GifPlayer::SetAnimating(bool animates) {
   }
   is_animating_ = animates;
   // Create a timer to play animation.
-  if (is_animating_)
+  if (is_animating_ && gtk_widget_is_visible(GetNative()) && timer_ == 0)
     ScheduleFrame(this);
 }
 
@@ -101,6 +112,13 @@ GdkPixbufAnimationIter* GifPlayer::GetFrame() {
   return iter_;
 }
 
+void GifPlayer::StopAnimationTimer() {
+  if (timer_ > 0) {
+    g_source_remove(timer_);
+    timer_ = 0;
+  }
+}
+
 gboolean GifPlayer::ScheduleFrame(GifPlayer* self) {
   if (self->iter_) {
     // Advance frame.
@@ -114,9 +132,9 @@ gboolean GifPlayer::ScheduleFrame(GifPlayer* self) {
   gtk_widget_queue_draw(self->GetNative());
   // Schedule next call.
   if (self->is_animating_) {
-    g_timeout_add(gdk_pixbuf_animation_iter_get_delay_time(self->iter_),
-                  reinterpret_cast<GSourceFunc>(&GifPlayer::ScheduleFrame),
-                  self);
+    self->timer_ = g_timeout_add(
+        gdk_pixbuf_animation_iter_get_delay_time(self->iter_),
+        reinterpret_cast<GSourceFunc>(&GifPlayer::ScheduleFrame), self);
   }
   return FALSE;
 }
