@@ -41,7 +41,8 @@
 namespace nu {
 
 GifPlayer::GifPlayer() {
-  TakeOverView([[NSImageView alloc] init]);
+  TakeOverView([[NUGifPlayer alloc] init]);
+  SetWantsLayer(true);
 }
 
 GifPlayer::~GifPlayer() {
