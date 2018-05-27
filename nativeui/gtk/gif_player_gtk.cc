@@ -29,9 +29,14 @@ gboolean OnDraw(GtkWidget* widget, cairo_t* cr, GifPlayer* view) {
   GdkPixbuf* pixbuf = view->CanAnimate() ?
       gdk_pixbuf_animation_iter_get_pixbuf(view->GetFrame()) :
       gdk_pixbuf_animation_get_static_image(image->GetNative());
-  int image_width = gdk_pixbuf_get_width(pixbuf);
-  int image_height = gdk_pixbuf_get_height(pixbuf);
+  float scale = 1.f / image->GetScaleFactor();
+  float image_width = gdk_pixbuf_get_width(pixbuf) * scale;
+  float image_height = gdk_pixbuf_get_height(pixbuf) * scale;
   cairo_translate(cr, (width - image_width) / 2, (height - image_height) / 2);
+
+  // Scale if needed.
+  if (scale != 1.f)
+    cairo_scale(cr, scale, scale);
 
   // Paint.
   gdk_cairo_set_source_pixbuf(cr, pixbuf, 0, 0);
@@ -106,7 +111,7 @@ bool GifPlayer::IsPlaying() const {
 }
 
 bool GifPlayer::CanAnimate() const {
-  return image && !gdk_pixbuf_animation_is_static_image(image->GetNative());
+  return image_ && !gdk_pixbuf_animation_is_static_image(image_->GetNative());
 }
 
 void GifPlayer::StopAnimationTimer() {
@@ -126,7 +131,7 @@ gboolean GifPlayer::ScheduleFrame(GifPlayer* self) {
     self->GetFrame();
   }
   // Emit draw event.
-  SchedulePaint();
+  self->SchedulePaint();
   // Schedule next call.
   if (self->is_animating_) {
     self->timer_ = g_timeout_add(
