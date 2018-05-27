@@ -9,6 +9,12 @@ detail: |
   It can also display other types of images, but only GIF images can be
   animated.
 
+  Displaying animated GIF images consumes lots of CPU resources, it is highly
+  unrecommended to constantly display animated GIF images.
+
+  Hiding the view would automatically pause the animation, and showing the view
+  would automatically continue the animation if it is enabled.
+
 constructors:
   - signature: GifPlayer()
     lang: ['cpp']
