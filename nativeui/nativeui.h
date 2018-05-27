@@ -19,6 +19,7 @@
 #include "nativeui/gfx/geometry/insets.h"
 #include "nativeui/gfx/image.h"
 #include "nativeui/gfx/painter.h"
+#include "nativeui/gif_player.h"
 #include "nativeui/group.h"
 #include "nativeui/label.h"
 #include "nativeui/lifetime.h"

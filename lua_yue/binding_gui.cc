@@ -1403,6 +1403,20 @@ struct Type<nu::ProgressBar> {
 };
 
 template<>
+struct Type<nu::GifPlayer> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.GifPlayer";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateOnHeap<nu::GifPlayer>,
+           "setimage", &nu::GifPlayer::SetImage,
+           "getimage", &nu::GifPlayer::GetImage,
+           "setanimating", &nu::GifPlayer::SetAnimating,
+           "isanimating", &nu::GifPlayer::IsAnimating);
+  }
+};
+
+template<>
 struct Type<nu::Group> {
   using base = nu::View;
   static constexpr const char* name = "yue.Group";
@@ -1627,6 +1641,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::Entry>(state, "Entry");
   BindType<nu::Label>(state, "Label");
   BindType<nu::ProgressBar>(state, "ProgressBar");
+  BindType<nu::GifPlayer>(state, "GifPlayer");
   BindType<nu::Group>(state, "Group");
   BindType<nu::Scroll>(state, "Scroll");
   BindType<nu::TextEdit>(state, "TextEdit");

@@ -1,0 +1,38 @@
+name: GifPlayer
+component: gui
+header: nativeui/gif_player.h
+type: refcounted
+namespace: nu
+inherit: View
+description: Display animated GIF images.
+detail: |
+  It can also display other types of images, but only GIF images can be
+  animated.
+
+constructors:
+  - signature: GifPlayer()
+    lang: ['cpp']
+    description: Create a new `GifPlayer`.
+
+class_methods:
+  - signature: GifPlayer* Create()
+    lang: ['lua', 'js']
+    description: Create a new `GifPlayer`.
+
+class_properties:
+  - property: const char* kClassName
+    lang: ['cpp']
+    description: The class name of this view.
+
+methods:
+  - signature: void SetImage(Image* image)
+    description: Set the image.
+
+  - signature: Image* GetImage() const
+    description: Return the image.
+
+  - signature: void SetAnimating(bool animating)
+    description: Set whether the animated image should be played.
+
+  - signature: bool IsAnimating() const
+    description: Return whether the image is being played.

@@ -1638,6 +1638,25 @@ struct Type<nu::ProgressBar> {
 };
 
 template<>
+struct Type<nu::GifPlayer> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.GifPlayer";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+        "create", &CreateOnHeap<nu::GifPlayer>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "setImage", &nu::GifPlayer::SetImage,
+        "getImage", &nu::GifPlayer::GetImage,
+        "setAnimating", &nu::GifPlayer::SetAnimating,
+        "isAnimating", &nu::GifPlayer::IsAnimating);
+  }
+};
+
+template<>
 struct Type<nu::Group> {
   using base = nu::View;
   static constexpr const char* name = "yue.Group";
@@ -1931,6 +1950,7 @@ void Initialize(v8::Local<v8::Object> exports) {
           "Entry",             vb::Constructor<nu::Entry>(),
           "Label",             vb::Constructor<nu::Label>(),
           "ProgressBar",       vb::Constructor<nu::ProgressBar>(),
+          "GifPlayer",         vb::Constructor<nu::GifPlayer>(),
           "Group",             vb::Constructor<nu::Group>(),
           "Scroll",            vb::Constructor<nu::Scroll>(),
           "TextEdit",          vb::Constructor<nu::TextEdit>(),
