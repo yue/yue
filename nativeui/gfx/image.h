@@ -33,6 +33,7 @@ class NATIVEUI_EXPORT Image : public base::RefCounted<Image> {
   // Write the image to file.
   // Note: Do not make it a public API for now, we need to figure out a
   // universal type conversion API with options first.
+  // Note: Should we add API for saving animations?
   bool WriteToFile(const std::string& format, const base::FilePath& target);
 
   // Return the native instance of image object.

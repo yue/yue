@@ -154,13 +154,13 @@ void PainterGtk::DrawImageFromRect(Image* image, const RectF& src,
   cairo_rectangle(context_, 0, 0, dest.width(), dest.height());
   cairo_clip(context_);
   // Scale if needed.
-  SizeF size = image->GetSize();
   float x_scale = dest.width() / ps.width();
   float y_scale = dest.height() / ps.height();
   if (x_scale != 1.0f || y_scale != 1.0f)
     cairo_scale(context_, x_scale, y_scale);
   // Draw.
-  gdk_cairo_set_source_pixbuf(context_, image->GetNative(), -ps.x(), -ps.y());
+  GdkPixbuf* pixbuf = gdk_pixbuf_animation_get_static_image(image->GetNative());
+  gdk_cairo_set_source_pixbuf(context_, pixbuf, -ps.x(), -ps.y());
   cairo_paint(context_);
   cairo_restore(context_);
 }
@@ -178,7 +178,6 @@ void PainterGtk::DrawCanvasFromRect(Canvas* canvas, const RectF& src,
   cairo_rectangle(context_, 0, 0, dest.width(), dest.height());
   cairo_clip(context_);
   // Scale if needed.
-  SizeF size = canvas->GetSize();
   float x_scale = dest.width() / src.width();
   float y_scale = dest.height() / src.height();
   if (x_scale != 1.0f || y_scale != 1.0f)

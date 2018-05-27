@@ -193,6 +193,7 @@ component("nativeui") {
     "gtk/file_dialog_gtk.cc",
     "gtk/file_open_dialog_gtk.cc",
     "gtk/file_save_dialog_gtk.cc",
+    "gtk/gif_player_gtk.cc",
     "gtk/group_gtk.cc",
     "gtk/label_gtk.cc",
     "gtk/menu_gtk.cc",

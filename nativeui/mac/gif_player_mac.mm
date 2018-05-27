@@ -48,7 +48,8 @@ GifPlayer::~GifPlayer() {
 }
 
 void GifPlayer::PlatformSetImage(Image* image) {
-  static_cast<NUGifPlayer*>(GetNative()).image = image->GetNative();
+  NSImage* nsimage = image ? image->GetNative() : nullptr;
+  static_cast<NUGifPlayer*>(GetNative()).image = nsimage;
 }
 
 void GifPlayer::SetAnimating(bool animates) {

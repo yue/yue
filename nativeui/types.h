@@ -20,6 +20,7 @@
 #if defined(OS_LINUX)
 typedef struct _AppIndicator AppIndicator;
 typedef struct _GdkPixbuf GdkPixbuf;
+typedef struct _GdkPixbufAnimation GdkPixbufAnimation;
 typedef struct _GtkFileChooser GtkFileChooser;
 typedef struct _GtkMenuItem GtkMenuItem;
 typedef struct _GtkMenuShell GtkMenuShell;
@@ -111,7 +112,7 @@ using NativeFileDialog = GtkFileChooser*;
 using NativeView = GtkWidget*;
 using NativeWindow = GtkWindow*;
 using NativeBitmap = cairo_surface_t*;
-using NativeImage = GdkPixbuf*;
+using NativeImage = GdkPixbufAnimation*;
 using nativeGraphicsContext = cairo_t*;
 using NativeFont = PangoFontDescription*;
 using NativeMenu = GtkMenuShell*;

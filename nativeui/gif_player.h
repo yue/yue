@@ -7,6 +7,10 @@
 
 #include "nativeui/view.h"
 
+#if defined(OS_LINUX)
+typedef struct _GdkPixbufAnimationIter GdkPixbufAnimationIter;
+#endif
+
 namespace nu {
 
 class Image;
@@ -27,11 +31,25 @@ class NATIVEUI_EXPORT GifPlayer : public View {
   const char* GetClassName() const override;
   SizeF GetMinimumSize() const override;
 
+#if defined(OS_LINUX)
+  // Internal: Return current animation frame.
+  GdkPixbufAnimationIter* GetFrame();
+
+  // Internal: Advance the animation frame and schedule next frame.
+  static gboolean ScheduleFrame(GifPlayer* self);
+#endif
+
  protected:
   ~GifPlayer() override;
 
  private:
   void PlatformSetImage(Image* image);
+
+#if defined(OS_LINUX)
+  bool is_animating_ = false;
+  GdkPixbufAnimationIter* iter_ = nullptr;
+  guint timer_ = 0;
+#endif
 
   scoped_refptr<Image> image_;
 };

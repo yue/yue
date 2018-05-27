@@ -8,23 +8,36 @@
 
 namespace nu {
 
-Image::Image(const base::FilePath& path)
-    : scale_factor_(GetScaleFactorFromFilePath(path)),
-      image_(gdk_pixbuf_new_from_file(path.value().c_str(), nullptr)) {
+namespace {
+
+// Create an empty image with only 1 frame.
+NativeImage CreateEmptyImage() {
+  GdkPixbufSimpleAnim* image = gdk_pixbuf_simple_anim_new(1, 1, 1.f);
+  GdkPixbuf* frame = gdk_pixbuf_new(GDK_COLORSPACE_RGB, true, 8, 1, 1);
+  gdk_pixbuf_simple_anim_add_frame(image, frame);
+  g_object_unref(frame);
+  return GDK_PIXBUF_ANIMATION(image);
+}
+
+}  // namespace
+
+Image::Image(const base::FilePath& p)
+    : scale_factor_(GetScaleFactorFromFilePath(p)),
+      image_(gdk_pixbuf_animation_new_from_file(p.value().c_str(), nullptr)) {
   // When file reading failed |image_| could be nullptr, having a null
   // native image is very dangerous so we create an empty image when it
   // happens.
   if (!image_)
-    image_ = gdk_pixbuf_new(GDK_COLORSPACE_RGB, true, 8, 1, 1);
+    image_ = CreateEmptyImage();
 }
 
 Image::Image(const Buffer& buffer, float scale_factor)
     : scale_factor_(scale_factor) {
   GInputStream* stream = g_memory_input_stream_new_from_data(
       buffer.content(), buffer.size(), nullptr);
-  image_ = gdk_pixbuf_new_from_stream(stream, nullptr, nullptr);
+  image_ = gdk_pixbuf_animation_new_from_stream(stream, nullptr, nullptr);
   if (!image_)
-    image_ = gdk_pixbuf_new(GDK_COLORSPACE_RGB, true, 8, 1, 1);
+    image_ = CreateEmptyImage();
   g_object_unref(stream);
 }
 
@@ -33,14 +46,15 @@ Image::~Image() {
 }
 
 SizeF Image::GetSize() const {
-  return ScaleSize(SizeF(gdk_pixbuf_get_width(image_),
-                         gdk_pixbuf_get_height(image_)),
+  return ScaleSize(SizeF(gdk_pixbuf_animation_get_width(image_),
+                         gdk_pixbuf_animation_get_height(image_)),
                    1.f / scale_factor_);
 }
 
 bool Image::WriteToFile(const std::string& format,
                         const base::FilePath& target) {
-  return gdk_pixbuf_save(image_, target.value().c_str(), format.c_str(),
+  GdkPixbuf* pixbuf = gdk_pixbuf_animation_get_static_image(image_);
+  return gdk_pixbuf_save(pixbuf, target.value().c_str(), format.c_str(),
                          nullptr, nullptr);
 }
 
