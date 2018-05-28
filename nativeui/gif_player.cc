@@ -25,6 +25,19 @@ bool GifPlayer::IsAnimating() const {
   return is_animating_;
 }
 
+#if defined(OS_WIN) || defined(OS_LINUX)
+bool GifPlayer::IsPlaying() const {
+  return timer_ != 0;
+}
+
+void GifPlayer::StopAnimationTimer() {
+  if (timer_ != 0) {
+    MessageLoop::ClearTimeout(timer_);
+    timer_ = 0;
+  }
+}
+#endif
+
 const char* GifPlayer::GetClassName() const {
   return kClassName;
 }

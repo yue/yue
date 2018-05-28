@@ -9,7 +9,7 @@
 
 #include "nativeui/view.h"
 
-#if defined(OS_WIN)
+#if defined(OS_WIN) || defined(OS_LINUX)
 #include "nativeui/message_loop.h"
 #endif
 
@@ -33,33 +33,28 @@ class NATIVEUI_EXPORT GifPlayer : public View {
   void SetAnimating(bool animates);
   bool IsAnimating() const;
 
-  // View:
-  const char* GetClassName() const override;
-  SizeF GetMinimumSize() const override;
-
 #if defined(OS_WIN) || defined(OS_LINUX)
   // Internal: Is animation being played.
   bool IsPlaying() const;
 
+  // Internal: Pause the animation.
+  void StopAnimationTimer();
+
   // Internal: Whether the image can animate.
   bool CanAnimate() const;
 
-  // Internal: Pause the animation.
-  void StopAnimationTimer();
+  // Internal: Schedule to draw next animation frame.
+  void ScheduleFrame();
 #endif
 
 #if defined(OS_LINUX)
   // Internal: Return current animation frame.
   GdkPixbufAnimationIter* GetFrame();
-
-  // Internal: Schedule to draw next animation frame.
-  static gboolean ScheduleFrame(GifPlayer* self);
 #endif
 
-#if defined(OS_WIN)
-  // Internal: Schedule to draw next animation frame.
-  void ScheduleFrame();
-#endif
+  // View:
+  const char* GetClassName() const override;
+  SizeF GetMinimumSize() const override;
 
  protected:
   ~GifPlayer() override;
@@ -69,11 +64,13 @@ class NATIVEUI_EXPORT GifPlayer : public View {
 
 #if defined(OS_LINUX)
   GdkPixbufAnimationIter* iter_ = nullptr;
-  guint timer_ = 0;
 #elif defined(OS_WIN)
   UINT frames_count_ = 0;
   UINT frame_ = 0;
   std::unique_ptr<BYTE[]> frame_delays_;
+#endif
+
+#if defined(OS_WIN) || defined(OS_LINUX)
   MessageLoop::TimerId timer_ = 0;
 #endif
 

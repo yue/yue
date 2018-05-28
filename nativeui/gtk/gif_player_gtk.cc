@@ -6,7 +6,6 @@
 
 #include <gtk/gtk.h>
 
-#include "nativeui/gfx/gtk/painter_gtk.h"
 #include "nativeui/gfx/image.h"
 
 namespace nu {
@@ -47,7 +46,7 @@ gboolean OnDraw(GtkWidget* widget, cairo_t* cr, GifPlayer* view) {
 // Callback when widget is show.
 void OnShow(GtkWidget* widget, GifPlayer* view) {
   if (view->IsAnimating() && !view->IsPlaying())
-    view->ScheduleFrame(view);
+    view->ScheduleFrame();
 }
 
 // Callback when widget is hidden.
@@ -94,7 +93,7 @@ void GifPlayer::SetAnimating(bool animates) {
   is_animating_ = animates;
   // Create a timer to play animation.
   if (is_animating_ && gtk_widget_is_visible(GetNative()))
-    ScheduleFrame(this);
+    ScheduleFrame();
 }
 
 GdkPixbufAnimationIter* GifPlayer::GetFrame() {
@@ -106,39 +105,27 @@ GdkPixbufAnimationIter* GifPlayer::GetFrame() {
   return iter_;
 }
 
-bool GifPlayer::IsPlaying() const {
-  return timer_ != 0;
-}
-
 bool GifPlayer::CanAnimate() const {
   return image_ && !gdk_pixbuf_animation_is_static_image(image_->GetNative());
 }
 
-void GifPlayer::StopAnimationTimer() {
-  if (timer_ > 0) {
-    g_source_remove(timer_);
-    timer_ = 0;
-  }
-}
-
-gboolean GifPlayer::ScheduleFrame(GifPlayer* self) {
-  if (self->iter_) {
+void GifPlayer::ScheduleFrame() {
+  if (iter_) {
     // Advance frame.
     GTimeVal time;
     g_get_current_time(&time);
-    gdk_pixbuf_animation_iter_advance(self->iter_, &time);
+    gdk_pixbuf_animation_iter_advance(iter_, &time);
   } else {
-    self->GetFrame();
+    GetFrame();
   }
   // Emit draw event.
-  self->SchedulePaint();
+  SchedulePaint();
   // Schedule next call.
-  if (self->is_animating_) {
-    self->timer_ = g_timeout_add(
-        gdk_pixbuf_animation_iter_get_delay_time(self->iter_),
-        reinterpret_cast<GSourceFunc>(&GifPlayer::ScheduleFrame), self);
+  if (is_animating_) {
+    timer_ = MessageLoop::SetTimeout(
+        gdk_pixbuf_animation_iter_get_delay_time(iter_),
+        std::bind(&GifPlayer::ScheduleFrame, this));
   }
-  return FALSE;
 }
 
 }  // namespace nu

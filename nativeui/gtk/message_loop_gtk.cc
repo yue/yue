@@ -37,9 +37,19 @@ void MessageLoop::PostTask(const std::function<void()>& task) {
 
 // static
 void MessageLoop::PostDelayedTask(int ms, const std::function<void()>& task) {
-  g_timeout_add_full(G_PRIORITY_DEFAULT, ms,
-                     reinterpret_cast<GSourceFunc>(OnSource),
-                     new Task(task), Delete<Task>);
+  SetTimeout(ms, task);
+}
+
+// static
+MessageLoop::TimerId MessageLoop::SetTimeout(int ms, const Task& task) {
+  return g_timeout_add_full(G_PRIORITY_DEFAULT, ms,
+                            reinterpret_cast<GSourceFunc>(OnSource),
+                            new Task(task), Delete<Task>);
+}
+
+// static
+void MessageLoop::ClearTimeout(TimerId id) {
+  g_source_remove(id);
 }
 
 }  // namespace nu

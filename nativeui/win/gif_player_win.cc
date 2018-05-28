@@ -104,19 +104,8 @@ void GifPlayer::SetAnimating(bool animates) {
     ScheduleFrame();
 }
 
-bool GifPlayer::IsPlaying() const {
-  return timer_ != 0;
-}
-
 bool GifPlayer::CanAnimate() const {
   return frames_count_ > 1;
-}
-
-void GifPlayer::StopAnimationTimer() {
-  if (timer_ != 0) {
-    MessageLoop::ClearTimeout(timer_);
-    timer_ = 0;
-  }
 }
 
 void GifPlayer::ScheduleFrame() {
