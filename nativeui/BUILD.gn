@@ -387,6 +387,7 @@ test("nativeui_unittests") {
     "container_unittest.cc",
     "browser_unittest.cc",
     "button_unittest.cc",
+    "gif_player_unittest.cc",
     "group_unittest.cc",
     "label_unittest.cc",
     "menu_unittests.cc",
