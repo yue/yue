@@ -75,8 +75,4 @@ void GifPlayer::SetAnimating(bool animates) {
     gif.animates = NO;
 }
 
-bool GifPlayer::IsAnimating() const {
-  return is_animating_;
-}
-
 }  // namespace nu

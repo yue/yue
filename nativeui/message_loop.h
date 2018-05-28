@@ -24,6 +24,14 @@ class NATIVEUI_EXPORT MessageLoop {
   static void PostTask(const Task& task);
   static void PostDelayedTask(int ms, const Task& task);
 
+#if defined(OS_WIN)
+  // Internal: Cancellable timers.
+  using TimerId = UINT_PTR;
+
+  static TimerId SetTimeout(int ms, const Task& task);
+  static void ClearTimeout(TimerId id);
+#endif
+
  private:
 #if defined(OS_WIN)
   static void CALLBACK OnTimer(HWND, UINT, UINT_PTR event, DWORD);

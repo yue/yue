@@ -35,9 +35,22 @@ void MessageLoop::PostTask(const std::function<void()>& task) {
 
 // static
 void MessageLoop::PostDelayedTask(int ms, const std::function<void()>& task) {
+  SetTimeout(ms, task);
+}
+
+// static
+UINT_PTR MessageLoop::SetTimeout(int ms, const Task& task) {
   UINT_PTR event = ::SetTimer(NULL, NULL, ms, OnTimer);
   base::AutoLock auto_lock(lock_);
   tasks_[event] = task;
+  return event;
+}
+
+// static
+void MessageLoop::ClearTimeout(TimerId id) {
+  ::KillTimer(NULL, id);
+  base::AutoLock auto_lock(lock_);
+  tasks_.erase(id);
 }
 
 // static
@@ -46,8 +59,11 @@ void CALLBACK MessageLoop::OnTimer(HWND, UINT, UINT_PTR event, DWORD) {
   std::function<void()> task;
   {
     base::AutoLock auto_lock(lock_);
-    task = tasks_[event];
-    tasks_.erase(event);
+    auto it = tasks_.find(event);
+    if (it == tasks_.end())  // could it happen?
+      return;
+    task = it->second;
+    tasks_.erase(it);
   }
   task();
 }

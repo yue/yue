@@ -13,13 +13,6 @@ namespace nu {
 
 namespace {
 
-// Determine whether the image can be animated.
-bool CanImageAnimate(Image* image) {
-  if (!image)
-    return false;
-  return !gdk_pixbuf_animation_is_static_image(image->GetNative());
-}
-
 // Callback for drawing GifPlayer.
 gboolean OnDraw(GtkWidget* widget, cairo_t* cr, GifPlayer* view) {
   Image* image = view->GetImage();
@@ -33,7 +26,7 @@ gboolean OnDraw(GtkWidget* widget, cairo_t* cr, GifPlayer* view) {
                         0, 0, width, height);
 
   // Calulate image position.
-  GdkPixbuf* pixbuf = CanImageAnimate(image) ?
+  GdkPixbuf* pixbuf = view->CanAnimate() ?
       gdk_pixbuf_animation_iter_get_pixbuf(view->GetFrame()) :
       gdk_pixbuf_animation_get_static_image(image->GetNative());
   int image_width = gdk_pixbuf_get_width(pixbuf);
@@ -48,7 +41,7 @@ gboolean OnDraw(GtkWidget* widget, cairo_t* cr, GifPlayer* view) {
 
 // Callback when widget is show.
 void OnShow(GtkWidget* widget, GifPlayer* view) {
-  if (view->IsAnimating())
+  if (view->IsAnimating() && !view->IsPlaying())
     view->ScheduleFrame(view);
 }
 
@@ -71,7 +64,7 @@ GifPlayer::~GifPlayer() {
   if (iter_)
     g_object_unref(iter_);
   if (timer_ > 0)
-    g_source_remove(timer_);
+    StopAnimationTimer();
 }
 
 void GifPlayer::PlatformSetImage(Image* image) {
@@ -89,18 +82,14 @@ void GifPlayer::SetAnimating(bool animates) {
   // Reset timer.
   StopAnimationTimer();
   // Do not animate static image.
-  if (!CanImageAnimate(image_.get())) {
+  if (!CanAnimate()) {
     is_animating_ = false;
     return;
   }
   is_animating_ = animates;
   // Create a timer to play animation.
-  if (is_animating_ && gtk_widget_is_visible(GetNative()) && timer_ == 0)
+  if (is_animating_ && gtk_widget_is_visible(GetNative()))
     ScheduleFrame(this);
-}
-
-bool GifPlayer::IsAnimating() const {
-  return is_animating_;
 }
 
 GdkPixbufAnimationIter* GifPlayer::GetFrame() {
@@ -110,6 +99,14 @@ GdkPixbufAnimationIter* GifPlayer::GetFrame() {
     iter_ = gdk_pixbuf_animation_get_iter(image_->GetNative(), &time);
   }
   return iter_;
+}
+
+bool GifPlayer::IsPlaying() const {
+  return timer_ != 0;
+}
+
+bool GifPlayer::CanAnimate() const {
+  return image && !gdk_pixbuf_animation_is_static_image(image->GetNative());
 }
 
 void GifPlayer::StopAnimationTimer() {
@@ -129,7 +126,7 @@ gboolean GifPlayer::ScheduleFrame(GifPlayer* self) {
     self->GetFrame();
   }
   // Emit draw event.
-  gtk_widget_queue_draw(self->GetNative());
+  SchedulePaint();
   // Schedule next call.
   if (self->is_animating_) {
     self->timer_ = g_timeout_add(

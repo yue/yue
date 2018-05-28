@@ -21,6 +21,10 @@ Image* GifPlayer::GetImage() const {
   return image_.get();
 }
 
+bool GifPlayer::IsAnimating() const {
+  return is_animating_;
+}
+
 const char* GifPlayer::GetClassName() const {
   return kClassName;
 }
