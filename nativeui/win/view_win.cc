@@ -306,6 +306,10 @@ bool View::IsVisible() const {
   return GetNative()->is_visible();
 }
 
+bool View::IsTreeVisible() const {
+  return GetNative()->is_tree_visible();
+}
+
 void View::SetEnabled(bool enable) {
   GetNative()->SetState(enable ? ControlState::Normal : ControlState::Disabled);
 }

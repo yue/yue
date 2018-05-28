@@ -63,6 +63,10 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   void SetVisible(bool visible);
   bool IsVisible() const;
 
+  // Whether the view and its parent are visible.
+  // TODO(zcbenz): Find a better name before making it public.
+  bool IsTreeVisible() const;
+
   // Enable/disable the view.
   void SetEnabled(bool enable);
   bool IsEnabled() const;

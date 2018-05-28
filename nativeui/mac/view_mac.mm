@@ -112,6 +112,10 @@ bool View::IsVisible() const {
   return ![view_ isHidden];
 }
 
+bool View::IsTreeVisible() const {
+  return ![view_ isHiddenOrHasHiddenAncestor];
+}
+
 void View::SetEnabled(bool enable) {
   [view_ setNUEnabled:enable];
 }

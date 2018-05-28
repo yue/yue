@@ -82,20 +82,6 @@ void GifPlayer::PlatformSetImage(Image* image) {
   SetAnimating(!!image);
 }
 
-void GifPlayer::SetAnimating(bool animates) {
-  // Reset timer.
-  StopAnimationTimer();
-  // Do not animate static image.
-  if (!CanAnimate()) {
-    is_animating_ = false;
-    return;
-  }
-  is_animating_ = animates;
-  // Create a timer to play animation.
-  if (is_animating_ && gtk_widget_is_visible(GetNative()))
-    ScheduleFrame();
-}
-
 GdkPixbufAnimationIter* GifPlayer::GetFrame() {
   if (!iter_) {
     GTimeVal time;

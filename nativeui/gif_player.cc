@@ -21,6 +21,22 @@ Image* GifPlayer::GetImage() const {
   return image_.get();
 }
 
+#if defined(OS_WIN) || defined(OS_LINUX)
+void GifPlayer::SetAnimating(bool animates) {
+  // Reset timer.
+  StopAnimationTimer();
+  // Do not animate static image.
+  if (!CanAnimate()) {
+    is_animating_ = false;
+    return;
+  }
+  is_animating_ = animates;
+  // Create a timer to play animation.
+  if (is_animating_ && IsTreeVisible())
+    ScheduleFrame();
+}
+#endif
+
 bool GifPlayer::IsAnimating() const {
   return is_animating_;
 }

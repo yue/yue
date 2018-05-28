@@ -208,6 +208,10 @@ bool View::IsVisible() const {
   return gtk_widget_get_visible(view_);
 }
 
+bool View::IsTreeVisible() const {
+  return gtk_widget_is_visible(view_);
+}
+
 void View::SetEnabled(bool enable) {
   // Do not support disabling a container, to match other platforms' behavior.
   if (GTK_IS_CONTAINER(view_) && !GTK_IS_BIN(view_))
