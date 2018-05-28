@@ -16,11 +16,16 @@
 
 @implementation NUGifPlayer
 
-- (void)setHidden:(BOOL)hidden {
-  [super setHidden:hidden];
-  // Start/stop animation when view visibility is changed.
+- (void)viewDidHide {
+  [super viewDidHide];
   if (static_cast<nu::GifPlayer*>([self shell])->IsAnimating())
-    [self setAnimates:!hidden];
+    [self setAnimates:NO];
+}
+
+- (void)viewDidUnhide {
+  [super viewDidUnhide];
+  if (static_cast<nu::GifPlayer*>([self shell])->IsAnimating())
+    [self setAnimates:YES];
 }
 
 - (nu::NUPrivate*)nuPrivate {
