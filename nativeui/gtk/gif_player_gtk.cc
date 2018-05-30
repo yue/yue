@@ -72,7 +72,7 @@ GifPlayer::~GifPlayer() {
 }
 
 void GifPlayer::PlatformSetImage(Image* image) {
-  gtk_widget_queue_draw(GetNative());
+  SchedulePaint();
   // Reset iterator after changing image.
   if (iter_) {
     g_object_unref(iter_);
@@ -80,15 +80,6 @@ void GifPlayer::PlatformSetImage(Image* image) {
   }
   // Start animation by default.
   SetAnimating(!!image);
-}
-
-GdkPixbufAnimationIter* GifPlayer::GetFrame() {
-  if (!iter_) {
-    GTimeVal time;
-    g_get_current_time(&time);
-    iter_ = gdk_pixbuf_animation_get_iter(image_->GetNative(), &time);
-  }
-  return iter_;
 }
 
 bool GifPlayer::CanAnimate() const {
@@ -112,6 +103,15 @@ void GifPlayer::ScheduleFrame() {
         gdk_pixbuf_animation_iter_get_delay_time(iter_),
         std::bind(&GifPlayer::ScheduleFrame, this));
   }
+}
+
+GdkPixbufAnimationIter* GifPlayer::GetFrame() {
+  if (!iter_) {
+    GTimeVal time;
+    g_get_current_time(&time);
+    iter_ = gdk_pixbuf_animation_get_iter(image_->GetNative(), &time);
+  }
+  return iter_;
 }
 
 }  // namespace nu

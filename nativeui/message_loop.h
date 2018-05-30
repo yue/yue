@@ -27,21 +27,20 @@ class NATIVEUI_EXPORT MessageLoop {
   // Internal: Cancellable timers.
 #if defined(OS_WIN)
   using TimerId = UINT_PTR;
-#elif defined(OS_LINUX)
+#elif defined(OS_LINUX) || defined(OS_MACOSX)
   using TimerId = unsigned int;
 #endif
-
-#if defined(OS_WIN) || defined(OS_LINUX)
   static TimerId SetTimeout(int ms, const Task& task);
   static void ClearTimeout(TimerId id);
-#endif
 
  private:
 #if defined(OS_WIN)
   static void CALLBACK OnTimer(HWND, UINT, UINT_PTR event, DWORD);
+#endif
 
+#if defined(OS_WIN) || defined(OS_MACOSX)
   static base::Lock lock_;
-  static std::unordered_map<UINT_PTR, Task> tasks_;
+  static std::unordered_map<TimerId, Task> tasks_;
 #endif
 
   DISALLOW_IMPLICIT_CONSTRUCTORS(MessageLoop);

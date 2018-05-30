@@ -8,6 +8,18 @@
 
 namespace nu {
 
+namespace {
+
+unsigned int g_task_id = 0;
+
+}  // namespace
+
+// static
+base::Lock MessageLoop::lock_;
+
+// static
+std::unordered_map<MessageLoop::TimerId, MessageLoop::Task> MessageLoop::tasks_;
+
 // static
 void MessageLoop::Run() {
   [NSApp run];
@@ -30,7 +42,7 @@ void MessageLoop::Quit() {
 }
 
 // static
-void MessageLoop::PostTask(const std::function<void()>& task) {
+void MessageLoop::PostTask(const Task& task) {
   __block auto callback = task;
   dispatch_async(dispatch_get_main_queue(), ^{
     callback();
@@ -38,12 +50,44 @@ void MessageLoop::PostTask(const std::function<void()>& task) {
 }
 
 // static
-void MessageLoop::PostDelayedTask(int ms, const std::function<void()>& task) {
+void MessageLoop::PostDelayedTask(int ms, const Task& task) {
   __block std::function<void()> callback = task;
   dispatch_time_t t = dispatch_time(DISPATCH_TIME_NOW, ms * NSEC_PER_MSEC);
   dispatch_after(t, dispatch_get_main_queue(), ^{
     callback();
   });
+}
+
+// static
+MessageLoop::TimerId MessageLoop::SetTimeout(int ms, const Task& task) {
+  // Store the callback.
+  __block TimerId id;
+  {
+    base::AutoLock auto_lock(lock_);
+    id = ++g_task_id;
+    tasks_[id] = task;
+  }
+  // Schedule a task to run the callback.
+  dispatch_time_t t = dispatch_time(DISPATCH_TIME_NOW, ms * NSEC_PER_MSEC);
+  dispatch_after(t, dispatch_get_main_queue(), ^{
+    Task task;
+    {
+      base::AutoLock auto_lock(lock_);
+      auto it = tasks_.find(id);
+      if (it == tasks_.end())  // cleared
+        return;
+      task = it->second;
+      tasks_.erase(it);
+    }
+    task();
+  });
+  return id;
+}
+
+// static
+void MessageLoop::ClearTimeout(TimerId id) {
+  base::AutoLock auto_lock(lock_);
+  tasks_.erase(id);
 }
 
 }  // namespace nu

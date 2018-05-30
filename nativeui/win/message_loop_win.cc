@@ -12,7 +12,7 @@ namespace nu {
 base::Lock MessageLoop::lock_;
 
 // static
-std::unordered_map<UINT_PTR, std::function<void()>> MessageLoop::tasks_;
+std::unordered_map<MessageLoop::TimerId, MessageLoop::Task> MessageLoop::tasks_;
 
 // static
 void MessageLoop::Run() {

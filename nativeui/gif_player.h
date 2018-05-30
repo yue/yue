@@ -7,11 +7,8 @@
 
 #include <memory>
 
-#include "nativeui/view.h"
-
-#if defined(OS_WIN) || defined(OS_LINUX)
 #include "nativeui/message_loop.h"
-#endif
+#include "nativeui/view.h"
 
 #if defined(OS_LINUX)
 typedef struct _GdkPixbufAnimationIter GdkPixbufAnimationIter;
@@ -33,7 +30,6 @@ class NATIVEUI_EXPORT GifPlayer : public View {
   void SetAnimating(bool animates);
   bool IsAnimating() const;
 
-#if defined(OS_WIN) || defined(OS_LINUX)
   // Internal: Is animation being played.
   bool IsPlaying() const;
 
@@ -45,7 +41,6 @@ class NATIVEUI_EXPORT GifPlayer : public View {
 
   // Internal: Schedule to draw next animation frame.
   void ScheduleFrame();
-#endif
 
 #if defined(OS_LINUX)
   // Internal: Return current animation frame.
@@ -64,15 +59,17 @@ class NATIVEUI_EXPORT GifPlayer : public View {
 
 #if defined(OS_LINUX)
   GdkPixbufAnimationIter* iter_ = nullptr;
+#elif defined(OS_MACOSX)
+  unsigned int frames_count_ = 0;
+  unsigned int frame_ = 0;
+  NSBitmapImageRep* animation_rep_ = nullptr;
 #elif defined(OS_WIN)
   UINT frames_count_ = 0;
   UINT frame_ = 0;
   std::unique_ptr<BYTE[]> frame_delays_;
 #endif
 
-#if defined(OS_WIN) || defined(OS_LINUX)
   MessageLoop::TimerId timer_ = 0;
-#endif
 
   bool is_animating_ = false;
   scoped_refptr<Image> image_;

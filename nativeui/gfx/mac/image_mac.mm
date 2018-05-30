@@ -31,6 +31,13 @@ Image::Image(const base::FilePath& p)
       scale_factor_ = expected;
     }
   }
+  // Read image with CGImage for animations.
+  NSBitmapImageRep* rep = GetAnimationRep();
+  if (rep) {
+    NSString* u = base::SysUTF8ToNSString(p.value());
+    cgimage_ = CGImageSourceCreateWithURL(
+        (__bridge CFURLRef)[NSURL fileURLWithPath:u], nullptr);
+  }
 }
 
 Image::Image(const Buffer& buffer, float scale_factor)
@@ -45,10 +52,18 @@ Image::Image(const Buffer& buffer, float scale_factor)
                                  [rep pixelsHigh] / scale_factor_)];
     }
   }
+  // Read image with CGImage for animations.
+  NSBitmapImageRep* rep = GetAnimationRep();
+  if (rep) {
+    cgimage_ = CGImageSourceCreateWithData(
+        (__bridge CFDataRef)buffer.ToNSData(), nullptr);
+  }
 }
 
 Image::~Image() {
   [image_ release];
+  if (cgimage_)
+    CFRelease(cgimage_);
 }
 
 SizeF Image::GetSize() const {
@@ -57,6 +72,33 @@ SizeF Image::GetSize() const {
 
 NativeImage Image::GetNative() const {
   return image_;
+}
+
+NSBitmapImageRep* Image::GetAnimationRep() const {
+  for (NSBitmapImageRep* rep in [image_ representations]) {
+    if (![rep isKindOfClass:[NSBitmapImageRep class]])
+      continue;
+    NSNumber* frames = [rep valueForProperty:NSImageFrameCount];
+    if (frames && [frames intValue] > 1)
+      return rep;
+  }
+  return nullptr;
+}
+
+float Image::GetAnimationDuration(int index) const {
+  if (!cgimage_)
+    return 0.f;
+  // NSImage uses clamped duration by default, which makes NSImageView useless,
+  // the only way to get true duration time is to use CGImage.
+  CFDictionaryRef cfdict = CGImageSourceCopyPropertiesAtIndex(
+      cgimage_, index, nullptr);
+  NSDictionary* dict = CFBridgingRelease(cfdict);
+  NSNumber* duration =
+      [[dict objectForKey:(__bridge NSString *)kCGImagePropertyGIFDictionary]
+            objectForKey:(__bridge NSString *)kCGImagePropertyGIFUnclampedDelayTime];
+  if (!duration)
+    return 0.f;
+  return [duration floatValue] * 1000;
 }
 
 }  // namespace nu

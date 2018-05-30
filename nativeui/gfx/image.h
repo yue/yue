@@ -13,6 +13,10 @@
 #include "nativeui/gfx/geometry/size_f.h"
 #include "nativeui/types.h"
 
+#if defined(OS_MACOSX)
+#include <ImageIO/ImageIO.h>
+#endif
+
 namespace nu {
 
 class NATIVEUI_EXPORT Image : public base::RefCounted<Image> {
@@ -39,6 +43,14 @@ class NATIVEUI_EXPORT Image : public base::RefCounted<Image> {
   // Return the native instance of image object.
   NativeImage GetNative() const;
 
+#if defined(OS_MACOSX)
+  // Internal: Return the image representaion that has animations.
+  NSBitmapImageRep* GetAnimationRep() const;
+
+  // Internal: Get the duration of animations.
+  float GetAnimationDuration(int index) const;
+#endif
+
  protected:
   virtual ~Image();
 
@@ -49,6 +61,11 @@ class NATIVEUI_EXPORT Image : public base::RefCounted<Image> {
 
   float scale_factor_;
   NativeImage image_;
+
+#if defined(OS_MACOSX)
+  // An extra copy of image when the image includes animations.
+  CGImageSourceRef cgimage_ = nullptr;
+#endif
 };
 
 }  // namespace nu
