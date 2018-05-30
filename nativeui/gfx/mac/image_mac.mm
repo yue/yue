@@ -6,9 +6,35 @@
 
 #import <Cocoa/Cocoa.h>
 
+#include "base/mac/scoped_cftyperef.h"
 #include "base/strings/sys_string_conversions.h"
 
 namespace nu {
+
+namespace {
+
+// NSImage uses clamped duration by default, which makes NSImageView useless,
+// the only way to get true duration time is to use CGImage.
+std::vector<float> GetFrameDurations(NSBitmapImageRep* bitmap,
+                                     CGImageSourceRef image) {
+  std::vector<float> durations;
+  if (!image)
+    return durations;
+  NSNumber* frames = [bitmap valueForProperty:NSImageFrameCount];
+  int frames_count = [frames intValue];
+  durations.resize(frames_count);
+  for (int i = 0; i < frames_count; ++i) {
+    CFDictionaryRef cfdict = CGImageSourceCopyPropertiesAtIndex(image, i, nullptr);
+    NSDictionary* dict = CFBridgingRelease(cfdict);
+    NSNumber* delay =
+        [[dict objectForKey:(__bridge NSString *)kCGImagePropertyGIFDictionary]
+              objectForKey:(__bridge NSString *)kCGImagePropertyGIFUnclampedDelayTime];
+    durations[i] = delay ? [delay floatValue] * 1000 : 100;
+  }
+  return durations;
+}
+
+}  // namespace
 
 Image::Image(const base::FilePath& p)
     : scale_factor_(1.f),
@@ -35,8 +61,10 @@ Image::Image(const base::FilePath& p)
   NSBitmapImageRep* rep = GetAnimationRep();
   if (rep) {
     NSString* u = base::SysUTF8ToNSString(p.value());
-    cgimage_ = CGImageSourceCreateWithURL(
-        (__bridge CFURLRef)[NSURL fileURLWithPath:u], nullptr);
+    base::ScopedCFTypeRef<CGImageSourceRef> source(
+        CGImageSourceCreateWithURL((__bridge CFURLRef)[NSURL fileURLWithPath:u],
+                                   nullptr));
+    durations_ = GetFrameDurations(rep, source);
   }
 }
 
@@ -55,15 +83,15 @@ Image::Image(const Buffer& buffer, float scale_factor)
   // Read image with CGImage for animations.
   NSBitmapImageRep* rep = GetAnimationRep();
   if (rep) {
-    cgimage_ = CGImageSourceCreateWithData(
-        (__bridge CFDataRef)buffer.ToNSData(), nullptr);
+    base::ScopedCFTypeRef<CGImageSourceRef> source(
+        CGImageSourceCreateWithData((__bridge CFDataRef)buffer.ToNSData(),
+                                    nullptr));
+    durations_ = GetFrameDurations(rep, source);
   }
 }
 
 Image::~Image() {
   [image_ release];
-  if (cgimage_)
-    CFRelease(cgimage_);
 }
 
 SizeF Image::GetSize() const {
@@ -86,19 +114,7 @@ NSBitmapImageRep* Image::GetAnimationRep() const {
 }
 
 float Image::GetAnimationDuration(int index) const {
-  if (!cgimage_)
-    return 0.f;
-  // NSImage uses clamped duration by default, which makes NSImageView useless,
-  // the only way to get true duration time is to use CGImage.
-  CFDictionaryRef cfdict = CGImageSourceCopyPropertiesAtIndex(
-      cgimage_, index, nullptr);
-  NSDictionary* dict = CFBridgingRelease(cfdict);
-  NSNumber* duration =
-      [[dict objectForKey:(__bridge NSString *)kCGImagePropertyGIFDictionary]
-            objectForKey:(__bridge NSString *)kCGImagePropertyGIFUnclampedDelayTime];
-  if (!duration)
-    return 0.f;
-  return [duration floatValue] * 1000;
+  return durations_[index];
 }
 
 }  // namespace nu

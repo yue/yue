@@ -6,6 +6,7 @@
 #define NATIVEUI_GFX_IMAGE_H_
 
 #include <string>
+#include <vector>
 
 #include "base/files/file_path.h"
 #include "base/memory/ref_counted.h"
@@ -63,8 +64,8 @@ class NATIVEUI_EXPORT Image : public base::RefCounted<Image> {
   NativeImage image_;
 
 #if defined(OS_MACOSX)
-  // An extra copy of image when the image includes animations.
-  CGImageSourceRef cgimage_ = nullptr;
+  // The frame durations.
+  std::vector<float> durations_;
 #endif
 };
 
