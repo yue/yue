@@ -19,7 +19,7 @@ class_methods:
       items:
         description: An array of menu items to be inserted to the menu.
 
-method:
+methods:
   - signature: void Popup()
     description: |
       Show the popup menu at current mouse position, this method will block
