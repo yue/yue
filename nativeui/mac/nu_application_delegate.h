@@ -14,6 +14,8 @@ class Lifetime;
 @interface NUApplicationDelegate : NSObject<NSApplicationDelegate> {
  @private
   nu::Lifetime* shell_;
+ @private
+  NSMutableArray *fileURLPaths;
 }
 - (id)initWithShell:(nu::Lifetime*)shell;
 @end

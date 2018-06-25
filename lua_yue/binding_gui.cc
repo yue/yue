@@ -182,6 +182,7 @@ struct Type<nu::Lifetime> {
 #if defined(OS_MACOSX)
     RawSetProperty(state, index,
                    "onready", &nu::Lifetime::on_ready,
+                   "onopen", &nu::Lifetime::on_open,
                    "onactivate", &nu::Lifetime::on_activate);
 #endif
   }

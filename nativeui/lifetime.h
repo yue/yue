@@ -5,6 +5,7 @@
 #ifndef NATIVEUI_LIFETIME_H_
 #define NATIVEUI_LIFETIME_H_
 
+#include <string>
 #include "base/macros.h"
 #include "base/memory/weak_ptr.h"
 #include "nativeui/signal.h"
@@ -32,6 +33,7 @@ class NATIVEUI_EXPORT Lifetime {
   // Events.
 #if defined(OS_MACOSX)
   Signal<void()> on_ready;
+  Signal<void(const std::string&)> on_open;
   Signal<void()> on_activate;
 #endif
 

@@ -194,6 +194,7 @@ struct Type<nu::Lifetime> {
 #if defined(OS_MACOSX)
     SetProperty(context, templ,
                 "onReady", &nu::Lifetime::on_ready,
+                "onOpen", &nu::Lifetime::on_open,
                 "onActivate", &nu::Lifetime::on_activate);
 #endif
   }
