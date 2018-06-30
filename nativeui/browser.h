@@ -84,6 +84,7 @@ class NATIVEUI_EXPORT Browser : public View {
   Signal<void(Browser*, const std::string&)> on_commit_navigation;
   Signal<void(Browser*, const std::string&, int)> on_fail_navigation;
   Signal<void(Browser*, const std::string&)> on_finish_navigation;
+  Signal<bool(Browser*, const std::string&)> on_create_new_browser;
 
   // Internal: Called from web pages to invoke native bindings.
   bool InvokeBindings(const std::string& key,

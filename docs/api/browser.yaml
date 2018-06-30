@@ -182,3 +182,6 @@ events:
 
   - callback: void on_fail_navigation(Browser* self, const std::string& url, int code)
     description: Emitted when the navigation fails.
+
+  - callback: bool on_create_new_browser(Browser* self, const std::string& url)
+    description: Emitted when the web page requests to create new browser. Return whether to prevent the operating system from creating a browser.

@@ -144,6 +144,10 @@ STDMETHODIMP BrowserEventSink::Invoke(_In_  DISPID dispIdMember,
     case DISPID_DOWNLOADCOMPLETE:
       delegate->on_change_loading.Emit(delegate);
       break;
+    case DISPID_NEWWINDOW3:
+      if (delegate->on_create_new_browser.Emit(delegate, URLToString(pDispParams->rgvarg[0].bstrVal)))
+        *pDispParams->rgvarg[3].pboolVal = VARIANT_TRUE;
+      break;
     default:
       hr = E_NOTIMPL;
       break;

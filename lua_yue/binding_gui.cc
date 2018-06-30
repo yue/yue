@@ -1318,7 +1318,8 @@ struct Type<nu::Browser> {
                    "onstartnavigation", &nu::Browser::on_start_navigation,
                    "oncommitnavigation", &nu::Browser::on_commit_navigation,
                    "onfinishnavigation", &nu::Browser::on_finish_navigation,
-                   "onfailnavigation", &nu::Browser::on_fail_navigation);
+                   "onfailnavigation", &nu::Browser::on_fail_navigation,
+                   "oncreatenewbrowser", &nu::Browser::on_create_new_browser);
   }
   static void AddBinding(CallContext* context,
                          nu::Browser* browser,
