@@ -184,6 +184,10 @@ void Toolbar::SetDisplayMode(DisplayMode mode) {
   toolbar_.displayMode = static_cast<NSToolbarDisplayMode>(mode);
 }
 
+void Toolbar::SetItems(std::vector<Item> items) {
+  toolbar_.items = static_cast<NSArray<NSToolbarItem>>(items);
+}
+
 void Toolbar::SetVisible(bool visible) {
   toolbar_.visible = visible;
 }

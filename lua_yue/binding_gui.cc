@@ -925,6 +925,7 @@ struct Type<nu::Toolbar> {
            "setalloweditemidentifiers", &nu::Toolbar::SetAllowedItemIdentifiers,
            "setallowcustomization", &nu::Toolbar::SetAllowCustomization,
            "setdisplaymode", &nu::Toolbar::SetDisplayMode,
+           "setitems", &nu::Toolbar::SetItems,
            "setvisible", &nu::Toolbar::SetVisible,
            "isvisible", &nu::Toolbar::IsVisible,
            "getidentifier", &nu::Toolbar::GetIdentifier);

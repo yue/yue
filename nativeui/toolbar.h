@@ -52,6 +52,7 @@ class NATIVEUI_EXPORT Toolbar : public base::RefCounted<Toolbar> {
   void SetAllowedItemIdentifiers(const std::vector<std::string>& identifiers);
   void SetAllowCustomization(bool allow);
   void SetDisplayMode(DisplayMode mode);
+  void SetItems(std::vector<Item> items);
   void SetVisible(bool visible);
   bool IsVisible() const;
   std::string GetIdentifier() const;
