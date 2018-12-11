@@ -39,8 +39,8 @@ execSync(`node ./scripts/test_libyue.js`)
 // Build node extensions.
 const runtimes = {
   node: [
-    'v9.4.0',
-    'v8.9.4',
+    '10.14.1',
+    '11.4.0',
   ],
   electron: [
   ],
