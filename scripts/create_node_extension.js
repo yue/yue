@@ -15,7 +15,7 @@ if (argv.length != 2) {
 }
 
 const runtime = argv[0]
-const nodever = argv[1]
+const nodever = argv[1].startsWith('v') ? argv[1] : `v${argv[1]}`
 
 const args = [
   // Same with Release build.

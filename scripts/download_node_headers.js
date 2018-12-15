@@ -17,7 +17,7 @@ if (argv.length != 3) {
 }
 
 const runtime = argv[0]
-const version = argv[1]
+const version = argv[1].startsWith('v') ? argv[1] : `v${argv[1]}`
 const targetCpu = argv[2]
 
 const prefix = {
