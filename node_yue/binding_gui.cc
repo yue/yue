@@ -1527,7 +1527,7 @@ struct Type<nu::Browser> {
       for (const auto& it : value.GetList())
         args.push_back(ToV8(context, it));
       node::MakeCallback(isolate, func, func, static_cast<int>(args.size()),
-                         &args.front());
+                         &args.front(), {0, 0});
     });
   }
   static void AddRawBinding(Arguments* args,
