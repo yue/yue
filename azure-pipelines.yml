@@ -14,6 +14,8 @@ jobs:
         TARGET_CPU: x64
       x86:
         TARGET_CPU: x86
+  steps:
+  - template: azure-pipelines-template.yml
 
 - job: macos_build
   displayName: 'Build for macOS'
