@@ -37,6 +37,9 @@
 
 - (void)drawRect:(NSRect)dirtyRect {
   nu::Container* shell = static_cast<nu::Container*>([self shell]);
+  if (!shell)
+    return;
+
   nu::RectF dirty(dirtyRect);
   nu::PainterMac painter;
   painter.SetColor(background_color_);

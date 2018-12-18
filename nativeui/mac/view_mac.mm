@@ -25,6 +25,11 @@ View* g_captured_view = nullptr;
 }  // namespace
 
 void View::PlatformDestroy() {
+  if (IsNUView(view_)) {
+    // The view may be referenced after this class gets destroyed.
+    NUPrivate* priv = [view_ nuPrivate];
+    priv->shell = nullptr;
+  }
   [view_ release];
 }
 

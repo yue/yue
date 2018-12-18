@@ -47,6 +47,9 @@
 }
 
 - (void)drawRect:(NSRect)dirtyRect {
+  if (![self shell])
+    return;
+
   nu::PainterMac painter;
   painter.SetColor(background_color_);
   painter.FillRect(nu::RectF(dirtyRect));

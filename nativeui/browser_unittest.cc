@@ -384,7 +384,6 @@ TEST_F(BrowserTest, LargeFileProtocol) {
                                 .Append(FILE_PATH_LITERAL("libs"))
                                 .Append(FILE_PATH_LITERAL("pug.js"));
   std::string content;
-  LOG(ERROR) << file.value();
   ASSERT_TRUE(base::ReadFileToString(file, &content));
   nu::Browser::RegisterProtocol("large", [&](const std::string& url) {
     return new nu::ProtocolStringJob(
