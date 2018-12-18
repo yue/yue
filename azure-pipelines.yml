@@ -11,11 +11,9 @@ jobs:
   strategy:
     matrix:
       x64:
-        TARGET_ARCH: x64
+        TARGET_CPU: x64
       x86:
-        TARGET_ARCH: x86
-  timeoutInMinutes: 120
-  cancelTimeoutInMinutes: 120
+        TARGET_CPU: x86
 
 - job: macos_build
   displayName: 'Build for macOS'
@@ -24,7 +22,9 @@ jobs:
   strategy:
     matrix:
       x64:
-        TARGET_ARCH: x64
+        TARGET_CPU: x64
+  steps:
+  - template: azure-pipelines-template.yml
 
 - job: linux_build
   displayName: 'Build for Linux'
@@ -33,10 +33,10 @@ jobs:
   strategy:
     matrix:
       x64:
-        TARGET_ARCH: x64
+        TARGET_CPU: x64
       x86:
-        TARGET_ARCH: x86
+        TARGET_CPU: x86
       arm:
-        TARGET_ARCH: arm
+        TARGET_CPU: arm
       arm64:
-        TARGET_ARCH: arm64
+        TARGET_CPU: arm64

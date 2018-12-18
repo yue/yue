@@ -1,0 +1,37 @@
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: 10.x
+
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '2.7'
+    architecture: 'x64'
+
+- script: node scripts/cibuild.js --target-cpu=$(TARGET_CPU)
+  displayName: Build and Test
+
+- bash: |
+    BRANCH=$(Build.SourceBranch)
+    TAG=${BRANCH:10}
+    echo "##vso[task.setvariable variable=Name;isOutput=true]$TAG"
+  displayName: Get Tag Name
+  name: Tag
+  condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
+
+- task: GithubRelease@0
+  displayName: Create GitHub Release
+  condition: startsWith(variables['Tag.Name'], 'v')
+  inputs:
+    gitHubConnection: GitHub Yue
+    repositoryName: yue/yue
+    action: Edit
+    tagSource: auto
+    tag: $(Tag.Name)
+    title: Yue $(Tag.name)
+    releaseNotesSource: input
+    releaseNotes: (placeholder)
+    assets: 'out/Dist/*.zip'
+    assetUploadMode: replace
+    isDraft: true
+    addChangelog: false
