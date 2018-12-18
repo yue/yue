@@ -9,26 +9,29 @@ steps:
     architecture: 'x64'
 
 - script: node scripts/cibuild.js --target-cpu=$(TARGET_CPU)
-  displayName: Build and Test
+  displayName: Build and test
+  condition: ne(variables['Agent.OS'], 'Linux')
+
+- script: xvfb-run node scripts/cibuild.js --target-cpu=$(TARGET_CPU)
+  displayName: Build and test with xvfb
+  condition: eq(variables['Agent.OS'], 'Linux')
 
 - bash: |
-    BRANCH=$(Build.SourceBranch)
-    TAG=${BRANCH:10}
-    echo "##vso[task.setvariable variable=Name;isOutput=true]$TAG"
-  displayName: Get Tag Name
-  name: Tag
-  condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
+    VERSION=`git describe --always --tags`
+    echo "##vso[task.setvariable variable=Version;isOutput=true]$VERSION"
+  displayName: Get Yue version
+  name: Yue
 
 - task: GithubRelease@0
   displayName: Create GitHub Release
-  condition: startsWith(variables['Tag.Name'], 'v')
+  condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
   inputs:
     gitHubConnection: GitHub Yue
     repositoryName: yue/yue
     action: Edit
     tagSource: auto
-    tag: $(Tag.Name)
-    title: Yue $(Tag.name)
+    tag: $(Yue.Version)
+    title: Yue $(Yue.Version)
     releaseNotesSource: input
     releaseNotes: (placeholder)
     assets: 'out/Dist/*.zip'
