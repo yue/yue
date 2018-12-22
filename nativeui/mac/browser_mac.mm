@@ -114,6 +114,8 @@ base::Value NSValueToBaseValue(id value) {
       [[WKWebViewConfiguration alloc] init]);
   if (options.devtools)
     [[config preferences] setValue:@YES forKey:@"developerExtrasEnabled"];
+  if (options.allow_file_access_from_files)
+    [[config preferences] setValue:@YES forKey:@"allowFileAccessFromFileURLs"];
   [[config userContentController] addScriptMessageHandler:handler_.get()
                                                      name:@"yue"];
   [super initWithFrame:NSZeroRect configuration:config.get()];

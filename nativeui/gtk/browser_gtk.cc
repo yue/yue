@@ -202,6 +202,9 @@ void Browser::PlatformInit(const Options& options) {
     webkit_settings_set_enable_write_console_messages_to_stdout(settings, true);
     webkit_settings_set_enable_developer_extras(settings, true);
   }
+  if (options.allow_file_access_from_files) {
+    webkit_settings_set_allow_file_access_from_file_urls(settings, true);
+  }
   webkit_web_view_set_settings(WEBKIT_WEB_VIEW(webview), settings);
 
   // Disable the context menu.

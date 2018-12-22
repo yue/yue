@@ -1449,8 +1449,10 @@ struct Type<nu::Browser::Options> {
     auto obj = value.As<v8::Object>();
     if (obj.IsEmpty())
       return false;
-    Get(context, obj, "devtools", &out->devtools);
-    Get(context, obj, "contextMenu", &out->context_menu);
+    Get(context, obj,
+        "devtools", &out->devtools,
+        "contextMenu", &out->context_menu,
+        "allowFileAccessFromFiles", &out->allow_file_access_from_files);
     return true;
   }
 };

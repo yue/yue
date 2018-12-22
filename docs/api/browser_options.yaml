@@ -19,3 +19,11 @@ properties:
     detail: |
       On macOS due to the limitation of system APIs, right-clicking certain
       elements would still popup a menu with Services items.
+
+  - property: bool allow_file_access_from_files
+    description: Whether file access is allowed from file URLs, default is `false`.
+    detail: |
+      By default, when something is loaded in using a file URI, cross origin
+      requests to other file resources are not allowed. This setting allows
+      you to change that behaviour, so that it would be possible to do a
+      `XMLHttpRequest` of a local file, for example.
