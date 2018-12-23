@@ -72,14 +72,14 @@
 - (void)viewDidHide {
   [super viewDidHide];
   auto* gif = static_cast<nu::GifPlayer*>([self shell]);
-  if (gif->IsAnimating())
+  if (gif && gif->IsAnimating())
     gif->StopAnimationTimer();
 }
 
 - (void)viewDidUnhide {
   [super viewDidUnhide];
   auto* gif = static_cast<nu::GifPlayer*>([self shell]);
-  if (gif->IsAnimating() && !gif->IsPlaying())
+  if (gif && gif->IsAnimating() && !gif->IsPlaying())
     gif->ScheduleFrame();
 }
 
