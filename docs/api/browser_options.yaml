@@ -22,8 +22,13 @@ properties:
 
   - property: bool allow_file_access_from_files
     description: Whether file access is allowed from file URLs, default is `false`.
+    platform: ['macOS', 'Linux']
     detail: |
       By default, when something is loaded in using a file URI, cross origin
       requests to other file resources are not allowed. This setting allows
       you to change that behaviour, so that it would be possible to do a
       `XMLHttpRequest` of a local file, for example.
+
+  - property: bool hardware_acceleration
+    description: Whether to enable hardware acceleration, default is `true`.
+    platform: ['Linux']

@@ -1452,7 +1452,8 @@ struct Type<nu::Browser::Options> {
     Get(context, obj,
         "devtools", &out->devtools,
         "contextMenu", &out->context_menu,
-        "allowFileAccessFromFiles", &out->allow_file_access_from_files);
+        "allowFileAccessFromFiles", &out->allow_file_access_from_files,
+        "hardwareAcceleration", &out->hardware_acceleration);
     return true;
   }
 };

@@ -26,6 +26,7 @@ class NATIVEUI_EXPORT Browser : public View {
     bool devtools = false;
     bool context_menu = false;
     bool allow_file_access_from_files = false;
+    bool hardware_acceleration = true;
   };
 
   explicit Browser(const Options& options);

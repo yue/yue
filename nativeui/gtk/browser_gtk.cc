@@ -205,6 +205,10 @@ void Browser::PlatformInit(const Options& options) {
   if (options.allow_file_access_from_files) {
     webkit_settings_set_allow_file_access_from_file_urls(settings, true);
   }
+  if (!options.hardware_acceleration) {
+    webkit_settings_set_hardware_acceleration_policy(
+        settings, WEBKIT_HARDWARE_ACCELERATION_POLICY_NEVER);
+  }
   webkit_web_view_set_settings(WEBKIT_WEB_VIEW(webview), settings);
 
   // Disable the context menu.
