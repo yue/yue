@@ -35,10 +35,4 @@ The Yue project is licensed under [LGPL v2.1][license] with following exception:
 * If you did not modify Yue's source code, you have the permission to statically
   link Yue with your project, regardless of the license of your project.
 
-### Alternative license
-
-The source code of Yue is also available under the MIT license if you subscribe
-to the [paid plans][paid-plans].
-
 [license]: https://github.com/yue/yue/blob/master/LICENSE
-[paid-plans]: https://github.com/yue/yue/tree/master/docs/paid_plans
