@@ -23,6 +23,7 @@ class SubwinHolder : public Win32Window {
     CR_MSG_WM_NOTIFY(OnNotify)
     CR_MSG_WM_CTLCOLOREDIT(OnCtlColorStatic)
     CR_MSG_WM_CTLCOLORSTATIC(OnCtlColorStatic)
+    CR_MSG_WM_HSCROLL(OnHScroll)
   CR_END_MSG_MAP()
 
   // Some controls cache their parents, so after we reparent some controls to
@@ -31,6 +32,7 @@ class SubwinHolder : public Win32Window {
   void OnCommand(UINT code, int command, HWND window);
   LRESULT OnNotify(int id, LPNMHDR pnmh);
   HBRUSH OnCtlColorStatic(HDC dc, HWND window);
+  void OnHScroll(UINT code, UINT pos, HWND window);
 };
 
 }  // namespace nu

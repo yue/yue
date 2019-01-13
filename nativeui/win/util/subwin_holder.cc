@@ -35,4 +35,9 @@ HBRUSH SubwinHolder::OnCtlColorStatic(HDC dc, HWND window) {
   return brush;
 }
 
+void SubwinHolder::OnHScroll(UINT code, UINT pos, HWND window) {
+  auto* control = reinterpret_cast<SubwinView*>(GetWindowUserData(window));
+  control->OnHScroll(code, pos);
+}
+
 }  // namespace nu

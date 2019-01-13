@@ -36,6 +36,7 @@ class SubwinView : public Win32Window, public ViewImpl {
   virtual void OnCommand(UINT code, int command) {}
   virtual LRESULT OnNotify(int code, LPNMHDR pnmh) { return 0; }
   virtual bool OnCtlColor(HDC dc, HBRUSH* brush);
+  virtual void OnHScroll(UINT code, UINT pos) {}
 
  protected:
   // Mark that this control has transparent background.
