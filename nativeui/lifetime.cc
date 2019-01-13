@@ -24,6 +24,7 @@ Lifetime::Lifetime() : weak_factory_(this) {
   CHECK(!State::GetCurrent()) << "Lifetime must be initailized before State";
   CHECK(!g_lifetime) << "Lifetime can not be created twice";
   g_lifetime = this;
+  logging::SetMinLogLevel(logging::LOG_ERROR);
   PlatformInit();
 }
 
