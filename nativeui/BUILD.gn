@@ -309,6 +309,8 @@ component("nativeui") {
     "win/menu_item_win.cc",
     "win/menu_item_win.h",
     "win/message_loop_win.cc",
+    "win/picker_win.cc",
+    "win/picker_win.h",
     "win/progress_bar_win.cc",
     "win/scroll_win.cc",
     "win/scroll_win.h",

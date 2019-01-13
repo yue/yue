@@ -16,6 +16,7 @@ class SliderImpl : public SubwinView {
  public:
   explicit SliderImpl(Slider* delegate)
       : SubwinView(delegate, TRACKBAR_CLASS, WS_CHILD | WS_VISIBLE) {
+    set_focusable(true);
     SetTransparentBackground();
     ::SendMessage(hwnd(), TBM_SETRANGE, TRUE, MAKELPARAM(0, base_));
     ::SendMessage(hwnd(), TBM_SETPAGESIZE, TRUE, base_ / max_);
@@ -76,8 +77,7 @@ class SliderImpl : public SubwinView {
 }  // namespace
 
 Slider::Slider() {
-  auto* slider = new SliderImpl(this);
-  TakeOverView(slider);
+  TakeOverView(new SliderImpl(this));
   UpdateDefaultStyle();
 }
 
