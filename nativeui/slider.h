@@ -5,6 +5,8 @@
 #ifndef NATIVEUI_SLIDER_H_
 #define NATIVEUI_SLIDER_H_
 
+#include <tuple>
+
 #include "nativeui/view.h"
 
 namespace nu {
@@ -20,10 +22,8 @@ class NATIVEUI_EXPORT Slider : public View {
   float GetValue() const;
   void SetStep(float step);
   float GetStep() const;
-  void SetMaximumValue(float max);
-  float GetMaximumValue() const;
-  void SetMinimumValue(float min);
-  float GetMinimumValue() const;
+  void SetRange(float min, float max);
+  std::tuple<float, float> GetRange() const;
 
   // View:
   const char* GetClassName() const override;

@@ -36,17 +36,11 @@ methods:
   - signature: float GetValue() const
     description: Return the step value of the slider.
 
-  - signature: void SetMaximumValue(float value)
-    description: Set the maximum value of the slider.
+  - signature: void SetRange(float min, float max)
+    description: Set the range of the slider.
 
-  - signature: float GetMaximumValue() const
-    description: Return the maximum value of the slider.
-
-  - signature: void SetMinimumValue(float value)
-    description: Set the minimum value of the slider.
-
-  - signature: float GetMinimumValue() const
-    description: Return the minimum value of the slider.
+  - signature: std::tuple<float, float> GetRange() const
+    description: Return the range of the slider.
 
 events:
   - callback: void on_value_change(Slider* self)

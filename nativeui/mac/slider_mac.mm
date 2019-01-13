@@ -103,24 +103,15 @@ float Slider::GetStep() const {
   return [slider altIncrementValue];
 }
 
-void Slider::SetMaximumValue(float max) {
+void Slider::SetRange(float min, float max) {
   auto* slider = static_cast<NSSlider*>(GetNative());
+  [slider setMinValue:min];
   [slider setMaxValue:max];
 }
 
-float Slider::GetMaximumValue() const {
+std::tuple<float, float> Slider::GetRange() const {
   auto* slider = static_cast<NSSlider*>(GetNative());
-  return [slider maxValue];
-}
-
-void Slider::SetMinimumValue(float min) {
-  auto* slider = static_cast<NSSlider*>(GetNative());
-  [slider setMinValue:min];
-}
-
-float Slider::GetMinimumValue() const {
-  auto* slider = static_cast<NSSlider*>(GetNative());
-  return [slider minValue];
+  return std::make_tuple([slider minValue], [slider maxValue]);
 }
 
 SizeF Slider::GetMinimumSize() const {

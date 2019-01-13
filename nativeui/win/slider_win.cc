@@ -69,26 +69,17 @@ float Slider::GetStep() const {
       ::SendMessage(slider->hwnd(), TBM_GETPAGESIZE, 0, 0L));
 }
 
-void Slider::SetMaximumValue(float max) {
+void Slider::SetRange(float min, float max) {
   auto* slider = static_cast<SliderImpl*>(GetNative());
+  ::SendMessage(slider->hwnd(), TBM_SETRANGEMIN, TRUE, min);
   ::SendMessage(slider->hwnd(), TBM_SETRANGEMAX, TRUE, max);
 }
 
-float Slider::GetMaximumValue() const {
-  auto* slider = static_cast<SliderImpl*>(GetNative());
-  return static_cast<float>(
-      ::SendMessage(slider->hwnd(), TBM_GETRANGEMAX, 0, 0L));
-}
-
-void Slider::SetMinimumValue(float min) {
-  auto* slider = static_cast<SliderImpl*>(GetNative());
-  ::SendMessage(slider->hwnd(), TBM_SETRANGEMIN, TRUE, min);
-}
-
-float Slider::GetMinimumValue() const {
-  auto* slider = static_cast<SliderImpl*>(GetNative());
-  return static_cast<float>(
-      ::SendMessage(slider->hwnd(), TBM_GETRANGEMIN, 0, 0L));
+std::tuple<float, float> Slider::GetRange() const {
+  HWND hwnd = static_cast<SliderImpl*>(GetNative())->hwnd();
+  return std::make_tuple(
+      static_cast<float>(::SendMessage(hwnd, TBM_GETRANGEMIN, 0, 0L)),
+      static_cast<float>(::SendMessage(hwnd, TBM_GETRANGEMAX, 0, 0L)));
 }
 
 SizeF Slider::GetMinimumSize() const {

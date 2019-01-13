@@ -1497,10 +1497,8 @@ struct Type<nu::Slider> {
            "getvalue", &nu::Slider::GetValue,
            "setstep", &nu::Slider::SetStep,
            "getstep", &nu::Slider::GetStep,
-           "setmaximumvalue", &nu::Slider::SetMaximumValue,
-           "getmaximumvalue", &nu::Slider::GetMaximumValue,
-           "setminimumvalue", &nu::Slider::SetMinimumValue,
-           "getminimumvalue", &nu::Slider::GetMinimumValue);
+           "setrange", &nu::Slider::SetRange,
+           "getrange", &nu::Slider::GetRange);
     RawSetProperty(state, metatable,
                    "onvaluechange", &nu::Slider::on_value_change,
                    "onslidingcomplete", &nu::Slider::on_sliding_complete);
