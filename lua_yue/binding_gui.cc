@@ -1414,12 +1414,21 @@ struct Type<nu::Picker> {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::Picker>,
            "additem", &nu::Picker::AddItem,
-           "removeitemat", &nu::Picker::RemoveItemAt,
+           "removeitemat", &RemoveItemAt,
            "getitems", &nu::Picker::GetItems,
-           "selectitemat", &nu::Picker::SelectItemAt,
+           "selectitemat", &SelectItemAt,
            "getselecteditem", &nu::Picker::GetSelectedItem,
-           "getselecteditemindex", &nu::Picker::GetSelectedItemIndex);
+           "getselecteditemindex", &GetSelectedItemIndex);
     RawSetProperty(state, metatable, "onchange", &nu::Picker::on_change);
+  }
+  static void RemoveItemAt(nu::Picker* picker, int i) {
+    return picker->RemoveItemAt(i - 1);
+  }
+  static void SelectItemAt(nu::Picker* picker, int i) {
+    return picker->SelectItemAt(i - 1);
+  }
+  static int GetSelectedItemIndex(nu::Picker* picker) {
+    return picker->GetSelectedItemIndex() + 1;
   }
 };
 
