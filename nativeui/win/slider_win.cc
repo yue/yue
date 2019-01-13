@@ -17,6 +17,37 @@ class SliderImpl : public SubwinView {
   explicit SliderImpl(Slider* delegate)
       : SubwinView(delegate, TRACKBAR_CLASS, WS_CHILD | WS_VISIBLE) {
     SetTransparentBackground();
+    ::SendMessage(hwnd(), TBM_SETRANGE, TRUE, MAKELPARAM(0, base_));
+    ::SendMessage(hwnd(), TBM_SETPAGESIZE, TRUE, base_ / max_);
+  }
+
+  void SetValue(float value) {
+    int pos = value * (base_ / (max_ - min_));
+    ::SendMessage(hwnd(), TBM_SETPOS, TRUE, pos);
+  }
+
+  float GetValue() const {
+    int pos = ::SendMessage(hwnd(), TBM_GETPOS, 0, 0L);
+    return pos * ((max_ - min_) / base_);
+  }
+
+  void SetStep(float step) {
+    step_ = step;
+    ::SendMessage(hwnd(), TBM_SETPAGESIZE, TRUE,
+                  step_ * (base_ / (max_ - min_)));
+  }
+
+  float GetStep() const {
+    return step_;
+  }
+
+  void SetRange(float min, float max) {
+    min_ = min;
+    max_ = max;
+  }
+
+  std::tuple<float, float> GetRange() const {
+    return std::make_tuple(min_, max_);
   }
 
  protected:
@@ -32,14 +63,20 @@ class SliderImpl : public SubwinView {
     Slider* slider = static_cast<Slider*>(delegate());
     slider->on_value_change.Emit(slider);
   }
+
+ private:
+  float min_ = 0.;
+  float max_ = 100.l;
+  float step_ = 1.;
+
+  // Use a large range since Windows does not support discrete range.
+  const int base_ = 10000;
 };
 
 }  // namespace
 
 Slider::Slider() {
   auto* slider = new SliderImpl(this);
-  ::SendMessage(slider->hwnd(), TBM_SETRANGE, TRUE, MAKELPARAM(0, 100));
-  ::SendMessage(slider->hwnd(), TBM_SETPAGESIZE, TRUE, 1);
   TakeOverView(slider);
   UpdateDefaultStyle();
 }
@@ -49,37 +86,32 @@ Slider::~Slider() {
 
 void Slider::SetValue(float value) {
   auto* slider = static_cast<SliderImpl*>(GetNative());
-  ::SendMessage(slider->hwnd(), TBM_SETPOS, TRUE, value);
+  slider->SetValue(value);
 }
 
 float Slider::GetValue() const {
   auto* slider = static_cast<SliderImpl*>(GetNative());
-  return static_cast<float>(
-      ::SendMessage(slider->hwnd(), TBM_GETPOS, 0, 0L));
+  return slider->GetValue();
 }
 
 void Slider::SetStep(float step) {
   auto* slider = static_cast<SliderImpl*>(GetNative());
-  ::SendMessage(slider->hwnd(), TBM_SETPAGESIZE, TRUE, step);
+  slider->SetStep(step);
 }
 
 float Slider::GetStep() const {
   auto* slider = static_cast<SliderImpl*>(GetNative());
-  return static_cast<float>(
-      ::SendMessage(slider->hwnd(), TBM_GETPAGESIZE, 0, 0L));
+  return slider->GetStep();
 }
 
 void Slider::SetRange(float min, float max) {
   auto* slider = static_cast<SliderImpl*>(GetNative());
-  ::SendMessage(slider->hwnd(), TBM_SETRANGEMIN, TRUE, min);
-  ::SendMessage(slider->hwnd(), TBM_SETRANGEMAX, TRUE, max);
+  slider->SetRange(min, max);
 }
 
 std::tuple<float, float> Slider::GetRange() const {
-  HWND hwnd = static_cast<SliderImpl*>(GetNative())->hwnd();
-  return std::make_tuple(
-      static_cast<float>(::SendMessage(hwnd, TBM_GETRANGEMIN, 0, 0L)),
-      static_cast<float>(::SendMessage(hwnd, TBM_GETRANGEMAX, 0, 0L)));
+  auto* slider = static_cast<SliderImpl*>(GetNative());
+  return slider->GetRange();
 }
 
 SizeF Slider::GetMinimumSize() const {
