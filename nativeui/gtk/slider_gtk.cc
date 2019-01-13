@@ -1,4 +1,4 @@
-// Copyright 2018 Cheng Zhao. All rights reserved.
+// Copyright 2019 Cheng Zhao. All rights reserved.
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
@@ -12,7 +12,11 @@ namespace nu {
 
 namespace {
 
-void OnValueChanged(GtkRange*, Slider* slider) {
+void OnValueChanged(GObject* widget, Slider* slider) {
+  if (g_object_get_data(widget, "ignore-value-change")) {
+    g_object_set_data(widget, "ignore-value-change", nullptr);
+    return;
+  }
   slider->on_value_change.Emit(slider);
 }
 
@@ -39,6 +43,7 @@ Slider::~Slider() {
 }
 
 void Slider::SetValue(float value) {
+  g_object_set_data(G_OBJECT(GetNative()), "ignore-value-change", this);
   gtk_range_set_value(GTK_RANGE(GetNative()), value);
 }
 

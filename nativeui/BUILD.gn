@@ -398,6 +398,7 @@ test("nativeui_unittests") {
     "menu_unittests.cc",
     "menu_item_unittests.cc",
     "message_loop_unittests.cc",
+    "slider_unittests.cc",
     "text_edit_unittests.cc",
     "view_unittest.cc",
     "window_unittest.cc",
