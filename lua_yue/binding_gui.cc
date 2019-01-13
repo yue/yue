@@ -1407,6 +1407,23 @@ struct Type<nu::ProgressBar> {
 };
 
 template<>
+struct Type<nu::Picker> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Picker";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateOnHeap<nu::Picker>,
+           "additem", &nu::Picker::AddItem,
+           "removeitemat", &nu::Picker::RemoveItemAt,
+           "getitems", &nu::Picker::GetItems,
+           "selectitemat", &nu::Picker::SelectItemAt,
+           "getselecteditem", &nu::Picker::GetSelectedItem,
+           "getselecteditemindex", &nu::Picker::GetSelectedItemIndex);
+    RawSetProperty(state, metatable, "onchange", &nu::Picker::on_change);
+  }
+};
+
+template<>
 struct Type<nu::GifPlayer> {
   using base = nu::View;
   static constexpr const char* name = "yue.GifPlayer";
@@ -1663,6 +1680,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::Browser>(state, "Browser");
   BindType<nu::Entry>(state, "Entry");
   BindType<nu::Label>(state, "Label");
+  BindType<nu::Picker>(state, "Picker");
   BindType<nu::ProgressBar>(state, "ProgressBar");
   BindType<nu::GifPlayer>(state, "GifPlayer");
   BindType<nu::Group>(state, "Group");

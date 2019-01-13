@@ -1,0 +1,50 @@
+name: Picker
+component: gui
+header: nativeui/picker.h
+type: refcounted
+namespace: nu
+inherit: View
+description: Choose a single item from a list of items.
+
+detail: |
+  The first item is automatically selected. Duplicate items are merged into one.
+
+constructors:
+  - signature: Picker()
+    lang: ['cpp']
+    description: Create a new `Picker` view.
+
+class_methods:
+  - signature: Picker* Create()
+    lang: ['lua', 'js']
+    description: Create a new `Picker` view.
+
+class_properties:
+  - property: const char* kClassName
+    lang: ['cpp']
+    description: The class name of this view.
+
+methods:
+  - signature: void AddItem(const std::string& title)
+    description: Add an item with `title` to the end.
+
+  - signature: void RemoveItemAt(int index)
+    description: Remove the item at `index`.
+
+  - signature: std::vector<std::string> GetItems() const
+    description: Return all items.
+
+  - signature: void SelectItemAt(int index)
+    description: Select the item at `index`.
+
+  - signature: std::string GetSelectedItem() const
+    description: Return the title of selected item.
+    detail: Empty string is returned if there is no selected item.
+
+  - signature: int GetSelectedItemIndex() const
+    description: Return the index of selected item.
+    detail: -1 is returned if there is no selected item.
+
+events:
+  - callback: void on_change(Picker* self)
+    description: Emitted when user has changed the selected item.

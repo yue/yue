@@ -1641,6 +1641,27 @@ struct Type<nu::ProgressBar> {
 };
 
 template<>
+struct Type<nu::Picker> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Picker";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor, "create", &CreateOnHeap<nu::Picker>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "addItem", &nu::Picker::AddItem,
+        "removeItemAt", &nu::Picker::RemoveItemAt,
+        "getItems", &nu::Picker::GetItems,
+        "selectItemAt", &nu::Picker::SelectItemAt,
+        "getSelectedItem", &nu::Picker::GetSelectedItem,
+        "getSelectedItemIndex", &nu::Picker::GetSelectedItemIndex);
+    SetProperty(context, templ, "onChange", &nu::Picker::on_change);
+  }
+};
+
+template<>
 struct Type<nu::GifPlayer> {
   using base = nu::View;
   static constexpr const char* name = "yue.GifPlayer";
@@ -1975,6 +1996,7 @@ void Initialize(v8::Local<v8::Object> exports) {
           "Browser",           vb::Constructor<nu::Browser>(),
           "Entry",             vb::Constructor<nu::Entry>(),
           "Label",             vb::Constructor<nu::Label>(),
+          "Picker",            vb::Constructor<nu::Picker>(),
           "ProgressBar",       vb::Constructor<nu::ProgressBar>(),
           "GifPlayer",         vb::Constructor<nu::GifPlayer>(),
           "Group",             vb::Constructor<nu::Group>(),
