@@ -57,7 +57,7 @@
 }
 
 - (IBAction)onChange:(id)sender {
-  shell_->on_change.Emit(shell_);
+  shell_->on_selection_change.Emit(shell_);
 }
 
 @end

@@ -1657,7 +1657,8 @@ struct Type<nu::Picker> {
         "selectItemAt", &nu::Picker::SelectItemAt,
         "getSelectedItem", &nu::Picker::GetSelectedItem,
         "getSelectedItemIndex", &nu::Picker::GetSelectedItemIndex);
-    SetProperty(context, templ, "onChange", &nu::Picker::on_change);
+    SetProperty(context, templ,
+                "onSelectionChange", &nu::Picker::on_selection_change);
   }
 };
 

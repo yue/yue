@@ -1419,7 +1419,8 @@ struct Type<nu::Picker> {
            "selectitemat", &SelectItemAt,
            "getselecteditem", &nu::Picker::GetSelectedItem,
            "getselecteditemindex", &GetSelectedItemIndex);
-    RawSetProperty(state, metatable, "onchange", &nu::Picker::on_change);
+    RawSetProperty(state, metatable,
+                   "onselectionchange", &nu::Picker::on_selection_change);
   }
   static void RemoveItemAt(nu::Picker* picker, int i) {
     return picker->RemoveItemAt(i - 1);

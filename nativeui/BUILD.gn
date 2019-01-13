@@ -205,6 +205,7 @@ component("nativeui") {
     "gtk/menu_bar_gtk.cc",
     "gtk/menu_item_gtk.cc",
     "gtk/message_loop_gtk.cc",
+    "gtk/picker_gtk.cc",
     "gtk/progress_bar_gtk.cc",
     "gtk/scroll_gtk.cc",
     "gtk/slider_gtk.cc",

@@ -45,7 +45,7 @@ int PickerImpl::GetSelectedItemIndex() const {
 void PickerImpl::OnCommand(UINT code, int command) {
   Picker* picker = static_cast<Picker*>(delegate());
   if (code == CBN_SELENDOK)
-    picker->on_change.Emit(picker);
+    picker->on_selection_change.Emit(picker);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

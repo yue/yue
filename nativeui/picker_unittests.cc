@@ -47,7 +47,7 @@ TEST_F(PickerTest, SelectItemShouldNotEmitEvent) {
   picker_->AddItem("item1");
   picker_->AddItem("item2");
   bool emitted = false;
-  picker_->on_change.Connect([&emitted](nu::Picker*) {
+  picker_->on_selection_change.Connect([&emitted](nu::Picker*) {
     emitted = true;
   });
   picker_->SelectItemAt(1);

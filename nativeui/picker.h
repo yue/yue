@@ -31,7 +31,7 @@ class NATIVEUI_EXPORT Picker : public View {
   SizeF GetMinimumSize() const override;
 
   // Events.
-  Signal<void(Picker*)> on_change;
+  Signal<void(Picker*)> on_selection_change;
 
  protected:
   ~Picker() override;

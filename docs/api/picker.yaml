@@ -7,7 +7,8 @@ inherit: View
 description: Choose a single item from a list of items.
 
 detail: |
-  The first item is automatically selected. Duplicate items are merged into one.
+  By default, the first item is automatically selected, and duplicate items
+  are merged into one.
 
 constructors:
   - signature: Picker()
@@ -46,5 +47,5 @@ methods:
     detail: -1 is returned if there is no selected item.
 
 events:
-  - callback: void on_change(Picker* self)
+  - callback: void on_selection_change(Picker* self)
     description: Emitted when user has changed the selected item.
