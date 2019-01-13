@@ -58,8 +58,9 @@ bool ProgressBar::IsIndeterminate() const {
 }
 
 SizeF ProgressBar::GetMinimumSize() const {
+  auto* progress = static_cast<ProgressBarImpl*>(GetNative());
   return ScaleSize(SizeF(0, ::GetSystemMetrics(SM_CYVSCROLL)),
-                   1.0f / GetScaleFactor());
+                   1.0f / progress->scale_factor());
 }
 
 }  // namespace nu

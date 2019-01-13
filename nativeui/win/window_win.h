@@ -46,6 +46,7 @@ class WindowImpl : public Win32Window {
   Window* delegate() { return delegate_; }
   FocusManager* focus_manager() { return &focus_manager_; }
   ViewImpl* captured_view() const { return captured_view_; }
+  Color background_color() const { return background_color_; }
   float scale_factor() const { return scale_factor_; }
 
  protected:

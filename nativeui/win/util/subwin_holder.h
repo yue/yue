@@ -21,6 +21,8 @@ class SubwinHolder : public Win32Window {
   CR_BEGIN_MSG_MAP_EX(SubwinHolder, Win32Window)
     CR_MSG_WM_COMMAND(OnCommand)
     CR_MSG_WM_NOTIFY(OnNotify)
+    CR_MSG_WM_CTLCOLOREDIT(OnCtlColorStatic)
+    CR_MSG_WM_CTLCOLORSTATIC(OnCtlColorStatic)
   CR_END_MSG_MAP()
 
   // Some controls cache their parents, so after we reparent some controls to
@@ -28,6 +30,7 @@ class SubwinHolder : public Win32Window {
   // We need to redirect the messages just like the toplevel window.
   void OnCommand(UINT code, int command, HWND window);
   LRESULT OnNotify(int id, LPNMHDR pnmh);
+  HBRUSH OnCtlColorStatic(HDC dc, HWND window);
 };
 
 }  // namespace nu

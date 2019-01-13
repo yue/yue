@@ -30,9 +30,6 @@ class SubwinView : public Win32Window, public ViewImpl {
   void SetBackgroundColor(Color color) override;
   void Draw(PainterWin* painter, const Rect& dirty) override;
 
-  // Change behaviors.
-  void set_switch_focus_on_tab(bool s) { switch_focus_on_tab_ = s; }
-
   WNDPROC proc() const { return proc_; }
 
   // Rerouted from parent window
@@ -41,6 +38,12 @@ class SubwinView : public Win32Window, public ViewImpl {
   virtual bool OnCtlColor(HDC dc, HBRUSH* brush);
 
  protected:
+  // Mark that this control has transparent background.
+  void SetTransparentBackground();
+
+  // Change focus behavior.
+  void set_switch_focus_on_tab(bool s) { switch_focus_on_tab_ = s; }
+
   CR_BEGIN_MSG_MAP_EX(SubwinView, Win32Window)
     CR_MSG_WM_CHAR(OnChar)
     CR_MSG_WM_SETFOCUS(OnSetFocus)
@@ -59,11 +62,16 @@ class SubwinView : public Win32Window, public ViewImpl {
       UINT message, WPARAM w_param, LPARAM l_param);
 
  private:
+  void UpdateTransparentBackgroundBrush();
+
   // Subclass-ed window procedure.
   static LRESULT CALLBACK WndProc(HWND window,
                                   UINT message,
                                   WPARAM w_param,
                                   LPARAM l_param);
+
+  // Should emulate the transparent background.
+  bool transprent_background_ = false;
 
   // Should switch focus when TAB is pressed.
   bool switch_focus_on_tab_ = true;

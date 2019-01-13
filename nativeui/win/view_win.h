@@ -133,6 +133,7 @@ class ViewImpl {
   Color background_color() const { return background_color_; }
 
   WindowImpl* window() const { return window_; }
+  ViewImpl* parent() const { return parent_; }
   ControlType type() const { return type_; }
   View* delegate() const { return delegate_; }
 

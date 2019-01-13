@@ -28,4 +28,11 @@ LRESULT SubwinHolder::OnNotify(int id, LPNMHDR pnmh) {
   return control->OnNotify(id, pnmh);
 }
 
+HBRUSH SubwinHolder::OnCtlColorStatic(HDC dc, HWND window) {
+  auto* control = reinterpret_cast<SubwinView*>(GetWindowUserData(window));
+  HBRUSH brush = NULL;
+  SetMsgHandled(control->OnCtlColor(dc, &brush));
+  return brush;
+}
+
 }  // namespace nu

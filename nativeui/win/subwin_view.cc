@@ -65,6 +65,8 @@ void SubwinView::SetParent(ViewImpl* parent) {
               parent && parent->window()
                   ? parent->window()->hwnd()
                   : State::GetCurrent()->GetSubwinHolder());
+  if (transprent_background_)
+    UpdateTransparentBackgroundBrush();
 }
 
 void SubwinView::BecomeContentView(WindowImpl* parent) {
@@ -107,11 +109,19 @@ void SubwinView::SetFont(Font* new_font) {
 
 void SubwinView::SetBackgroundColor(Color color) {
   ViewImpl::SetBackgroundColor(color);
-  bg_brush_.reset(CreateSolidBrush(color.ToCOLORREF()));
+  if (color.transparent())
+    SetTransparentBackground();
+  else
+    bg_brush_.reset(CreateSolidBrush(color.ToCOLORREF()));
 }
 
 void SubwinView::Draw(PainterWin* painter, const Rect& dirty) {
   // There is nothing to draw in a sub window.
+}
+
+void SubwinView::SetTransparentBackground() {
+  transprent_background_ = true;
+  UpdateTransparentBackgroundBrush();
 }
 
 bool SubwinView::OnCtlColor(HDC dc, HBRUSH* brush) {
@@ -164,6 +174,20 @@ LRESULT SubwinView::OnMouseWheelFromSelf(
   }
   SetMsgHandled(false);
   return 0;
+}
+
+void SubwinView::UpdateTransparentBackgroundBrush() {
+  if (!window() || !parent()) {
+    bg_brush_.reset();
+    return;
+  }
+
+  // Search for the opaque parent.
+  ViewImpl* p = parent();
+  while (p && p->background_color().transparent())
+    p = p->parent();
+  Color b = p ? p->background_color() : window()->background_color();
+  bg_brush_.reset(CreateSolidBrush(b.ToCOLORREF()));
 }
 
 // static
