@@ -1,0 +1,56 @@
+name: Slider
+component: gui
+header: nativeui/slider.h
+type: refcounted
+namespace: nu
+inherit: View
+description: A slider bar for selecting numerical value.
+
+detail: The default range is between `0` and `100`.
+
+constructors:
+  - signature: Slider()
+    lang: ['cpp']
+    description: Create a new `Slider` view.
+
+class_methods:
+  - signature: Slider* Create()
+    lang: ['lua', 'js']
+    description: Create a new `Slider` view.
+
+class_properties:
+  - property: const char* kClassName
+    lang: ['cpp']
+    description: The class name of this view.
+
+methods:
+  - signature: void SetValue(float value)
+    description: Set the value.
+
+  - signature: float GetValue() const
+    description: Return the value.
+
+  - signature: void SetStep(float step)
+    description: Set the step value of the slider.
+
+  - signature: float GetValue() const
+    description: Return the step value of the slider.
+
+  - signature: void SetMaximumValue(float value)
+    description: Set the maximum value of the slider.
+
+  - signature: float GetMaximumValue() const
+    description: Return the maximum value of the slider.
+
+  - signature: void SetMinimumValue(float value)
+    description: Set the minimum value of the slider.
+
+  - signature: float GetMinimumValue() const
+    description: Return the minimum value of the slider.
+
+events:
+  - callback: void on_value_change(Slider* self)
+    description: Emitted when user is dragging the slider.
+
+  - callback: void on_sliding_complete(Slider* self)
+    description: Emitted when user releases the slider.

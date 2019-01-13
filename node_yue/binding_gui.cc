@@ -1738,6 +1738,31 @@ struct Type<nu::Scroll> {
 };
 
 template<>
+struct Type<nu::Slider> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Slider";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor, "create", &CreateOnHeap<nu::Slider>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "setValue", &nu::Slider::SetValue,
+        "getValue", &nu::Slider::GetValue,
+        "setStep", &nu::Slider::SetStep,
+        "getStep", &nu::Slider::GetStep,
+        "setMaximumValue", &nu::Slider::SetMaximumValue,
+        "getMaximumValue", &nu::Slider::GetMaximumValue,
+        "setMinimumValue", &nu::Slider::SetMinimumValue,
+        "getMinimumValue", &nu::Slider::GetMinimumValue);
+    SetProperty(context, templ,
+                "onValueChange", &nu::Slider::on_value_change,
+                "onSlidingComplete", &nu::Slider::on_sliding_complete);
+  }
+};
+
+template<>
 struct Type<nu::TextEdit> {
   using base = nu::View;
   static constexpr const char* name = "yue.TextEdit";
@@ -1956,6 +1981,7 @@ void Initialize(v8::Local<v8::Object> exports) {
           "GifPlayer",         vb::Constructor<nu::GifPlayer>(),
           "Group",             vb::Constructor<nu::Group>(),
           "Scroll",            vb::Constructor<nu::Scroll>(),
+          "Slider",            vb::Constructor<nu::Slider>(),
           "TextEdit",          vb::Constructor<nu::TextEdit>(),
           "Tray",              vb::Constructor<nu::Tray>(),
 #if defined(OS_MACOSX)

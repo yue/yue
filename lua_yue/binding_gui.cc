@@ -1487,6 +1487,27 @@ struct Type<nu::Scroll> {
 };
 
 template<>
+struct Type<nu::Slider> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Slider";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateOnHeap<nu::Slider>,
+           "setvalue", &nu::Slider::SetValue,
+           "getvalue", &nu::Slider::GetValue,
+           "setstep", &nu::Slider::SetStep,
+           "getstep", &nu::Slider::GetStep,
+           "setmaximumvalue", &nu::Slider::SetMaximumValue,
+           "getmaximumvalue", &nu::Slider::GetMaximumValue,
+           "setminimumvalue", &nu::Slider::SetMinimumValue,
+           "getminimumvalue", &nu::Slider::GetMinimumValue);
+    RawSetProperty(state, metatable,
+                   "onvaluechange", &nu::Slider::on_value_change,
+                   "onslidingcomplete", &nu::Slider::on_sliding_complete);
+  }
+};
+
+template<>
 struct Type<nu::TextEdit> {
   using base = nu::View;
   static constexpr const char* name = "yue.TextEdit";
@@ -1648,6 +1669,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::GifPlayer>(state, "GifPlayer");
   BindType<nu::Group>(state, "Group");
   BindType<nu::Scroll>(state, "Scroll");
+  BindType<nu::Slider>(state, "Slider");
   BindType<nu::TextEdit>(state, "TextEdit");
   BindType<nu::Tray>(state, "Tray");
 #if defined(OS_MACOSX)
