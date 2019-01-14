@@ -15,8 +15,18 @@ namespace {
 class ComboBoxImpl : public PickerImpl {
  public:
   explicit ComboBoxImpl(ComboBox* delegate)
-    : PickerImpl(delegate, CBS_DROPDOWN) {}
+    : PickerImpl(delegate, CBS_DROPDOWN) {
+    // Get the edit window handle to combo box.
+    COMBOBOXINFO info = { sizeof(COMBOBOXINFO) };
+    if (::GetComboBoxInfo(hwnd(), &info)) {
+      HWND edit = info.hwndItem;
+      // Subclass the edit control.
+      SetWindowUserData(edit, this);
+      proc_ = SetWindowProc(edit, &EditWndProc);
+    }
+  }
 
+ protected:
   // PickerImpl:
   void OnCommand(UINT code, int command) {
     ComboBox* combobox = static_cast<ComboBox*>(delegate());
@@ -24,6 +34,22 @@ class ComboBoxImpl : public PickerImpl {
       combobox->on_text_change.Emit(combobox);
     PickerImpl::OnCommand(code, command);
   }
+
+ private:
+  static LRESULT CALLBACK EditWndProc(HWND hwnd,
+                                      UINT message,
+                                      WPARAM w_param,
+                                      LPARAM l_param) {
+    auto* self = reinterpret_cast<ComboBoxImpl*>(GetWindowUserData(hwnd));
+    // Handle the TAB key.
+    if (message == WM_CHAR && w_param == VK_TAB && self->window()) {
+      self->window()->AdvanceFocus();
+      return 0;
+    }
+    return CallWindowProc(self->proc_, hwnd, message, w_param, l_param);
+  }
+
+  WNDPROC proc_;
 };
 
 }  // namespace
