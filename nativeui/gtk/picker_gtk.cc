@@ -31,8 +31,7 @@ void IterateComboBox(GtkComboBox* combobox,
       gtk_tree_model_get(model, &iter, column, &text, -1);
       if (!callback(text))
         break;
-    }
-    while (gtk_tree_model_iter_next(model, &iter));
+    } while (gtk_tree_model_iter_next(model, &iter));
   }
 }
 

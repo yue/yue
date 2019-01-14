@@ -72,6 +72,8 @@ Picker::Picker()
   [picker setPreferredEdge:NSMinYEdge];
   [[picker cell] setArrowPosition:NSPopUpArrowAtBottom];
 
+  // The subclass overrides GetMinimumSize, so we must let subclass call
+  // UpdateDefaultStyle itself.
   UpdateDefaultStyle();
 }
 

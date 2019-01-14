@@ -14,7 +14,7 @@ namespace nu {
 
 class PickerImpl : public SubwinView {
  public:
-  explicit PickerImpl(Picker* delegate);
+  PickerImpl(Picker* delegate, int style);
 
   int ItemCount() const;
   std::string GetItemAt(int i);

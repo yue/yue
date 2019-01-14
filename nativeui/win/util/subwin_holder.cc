@@ -16,20 +16,23 @@ SubwinHolder::~SubwinHolder() {
 }
 
 void SubwinHolder::OnCommand(UINT code, int command, HWND window) {
-  if (!window)
-    return;
   auto* control = reinterpret_cast<SubwinView*>(GetWindowUserData(window));
-  control->OnCommand(code, command);
+  if (control)
+    control->OnCommand(code, command);
 }
 
 LRESULT SubwinHolder::OnNotify(int id, LPNMHDR pnmh) {
   HWND window = pnmh->hwndFrom;
   auto* control = reinterpret_cast<SubwinView*>(GetWindowUserData(window));
+  if (!control)
+    return 0;
   return control->OnNotify(id, pnmh);
 }
 
 HBRUSH SubwinHolder::OnCtlColorStatic(HDC dc, HWND window) {
   auto* control = reinterpret_cast<SubwinView*>(GetWindowUserData(window));
+  if (!control)
+    return NULL;
   HBRUSH brush = NULL;
   SetMsgHandled(control->OnCtlColor(dc, &brush));
   return brush;
@@ -37,7 +40,8 @@ HBRUSH SubwinHolder::OnCtlColorStatic(HDC dc, HWND window) {
 
 void SubwinHolder::OnHScroll(UINT code, UINT pos, HWND window) {
   auto* control = reinterpret_cast<SubwinView*>(GetWindowUserData(window));
-  control->OnHScroll(code, pos);
+  if (control)
+    control->OnHScroll(code, pos);
 }
 
 }  // namespace nu

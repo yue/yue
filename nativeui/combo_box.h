@@ -5,6 +5,9 @@
 #ifndef NATIVEUI_COMBO_BOX_H_
 #define NATIVEUI_COMBO_BOX_H_
 
+#include <string>
+#include <vector>
+
 #include "nativeui/picker.h"
 
 namespace nu {
@@ -19,11 +22,11 @@ class NATIVEUI_EXPORT ComboBox : public Picker {
   void SetText(const std::string& text);
   std::string GetText() const;
 
-  // On macOS the ComboBox does not have any relationship with Picker, we have
-  // to reimplement every method.
-#if defined(OS_MACOSX)
   // Picker:
   void AddItem(const std::string& text) override;
+#if defined(OS_MACOSX)
+  // On macOS the ComboBox does not have any relationship with Picker, we have
+  // to reimplement every method.
   void RemoveItemAt(int index) override;
   std::vector<std::string> GetItems() const override;
   void SelectItemAt(int index) override;

@@ -13,9 +13,9 @@
 
 namespace nu {
 
-PickerImpl::PickerImpl(Picker* delegate)
+PickerImpl::PickerImpl(Picker* delegate, int style)
     : SubwinView(delegate, WC_COMBOBOX,
-                 CBS_DROPDOWNLIST | WS_CHILD | WS_VISIBLE) {
+                 style | WS_CHILD | WS_VISIBLE) {
   set_focusable(true);
 }
 
@@ -51,8 +51,11 @@ void PickerImpl::OnCommand(UINT code, int command) {
 ///////////////////////////////////////////////////////////////////////////////
 // Public Picker API implementation.
 
-Picker::Picker() {
-  TakeOverView(new PickerImpl(this));
+Picker::Picker() : Picker(new PickerImpl(this, CBS_DROPDOWNLIST)) {
+}
+
+Picker::Picker(NativeView view) {
+  TakeOverView(view);
   UpdateDefaultStyle();
 }
 

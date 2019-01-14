@@ -294,6 +294,7 @@ component("nativeui") {
     "win/browser_win.cc",
     "win/browser_win.h",
     "win/button_win.cc",
+    "win/combo_box_win.cc",
     "win/container_win.cc",
     "win/container_win.h",
     "win/entry_win.cc",
