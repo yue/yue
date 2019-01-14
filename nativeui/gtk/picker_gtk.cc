@@ -37,10 +37,12 @@ void IterateComboBox(GtkComboBox* combobox,
 
 }  // namespace
 
-Picker::Picker() {
-  GtkWidget* combobox = gtk_combo_box_text_new();
-  g_signal_connect(combobox, "changed", G_CALLBACK(OnChanged), this);
-  TakeOverView(combobox);
+Picker::Picker() : Picker(gtk_combo_box_text_new()) {
+}
+
+Picker::Picker(NativeView view) {
+  g_signal_connect(view, "changed", G_CALLBACK(OnChanged), this);
+  TakeOverView(view);
   UpdateDefaultStyle();
 }
 
