@@ -1078,6 +1078,19 @@ struct Type<nu::View> {
     view->Layout();
   }
 };
+template<>
+struct Type<nu::ComboBox> {
+  using base = nu::Picker;
+  static constexpr const char* name = "yue.ComboBox";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "create", &CreateOnHeap<nu::ComboBox>,
+           "settext", &nu::ComboBox::SetText,
+           "gettext", &nu::ComboBox::GetText);
+    RawSetProperty(state, index,
+                   "ontextchange", &nu::ComboBox::on_text_change);
+  }
+};
 
 template<>
 struct Type<nu::Container> {
@@ -1682,6 +1695,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::Menu>(state, "Menu");
   BindType<nu::MenuItem>(state, "MenuItem");
   BindType<nu::Window>(state, "Window");
+  BindType<nu::ComboBox>(state, "ComboBox");
   BindType<nu::Container>(state, "Container");
   BindType<nu::Button>(state, "Button");
   BindType<nu::ProtocolStringJob>(state, "ProtocolStringJob");

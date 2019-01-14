@@ -19,12 +19,14 @@ class NATIVEUI_EXPORT Picker : public View {
   // View class name.
   static const char kClassName[];
 
-  void AddItem(const std::string& text);
-  void RemoveItemAt(int index);
-  std::vector<std::string> GetItems() const;
-  void SelectItemAt(int index);
-  std::string GetSelectedItem() const;
-  int GetSelectedItemIndex() const;
+  // Note: After adding any new method, make sure it is also implemented in
+  // ComboBox on macOS.
+  virtual void AddItem(const std::string& text);
+  virtual void RemoveItemAt(int index);
+  virtual std::vector<std::string> GetItems() const;
+  virtual void SelectItemAt(int index);
+  virtual std::string GetSelectedItem() const;
+  virtual int GetSelectedItemIndex() const;
 
   // View:
   const char* GetClassName() const override;
@@ -35,6 +37,9 @@ class NATIVEUI_EXPORT Picker : public View {
 
  protected:
   ~Picker() override;
+
+  // Used by subclass.
+  explicit Picker(NativeView view);
 };
 
 }  // namespace nu

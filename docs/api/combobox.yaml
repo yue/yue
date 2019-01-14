@@ -1,0 +1,38 @@
+name: ComboBox
+component: gui
+header: nativeui/combo_box.h
+type: refcounted
+namespace: nu
+inherit: ComboBox
+description: Choose a single item from a list of items or type a custom value.
+
+detail: |
+  The `ComboBox` behaves differently from `ComboBox` that:
+  1. no item is selected by default;
+  2. duplicate items are allowed.
+
+constructors:
+  - signature: ComboBox()
+    lang: ['cpp']
+    description: Create a new `ComboBox` view.
+
+class_methods:
+  - signature: ComboBox* Create()
+    lang: ['lua', 'js']
+    description: Create a new `ComboBox` view.
+
+class_properties:
+  - property: const char* kClassName
+    lang: ['cpp']
+    description: The class name of this view.
+
+methods:
+  - signature: void SetText(const std::string& text)
+    description: Change the text in the view.
+
+  - signature: std::string GetText() const
+    description: Return currently displayed text.
+
+events:
+  - callback: void on_text_change(Entry* self)
+    description: Emitted when user has changed text.

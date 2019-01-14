@@ -64,21 +64,27 @@
 
 namespace nu {
 
-Picker::Picker() {
-  auto* picker = [[NUPicker alloc] initWithFrame:NSZeroRect pullsDown:NO];
+Picker::Picker()
+    : Picker([[NUPicker alloc] initWithFrame:NSZeroRect pullsDown:NO]) {
+  auto* picker = static_cast<NUPicker*>(GetNative());
   [picker setTarget:[[NUPickerDelegate alloc] initWithShell:this]];
   [picker setAction:@selector(onChange:)];
   [picker setPreferredEdge:NSMinYEdge];
   [[picker cell] setArrowPosition:NSPopUpArrowAtBottom];
 
-  TakeOverView(picker);
   UpdateDefaultStyle();
 }
 
+Picker::Picker(NativeView view) {
+  TakeOverView(view);
+}
+
 Picker::~Picker() {
-  auto* picker = static_cast<NUPicker*>(GetNative());
-  [picker.target release];
-  [picker setTarget:nil];
+  auto* picker = static_cast<NSControl*>(GetNative());
+  if (picker.target) {
+    [picker.target release];
+    [picker setTarget:nil];
+  }
 }
 
 void Picker::AddItem(const std::string& text) {
@@ -119,7 +125,7 @@ int Picker::GetSelectedItemIndex() const {
 }
 
 SizeF Picker::GetMinimumSize() const {
-  auto* picker = static_cast<NUPicker*>(GetNative());
+  auto* picker = static_cast<NSControl*>(GetNative());
   return SizeF(0, picker.intrinsicContentSize.height);
 }
 

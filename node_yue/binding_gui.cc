@@ -1222,6 +1222,24 @@ struct Type<nu::View> {
 };
 
 template<>
+struct Type<nu::ComboBox> {
+  using base = nu::Picker;
+  static constexpr const char* name = "yue.ComboBox";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor, "create", &CreateOnHeap<nu::ComboBox>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "setText", &nu::ComboBox::SetText,
+        "getText", &nu::ComboBox::GetText);
+    SetProperty(context, templ,
+                "onTextChange", &nu::ComboBox::on_text_change);
+  }
+};
+
+template<>
 struct Type<nu::Container> {
   using base = nu::View;
   static constexpr const char* name = "yue.Container";
@@ -1989,6 +2007,7 @@ void Initialize(v8::Local<v8::Object> exports) {
           "MenuItem",          vb::Constructor<nu::MenuItem>(),
           "Window",            vb::Constructor<nu::Window>(),
           "View",              vb::Constructor<nu::View>(),
+          "ComboBox",          vb::Constructor<nu::ComboBox>(),
           "Container",         vb::Constructor<nu::Container>(),
           "Button",            vb::Constructor<nu::Button>(),
           "ProtocolStringJob", vb::Constructor<nu::ProtocolStringJob>(),
