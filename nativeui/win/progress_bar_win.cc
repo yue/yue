@@ -32,7 +32,8 @@ ProgressBar::~ProgressBar() {
 
 void ProgressBar::SetValue(float value) {
   auto* progress = static_cast<ProgressBarImpl*>(GetNative());
-  SetIndeterminate(false);
+  if (IsIndeterminate())
+    SetIndeterminate(false);
   SendMessageW(progress->hwnd(), PBM_SETPOS, value, 0);
 }
 
