@@ -4,41 +4,9 @@
 
 #include "nativeui/slider.h"
 
+#include "base/mac/scoped_nsobject.h"
 #include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/nu_view.h"
-
-@interface NUSlider : NSSlider<NUView> {
- @private
-  nu::NUPrivate private_;
-}
-@end
-
-@implementation NUSlider
-
-- (nu::NUPrivate*)nuPrivate {
-  return &private_;
-}
-
-- (void)setNUFont:(nu::Font*)font {
-}
-
-- (void)setNUColor:(nu::Color)color {
-  [self setTrackFillColor:color.ToNSColor()];
-}
-
-- (void)setNUBackgroundColor:(nu::Color)color {
-  [self.cell setBackgroundColor:color.ToNSColor()];
-}
-
-- (void)setNUEnabled:(BOOL)enabled {
-  [self setEnabled:enabled];
-}
-
-- (BOOL)isNUEnabled {
-  return [self isEnabled];
-}
-
-@end
 
 @interface NUSliderDelegate : NSObject {
  @private
@@ -66,21 +34,56 @@
 
 @end
 
-namespace nu {
 
-Slider::Slider() {
-  auto* slider = [[NUSlider alloc] init];
-  [slider setMaxValue:100.];
-  [slider setTarget:[[NUSliderDelegate alloc] initWithShell:this]];
-  [slider setAction:@selector(onValueChange:)];
-  TakeOverView(slider);
-  UpdateDefaultStyle();
+@interface NUSlider : NSSlider<NUView> {
+ @private
+  base::scoped_nsobject<NUSliderDelegate> delegate_;
+  nu::NUPrivate private_;
+}
+- (id)initWithShell:(nu::Slider*)shell;
+@end
+
+@implementation NUSlider
+
+- (id)initWithShell:(nu::Slider*)shell {
+  if ((self = [super init])) {
+    delegate_.reset([[NUSliderDelegate alloc] initWithShell:shell]);
+    [self setMaxValue:100.];
+    [self setTarget:delegate_];
+    [self setAction:@selector(onValueChange:)];
+  }
+  return self;
 }
 
-Slider::~Slider() {
-  auto* slider = static_cast<NSSlider*>(GetNative());
-  [slider.target release];
-  [slider setTarget:nil];
+- (nu::NUPrivate*)nuPrivate {
+  return &private_;
+}
+
+- (void)setNUFont:(nu::Font*)font {
+}
+
+- (void)setNUColor:(nu::Color)color {
+  [self setTrackFillColor:color.ToNSColor()];
+}
+
+- (void)setNUBackgroundColor:(nu::Color)color {
+  [self.cell setBackgroundColor:color.ToNSColor()];
+}
+
+- (void)setNUEnabled:(BOOL)enabled {
+  [self setEnabled:enabled];
+}
+
+- (BOOL)isNUEnabled {
+  return [self isEnabled];
+}
+
+@end
+
+namespace nu {
+
+NativeView Slider::PlatformCreate() {
+  return [[NUSlider alloc] initWithShell:this];
 }
 
 void Slider::SetValue(float value) {

@@ -76,12 +76,8 @@ class SliderImpl : public SubwinView {
 
 }  // namespace
 
-Slider::Slider() {
-  TakeOverView(new SliderImpl(this));
-  UpdateDefaultStyle();
-}
-
-Slider::~Slider() {
+NativeView Slider::PlatformCreate() {
+  return new SliderImpl(this);
 }
 
 void Slider::SetValue(float value) {

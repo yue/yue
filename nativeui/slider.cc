@@ -9,6 +9,14 @@ namespace nu {
 // static
 const char Slider::kClassName[] = "Slider";
 
+Slider::Slider() {
+  TakeOverView(PlatformCreate());
+  UpdateDefaultStyle();
+}
+
+Slider::~Slider() {
+}
+
 const char* Slider::GetClassName() const {
   return kClassName;
 }

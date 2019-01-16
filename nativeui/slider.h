@@ -35,6 +35,9 @@ class NATIVEUI_EXPORT Slider : public View {
 
  protected:
   ~Slider() override;
+
+ private:
+  NativeView PlatformCreate();
 };
 
 }  // namespace nu

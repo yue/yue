@@ -28,18 +28,14 @@ gboolean OnButtonRelease(GtkRange*, GdkEventButton* event, Slider* slider) {
 
 }  // namespace
 
-Slider::Slider() {
+NativeView Slider::PlatformCreate() {
   GtkWidget* scale = gtk_scale_new_with_range(
       GTK_ORIENTATION_HORIZONTAL, 0, 100, 1);
   gtk_scale_set_draw_value(GTK_SCALE(scale), false);
   g_signal_connect(scale, "value-changed", G_CALLBACK(OnValueChanged), this);
   g_signal_connect(scale, "button-release-event",
                    G_CALLBACK(OnButtonRelease), this);
-  TakeOverView(scale);
-  UpdateDefaultStyle();
-}
-
-Slider::~Slider() {
+  return scale;
 }
 
 void Slider::SetValue(float value) {
