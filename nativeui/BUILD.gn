@@ -74,6 +74,8 @@ component("nativeui") {
     "slider.cc",
     "slider.h",
     "signal.h",
+    "table_model.cc",
+    "table_model.h",
     "text_edit.cc",
     "text_edit.h",
     "tray.h",
