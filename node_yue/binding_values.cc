@@ -32,4 +32,12 @@ bool Type<base::Value>::FromV8(v8::Local<v8::Context> context,
   return true;
 }
 
+// static
+v8::Local<v8::Value> Type<const base::Value*>::ToV8(
+    v8::Local<v8::Context> context,
+    const base::Value* value) {
+  std::unique_ptr<V8ValueConverter> converter = V8ValueConverter::Create();
+  return converter->ToV8Value(value, context);
+}
+
 }  // namespace vb

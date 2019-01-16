@@ -104,7 +104,7 @@ class Invoker<IndicesHolder<indices...>, ArgTypes...>
   // expression to foo. As a result, we must specialize the case of Callbacks
   // that have the void return type.
   void DispatchToCallback(const std::function<void(ArgTypes...)>& callback) {
-    callback(ArgumentHolder<indices, ArgTypes>::value...);
+    callback(std::move(ArgumentHolder<indices, ArgTypes>::value)...);
   }
 
  private:

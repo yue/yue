@@ -7,6 +7,7 @@
 
 #include <functional>
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include "node.h"  // NOLINT(build/include)
@@ -187,7 +188,7 @@ class Invoker<IndicesHolder<indices...>, ArgTypes...>
       const std::function<void(ArgTypes...)>& callback) {
     v8::MicrotasksScope script_scope(
         args_->isolate(), v8::MicrotasksScope::kRunMicrotasks);
-    callback(ArgumentHolder<indices, ArgTypes>::value...);
+    callback(std::move(ArgumentHolder<indices, ArgTypes>::value)...);
   }
 
  private:

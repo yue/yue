@@ -20,6 +20,13 @@ struct Type<base::Value> {
                      base::Value* out);
 };
 
+template<>
+struct Type<const base::Value*> {
+  static constexpr const char* name = "Value";
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   const base::Value* value);
+};
+
 }  // namespace vb
 
 #endif  // NODE_YUE_BINDING_VALUES_H_

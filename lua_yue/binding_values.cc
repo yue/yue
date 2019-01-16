@@ -121,4 +121,9 @@ bool Type<base::Value>::To(State* state, int index, base::Value* out) {
   return true;;
 }
 
+// static
+void Type<base::Value*>::Push(State* state, const base::Value* value) {
+  return Type<base::Value>::Push(state, *value);
+}
+
 }  // namespace lua

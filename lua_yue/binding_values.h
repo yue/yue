@@ -17,6 +17,12 @@ struct Type<base::Value> {
   static bool To(State* state, int index, base::Value* out);
 };
 
+template<>
+struct Type<base::Value*> {
+  static constexpr const char* name = "Value";
+  static void Push(State* state, const base::Value* value);
+};
+
 }  // namespace lua
 
 #endif  // LUA_YUE_BINDING_VALUES_H_
