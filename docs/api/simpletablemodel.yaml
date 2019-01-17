@@ -1,0 +1,34 @@
+name: SimpleTableModel
+component: gui
+header: nativeui/table_model.h
+type: refcounted
+namespace: nu
+inherit: TableModel
+description: A simple implementation of TableModel.
+
+detail: |
+  There is no need to call `Notify` methods when using `SimpleTableModel`.
+
+  Note that all data are stored as primary types, it is not possible to store
+  a native object (for example `Image`s) in table model.
+
+constructors:
+  - signature: SimpleTableModel(uint32_t columns)
+    lang: ['cpp']
+    description: Create a `SimpleTableModel` with fixed `columns` number.
+
+class_methods:
+  - signature: SimpleTableModel* Create(uint32_t columns)
+    lang: ['lua', 'js']
+    description: Create a `SimpleTableModel` with fixed `columns` number.
+
+methods:
+  - signature: void AddRow(std::vector<base::Value> row)
+    description: Add a row.
+    detail: The length of `row` should not be smaller than columns number.
+    lang_detail:
+      cpp: |
+        The `data` should be `std::move`d for best performance.
+
+  - signature: void RemoveRowAt(uint32_t index)
+    description: Remove the row at `index`.

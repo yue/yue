@@ -56,10 +56,10 @@ int RefMethodWrapper(State* state) {
 // This helper function is used for automatically deducing T.
 template<typename T>
 internal::RefMethodRef<T> RefMethod(
-    T func, RefType ref_type, const char* ref_key = nullptr) {
+    T func, RefType ref_type, const char* ref_key = nullptr, int arg = 1) {
   CHECK((ref_type == RefType::Reset && ref_key != nullptr) ||
         (ref_type != RefType::Reset && ref_key == nullptr));
-  return internal::RefMethodRef<T>(func, 1, ref_type, ref_key);
+  return internal::RefMethodRef<T>(func, arg, ref_type, ref_key);
 }
 
 // Converter for RefMethodRef.

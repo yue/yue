@@ -1,0 +1,26 @@
+name: AbstractTableModel
+component: gui
+lang: ['lua', 'js']
+type: refcounted
+namespace: nu
+inherit: TableModel
+description: Implement a custom TableModel.
+
+detail: |
+  To implement a custom `TableModel`, please implement all the methods in the
+  Delegates section. It is also required to call the `Notify` methods of
+  [`TableModel`](tablemodel.html) super class when data has been changed, so
+  the `Table` can correctly update.
+
+  For simple use cases, the [`SimpleTableModel`](simpletablemodel.html) can
+  be used.
+
+delegates:
+  - signature: uint32_t get_row_count(AbstractTableModel* self)
+    description: Return how many rows are in the model.
+
+  - signature: base::Value get_value(AbstractTableModel* self, uint32_t column, uint32_t row)
+    description: Return the data at `column` and `row`.
+
+  - signature: void set_value(AbstractTableModel* self, uint32_t column, uint32_t row, base::Value value)
+    description: Change the `value` at `column` and `row`.

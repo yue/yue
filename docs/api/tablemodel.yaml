@@ -1,0 +1,68 @@
+name: TableModel
+component: gui
+header: nativeui/table_model.h
+type: refcounted
+namespace: nu
+description: Base class for models of Table.
+
+lang_detail:
+  cpp: |
+    Users can implement a subclass of `TableModel` to feed `Table` any kind
+    of data source. It is required to call the `Notify` methods in subclasses
+    when data has been changed, so the `Table` can correctly update.
+
+    For simple use cases, the [`SimpleTableModel`](simpletablemodel.html) can
+    be used.
+
+  lua: &ref |
+    For simple use cases, the [`SimpleTableModel`](simpletablemodel.html) can
+    be used.
+
+    For implementing a custom `TableModel`, please see
+    [`AbstractTableModel`](abstracttablemodel.html).
+
+  js: *ref
+
+methods:
+  - signature: uint32_t GetRowCount() const
+    description: Return how many rows are in the model.
+    lang_detail:
+      cpp: This is a pure virtual method, subclass must override this method.
+
+  - signature: const base::Value* GetValue(uint32_t column, uint32_t row) const
+    lang: ['cpp']
+    description: Return the reference to the data at `column` and `row`.
+    detail: |
+      Caller should not store the return value, as it is a temporary reference
+      that may immediately get destroyed after exiting current stack.
+
+      This is a pure virtual method, subclass must override this method.
+
+  - signature: Any GetValue(uint32_t column, uint32_t row) const
+    lang: ['lua', 'js']
+    description: Return the data at `column` and `row`.
+    detail: |
+      Note that the returned value will be stored as primary types, native
+      objects (for example `Image`s) can not be passed to renderer.
+
+  - signature: void SetValue(uint32_t column, uint32_t row, base::Value value)
+    description: Change the `value` at `column` and `row`.
+    lang_detail:
+      cpp: This is a pure virtual method, subclass must override this method.
+      lua: &setvalue |
+        Note that the value will be stored as primary types, native objects (for
+        example `Image`s) can not be saved.
+      js: *setvalue
+
+  - signature: void NotifyRowInsertion(uint32_t row)
+    description: |
+      Called by implementers to notify the table that a row is inserted.
+
+  - signature: void NotifyRowDeletion(uint32_t row)
+    description: |
+      Called by implementers to notify the table that a row is removed.
+
+  - signature: void NotifyValueChange(uint32_t column, uint32_t row)
+    description: |
+      Called by implementers to notify the table that the value at `column` and
+      `row` has been changed.

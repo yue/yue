@@ -11,23 +11,30 @@
 
 #include "base/memory/ref_counted.h"
 #include "base/values.h"
+#include "nativeui/nativeui_export.h"
 
 namespace nu {
 
 class Table;
 
 // Users should sublcass TableModel to provide their own implementation.
-class TableModel : public base::RefCounted<TableModel> {
+class NATIVEUI_EXPORT TableModel : public base::RefCounted<TableModel> {
  public:
-  // Must be overridden by sublcass.
-  virtual size_t GetRowCount() const = 0;
-  virtual const base::Value* GetValue(
-      Table* view, size_t column, size_t row) const = 0;
+  // Return how many rows are in the model.
+  virtual uint32_t GetRowCount() const = 0;
+
+  // Return the reference to the data in the model.
+  // Caller should not store the return value, as it is a temporary reference
+  // that may immediately get destroyed after exiting current stack.
+  virtual const base::Value* GetValue(uint32_t column, uint32_t row) const = 0;
+
+  // Change the value.
+  virtual void SetValue(uint32_t column, uint32_t row, base::Value value) = 0;
 
   // Called by sublcass to notify when there rows inserted.
-  void NotifyRowInsertion(size_t row);
-  void NotifyRowDeletion(size_t row);
-  void NotifyRowChange(size_t row);
+  void NotifyRowInsertion(uint32_t row);
+  void NotifyRowDeletion(uint32_t row);
+  void NotifyValueChange(uint32_t column, uint32_t row);
 
  protected:
   TableModel();
@@ -45,46 +52,50 @@ class TableModel : public base::RefCounted<TableModel> {
 };
 
 // Used by language bindings.
-class AbstractTableModel : public TableModel {
+class NATIVEUI_EXPORT AbstractTableModel : public TableModel {
  public:
-  AbstractTableModel();
+  // TODO(zcbenz): Handle index_starts_from_0 in language bindings.
+  explicit AbstractTableModel(bool index_starts_from_0 = true);
 
   // TableModel:
-  size_t GetRowCount() const override;
-  const base::Value* GetValue(
-      Table* view, size_t column, size_t row) const override;
+  uint32_t GetRowCount() const override;
+  const base::Value* GetValue(uint32_t column, uint32_t row) const override;
+  void SetValue(uint32_t column, uint32_t row, base::Value value) override;
 
   // Delegate methods.
-  std::function<size_t(AbstractTableModel*)> get_row_count;
-  std::function<
-    const base::Value*(AbstractTableModel*,
-                       Table* view, size_t column, size_t row)> get_value;
+  std::function<uint32_t(AbstractTableModel*)> get_row_count;
+  std::function<base::Value(AbstractTableModel*, uint32_t, uint32_t)> get_value;
+  std::function<void(AbstractTableModel*,
+                     uint32_t, uint32_t, base::Value)> set_value;
 
  protected:
   ~AbstractTableModel() override;
+
+ private:
+  bool index_starts_from_0_;
+  base::Value copy_;
 };
 
 // A simple implementation of TableModel that manages the data.
-class SimpleTableModel : public TableModel {
+class NATIVEUI_EXPORT SimpleTableModel : public TableModel {
  public:
   using Row = std::vector<base::Value>;
 
-  explicit SimpleTableModel(size_t columns);
+  explicit SimpleTableModel(uint32_t columns);
 
   void AddRow(Row data);
-  void RemoveRowAt(size_t row);
-  void SetValue(size_t column, size_t row, base::Value value);
+  void RemoveRowAt(uint32_t row);
 
   // TableModel:
-  size_t GetRowCount() const override;
-  const base::Value* GetValue(
-      Table* view, size_t column, size_t row) const override;
+  uint32_t GetRowCount() const override;
+  const base::Value* GetValue(uint32_t column, uint32_t row) const override;
+  void SetValue(uint32_t column, uint32_t row, base::Value value) override;
 
  protected:
   ~SimpleTableModel() override;
 
  private:
-  const size_t columns_;
+  const uint32_t columns_;
   std::vector<Row> rows_;
 };
 

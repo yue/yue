@@ -1801,6 +1801,122 @@ struct Type<nu::Slider> {
 };
 
 template<>
+struct Type<nu::TableModel> {
+  static constexpr const char* name = "yue.TableModel";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "getRowCount", &nu::TableModel::GetRowCount,
+        "getValue", &nu::TableModel::GetValue,
+        "notifyRowInsertion", &nu::TableModel::NotifyRowInsertion,
+        "notifyRowDeletion", &nu::TableModel::NotifyRowDeletion,
+        "notifyValueChange", &nu::TableModel::NotifyValueChange);
+  }
+};
+
+template<>
+struct Type<nu::AbstractTableModel> {
+  using base = nu::TableModel;
+  static constexpr const char* name = "yue.AbstractTableModel";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor, "create", &CreateOnHeap<nu::AbstractTableModel>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    SetProperty(context, templ,
+                "getRowCount", &nu::AbstractTableModel::get_row_count,
+                "setValue", &nu::AbstractTableModel::set_value,
+                "getValue", &nu::AbstractTableModel::get_value);
+  }
+};
+
+template<>
+struct Type<nu::SimpleTableModel> {
+  using base = nu::TableModel;
+  static constexpr const char* name = "yue.SimpleTableModel";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+        "create", &CreateOnHeap<nu::SimpleTableModel, uint32_t>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "addRow", &nu::SimpleTableModel::AddRow,
+        "removeRowAt", &nu::SimpleTableModel::RemoveRowAt,
+        "setValue", &nu::SimpleTableModel::SetValue);
+  }
+};
+
+template<>
+struct Type<nu::Table::ColumnType> {
+  static constexpr const char* name = "yue.Table.ColumnType";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::Table::ColumnType* out) {
+    std::string type;
+    if (!vb::FromV8(context, value, &type))
+      return false;
+    if (type == "text") {
+      *out = nu::Table::ColumnType::Text;
+      return true;
+    } else if (type == "edit") {
+      *out = nu::Table::ColumnType::Edit;
+      return true;
+    } else if (type == "custom") {
+      *out = nu::Table::ColumnType::Custom;
+      return true;
+    } else {
+      return false;
+    }
+  }
+};
+
+template<>
+struct Type<nu::Table::ColumnOptions> {
+  static constexpr const char* name = "yue.Table.ColumnOptions";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::Table::ColumnOptions* out) {
+    auto obj = value.As<v8::Object>();
+    if (obj.IsEmpty())
+      return false;
+    Get(context, obj, "type", &out->type);
+    v8::Local<v8::Value> on_draw_val;
+    if (Get(context, obj, "onDraw", &on_draw_val))
+      WeakFunctionFromV8(context, on_draw_val, &out->on_draw);
+    Get(context, obj, "column", &out->column);
+    return true;
+  }
+};
+
+template<>
+struct Type<nu::Table> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Table";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor, "create", &CreateOnHeap<nu::Table>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "setModel", RefMethod(&nu::Table::SetModel, RefType::Reset, "model"),
+        "getModel", &nu::Table::GetModel,
+        "addColumn", &nu::Table::AddColumn,
+        "addColumnWithOptions",
+        RefMethod(&nu::Table::AddColumnWithOptions, RefType::Ref, nullptr, 1),
+        "getColumnCount", &nu::Table::GetColumnCount,
+        "setRowHeight", &nu::Table::SetRowHeight,
+        "getRowHeight", &nu::Table::GetRowHeight);
+  }
+};
+
+template<>
 struct Type<nu::TextEdit> {
   using base = nu::View;
   static constexpr const char* name = "yue.TextEdit";
@@ -2022,6 +2138,10 @@ void Initialize(v8::Local<v8::Object> exports) {
           "Group",             vb::Constructor<nu::Group>(),
           "Scroll",            vb::Constructor<nu::Scroll>(),
           "Slider",            vb::Constructor<nu::Slider>(),
+          "TableModel",        vb::Constructor<nu::TableModel>(),
+          "AbstractTableModel", vb::Constructor<nu::AbstractTableModel>(),
+          "SimpleTableModel",  vb::Constructor<nu::SimpleTableModel>(),
+          "Table",             vb::Constructor<nu::Table>(),
           "TextEdit",          vb::Constructor<nu::TextEdit>(),
           "Tray",              vb::Constructor<nu::Tray>(),
 #if defined(OS_MACOSX)

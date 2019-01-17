@@ -33,6 +33,8 @@
 #include "nativeui/scroll.h"
 #include "nativeui/slider.h"
 #include "nativeui/state.h"
+#include "nativeui/table.h"
+#include "nativeui/table_model.h"
 #include "nativeui/text_edit.h"
 #include "nativeui/tray.h"
 #include "nativeui/window.h"

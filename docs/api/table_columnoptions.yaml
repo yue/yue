@@ -1,0 +1,22 @@
+name: Table::ColumnOptions
+header: nativeui/table.h
+type: struct
+namespace: nu
+description: Options for columns of Table.
+
+properties:
+  - property: Table::ColumnType type
+    description: The `type` of column, which decides how table cells are rendered.
+    detail: By default the column renders readonly text.
+
+  - property: std::function<void(Painter*, const RectF&, const base::Value&)> on_draw
+    description: |
+      If the `type` is `Custom`, this function will be used for renderering
+      table cells under the column.
+    lang_detail:
+      lua: The function will be called with `ondraw(painter, dirtyrect, value)`.
+      js: The function will be called with `onDraw(painter, dirtyRect, value)`.
+
+  - property: int column
+    description: Which `column` of table model to show.
+    detail: By default the index of table's newly-added column will be used.

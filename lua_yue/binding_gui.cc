@@ -1546,6 +1546,129 @@ struct Type<nu::Slider> {
 };
 
 template<>
+struct Type<nu::TableModel> {
+  static constexpr const char* name = "yue.TableModel";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "getrowcount", &nu::TableModel::GetRowCount,
+           "setvalue", &SetValue,
+           "getvalue", &GetValue,
+           "notifyrowinsertion", &NotifyRowInsertion,
+           "notifyrowdeletion", &NotifyRowDeletion,
+           "notifyvaluechange", &NotifyValueChange);
+  }
+  static void SetValue(nu::TableModel* model,
+                       uint32_t column,
+                       uint32_t row,
+                       ::base::Value value) {
+    model->SetValue(column - 1, row - 1, std::move(value));
+  }
+  static const base::Value* GetValue(
+      nu::TableModel* model, uint32_t column, uint32_t row) {
+    return model->GetValue(column - 1, row - 1);
+  }
+  static void NotifyRowInsertion(nu::TableModel* model, uint32_t row) {
+    model->NotifyRowInsertion(row - 1);
+  }
+  static void NotifyRowDeletion(nu::TableModel* model, uint32_t row) {
+    model->NotifyRowDeletion(row - 1);
+  }
+  static void NotifyValueChange(nu::TableModel* model,
+                              uint32_t module, uint32_t row) {
+    model->NotifyValueChange(module - 1, row - 1);
+  }
+};
+
+template<>
+struct Type<nu::AbstractTableModel> {
+  using base = nu::TableModel;
+  static constexpr const char* name = "yue.AbstractTableModel";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable, "create", &Create);
+    RawSetProperty(state, metatable,
+                   "getrowcount", &nu::AbstractTableModel::get_row_count,
+                   "setvalue", &nu::AbstractTableModel::set_value,
+                   "getvalue", &nu::AbstractTableModel::get_value);
+  }
+  static nu::AbstractTableModel* Create() {
+    return new nu::AbstractTableModel(false /* index_starts_from_0 */);
+  }
+};
+
+template<>
+struct Type<nu::SimpleTableModel> {
+  using base = nu::TableModel;
+  static constexpr const char* name = "yue.SimpleTableModel";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateOnHeap<nu::SimpleTableModel, uint32_t>,
+           "addrow", &nu::SimpleTableModel::AddRow,
+           "removerowat", &RemoveRowAt);
+  }
+  static void RemoveRowAt(nu::SimpleTableModel* model, uint32_t row) {
+    model->RemoveRowAt(row - 1);
+  }
+};
+
+template<>
+struct Type<nu::Table::ColumnType> {
+  static constexpr const char* name = "yue.Table.ColumnType";
+  static inline bool To(State* state, int index, nu::Table::ColumnType* out) {
+    std::string type;
+    if (!lua::To(state, index, &type))
+      return false;
+    if (type == "text") {
+      *out = nu::Table::ColumnType::Text;
+      return true;
+    } else if (type == "edit") {
+      *out = nu::Table::ColumnType::Edit;
+      return true;
+    } else if (type == "custom") {
+      *out = nu::Table::ColumnType::Custom;
+      return true;
+    } else {
+      return false;
+    }
+  }
+};
+
+template<>
+struct Type<nu::Table::ColumnOptions> {
+  static constexpr const char* name = "yue.Table.ColumnOptions";
+  static inline bool To(State* state, int index,
+                        nu::Table::ColumnOptions* out) {
+    if (GetType(state, index) == LuaType::Table) {
+      RawGetAndPop(state, index, "type", &out->type);
+      RawGetAndPop(state, index, "ondraw", &out->on_draw);
+      uint32_t column = -1;
+      if (RawGetAndPop(state, index, "column", &column))
+        out->column = column - 1;
+    }
+    return true;
+  }
+};
+
+template<>
+struct Type<nu::Table> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Table";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateOnHeap<nu::Table>,
+           "setmodel",
+           RefMethod(&nu::Table::SetModel, RefType::Reset, "model"),
+           "getmodel", &nu::Table::GetModel,
+           "addcolumn", &nu::Table::AddColumn,
+           "addcolumnwithoptions",
+           RefMethod(&nu::Table::AddColumnWithOptions,
+                     RefType::Ref, nullptr, 2),
+           "getcolumncount", &nu::Table::GetColumnCount,
+           "setrowheight", &nu::Table::SetRowHeight,
+           "getrowheight", &nu::Table::GetRowHeight);
+  }
+};
+
+template<>
 struct Type<nu::TextEdit> {
   using base = nu::View;
   static constexpr const char* name = "yue.TextEdit";
@@ -1710,6 +1833,10 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::Group>(state, "Group");
   BindType<nu::Scroll>(state, "Scroll");
   BindType<nu::Slider>(state, "Slider");
+  BindType<nu::TableModel>(state, "TableModel");
+  BindType<nu::AbstractTableModel>(state, "AbstractTableModel");
+  BindType<nu::SimpleTableModel>(state, "SimpleTableModel");
+  BindType<nu::Table>(state, "TableModel");
   BindType<nu::TextEdit>(state, "TextEdit");
   BindType<nu::Tray>(state, "Tray");
 #if defined(OS_MACOSX)

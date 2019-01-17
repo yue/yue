@@ -1,0 +1,61 @@
+name: Table
+component: gui
+header: nativeui/table.h
+type: refcounted
+namespace: nu
+inherit: View
+description: Table view.
+
+detail: |
+  The `Table` does not store any data itself, to display data in `Table`, users
+  have to provide a [`TableModel`](tablemodel.html).
+
+  How data are renderered depends on the type of column. It is also possible to
+  create a custom renderer for arbitrary data.
+
+constructors:
+  - signature: Table()
+    lang: ['cpp']
+    description: Create a new `Table`.
+
+class_methods:
+  - signature: Table* Create()
+    lang: ['lua', 'js']
+    description: Create a new `Table`.
+
+class_properties:
+  - property: const char* kClassName
+    lang: ['cpp']
+    description: The class name of this view.
+
+methods:
+  - signature: void SetModel(TableModel* model)
+    description: Set `model` as table's data source.
+
+  - signature: TableModel* GetModel()
+    description: Return table's model.
+
+  - signature: void AddColumn(const std::string& title)
+    description: Add a new column with `title`, which shows readonly text.
+
+  - signature: void AddColumnWithOptions(const std::string& title,
+                                         const Table::ColumnOptions& options)
+    description: Add a new column with `title` and `options`.
+
+  - signature: int GetColumnCount() const
+    description: Return the number of columns.
+
+  - signature: void SetRowHeight(int height)
+    description: Set the `height` of each row.
+
+  - signature: int GetRowHeight() const
+    description: Return the `height` of each row.
+
+  - signature: void SelectRow(int row)
+    description: Select a `row`.
+
+  - signature: int GetSelectedRow() const
+    description: Return the index of selected row.
+    detail: |
+      For table that allows multiple selections, this will return the index of
+      first selected row. When no row is selected, `-1` will be returned.
