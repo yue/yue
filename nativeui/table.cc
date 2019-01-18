@@ -22,6 +22,7 @@ Table::Table() {
 }
 
 Table::~Table() {
+  PlatformDestroy();
   if (model_)
     model_->Unsubscribe(this);
 }

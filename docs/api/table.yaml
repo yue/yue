@@ -47,6 +47,10 @@ methods:
 
   - signature: void SetRowHeight(int height)
     description: Set the `height` of each row.
+    detail: |
+      On Linux, due to platform implementations, this method has to be called
+      before adding columns. It does not have any effect when columns have
+      already been added.
 
   - signature: int GetRowHeight() const
     description: Return the `height` of each row.

@@ -61,6 +61,7 @@ class NATIVEUI_EXPORT Table : public View {
   ~Table() override;
 
   NativeView PlatformCreate();
+  void PlatformDestroy();
   void PlatformSetModel(TableModel* model);
 
  private:

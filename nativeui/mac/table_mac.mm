@@ -108,6 +108,9 @@ NativeView Table::PlatformCreate() {
   return [[NUTable alloc] initWithShell:this];
 }
 
+void Table::PlatformDestroy() {
+}
+
 void Table::PlatformSetModel(TableModel* model) {
   auto* table = static_cast<NUTable*>(GetNative());
   [table setModel:model];
