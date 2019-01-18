@@ -64,6 +64,9 @@
     tableView_.reset([[NSTableView alloc] init]);
     delegate_.reset([[NUTableDelegate alloc] initWithShell:shell]);
     [tableView_ setDelegate:delegate_];
+    [self setBorderType:NSNoBorder];
+    [self setHasVerticalScroller:YES];
+    [self setHasHorizontalScroller:YES];
     [self setDocumentView:tableView_];
   }
   return self;
