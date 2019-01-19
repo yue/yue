@@ -16,9 +16,12 @@ class TableImpl : public SubwinView {
  public:
   explicit TableImpl(Table* delegate);
 
+  static const int kDefaultColumnWidth = 50;
+
   void AddColumnWithOptions(const base::string16& title,
                             Table::ColumnOptions options);
   int GetColumnCount() const;
+  void UpdateColumnsWidth(TableModel* model);
 
  protected:
   // SubwinView:

@@ -6,6 +6,7 @@
 
 #include <commctrl.h>
 
+#include <algorithm>
 #include <string>
 #include <utility>
 
@@ -30,17 +31,46 @@ void TableImpl::AddColumnWithOptions(const base::string16& title,
   col.mask = LVCF_TEXT;
   // The pszText is LPSTR even under Unicode build.
   col.pszText = const_cast<char*>(reinterpret_cast<const char*>(title.c_str()));
-  ListView_InsertColumn(hwnd(), GetColumnCount(), &col);
-  ListView_SetColumnWidth(hwnd(), GetColumnCount(), LVSCW_AUTOSIZE_USEHEADER);
+
+  // Insert.
   if (options.column == -1)
     options.column = GetColumnCount();
+  ListView_InsertColumn(hwnd(), GetColumnCount(), &col);
+  columns_.emplace_back(std::move(options));
+  UpdateColumnsWidth(static_cast<Table*>(delegate())->GetModel());
+
+  // Optimization in the custom draw handler.
   if (options.type == Table::ColumnType::Custom)
     has_custom_column_ = true;
-  columns_.emplace_back(std::move(options));
 }
 
 int TableImpl::GetColumnCount() const {
   return static_cast<int>(columns_.size());
+}
+
+void TableImpl::UpdateColumnsWidth(TableModel* model) {
+  int count = GetColumnCount();
+  // The AUTOSIZE style does not work for virtual list, we have to guess a
+  // best width for each column.
+  for (int i = 0; i < count - 1; ++i) {
+    int width = kDefaultColumnWidth * scale_factor();
+    // If there is data in model, use the first cell's width.
+    if (model && model->GetRowCount() > 0) {
+      const base::Value* value = model->GetValue(i, 0);
+      if (value && value->is_string()) {
+        base::string16 text = base::UTF8ToUTF16(value->GetString());
+        int text_width = ListView_GetStringWidth(hwnd(), text.c_str());
+        // Add some padding.
+        text_width += (i == 0 ? 7 : 14) * scale_factor();
+        // Do not choose a too small width.
+        width = std::max(width, text_width);
+      }
+    }
+    ListView_SetColumnWidth(hwnd(), i, width);
+  }
+  // Make the last column use USEHEADER style, which fills it to rest of the
+  // list control.
+  ListView_SetColumnWidth(hwnd(), count - 1, LVSCW_AUTOSIZE_USEHEADER);
 }
 
 void TableImpl::OnPaint(HDC dc) {
@@ -118,7 +148,7 @@ LRESULT TableImpl::OnCustomDraw(NMLVCUSTOMDRAW* nm, int row) {
   }
 
   // Draw custom type cells.
-  for (int i = 0; i < columns_.size(); ++i) {
+  for (int i = 0; i < GetColumnCount(); ++i) {
     const auto& options = columns_[i];
     if (options.type != Table::ColumnType::Custom || !options.on_draw)
       continue;
@@ -147,7 +177,7 @@ LRESULT TableImpl::OnBeginEdit(NMLVDISPINFO* nm, int row) {
   ::GetCursorPos(&hit.pt);
   ::ScreenToClient(hwnd(), &hit.pt);
   ListView_SubItemHitTest(hwnd(), &hit);
-  if (hit.iSubItem < 0 || hit.iSubItem >= columns_.size() || row != hit.iItem)
+  if (hit.iSubItem < 0 || hit.iSubItem >= GetColumnCount() || row != hit.iItem)
     return TRUE;
   int column = hit.iSubItem;
 
@@ -231,7 +261,12 @@ void Table::PlatformDestroy() {
 
 void Table::PlatformSetModel(TableModel* model) {
   auto* table = static_cast<TableImpl*>(GetNative());
-  ListView_SetItemCountEx(table->hwnd(), model->GetRowCount(), 0);
+  ListView_SetItemCountEx(table->hwnd(), model ? model->GetRowCount() : 0, 0);
+  if (model) {
+    ListView_SetItemState(table->hwnd(), -1, 0, 0);  // unselect all
+    table->UpdateColumnsWidth(model);
+    SchedulePaint();
+  }
 }
 
 void Table::AddColumnWithOptions(const std::string& title,
