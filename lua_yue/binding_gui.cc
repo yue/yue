@@ -1640,7 +1640,7 @@ struct Type<nu::Table::ColumnOptions> {
     if (GetType(state, index) == LuaType::Table) {
       RawGetAndPop(state, index, "type", &out->type);
       RawGetAndPop(state, index, "ondraw", &out->on_draw);
-      uint32_t column = -1;
+      int column;
       if (RawGetAndPop(state, index, "column", &column))
         out->column = column - 1;
     }

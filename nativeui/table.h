@@ -26,7 +26,7 @@ class NATIVEUI_EXPORT Table : public View {
     Custom,
   };
 
-  struct ColumnOptions {
+  struct NATIVEUI_EXPORT ColumnOptions {
     ColumnOptions();
     ColumnOptions(const ColumnOptions& other);
     ~ColumnOptions();

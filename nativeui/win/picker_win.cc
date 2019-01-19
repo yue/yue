@@ -9,7 +9,6 @@
 #include <vector>
 
 #include "base/strings/utf_string_conversions.h"
-#include "nativeui/win/subwin_view.h"
 
 namespace nu {
 

@@ -91,7 +91,7 @@ SimpleTableModel::~SimpleTableModel() {}
 void SimpleTableModel::AddRow(Row data) {
   if (data.size() >= columns_) {
     rows_.emplace_back(std::move(data));
-    NotifyRowInsertion(rows_.size() - 1);
+    NotifyRowInsertion(static_cast<uint32_t>(rows_.size()) - 1);
   }
 }
 
@@ -103,7 +103,7 @@ void SimpleTableModel::RemoveRowAt(uint32_t row) {
 }
 
 uint32_t SimpleTableModel::GetRowCount() const {
-  return rows_.size();
+  return static_cast<uint32_t>(rows_.size());
 }
 
 const base::Value* SimpleTableModel::GetValue(
