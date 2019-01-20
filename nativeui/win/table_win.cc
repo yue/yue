@@ -83,7 +83,9 @@ void TableImpl::UpdateColumnsWidth(TableModel* model) {
 
   // Make the last column use USEHEADER style, which fills it to rest of the
   // list control.
-  ListView_SetColumnWidth(hwnd(), count - 1, LVSCW_AUTOSIZE_USEHEADER);
+  int width = columns_[count - 1].width * scale_factor();
+  ListView_SetColumnWidth(hwnd(), count - 1,
+                          width < 0 ? LVSCW_AUTOSIZE_USEHEADER : width);
 }
 
 void TableImpl::SetRowHeight(int height) {
@@ -117,9 +119,13 @@ void TableImpl::OnPaint(HDC dc) {
 }
 
 void TableImpl::OnWindowPosChanged(WINDOWPOS* pos) {
+  SetMsgHandled(false);
+  if (!window())
+    return;
+
   // Resize the last column to fill the control.
   int count = GetColumnCount();
-  if (count > 0)
+  if (count > 0 && columns_[count - 1].width == -1)
     ListView_SetColumnWidth(hwnd(), count - 1, LVSCW_AUTOSIZE_USEHEADER);
 }
 
