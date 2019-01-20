@@ -26,9 +26,15 @@ int g_next_id = 0;
     self.columnInModel = options.column == -1 ? table->GetColumnCount()
                                               : columnOptions.column;
     self.options = columnOptions;
-    self.resizingMask = NSTableColumnAutoresizingMask |
-                        NSTableColumnUserResizingMask;
     self.headerCell.stringValue = base::SysUTF8ToNSString(title);
+
+    // Handle width property.
+    NSTableColumnResizingOptions resizingMask = NSTableColumnUserResizingMask;
+    if (columnOptions.width < 0)
+      resizingMask |= NSTableColumnAutoresizingMask;
+    else
+      self.width = columnOptions.width;
+    self.resizingMask = resizingMask;
   }
   return self;
 }

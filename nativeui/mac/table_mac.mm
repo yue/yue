@@ -117,6 +117,8 @@ void Table::PlatformDestroy() {
 void Table::PlatformSetModel(TableModel* model) {
   auto* table = static_cast<NUTable*>(GetNative());
   [table setModel:model];
+  // Somehow the content may have some offset, scroll to top.
+  [table.verticalScroller setFloatValue:0];
 }
 
 void Table::AddColumnWithOptions(const std::string& title,
