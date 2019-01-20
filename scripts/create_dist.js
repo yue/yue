@@ -39,13 +39,13 @@ const luaFiles = {
 // Independent executable.
 const exeFiles = {
   linux: [
-    'yue',
+    'yue_runtime',
   ],
   mac: [
-    'yue',
+    'yue_runtime',
   ],
   win: [
-    'yue.exe',
+    'yue_runtime.exe',
   ],
 }
 
@@ -95,7 +95,7 @@ addFileToZip(yuezip, 'sample_app/main.cc', '')
 generateZip('libyue', [], yuezip)
 
 // Zip other binaries.
-generateZip('yue', exeFiles[targetOs])
+generateZip('yue_runtime', exeFiles[targetOs])
 generateZip('lua_yue_lua_5.3', luaFiles[targetOs])
 
 // Zip docs, but only do it for linux/x64 when running on CI, to avoid uploading

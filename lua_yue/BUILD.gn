@@ -5,17 +5,17 @@
 import("//testing/test.gni")
 
 # Independent lua executable with yue runtime.
-executable("yue") {
+executable("yue_runtime") {
   sources = [
     "main.cc",
   ]
   deps = [
-    ":lua_yue_runtime",
+    ":lua_yue_lib",
   ]
 }
 
 # Component used for constructing a lua environment with yue inside.
-source_set("lua_yue_runtime") {
+source_set("lua_yue_lib") {
   sources = [
     "builtin_loader.cc",
     "builtin_loader.h",
@@ -93,7 +93,7 @@ test("lua_yue_unittests") {
   ]
 
   deps = [
-    ":lua_yue_runtime",
+    ":lua_yue_lib",
     "//nativeui",
     "//base",
     "//testing/gtest",

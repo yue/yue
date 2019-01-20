@@ -5,8 +5,8 @@
 group("default") {
   deps = [
     "//node_yue",
-    "//lua_yue:yue",
-    "//lua_yue:lua_yue",
+    "//lua_yue",
+    "//lua_yue:yue_runtime",
     "//sample_app",
   ]
 

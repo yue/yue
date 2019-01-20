@@ -11,8 +11,8 @@ Lua support in Yue is currently experimental, there are two modes provided:
 * A loadable module built for Lua 5.3.
 
 They can be downloaded in the [Releases](https://github.com/yue/yue/releases)
-page, the standalone runtime is in the `yue_VERSION_PLATFORM_ARCH.zip` archive,
-the loadable module is in the `lua_yue_LUA-VERSION_VERSION_PLATFORM_ARCH.zip`
+page, the standalone runtime is in the `yue_runtime_VERSION_PLATFORM_ARCH.zip`
+archive, the loadable module is in the `lua_yue_LUA-VERSION_VERSION_PLATFORM_ARCH.zip`
 archive.
 
 There are plans on making Yue available in LuaRocks.
