@@ -15,6 +15,7 @@ namespace nu {
 class TableImpl : public SubwinView {
  public:
   explicit TableImpl(Table* delegate);
+  ~TableImpl();
 
   static const int kDefaultColumnWidth = 50;
 
@@ -22,6 +23,8 @@ class TableImpl : public SubwinView {
                             Table::ColumnOptions options);
   int GetColumnCount() const;
   void UpdateColumnsWidth(TableModel* model);
+  void SetRowHeight(int height);
+  int GetRowHeight() const;
 
  protected:
   CR_BEGIN_MSG_MAP_EX(TableImpl, SubwinView)
@@ -59,6 +62,9 @@ class TableImpl : public SubwinView {
   int edit_row_ = -1;
   int edit_column_ = -1;
   Point edit_pos_;
+
+  // The ImageList hack used for changing row height.
+  HIMAGELIST image_list_ = NULL;
 
   // The pszText must be valid when the message is sent, so we have to keep
   // a cache to avoid returning a pointer to temporary memory.

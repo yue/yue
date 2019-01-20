@@ -133,7 +133,8 @@ void Table::AddColumnWithOptions(const std::string& title,
   int column = options.column == -1 ? GetColumnCount() : options.column;
   g_object_set_data(G_OBJECT(renderer), "column", GINT_TO_POINTER(column));
   // Set row height.
-  g_object_set(G_OBJECT(renderer), "height", GetRowHeight(), nullptr);
+  g_object_set(G_OBJECT(renderer), "height",
+               static_cast<int>(GetRowHeight()), nullptr);
 
   // Create column.
   auto* tree_column = gtk_tree_view_column_new_with_attributes(
@@ -155,18 +156,18 @@ int Table::GetColumnCount() const {
   return gtk_tree_view_get_n_columns(tree_view);
 }
 
-void Table::SetRowHeight(int height) {
+void Table::SetRowHeight(float height) {
   if (GetColumnCount() > 0) {
     LOG(ERROR) << "Setting row height only works before adding any column";
     return;
   }
   g_object_set_data(G_OBJECT(GetNative()),
-                    "row-height", GINT_TO_POINTER(height));
+                    "row-height", GINT_TO_POINTER(static_cast<int>(height)));
 }
 
-int Table::GetRowHeight() const {
-  return GPOINTER_TO_INT(
-      g_object_get_data(G_OBJECT(GetNative()), "row-height"));
+float Table::GetRowHeight() const {
+  return static_cast<float>(GPOINTER_TO_INT(
+      g_object_get_data(G_OBJECT(GetNative()), "row-height")));
 }
 
 void Table::SelectRow(int row) {

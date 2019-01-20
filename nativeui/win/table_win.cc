@@ -11,6 +11,7 @@
 #include <utility>
 
 #include "base/strings/utf_string_conversions.h"
+#include "nativeui/gfx/win/text_win.h"
 #include "nativeui/table_model.h"
 #include "nativeui/win/util/hwnd_util.h"
 
@@ -23,6 +24,11 @@ TableImpl::TableImpl(Table* delegate)
   set_focusable(true);
   ListView_SetExtendedListViewStyle(hwnd(),
                                     LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT);
+}
+
+TableImpl::~TableImpl() {
+  if (image_list_)
+    ImageList_Destroy(image_list_);
 }
 
 void TableImpl::AddColumnWithOptions(const base::string16& title,
@@ -71,6 +77,26 @@ void TableImpl::UpdateColumnsWidth(TableModel* model) {
   // Make the last column use USEHEADER style, which fills it to rest of the
   // list control.
   ListView_SetColumnWidth(hwnd(), count - 1, LVSCW_AUTOSIZE_USEHEADER);
+}
+
+void TableImpl::SetRowHeight(int height) {
+  // ListView does not have a way to change row height, so we have to work out
+  // our own way.
+  if (!image_list_)
+    image_list_ = ImageList_Create(1, height, 0, 0, 0);
+  else
+    ImageList_SetIconSize(image_list_, 1, height);
+  ListView_SetImageList(hwnd(), image_list_, LVSIL_SMALL);
+}
+
+int TableImpl::GetRowHeight() const {
+  if (image_list_) {
+    int cx, cy;
+    if (ImageList_GetIconSize(image_list_, &cx, &cy))
+      return cy;
+  }
+  // Default row height be able to draw full text.
+  return std::ceil(MeasureText(L"bp", font()).height());
 }
 
 void TableImpl::OnPaint(HDC dc) {
@@ -287,11 +313,18 @@ int Table::GetColumnCount() const {
   return table->GetColumnCount();
 }
 
-void Table::SetRowHeight(int height) {
+void Table::SetRowHeight(float height) {
+  auto* table = static_cast<TableImpl*>(GetNative());
+  table->SetRowHeight(std::ceil(height * table->scale_factor()));
+  // Update scrollbar after changing row height.
+  if (GetModel())
+    ListView_SetItemCountEx(table->hwnd(), GetModel()->GetRowCount(),
+                            LVSICF_NOINVALIDATEALL | LVSICF_NOSCROLL);
 }
 
-int Table::GetRowHeight() const {
-  return 0;
+float Table::GetRowHeight() const {
+  auto* table = static_cast<TableImpl*>(GetNative());
+  return table->GetRowHeight() / table->scale_factor();
 }
 
 void Table::SelectRow(int row) {

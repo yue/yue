@@ -142,13 +142,13 @@ void Table::SetRowHeight(int height) {
   [tableView setRowHeight:height];
 }
 
-int Table::GetRowHeight() const {
+float Table::GetRowHeight() const {
   auto* tableView = static_cast<NSTableView*>(
       [static_cast<NUTable*>(GetNative()) documentView]);
   return [tableView rowHeight];
 }
 
-void Table::SelectRow(int row) {
+void Table::SelectRow(float row) {
   auto* tableView = static_cast<NSTableView*>(
       [static_cast<NUTable*>(GetNative()) documentView]);
   [tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:row]

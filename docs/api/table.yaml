@@ -45,14 +45,18 @@ methods:
   - signature: int GetColumnCount() const
     description: Return the number of columns.
 
-  - signature: void SetRowHeight(int height)
+  - signature: void SetRowHeight(float height)
     description: Set the `height` of each row.
     detail: |
+      It is not recommended to change row height unless you are drawing all
+      cells yourself, as the default text cells may not show decently under
+      large or small height.
+
       On Linux, due to platform implementations, this method has to be called
       before adding columns. It does not have any effect when columns have
       already been added.
 
-  - signature: int GetRowHeight() const
+  - signature: float GetRowHeight() const
     description: Return the `height` of each row.
 
   - signature: void SelectRow(int row)
