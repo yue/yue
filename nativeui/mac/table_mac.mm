@@ -52,9 +52,11 @@
   base::scoped_nsobject<NSTableView> tableView_;
   base::scoped_nsobject<NUTableDelegate> delegate_;
   base::scoped_nsobject<NUTableDataSource> dataSource_;
+  base::scoped_nsobject<NSTableHeaderView> headerView_;
   nu::NUPrivate private_;
 }
 - (id)initWithShell:(nu::Table*)shell;
+- (void)setColumnsVisible:(bool)visible;
 @end
 
 @implementation NUTable
@@ -72,12 +74,24 @@
   return self;
 }
 
+- (void)setColumnsVisible:(bool)visible {
+  if (visible) {
+    [tableView_ setHeaderView:headerView_];
+    headerView_.reset();
+  } else {
+    headerView_.reset([tableView_ headerView]);
+    [tableView_ setHeaderView:nil];
+  }
+}
+
 - (void)setModel:(nu::TableModel*)model {
   if (model)
     dataSource_.reset([[NUTableDataSource alloc] initWithTableModel:model]);
   else
     dataSource_.reset();
   [tableView_ setDataSource:dataSource_];
+  // Somehow the content may have some offset, scroll to top.
+  [tableView_ scrollRowToVisible:0];
 }
 
 - (nu::NUPrivate*)nuPrivate {
@@ -117,8 +131,6 @@ void Table::PlatformDestroy() {
 void Table::PlatformSetModel(TableModel* model) {
   auto* table = static_cast<NUTable*>(GetNative());
   [table setModel:model];
-  // Somehow the content may have some offset, scroll to top.
-  [table.verticalScroller setFloatValue:0];
 }
 
 void Table::AddColumnWithOptions(const std::string& title,
@@ -136,6 +148,19 @@ int Table::GetColumnCount() const {
   auto* tableView = static_cast<NSTableView*>(
       [static_cast<NUTable*>(GetNative()) documentView]);
   return [tableView numberOfColumns];
+}
+
+void Table::SetColumnsVisible(bool visible) {
+  if (visible == IsColumnsVisible())
+    return;
+  auto* table = static_cast<NUTable*>(GetNative());
+  [table setColumnsVisible:visible];
+}
+
+bool Table::IsColumnsVisible() const {
+  auto* tableView = static_cast<NSTableView*>(
+      [static_cast<NUTable*>(GetNative()) documentView]);
+  return [tableView headerView];
 }
 
 void Table::SetRowHeight(float height) {

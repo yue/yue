@@ -51,6 +51,8 @@ class NATIVEUI_EXPORT Table : public View {
   void AddColumnWithOptions(const std::string& title,
                             const ColumnOptions& options);
   int GetColumnCount() const;
+  void SetColumnsVisible(bool visible);
+  bool IsColumnsVisible() const;
   void SetRowHeight(float height);
   float GetRowHeight() const;
   void SelectRow(int row);

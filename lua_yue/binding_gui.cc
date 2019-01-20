@@ -1664,6 +1664,8 @@ struct Type<nu::Table> {
            RefMethod(&nu::Table::AddColumnWithOptions,
                      RefType::Ref, nullptr, 2),
            "getcolumncount", &nu::Table::GetColumnCount,
+           "setcolumnsvisible", &nu::Table::SetColumnsVisible,
+           "iscolumnsvisible", &nu::Table::IsColumnsVisible,
            "setrowheight", &nu::Table::SetRowHeight,
            "getrowheight", &nu::Table::GetRowHeight);
   }

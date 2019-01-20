@@ -45,6 +45,18 @@ methods:
   - signature: int GetColumnCount() const
     description: Return the number of columns.
 
+  - signature: void SetColumnsVisible(bool visible)
+    description: Set whether the columns header is visible.
+    detail: |
+      On macOS adding column after hiding the header will result in missing
+      columns in the header even after making the header visible again.
+
+      It is recommended to never show the header again after hiding the header,
+      for consistent behaviors between platforms.
+
+  - signature: bool IsColumnsVisible() const
+    description: Return whether the columns header is visible.
+
   - signature: void SetRowHeight(float height)
     description: Set the `height` of each row.
     detail: |
