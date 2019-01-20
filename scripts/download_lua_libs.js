@@ -25,8 +25,8 @@ if (fs.existsSync(lua_dir)) {
 }
 
 const mirror = 'https://jaist.dl.sourceforge.net/project/luabinaries'
-const folder = 'Windows%20Libraries/Static'
-const zipname = `lua-${version}_${arch}_vc14_lib.zip`
+const folder = 'Windows%20Libraries/Dynamic'
+const zipname = `lua-${version}_${arch}_dll15_lib.zip`
 const url = `${mirror}/${version}/${folder}/${zipname}`
 
 download(url, (response) => {
