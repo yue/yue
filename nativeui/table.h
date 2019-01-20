@@ -36,6 +36,8 @@ class NATIVEUI_EXPORT Table : public View {
     std::function<void(Painter*, const RectF&, const base::Value&)> on_draw;
     // Which column of model, -1 means current last column.
     int column = -1;
+    // Initial width.
+    int width = -1;
   };
 
   Table();

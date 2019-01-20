@@ -56,24 +56,31 @@ int TableImpl::GetColumnCount() const {
 
 void TableImpl::UpdateColumnsWidth(TableModel* model) {
   int count = GetColumnCount();
+  if (count == 0)
+    return;
+
   // The AUTOSIZE style does not work for virtual list, we have to guess a
   // best width for each column.
   for (int i = 0; i < count - 1; ++i) {
-    int width = kDefaultColumnWidth * scale_factor();
-    // If there is data in model, use the first cell's width.
-    if (model && model->GetRowCount() > 0) {
-      const base::Value* value = model->GetValue(i, 0);
-      if (value && value->is_string()) {
-        base::string16 text = base::UTF8ToUTF16(value->GetString());
-        int text_width = ListView_GetStringWidth(hwnd(), text.c_str());
-        // Add some padding.
-        text_width += (i == 0 ? 7 : 14) * scale_factor();
-        // Do not choose a too small width.
-        width = std::max(width, text_width);
+    int width = columns_[i].width * scale_factor();
+    if (width < 0) {  // autosize
+      width = kDefaultColumnWidth * scale_factor();
+      // If there is data in model, use the first cell's width.
+      if (model && model->GetRowCount() > 0) {
+        const base::Value* value = model->GetValue(i, 0);
+        if (value && value->is_string()) {
+          base::string16 text = base::UTF8ToUTF16(value->GetString());
+          int text_width = ListView_GetStringWidth(hwnd(), text.c_str());
+          // Add some padding.
+          text_width += (i == 0 ? 7 : 14) * scale_factor();
+          // Do not choose a too small width.
+          width = std::max(width, text_width);
+        }
       }
     }
     ListView_SetColumnWidth(hwnd(), i, width);
   }
+
   // Make the last column use USEHEADER style, which fills it to rest of the
   // list control.
   ListView_SetColumnWidth(hwnd(), count - 1, LVSCW_AUTOSIZE_USEHEADER);
@@ -294,11 +301,21 @@ void Table::PlatformDestroy() {
 
 void Table::PlatformSetModel(TableModel* model) {
   auto* table = static_cast<TableImpl*>(GetNative());
+  if (GetModel()) {
+    // Deselect everything.
+    ListView_SetItemState(table->hwnd(), -1, LVIF_STATE, LVIS_SELECTED);
+    // Scroll back to top, otherwise listview will have rendering bugs.
+    ListView_EnsureVisible(table->hwnd(), 0, FALSE);
+  }
+  // Update row count.
   ListView_SetItemCountEx(table->hwnd(), model ? model->GetRowCount() : 0, 0);
   if (model) {
-    ListView_SetItemState(table->hwnd(), -1, 0, 0);  // unselect all
+    // Listview does not update column width automatically, recalculate width
+    // after changing model.
     table->UpdateColumnsWidth(model);
-    SchedulePaint();
+    // After updating column width, we have to set SetItemCount again to force
+    // listview to update scrollbar.
+    ListView_SetItemCountEx(table->hwnd(), model->GetRowCount(), 0);
   }
 }
 
@@ -318,8 +335,7 @@ void Table::SetRowHeight(float height) {
   table->SetRowHeight(std::ceil(height * table->scale_factor()));
   // Update scrollbar after changing row height.
   if (GetModel())
-    ListView_SetItemCountEx(table->hwnd(), GetModel()->GetRowCount(),
-                            LVSICF_NOINVALIDATEALL | LVSICF_NOSCROLL);
+    ListView_SetItemCountEx(table->hwnd(), GetModel()->GetRowCount(), 0);
 }
 
 float Table::GetRowHeight() const {

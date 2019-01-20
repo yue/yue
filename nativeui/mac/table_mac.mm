@@ -136,7 +136,7 @@ int Table::GetColumnCount() const {
   return [tableView numberOfColumns];
 }
 
-void Table::SetRowHeight(int height) {
+void Table::SetRowHeight(float height) {
   auto* tableView = static_cast<NSTableView*>(
       [static_cast<NUTable*>(GetNative()) documentView]);
   [tableView setRowHeight:height];
@@ -148,7 +148,7 @@ float Table::GetRowHeight() const {
   return [tableView rowHeight];
 }
 
-void Table::SelectRow(float row) {
+void Table::SelectRow(int row) {
   auto* tableView = static_cast<NSTableView*>(
       [static_cast<NUTable*>(GetNative()) documentView]);
   [tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:row]

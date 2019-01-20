@@ -20,3 +20,11 @@ properties:
   - property: int column
     description: Which `column` of table model to show.
     detail: By default the index of table's newly-added column will be used.
+
+  - property: int width
+    description: Initial width of column.
+    detail: |
+      Using -1 will use auto-size. By default -1 is used.
+
+      This property does not work for the last column, as it is always resized
+      to fill the rest of space.

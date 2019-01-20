@@ -1890,6 +1890,7 @@ struct Type<nu::Table::ColumnOptions> {
     if (Get(context, obj, "onDraw", &on_draw_val))
       WeakFunctionFromV8(context, on_draw_val, &out->on_draw);
     Get(context, obj, "column", &out->column);
+    Get(context, obj, "width", &out->width);
     return true;
   }
 };
