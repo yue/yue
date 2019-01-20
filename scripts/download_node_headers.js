@@ -46,7 +46,7 @@ const suffix = runtime == 'electron' ? '' : '-headers'
 const url = `${prefix[runtime]}/${version}/node-${version}${suffix}.tar.gz`
 download(url, (response) => {
   response.pipe(zlib.createGunzip())
-          .pipe(cp.exec('tar xf -', {cwd: 'third_party'}).stdin)
+          .pipe(cp.exec(`tar xf - node-${version}`, {cwd: 'third_party'}).stdin)
 
   // Download node.lib on Windows.
   if (process.platform == 'win32') {
