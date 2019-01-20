@@ -158,6 +158,18 @@ int Table::GetColumnCount() const {
   return gtk_tree_view_get_n_columns(tree_view);
 }
 
+void Table::SetColumnsVisible(bool visible) {
+  auto* tree_view = GTK_TREE_VIEW(g_object_get_data(G_OBJECT(GetNative()),
+                                                    "tree-view"));
+  gtk_tree_view_set_headers_visible(tree_view, visible);
+}
+
+bool Table::IsColumnsVisible() const {
+  auto* tree_view = GTK_TREE_VIEW(g_object_get_data(G_OBJECT(GetNative()),
+                                                    "tree-view"));
+  return gtk_tree_view_get_headers_visible(tree_view);
+}
+
 void Table::SetRowHeight(float height) {
   if (GetColumnCount() > 0) {
     LOG(ERROR) << "Setting row height only works before adding any column";
