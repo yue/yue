@@ -336,6 +336,21 @@ int Table::GetColumnCount() const {
   return table->GetColumnCount();
 }
 
+void Table::SetColumnsVisible(bool visible) {
+  auto* table = static_cast<TableImpl*>(GetNative());
+  LONG styles = ::GetWindowLong(table->hwnd(), GWL_STYLE);
+  if (!visible)
+    styles |= LVS_NOCOLUMNHEADER;
+  else
+    styles &= ~LVS_NOCOLUMNHEADER;
+  ::SetWindowLong(table->hwnd(), GWL_STYLE, styles);
+}
+
+bool Table::IsColumnsVisible() const {
+  auto* table = static_cast<TableImpl*>(GetNative());
+  return !(::GetWindowLong(table->hwnd(), GWL_STYLE) & LVS_NOCOLUMNHEADER);
+}
+
 void Table::SetRowHeight(float height) {
   auto* table = static_cast<TableImpl*>(GetNative());
   table->SetRowHeight(std::ceil(height * table->scale_factor()));
