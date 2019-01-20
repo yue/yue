@@ -23,4 +23,9 @@ properties:
 
   - property: int width
     description: Initial width of column.
-    detail: Using -1 will use auto-size. By default -1 is used.
+    detail: |
+      Using -1 will use auto-size. By default -1 is used.
+
+      On Linux setting the width of last column does not work, it always resizes
+      to fill the space. It is recommended to use -1 for last column to have
+      consistent behavior between platforms.

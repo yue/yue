@@ -141,6 +141,8 @@ void Table::AddColumnWithOptions(const std::string& title,
       title.c_str(), renderer, nullptr);
   gtk_tree_view_column_set_sizing(tree_column, GTK_TREE_VIEW_COLUMN_FIXED);
   gtk_tree_view_column_set_resizable(tree_column, true);
+  if (options.width != -1)
+    gtk_tree_view_column_set_fixed_width(tree_column, options.width);
   gtk_tree_view_append_column(tree_view, tree_column);
 
   // Pass the ColumnOptions to renderer.
