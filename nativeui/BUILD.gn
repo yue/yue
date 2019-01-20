@@ -223,6 +223,7 @@ component("nativeui") {
     "gtk/scroll_gtk.cc",
     "gtk/slider_gtk.cc",
     "gtk/state_gtk.cc",
+    "gtk/tab_gtk.cc",
     "gtk/table_gtk.cc",
     "gtk/text_edit_gtk.cc",
     "gtk/tray_gtk.cc",
