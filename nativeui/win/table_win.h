@@ -25,6 +25,7 @@ class TableImpl : public SubwinView {
 
  protected:
   // SubwinView:
+  void SizeAllocate(const Rect& size_allocation) override;
   LRESULT OnNotify(int code, LPNMHDR pnmh) override;
 
   CR_BEGIN_MSG_MAP_EX(TableImpl, SubwinView)
