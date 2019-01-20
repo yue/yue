@@ -31,7 +31,8 @@ if (!(runtime in prefix)) {
 }
 
 const node_dir = path.join('third_party', `node-${version}`)
-if (fs.existsSync(node_dir)) {
+const lib_dir = path.join(node_dir, targetCpu)
+if (fs.existsSync(lib_dir)) {
   process.exit(0)
 }
 
@@ -64,7 +65,6 @@ function downloadNodeLib(arch) {
   const name = runtime == 'electron' ? 'iojs' : 'node'
   const lib = `${prefix[runtime]}/${version}/win-${arch}/${name}.lib`
   download(lib, (response) => {
-    const lib_dir = path.join(node_dir, arch)
     fs.mkdirSync(lib_dir)
     response.pipe(fs.createWriteStream(path.join(lib_dir, 'node.lib')))
   })
