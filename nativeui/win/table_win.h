@@ -24,16 +24,18 @@ class TableImpl : public SubwinView {
   void UpdateColumnsWidth(TableModel* model);
 
  protected:
-  // SubwinView:
-  void SizeAllocate(const Rect& size_allocation) override;
-  LRESULT OnNotify(int code, LPNMHDR pnmh) override;
-
   CR_BEGIN_MSG_MAP_EX(TableImpl, SubwinView)
     CR_MSG_WM_PAINT(OnPaint)
+    CR_MSG_WM_WINDOWPOSCHANGED(OnWindowPosChanged)
   CR_END_MSG_MAP()
+
+  // SubwinView:
+  LRESULT OnNotify(int code, LPNMHDR pnmh) override;
 
  private:
   void OnPaint(HDC dc);
+  void OnWindowPosChanged(WINDOWPOS* pos);
+
   LRESULT OnGetDispInfo(NMLVDISPINFO* nm, int column, int row);
   LRESULT OnCustomDraw(NMLVCUSTOMDRAW* nm, int row);
   LRESULT OnBeginEdit(NMLVDISPINFO* nm, int row);

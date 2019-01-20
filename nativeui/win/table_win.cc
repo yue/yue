@@ -73,14 +73,6 @@ void TableImpl::UpdateColumnsWidth(TableModel* model) {
   ListView_SetColumnWidth(hwnd(), count - 1, LVSCW_AUTOSIZE_USEHEADER);
 }
 
-void TableImpl::SizeAllocate(const Rect& size_allocation) {
-  SubwinView::SizeAllocate(size_allocation);
-  // Resize the last column to fill the control.
-  int count = GetColumnCount();
-  if (count > 0)
-    ListView_SetColumnWidth(hwnd(), count - 1, LVSCW_AUTOSIZE_USEHEADER);
-}
-
 void TableImpl::OnPaint(HDC dc) {
   // Block redrawing of leftmost item when editing sub item.
   if (edit_proc_) {
@@ -89,6 +81,13 @@ void TableImpl::OnPaint(HDC dc) {
     ::ValidateRect(hwnd(), &rc);
   }
   SetMsgHandled(false);
+}
+
+void TableImpl::OnWindowPosChanged(WINDOWPOS* pos) {
+  // Resize the last column to fill the control.
+  int count = GetColumnCount();
+  if (count > 0)
+    ListView_SetColumnWidth(hwnd(), count - 1, LVSCW_AUTOSIZE_USEHEADER);
 }
 
 LRESULT TableImpl::OnNotify(int code, LPNMHDR pnmh) {
