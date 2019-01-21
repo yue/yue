@@ -45,11 +45,9 @@ loadable_module("lua_yue") {
   } else if (is_linux && is_component_build) {
     configs += [ "//build/config/gcc:rpath_for_built_shared_libraries" ]
   } else if (is_win) {
-    if (current_cpu == "x86") {
-      libs = [ rebase_path("//third_party/lua_binaries_5.3.4_Win32/lua53.lib") ]
-    } else if (current_cpu == "x64") {
-      libs = [ rebase_path("//third_party/lua_binaries_5.3.4_Win64/lua53.lib") ]
-    }
+    deps += [
+      "//third_party/lua:lua_shared",
+    ]
   }
 }
 
