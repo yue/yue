@@ -16,6 +16,11 @@ executable("lua53") {
   deps = [ ":lua" ]
 }
 
+shared_library("lua_shared") {
+  output_name = "lua53"
+  deps = [ ":lua" ]
+}
+
 source_set("lua") {
   sources = [
     "src/lapi.c",
