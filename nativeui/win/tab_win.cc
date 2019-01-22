@@ -112,7 +112,7 @@ class TabImpl : public ContainerImpl,
   }
 
   void RemovePageAt(int index) {
-    if (index < 0 || index >= items_.size())
+    if (index < 0 || static_cast<size_t>(index) >= items_.size())
       return;
 
     // Select next item automatically.
@@ -133,7 +133,7 @@ class TabImpl : public ContainerImpl,
   }
 
   void SelectItemAt(int index) {
-    if (index < 0 || index >= items_.size())
+    if (index < 0 || static_cast<size_t>(index) >= items_.size())
       return;
     SetSelectedItem(items_[index].get());
   }
@@ -157,7 +157,7 @@ class TabImpl : public ContainerImpl,
   }
 
   ViewImpl* GetSelectedPage() const {
-    View* content = static_cast<Tab*>(delegate())->GetSelectedPage();
+    View* content = static_cast<Tab*>(delegate())->PageAt(selected_item_index_);
     return content ? content->GetNative() : nullptr;
   }
 
@@ -203,19 +203,16 @@ class TabImpl : public ContainerImpl,
 
   void ForEach(const std::function<bool(ViewImpl*)>& callback,
                bool reverse) override {
-    ViewImpl* content = GetSelectedPage();
-    if (reverse && content)
-      callback(content);
     if (items_.empty())
       return;
+    auto* tab = static_cast<Tab*>(delegate());
     for (int i = reverse ? static_cast<int>(items_.size()) - 1 : 0;
-         reverse ? (i >= 0) : (i < items_.size());
+         reverse ? (i >= 0) : (i < static_cast<int>(items_.size()));
          reverse ? --i : ++i) {
-      if (!callback(items_[i].get()))
+      if (!callback(items_[i].get()) ||
+          !callback(tab->PageAt(i)->GetNative()))
         break;
     }
-    if (!reverse && content)
-      callback(content);
   }
 
   bool HasChild(ViewImpl* child) override {
@@ -295,6 +292,8 @@ NativeView Tab::PlatformCreate() {
 void Tab::PlatformAddPage(const std::string& title, View* view) {
   auto* tab = static_cast<TabImpl*>(GetNative());
   view->GetNative()->SetParent(tab);
+  if (PageCount() > 0)  // later added pages are hidden by default
+    view->SetVisible(false);
   tab->AddPage(base::UTF8ToUTF16(title));
 }
 

@@ -40,6 +40,9 @@ UINT ViewImpl::HitTest(const Point& point) const {
 }
 
 void ViewImpl::SetParent(ViewImpl* parent) {
+  if (window())
+    window()->focus_manager()->RemoveFocus(this);
+
   window_ = parent ? parent->window_ : nullptr;
   parent_ = parent;
 
@@ -86,10 +89,16 @@ void ViewImpl::ClipRectForChild(const ViewImpl* child, Rect* rect) const {
 }
 
 void ViewImpl::SetFocus(bool focus) {
+  if (is_focused_ == focus)
+    return;
   is_focused_ = focus;
-  if (focus && window()) {
-    ::SetFocus(window()->hwnd());  // need this to take focus from subwin
-    window_->focus_manager()->TakeFocus(this);
+  if (window()) {
+    if (focus) {
+      ::SetFocus(window()->hwnd());  // need this to take focus from subwin
+      window()->focus_manager()->TakeFocus(this);
+    } else {
+      window()->focus_manager()->RemoveFocus(this);
+    }
   }
   Invalidate();
 }
@@ -103,6 +112,8 @@ void ViewImpl::VisibilityChanged() {
     is_tree_visible_ = is_visible_ && parent_->is_tree_visible_;
   else
     is_tree_visible_ = is_visible_;
+  if (!is_tree_visible_)  // remove focus when view is hidden
+    SetFocus(false);
 }
 
 void ViewImpl::SetFont(Font* font) {

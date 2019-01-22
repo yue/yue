@@ -80,10 +80,13 @@ void SubwinView::Invalidate(const Rect& dirty) {
 }
 
 void SubwinView::SetFocus(bool focus) {
-  if (focus)
+  if (focus) {
     ::SetFocus(hwnd());
-  else
+  } else {
+    if (window())
+      window()->focus_manager()->RemoveFocus(this);
     ::SendMessage(hwnd(), WM_KILLFOCUS, 0, 0L);
+  }
 }
 
 bool SubwinView::HasFocus() const {

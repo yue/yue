@@ -19,6 +19,9 @@ class FocusManager {
   FocusManager();
   ~FocusManager();
 
+  // Reset current focus tracking if the view is focused.
+  void RemoveFocus(ViewImpl* view);
+
   // A view has taken the focus by clicking.
   void TakeFocus(ViewImpl* view);
 
