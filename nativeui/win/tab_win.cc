@@ -206,9 +206,9 @@ class TabImpl : public ContainerImpl,
     ViewImpl* content = GetSelectedPage();
     if (reverse && content)
       callback(content);
-    if (items_.size() == 0)
+    if (items_.empty())
       return;
-    for (size_t i = reverse ? items_.size() - 1 : 0;
+    for (int i = reverse ? static_cast<int>(items_.size()) - 1 : 0;
          reverse ? (i >= 0) : (i < items_.size());
          reverse ? --i : ++i) {
       if (!callback(items_[i].get()))
@@ -219,6 +219,8 @@ class TabImpl : public ContainerImpl,
   }
 
   bool HasChild(ViewImpl* child) override {
+    if (child == GetSelectedPage())
+      return true;
     return std::find_if(items_.begin(), items_.end(), [child](const auto& it) {
       return it.get() == child;
     }) != items_.end();
