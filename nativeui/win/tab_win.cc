@@ -107,7 +107,7 @@ class TabImpl : public ContainerImpl,
     item->on_select = [this](TabItem* item) { this->SetSelectedItem(item); };
     items_.emplace_back(std::move(item));
     if (items_.size() == 1)
-      SetSelectedItem(items_[0].get(), false);
+      SetSelectedItem(items_[0].get());
     Layout();
   }
 
@@ -135,10 +135,10 @@ class TabImpl : public ContainerImpl,
   void SelectItemAt(int index) {
     if (index < 0 || index >= items_.size())
       return;
-    SetSelectedItem(items_[index].get(), false);
+    SetSelectedItem(items_[index].get());
   }
 
-  void SetSelectedItem(TabItem* item, bool notify = true) {
+  void SetSelectedItem(TabItem* item) {
     auto* tab = static_cast<Tab*>(delegate());
     if (selected_item_) {
       selected_item_->SetSelected(false);
@@ -152,11 +152,8 @@ class TabImpl : public ContainerImpl,
                      [item](auto& it) { return it.get() == item; }));
     selected_item_->SetSelected(true);
     tab->PageAt(selected_item_index_)->SetVisible(true);
-
     Layout();
-
-    if (notify)
-      tab->on_selected_page_change.Emit(tab);
+    tab->on_selected_page_change.Emit(tab);
   }
 
   ViewImpl* GetSelectedPage() const {

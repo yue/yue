@@ -279,6 +279,7 @@ component("nativeui") {
     "mac/slider_mac.mm",
     "mac/state_mac.mm",
     "mac/toolbar_mac.mm",
+    "mac/tab_mac.mm",
     "mac/table_mac.mm",
     "mac/text_edit_mac.mm",
     "mac/tray_mac.mm",

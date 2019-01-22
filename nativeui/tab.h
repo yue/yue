@@ -24,7 +24,7 @@ class NATIVEUI_EXPORT Tab : public View {
 
   int PageCount() const { return static_cast<int>(pages_.size()); }
   View* PageAt(int index) const {
-    if (index < 0 || index >= pages_.size())
+    if (index < 0 || static_cast<size_t>(index) >= pages_.size())
       return nullptr;
     return pages_[index].get();
   }

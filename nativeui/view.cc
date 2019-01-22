@@ -61,7 +61,7 @@ void View::SetVisible(bool visible) {
 
 void View::Layout() {
   // By default just make parent do layout.
-  if (IsContainer())
+  if (GetParent() && GetParent()->IsContainer())
     static_cast<Container*>(GetParent())->Layout();
 }
 

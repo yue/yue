@@ -17,7 +17,7 @@ class TabTest : public testing::Test {
 };
 
 TEST_F(TabTest, Empty) {
-  EXPECT_EQ(tab_->GetPageCount(), 0);
+  EXPECT_EQ(tab_->PageCount(), 0);
   EXPECT_EQ(tab_->GetSelectedPageIndex(), -1);
   EXPECT_EQ(tab_->GetSelectedPage(), nullptr);
 }
@@ -25,11 +25,11 @@ TEST_F(TabTest, Empty) {
 TEST_F(TabTest, AddAndSelect) {
   scoped_refptr<nu::View> page = new nu::Container;
   tab_->AddPage("Tab", page.get());
-  EXPECT_EQ(tab_->GetPageCount(), 1);
+  EXPECT_EQ(tab_->PageCount(), 1);
   EXPECT_EQ(tab_->GetSelectedPageIndex(), 0);
   EXPECT_EQ(tab_->GetSelectedPage(), page.get());
   tab_->AddPage("Tab 2", new nu::Container);
-  EXPECT_EQ(tab_->GetPageCount(), 2);
+  EXPECT_EQ(tab_->PageCount(), 2);
   EXPECT_EQ(tab_->GetSelectedPageIndex(), 0);
 }
 
@@ -37,8 +37,8 @@ TEST_F(TabTest, RemoveAndSelect) {
   tab_->AddPage("Tab 1", new nu::Container);
   tab_->AddPage("Tab 2", new nu::Container);
   tab_->AddPage("Tab 3", new nu::Container);
-  tab_->RemovePage(tab_->GetPageAt(2));
-  EXPECT_EQ(tab_->GetPageCount(), 2);
+  tab_->RemovePage(tab_->PageAt(2));
+  EXPECT_EQ(tab_->PageCount(), 2);
   EXPECT_EQ(tab_->GetSelectedPageIndex(), 0);
 }
 
@@ -52,7 +52,7 @@ TEST_F(TabTest, SelectPage) {
   EXPECT_EQ(tab_->GetSelectedPageIndex(), 1);
 }
 
-TEST_F(TabTest, SelectPageShouldNotEmitEvent) {
+TEST_F(TabTest, SelectPageShouldEmitEvent) {
   tab_->AddPage("Tab 1", new nu::Container);
   tab_->AddPage("Tab 2", new nu::Container);
   bool emitted = false;
@@ -60,5 +60,5 @@ TEST_F(TabTest, SelectPageShouldNotEmitEvent) {
     emitted = true;
   });
   tab_->SelectPageAt(1);
-  EXPECT_FALSE(emitted);
+  EXPECT_TRUE(emitted);
 }
