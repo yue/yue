@@ -1442,7 +1442,8 @@ struct Type<nu::Picker> {
     return picker->SelectItemAt(i - 1);
   }
   static int GetSelectedItemIndex(nu::Picker* picker) {
-    return picker->GetSelectedItemIndex() + 1;
+    int index = picker->GetSelectedItemIndex();
+    return index == -1 ? -1 : index + 1;
   }
 };
 
@@ -1542,6 +1543,35 @@ struct Type<nu::Slider> {
     RawSetProperty(state, metatable,
                    "onvaluechange", &nu::Slider::on_value_change,
                    "onslidingcomplete", &nu::Slider::on_sliding_complete);
+  }
+};
+
+template<>
+struct Type<nu::Tab> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Tab";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateOnHeap<nu::Tab>,
+           "addpage", RefMethod(&nu::Tab::AddPage, RefType::Ref),
+           "removePage", RefMethod(&nu::Tab::RemovePage, RefType::Deref),
+           "pagecount", &nu::Tab::PageCount,
+           "pageat", &PageAt,
+           "selectpageat", &SelectPageAt,
+           "getselectedpage", &nu::Tab::GetSelectedPage,
+           "getselectedpageindex", &GetSelectedPageIndex);
+    RawSetProperty(state, metatable,
+                   "onselectedpagechange", &nu::Tab::on_selected_page_change);
+  }
+  static nu::View* PageAt(nu::Tab* tab, int index) {
+    return tab->PageAt(index - 1);
+  }
+  static void SelectPageAt(nu::Tab* tab, int index) {
+    tab->SelectPageAt(index - 1);
+  }
+  static int GetSelectedPageIndex(nu::Tab* tab) {
+    int index = tab->GetSelectedPageIndex();
+    return index == -1 ? -1 : index + 1;
   }
 };
 
@@ -1836,6 +1866,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::Group>(state, "Group");
   BindType<nu::Scroll>(state, "Scroll");
   BindType<nu::Slider>(state, "Slider");
+  BindType<nu::Tab>(state, "Tab");
   BindType<nu::TableModel>(state, "TableModel");
   BindType<nu::AbstractTableModel>(state, "AbstractTableModel");
   BindType<nu::SimpleTableModel>(state, "SimpleTableModel");

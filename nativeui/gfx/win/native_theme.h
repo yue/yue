@@ -54,6 +54,9 @@ class NativeTheme {
     ScrollbarHorizontalTrack,
     ScrollbarVerticalTrack,
 
+    TabPanel,
+    TabItem,
+
     Count,
   };
 
@@ -124,6 +127,14 @@ class NativeTheme {
                               ControlState state,
                               const Rect& rect,
                               const ScrollbarTrackExtraParams& extra) const;
+  HRESULT PaintTabPanel(Part part,
+                        HDC hdc,
+                        ControlState state,
+                        const Rect& rect) const;
+  HRESULT PaintTabItem(Part part,
+                       HDC hdc,
+                       ControlState state,
+                       const Rect& rect) const;
 
   HRESULT PaintButton(HDC hdc,
                       ControlState state,

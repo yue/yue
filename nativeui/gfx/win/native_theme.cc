@@ -146,6 +146,12 @@ void NativeTheme::Paint(Part part, HDC hdc, ControlState state,
     case Part::ScrollbarVerticalTrack:
       PaintScrollbarTrack(part, hdc, state, rect, extra.scrollbar_track);
       break;
+    case Part::TabPanel:
+      PaintTabPanel(part, hdc, state, rect);
+      break;
+    case Part::TabItem:
+      PaintTabItem(part, hdc, state, rect);
+      break;
   }
 }
 
@@ -416,6 +422,41 @@ HRESULT NativeTheme::PaintScrollbarTrack(
   return S_OK;
 }
 
+HRESULT NativeTheme::PaintTabPanel(Part part,
+                                   HDC hdc,
+                                   ControlState state,
+                                   const Rect& rect) const {
+  HANDLE handle = GetThemeHandle(part);
+  RECT rect_win = rect.ToRECT();
+
+  if (handle && draw_theme_)
+    return draw_theme_(handle, hdc, TABP_PANE, 0, &rect_win, NULL);
+
+  // TODO(zcbenz): Add fallback when visual theme is not enabled.
+  return S_OK;
+}
+
+HRESULT NativeTheme::PaintTabItem(Part part,
+                                  HDC hdc,
+                                  ControlState state,
+                                  const Rect& rect) const {
+  static const int state_id_matrix[ControlState::Size] = {
+      TIS_DISABLED, TIS_HOT, TIS_NORMAL, TIS_SELECTED
+  };
+
+  HANDLE handle = GetThemeHandle(part);
+  RECT rect_win = rect.ToRECT();
+
+  const int part_id = TABP_TABITEM;
+  int state_id = state_id_matrix[static_cast<int>(state)];
+
+  if (handle && draw_theme_)
+    return draw_theme_(handle, hdc, part_id, state_id, &rect_win, NULL);
+
+  // TODO(zcbenz): Add fallback when visual theme is not enabled.
+  return S_OK;
+}
+
 HRESULT NativeTheme::PaintButton(HDC hdc,
                                  ControlState state,
                                  const ButtonExtraParams& extra,
@@ -537,6 +578,8 @@ HANDLE NativeTheme::GetThemeHandle(Part part) const {
     case Part::ScrollbarVerticalTrack:
       part = Part::ScrollbarDownArrow;
       break;
+    case Part::TabItem:
+      part = Part::TabPanel;
     default:
       break;
   }
@@ -552,6 +595,9 @@ HANDLE NativeTheme::GetThemeHandle(Part part) const {
       break;
     case Part::ScrollbarDownArrow:
       handle = open_theme_(NULL, L"Scrollbar");
+      break;
+    case Part::TabPanel:
+      handle = open_theme_(NULL, L"Tab");
       break;
     default:
       NOTREACHED();

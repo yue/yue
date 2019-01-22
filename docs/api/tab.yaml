@@ -1,0 +1,48 @@
+name: Tab
+component: gui
+header: nativeui/tab.h
+type: refcounted
+namespace: nu
+inherit: View
+description: Multipage view with tabs.
+
+constructors:
+  - signature: Tab()
+    lang: ['cpp']
+    description: Create a new `Tab` view.
+
+class_methods:
+  - signature: Tab* Create()
+    lang: ['lua', 'js']
+    description: Create a new `Tab` view.
+
+class_properties:
+  - property: const char* kClassName
+    lang: ['cpp']
+    description: The class name of this view.
+
+methods:
+  - signature: void AddPage(const std::string& title, View* view)
+    description: Add `view` as a new page with `title`.
+
+  - signature: void RemovePage(View* view)
+    description: Remove the page that shows `view`.
+
+  - signature: int PageCount() const
+    description: Return the number of pages.
+
+  - signature: View* PageAt(int index) const
+    description: Return the view of page at `index`.
+
+  - signature: void SelectPageAt(int index)
+    description: Select the page at `index`.
+
+  - signature: int GetSelectedPageIndex() const
+    description: Return the index of selected page.
+
+  - signature: View* GetSelectedPage() const
+    description: Return the view of selected page.
+
+events:
+  - callback: void on_selected_page_change(Tab* self)
+    description: Emitted when user has changed the selected page.

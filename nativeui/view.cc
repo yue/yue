@@ -61,7 +61,7 @@ void View::SetVisible(bool visible) {
 
 void View::Layout() {
   // By default just make parent do layout.
-  if (GetParent())
+  if (IsContainer())
     static_cast<Container*>(GetParent())->Layout();
 }
 
@@ -121,6 +121,10 @@ void View::BecomeContentView(Window* window) {
     window_ = nullptr;
   }
   parent_ = nullptr;
+}
+
+bool View::IsContainer() const {
+  return false;
 }
 
 void View::OnSizeChanged() {

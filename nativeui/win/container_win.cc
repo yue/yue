@@ -55,6 +55,13 @@ void ContainerImpl::Draw(PainterWin* painter, const Rect& dirty) {
   });
 }
 
+void ContainerImpl::OnDPIChanged() {
+  adapter_->ForEach([=](ViewImpl* child) {
+    child->OnDPIChanged();
+    return true;
+  });
+}
+
 void ContainerImpl::OnMouseMove(NativeEvent event) {
   // Find the view that has the mouse.
   Point point(event->l_param);
@@ -115,6 +122,7 @@ void ContainerImpl::DrawChild(ViewImpl* child, PainterWin* painter,
                           size_allocation().OffsetFromOrigin();
   painter->Save();
   painter->TranslatePixel(child_origin);
+  painter->ClipRectPixel(Rect(child->size_allocation().size()));
   child->Draw(painter, child_dirty - child_origin);
   painter->Restore();
 }
@@ -159,6 +167,8 @@ class ContainerAdapter : public ContainerImpl,
 
   void ForEach(const std::function<bool(ViewImpl*)>& callback,
                bool reverse) override {
+    if (container_->ChildCount() == 0)
+      return;
     for (int i = reverse ? container_->ChildCount() - 1 : 0;
          reverse ? (i >= 0) : (i < container_->ChildCount());
          reverse ? --i : ++i) {

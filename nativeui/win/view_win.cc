@@ -81,6 +81,10 @@ void ViewImpl::Invalidate(const Rect& dirty) {
   InvalidateRect(window_->hwnd(), &rect, TRUE);
 }
 
+void ViewImpl::ClipRectForChild(const ViewImpl* child, Rect* rect) const {
+  rect->Intersect(GetClippedRect());
+}
+
 void ViewImpl::SetFocus(bool focus) {
   is_focused_ = focus;
   if (focus && window()) {
@@ -208,6 +212,8 @@ Rect ViewImpl::GetClippedRect() const {
   Rect rect(size_allocation());
   if (viewport_)
     rect.Intersect(viewport_->GetViewportRect());
+  if (parent())
+    parent()->ClipRectForChild(this, &rect);
   return rect;
 }
 

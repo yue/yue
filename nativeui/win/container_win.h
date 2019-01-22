@@ -30,13 +30,14 @@ class ContainerImpl : public ViewImpl {
   ContainerImpl(View* view, Adapter* delegate,
                 ControlType type = ControlType::Container);
 
-  // Baseview:
+  // ViewImpl:
   void SizeAllocate(const Rect& size_allocation) override;
   UINT HitTest(const Point& point) const override;
   void SetParent(ViewImpl* parent) override;
   void BecomeContentView(WindowImpl* parent) override;
   void VisibilityChanged() override;
   void Draw(PainterWin* painter, const Rect& dirty) override;
+  void OnDPIChanged() override;
   void OnMouseMove(NativeEvent event) override;
   void OnMouseLeave(NativeEvent event) override;
   bool OnMouseWheel(NativeEvent event) override;

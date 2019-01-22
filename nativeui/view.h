@@ -139,6 +139,9 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   void SetParent(View* parent);
   void BecomeContentView(Window* window);
 
+  // Internal: Whether this class inherits from Container.
+  virtual bool IsContainer() const;
+
   // Internal: Notify that view's size has changed.
   virtual void OnSizeChanged();
 

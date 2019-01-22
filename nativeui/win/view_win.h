@@ -51,6 +51,9 @@ class ViewImpl {
   // Invalidate the |dirty| rect.
   virtual void Invalidate(const Rect& dirty);
 
+  // Calculate the clipped rect of a child.
+  virtual void ClipRectForChild(const ViewImpl* child, Rect* rect) const;
+
   // Move focus to the view.
   virtual void SetFocus(bool focus);
   virtual bool HasFocus() const;

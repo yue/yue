@@ -1801,6 +1801,29 @@ struct Type<nu::Slider> {
 };
 
 template<>
+struct Type<nu::Tab> {
+  using base = nu::View;
+  static constexpr const char* name = "yue.Tab";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor, "create", &CreateOnHeap<nu::Tab>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "addPage", RefMethod(&nu::Tab::AddPage, RefType::Ref),
+        "removePage", RefMethod(&nu::Tab::RemovePage, RefType::Deref),
+        "pageCount", &nu::Tab::PageCount,
+        "pageAt", &nu::Tab::PageAt,
+        "selectPageAt", &nu::Tab::SelectPageAt,
+        "getSelectedPage", &nu::Tab::GetSelectedPage,
+        "getSelectedPageIndex", &nu::Tab::GetSelectedPageIndex);
+    SetProperty(context, templ,
+                "onSelectedPageChange", &nu::Tab::on_selected_page_change);
+  }
+};
+
+template<>
 struct Type<nu::TableModel> {
   static constexpr const char* name = "yue.TableModel";
   static void BuildConstructor(v8::Local<v8::Context> context,
@@ -2144,6 +2167,7 @@ void Initialize(v8::Local<v8::Object> exports) {
           "TableModel",        vb::Constructor<nu::TableModel>(),
           "AbstractTableModel", vb::Constructor<nu::AbstractTableModel>(),
           "SimpleTableModel",  vb::Constructor<nu::SimpleTableModel>(),
+          "Tab",               vb::Constructor<nu::Tab>(),
           "Table",             vb::Constructor<nu::Table>(),
           "TextEdit",          vb::Constructor<nu::TextEdit>(),
           "Tray",              vb::Constructor<nu::Tray>(),

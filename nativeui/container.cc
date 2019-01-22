@@ -16,7 +16,7 @@ namespace {
 
 // Whether a Container is a root CSS node.
 inline bool IsRootYGNode(Container* view) {
-  return !YGNodeGetParent(view->node()) || !view->GetParent();
+  return !YGNodeGetParent(view->node()) || !view->IsContainer();
 }
 
 // Get bounds from the CSS node.
@@ -64,6 +64,10 @@ void Container::Layout() {
   SizeF size(GetBounds().size());
   YGNodeCalculateLayout(node(), size.width(), size.height(), YGDirectionLTR);
   SetChildBoundsFromCSS();
+}
+
+bool Container::IsContainer() const {
+  return true;
 }
 
 void Container::OnSizeChanged() {
