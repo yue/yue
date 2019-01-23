@@ -4,7 +4,7 @@ header: nativeui/gif_player.h
 type: refcounted
 namespace: nu
 inherit: View
-description: Display animated GIF images.
+description: Image view with animated GIF support.
 detail: |
   It can also display other types of images, but only GIF images can be
   animated.
@@ -12,8 +12,8 @@ detail: |
   Displaying animated GIF images consumes lots of CPU resources, it is highly
   unrecommended to constantly display animated GIF images.
 
-  Hiding the view would automatically pause the animation, and showing the view
-  would automatically continue the animation if it is enabled.
+  For optimization, hiding the view would automatically pause the animation,
+  and showing the view would automatically resume previous state.
 
 constructors:
   - signature: GifPlayer()
@@ -33,6 +33,9 @@ class_properties:
 methods:
   - signature: void SetImage(Image* image)
     description: Set the image.
+    detail: |
+      After setting the image, the animated image will start playing
+      automatically.
 
   - signature: Image* GetImage() const
     description: Return the image.
@@ -41,4 +44,4 @@ methods:
     description: Set whether the animated image should be played.
 
   - signature: bool IsAnimating() const
-    description: Return whether the image is being played.
+    description: Return whether the image is animating.
