@@ -6,6 +6,7 @@
 
 #include "base/strings/string_util.h"
 #include "nativeui/container.h"
+#include "nativeui/cursor.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/state.h"
 #include "nativeui/util/yoga_util.h"
@@ -65,10 +66,18 @@ void View::Layout() {
     static_cast<Container*>(GetParent())->Layout();
 }
 
+void View::SetCursor(Cursor* cursor) {
+  if (cursor_.get() == cursor)
+    return;
+  PlatformSetCursor(cursor);
+  cursor_ = cursor;
+}
+
 void View::SetFont(Font* font) {
   if (font_.get() == font)
     return;
   PlatformSetFont(font);
+  font_ = font;
   UpdateDefaultStyle();
 }
 

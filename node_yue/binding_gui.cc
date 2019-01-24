@@ -432,6 +432,70 @@ struct Type<nu::Color> {
 };
 
 template<>
+struct Type<nu::Cursor::Type> {
+  static constexpr const char* name = "yue.Cursor.Type";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::Cursor::Type* out) {
+    std::string type;
+    if (!vb::FromV8(context, value, &type))
+      return false;
+    if (type == "default") {
+      *out = nu::Cursor::Type::Default;
+      return true;
+    } else if (type == "hand") {
+      *out = nu::Cursor::Type::Hand;
+      return true;
+    } else if (type == "crosshair") {
+      *out = nu::Cursor::Type::Crosshair;
+      return true;
+    } else if (type == "progress") {
+      *out = nu::Cursor::Type::Progress;
+      return true;
+    } else if (type == "text") {
+      *out = nu::Cursor::Type::Text;
+      return true;
+    } else if (type == "not-allowed") {
+      *out = nu::Cursor::Type::NotAllowed;
+      return true;
+    } else if (type == "help") {
+      *out = nu::Cursor::Type::Help;
+      return true;
+    } else if (type == "resize-all") {
+      *out = nu::Cursor::Type::ResizeAll;
+      return true;
+    } else if (type == "resize-ew") {
+      *out = nu::Cursor::Type::ResizeEW;
+      return true;
+    } else if (type == "resize-ns") {
+      *out = nu::Cursor::Type::ResizeNS;
+      return true;
+    } else if (type == "resize-nesw") {
+      *out = nu::Cursor::Type::ResizeNESW;
+      return true;
+    } else if (type == "resize-nwse") {
+      *out = nu::Cursor::Type::ResizeNWSE;
+      return true;
+    } else {
+      return false;
+    }
+  }
+};
+
+template<>
+struct Type<nu::Cursor> {
+  static constexpr const char* name = "yue.Cursor";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+        "createWithType", &CreateOnHeap<nu::Cursor, nu::Cursor::Type>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+  }
+};
+
+template<>
 struct Type<nu::Image> {
   static constexpr const char* name = "yue.Image";
   static void BuildConstructor(v8::Local<v8::Context> context,
@@ -1182,6 +1246,7 @@ struct Type<nu::View> {
         "hasCapture", &nu::View::HasCapture,
         "setMouseDownCanMoveWindow", &nu::View::SetMouseDownCanMoveWindow,
         "isMouseDownCanMoveWindow", &nu::View::IsMouseDownCanMoveWindow,
+        "setCursor", &nu::View::SetCursor,
         "setFont", &nu::View::SetFont,
         "setColor", &nu::View::SetColor,
         "setBackgroundColor", &nu::View::SetBackgroundColor,
@@ -2138,6 +2203,7 @@ void Initialize(v8::Local<v8::Object> exports) {
           "Font",              vb::Constructor<nu::Font>(),
           "Canvas",            vb::Constructor<nu::Canvas>(),
           "Color",             vb::Constructor<nu::Color>(),
+          "Cursor",            vb::Constructor<nu::Cursor>(),
           "Image",             vb::Constructor<nu::Image>(),
           "Painter",           vb::Constructor<nu::Painter>(),
           "Event",             vb::Constructor<nu::Event>(),

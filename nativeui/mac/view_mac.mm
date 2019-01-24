@@ -6,6 +6,7 @@
 
 #include "nativeui/browser.h"
 #include "nativeui/container.h"
+#include "nativeui/cursor.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/gfx/geometry/point_conversions.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
@@ -185,6 +186,15 @@ void View::SetMouseDownCanMoveWindow(bool yes) {
 
 bool View::IsMouseDownCanMoveWindow() const {
   return [view_ mouseDownCanMoveWindow];
+}
+
+void View::PlatformSetCursor(Cursor* cursor) {
+  if (IsNUView(view_)) {
+    if (cursor)
+      [view_ nuPrivate]->cursor.reset([cursor->GetNative() retain]);
+    else
+      [view_ nuPrivate]->cursor.reset();
+  }
 }
 
 void View::PlatformSetFont(Font* font) {

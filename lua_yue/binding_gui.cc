@@ -395,6 +395,64 @@ struct Type<nu::Color> {
 };
 
 template<>
+struct Type<nu::Cursor::Type> {
+  static constexpr const char* name = "yue.Cursor.Type";
+  static inline bool To(State* state, int index, nu::Cursor::Type* out) {
+    std::string type;
+    if (!lua::To(state, index, &type))
+      return false;
+    if (type == "default") {
+      *out = nu::Cursor::Type::Default;
+      return true;
+    } else if (type == "hand") {
+      *out = nu::Cursor::Type::Hand;
+      return true;
+    } else if (type == "crosshair") {
+      *out = nu::Cursor::Type::Crosshair;
+      return true;
+    } else if (type == "progress") {
+      *out = nu::Cursor::Type::Progress;
+      return true;
+    } else if (type == "text") {
+      *out = nu::Cursor::Type::Text;
+      return true;
+    } else if (type == "not-allowed") {
+      *out = nu::Cursor::Type::NotAllowed;
+      return true;
+    } else if (type == "help") {
+      *out = nu::Cursor::Type::Help;
+      return true;
+    } else if (type == "resize-all") {
+      *out = nu::Cursor::Type::ResizeAll;
+      return true;
+    } else if (type == "resize-ew") {
+      *out = nu::Cursor::Type::ResizeEW;
+      return true;
+    } else if (type == "resize-ns") {
+      *out = nu::Cursor::Type::ResizeNS;
+      return true;
+    } else if (type == "resize-nesw") {
+      *out = nu::Cursor::Type::ResizeNESW;
+      return true;
+    } else if (type == "resize-nwse") {
+      *out = nu::Cursor::Type::ResizeNWSE;
+      return true;
+    } else {
+      return false;
+    }
+  }
+};
+
+template<>
+struct Type<nu::Cursor> {
+  static constexpr const char* name = "yue.Cursor";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "createwithtype", &CreateOnHeap<nu::Cursor, nu::Cursor::Type>);
+  }
+};
+
+template<>
 struct Type<nu::Image> {
   static constexpr const char* name = "yue.Image";
   static void BuildMetaTable(State* state, int index) {
@@ -1048,6 +1106,7 @@ struct Type<nu::View> {
            "hascapture", &nu::View::HasCapture,
            "setmousedowncanmovewindow", &nu::View::SetMouseDownCanMoveWindow,
            "ismousedowncanmovewindow", &nu::View::IsMouseDownCanMoveWindow,
+           "setcursor", &nu::View::SetCursor,
            "setfont", &nu::View::SetFont,
            "setcolor", &nu::View::SetColor,
            "setbackgroundcolor", &nu::View::SetBackgroundColor,
@@ -1841,6 +1900,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::Font>(state, "Font");
   BindType<nu::Canvas>(state, "Canvas");
   BindType<nu::Color>(state, "Color");
+  BindType<nu::Cursor>(state, "Cursor");
   BindType<nu::Image>(state, "Image");
   BindType<nu::Painter>(state, "Painter");
   BindType<nu::Event>(state, "Event");

@@ -9,6 +9,7 @@
 #include "nativeui/browser.h"
 #include "nativeui/button.h"
 #include "nativeui/combo_box.h"
+#include "nativeui/cursor.h"
 #include "nativeui/entry.h"
 #include "nativeui/events/event.h"
 #include "nativeui/events/keyboard_code_conversion.h"

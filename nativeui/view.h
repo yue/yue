@@ -19,6 +19,7 @@ typedef struct YGConfig *YGConfigRef;
 
 namespace nu {
 
+class Cursor;
 class Font;
 class Window;
 struct MouseEvent;
@@ -87,6 +88,9 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   // Dragging the view would move the window.
   void SetMouseDownCanMoveWindow(bool yes);
   bool IsMouseDownCanMoveWindow() const;
+
+  // Custom cursor when mouse hovers the view.
+  void SetCursor(Cursor* cursor);
 
   // Display related styles.
   void SetFont(Font* font);
@@ -175,6 +179,7 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   void PlatformInit();
   void PlatformDestroy();
   void PlatformSetVisible(bool visible);
+  void PlatformSetCursor(Cursor* cursor);
   void PlatformSetFont(Font* font);
 
  private:
@@ -192,6 +197,9 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
 
   // The font used for the view.
   scoped_refptr<Font> font_;
+
+  // Custom cursor.
+  scoped_refptr<Cursor> cursor_;
 
   // The node recording CSS styles.
   YGNodeRef node_;

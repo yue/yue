@@ -57,6 +57,17 @@ BOOL MouseDownCanMoveWindow(NSView* self, SEL _cmd) {
   return [self nuPrivate]->draggable;
 }
 
+void ResetCursorRects(NSView* self, SEL _cmd) {
+  NUPrivate* priv = [self nuPrivate];
+  if (priv->cursor) {
+    [self addCursorRect:[self bounds] cursor:priv->cursor];
+  } else {
+    auto super_impl = reinterpret_cast<decltype(&ResetCursorRects)>(
+        [[self superclass] instanceMethodForSelector:_cmd]);
+    super_impl(self, _cmd);
+  }
+}
+
 void EnableTracking(NSView* self, SEL _cmd) {
   NUPrivate* priv = [self nuPrivate];
   NSTrackingAreaOptions trackingOptions = NSTrackingMouseEnteredAndExited |
@@ -156,6 +167,8 @@ void InstallNUViewMethods(Class cl) {
                   (IMP)AcceptsFirstResponder, "B@:");
   class_addMethod(cl, @selector(mouseDownCanMoveWindow),
                   (IMP)MouseDownCanMoveWindow, "B@:");
+  class_addMethod(cl, @selector(resetCursorRects),
+                  (IMP)ResetCursorRects, "v@");
   class_addMethod(cl, @selector(enableTracking), (IMP)EnableTracking, "v@:");
   class_addMethod(cl, @selector(disableTracking), (IMP)DisableTracking, "v@:");
   class_addMethod(cl, @selector(updateTrackingAreas),

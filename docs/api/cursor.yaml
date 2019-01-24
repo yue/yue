@@ -1,0 +1,17 @@
+name: Cursor
+component: gui
+header: nativeui/cursor.h
+type: refcounted
+namespace: nu
+description: Native cursor.
+
+constructors:
+  - signature: Cursor(Cursor::Type type)
+    lang: ['cpp']
+    description: &ref1 Create a cursor of `type`.
+
+class_methods:
+  - signature: Font* CreateWithType(Cursor::Type type)
+    lang: ['lua', 'js']
+    description: *ref1
+

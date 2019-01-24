@@ -104,6 +104,9 @@ methods:
   - signature: bool IsMouseDownCanMoveWindow() const
     description: Return whether dragging the view would move the window.
 
+  - signature: void SetCursor(Cursor* cursor)
+    description: Set the cursor to show when hovering the view.
+
   - signature: void SetFont(Font* font)
     description: Change the font used for drawing text in the view.
     detail: |

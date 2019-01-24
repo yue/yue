@@ -29,6 +29,7 @@ typedef struct _GtkWindow GtkWindow;
 typedef struct _PangoFontDescription PangoFontDescription;
 typedef struct _cairo_surface cairo_surface_t;
 typedef struct _cairo cairo_t;
+typedef union _GdkCursor GdkCursor;
 typedef union _GdkEvent GdkEvent;
 #endif
 
@@ -36,6 +37,7 @@ typedef union _GdkEvent GdkEvent;
 typedef struct CGContext* CGContextRef;
 #ifdef __OBJC__
 @class NSBitmapImageRep;
+@class NSCursor;
 @class NSEvent;
 @class NSFont;
 @class NSGraphicsContext;
@@ -49,6 +51,7 @@ typedef struct CGContext* CGContextRef;
 @class NSWindow;
 #else
 class NSBitmapImageRep;
+class NSCursor;
 class NSEvent;
 class NSFont;
 class NSGraphicsContext;
@@ -94,6 +97,7 @@ struct MenuItemData;
 #endif
 
 #if defined(OS_MACOSX)
+using NativeCursor = NSCursor*;
 using NativeEvent = NSEvent*;
 using NativeFileDialog = NSSavePanel*;
 using NativeView = NSView*;
@@ -107,6 +111,7 @@ using NativeMenuItem = NSMenuItem*;
 using NativeToolbar = NSToolbar*;
 using NativeTray = NSStatusItem*;
 #elif defined(OS_LINUX)
+using NativeCursor = GdkCursor*;
 using NativeEvent = GdkEvent*;
 using NativeFileDialog = GtkFileChooser*;
 using NativeView = GtkWidget*;
@@ -119,6 +124,7 @@ using NativeMenu = GtkMenuShell*;
 using NativeMenuItem = GtkMenuItem*;
 using NativeTray = AppIndicator*;
 #elif defined(OS_WIN)
+using NativeCursor = HCURSOR;
 using NativeEvent = Win32Message*;
 using NativeFileDialog = FileDialogImpl*;
 using NativeView = ViewImpl*;
