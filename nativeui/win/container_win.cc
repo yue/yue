@@ -105,6 +105,13 @@ bool ContainerImpl::OnMouseClick(NativeEvent event) {
   return ViewImpl::OnMouseClick(event);
 }
 
+bool ContainerImpl::OnSetCursor(NativeEvent event) {
+  ViewImpl* child = FindChildFromPoint(Point(event->l_param));
+  if (child && child->OnSetCursor(event))
+    return true;
+  return ViewImpl::OnSetCursor(event);
+}
+
 void ContainerImpl::DrawChild(ViewImpl* child, PainterWin* painter,
                               const Rect& dirty) {
   if (!child->is_visible())

@@ -80,7 +80,7 @@ class WindowImpl : public Win32Window {
     CR_MSG_WM_GETMINMAXINFO(OnGetMinMaxInfo)
     CR_MESSAGE_HANDLER_EX(WM_NCHITTEST, OnNCHitTest)
     CR_MSG_WM_NCCALCSIZE(OnNCCalcSize)
-    CR_MESSAGE_HANDLER_EX(WM_SETCURSOR, OnSetCursor);
+    CR_MESSAGE_HANDLER_EX(WM_SETCURSOR, OnSetCursor)
   CR_END_MSG_MAP()
 
  private:

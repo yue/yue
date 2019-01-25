@@ -185,6 +185,14 @@ bool ViewImpl::OnMouseClick(NativeEvent event) {
   return false;
 }
 
+bool ViewImpl::OnSetCursor(NativeEvent event) {
+  if (cursor()) {
+    ::SetCursor(cursor()->GetNative());
+    return true;
+  }
+  return false;
+}
+
 bool ViewImpl::OnKeyEvent(NativeEvent event) {
   if (!delegate())
     return false;
@@ -372,6 +380,9 @@ void View::SetMouseDownCanMoveWindow(bool yes) {
 
 bool View::IsMouseDownCanMoveWindow() const {
   return view_->is_draggable();
+}
+
+void View::PlatformSetCursor(Cursor* cursor) {
 }
 
 void View::PlatformSetFont(Font* font) {

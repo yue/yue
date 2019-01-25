@@ -143,6 +143,15 @@ void SubwinView::OnChar(UINT ch, UINT repeat, UINT flags) {
     SetMsgHandled(false);
 }
 
+BOOL SubwinView::OnSetCursor(HWND hwnd, UINT hittest, UINT message) {
+  if (cursor()) {
+    ::SetCursor(cursor()->GetNative());
+    return TRUE;
+  }
+  SetMsgHandled(false);
+  return FALSE;
+}
+
 void SubwinView::OnSetFocus(HWND hwnd) {
   // Notify the window that focus has changed.
   if (window())

@@ -5,8 +5,9 @@
 #ifndef NATIVEUI_WIN_VIEW_WIN_H_
 #define NATIVEUI_WIN_VIEW_WIN_H_
 
-#include "nativeui/view.h"
+#include "nativeui/cursor.h"
 #include "nativeui/gfx/win/painter_win.h"
+#include "nativeui/view.h"
 #include "nativeui/win/window_win.h"
 
 namespace nu {
@@ -75,12 +76,13 @@ class ViewImpl {
   // The DPI of this view has changed.
   virtual void OnDPIChanged() {}
 
-  // The mouse events.
+  // The input events.
   virtual void OnMouseMove(NativeEvent event);
   virtual void OnMouseEnter(NativeEvent event);
   virtual void OnMouseLeave(NativeEvent event);
   virtual bool OnMouseWheel(NativeEvent event) { return false; }
   virtual bool OnMouseClick(NativeEvent event);
+  virtual bool OnSetCursor(NativeEvent event);
   virtual bool OnKeyEvent(NativeEvent event);
 
   // Called when the view lost capture.
@@ -131,7 +133,8 @@ class ViewImpl {
   // Returns the DPI of current view.
   float scale_factor() const { return scale_factor_; }
 
-  Font* font() const { return font_.get(); }
+  Cursor* cursor() const { return delegate_->cursor(); }
+  Font* font() const { return font_; }
   Color color() const { return color_; }
   Color background_color() const { return background_color_; }
 
@@ -156,7 +159,7 @@ class ViewImpl {
   bool draggable_ = false;
 
   // Styles.
-  scoped_refptr<Font> font_;
+  Font* font_;  // weak ptr
   Color color_;
   Color background_color_ = Color(0, 0, 0, 0);  // transparent
 

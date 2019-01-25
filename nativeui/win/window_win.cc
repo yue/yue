@@ -527,7 +527,26 @@ LRESULT WindowImpl::OnSetCursor(UINT message, WPARAM w_param, LPARAM l_param) {
   // Do not override cursor of child windows.
   if (reinterpret_cast<HWND>(w_param) != hwnd()) {
     SetMsgHandled(false);
-    return 0;
+    return FALSE;
+  }
+
+  // Ask the views for cursor in client area.
+  if (LOWORD(l_param) == HTCLIENT) {
+    // The l_param does not include mouse position.
+    POINT p;
+    ::GetCursorPos(&p);
+    ::ScreenToClient(hwnd(), &p);
+    Win32Message msg = {message, w_param, MAKELPARAM(p.x, p.y)};
+
+    // Set view cursors.
+    ViewImpl* view = captured_view_ ? captured_view_
+                                    : delegate_->GetContentView()->GetNative();
+    if (view->OnSetCursor(&msg)) {
+      return TRUE;
+    } else {
+      SetMsgHandled(false);
+      return FALSE;
+    }
   }
 
   // Reimplement the necessary default behavior here. Calling DefWindowProc can
@@ -564,7 +583,7 @@ LRESULT WindowImpl::OnSetCursor(UINT message, WPARAM w_param, LPARAM l_param) {
       break;
   }
   ::SetCursor(::LoadCursor(NULL, cursor));
-  return 1;
+  return TRUE;
 }
 
 void WindowImpl::TrackMouse(bool enable) {

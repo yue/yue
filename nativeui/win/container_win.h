@@ -42,6 +42,7 @@ class ContainerImpl : public ViewImpl {
   void OnMouseLeave(NativeEvent event) override;
   bool OnMouseWheel(NativeEvent event) override;
   bool OnMouseClick(NativeEvent event) override;
+  bool OnSetCursor(NativeEvent event) override;
 
   Adapter* adapter() const { return adapter_; }
 

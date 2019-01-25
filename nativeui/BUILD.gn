@@ -323,6 +323,7 @@ component("nativeui") {
     "win/combo_box_win.cc",
     "win/container_win.cc",
     "win/container_win.h",
+    "win/cursor_win.cc",
     "win/entry_win.cc",
     "win/file_dialog_win.cc",
     "win/file_dialog_win.h",

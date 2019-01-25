@@ -47,6 +47,7 @@ class SubwinView : public Win32Window, public ViewImpl {
 
   CR_BEGIN_MSG_MAP_EX(SubwinView, Win32Window)
     CR_MSG_WM_CHAR(OnChar)
+    CR_MSG_WM_SETCURSOR(OnSetCursor)
     CR_MSG_WM_SETFOCUS(OnSetFocus)
     CR_MESSAGE_RANGE_HANDLER_EX(WM_LBUTTONDOWN, WM_MBUTTONDBLCLK, OnMouseClick)
     CR_MESSAGE_RANGE_HANDLER_EX(WM_KEYDOWN, WM_KEYUP, OnKeyEvent)
@@ -56,6 +57,7 @@ class SubwinView : public Win32Window, public ViewImpl {
   CR_END_MSG_MAP()
 
   void OnChar(UINT ch, UINT repeat, UINT flags);
+  BOOL OnSetCursor(HWND hwnd, UINT hittest, UINT message);
   void OnSetFocus(HWND hwnd);
   LRESULT OnMouseClick(UINT message, WPARAM w_param, LPARAM l_param);
   LRESULT OnKeyEvent(UINT message, WPARAM w_param, LPARAM l_param);
