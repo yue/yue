@@ -62,11 +62,6 @@ static void nu_container_class_init(NUContainerClass* nu_class) {
 }
 
 static void nu_container_realize(GtkWidget* widget) {
-  // Set GDK window.
-  GdkWindow* window = gtk_widget_get_parent_window(widget);
-  gtk_widget_set_window(widget, window);
-  g_object_ref(window);
-
   GTK_WIDGET_CLASS(nu_container_parent_class)->realize(widget);
 
   // Create invisible input window.
@@ -89,7 +84,8 @@ static void nu_container_realize(GtkWidget* widget) {
                           | GDK_KEY_PRESS_MASK
                           | GDK_KEY_RELEASE_MASK;
   NUContainerPrivate* priv = NU_CONTAINER(widget)->priv;
-  priv->event_window = gdk_window_new(window, &attributes, GDK_WA_X | GDK_WA_Y);
+  priv->event_window = gdk_window_new(gtk_widget_get_parent_window(widget),
+                                      &attributes, GDK_WA_X | GDK_WA_Y);
   gtk_widget_register_window(widget, priv->event_window);
   gdk_window_move_resize(priv->event_window,
                          allocation.x, allocation.y,
