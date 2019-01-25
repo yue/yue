@@ -9,17 +9,20 @@
 
 namespace nu {
 
-TextAttributes::TextAttributes()
-    : font(App::GetCurrent()->GetDefaultFont()),
-      color(App::GetCurrent()->GetColor(App::ThemeColor::Text)),
-      align(TextAlign::Start),
-      valign(TextAlign::Start) {
-}
-
 TextAttributes::TextAttributes(Font* font, Color color, TextAlign align,
                                TextAlign valign)
-    : font(font), color(color), align(align), valign(valign) {
-}
+    : font(font), color(color), align(align), valign(valign) {}
+
+TextAttributes::TextAttributes()
+    : TextAttributes(App::GetCurrent()->GetDefaultFont(),
+                     App::GetCurrent()->GetColor(App::ThemeColor::Text)) {}
+
+TextAttributes::TextAttributes(Font* font)
+    : TextAttributes(font,
+                     App::GetCurrent()->GetColor(App::ThemeColor::Text)) {}
+
+TextAttributes::TextAttributes(Color color)
+    : TextAttributes(App::GetCurrent()->GetDefaultFont(), color) {}
 
 TextAttributes::~TextAttributes() {
 }

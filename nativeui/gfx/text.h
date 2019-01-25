@@ -21,9 +21,17 @@ enum class TextAlign {
 
 // Attributes used for drawing the text.
 struct NATIVEUI_EXPORT TextAttributes {
-  TextAttributes();
-  TextAttributes(Font* font, Color color, TextAlign align, TextAlign valign);
+  // Full constructor.
+  TextAttributes(Font* font,
+                 Color color,
+                 TextAlign align = TextAlign::Start,
+                 TextAlign valign = TextAlign::Start);
   ~TextAttributes();
+
+  // Helpers.
+  TextAttributes();
+  TextAttributes(Font* font);
+  TextAttributes(Color color);
 
   scoped_refptr<Font> font;
   Color color;
