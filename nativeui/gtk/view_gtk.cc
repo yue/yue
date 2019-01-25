@@ -31,6 +31,15 @@ struct NUViewPrivate {
   Size size;
 };
 
+// Helper to set cursor for view.
+void NUSetCursor(GtkWidget* widget, GdkCursor* cursor) {
+  GdkWindow* window = NU_IS_CONTAINER(widget) ?
+      nu_container_get_window(NU_CONTAINER(widget)) :
+      gtk_widget_get_window(widget);
+  if (window)
+    gdk_window_set_cursor(window, cursor);
+}
+
 void OnSizeAllocate(GtkWidget* widget, GdkRectangle* allocation,
                     NUViewPrivate* priv) {
   // Ignore empty sizes on initialization.
@@ -47,10 +56,8 @@ void OnSizeAllocate(GtkWidget* widget, GdkRectangle* allocation,
 }
 
 void OnRealize(GtkWidget* widget, View* view) {
-  if (view->cursor() && gtk_widget_get_has_window(widget)) {
-    GdkWindow* window = gtk_widget_get_window(widget);
-    gdk_window_set_cursor(window, view->cursor()->GetNative());
-  }
+  if (view->cursor())
+    NUSetCursor(widget, view->cursor()->GetNative());
 }
 
 gboolean OnMouseMove(GtkWidget* widget, GdkEvent* event, View* view) {
@@ -291,11 +298,9 @@ bool View::IsMouseDownCanMoveWindow() const {
 }
 
 void View::PlatformSetCursor(Cursor* cursor) {
-  if (!gtk_widget_get_has_window(view_))
-    return;
-  GdkWindow* window = gtk_widget_get_window(view_);
-  if (window)
-    gdk_window_set_cursor(window, cursor ? cursor->GetNative(): nullptr);
+  if (!gtk_widget_get_has_window(view_) && !IsContainer())
+    gtk_widget_set_has_window(view_, true);
+  NUSetCursor(view_, cursor ? cursor->GetNative(): nullptr);
 }
 
 void View::PlatformSetFont(Font* font) {
