@@ -461,8 +461,8 @@ struct Type<nu::Cursor::Type> {
     } else if (type == "help") {
       *out = nu::Cursor::Type::Help;
       return true;
-    } else if (type == "resize-all") {
-      *out = nu::Cursor::Type::ResizeAll;
+    } else if (type == "move") {
+      *out = nu::Cursor::Type::Move;
       return true;
     } else if (type == "resize-ew") {
       *out = nu::Cursor::Type::ResizeEW;

@@ -106,6 +106,10 @@ methods:
 
   - signature: void SetCursor(Cursor* cursor)
     description: Set the cursor to show when hovering the view.
+    detail: |
+      On Linux, setting cursor would force the view to own its own GDK window.
+      For certain views like `Label`, this may have remove the view's background
+      color.
 
   - signature: void SetFont(Font* font)
     description: Change the font used for drawing text in the view.

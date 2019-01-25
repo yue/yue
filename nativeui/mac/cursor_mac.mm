@@ -59,7 +59,7 @@ Cursor::Cursor(Type type) {
     case Type::Help:
       cursor_ = LoadFromHIServices(@"help");
       break;
-    case Type::ResizeAll:
+    case Type::Move:
       cursor_ = LoadFromHIServices(@"move");
       break;
     case Type::ResizeEW:

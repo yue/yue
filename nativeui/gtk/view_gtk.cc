@@ -8,6 +8,7 @@
 
 #include "base/strings/stringprintf.h"
 #include "nativeui/container.h"
+#include "nativeui/cursor.h"
 #include "nativeui/events/event.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/gfx/geometry/point_f.h"
@@ -42,6 +43,13 @@ void OnSizeAllocate(GtkWidget* widget, GdkRectangle* allocation,
   if (size != priv->size) {
     priv->size = size;
     priv->delegate->OnSizeChanged();
+  }
+}
+
+void OnRealize(GtkWidget* widget, View* view) {
+  if (view->cursor() && gtk_widget_get_has_window(widget)) {
+    GdkWindow* window = gtk_widget_get_window(widget);
+    gdk_window_set_cursor(window, view->cursor()->GetNative());
   }
 }
 
@@ -122,6 +130,7 @@ void View::TakeOverView(NativeView view) {
 
   // Install event hooks.
   g_signal_connect(view, "size-allocate", G_CALLBACK(OnSizeAllocate), priv);
+  g_signal_connect(view, "realize", G_CALLBACK(OnRealize), this);
   g_signal_connect(view, "motion-notify-event", G_CALLBACK(OnMouseMove), this);
   // TODO(zcbenz): Lazily install the event hooks.
   g_signal_connect(view, "button-press-event", G_CALLBACK(OnMouseEvent), this);
@@ -279,6 +288,14 @@ void View::SetMouseDownCanMoveWindow(bool yes) {
 
 bool View::IsMouseDownCanMoveWindow() const {
   return g_object_get_data(G_OBJECT(view_), "draggable");
+}
+
+void View::PlatformSetCursor(Cursor* cursor) {
+  if (!gtk_widget_get_has_window(view_))
+    return;
+  GdkWindow* window = gtk_widget_get_window(view_);
+  if (window)
+    gdk_window_set_cursor(window, cursor ? cursor->GetNative(): nullptr);
 }
 
 void View::PlatformSetFont(Font* font) {

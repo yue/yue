@@ -207,6 +207,7 @@ component("nativeui") {
     "gtk/button_gtk.cc",
     "gtk/combo_box_gtk.cc",
     "gtk/container_gtk.cc",
+    "gtk/cursor_gtk.cc",
     "gtk/entry_gtk.cc",
     "gtk/file_dialog_gtk.cc",
     "gtk/file_open_dialog_gtk.cc",

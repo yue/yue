@@ -22,7 +22,7 @@ class NATIVEUI_EXPORT Cursor : public base::RefCounted<Cursor> {
     Text,
     NotAllowed,
     Help,
-    ResizeAll,
+    Move,
     ResizeEW,
     ResizeNS,
     ResizeNESW,

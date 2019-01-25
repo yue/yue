@@ -13,8 +13,6 @@ namespace nu {
 Label::Label(const std::string& text) {
   TakeOverView(gtk_label_new(text.c_str()));
   UpdateDefaultStyle();
-  // Create GdkWindow for label, otherwise it can not receive input events.
-  gtk_widget_set_has_window(GetNative(), true);
 }
 
 Label::~Label() {

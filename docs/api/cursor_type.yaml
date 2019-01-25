@@ -14,7 +14,7 @@ lang_detail:
     * `Cursor::Type::Text`
     * `Cursor::Type::NotAllowed`
     * `Cursor::Type::Help`
-    * `Cursor::Type::ResizeAll`
+    * `Cursor::Type::Move`
     * `Cursor::Type::ResizeEW`
     * `Cursor::Type::ResizeNS`
     * `Cursor::Type::ResizeNESW`
@@ -29,7 +29,7 @@ lang_detail:
     * `"text"`
     * `"not-allowed"`
     * `"help"`
-    * `"resize-all"`
+    * `"move"`
     * `"resize-ew"`
     * `"resize-ns"`
     * `"resize-nesw"`

@@ -19,6 +19,7 @@
 
 #if defined(OS_LINUX)
 typedef struct _AppIndicator AppIndicator;
+typedef struct _GdkCursor GdkCursor;
 typedef struct _GdkPixbuf GdkPixbuf;
 typedef struct _GdkPixbufAnimation GdkPixbufAnimation;
 typedef struct _GtkFileChooser GtkFileChooser;
@@ -29,7 +30,6 @@ typedef struct _GtkWindow GtkWindow;
 typedef struct _PangoFontDescription PangoFontDescription;
 typedef struct _cairo_surface cairo_surface_t;
 typedef struct _cairo cairo_t;
-typedef union _GdkCursor GdkCursor;
 typedef union _GdkEvent GdkEvent;
 #endif
 
