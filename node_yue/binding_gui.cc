@@ -548,6 +548,8 @@ struct Type<nu::TextAttributes> {
     Get(context, obj, "color", &out->color);
     Get(context, obj, "align", &out->align);
     Get(context, obj, "valign", &out->valign);
+    Get(context, obj, "wrap", &out->wrap);
+    Get(context, obj, "ellipsis", &out->ellipsis);
     return true;
   }
 };

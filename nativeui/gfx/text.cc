@@ -10,8 +10,9 @@
 namespace nu {
 
 TextAttributes::TextAttributes(Font* font, Color color, TextAlign align,
-                               TextAlign valign)
-    : font(font), color(color), align(align), valign(valign) {}
+                               TextAlign valign, bool wrap, bool ellipsis)
+    : font(font), color(color), align(align), valign(valign), wrap(wrap),
+      ellipsis(ellipsis) {}
 
 TextAttributes::TextAttributes()
     : TextAttributes(App::GetCurrent()->GetDefaultFont(),

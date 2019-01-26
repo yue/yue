@@ -497,6 +497,8 @@ struct Type<nu::TextAttributes> {
     RawGetAndPop(state, index, "color", &out->color);
     RawGetAndPop(state, index, "align", &out->align);
     RawGetAndPop(state, index, "valign", &out->valign);
+    RawGetAndPop(state, index, "wrap", &out->wrap);
+    RawGetAndPop(state, index, "ellipsis", &out->ellipsis);
     return true;
   }
 };

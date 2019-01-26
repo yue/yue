@@ -18,3 +18,13 @@ properties:
 
   - property: TextAlign valign
     description: Vertical text align, default is to the start of layout.
+
+  - property: bool wrap
+    description: Whether to wrap lines, default is `true`.
+    detail: Lines are wrapped at word boundaries.
+
+  - property: bool ellipsis
+    description: |
+      Whether to show ellipsis (...) at the end of the last visible line if the
+      text doesn't fit into the bounds specified, default is `false`.
+    detail: The text is broken at the boundary of the last word.

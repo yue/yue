@@ -25,7 +25,9 @@ struct NATIVEUI_EXPORT TextAttributes {
   TextAttributes(Font* font,
                  Color color,
                  TextAlign align = TextAlign::Start,
-                 TextAlign valign = TextAlign::Start);
+                 TextAlign valign = TextAlign::Start,
+                 bool wrap = true,
+                 bool ellipsis = false);
   ~TextAttributes();
 
   // Helpers.
@@ -37,6 +39,8 @@ struct NATIVEUI_EXPORT TextAttributes {
   Color color;
   TextAlign align;
   TextAlign valign;
+  bool wrap;
+  bool ellipsis;
 };
 
 // Result of text measurement.
