@@ -248,10 +248,20 @@ void PainterMac::DrawText(const std::string& text, const RectF& rect,
     NSForegroundColorAttributeName: attributes.color.ToNSColor(),
   };
 
+  // Options for drawing.
+  int options = NSStringDrawingUsesLineFragmentOrigin;
+  if (attributes.ellipsis)
+    options |= NSStringDrawingTruncatesLastVisibleLine;
+
   // Vertical alignment.
   RectF bounds(rect);
   if (attributes.valign != TextAlign::Start) {
-    float text_height = [str sizeWithAttributes:attrs_dict].height;
+    float text_height = attributes.wrap ?
+        [str boundingRectWithSize:rect.size().ToCGSize()
+                          options:options
+                       attributes:attrs_dict
+                          context:nil].size.height :
+        [str sizeWithAttributes:attrs_dict].height;
     // Compute the drawing bounds.
     if (attributes.valign == TextAlign::Center)
       bounds.Inset(0.f, (rect.height() - text_height) / 2.f);
@@ -260,7 +270,10 @@ void PainterMac::DrawText(const std::string& text, const RectF& rect,
   }
 
   GraphicsContextScope scoped(target_context_);
-  [str drawInRect:bounds.ToCGRect() withAttributes:attrs_dict];
+  [str drawWithRect:bounds.ToCGRect()
+            options:options
+         attributes:attrs_dict
+            context:nil];
 }
 
 }  // namespace nu

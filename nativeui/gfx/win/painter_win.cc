@@ -322,7 +322,7 @@ void PainterWin::DrawTextPixel(const base::string16& text, const nu::Rect& rect,
   if (!attributes.wrap)
     format.SetFormatFlags(Gdiplus::StringFormatFlagsNoWrap);
   if (attributes.ellipsis)
-    format.SetTrimming(Gdiplus::StringTrimmingEllipsisWord);
+    format.SetTrimming(Gdiplus::StringTrimmingEllipsisCharacter);
   graphics_.DrawString(
       text.c_str(), static_cast<int>(text.size()),
       attributes.font->GetNative(), ToGdi(RectF(rect)), &format, &brush);
