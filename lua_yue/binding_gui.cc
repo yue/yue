@@ -1113,7 +1113,7 @@ struct Type<nu::View> {
            "setcolor", &nu::View::SetColor,
            "setbackgroundcolor", &nu::View::SetBackgroundColor,
            "setstyle", &SetStyle,
-           "printstyle", &nu::View::PrintStyle,
+           "getcomputedlayout", &nu::View::GetComputedLayout,
            "getminimumsize", &nu::View::GetMinimumSize,
 #if defined(OS_MACOSX)
            "setwantslayer", &nu::View::SetWantsLayer,

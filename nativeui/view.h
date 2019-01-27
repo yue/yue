@@ -119,8 +119,8 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   void SetStyle() {
   }
 
-  // Internal: Print style layout to stdout.
-  void PrintStyle() const;
+  // Return the string representation of yoga style.
+  std::string GetComputedLayout() const;
 
   // Return the minimum size of view.
   virtual SizeF GetMinimumSize() const;

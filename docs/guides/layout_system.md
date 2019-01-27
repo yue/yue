@@ -91,8 +91,7 @@ listView.setContentSize(contentView.getPreferredSize())
 listView.setContentView(contentView)
 ```
 
-
 ## Style properties
 
 For a complete list of supported style properties, it is recommended to read the
-[documentation of Yoga](https://facebook.github.io/yoga/docs/learn-more/).
+[documentation of Yoga](https://yogalayout.com/docs).

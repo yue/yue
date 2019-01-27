@@ -154,6 +154,9 @@ methods:
       Available style properties can be found at
       [Layout System](../guides/layout_system.html).
 
+  - signature: std::string GetComputedLayout() const
+    description: Return string representation of the view's layout.
+
   - signature: SizeF GetMinimumSize() const
     description: Return the minimum size needed to show the view.
 

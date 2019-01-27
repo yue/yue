@@ -11,6 +11,7 @@
 #include "nativeui/state.h"
 #include "nativeui/util/yoga_util.h"
 #include "nativeui/window.h"
+#include "third_party/yoga/yoga/YGNodePrint.h"
 #include "third_party/yoga/yoga/Yoga.h"
 
 namespace nu {
@@ -102,10 +103,13 @@ void View::SetStyleProperty(const std::string& name, float value) {
   SetYogaProperty(node_, ParseName(name), value);
 }
 
-void View::PrintStyle() const {
-  YGNodePrint(node_, static_cast<YGPrintOptions>(YGPrintOptionsLayout |
-                                                 YGPrintOptionsStyle |
-                                                 YGPrintOptionsChildren));
+std::string View::GetComputedLayout() const {
+  std::string result;
+  auto options = static_cast<YGPrintOptions>(YGPrintOptionsLayout |
+                                             YGPrintOptionsStyle |
+                                             YGPrintOptionsChildren);
+  facebook::yoga::YGNodeToString(result, node_, options, 0);
+  return result;
 }
 
 SizeF View::GetMinimumSize() const {

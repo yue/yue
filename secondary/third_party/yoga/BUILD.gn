@@ -2,10 +2,6 @@
 
 config("yoga_config") {
   include_dirs = [ "//third_party/yoga/yoga" ]
-  if (!is_win) {
-    # using namespace facebook.
-    cflags = [ "-Wno-header-hygiene" ]
-  }
 }
 
 source_set("yoga") {
@@ -42,6 +38,9 @@ source_set("yoga") {
       "/wd4267",  # conversion from 'size_t' to 'const unsigned long'
       "/wd4232",  # address of dllimport 'free' is not static, identity not guaranteed
     ]
+  } else {
+    # using namespace facebook.
+    cflags_cc = [ "-Wno-header-hygiene" ]
   }
 
   public_configs = [ ":yoga_config" ]
