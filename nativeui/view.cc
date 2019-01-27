@@ -108,7 +108,7 @@ std::string View::GetComputedLayout() const {
   auto options = static_cast<YGPrintOptions>(YGPrintOptionsLayout |
                                              YGPrintOptionsStyle |
                                              YGPrintOptionsChildren);
-  facebook::yoga::YGNodeToString(result, node_, options, 0);
+  facebook::yoga::YGNodeToString(&result, node_, options, 0);
   return result;
 }
 
