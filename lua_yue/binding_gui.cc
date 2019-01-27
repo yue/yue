@@ -228,7 +228,8 @@ struct Type<nu::App> {
            "getdockbadgelabel", &nu::App::GetDockBadgeLabel,
 #endif
            "getcolor", &nu::App::GetColor,
-           "getdefaultfont", &nu::App::GetDefaultFont);
+           "getdefaultfont", &nu::App::GetDefaultFont,
+           "getclipboard", &nu::App::GetClipboard);
   }
 };
 
@@ -361,6 +362,48 @@ struct Type<nu::Canvas> {
            "getscalefactor", &nu::Canvas::GetScaleFactor,
            "getpainter", &nu::Canvas::GetPainter,
            "getsize", &nu::Canvas::GetSize);
+  }
+};
+
+template<>
+struct Type<nu::Clipboard::Type> {
+  static constexpr const char* name = "yue.Clipboard.Type";
+  static inline bool To(State* state, int index, nu::Clipboard::Type* out) {
+    std::string type;
+    if (!lua::To(state, index, &type))
+      return false;
+    if (type == "copy-paste") {
+      *out = nu::Clipboard::Type::CopyPaste;
+      return true;
+#if defined(OS_MACOSX)
+    } else if (type == "drag") {
+      *out = nu::Clipboard::Type::Drag;
+      return true;
+    } else if (type == "find") {
+      *out = nu::Clipboard::Type::Find;
+      return true;
+    } else if (type == "font") {
+      *out = nu::Clipboard::Type::Font;
+      return true;
+#elif defined(OS_LINUX)
+    } else if (type == "selection") {
+      *out = nu::Clipboard::Type::Selection;
+      return true;
+#endif
+    } else {
+      return false;
+    }
+  }
+};
+
+template<>
+struct Type<nu::Clipboard> {
+  static constexpr const char* name = "yue.Clipboard";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "clear", &nu::Clipboard::Clear,
+           "settext", &nu::Clipboard::SetText,
+           "gettext", &nu::Clipboard::GetText);
   }
 };
 
@@ -1901,6 +1944,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::App>(state, "App");
   BindType<nu::Font>(state, "Font");
   BindType<nu::Canvas>(state, "Canvas");
+  BindType<nu::Clipboard>(state, "Clipboard");
   BindType<nu::Color>(state, "Color");
   BindType<nu::Cursor>(state, "Cursor");
   BindType<nu::Image>(state, "Image");

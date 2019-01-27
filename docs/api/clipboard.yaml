@@ -19,9 +19,6 @@ methods:
   - signature: std::string GetText() const
     description: Return the content of clipboard as text.
 
-  - signature: Clipboard::Type GetType() const
-    description: Return the type of clipboard.
-
   - signature: NativeClipboard GetNative() const
     lang: ['cpp']
     description: Return the native handle of clipboard.

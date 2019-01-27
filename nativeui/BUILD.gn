@@ -207,6 +207,7 @@ component("nativeui") {
     "gtk/accelerator_manager_gtk.cc",
     "gtk/browser_gtk.cc",
     "gtk/button_gtk.cc",
+    "gtk/clipboard_gtk.cc",
     "gtk/combo_box_gtk.cc",
     "gtk/container_gtk.cc",
     "gtk/cursor_gtk.cc",

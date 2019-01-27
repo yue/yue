@@ -252,7 +252,8 @@ struct Type<nu::App> {
         "getDockBadgeLabel", &nu::App::GetDockBadgeLabel,
 #endif
         "getColor", &nu::App::GetColor,
-        "getDefaultFont", &nu::App::GetDefaultFont);
+        "getDefaultFont", &nu::App::GetDefaultFont,
+        "getClipboard", &nu::App::GetClipboard);
   }
 };
 
@@ -394,6 +395,54 @@ struct Type<nu::Canvas> {
         "getScaleFactor", &nu::Canvas::GetScaleFactor,
         "getPainter", &nu::Canvas::GetPainter,
         "getSize", &nu::Canvas::GetSize);
+  }
+};
+
+template<>
+struct Type<nu::Clipboard::Type> {
+  static constexpr const char* name = "yue.Clipboard.Type";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::Clipboard::Type* out) {
+    std::string type;
+    if (!vb::FromV8(context, value, &type))
+      return false;
+    if (type == "copy-paste") {
+      *out = nu::Clipboard::Type::CopyPaste;
+      return true;
+#if defined(OS_MACOSX)
+    } else if (type == "drag") {
+      *out = nu::Clipboard::Type::Drag;
+      return true;
+    } else if (type == "find") {
+      *out = nu::Clipboard::Type::Find;
+      return true;
+    } else if (type == "font") {
+      *out = nu::Clipboard::Type::Font;
+      return true;
+#elif defined(OS_LINUX)
+    } else if (type == "selection") {
+      *out = nu::Clipboard::Type::Selection;
+      return true;
+#endif
+    } else {
+      return false;
+    }
+  }
+};
+
+template<>
+struct Type<nu::Clipboard> {
+  static constexpr const char* name = "yue.Clipboard";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "clear", &nu::Clipboard::Clear,
+        "setText", &nu::Clipboard::SetText,
+        "getText", &nu::Clipboard::GetText);
   }
 };
 
@@ -2204,6 +2253,7 @@ void Initialize(v8::Local<v8::Object> exports) {
           "App",               vb::Constructor<nu::App>(),
           "Font",              vb::Constructor<nu::Font>(),
           "Canvas",            vb::Constructor<nu::Canvas>(),
+          "Clipboard",         vb::Constructor<nu::Clipboard>(),
           "Color",             vb::Constructor<nu::Color>(),
           "Cursor",            vb::Constructor<nu::Cursor>(),
           "Image",             vb::Constructor<nu::Image>(),

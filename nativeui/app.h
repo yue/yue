@@ -6,6 +6,7 @@
 #define NATIVEUI_APP_H_
 
 #include <array>
+#include <memory>
 #include <string>
 #include <unordered_map>
 

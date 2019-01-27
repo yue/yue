@@ -34,7 +34,6 @@ class NATIVEUI_EXPORT Clipboard {
   void SetText(const std::string& text);
   std::string GetText() const;
 
-  Type GetType() const { return type_; }
   NativeClipboard GetNative() const { return clipboard_; }
 
   base::WeakPtr<Clipboard> GetWeakPtr() { return weak_factory_.GetWeakPtr(); }
