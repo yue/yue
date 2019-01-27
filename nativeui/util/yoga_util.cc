@@ -84,6 +84,8 @@ bool JustifyValue(const std::string& value, int* out) {
     *out = static_cast<int>(YGJustifySpaceAround);
   else if (value == "space-between")
     *out = static_cast<int>(YGJustifySpaceBetween);
+  else if (value == "space-evenly")
+    *out = static_cast<int>(YGJustifySpaceEvenly);
   else if (value == "flex-start")
     *out = static_cast<int>(YGJustifyFlexStart);
   else if (value == "flex-end")
@@ -147,42 +149,6 @@ int PercentValue(const std::string& value) {
   return integer;
 }
 
-// Easy helpers to set edge values.
-void SetMargin(const YGNodeRef node, float margin) {
-  YGNodeStyleSetMargin(node, YGEdgeBottom, margin);
-  YGNodeStyleSetMargin(node, YGEdgeLeft, margin);
-  YGNodeStyleSetMargin(node, YGEdgeRight, margin);
-  YGNodeStyleSetMargin(node, YGEdgeTop, margin);
-}
-
-void SetMarginPercent(const YGNodeRef node, float margin) {
-  YGNodeStyleSetMarginPercent(node, YGEdgeBottom, margin);
-  YGNodeStyleSetMarginPercent(node, YGEdgeLeft, margin);
-  YGNodeStyleSetMarginPercent(node, YGEdgeRight, margin);
-  YGNodeStyleSetMarginPercent(node, YGEdgeTop, margin);
-}
-
-void SetPadding(const YGNodeRef node, float padding) {
-  YGNodeStyleSetPadding(node, YGEdgeBottom, padding);
-  YGNodeStyleSetPadding(node, YGEdgeLeft, padding);
-  YGNodeStyleSetPadding(node, YGEdgeRight, padding);
-  YGNodeStyleSetPadding(node, YGEdgeTop, padding);
-}
-
-void SetPaddingPercent(const YGNodeRef node, float padding) {
-  YGNodeStyleSetPaddingPercent(node, YGEdgeBottom, padding);
-  YGNodeStyleSetPaddingPercent(node, YGEdgeLeft, padding);
-  YGNodeStyleSetPaddingPercent(node, YGEdgeRight, padding);
-  YGNodeStyleSetPaddingPercent(node, YGEdgeTop, padding);
-}
-
-void SetBorderWidth(const YGNodeRef node, float border) {
-  YGNodeStyleSetBorder(node, YGEdgeBottom, border);
-  YGNodeStyleSetBorder(node, YGEdgeLeft, border);
-  YGNodeStyleSetBorder(node, YGEdgeRight, border);
-  YGNodeStyleSetBorder(node, YGEdgeTop, border);
-}
-
 // We use int to represent enums.
 using IntSetter = void(*)(const YGNodeRef, int);
 using FloatSetter = void(*)(const YGNodeRef, float);
@@ -214,18 +180,15 @@ const std::tuple<const char*, IntConverter, IntSetter> int_setters[] = {
 };
 const std::pair<const char*, FloatSetter> float_setters[] = {
   { "aspectratio", YGNodeStyleSetAspectRatio },
-  { "border", SetBorderWidth },
   { "flex", YGNodeStyleSetFlex },
   { "flexbasis", YGNodeStyleSetFlexBasis },
   { "flexgrow", YGNodeStyleSetFlexGrow },
   { "flexshrink", YGNodeStyleSetFlexShrink },
   { "height", YGNodeStyleSetHeight },
-  { "margin", SetMargin },
   { "maxheight", YGNodeStyleSetMaxHeight },
   { "maxwidth", YGNodeStyleSetMaxWidth },
   { "minheight", YGNodeStyleSetMinHeight },
   { "minwidth", YGNodeStyleSetMinWidth },
-  { "padding", SetPadding },
   { "width", YGNodeStyleSetWidth },
 };
 const std::pair<const char*, AutoSetter> auto_setters[] = {
@@ -236,25 +199,26 @@ const std::pair<const char*, AutoSetter> auto_setters[] = {
 const std::pair<const char*, FloatSetter> percent_setters[] = {
   { "flexbasis", YGNodeStyleSetFlexBasisPercent },
   { "height", YGNodeStyleSetHeightPercent },
-  { "margin", SetMarginPercent },
   { "maxheight", YGNodeStyleSetMaxHeightPercent },
   { "maxwidth", YGNodeStyleSetMaxWidthPercent },
   { "minheight", YGNodeStyleSetMinHeightPercent },
   { "minwidth", YGNodeStyleSetMinWidthPercent },
-  { "padding", SetPaddingPercent },
   { "width", YGNodeStyleSetWidthPercent },
 };
 const std::tuple<const char*, YGEdge, EdgeSetter> edge_setters[] = {
+  { "border", YGEdgeAll, YGNodeStyleSetBorder },
   { "borderbottom", YGEdgeBottom, YGNodeStyleSetBorder },
   { "borderleft", YGEdgeLeft, YGNodeStyleSetBorder },
   { "borderright", YGEdgeRight, YGNodeStyleSetBorder },
   { "bordertop", YGEdgeTop, YGNodeStyleSetBorder },
   { "bottom", YGEdgeBottom, YGNodeStyleSetPosition },
   { "left", YGEdgeLeft, YGNodeStyleSetPosition },
+  { "margin", YGEdgeAll, YGNodeStyleSetMargin },
   { "marginbottom", YGEdgeBottom, YGNodeStyleSetMargin },
   { "marginleft", YGEdgeLeft, YGNodeStyleSetMargin },
   { "marginright", YGEdgeRight, YGNodeStyleSetMargin },
   { "margintop", YGEdgeTop, YGNodeStyleSetMargin },
+  { "padding", YGEdgeAll, YGNodeStyleSetPadding },
   { "paddingbottom", YGEdgeBottom, YGNodeStyleSetPadding },
   { "paddingleft", YGEdgeLeft, YGNodeStyleSetPadding },
   { "paddingright", YGEdgeRight, YGNodeStyleSetPadding },
@@ -265,10 +229,12 @@ const std::tuple<const char*, YGEdge, EdgeSetter> edge_setters[] = {
 const std::tuple<const char*, YGEdge, EdgeSetter> edge_percent_setters[] = {
   { "bottom", YGEdgeBottom, YGNodeStyleSetPositionPercent },
   { "left", YGEdgeLeft, YGNodeStyleSetPositionPercent },
+  { "margin", YGEdgeAll, YGNodeStyleSetMarginPercent },
   { "marginbottom", YGEdgeBottom, YGNodeStyleSetMarginPercent },
   { "marginleft", YGEdgeLeft, YGNodeStyleSetMarginPercent },
   { "marginright", YGEdgeRight, YGNodeStyleSetMarginPercent },
   { "margintop", YGEdgeTop, YGNodeStyleSetMarginPercent },
+  { "padding", YGEdgeAll, YGNodeStyleSetPaddingPercent },
   { "paddingbottom", YGEdgeBottom, YGNodeStyleSetPaddingPercent },
   { "paddingleft", YGEdgeLeft, YGNodeStyleSetPaddingPercent },
   { "paddingright", YGEdgeRight, YGNodeStyleSetPaddingPercent },

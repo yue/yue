@@ -1,18 +1,37 @@
 # Copyright 2016 Cheng Zhao. All rights reserved.
 
 config("yoga_config") {
-  include_dirs = [ "yoga" ]
+  include_dirs = [ "//third_party/yoga/yoga" ]
+  if (!is_win) {
+    # using namespace facebook.
+    cflags = [ "-Wno-header-hygiene" ]
+  }
 }
 
 source_set("yoga") {
   sources = [
-    "yoga/YGEnums.c",
+    "yoga/CompactValue.h",
+    "yoga/Utils.cpp",
+    "yoga/Utils.h",
+    "yoga/YGConfig.cpp",
+    "yoga/YGConfig.h",
+    "yoga/YGEnums.cpp",
     "yoga/YGEnums.h",
+    "yoga/YGFloatOptional.h",
+    "yoga/YGLayout.cpp",
+    "yoga/YGLayout.h",
     "yoga/YGMacros.h",
-    "yoga/YGNodeList.c",
-    "yoga/YGNodeList.h",
+    "yoga/YGMarker.h",
+    "yoga/YGNode.cpp",
+    "yoga/YGNode.h",
+    "yoga/YGNodePrint.cpp",
+    "yoga/YGNodePrint.h",
+    "yoga/YGStyle.cpp",
+    "yoga/YGStyle.h",
+    "yoga/YGValue.cpp",
+    "yoga/YGValue.h",
     "yoga/Yoga-internal.h",
-    "yoga/Yoga.c",
+    "yoga/Yoga.cpp",
     "yoga/Yoga.h",
   ]
 
