@@ -32,8 +32,8 @@ struct NATIVEUI_EXPORT TextAttributes {
 
   // Helpers.
   TextAttributes();
-  TextAttributes(Font* font);
-  TextAttributes(Color color);
+  explicit TextAttributes(Font* font);
+  explicit TextAttributes(Color color);
 
   scoped_refptr<Font> font;
   Color color;

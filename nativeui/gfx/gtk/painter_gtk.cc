@@ -209,7 +209,12 @@ void PainterGtk::DrawText(const std::string& text, const RectF& rect,
 
   // Text size.
   int width, height;
-  pango_layout_set_width(layout, -1);
+  if (attributes.wrap) {
+    pango_layout_set_width(layout, std::floor(rect.width() * PANGO_SCALE));
+    pango_layout_set_height(layout, std::floor(rect.height() *PANGO_SCALE));
+  } else {
+    pango_layout_set_width(layout, -1);
+  }
   pango_layout_set_text(layout, text.data(), text.length());
   pango_layout_get_pixel_size(layout, &width, &height);
 
@@ -236,8 +241,15 @@ void PainterGtk::DrawText(const std::string& text, const RectF& rect,
 
   // Draw text.
   cairo_move_to(context_, bounds.x(), bounds.y());
-  pango_layout_set_width(layout, -1);
-  pango_layout_set_height(layout, bounds.height() * PANGO_SCALE);
+  if (attributes.ellipsis)
+    pango_layout_set_ellipsize(layout, PANGO_ELLIPSIZE_END);
+  if (attributes.wrap) {
+    pango_layout_set_wrap(layout, PANGO_WRAP_WORD_CHAR);
+    pango_layout_set_width(layout, bounds.width() * PANGO_SCALE);
+    pango_layout_set_height(layout, bounds.height() * PANGO_SCALE);
+  } else {
+    pango_layout_set_width(layout, -1);
+  }
   pango_cairo_show_layout(context_, layout);
 
   cairo_restore(context_);

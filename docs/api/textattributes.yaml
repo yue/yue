@@ -27,4 +27,7 @@ properties:
     description: |
       Whether to show ellipsis (...) at the end of the last visible line if the
       text doesn't fit into the bounds specified, default is `false`.
-    detail: The text is broken at the boundary of the last character.
+    detail: |
+      The text is broken at the boundary of the last character.
+
+      On Linux, `ellipsis` does not have effect if `wrap` is `false`.
