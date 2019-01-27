@@ -1,0 +1,30 @@
+name: Clipboard::Type
+header: nativeui/type.h
+type: enum class
+namespace: nu
+description: Type of `Clipboard`.
+
+lang_detail:
+  cpp: |
+    This type is an `enum class` with following values:
+    * `Clipboard::Type::CopyPaste`
+    * `Clipboard::Type::Drag`
+    * `Clipboard::Type::Find`
+    * `Clipboard::Type::Font`
+    * `Clipboard::Type::Selection`
+
+    The `Drag`, `Find`, `Font` clipboards are only available on macOS, and the
+    `Selection` clipboard is only available on Linux.
+
+  lua: &ref |
+    This type is a string with following possible values:
+    * `"copy-paste"`
+    * `"drag"`
+    * `"find"`
+    * `"font"`
+    * `"selection"`
+
+    The `drag`, `find`, `font` clipboards are only available on macOS, and the
+    `selection` clipboard is only available on Linux.
+
+  js: *ref

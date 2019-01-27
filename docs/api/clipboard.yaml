@@ -1,0 +1,27 @@
+name: Clipboard
+component: gui
+header: nativeui/clipboard.h
+type: class
+namespace: nu
+description: Native clipboard.
+
+detail:
+  The `Clipboard` class can not be created by user, its instance can only be
+  recevied by using [`App.getClipboard`](app.html#getclipboard-type).
+
+methods:
+  - signature: void Clear()
+    description: Clear the clipboard.
+
+  - signature: void SetText(const std::string& text)
+    description: Set `text` as clipboard's content.
+
+  - signature: std::string GetText() const
+    description: Return the content of clipboard as text.
+
+  - signature: Clipboard::Type GetType() const
+    description: Return the type of clipboard.
+
+  - signature: NativeClipboard GetNative() const
+    lang: ['cpp']
+    description: Return the native handle of clipboard.

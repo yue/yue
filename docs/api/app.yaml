@@ -63,3 +63,13 @@ methods:
 
   - signature: Font* GetDefaultFont()
     description: Return the default font for displaying text.
+
+  - signature: Clipboard* GetClipboard(Clipboard::Type type)
+    description: Return the clipboard with `type`.
+    lang_detail:
+      cpp: |
+        The returned clipboard instance is managed by App, there is no need to
+        manually free it.
+
+        The `CopyPaste` clipboard will be return if The `type` argument is
+        omitted.

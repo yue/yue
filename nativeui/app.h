@@ -5,10 +5,12 @@
 #ifndef NATIVEUI_APP_H_
 #define NATIVEUI_APP_H_
 
+#include <array>
 #include <string>
 #include <unordered_map>
 
 #include "base/memory/weak_ptr.h"
+#include "nativeui/clipboard.h"
 #include "nativeui/gfx/color.h"
 
 namespace nu {
@@ -32,6 +34,9 @@ class NATIVEUI_EXPORT App {
 
   // Return the default GUI font.
   Font* GetDefaultFont();
+
+  // Return clipboard instance.
+  Clipboard* GetClipboard(Clipboard::Type type = Clipboard::Type::CopyPaste);
 
 #if defined(OS_MACOSX)
   // Set the application menu.
@@ -58,6 +63,10 @@ class NATIVEUI_EXPORT App {
   std::unordered_map<int, Color> theme_colors_;
 
   scoped_refptr<Font> default_font_;
+
+  // Array of available clipboards.
+  std::array<std::unique_ptr<Clipboard>,
+             static_cast<size_t>(Clipboard::Type::Count)> clipboards_;
 
 #if defined(OS_MACOSX)
   scoped_refptr<MenuBar> application_menu_;

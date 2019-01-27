@@ -22,6 +22,7 @@ typedef struct _AppIndicator AppIndicator;
 typedef struct _GdkCursor GdkCursor;
 typedef struct _GdkPixbuf GdkPixbuf;
 typedef struct _GdkPixbufAnimation GdkPixbufAnimation;
+typedef struct _GtkClipboard GtkClipboard;
 typedef struct _GtkFileChooser GtkFileChooser;
 typedef struct _GtkMenuItem GtkMenuItem;
 typedef struct _GtkMenuShell GtkMenuShell;
@@ -42,6 +43,7 @@ typedef struct CGContext* CGContextRef;
 @class NSFont;
 @class NSGraphicsContext;
 @class NSImage;
+@class NSPasteboard;
 @class NSMenu;
 @class NSMenuItem;
 @class NSSavePanel;
@@ -56,6 +58,7 @@ class NSEvent;
 class NSFont;
 class NSGraphicsContext;
 class NSImage;
+class NSPasteboard;
 class NSMenu;
 class NSMenuItem;
 class NSSavePanel;
@@ -88,6 +91,7 @@ class Image;
 namespace nu {
 
 #if defined(OS_WIN)
+class ClipboardImpl;
 class FileDialogImpl;
 class TrayImpl;
 class ViewImpl;
@@ -97,6 +101,7 @@ struct MenuItemData;
 #endif
 
 #if defined(OS_MACOSX)
+using NativeClipboard = NSPasteboard*;
 using NativeCursor = NSCursor*;
 using NativeEvent = NSEvent*;
 using NativeFileDialog = NSSavePanel*;
@@ -111,6 +116,7 @@ using NativeMenuItem = NSMenuItem*;
 using NativeToolbar = NSToolbar*;
 using NativeTray = NSStatusItem*;
 #elif defined(OS_LINUX)
+using NativeClipboard = GtkClipboard*;
 using NativeCursor = GdkCursor*;
 using NativeEvent = GdkEvent*;
 using NativeFileDialog = GtkFileChooser*;
@@ -124,6 +130,7 @@ using NativeMenu = GtkMenuShell*;
 using NativeMenuItem = GtkMenuItem*;
 using NativeTray = AppIndicator*;
 #elif defined(OS_WIN)
+using NativeClipboard = ClipboardImpl*;
 using NativeCursor = HCURSOR;
 using NativeEvent = Win32Message*;
 using NativeFileDialog = FileDialogImpl*;
