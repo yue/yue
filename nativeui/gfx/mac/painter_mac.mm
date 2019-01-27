@@ -255,19 +255,19 @@ void PainterMac::DrawText(const std::string& text, const RectF& rect,
 
   // Vertical alignment.
   RectF bounds(rect);
-  if (attributes.valign != TextAlign::Start) {
-    float text_height = attributes.wrap ?
-        [str boundingRectWithSize:rect.size().ToCGSize()
-                          options:options
-                       attributes:attrs_dict
-                          context:nil].size.height :
-        [str sizeWithAttributes:attrs_dict].height;
-    // Compute the drawing bounds.
-    if (attributes.valign == TextAlign::Center)
-      bounds.Inset(0.f, (rect.height() - text_height) / 2.f);
-    else if (attributes.valign == TextAlign::End)
-      bounds.Inset(0.f, rect.height() - text_height, 0.f, 0.f);
-  }
+  float text_height = attributes.wrap ?
+      [str boundingRectWithSize:rect.size().ToCGSize()
+                        options:options
+                     attributes:attrs_dict
+                        context:nil].size.height :
+      [str sizeWithAttributes:attrs_dict].height;
+  // Compute the drawing bounds.
+  if (attributes.valign == TextAlign::Start)
+    bounds.set_height(text_height);
+  else if (attributes.valign == TextAlign::Center)
+    bounds.Inset(0.f, (rect.height() - text_height) / 2.f);
+  else if (attributes.valign == TextAlign::End)
+    bounds.Inset(0.f, rect.height() - text_height, 0.f, 0.f);
 
   GraphicsContextScope scoped(target_context_);
   [str drawWithRect:bounds.ToCGRect()
