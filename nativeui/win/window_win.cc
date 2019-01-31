@@ -781,11 +781,11 @@ bool Window::IsFullscreen() const {
 }
 
 void Window::Maximize() {
-  window_->ExecuteSystemMenuCommand(SC_MAXIMIZE);
+  ::ShowWindow(window_->hwnd(), SW_MAXIMIZE);
 }
 
 void Window::Unmaximize() {
-  window_->ExecuteSystemMenuCommand(SC_RESTORE);
+  ::ShowWindow(window_->hwnd(), SW_RESTORE);
 }
 
 bool Window::IsMaximized() const {
@@ -793,11 +793,12 @@ bool Window::IsMaximized() const {
 }
 
 void Window::Minimize() {
-  window_->ExecuteSystemMenuCommand(SC_MINIMIZE);
+  ::ShowWindow(window_->hwnd(), SW_MINIMIZE);
 }
 
 void Window::Restore() {
-  window_->ExecuteSystemMenuCommand(SC_RESTORE); }
+  ::ShowWindow(window_->hwnd(), SW_RESTORE);
+}
 
 bool Window::IsMinimized() const {
   return !!::IsIconic(window_->hwnd());
