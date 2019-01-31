@@ -1,6 +1,6 @@
 // Copyright 2012 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
+// found in the LICENSE.chromium file.
 
 #ifndef NATIVEUI_WIN_UTIL_HWND_UTIL_H_
 #define NATIVEUI_WIN_UTIL_HWND_UTIL_H_
@@ -11,6 +11,7 @@
 #include "nativeui/nativeui_export.h"
 
 namespace nu {
+
 class Point;
 class Size;
 
@@ -47,6 +48,9 @@ HWND GetWindowToParentTo(bool get_real_hwnd);
 
 // Get the window text.
 base::string16 GetWindowString(HWND hwnd);
+
+// The size, in pixels, of the non-client frame around a window.
+int GetFrameThickness(float scale_factor);
 
 }  // namespace nu
 

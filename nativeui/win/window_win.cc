@@ -1,7 +1,7 @@
 // Copyright 2016 Cheng Zhao. All rights reserved.
 // Copyright 2012 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by the license that can be found in the
-// LICENSE file.
+// LICENSE.chromium file.
 
 #include "nativeui/win/window_win.h"
 
@@ -37,13 +37,6 @@ namespace {
 // Default window style for frameless window.
 const DWORD kWindowDefaultFramelessStyle =
     WS_CAPTION | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
-
-// Width of the resize handle.
-const int kResizeBorderWidth = 5;
-
-// At the window corners the resize area is not actually bigger, but the 16
-// pixels at the end of the top and bottom edges trigger diagonal resizing.
-const int kResizeCornerWidth = 16;
 
 // Convert between window and client areas.
 Size ContentToWindowSize(Win32Window* window, bool has_menu_bar,
@@ -446,8 +439,11 @@ LRESULT WindowImpl::OnNCHitTest(UINT msg, WPARAM w_param, LPARAM l_param) {
   // Calculate the resize handle.
   if (delegate_->IsResizable() && !(IsMaximized() || IsFullscreen())) {
     Rect bounds = GetPixelBounds();
-    int border_thickness = kResizeBorderWidth * scale_factor();
-    int corner_width = kResizeCornerWidth * scale_factor();
+    int border_thickness = GetFrameThickness(scale_factor());
+    int corner_width =
+        border_thickness * 2 +
+        GetSystemMetricsForScaleFactor(scale_factor(), SM_CXBORDER);
+
     if (point.x() < border_thickness) {
       if (point.y() < corner_width)
         return HTTOPLEFT;
@@ -484,6 +480,11 @@ LRESULT WindowImpl::OnNCHitTest(UINT msg, WPARAM w_param, LPARAM l_param) {
 }
 
 LRESULT WindowImpl::OnNCCalcSize(BOOL mode, LPARAM l_param) {
+  // We only override the default handling if we need to specify a custom
+  // non-client edge width. Note that in most cases "no insets" means no
+  // custom width, but in fullscreen mode or when the NonClientFrameView
+  // requests it, we want a custom width of 0.
+
   // Let User32 handle the first nccalcsize for captioned windows
   // so it updates its internal structures (specifically caption-present)
   // Without this Tile & Cascade windows won't work.
@@ -604,9 +605,7 @@ bool WindowImpl::GetClientAreaInsets(Insets* insets) {
   if (IsMaximized()) {
     // Windows automatically adds a standard width border to all sides when a
     // window is maximized.
-    int border_thickness = ::GetSystemMetrics(SM_CXSIZEFRAME);
-    if (!delegate_->HasFrame())
-      border_thickness -= 1;
+    int border_thickness = GetFrameThickness(scale_factor());
     *insets = Insets(border_thickness, border_thickness,
                      border_thickness, border_thickness);
     return true;

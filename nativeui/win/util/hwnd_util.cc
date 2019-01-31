@@ -9,6 +9,7 @@
 #include "nativeui/gfx/geometry/point.h"
 #include "nativeui/gfx/geometry/rect.h"
 #include "nativeui/gfx/geometry/size.h"
+#include "nativeui/gfx/win/screen_win.h"
 
 namespace nu {
 
@@ -212,6 +213,18 @@ base::string16 GetWindowString(HWND hwnd) {
   if (len > 1)
     ::GetWindowTextW(hwnd, base::WriteInto(&title, len), len);
   return title;
+}
+
+int GetFrameThickness(float scale_factor) {
+  // On Windows 10 the visible frame border is one pixel thick, but there is
+  // some additional non-visible space: SM_CXSIZEFRAME (the resize handle)
+  // and SM_CXPADDEDBORDER (additional border space that isn't part of the
+  // resize handle).
+  const int resize_frame_thickness =
+      GetSystemMetricsForScaleFactor(scale_factor, SM_CXSIZEFRAME);
+  const int padding_thickness =
+      GetSystemMetricsForScaleFactor(scale_factor, SM_CXPADDEDBORDER);
+  return resize_frame_thickness + padding_thickness;
 }
 
 }  // namespace nu
