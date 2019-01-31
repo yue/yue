@@ -52,6 +52,9 @@ base::string16 GetWindowString(HWND hwnd);
 // The size, in pixels, of the non-client frame around a window.
 int GetFrameThickness(float scale_factor);
 
+// Returns whether the edge has auto-hide taskbar.
+bool MonitorHasAutohideTaskbarForEdge(UINT edge, HMONITOR monitor);
+
 }  // namespace nu
 
 #endif  // NATIVEUI_WIN_UTIL_HWND_UTIL_H_

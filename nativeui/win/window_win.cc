@@ -38,6 +38,9 @@ namespace {
 const DWORD kWindowDefaultFramelessStyle =
     WS_CAPTION | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
 
+// The thickness of an auto-hide taskbar in pixels.
+const int kAutoHideTaskbarThicknessPx = 2;
+
 // Convert between window and client areas.
 Size ContentToWindowSize(Win32Window* window, bool has_menu_bar,
                          const Size& size) {
@@ -497,6 +500,29 @@ LRESULT WindowImpl::OnNCCalcSize(BOOL mode, LPARAM l_param) {
     }
   }
 
+  RECT* client_rect = mode ?
+      &(reinterpret_cast<NCCALCSIZE_PARAMS*>(l_param)->rgrc[0]) :
+      reinterpret_cast<RECT*>(l_param);
+
+  HMONITOR monitor = MonitorFromWindow(hwnd(), MONITOR_DEFAULTTONULL);
+  if (!monitor) {
+    // We might end up here if the window was previously minimized and the
+    // user clicks on the taskbar button to restore it in the previous
+    // position. In that case WM_NCCALCSIZE is sent before the window
+    // coordinates are restored to their previous values, so our (left,top)
+    // would probably be (-32000,-32000) like all minimized windows. So the
+    // above MonitorFromWindow call fails, but if we check the window rect
+    // given with WM_NCCALCSIZE (which is our previous restored window
+    // position) we will get the correct monitor handle.
+    monitor = MonitorFromRect(client_rect, MONITOR_DEFAULTTONULL);
+    if (!monitor) {
+      // This is probably an extreme case that we won't hit, but if we don't
+      // intersect any monitor, let us not adjust the client rect since our
+      // window will not be visible anyway.
+      return 0;
+    }
+  }
+
   Insets insets;
   bool got_insets = GetClientAreaInsets(&insets);
   if (!got_insets && !IsFullscreen() && !(mode && !delegate_->HasFrame())) {
@@ -504,13 +530,43 @@ LRESULT WindowImpl::OnNCCalcSize(BOOL mode, LPARAM l_param) {
     return 0;
   }
 
-  RECT* client_rect = mode ?
-      &(reinterpret_cast<NCCALCSIZE_PARAMS*>(l_param)->rgrc[0]) :
-      reinterpret_cast<RECT*>(l_param);
   client_rect->left += insets.left();
   client_rect->top += insets.top();
   client_rect->bottom -= insets.bottom();
   client_rect->right -= insets.right();
+  if (IsMaximized()) {
+    // Find all auto-hide taskbars along the screen edges and adjust in by the
+    // thickness of the auto-hide taskbar on each such edge, so the window isn't
+    // treated as a "fullscreen app", which would cause the taskbars to
+    // disappear.
+    if (MonitorHasAutohideTaskbarForEdge(ABE_LEFT, monitor))
+      client_rect->left += kAutoHideTaskbarThicknessPx;
+    if (MonitorHasAutohideTaskbarForEdge(ABE_TOP, monitor)) {
+      if (HasSystemFrame()) {
+        // Tricky bit.  Due to a bug in DwmDefWindowProc()'s handling of
+        // WM_NCHITTEST, having any nonclient area atop the window causes the
+        // caption buttons to draw onscreen but not respond to mouse
+        // hover/clicks.
+        // So for a taskbar at the screen top, we can't push the
+        // client_rect->top down; instead, we move the bottom up by one pixel,
+        // which is the smallest change we can make and still get a client area
+        // less than the screen size. This is visibly ugly, but there seems to
+        // be no better solution.
+        --client_rect->bottom;
+      } else {
+        client_rect->top += kAutoHideTaskbarThicknessPx;
+      }
+    }
+    if (MonitorHasAutohideTaskbarForEdge(ABE_RIGHT, monitor))
+      client_rect->right -= kAutoHideTaskbarThicknessPx;
+    if (MonitorHasAutohideTaskbarForEdge(ABE_BOTTOM, monitor))
+      client_rect->bottom -= kAutoHideTaskbarThicknessPx;
+
+    // We cannot return WVR_REDRAW when there is nonclient area, or Windows
+    // exhibits bugs where client pixels and child HWNDs are mispositioned by
+    // the width/height of the upper-left nonclient area.
+    return 0;
+  }
 
   // If the window bounds change, we're going to relayout and repaint anyway.
   // Returning WVR_REDRAW avoids an extra paint before that of the old client
