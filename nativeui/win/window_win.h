@@ -32,6 +32,7 @@ class WindowImpl : public Win32Window {
   bool IsFullscreen() const;
 
   void SetBackgroundColor(nu::Color color);
+  void SetHasShadow(bool has);
 
   void SetWindowStyle(LONG style, bool on);
   bool HasWindowStyle(LONG style) const;
@@ -43,11 +44,12 @@ class WindowImpl : public Win32Window {
   void set_max_size(const Size& max_size) { max_size_ = max_size; }
   Size max_size() const { return max_size_; }
 
-  Window* delegate() { return delegate_; }
   FocusManager* focus_manager() { return &focus_manager_; }
   ViewImpl* captured_view() const { return captured_view_; }
   Color background_color() const { return background_color_; }
+  bool has_shadow() const { return has_shadow_; }
   float scale_factor() const { return scale_factor_; }
+  Window* delegate() { return delegate_; }
 
  protected:
   CR_BEGIN_MSG_MAP_EX(WindowImpl, Win32Window)
@@ -108,7 +110,6 @@ class WindowImpl : public Win32Window {
 
   void TrackMouse(bool enable);
   bool GetClientAreaInsets(Insets* insets);
-  bool HasSystemFrame() const;
 
   FocusManager focus_manager_;
   bool mouse_in_window_ = false;
@@ -135,11 +136,14 @@ class WindowImpl : public Win32Window {
   // The background color.
   nu::Color background_color_ = nu::Color(0xFF, 0xFF, 0xFF);
 
-  // The public Window interface.
-  Window* delegate_;
+  // Whether there is native shadow.
+  bool has_shadow_ = true;
 
   // The scale factor of current window.
   float scale_factor_;
+
+  // The public Window interface.
+  Window* delegate_;
 };
 
 }  // namespace nu

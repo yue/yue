@@ -70,9 +70,14 @@ WindowImpl::WindowImpl(const Window::Options& options, Window* delegate)
                   options.frame ? kWindowDefaultStyle
                                 : kWindowDefaultFramelessStyle,
                   options.transparent ? WS_EX_LAYERED : 0),
-      delegate_(delegate),
-      scale_factor_(GetScaleFactorForHWND(hwnd())) {
-  if (!options.frame) {
+      scale_factor_(GetScaleFactorForHWND(hwnd())),
+      delegate_(delegate) {
+  if (options.frame) {
+    // Normal window always has shadow.
+    has_shadow_ = true;
+  } else {
+    // Show shadow for frameless window by default.
+    SetHasShadow(true);
     // First nccalcszie (during CreateWindow) for captioned windows is
     // deliberately ignored so force a second one here to get the right
     // non-client set up.
@@ -187,6 +192,19 @@ bool WindowImpl::IsFullscreen() const {
 void WindowImpl::SetBackgroundColor(nu::Color color) {
   background_color_ = color;
   ::InvalidateRect(hwnd(), NULL, TRUE);
+}
+
+void WindowImpl::SetHasShadow(bool has) {
+  if (delegate_->HasFrame())
+    return;
+  BOOL enabled = FALSE;
+  if (!SUCCEEDED(DwmIsCompositionEnabled(&enabled)) || !enabled)
+    return;
+  has_shadow_ = has;
+  MARGINS shadow = {0};
+  if (has)
+    shadow = {0, 0, 1, 0};
+  ::DwmExtendFrameIntoClientArea(hwnd(), &shadow);
 }
 
 void WindowImpl::SetWindowStyle(LONG style, bool on) {
@@ -542,7 +560,7 @@ LRESULT WindowImpl::OnNCCalcSize(BOOL mode, LPARAM l_param) {
     if (MonitorHasAutohideTaskbarForEdge(ABE_LEFT, monitor))
       client_rect->left += kAutoHideTaskbarThicknessPx;
     if (MonitorHasAutohideTaskbarForEdge(ABE_TOP, monitor)) {
-      if (HasSystemFrame()) {
+      if (delegate_->HasFrame()) {
         // Tricky bit.  Due to a bug in DwmDefWindowProc()'s handling of
         // WM_NCHITTEST, having any nonclient area atop the window causes the
         // caption buttons to draw onscreen but not respond to mouse
@@ -655,7 +673,7 @@ void WindowImpl::TrackMouse(bool enable) {
 bool WindowImpl::GetClientAreaInsets(Insets* insets) {
   // Returning false causes the default handling in OnNCCalcSize() to
   // be invoked.
-  if (HasSystemFrame())
+  if (delegate_->HasFrame())
     return false;
 
   if (IsMaximized()) {
@@ -669,11 +687,6 @@ bool WindowImpl::GetClientAreaInsets(Insets* insets) {
 
   *insets = Insets();
   return true;
-}
-
-bool WindowImpl::HasSystemFrame() const {
-  // In future we may support custom non-client frame.
-  return delegate_->HasFrame();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -695,20 +708,11 @@ void Window::Close() {
 }
 
 void Window::SetHasShadow(bool has) {
-  if (!HasFrame() && base::win::GetVersion() >= base::win::VERSION_WIN7) {
-    BOOL enabled = FALSE;
-    if (SUCCEEDED(DwmIsCompositionEnabled(&enabled)) && enabled) {
-      has_shadow_ = has;
-      MARGINS shadow = { 0 };
-      if (has)
-        shadow = { 1, 1, 1, 1 };
-      ::DwmExtendFrameIntoClientArea(window_->hwnd(), &shadow);
-    }
-  }
+  window_->SetHasShadow(has);
 }
 
 bool Window::HasShadow() const {
-  return has_shadow_;
+  return window_->has_shadow();
 }
 
 void Window::PlatformSetContentView(View* view) {

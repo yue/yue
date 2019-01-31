@@ -157,9 +157,6 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
   // Whether window is transparent.
   bool transparent_;
 
-  // Whether there is native shadow.
-  bool has_shadow_ = false;
-
   // The yoga config for window's children.
   YGConfigRef yoga_config_;
 
