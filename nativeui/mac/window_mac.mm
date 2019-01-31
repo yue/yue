@@ -77,7 +77,11 @@ void Window::PlatformInit(const Options& options) {
   YGConfigSetPointScaleFactor(yoga_config_,
                               [window_ screen].backingScaleFactor);
 
-  if (!options.frame) {
+  if (!HasFrame()) {
+    // Remove title bar.
+    [window_ setTitlebarAppearsTransparent:YES];
+    [window_ setTitleVisibility:NSWindowTitleHidden];
+
     // The fullscreen button should always be hidden for frameless window.
     [[window_ standardWindowButton:NSWindowFullScreenButton] setHidden:YES];
 
@@ -342,17 +346,12 @@ void Window::SetToolbar(Toolbar* toolbar) {
 }
 
 void Window::SetTitleVisible(bool visible) {
-  if (base::mac::IsAtLeastOS10_10()) {
-    window_.titleVisibility = visible ? NSWindowTitleVisible
-                                      : NSWindowTitleHidden;
-  }
+  window_.titleVisibility = visible ? NSWindowTitleVisible
+                                    : NSWindowTitleHidden;
 }
 
 bool Window::IsTitleVisible() const {
-  if (base::mac::IsAtLeastOS10_10())
-    return window_.titleVisibility == NSWindowTitleVisible;
-  else
-    return false;
+  return window_.titleVisibility == NSWindowTitleVisible;
 }
 
 void Window::SetFullSizeContentView(bool full) {
