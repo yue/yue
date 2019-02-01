@@ -12,6 +12,8 @@
 
 namespace nu {
 
+class DropTarget;
+
 class WindowImpl : public Win32Window {
  public:
   WindowImpl(const Window::Options& options, Window* delegate);
@@ -37,6 +39,8 @@ class WindowImpl : public Win32Window {
   void SetWindowStyle(LONG style, bool on);
   bool HasWindowStyle(LONG style) const;
   void ExecuteSystemMenuCommand(int command);
+
+  void RegisterDropTarget();
 
   // Min/max sizes.
   void set_min_size(const Size& min_size) { min_size_ = min_size; }
@@ -138,6 +142,9 @@ class WindowImpl : public Win32Window {
 
   // Whether there is native shadow.
   bool has_shadow_ = true;
+
+  // Drag and drop.
+  scoped_refptr<DropTarget> drop_target_;
 
   // The scale factor of current window.
   float scale_factor_;

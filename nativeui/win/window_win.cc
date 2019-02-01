@@ -25,6 +25,7 @@
 #include "nativeui/gfx/win/painter_win.h"
 #include "nativeui/gfx/win/screen_win.h"
 #include "nativeui/menu_bar.h"
+#include "nativeui/win/drag_drop/drop_target.h"
 #include "nativeui/win/menu_base_win.h"
 #include "nativeui/win/subwin_view.h"
 #include "nativeui/win/util/hwnd_util.h"
@@ -222,6 +223,11 @@ bool WindowImpl::HasWindowStyle(LONG style) const {
 
 void WindowImpl::ExecuteSystemMenuCommand(int command) {
   SendMessage(hwnd(), WM_SYSCOMMAND, command, 0);
+}
+
+void WindowImpl::RegisterDropTarget() {
+  drop_target_ = new DropTarget;
+  drop_target_->Init(hwnd());
 }
 
 void WindowImpl::OnCaptureChanged(HWND window) {

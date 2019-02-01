@@ -329,6 +329,8 @@ component("nativeui") {
     "win/container_win.cc",
     "win/container_win.h",
     "win/cursor_win.cc",
+    "win/drag_drop/drop_target.cc",
+    "win/drag_drop/drop_target.h",
     "win/entry_win.cc",
     "win/file_dialog_win.cc",
     "win/file_dialog_win.h",
