@@ -27,7 +27,7 @@ FileDialog::~FileDialog() {
 }
 
 base::FilePath FileDialog::GetResult() const {
-  return base::FilePath(base::SysNSStringToUTF8([[dialog_ URL] path]));
+  return base::mac::NSStringToFilePath([[dialog_ URL] path]);
 }
 
 bool FileDialog::Run() {

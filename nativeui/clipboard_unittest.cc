@@ -14,6 +14,14 @@ class ClipboardTest : public testing::Test {
   void SetUp() override {
     app_ = nu::App::GetCurrent();
     clipboard_ = app_->GetClipboard();
+
+    base::FilePath exe_path;
+    PathService::Get(base::FILE_EXE, &exe_path);
+    image_path_ = exe_path.DirName().DirName().DirName()
+                          .Append(FILE_PATH_LITERAL("nativeui"))
+                          .Append(FILE_PATH_LITERAL("test"))
+                          .Append(FILE_PATH_LITERAL("fixtures"))
+                          .Append(FILE_PATH_LITERAL("static.png"));
   }
 
   nu::Lifetime lifetime_;
@@ -21,6 +29,7 @@ class ClipboardTest : public testing::Test {
 
   nu::App* app_;
   nu::Clipboard* clipboard_;
+  base::FilePath image_path_;
 };
 
 TEST_F(ClipboardTest, Types) {
@@ -80,14 +89,7 @@ TEST_F(ClipboardTest, HTML) {
 }
 
 TEST_F(ClipboardTest, Image) {
-  base::FilePath exe_path;
-  PathService::Get(base::FILE_EXE, &exe_path);
-  base::FilePath p = exe_path.DirName().DirName().DirName()
-                             .Append(FILE_PATH_LITERAL("nativeui"))
-                             .Append(FILE_PATH_LITERAL("test"))
-                             .Append(FILE_PATH_LITERAL("fixtures"))
-                             .Append(FILE_PATH_LITERAL("static.png"));
-  scoped_refptr<nu::Image> image = new nu::Image(p);
+  scoped_refptr<nu::Image> image = new nu::Image(image_path_);
 
   std::vector<Data> objects;
   objects.emplace_back(image.get());
@@ -105,6 +107,7 @@ TEST_F(ClipboardTest, FilePaths) {
   base::FilePath root_dir = exe_path.DirName().DirName().DirName();
   std::vector<base::FilePath> paths = {
     exe_path,
+    image_path_,
     root_dir.Append(FILE_PATH_LITERAL("base")),
     root_dir.Append(FILE_PATH_LITERAL("nativeui")),
     root_dir.Append(FILE_PATH_LITERAL("v8binding")),
@@ -124,7 +127,7 @@ TEST_F(ClipboardTest, Multiple) {
   std::vector<Data> objects;
   objects.emplace_back(Data::Type::HTML, "<div></div>");
   objects.emplace_back(Data::Type::Text, "text");
-  objects.emplace_back(new nu::Image);
+  objects.emplace_back(new nu::Image(image_path_));
   clipboard_->SetData(std::move(objects));
   EXPECT_TRUE(clipboard_->IsDataAvailable(Data::Type::HTML));
   EXPECT_TRUE(clipboard_->IsDataAvailable(Data::Type::Text));

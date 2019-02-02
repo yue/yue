@@ -25,10 +25,8 @@ class NATIVEUI_EXPORT Image : public base::RefCounted<Image> {
   // Create an empty image.
   Image();
 
-#if defined(OS_WIN)
   // Take over an existing image.
   explicit Image(NativeImage take);
-#endif
 
   // Create an image by reading from |path|.
   // The @2x suffix in basename will make the image have scale factor.

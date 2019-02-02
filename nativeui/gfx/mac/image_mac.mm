@@ -36,10 +36,15 @@ std::vector<float> GetFrameDurations(NSBitmapImageRep* bitmap,
 
 }  // namespace
 
+Image::Image() : image_([[NSImage alloc] init]) {}
+
+Image::Image(NativeImage image) : image_(image) {}
+
 Image::Image(const base::FilePath& p)
-    : scale_factor_(1.f),
-      image_([[NSImage alloc]
+    : image_([[NSImage alloc]
                  initWithContentsOfFile:base::SysUTF8ToNSString(p.value())]) {
+  if (!image_)
+    image_ = [[NSImage alloc] init];
   // Compute the scale factor from actual NSImageRep.
   NSArray* reps = [image_ representations];
   if ([reps count] > 0) {
@@ -71,6 +76,8 @@ Image::Image(const base::FilePath& p)
 Image::Image(const Buffer& buffer, float scale_factor)
     : scale_factor_(scale_factor),
       image_([[NSImage alloc] initWithData:buffer.ToNSData()]) {
+  if (!image_)
+    image_ = [[NSImage alloc] init];
   if (scale_factor_ != 1.f) {
     // Set the scale factor.
     NSArray* reps = [image_ representations];

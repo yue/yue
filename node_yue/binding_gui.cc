@@ -479,21 +479,21 @@ struct Type<nu::Clipboard::Data> {
         std::string str;
         if (!Get(context, obj, "value", &str))
           return false;
-        *out = std::move(nu::Clipboard::Data(type, std::move(str)));
+        *out = nu::Clipboard::Data(type, std::move(str));
         break;
       }
       case nu::Clipboard::Data::Type::Image: {
         nu::Image* image;
         if (!Get(context, obj, "value", &image))
           return false;
-        *out = std::move(nu::Clipboard::Data(image));
+        *out = nu::Clipboard::Data(image);
         break;
       }
       case nu::Clipboard::Data::Type::FilePaths: {
         std::vector<base::FilePath> file_paths;
         if (!Get(context, obj, "value", &file_paths))
           return false;
-        *out = std::move(nu::Clipboard::Data(std::move(file_paths)));
+        *out = nu::Clipboard::Data(std::move(file_paths));
         break;
       }
       default:

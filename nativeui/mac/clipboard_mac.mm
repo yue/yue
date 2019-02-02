@@ -6,9 +6,34 @@
 
 #import <Cocoa/Cocoa.h>
 
+#include "base/mac/foundation_util.h"
+#include "base/mac/scoped_nsobject.h"
 #include "base/strings/sys_string_conversions.h"
 
 namespace nu {
+
+namespace {
+
+// If there is RTF data on the pasteboard, returns an HTML version of it.
+// Otherwise returns nil.
+NSString* GetHTMLFromRTFOnPasteboard(NSPasteboard* pboard) {
+  NSData* rtfData = [pboard dataForType:NSRTFPboardType];
+  if (!rtfData)
+    return nil;
+  auto* rtf = [[[NSAttributedString alloc] initWithRTF:rtfData
+                                    documentAttributes:nil] autorelease];
+  NSDictionary* attributes = @{
+     NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType
+  };
+  NSData* htmlData = [rtf dataFromRange:NSMakeRange(0, [rtf length])
+                     documentAttributes:attributes
+                                  error:nil];
+  // According to the docs, NSHTMLTextDocumentType is UTF8.
+  return [[[NSString alloc] initWithData:htmlData
+                                encoding:NSUTF8StringEncoding] autorelease];
+}
+
+}  // namespace
 
 NativeClipboard Clipboard::PlatformCreate(Type type) {
   switch (type) {
@@ -29,19 +54,101 @@ NativeClipboard Clipboard::PlatformCreate(Type type) {
 void Clipboard::PlatformDestroy() {
 }
 
-void Clipboard::Clear() {
-  [clipboard_ clearContents];
+bool Clipboard::IsDataAvailable(Data::Type type) const {
+  NSArray* types = clipboard_.types;
+  switch (type) {
+    case Data::Type::Text:
+      return [types containsObject:NSPasteboardTypeString];
+    case Data::Type::HTML:
+      return [types containsObject:NSHTMLPboardType] ||
+             [types containsObject:NSRTFPboardType];
+    case Data::Type::Image:
+      return [types containsObject:NSPasteboardTypeTIFF];
+    case Data::Type::FilePaths:
+      return [types containsObject:NSFilenamesPboardType];
+    default:
+      NOTREACHED() << "Can not get clipboard data without type";
+      return false;
+  }
 }
 
-void Clipboard::SetText(const std::string& text) {
-  [clipboard_ declareTypes:@[NSPasteboardTypeString] owner:nil];
-  [clipboard_ setString:base::SysUTF8ToNSString(text)
-                forType:NSPasteboardTypeString];
+Clipboard::Data Clipboard::GetData(Data::Type type) const {
+  switch (type) {
+    case Data::Type::Text: {
+      NSString* str = [clipboard_ stringForType:NSPasteboardTypeString];
+      return Data(Data::Type::Text, base::SysNSStringToUTF8(str));
+    }
+    case Data::Type::HTML: {
+      NSArray* supportedTypes =
+          @[NSHTMLPboardType, NSRTFPboardType, NSPasteboardTypeString];
+      NSString* bestType = [clipboard_ availableTypeFromArray:supportedTypes];
+      if (bestType) {
+        NSString* contents;
+        if ([bestType isEqualToString:NSRTFPboardType])
+          contents = GetHTMLFromRTFOnPasteboard(clipboard_);
+        else
+          contents = [clipboard_ stringForType:bestType];
+        return Data(Data::Type::HTML, base::SysNSStringToUTF8(contents));
+      } else {
+        return Data(Data::Type::HTML, "");
+      }
+    }
+    case Data::Type::Image: {
+      // If the pasteboard's image data is not to its liking, the guts of
+      // NSImage may throw, and that exception will leak. Prevent a crash in
+      // that case; a blank image is better.
+      base::scoped_nsobject<NSImage> image;
+      @try {
+        image.reset([[NSImage alloc] initWithPasteboard:clipboard_]);
+      } @catch (id exception) {
+      }
+      return Data(image ? new Image(image.release()): new Image);
+    }
+    case Data::Type::FilePaths: {
+      NSArray* paths = [clipboard_ propertyListForType:NSFilenamesPboardType];
+      std::vector<base::FilePath> result;
+      result.reserve([paths count]);
+      for (NSString* path in paths)
+        result.push_back(base::mac::NSStringToFilePath(path));
+      return Data(std::move(result));
+    }
+    default:
+      NOTREACHED() << "Can not get clipboard data without type";
+      return Data();
+  }
 }
 
-std::string Clipboard::GetText() const {
-  return base::SysNSStringToUTF8(
-      [clipboard_ stringForType:NSPasteboardTypeString]);
+void Clipboard::SetData(std::vector<Data> objects) {
+  [clipboard_ declareTypes:@[] owner:nil];
+
+  for (const auto& data : objects) {
+    switch (data.type()) {
+      case Data::Type::Text:
+        [clipboard_ addTypes:@[NSPasteboardTypeString] owner:nil];
+        [clipboard_ setString:base::SysUTF8ToNSString(data.str())
+                      forType:NSPasteboardTypeString];
+        break;
+      case Data::Type::HTML: {
+        [clipboard_ addTypes:@[NSHTMLPboardType] owner:nil];
+        [clipboard_ setString:base::SysUTF8ToNSString(data.str())
+                      forType:NSHTMLPboardType];
+        break;
+      }
+      case Data::Type::Image:
+        [clipboard_ writeObjects:@[data.image()->GetNative()]];
+        break;
+      case Data::Type::FilePaths: {
+        NSMutableArray* filePaths = [NSMutableArray array];
+        for (const auto& path : data.file_paths())
+          [filePaths addObject:base::SysUTF8ToNSString(path.value())];
+        [clipboard_ addTypes:@[NSFilenamesPboardType] owner:nil];
+        [clipboard_ setPropertyList:filePaths forType:NSFilenamesPboardType];
+        break;
+      }
+      default:
+        NOTREACHED() << "Can not set clipboard data without type";
+    }
+  }
 }
 
 }  // namespace nu
