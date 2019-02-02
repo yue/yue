@@ -1,0 +1,68 @@
+name: Clipboard::Data
+header: nativeui/clipboard.h
+type: class
+namespace: nu
+description: Clipboard data.
+
+lang_detail:
+  cpp: |
+    The `Clipboard::Data` is a move-only type, it can not be copied. When
+    creating a `Clipboard::Data`, the arguments should be passed as r-value
+    reference for best performance.
+
+constructors:
+  - signature: Data()
+    lang: ['cpp']
+    description: Create a null data.
+    detail: |
+      This constructor is useless in userland and should not be used by users,
+      it is only usefull when writing language bindings or libraries.
+
+  - signature: Data(Clipboard::Data::Type type, std::string str)
+    lang: ['cpp']
+    description: Create a data that contains an string.
+    detail: The `type` can only be `Text` or `HTML`.
+
+  - signature: Data(Image* image)
+    lang: ['cpp']
+    description: Create a data with type of `Image`.
+
+  - signature: Data(std::vector<base::FilePath> file_paths)
+    lang: ['cpp']
+    description: Create a data with type of `FilePaths`.
+
+methods:
+  - signature: Clipboard::Data::Type type() const
+    lang: ['cpp']
+    description: Return the type of data.
+
+  - signature: std::string str() const
+    lang: ['cpp']
+    description: Return the string content of data.
+    detail: It can only be called when type is `Text` or `HTML`.
+
+  - signature: Image* image() const
+    lang: ['cpp']
+    description: Return the image content of data.
+    detail: It can only be called when type is `Image`.
+
+  - signature: std::vector<base::FilePath> file_paths() const
+    lang: ['cpp']
+    description: Return the file paths content of data.
+    detail: It can only be called when type is `FilePaths`.
+
+properties:
+  - property: Clipboard::Data::Type type
+    lang: ['lua', 'js']
+    description: The type of data.
+
+  - property: Any value
+    lang: ['lua', 'js']
+    description: The value of data.
+    detail: |
+      The type of `value` depends on the `type` of data:
+
+      * for `text` and `html` types, the `value` is a string;
+      * for `image` type, the `value` is [`Image`](image.html);
+      * for `file-paths` type, the value is an array of string;
+      * if the data is invalid, the `value` would be null.

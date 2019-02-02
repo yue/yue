@@ -1,5 +1,5 @@
 name: Clipboard::Type
-header: nativeui/type.h
+header: nativeui/clipboard.h
 type: enum class
 namespace: nu
 description: Type of `Clipboard`.

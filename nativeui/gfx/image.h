@@ -22,6 +22,14 @@ namespace nu {
 
 class NATIVEUI_EXPORT Image : public base::RefCounted<Image> {
  public:
+  // Create an empty image.
+  Image();
+
+#if defined(OS_WIN)
+  // Take over an existing image.
+  explicit Image(NativeImage take);
+#endif
+
   // Create an image by reading from |path|.
   // The @2x suffix in basename will make the image have scale factor.
   explicit Image(const base::FilePath& path);
@@ -60,7 +68,7 @@ class NATIVEUI_EXPORT Image : public base::RefCounted<Image> {
 
   static float GetScaleFactorFromFilePath(const base::FilePath& path);
 
-  float scale_factor_;
+  float scale_factor_ = 1.f;
   NativeImage image_;
 
 #if defined(OS_MACOSX)

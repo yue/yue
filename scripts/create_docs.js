@@ -266,6 +266,8 @@ function parseSignature(lang, str) {
     signature.parameters = match[2]
   } else {
     match = str.match(/^(.*) (\w+)\((.*)\).*$/)
+    if (!match)
+      console.error(`Failed to parse ${str}`)
     if (match[1] != 'void')
       signature.returnType = parseType(lang, match[1])
     signature.name = match[2]
@@ -402,7 +404,7 @@ function parseType(lang, str) {
   }
   // Custom types usually have 1-to-1 maps.
   if (!builtin)
-    type.id = type.name.toLowerCase().replace('::', '_')
+    type.id = type.name.toLowerCase().replace(/::/g, '_')
   // C++ uses full type as name.
   if (lang == 'cpp')
     type.name = str

@@ -399,6 +399,111 @@ struct Type<nu::Canvas> {
 };
 
 template<>
+struct Type<nu::Clipboard::Data::Type> {
+  static constexpr const char* name = "yue.Clipboard.Data.Type";
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   nu::Clipboard::Data::Type type) {
+    switch (type) {
+      case nu::Clipboard::Data::Type::Text:
+        return vb::ToV8(context, "text");
+      case nu::Clipboard::Data::Type::HTML:
+        return vb::ToV8(context, "html");
+      case nu::Clipboard::Data::Type::Image:
+        return vb::ToV8(context, "html");
+      case nu::Clipboard::Data::Type::FilePaths:
+        return vb::ToV8(context, "file-paths");
+      default:
+        return vb::ToV8(context, "none");
+    }
+  }
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::Clipboard::Data::Type* out) {
+    std::string type;
+    if (!vb::FromV8(context, value, &type))
+      return false;
+    if (type == "text") {
+      *out = nu::Clipboard::Data::Type::Text;
+      return true;
+    } else if (type == "html") {
+      *out = nu::Clipboard::Data::Type::HTML;
+      return true;
+    } else if (type == "image") {
+      *out = nu::Clipboard::Data::Type::Image;
+      return true;
+    } else if (type == "file-paths") {
+      *out = nu::Clipboard::Data::Type::FilePaths;
+      return true;
+    } else {
+      return false;
+    }
+  }
+};
+
+template<>
+struct Type<nu::Clipboard::Data> {
+  static constexpr const char* name = "yue.Clipboard.Data";
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   const nu::Clipboard::Data& data) {
+    v8::Local<v8::Object> obj = v8::Object::New(context->GetIsolate());
+    Set(context, obj, "type", data.type());
+    switch (data.type()) {
+      case nu::Clipboard::Data::Type::Text:
+      case nu::Clipboard::Data::Type::HTML:
+        Set(context, obj, "value", data.str());
+        break;
+      case nu::Clipboard::Data::Type::Image:
+        Set(context, obj, "value", data.image());
+        break;
+      case nu::Clipboard::Data::Type::FilePaths:
+        Set(context, obj, "value", data.file_paths());
+        break;
+      default:
+        Set(context, obj, "value", nullptr);
+        break;
+    }
+    return obj;
+  }
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::Clipboard::Data* out) {
+    if (!value->IsObject())
+      return false;
+    v8::Local<v8::Object> obj = value.As<v8::Object>();
+    nu::Clipboard::Data::Type type;
+    if (!Get(context, obj, "type", &type))
+      return false;
+    switch (type) {
+      case nu::Clipboard::Data::Type::Text:
+      case nu::Clipboard::Data::Type::HTML: {
+        std::string str;
+        if (!Get(context, obj, "value", &str))
+          return false;
+        *out = std::move(nu::Clipboard::Data(type, std::move(str)));
+        break;
+      }
+      case nu::Clipboard::Data::Type::Image: {
+        nu::Image* image;
+        if (!Get(context, obj, "value", &image))
+          return false;
+        *out = std::move(nu::Clipboard::Data(image));
+        break;
+      }
+      case nu::Clipboard::Data::Type::FilePaths: {
+        std::vector<base::FilePath> file_paths;
+        if (!Get(context, obj, "value", &file_paths))
+          return false;
+        *out = std::move(nu::Clipboard::Data(std::move(file_paths)));
+        break;
+      }
+      default:
+        return false;
+    }
+    return true;
+  }
+};
+
+template<>
 struct Type<nu::Clipboard::Type> {
   static constexpr const char* name = "yue.Clipboard.Type";
   static bool FromV8(v8::Local<v8::Context> context,
@@ -442,7 +547,10 @@ struct Type<nu::Clipboard> {
     Set(context, templ,
         "clear", &nu::Clipboard::Clear,
         "setText", &nu::Clipboard::SetText,
-        "getText", &nu::Clipboard::GetText);
+        "getText", &nu::Clipboard::GetText,
+        "isDataAvailable", &nu::Clipboard::IsDataAvailable,
+        "getData", &nu::Clipboard::GetData,
+        "setData", &nu::Clipboard::SetData);
   }
 };
 

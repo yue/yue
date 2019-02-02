@@ -366,6 +366,104 @@ struct Type<nu::Canvas> {
 };
 
 template<>
+struct Type<nu::Clipboard::Data::Type> {
+  static constexpr const char* name = "yue.Clipboard.Data.Type";
+  static inline void Push(State* state, nu::Clipboard::Data::Type type) {
+    switch (type) {
+      case nu::Clipboard::Data::Type::Text:
+        return lua::Push(state, "text");
+      case nu::Clipboard::Data::Type::HTML:
+        return lua::Push(state, "html");
+      case nu::Clipboard::Data::Type::Image:
+        return lua::Push(state, "html");
+      case nu::Clipboard::Data::Type::FilePaths:
+        return lua::Push(state, "file-paths");
+      default:
+        return lua::Push(state, "none");
+    }
+  }
+  static inline bool To(State* state, int index,
+                        nu::Clipboard::Data::Type* out) {
+    std::string type;
+    if (!lua::To(state, index, &type))
+      return false;
+    if (type == "text") {
+      *out = nu::Clipboard::Data::Type::Text;
+      return true;
+    } else if (type == "html") {
+      *out = nu::Clipboard::Data::Type::HTML;
+      return true;
+    } else if (type == "image") {
+      *out = nu::Clipboard::Data::Type::Image;
+      return true;
+    } else if (type == "file-paths") {
+      *out = nu::Clipboard::Data::Type::FilePaths;
+      return true;
+    } else {
+      return false;
+    }
+  }
+};
+
+template<>
+struct Type<nu::Clipboard::Data> {
+  static constexpr const char* name = "yue.Clipboard.Data";
+  static inline void Push(State* state, const nu::Clipboard::Data& data) {
+    NewTable(state);
+    RawSet(state, -1, "type", data.type());
+    switch (data.type()) {
+      case nu::Clipboard::Data::Type::Text:
+      case nu::Clipboard::Data::Type::HTML:
+        RawSet(state, -1, "value", data.str());
+        break;
+      case nu::Clipboard::Data::Type::Image:
+        RawSet(state, -1, "value", data.image());
+        break;
+      case nu::Clipboard::Data::Type::FilePaths:
+        RawSet(state, -1, "value", data.file_paths());
+        break;
+      default:
+        RawSet(state, -1, "value", nullptr);
+        break;
+    }
+  }
+  static inline bool To(State* state, int index, nu::Clipboard::Data* out) {
+    if (GetType(state, index) != LuaType::Table)
+      return false;
+    nu::Clipboard::Data::Type type;
+    if (!RawGetAndPop(state, index, "type", &type))
+      return false;
+    switch (type) {
+      case nu::Clipboard::Data::Type::Text:
+      case nu::Clipboard::Data::Type::HTML: {
+        std::string str;
+        if (!RawGetAndPop(state, index, "value", &str))
+          return false;
+        *out = std::move(nu::Clipboard::Data(type, std::move(str)));
+        break;
+      }
+      case nu::Clipboard::Data::Type::Image: {
+        nu::Image* image;
+        if (!RawGetAndPop(state, index, "value", &image))
+          return false;
+        *out = std::move(nu::Clipboard::Data(image));
+        break;
+      }
+      case nu::Clipboard::Data::Type::FilePaths: {
+        std::vector<base::FilePath> file_paths;
+        if (!RawGetAndPop(state, index, "value", &file_paths))
+          return false;
+        *out = std::move(nu::Clipboard::Data(std::move(file_paths)));
+        break;
+      }
+      default:
+        return false;
+    }
+    return true;
+  }
+};
+
+template<>
 struct Type<nu::Clipboard::Type> {
   static constexpr const char* name = "yue.Clipboard.Type";
   static inline bool To(State* state, int index, nu::Clipboard::Type* out) {
@@ -403,7 +501,10 @@ struct Type<nu::Clipboard> {
     RawSet(state, index,
            "clear", &nu::Clipboard::Clear,
            "settext", &nu::Clipboard::SetText,
-           "gettext", &nu::Clipboard::GetText);
+           "gettext", &nu::Clipboard::GetText,
+           "isdataavailable", &nu::Clipboard::IsDataAvailable,
+           "getdata", &nu::Clipboard::GetData,
+           "setdata", &nu::Clipboard::SetData);
   }
 };
 

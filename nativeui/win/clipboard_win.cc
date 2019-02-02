@@ -5,7 +5,13 @@
 
 #include "nativeui/clipboard.h"
 
+#include <algorithm>
+
 #include "base/strings/utf_string_conversions.h"
+#include "nativeui/gfx/canvas.h"
+#include "nativeui/gfx/painter.h"
+#include "nativeui/gfx/win/gdiplus.h"
+#include "nativeui/win/drag_drop/clipboard_util.h"
 #include "nativeui/win/util/win32_window.h"
 
 namespace nu {
@@ -165,35 +171,107 @@ void TrimAfterNull(StringType* result) {
 // The implementation of clipboard.
 class ClipboardImpl {
  public:
+  using Data = Clipboard::Data;
+
   ClipboardImpl() {}
   ~ClipboardImpl() {}
 
-  void Clear() {
+  bool IsDataAvailable(Data::Type type) const {
+    switch (type) {
+      case Data::Type::Text:
+        return ::IsClipboardFormatAvailable(CF_UNICODETEXT);
+      case Data::Type::HTML:
+        return ::IsClipboardFormatAvailable(GetHTMLFormat());
+      case Data::Type::Image:
+        return ::IsClipboardFormatAvailable(CF_BITMAP) ||
+               ::IsClipboardFormatAvailable(CF_DIBV5) ||
+               ::IsClipboardFormatAvailable(CF_DIB);
+      case Data::Type::FilePaths:
+        return ::IsClipboardFormatAvailable(CF_HDROP);
+      default:
+        NOTREACHED() << "Can not get clipboard data without type";
+        return false;
+    }
+  }
+
+  Data GetData(Data::Type type) const {
+    ScopedClipboard clipboard;
+    if (!clipboard.Acquire(clipboard_owner_.hwnd()))
+      return Data();
+
+    switch (type) {
+      case Data::Type::Text:
+        return Data(Data::Type::Text, base::UTF16ToUTF8(ReadText()));
+      case Data::Type::HTML:
+        return Data(Data::Type::HTML, ReadHTML());
+      case Data::Type::Image:
+        return Data(ReadImage());
+      case Data::Type::FilePaths:
+        return Data(ReadFilePaths());
+      default:
+        NOTREACHED() << "Can not get clipboard data without type";
+        return Data();
+    }
+  }
+
+  void SetData(std::vector<Data> objects) {
     ScopedClipboard clipboard;
     if (!clipboard.Acquire(clipboard_owner_.hwnd()))
       return;
 
     ::EmptyClipboard();
+
+    for (Data& data : objects) {
+      switch (data.type()) {
+        case Data::Type::Text:
+          WriteToClipboard(CF_UNICODETEXT,
+                           CreateGlobalData(base::UTF8ToUTF16(data.str())));
+          break;
+        case Data::Type::HTML:
+          WriteToClipboard(GetHTMLFormat(),
+                           CreateGlobalData(HtmlToCFHtml(data.str(), "")));
+          break;
+        case Data::Type::Image: {
+          scoped_refptr<Canvas> canvas = new Canvas(
+              data.image()->GetSize(), data.image()->GetScaleFactor());
+          canvas->GetPainter()->DrawImage(data.image(),
+                                          RectF(data.image()->GetSize()));
+          HBITMAP bitmap;
+          canvas->GetBitmap()->GetHBITMAP(Gdiplus::Color(0, 255, 255, 255),
+                                          &bitmap);
+          WriteToClipboard(CF_BITMAP, bitmap);
+          break;
+        }
+        case Data::Type::FilePaths: {
+          STGMEDIUM* storage = GetStorageForFileNames(data.file_paths());
+          if (storage) {
+            WriteToClipboard(CF_HDROP, storage->hGlobal);
+            delete storage;
+          }
+          break;
+        }
+        default:
+          NOTREACHED() << "Can not set clipboard data without type";
+      }
+    }
   }
 
-  void SetText(base::string16 text) {
-    ScopedClipboard clipboard;
-    if (!clipboard.Acquire(clipboard_owner_.hwnd()))
-      return;
-
-    ::EmptyClipboard();
-
-    HGLOBAL glob = CreateGlobalData(text);
-    WriteToClipboard(CF_UNICODETEXT, glob);
+ private:
+  // Safely write to system clipboard. Free |handle| on failure.
+  void WriteToClipboard(UINT format, HANDLE handle) {
+    if (handle && !::SetClipboardData(format, handle)) {
+      DCHECK(ERROR_CLIPBOARD_NOT_OPEN != GetLastError());
+      FreeData(format, handle);
+    }
   }
 
-  base::string16 GetText() const {
+  UINT GetHTMLFormat() const {
+    static UINT html_format = ::RegisterClipboardFormat(L"HTML Format");
+    return html_format;
+  }
+
+  base::string16 ReadText() const {
     base::string16 result;
-
-    ScopedClipboard clipboard;
-    if (!clipboard.Acquire(clipboard_owner_.hwnd()))
-      return result;
-
     HANDLE data = ::GetClipboardData(CF_UNICODETEXT);
     if (!data)
       return result;
@@ -202,17 +280,45 @@ class ClipboardImpl {
                   ::GlobalSize(data) / sizeof(base::char16));
     ::GlobalUnlock(data);
     TrimAfterNull(&result);
-
     return result;
   }
 
- private:
-  // Safely write to system clipboard. Free |handle| on failure.
-  void WriteToClipboard(unsigned int format, HANDLE handle) {
-    if (handle && !::SetClipboardData(format, handle)) {
-      DCHECK(ERROR_CLIPBOARD_NOT_OPEN != GetLastError());
-      FreeData(format, handle);
-    }
+  std::string ReadHTML() const {
+    HANDLE data = ::GetClipboardData(GetHTMLFormat());
+    if (!data)
+      return std::string();
+
+    std::string cf_html(static_cast<const char*>(::GlobalLock(data)),
+                        ::GlobalSize(data));
+    ::GlobalUnlock(data);
+    TrimAfterNull(&cf_html);
+
+    std::string html, url;
+    CFHtmlToHtml(cf_html, &html, &url);
+    return html;
+  }
+
+  Image* ReadImage() const {
+    BITMAPINFO* bitmap = static_cast<BITMAPINFO*>(::GetClipboardData(CF_DIBV5));
+    if (!bitmap)
+      return new Image;  // empty
+    Gdiplus::Bitmap* ret = Gdiplus::Bitmap::FromBITMAPINFO(
+        bitmap, bitmap + sizeof(BITMAPINFO));
+    if (!ret)
+      return new Image;  // empty
+    return new Image(ret);
+  }
+
+  std::vector<base::FilePath> ReadFilePaths() const {
+    std::vector<base::FilePath> result;
+    HANDLE data = ::GetClipboardData(CF_HDROP);
+    if (!data)
+      return result;
+
+    HDROP drop = static_cast<HDROP>(::GlobalLock(data));
+    GetFilePathsFromHDrop(drop, &result);
+    ::GlobalUnlock(data);
+    return result;
   }
 
   ClipboardWindow clipboard_owner_;
@@ -231,16 +337,16 @@ void Clipboard::PlatformDestroy() {
   delete clipboard_;
 }
 
-void Clipboard::Clear() {
-  clipboard_->Clear();
+bool Clipboard::IsDataAvailable(Data::Type type) const {
+  return clipboard_->IsDataAvailable(type);
 }
 
-void Clipboard::SetText(const std::string& text) {
-  clipboard_->SetText(base::UTF8ToUTF16(text));
+Clipboard::Data Clipboard::GetData(Data::Type type) const {
+  return clipboard_->GetData(type);
 }
 
-std::string Clipboard::GetText() const {
-  return base::UTF16ToUTF8(clipboard_->GetText());
+void Clipboard::SetData(std::vector<Data> objects) {
+  clipboard_->SetData(std::move(objects));
 }
 
 }  // namespace nu

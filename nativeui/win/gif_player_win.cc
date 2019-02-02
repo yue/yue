@@ -88,6 +88,7 @@ void GifPlayer::PlatformSetImage(Image* image) {
   }
   // Start animation by default.
   SetAnimating(!!image);
+  GetNative()->Invalidate();
 }
 
 bool GifPlayer::CanAnimate() const {
