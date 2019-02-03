@@ -83,8 +83,7 @@ Clipboard::Data Clipboard::GetData(Data::Type type) const {
                  : Data();
     }
     case Data::Type::HTML: {
-      NSArray* supportedTypes =
-          @[NSHTMLPboardType, NSRTFPboardType, NSPasteboardTypeString];
+      NSArray* supportedTypes = @[NSHTMLPboardType, NSRTFPboardType];
       NSString* bestType = [clipboard_ availableTypeFromArray:supportedTypes];
       if (!bestType)
         return Data();
