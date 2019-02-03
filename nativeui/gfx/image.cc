@@ -34,6 +34,8 @@ ScaleFactorPair kScaleFactorPairs[] = {
 
 }  // namespace
 
+Image::Image(NativeImage image) : image_(image) {}
+
 // static
 float Image::GetScaleFactorFromFilePath(const base::FilePath& path) {
   base::FilePath::StringType name(path.BaseName().RemoveExtension().value());

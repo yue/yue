@@ -76,22 +76,21 @@ Clipboard::Data Clipboard::GetData(Data::Type type) const {
   switch (type) {
     case Data::Type::Text: {
       NSString* str = [clipboard_ stringForType:NSPasteboardTypeString];
-      return Data(Data::Type::Text, base::SysNSStringToUTF8(str));
+      return str ? Data(Data::Type::Text, base::SysNSStringToUTF8(str))
+                 : Data();
     }
     case Data::Type::HTML: {
       NSArray* supportedTypes =
           @[NSHTMLPboardType, NSRTFPboardType, NSPasteboardTypeString];
       NSString* bestType = [clipboard_ availableTypeFromArray:supportedTypes];
-      if (bestType) {
-        NSString* contents;
-        if ([bestType isEqualToString:NSRTFPboardType])
-          contents = GetHTMLFromRTFOnPasteboard(clipboard_);
-        else
-          contents = [clipboard_ stringForType:bestType];
-        return Data(Data::Type::HTML, base::SysNSStringToUTF8(contents));
-      } else {
-        return Data(Data::Type::HTML, "");
-      }
+      if (!bestType)
+        return Data();
+      NSString* contents;
+      if ([bestType isEqualToString:NSRTFPboardType])
+        contents = GetHTMLFromRTFOnPasteboard(clipboard_);
+      else
+        contents = [clipboard_ stringForType:bestType];
+      return Data(Data::Type::HTML, base::SysNSStringToUTF8(contents));
     }
     case Data::Type::Image: {
       // If the pasteboard's image data is not to its liking, the guts of
@@ -102,10 +101,12 @@ Clipboard::Data Clipboard::GetData(Data::Type type) const {
         image.reset([[NSImage alloc] initWithPasteboard:clipboard_]);
       } @catch (id exception) {
       }
-      return Data(image ? new Image(image.release()): new Image);
+      return image ? Data(new Image(image.release())) : Data();
     }
     case Data::Type::FilePaths: {
       NSArray* paths = [clipboard_ propertyListForType:NSFilenamesPboardType];
+      if (!paths)
+        return Data();
       std::vector<base::FilePath> result;
       result.reserve([paths count]);
       for (NSString* path in paths)

@@ -38,8 +38,6 @@ std::vector<float> GetFrameDurations(NSBitmapImageRep* bitmap,
 
 Image::Image() : image_([[NSImage alloc] init]) {}
 
-Image::Image(NativeImage image) : image_(image) {}
-
 Image::Image(const base::FilePath& p)
     : image_([[NSImage alloc]
                  initWithContentsOfFile:base::SysUTF8ToNSString(p.value())]) {

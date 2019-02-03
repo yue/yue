@@ -14,8 +14,6 @@ namespace nu {
 
 Image::Image() : image_(new Gdiplus::Image(L"")) {}
 
-Image::Image(NativeImage take) :image_(take) {}
-
 Image::Image(const base::FilePath& path)
     : scale_factor_(GetScaleFactorFromFilePath(path)),
       image_(new Gdiplus::Image(path.value().c_str())) {}

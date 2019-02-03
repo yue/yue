@@ -14,6 +14,7 @@ class ClipboardTest : public testing::Test {
   void SetUp() override {
     app_ = nu::App::GetCurrent();
     clipboard_ = app_->GetClipboard();
+    clipboard_->Clear();
 
     base::FilePath exe_path;
     PathService::Get(base::FILE_EXE, &exe_path);
@@ -56,7 +57,6 @@ TEST_F(ClipboardTest, DataMovable) {
 
   Data image(new nu::Image);
   EXPECT_EQ(image.type(), Data::Type::Image);
-  EXPECT_TRUE(image.image()->GetSize().IsEmpty());
 
   other = std::move(image);
   EXPECT_EQ(other.type(), Data::Type::Image);

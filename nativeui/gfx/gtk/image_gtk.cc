@@ -21,6 +21,8 @@ NativeImage CreateEmptyImage() {
 
 }  // namespace
 
+Image::Image() : image_(CreateEmptyImage()) {}
+
 Image::Image(const base::FilePath& p)
     : scale_factor_(GetScaleFactorFromFilePath(p)),
       image_(gdk_pixbuf_animation_new_from_file(p.value().c_str(), nullptr)) {

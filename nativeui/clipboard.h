@@ -56,6 +56,10 @@ class NATIVEUI_EXPORT Clipboard {
 
     // Getters for data.
     Type type() const { return type_; }
+    std::string& str() {
+      CHECK(type_ == Type::Text || type_ == Type::HTML);
+      return str_;
+    }
     const std::string& str() const {
       CHECK(type_ == Type::Text || type_ == Type::HTML);
       return str_;
@@ -63,6 +67,10 @@ class NATIVEUI_EXPORT Clipboard {
     Image* image() const {
       CHECK_EQ(type_, Type::Image);
       return image_.get();
+    }
+    std::vector<base::FilePath>& file_paths() {
+      CHECK_EQ(type_, Type::FilePaths);
+      return file_paths_;
     }
     const std::vector<base::FilePath>& file_paths() const {
       CHECK_EQ(type_, Type::FilePaths);

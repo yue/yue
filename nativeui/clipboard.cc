@@ -21,7 +21,9 @@ Clipboard::Data::Data(Type t, std::string s) : type_(t), str_(std::move(s)) {
   }
 }
 
-Clipboard::Data::Data(Image* i) : type_(Type::Image), image_(i) {}
+Clipboard::Data::Data(Image* i) : type_(Type::Image), image_(i) {
+  CHECK(image_) << "The image passed to Clipboard::Data can not be null";
+}
 
 Clipboard::Data::Data(std::vector<base::FilePath> f)
     : type_(Type::FilePaths), file_paths_(std::move(f)) {}
@@ -92,7 +94,8 @@ void Clipboard::SetText(const std::string& text) {
 
 std::string Clipboard::GetText() const {
   Data data = GetData(Data::Type::Text);
-  return data.type() == Data::Type::Text ? data.str() : std::string();
+  return data.type() == Data::Type::Text ? std::move(data.str())
+                                         : std::string();
 }
 
 }  // namespace nu
