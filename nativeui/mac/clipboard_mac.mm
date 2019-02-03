@@ -8,11 +8,14 @@
 
 #include "base/mac/foundation_util.h"
 #include "base/mac/scoped_nsobject.h"
+#include "base/strings/string_util.h"
 #include "base/strings/sys_string_conversions.h"
 
 namespace nu {
 
 namespace {
+
+const char kMarkupPrefix[] = "<meta charset='utf-8'>";
 
 // If there is RTF data on the pasteboard, returns an HTML version of it.
 // Otherwise returns nil.
@@ -90,7 +93,12 @@ Clipboard::Data Clipboard::GetData(Data::Type type) const {
         contents = GetHTMLFromRTFOnPasteboard(clipboard_);
       else
         contents = [clipboard_ stringForType:bestType];
-      return Data(Data::Type::HTML, base::SysNSStringToUTF8(contents));
+      // The HTML may have meta prefix in it, remove it for consistent result.
+      std::string html = base::SysNSStringToUTF8(contents);
+      if (base::StartsWith(html, kMarkupPrefix, base::CompareCase::SENSITIVE))
+        html = html.substr(arraysize(kMarkupPrefix) - 1,
+                           html.length() - (arraysize(kMarkupPrefix) - 1));
+      return Data(Data::Type::HTML, std::move(html));
     }
     case Data::Type::Image: {
       // If the pasteboard's image data is not to its liking, the guts of
@@ -131,7 +139,9 @@ void Clipboard::SetData(std::vector<Data> objects) {
         break;
       case Data::Type::HTML: {
         [clipboard_ addTypes:@[NSHTMLPboardType] owner:nil];
-        [clipboard_ setString:base::SysUTF8ToNSString(data.str())
+        // We need to mark it as utf-8. (see crbug.com/11957)
+        std::string html = kMarkupPrefix + data.str();
+        [clipboard_ setString:base::SysUTF8ToNSString(html)
                       forType:NSHTMLPboardType];
         break;
       }
