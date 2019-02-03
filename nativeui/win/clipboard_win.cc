@@ -200,14 +200,28 @@ class ClipboardImpl {
       return Data();
 
     switch (type) {
-      case Data::Type::Text:
-        return Data(Data::Type::Text, base::UTF16ToUTF8(ReadText()));
-      case Data::Type::HTML:
-        return Data(Data::Type::HTML, ReadHTML());
-      case Data::Type::Image:
-        return Data(ReadImage());
-      case Data::Type::FilePaths:
-        return Data(ReadFilePaths());
+      case Data::Type::Text: {
+        base::string16 result;
+        if (!ReadText(&result))
+          return Data();
+        return Data(Data::Type::Text, base::UTF16ToUTF8(result));
+      }
+      case Data::Type::HTML: {
+        std::string result;
+        if (!ReadHTML(&result))
+          return Data();
+        return Data(Data::Type::HTML, std::move(result));
+      }
+      case Data::Type::Image: {
+        Image* image = ReadImage();
+        return image ? Data(image) : Data();
+      }
+      case Data::Type::FilePaths: {
+        std::vector<base::FilePath> result;
+        if (!ReadFilePaths(&result))
+          return Data();
+        return Data(std::move(result));
+      }
       default:
         NOTREACHED() << "Can not get clipboard data without type";
         return Data();
@@ -270,55 +284,52 @@ class ClipboardImpl {
     return html_format;
   }
 
-  base::string16 ReadText() const {
-    base::string16 result;
+  bool ReadText(base::string16* result) const {
     HANDLE data = ::GetClipboardData(CF_UNICODETEXT);
     if (!data)
-      return result;
+      return false;
 
-    result.assign(static_cast<const base::char16*>(::GlobalLock(data)),
-                  ::GlobalSize(data) / sizeof(base::char16));
+    result->assign(static_cast<const base::char16*>(::GlobalLock(data)),
+                   ::GlobalSize(data) / sizeof(base::char16));
     ::GlobalUnlock(data);
-    TrimAfterNull(&result);
-    return result;
+    TrimAfterNull(result);
+    return true;
   }
 
-  std::string ReadHTML() const {
+  bool ReadHTML(std::string* result) const {
     HANDLE data = ::GetClipboardData(GetHTMLFormat());
     if (!data)
-      return std::string();
+      return false;
 
     std::string cf_html(static_cast<const char*>(::GlobalLock(data)),
                         ::GlobalSize(data));
     ::GlobalUnlock(data);
     TrimAfterNull(&cf_html);
 
-    std::string html, url;
-    CFHtmlToHtml(cf_html, &html, &url);
-    return html;
+    CFHtmlToHtml(cf_html, result, nullptr);
+    return true;
   }
 
   Image* ReadImage() const {
     BITMAPINFO* bitmap = static_cast<BITMAPINFO*>(::GetClipboardData(CF_DIBV5));
     if (!bitmap)
-      return new Image;  // empty
+      return nullptr;
     Gdiplus::Bitmap* ret = Gdiplus::Bitmap::FromBITMAPINFO(
         bitmap, bitmap + sizeof(BITMAPINFO));
     if (!ret)
-      return new Image;  // empty
+      return nullptr;
     return new Image(ret);
   }
 
-  std::vector<base::FilePath> ReadFilePaths() const {
-    std::vector<base::FilePath> result;
+  bool ReadFilePaths(std::vector<base::FilePath>* result) const {
     HANDLE data = ::GetClipboardData(CF_HDROP);
     if (!data)
-      return result;
+      return false;
 
     HDROP drop = static_cast<HDROP>(::GlobalLock(data));
-    GetFilePathsFromHDrop(drop, &result);
+    GetFilePathsFromHDrop(drop, result);
     ::GlobalUnlock(data);
-    return result;
+    return true;
   }
 
   ClipboardWindow clipboard_owner_;

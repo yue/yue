@@ -134,3 +134,22 @@ TEST_F(ClipboardTest, Multiple) {
   EXPECT_TRUE(clipboard_->IsDataAvailable(Data::Type::Image));
   EXPECT_FALSE(clipboard_->IsDataAvailable(Data::Type::FilePaths));
 }
+
+TEST_F(ClipboardTest, NotAvailable) {
+  Data data = clipboard_->GetData(Data::Type::Text);
+  EXPECT_EQ(data.type(), Data::Type::None);
+  data = clipboard_->GetData(Data::Type::HTML);
+  EXPECT_EQ(data.type(), Data::Type::None);
+  data = clipboard_->GetData(Data::Type::Image);
+  EXPECT_EQ(data.type(), Data::Type::None);
+  data = clipboard_->GetData(Data::Type::FilePaths);
+  EXPECT_EQ(data.type(), Data::Type::None);
+
+  clipboard_->SetText("some text");
+  data = clipboard_->GetData(Data::Type::HTML);
+  EXPECT_EQ(data.type(), Data::Type::None);
+  data = clipboard_->GetData(Data::Type::Image);
+  EXPECT_EQ(data.type(), Data::Type::None);
+  data = clipboard_->GetData(Data::Type::FilePaths);
+  EXPECT_EQ(data.type(), Data::Type::None);
+}
