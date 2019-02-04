@@ -112,6 +112,46 @@ bool ContainerImpl::OnSetCursor(NativeEvent event) {
   return ViewImpl::OnSetCursor(event);
 }
 
+int ContainerImpl::OnDragUpdate(IDataObject* data,
+                                int effect,
+                                const Point& point) {
+  // Find the view that has the mouse.
+  ViewImpl* dragging_dest = FindChildFromPoint(point);
+
+  // Emit drag enter/leave events
+  if (dragging_dest_ != dragging_dest) {
+    if (dragging_dest_ && adapter_->HasChild(dragging_dest_))
+      dragging_dest_->OnDragLeave(data);
+    dragging_dest_ = dragging_dest;
+    if (dragging_dest_)
+      return dragging_dest_->OnDragEnter(data, effect, point);
+  }
+  // Emit drag update events.
+  if (dragging_dest_)
+    return dragging_dest_->OnDragUpdate(data, effect, point);
+
+  return ViewImpl::OnDragUpdate(data, effect, point);
+}
+
+void ContainerImpl::OnDragLeave(IDataObject* data) {
+  if (dragging_dest_) {
+    if (adapter_->HasChild(dragging_dest_))
+      dragging_dest_->OnDragLeave(data);
+    dragging_dest_ = nullptr;
+  }
+  ViewImpl::OnDragLeave(data);
+}
+
+int ContainerImpl::OnDrop(IDataObject* data, int effect, const Point& point) {
+  if (dragging_dest_)
+    dragging_dest_ = nullptr;
+
+  ViewImpl* child = FindChildFromPoint(point);
+  if (child)
+    return child->OnDrop(data, effect, point);
+  return ViewImpl::OnDrop(data, effect, point);
+}
+
 void ContainerImpl::DrawChild(ViewImpl* child, PainterWin* painter,
                               const Rect& dirty) {
   if (!child->is_visible())

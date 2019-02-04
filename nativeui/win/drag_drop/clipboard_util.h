@@ -6,16 +6,18 @@
 #ifndef NATIVEUI_WIN_DRAG_DROP_CLIPBOARD_UTIL_H_
 #define NATIVEUI_WIN_DRAG_DROP_CLIPBOARD_UTIL_H_
 
-#include <windows.h>
-
 #include <string>
 #include <vector>
 
-namespace base {
-class FilePath;
-}
+#include "nativeui/clipboard.h"
 
 namespace nu {
+
+// Convert clipboard data type to CF format.
+int ToCFType(Clipboard::Data::Type type);
+
+// Return the CF format for HTML.
+UINT GetHTMLFormat();
 
 // Read filenames from HDROP.
 void GetFilePathsFromHDrop(HDROP drop, std::vector<base::FilePath>* result);

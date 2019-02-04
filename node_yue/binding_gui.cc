@@ -409,7 +409,7 @@ struct Type<nu::Clipboard::Data::Type> {
       case nu::Clipboard::Data::Type::HTML:
         return vb::ToV8(context, "html");
       case nu::Clipboard::Data::Type::Image:
-        return vb::ToV8(context, "html");
+        return vb::ToV8(context, "image");
       case nu::Clipboard::Data::Type::FilePaths:
         return vb::ToV8(context, "file-paths");
       default:
@@ -649,6 +649,26 @@ struct Type<nu::Cursor> {
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
+  }
+};
+
+template<>
+struct Type<nu::DraggingInfo> {
+  static constexpr const char* name = "yue.DraggingInfo";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+        "dragOperationNone", static_cast<int>(nu::DRAG_OPERATION_NONE),
+        "dragOperationCopy", static_cast<int>(nu::DRAG_OPERATION_COPY),
+        "dragOperationMove", static_cast<int>(nu::DRAG_OPERATION_MOVE),
+        "dragOperationLink", static_cast<int>(nu::DRAG_OPERATION_LINK));
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "isDataAvailable", &nu::DraggingInfo::IsDataAvailable,
+        "getData", &nu::DraggingInfo::GetData,
+        "getDragOperation", &nu::DraggingInfo::GetDragOperation);
   }
 };
 
@@ -1405,6 +1425,7 @@ struct Type<nu::View> {
         "hasCapture", &nu::View::HasCapture,
         "setMouseDownCanMoveWindow", &nu::View::SetMouseDownCanMoveWindow,
         "isMouseDownCanMoveWindow", &nu::View::IsMouseDownCanMoveWindow,
+        "registerDraggedTypes", &nu::View::RegisterDraggedTypes,
         "setCursor", &nu::View::SetCursor,
         "setFont", &nu::View::SetFont,
         "setColor", &nu::View::SetColor,
@@ -1426,8 +1447,12 @@ struct Type<nu::View> {
                 "onMouseLeave", &nu::View::on_mouse_leave,
                 "onKeyDown", &nu::View::on_key_down,
                 "onKeyUp", &nu::View::on_key_up,
+                "onDragLeave", &nu::View::on_drag_leave,
                 "onSizeChanged", &nu::View::on_size_changed,
-                "onCaptureLost", &nu::View::on_capture_lost);
+                "onCaptureLost", &nu::View::on_capture_lost,
+                "handleDragEnter", &nu::View::handle_drag_enter,
+                "handleDragUpdate", &nu::View::handle_drag_update,
+                "handleDrop", &nu::View::handle_drop);
   }
   static void SetStyle(
       Arguments* args,
@@ -2364,6 +2389,7 @@ void Initialize(v8::Local<v8::Object> exports) {
           "Clipboard",         vb::Constructor<nu::Clipboard>(),
           "Color",             vb::Constructor<nu::Color>(),
           "Cursor",            vb::Constructor<nu::Cursor>(),
+          "DraggingInfo",      vb::Constructor<nu::DraggingInfo>(),
           "Image",             vb::Constructor<nu::Image>(),
           "Painter",           vb::Constructor<nu::Painter>(),
           "Event",             vb::Constructor<nu::Event>(),

@@ -177,21 +177,10 @@ class ClipboardImpl {
   ~ClipboardImpl() {}
 
   bool IsDataAvailable(Data::Type type) const {
-    switch (type) {
-      case Data::Type::Text:
-        return ::IsClipboardFormatAvailable(CF_UNICODETEXT);
-      case Data::Type::HTML:
-        return ::IsClipboardFormatAvailable(GetHTMLFormat());
-      case Data::Type::Image:
-        return ::IsClipboardFormatAvailable(CF_BITMAP) ||
-               ::IsClipboardFormatAvailable(CF_DIBV5) ||
-               ::IsClipboardFormatAvailable(CF_DIB);
-      case Data::Type::FilePaths:
-        return ::IsClipboardFormatAvailable(CF_HDROP);
-      default:
-        NOTREACHED() << "Can not get clipboard data without type";
-        return false;
-    }
+    int cf_type = ToCFType(type);
+    if (cf_type < 0)
+      return false;
+    return ::IsClipboardFormatAvailable(cf_type);
   }
 
   Data GetData(Data::Type type) const {
@@ -277,11 +266,6 @@ class ClipboardImpl {
       DCHECK(ERROR_CLIPBOARD_NOT_OPEN != GetLastError());
       FreeData(format, handle);
     }
-  }
-
-  UINT GetHTMLFormat() const {
-    static UINT html_format = ::RegisterClipboardFormat(L"HTML Format");
-    return html_format;
   }
 
   bool ReadText(base::string16* result) const {

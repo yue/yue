@@ -6,13 +6,15 @@
 #define NATIVEUI_VIEW_H_
 
 #include <string>
+#include <vector>
 
 #include "base/memory/ref_counted.h"
+#include "nativeui/clipboard.h"
+#include "nativeui/dragging_info.h"
 #include "nativeui/gfx/color.h"
 #include "nativeui/gfx/geometry/rect_f.h"
 #include "nativeui/gfx/geometry/size_f.h"
 #include "nativeui/signal.h"
-#include "nativeui/types.h"
 
 typedef struct YGNode *YGNodeRef;
 typedef struct YGConfig *YGConfigRef;
@@ -88,6 +90,9 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   // Dragging the view would move the window.
   void SetMouseDownCanMoveWindow(bool yes);
   bool IsMouseDownCanMoveWindow() const;
+
+  // Drag and drop.
+  void RegisterDraggedTypes(std::vector<Clipboard::Data::Type> types);
 
   // Custom cursor when mouse hovers the view.
   void SetCursor(Cursor* cursor);
@@ -166,8 +171,14 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   Signal<void(View*, const MouseEvent&)> on_mouse_leave;
   Signal<bool(View*, const KeyEvent&)> on_key_down;
   Signal<bool(View*, const KeyEvent&)> on_key_up;
+  Signal<void(View*, DraggingInfo*)> on_drag_leave;
   Signal<void(View*)> on_size_changed;
   Signal<void(View*)> on_capture_lost;
+
+  // Delegates.
+  std::function<int(View*, DraggingInfo*, const PointF&)> handle_drag_enter;
+  std::function<int(View*, DraggingInfo*, const PointF&)> handle_drag_update;
+  std::function<bool(View*, DraggingInfo*, const PointF&)> handle_drop;
 
  protected:
   View();

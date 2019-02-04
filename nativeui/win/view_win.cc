@@ -4,12 +4,15 @@
 
 #include "nativeui/win/view_win.h"
 
+#include <utility>
+
 #include "nativeui/events/event.h"
 #include "nativeui/events/win/event_win.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/gfx/screen.h"
 #include "nativeui/label.h"
 #include "nativeui/state.h"
+#include "nativeui/win/dragging_info_win.h"
 #include "nativeui/win/scroll_win.h"
 
 namespace nu {
@@ -45,6 +48,9 @@ void ViewImpl::SetParent(ViewImpl* parent) {
 
   window_ = parent ? parent->window_ : nullptr;
   parent_ = parent;
+
+  if (!dragged_types_.empty() && window())
+    window()->RegisterDropTarget();
 
   if (parent) {
     if (parent->type() == ControlType::Scroll &&
@@ -114,6 +120,12 @@ void ViewImpl::VisibilityChanged() {
     is_tree_visible_ = is_visible_;
   if (!is_tree_visible_)  // remove focus when view is hidden
     SetFocus(false);
+}
+
+void ViewImpl::RegisterDraggedTypes(std::vector<Clipboard::Data::Type> types) {
+  dragged_types_ = std::move(types);
+  if (!dragged_types_.empty() && window())
+    window()->RegisterDropTarget();
 }
 
 void ViewImpl::SetFont(Font* font) {
@@ -193,6 +205,11 @@ bool ViewImpl::OnSetCursor(NativeEvent event) {
   return false;
 }
 
+void ViewImpl::OnCaptureLost() {
+  if (delegate())
+    delegate()->on_capture_lost.Emit(delegate());
+}
+
 bool ViewImpl::OnKeyEvent(NativeEvent event) {
   if (!delegate())
     return false;
@@ -211,9 +228,54 @@ bool ViewImpl::OnKeyEvent(NativeEvent event) {
   return false;
 }
 
-void ViewImpl::OnCaptureLost() {
-  if (delegate())
-    delegate()->on_capture_lost.Emit(delegate());
+int ViewImpl::OnDragEnter(IDataObject* data, int effect, const Point& point) {
+  if (!delegate() || !delegate()->handle_drag_enter || !AcceptsDropping(data))
+    return DRAG_OPERATION_NONE;
+  DraggingInfoWin info(data, effect);
+  PointF client_point = ScalePoint(
+      PointF(point - size_allocation().OffsetFromOrigin()),
+      1.f / scale_factor());
+  return delegate()->handle_drag_enter(delegate(), &info, client_point);
+}
+
+int ViewImpl::OnDragUpdate(IDataObject* data, int effect, const Point& point) {
+  if (!AcceptsDropping(data))
+    return DRAG_OPERATION_NONE;
+  if (!delegate() || !delegate()->handle_drag_update)
+    return DRAG_OPERATION_LAST;
+  DraggingInfoWin info(data, effect);
+  PointF client_point = ScalePoint(
+      PointF(point - size_allocation().OffsetFromOrigin()),
+      1.f / scale_factor());
+  return delegate()->handle_drag_update(delegate(), &info, client_point);
+}
+
+void ViewImpl::OnDragLeave(IDataObject* data) {
+  if (!delegate() || delegate()->on_drag_leave.IsEmpty() ||
+      !AcceptsDropping(data))
+    return;
+  DraggingInfoWin info(data, DRAG_OPERATION_NONE);
+  delegate()->on_drag_leave.Emit(delegate(), &info);
+}
+
+int ViewImpl::OnDrop(IDataObject* data, int effect, const Point& point) {
+  if (!delegate() || !delegate()->handle_drop || !AcceptsDropping(data))
+    return DRAG_OPERATION_NONE;
+  DraggingInfoWin info(data, effect);
+  PointF client_point = ScalePoint(
+      PointF(point - size_allocation().OffsetFromOrigin()),
+      1.f / scale_factor());
+  return delegate()->handle_drop(delegate(), &info, client_point) ?
+      DRAG_OPERATION_LAST : DRAG_OPERATION_NONE;
+}
+
+bool ViewImpl::AcceptsDropping(IDataObject* data) {
+  DraggingInfoWin info(data, 0);
+  for (const auto& type : dragged_types_) {
+    if (info.IsDataAvailable(type))
+      return true;
+  }
+  return false;
 }
 
 Point ViewImpl::GetMousePosition() const {
@@ -380,6 +442,10 @@ void View::SetMouseDownCanMoveWindow(bool yes) {
 
 bool View::IsMouseDownCanMoveWindow() const {
   return view_->is_draggable();
+}
+
+void View::RegisterDraggedTypes(std::vector<Clipboard::Data::Type> types) {
+  view_->RegisterDraggedTypes(std::move(types));
 }
 
 void View::PlatformSetCursor(Cursor* cursor) {

@@ -375,7 +375,7 @@ struct Type<nu::Clipboard::Data::Type> {
       case nu::Clipboard::Data::Type::HTML:
         return lua::Push(state, "html");
       case nu::Clipboard::Data::Type::Image:
-        return lua::Push(state, "html");
+        return lua::Push(state, "image");
       case nu::Clipboard::Data::Type::FilePaths:
         return lua::Push(state, "file-paths");
       default:
@@ -593,6 +593,21 @@ struct Type<nu::Cursor> {
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
            "createwithtype", &CreateOnHeap<nu::Cursor, nu::Cursor::Type>);
+  }
+};
+
+template<>
+struct Type<nu::DraggingInfo> {
+  static constexpr const char* name = "yue.DraggingInfo";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+        "dragoperationnone", static_cast<int>(nu::DRAG_OPERATION_NONE),
+        "dragoperationcopy", static_cast<int>(nu::DRAG_OPERATION_COPY),
+        "dragoperationmove", static_cast<int>(nu::DRAG_OPERATION_MOVE),
+        "dragoperationlink", static_cast<int>(nu::DRAG_OPERATION_LINK),
+        "isdataavailable", &nu::DraggingInfo::IsDataAvailable,
+        "getdata", &nu::DraggingInfo::GetData,
+        "getdragoperation", &nu::DraggingInfo::GetDragOperation);
   }
 };
 
@@ -1252,6 +1267,7 @@ struct Type<nu::View> {
            "hascapture", &nu::View::HasCapture,
            "setmousedowncanmovewindow", &nu::View::SetMouseDownCanMoveWindow,
            "ismousedowncanmovewindow", &nu::View::IsMouseDownCanMoveWindow,
+           "registerdraggedtypes", &nu::View::RegisterDraggedTypes,
            "setcursor", &nu::View::SetCursor,
            "setfont", &nu::View::SetFont,
            "setcolor", &nu::View::SetColor,
@@ -1273,8 +1289,12 @@ struct Type<nu::View> {
                    "onmouseleave", &nu::View::on_mouse_leave,
                    "onkeydown", &nu::View::on_key_down,
                    "onkeyup", &nu::View::on_key_up,
+                   "ondragleave", &nu::View::on_drag_leave,
                    "onsizechanged", &nu::View::on_size_changed,
-                   "oncapturelost", &nu::View::on_capture_lost);
+                   "oncapturelost", &nu::View::on_capture_lost,
+                   "handledragenter", &nu::View::handle_drag_enter,
+                   "handledragupdate", &nu::View::handle_drag_update,
+                   "handledrop", &nu::View::handle_drop);
   }
   static void SetStyle(nu::View* view,
                        const std::map<std::string, std::string>& styles) {
@@ -2048,6 +2068,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::Clipboard>(state, "Clipboard");
   BindType<nu::Color>(state, "Color");
   BindType<nu::Cursor>(state, "Cursor");
+  BindType<nu::DraggingInfo>(state, "DraggingInfo");
   BindType<nu::Image>(state, "Image");
   BindType<nu::Painter>(state, "Painter");
   BindType<nu::Event>(state, "Event");

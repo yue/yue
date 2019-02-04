@@ -43,6 +43,9 @@ class ContainerImpl : public ViewImpl {
   bool OnMouseWheel(NativeEvent event) override;
   bool OnMouseClick(NativeEvent event) override;
   bool OnSetCursor(NativeEvent event) override;
+  int OnDragUpdate(IDataObject* data, int effect, const Point& point) override;
+  void OnDragLeave(IDataObject* data) override;
+  int OnDrop(IDataObject* data, int effect, const Point& point) override;
 
   Adapter* adapter() const { return adapter_; }
 
@@ -57,6 +60,9 @@ class ContainerImpl : public ViewImpl {
 
   // The View in which mouse hovers.
   ViewImpl* hover_view_ = nullptr;
+
+  // The view under the mouse when dragging.
+  ViewImpl* dragging_dest_ = nullptr;
 };
 
 }  // namespace nu

@@ -5,6 +5,8 @@
 #ifndef NATIVEUI_WIN_VIEW_WIN_H_
 #define NATIVEUI_WIN_VIEW_WIN_H_
 
+#include <vector>
+
 #include "nativeui/cursor.h"
 #include "nativeui/gfx/win/painter_win.h"
 #include "nativeui/view.h"
@@ -62,6 +64,9 @@ class ViewImpl {
   // This view or parent view has changed its visibility.
   virtual void VisibilityChanged();
 
+  // Drag and drop.
+  virtual void RegisterDraggedTypes(std::vector<Clipboard::Data::Type> types);
+
   // Set styles.
   virtual void SetFont(Font* font);
   virtual void SetColor(Color color);
@@ -88,8 +93,17 @@ class ViewImpl {
   // Called when the view lost capture.
   virtual void OnCaptureLost();
 
+  // The drag and drop events.
+  virtual int OnDragEnter(IDataObject* data, int effect, const Point& point);
+  virtual int OnDragUpdate(IDataObject* data, int effect, const Point& point);
+  virtual void OnDragLeave(IDataObject* data);
+  virtual int OnDrop(IDataObject* data, int effect, const Point& point);
+
   /////////////////////////////////////////////////////////////////////////////
   // Helpers
+
+  // whether the view accepts dropping.
+  bool AcceptsDropping(IDataObject* data);
 
   // Get the mouse position in current view.
   Point GetMousePosition() const;
@@ -171,6 +185,9 @@ class ViewImpl {
 
   // Whether the view and its parent are visible.
   bool is_tree_visible_ = true;
+
+  // Accepted dragged types.
+  std::vector<Clipboard::Data::Type> dragged_types_;
 
   // The control state.
   ControlState state_ = ControlState::Normal;

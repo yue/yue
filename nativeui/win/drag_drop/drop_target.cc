@@ -8,23 +8,23 @@
 #include <shlobj.h>
 
 #include "base/logging.h"
+#include "nativeui/gfx/geometry/point.h"
 #include "nativeui/state.h"
+#include "nativeui/win/drag_operation_win.h"
 
 namespace nu {
 
 IDropTargetHelper* DropTarget::cached_drop_target_helper_ = nullptr;
 
-DropTarget::DropTarget() : hwnd_(nullptr), ref_count_(0) {}
-
-DropTarget::~DropTarget() {}
-
-void DropTarget::Init(HWND hwnd) {
-  DCHECK(!hwnd_);
+DropTarget::DropTarget(HWND hwnd, Delegate* delegate)
+    : hwnd_(hwnd), delegate_(delegate) {
   DCHECK(hwnd);
   State::GetCurrent()->InitializeCOM();
   HRESULT result = ::RegisterDragDrop(hwnd, this);
   DCHECK(SUCCEEDED(result));
 }
+
+DropTarget::~DropTarget() {}
 
 // static
 IDropTargetHelper* DropTarget::DropHelper() {
@@ -46,14 +46,19 @@ HRESULT DropTarget::DragEnter(IDataObject* data_object,
   // Tell the helper that we entered so it can update the drag image.
   IDropTargetHelper* drop_helper = DropHelper();
   if (drop_helper) {
-    drop_helper->DragEnter(GetHWND(), data_object,
+    drop_helper->DragEnter(hwnd(), data_object,
                            reinterpret_cast<POINT*>(&cursor_position), *effect);
   }
 
   current_data_object_ = data_object;
+
   POINT screen_pt = { cursor_position.x, cursor_position.y };
-  *effect =
-      OnDragEnter(current_data_object_.get(), key_state, screen_pt, *effect);
+  ::ScreenToClient(hwnd(), &screen_pt);
+  *effect = delegate_->OnDragEnter(
+      current_data_object_.get(), *effect, Point(screen_pt));
+
+  last_drag_state_ = {key_state, cursor_position};
+  last_drag_effect_ = static_cast<int>(*effect);
   return S_OK;
 }
 
@@ -65,9 +70,28 @@ HRESULT DropTarget::DragOver(DWORD key_state,
   if (drop_helper)
     drop_helper->DragOver(reinterpret_cast<POINT*>(&cursor_position), *effect);
 
+  // Do not repeatly emit DragOver event if input state is not changed.
+  if (last_drag_effect_ != -1 &&
+      key_state == last_drag_state_.key_state &&
+      cursor_position.x == last_drag_state_.cursor_position.x &&
+      cursor_position.y == last_drag_state_.cursor_position.y) {
+    *effect = last_drag_effect_;
+    return S_OK;
+  }
+
   POINT screen_pt = { cursor_position.x, cursor_position.y };
-  *effect =
-      OnDragOver(current_data_object_.get(), key_state, screen_pt, *effect);
+  ::ScreenToClient(hwnd(), &screen_pt);
+
+  // The user may indicate using last drag effect.
+  int r = delegate_->OnDragOver(
+      current_data_object_.get(), *effect, Point(screen_pt));
+  if (r == DRAG_OPERATION_LAST)
+    *effect = last_drag_effect_ == -1 ? DRAG_OPERATION_NONE
+                                      : last_drag_effect_;
+  else
+    *effect = last_drag_effect_ = r;
+
+  last_drag_state_ = {key_state, cursor_position};
   return S_OK;
 }
 
@@ -77,9 +101,10 @@ HRESULT DropTarget::DragLeave() {
   if (drop_helper)
     drop_helper->DragLeave();
 
-  OnDragLeave(current_data_object_.get());
+  delegate_->OnDragLeave(current_data_object_.get());
 
   current_data_object_ = nullptr;
+  last_drag_effect_ = -1;
   return S_OK;
 }
 
@@ -95,7 +120,18 @@ HRESULT DropTarget::Drop(IDataObject* data_object,
   }
 
   POINT screen_pt = { cursor_position.x, cursor_position.y };
-  *effect = OnDrop(current_data_object_.get(), key_state, screen_pt, *effect);
+  ::ScreenToClient(hwnd(), &screen_pt);
+
+  // The user may indicate using last drag effect.
+  int r = delegate_->OnDrop(
+      current_data_object_.get(), *effect, Point(screen_pt));
+  if (r == DRAG_OPERATION_LAST)
+    *effect = last_drag_effect_ == -1 ? DRAG_OPERATION_NONE
+                                      : last_drag_effect_;
+  else
+    *effect = last_drag_effect_ = r;
+
+  last_drag_effect_ = -1;
   return S_OK;
 }
 
@@ -123,34 +159,6 @@ ULONG DropTarget::Release() {
     return 0U;
   }
   return ref_count_;
-}
-
-DWORD DropTarget::OnDragEnter(IDataObject* data_object,
-                              DWORD key_state,
-                              POINT cursor_position,
-                              DWORD effect) {
-  LOG(ERROR) << "OnDragEnter";
-  return DROPEFFECT_NONE;
-}
-
-DWORD DropTarget::OnDragOver(IDataObject* data_object,
-                             DWORD key_state,
-                             POINT cursor_position,
-                             DWORD effect) {
-  LOG(ERROR) << "OnDragOver";
-  return DROPEFFECT_NONE;
-}
-
-void DropTarget::OnDragLeave(IDataObject* data_object) {
-  LOG(ERROR) << "OnDragLeave";
-}
-
-DWORD DropTarget::OnDrop(IDataObject* data_object,
-                         DWORD key_state,
-                         POINT cursor_position,
-                         DWORD effect) {
-  LOG(ERROR) << "OnDrop";
-  return DROPEFFECT_NONE;
 }
 
 }  // namespace nu

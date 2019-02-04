@@ -226,8 +226,8 @@ void WindowImpl::ExecuteSystemMenuCommand(int command) {
 }
 
 void WindowImpl::RegisterDropTarget() {
-  drop_target_ = new DropTarget;
-  drop_target_->Init(hwnd());
+  if (!drop_target_)
+    drop_target_ = new DropTarget(hwnd(), this);
 }
 
 void WindowImpl::OnCaptureChanged(HWND window) {
@@ -665,6 +665,24 @@ LRESULT WindowImpl::OnSetCursor(UINT message, WPARAM w_param, LPARAM l_param) {
   }
   ::SetCursor(::LoadCursor(NULL, cursor));
   return TRUE;
+}
+
+int WindowImpl::OnDragEnter(IDataObject* data, int effect, const Point& point) {
+  return delegate_->GetContentView()->GetNative()->OnDragEnter(
+      data, effect, point);
+}
+
+int WindowImpl::OnDragOver(IDataObject* data, int effect, const Point& point) {
+  return delegate_->GetContentView()->GetNative()->OnDragUpdate(
+      data, effect, point);
+}
+
+void WindowImpl::OnDragLeave(IDataObject* data) {
+  return delegate_->GetContentView()->GetNative()->OnDragLeave(data);
+}
+
+int WindowImpl::OnDrop(IDataObject* data, int effect, const Point& point) {
+  return delegate_->GetContentView()->GetNative()->OnDrop(data, effect, point);
 }
 
 void WindowImpl::TrackMouse(bool enable) {

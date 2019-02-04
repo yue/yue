@@ -16,6 +16,8 @@ struct IDropTargetHelper;
 
 namespace nu {
 
+class Point;
+
 // A DropTarget implementation that takes care of the nitty gritty
 // of dnd. While this class is concrete, subclasses will most likely
 // want to override various OnXXX methods.
@@ -27,11 +29,38 @@ namespace nu {
 // This class is meant to be used in a STA and is not multithread-safe.
 class DropTarget : public IDropTarget {
  public:
-  DropTarget();
+  class Delegate {
+   public:
+    // Invoked when the cursor first moves over the hwnd during a dnd session.
+    // This should return a bitmask of the supported drop operations:
+    // DROPEFFECT_NONE, DROPEFFECT_COPY, DROPEFFECT_LINK and/or
+    // DROPEFFECT_MOVE.
+    virtual int OnDragEnter(IDataObject* data,
+                            int effect,
+                            const Point& point) = 0;
+
+    // Invoked when the cursor moves over the window during a dnd session.
+    // This should return a bitmask of the supported drop operations:
+    // DROPEFFECT_NONE, DROPEFFECT_COPY, DROPEFFECT_LINK and/or
+    // DROPEFFECT_MOVE.
+    virtual int OnDragOver(IDataObject* data,
+                           int effect,
+                           const Point& point) = 0;
+
+    // Invoked when the cursor moves outside the bounds of the hwnd during a
+    // dnd session.
+    virtual void OnDragLeave(IDataObject* data) = 0;
+
+    // Invoked when the drop ends on the window. This should return the
+    // operation that was taken.
+    virtual int OnDrop(IDataObject* data, int effect, const Point& point) = 0;
+  };
+
+  DropTarget(HWND hwnd, Delegate* delegate);
   virtual ~DropTarget();
 
-  // Initialize the drop target by associating it with the given HWND.
-  void Init(HWND hwnd);
+  // Returns the hosting HWND.
+  HWND hwnd() { return hwnd_; }
 
   // IDropTarget implementation:
   HRESULT __stdcall DragEnter(IDataObject* data_object,
@@ -52,39 +81,6 @@ class DropTarget : public IDropTarget {
   ULONG __stdcall AddRef() override;
   ULONG __stdcall Release() override;
 
- protected:
-  // Returns the hosting HWND.
-  HWND GetHWND() { return hwnd_; }
-
-  // Invoked when the cursor first moves over the hwnd during a dnd session.
-  // This should return a bitmask of the supported drop operations:
-  // DROPEFFECT_NONE, DROPEFFECT_COPY, DROPEFFECT_LINK and/or
-  // DROPEFFECT_MOVE.
-  virtual DWORD OnDragEnter(IDataObject* data_object,
-                            DWORD key_state,
-                            POINT cursor_position,
-                            DWORD effect);
-
-  // Invoked when the cursor moves over the window during a dnd session.
-  // This should return a bitmask of the supported drop operations:
-  // DROPEFFECT_NONE, DROPEFFECT_COPY, DROPEFFECT_LINK and/or
-  // DROPEFFECT_MOVE.
-  virtual DWORD OnDragOver(IDataObject* data_object,
-                           DWORD key_state,
-                           POINT cursor_position,
-                           DWORD effect);
-
-  // Invoked when the cursor moves outside the bounds of the hwnd during a
-  // dnd session.
-  virtual void OnDragLeave(IDataObject* data_object);
-
-  // Invoked when the drop ends on the window. This should return the operation
-  // that was taken.
-  virtual DWORD OnDrop(IDataObject* data_object,
-                       DWORD key_state,
-                       POINT cursor_position,
-                       DWORD effect);
-
  private:
   // Returns the cached drop helper, creating one if necessary. The returned
   // object is not addrefed. May return NULL if the object couldn't be created.
@@ -92,6 +88,15 @@ class DropTarget : public IDropTarget {
 
   // The data object currently being dragged over this drop target.
   scoped_refptr<IDataObject> current_data_object_;
+
+  // The state of last DragOver.
+  struct {
+    DWORD key_state = 0;
+    POINTL cursor_position = {0, 0};
+  } last_drag_state_;
+
+  // Cached effect var.
+  int last_drag_effect_ = -1;
 
   // A helper object that is used to provide drag image support while the mouse
   // is dragging over the content area.
@@ -103,11 +108,13 @@ class DropTarget : public IDropTarget {
   // first time it is actually used.
   static IDropTargetHelper* cached_drop_target_helper_;
 
+  LONG ref_count_ = 0;
+
   // The HWND of the source. This HWND is used to determine coordinates for
   // mouse events that are sent to the renderer notifying various drag states.
   HWND hwnd_;
 
-  LONG ref_count_;
+  Delegate* delegate_;  // weak ref
 
   DISALLOW_COPY_AND_ASSIGN(DropTarget);
 };

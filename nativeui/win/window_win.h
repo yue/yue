@@ -6,6 +6,7 @@
 #ifndef NATIVEUI_WIN_WINDOW_WIN_H_
 #define NATIVEUI_WIN_WINDOW_WIN_H_
 
+#include "nativeui/win/drag_drop/drop_target.h"
 #include "nativeui/win/focus_manager.h"
 #include "nativeui/win/util/win32_window.h"
 #include "nativeui/window.h"
@@ -14,7 +15,8 @@ namespace nu {
 
 class DropTarget;
 
-class WindowImpl : public Win32Window {
+class WindowImpl : public Win32Window,
+                   public DropTarget::Delegate {
  public:
   WindowImpl(const Window::Options& options, Window* delegate);
 
@@ -111,6 +113,12 @@ class WindowImpl : public Win32Window {
   LRESULT OnNCHitTest(UINT msg, WPARAM w_param, LPARAM l_param);
   LRESULT OnNCCalcSize(BOOL mode, LPARAM l_param);
   LRESULT OnSetCursor(UINT message, WPARAM w_param, LPARAM l_param);
+
+  // DropTarget::Delegate:
+  int OnDragEnter(IDataObject* data, int effect, const Point& point) override;
+  int OnDragOver(IDataObject* data, int effect, const Point& point) override;
+  void OnDragLeave(IDataObject* data) override;
+  int OnDrop(IDataObject* data, int effect, const Point& point) override;
 
   void TrackMouse(bool enable);
   bool GetClientAreaInsets(Insets* insets);

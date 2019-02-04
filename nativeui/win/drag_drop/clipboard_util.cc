@@ -17,6 +17,27 @@
 
 namespace nu {
 
+int ToCFType(Clipboard::Data::Type type) {
+  switch (type) {
+    case Clipboard::Data::Type::Text:
+      return CF_UNICODETEXT;
+    case Clipboard::Data::Type::HTML:
+      return GetHTMLFormat();
+    case Clipboard::Data::Type::Image:
+      return CF_DIBV5;
+    case Clipboard::Data::Type::FilePaths:
+      return CF_HDROP;
+    default:
+      NOTREACHED() << "Invalid clipboard data type: " << static_cast<int>(type);
+      return -1;
+  }
+}
+
+UINT GetHTMLFormat() {
+  static UINT html_format = ::RegisterClipboardFormat(L"HTML Format");
+  return html_format;
+}
+
 void GetFilePathsFromHDrop(HDROP drop, std::vector<base::FilePath>* result) {
   const int kMaxFilenameLen = 4096;
   const unsigned num_files = ::DragQueryFileW(drop, 0xffffffff, 0, 0);
