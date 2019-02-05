@@ -38,6 +38,9 @@ NSString* GetHTMLFromRTFOnPasteboard(NSPasteboard* pboard) {
 
 }  // namespace
 
+Clipboard::Clipboard(NativeClipboard clipboard)
+    : type_(Type::Drag), clipboard_(clipboard), weak_factory_(this) {}
+
 NativeClipboard Clipboard::PlatformCreate(Type type) {
   switch (type) {
     case Type::CopyPaste:

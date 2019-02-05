@@ -14,6 +14,7 @@ class View;
 // Dynamically add event methods to a NSView.
 void AddMouseEventHandlerToClass(Class cl);
 void AddKeyEventHandlerToClass(Class cl);
+void AddDragDropHandlerToClass(Class cl);
 
 // Dispatch mouse events to a view.
 bool DispatchMouseEvent(View* view, NSEvent* event);

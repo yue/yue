@@ -50,6 +50,7 @@ void View::TakeOverView(NativeView view) {
       AddMouseEventHandlerToClass(cl);
     }
     AddKeyEventHandlerToClass(cl);
+    AddDragDropHandlerToClass(cl);
   }
 
   // Initialize private bits of the view.
@@ -186,6 +187,30 @@ void View::SetMouseDownCanMoveWindow(bool yes) {
 
 bool View::IsMouseDownCanMoveWindow() const {
   return [view_ mouseDownCanMoveWindow];
+}
+
+void View::RegisterDraggedTypes(std::vector<Clipboard::Data::Type> types) {
+  NSMutableArray* newTypes = [NSMutableArray array];
+  for (auto type : types) {
+    switch (type) {
+      case Clipboard::Data::Type::Text:
+        [newTypes addObject:NSPasteboardTypeString];
+        break;
+      case Clipboard::Data::Type::HTML:
+        [newTypes addObject:NSHTMLPboardType];
+        [newTypes addObject:NSRTFPboardType];
+        break;
+      case Clipboard::Data::Type::Image:
+        [newTypes addObject:NSPasteboardTypeTIFF];
+        break;
+      case Clipboard::Data::Type::FilePaths:
+        [newTypes addObject:NSFilenamesPboardType];
+        break;
+      default:
+        break;
+    }
+  }
+  [view_ registerForDraggedTypes:newTypes];
 }
 
 void View::PlatformSetCursor(Cursor* cursor) {

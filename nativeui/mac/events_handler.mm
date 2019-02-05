@@ -8,6 +8,7 @@
 
 #include "base/logging.h"
 #include "nativeui/events/event.h"
+#include "nativeui/mac/dragging_info_mac.h"
 #include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/nu_view.h"
 #include "nativeui/view.h"
@@ -55,6 +56,47 @@ void OnKeyEvent(NSView* self, SEL _cmd, NSEvent* event) {
   }
 }
 
+NSDragOperation DraggingEntered(NSView* self, SEL _cmd, id<NSDraggingInfo> info) {
+  View* view = [self shell];
+  if (!view->handle_drag_enter)
+    return NSDragOperationNone;
+
+  DraggingInfoMac dragging_info(info);
+  PointF point([self convertPoint:[info draggingLocation] fromView:nil]);
+  int r = view->handle_drag_enter(view, &dragging_info, point);
+  return [self nuPrivate]->last_drag_operation = r;
+}
+
+NSDragOperation DraggingUpdated(NSView* self, SEL _cmd, id<NSDraggingInfo> info) {
+  View* view = [self shell];
+  if (!view->handle_drag_update)
+    return [self nuPrivate]->last_drag_operation;
+
+  DraggingInfoMac dragging_info(info);
+  PointF point([self convertPoint:[info draggingLocation] fromView:nil]);
+  int r = view->handle_drag_update(view, &dragging_info, point);
+  return [self nuPrivate]->last_drag_operation = r;
+}
+
+void DraggingExited(NSView* self, SEL _cmd, id<NSDraggingInfo> info) {
+  View* view = [self shell];
+  if (view->on_drag_leave.IsEmpty())
+    return;
+
+  DraggingInfoMac dragging_info(info);
+  view->on_drag_leave.Emit(view, &dragging_info);
+}
+
+BOOL PerformDragOperation(NSView* self, SEL _cmd, id<NSDraggingInfo> info) {
+  View* view = [self shell];
+  if (!view->handle_drop)
+    return NO;
+
+  DraggingInfoMac dragging_info(info);
+  PointF point([self convertPoint:[info draggingLocation] fromView:nil]);
+  return view->handle_drop(view, &dragging_info, point);
+}
+
 }  // namespace
 
 void AddMouseEventHandlerToClass(Class cl) {
@@ -76,6 +118,17 @@ void AddKeyEventHandlerToClass(Class cl) {
   class_addMethod(cl, @selector(keyDown:), (IMP)OnKeyEvent, "v@:@");
   class_addMethod(cl, @selector(keyUp:), (IMP)OnKeyEvent, "v@:@");
   class_addMethod(cl, @selector(flagsChanged:), (IMP)OnKeyEvent, "v@:@");
+}
+
+void AddDragDropHandlerToClass(Class cl) {
+  class_addMethod(cl, @selector(draggingEntered:),
+                  (IMP)DraggingEntered, "L@:@:^:");
+  class_addMethod(cl, @selector(draggingUpdated:),
+                  (IMP)DraggingUpdated, "L@:@:^:");
+  class_addMethod(cl, @selector(draggingExited:),
+                  (IMP)DraggingExited, "v@:@:^:");
+  class_addMethod(cl, @selector(performDragOperation:),
+                  (IMP)PerformDragOperation, "B@:@:^:");
 }
 
 bool DispatchMouseEvent(View* view, NSEvent* event) {

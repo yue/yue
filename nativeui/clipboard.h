@@ -90,6 +90,11 @@ class NATIVEUI_EXPORT Clipboard {
     };
   };
 
+#if defined(OS_MACOSX)
+  // Initializing from existing draggingPasteboard.
+  explicit Clipboard(NativeClipboard clipboard);
+#endif
+
   void Clear();
   void SetText(const std::string& text);
   std::string GetText() const;
