@@ -189,6 +189,9 @@ class ViewImpl {
   // Accepted dragged types.
   std::vector<Clipboard::Data::Type> dragged_types_;
 
+  // The last returned drag operation.
+  int last_drag_effect_ = DRAG_OPERATION_UNHANDLED;
+
   // The control state.
   ControlState state_ = ControlState::Normal;
 

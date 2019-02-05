@@ -50,15 +50,15 @@ HRESULT DropTarget::DragEnter(IDataObject* data_object,
                            reinterpret_cast<POINT*>(&cursor_position), *effect);
   }
 
-  current_data_object_ = data_object;
-
   POINT screen_pt = { cursor_position.x, cursor_position.y };
   ::ScreenToClient(hwnd(), &screen_pt);
-  *effect = delegate_->OnDragEnter(
-      current_data_object_.get(), *effect, Point(screen_pt));
 
+  current_data_object_ = data_object;
   last_drag_state_ = {key_state, cursor_position};
-  last_drag_effect_ = static_cast<int>(*effect);
+  int r = delegate_->OnDragEnter(
+      current_data_object_.get(), *effect, Point(screen_pt));
+  *effect = last_drag_effect_ =
+      r == DRAG_OPERATION_UNHANDLED ? DRAG_OPERATION_NONE : r;
   return S_OK;
 }
 
@@ -71,7 +71,7 @@ HRESULT DropTarget::DragOver(DWORD key_state,
     drop_helper->DragOver(reinterpret_cast<POINT*>(&cursor_position), *effect);
 
   // Do not repeatly emit DragOver event if input state is not changed.
-  if (last_drag_effect_ != -1 &&
+  if (last_drag_effect_ >= 0 &&
       key_state == last_drag_state_.key_state &&
       cursor_position.x == last_drag_state_.cursor_position.x &&
       cursor_position.y == last_drag_state_.cursor_position.y) {
@@ -82,16 +82,11 @@ HRESULT DropTarget::DragOver(DWORD key_state,
   POINT screen_pt = { cursor_position.x, cursor_position.y };
   ::ScreenToClient(hwnd(), &screen_pt);
 
-  // The user may indicate using last drag effect.
+  last_drag_state_ = {key_state, cursor_position};
   int r = delegate_->OnDragOver(
       current_data_object_.get(), *effect, Point(screen_pt));
-  if (r == DRAG_OPERATION_LAST)
-    *effect = last_drag_effect_ == -1 ? DRAG_OPERATION_NONE
-                                      : last_drag_effect_;
-  else
-    *effect = last_drag_effect_ = r;
-
-  last_drag_state_ = {key_state, cursor_position};
+  *effect = last_drag_effect_ =
+      r == DRAG_OPERATION_UNHANDLED ? DRAG_OPERATION_NONE : r;
   return S_OK;
 }
 
@@ -122,15 +117,9 @@ HRESULT DropTarget::Drop(IDataObject* data_object,
   POINT screen_pt = { cursor_position.x, cursor_position.y };
   ::ScreenToClient(hwnd(), &screen_pt);
 
-  // The user may indicate using last drag effect.
   int r = delegate_->OnDrop(
       current_data_object_.get(), *effect, Point(screen_pt));
-  if (r == DRAG_OPERATION_LAST)
-    *effect = last_drag_effect_ == -1 ? DRAG_OPERATION_NONE
-                                      : last_drag_effect_;
-  else
-    *effect = last_drag_effect_ = r;
-
+  *effect = r == DRAG_OPERATION_UNHANDLED ? DRAG_OPERATION_NONE : r;
   last_drag_effect_ = -1;
   return S_OK;
 }

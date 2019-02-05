@@ -13,9 +13,8 @@ enum DragOperation {
   DRAG_OPERATION_MOVE = 2,  // DROPEFFECT_MOVE
   DRAG_OPERATION_LINK = 4,  // DROPEFFECT_LINK
 
-  // A pseudo operation that indicates using last operation, it should never be
-  // passed to system APIs.
-  DRAG_OPERATION_LAST = -1,
+  // Indicates the the event is not handled.
+  DRAG_OPERATION_UNHANDLED = -1,
 };
 
 }  // namespace nu

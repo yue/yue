@@ -123,12 +123,18 @@ int ContainerImpl::OnDragUpdate(IDataObject* data,
     if (dragging_dest_ && adapter_->HasChild(dragging_dest_))
       dragging_dest_->OnDragLeave(data);
     dragging_dest_ = dragging_dest;
-    if (dragging_dest_)
-      return dragging_dest_->OnDragEnter(data, effect, point);
+    if (dragging_dest_) {
+      int r = dragging_dest_->OnDragEnter(data, effect, point);
+      if (r != DRAG_OPERATION_UNHANDLED)  // handled by child
+        return r;
+    }
   }
   // Emit drag update events.
-  if (dragging_dest_)
-    return dragging_dest_->OnDragUpdate(data, effect, point);
+  if (dragging_dest_) {
+    int r = dragging_dest_->OnDragUpdate(data, effect, point);
+    if (r != DRAG_OPERATION_UNHANDLED)  // handled by child
+      return r;
+  }
 
   return ViewImpl::OnDragUpdate(data, effect, point);
 }
@@ -147,8 +153,11 @@ int ContainerImpl::OnDrop(IDataObject* data, int effect, const Point& point) {
     dragging_dest_ = nullptr;
 
   ViewImpl* child = FindChildFromPoint(point);
-  if (child)
-    return child->OnDrop(data, effect, point);
+  if (child) {
+    int r = child->OnDrop(data, effect, point);
+    if (r != DRAG_OPERATION_UNHANDLED)  // handled by child
+      return r;
+  }
   return ViewImpl::OnDrop(data, effect, point);
 }
 

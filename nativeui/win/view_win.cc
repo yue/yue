@@ -230,24 +230,28 @@ bool ViewImpl::OnKeyEvent(NativeEvent event) {
 
 int ViewImpl::OnDragEnter(IDataObject* data, int effect, const Point& point) {
   if (!delegate() || !delegate()->handle_drag_enter || !AcceptsDropping(data))
-    return DRAG_OPERATION_NONE;
+    return last_drag_effect_ = DRAG_OPERATION_UNHANDLED;
+
   DraggingInfoWin info(data, effect);
   PointF client_point = ScalePoint(
       PointF(point - size_allocation().OffsetFromOrigin()),
       1.f / scale_factor());
-  return delegate()->handle_drag_enter(delegate(), &info, client_point);
+  return last_drag_effect_ =
+      delegate()->handle_drag_enter(delegate(), &info, client_point);
 }
 
 int ViewImpl::OnDragUpdate(IDataObject* data, int effect, const Point& point) {
   if (!AcceptsDropping(data))
-    return DRAG_OPERATION_NONE;
+    return DRAG_OPERATION_UNHANDLED;
   if (!delegate() || !delegate()->handle_drag_update)
-    return DRAG_OPERATION_LAST;
+    return last_drag_effect_;
+
   DraggingInfoWin info(data, effect);
   PointF client_point = ScalePoint(
       PointF(point - size_allocation().OffsetFromOrigin()),
       1.f / scale_factor());
-  return delegate()->handle_drag_update(delegate(), &info, client_point);
+  return last_drag_effect_ =
+      delegate()->handle_drag_update(delegate(), &info, client_point);
 }
 
 void ViewImpl::OnDragLeave(IDataObject* data) {
@@ -260,13 +264,14 @@ void ViewImpl::OnDragLeave(IDataObject* data) {
 
 int ViewImpl::OnDrop(IDataObject* data, int effect, const Point& point) {
   if (!delegate() || !delegate()->handle_drop || !AcceptsDropping(data))
-    return DRAG_OPERATION_NONE;
+    return DRAG_OPERATION_UNHANDLED;
+
   DraggingInfoWin info(data, effect);
   PointF client_point = ScalePoint(
       PointF(point - size_allocation().OffsetFromOrigin()),
       1.f / scale_factor());
   return delegate()->handle_drop(delegate(), &info, client_point) ?
-      DRAG_OPERATION_LAST : DRAG_OPERATION_NONE;
+      last_drag_effect_ : DRAG_OPERATION_NONE;
 }
 
 bool ViewImpl::AcceptsDropping(IDataObject* data) {
