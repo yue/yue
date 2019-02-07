@@ -89,10 +89,13 @@ void DraggingExited(NSView* self, SEL _cmd, id<NSDraggingInfo> info) {
 
 BOOL PerformDragOperation(NSView* self, SEL _cmd, id<NSDraggingInfo> info) {
   View* view = [self shell];
+
+  // Emit on_drag_leave to match the behavir on GTK.
+  DraggingInfoMac dragging_info(info);
+  view->on_drag_leave.Emit(view, &dragging_info);
+
   if (!view->handle_drop)
     return NO;
-
-  DraggingInfoMac dragging_info(info);
   PointF point([self convertPoint:[info draggingLocation] fromView:nil]);
   return view->handle_drop(view, &dragging_info, point);
 }

@@ -263,6 +263,9 @@ void ViewImpl::OnDragLeave(IDataObject* data) {
 }
 
 int ViewImpl::OnDrop(IDataObject* data, int effect, const Point& point) {
+  // Emit OnDragLeave to match GTK's behavior.
+  OnDragLeave(data);
+
   if (!delegate() || !delegate()->handle_drop || !AcceptsDropping(data))
     return DRAG_OPERATION_UNHANDLED;
 

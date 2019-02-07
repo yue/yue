@@ -54,6 +54,8 @@ class NATIVEUI_EXPORT Clipboard {
 
     ~Data();
 
+    Data Clone() const;
+
     // Getters for data.
     Type type() const { return type_; }
     std::string& str() {

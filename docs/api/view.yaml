@@ -12,7 +12,7 @@ lang_detail:
   cpp: |
     `View` is a `RefCounted` type. Sub-classes of `View` can only be created on
     heap, and must be managed with `scoped_refptr`.
-    Every API that accpets `View*` will store a reference to the pointer, so it
+    Every API that accepets `View*` will store a reference to the pointer, so it
     is safe to pass a newly created raw pointer to public APIs.
 
     ```cpp
@@ -104,6 +104,9 @@ methods:
   - signature: bool IsMouseDownCanMoveWindow() const
     description: Return whether dragging the view would move the window.
 
+  - signature: void RegisterDraggedTypes(std::vector<Clipboard::Data::Type> types)
+    description: Make the view a drag destination that accepets `types`.
+
   - signature: void SetCursor(Cursor* cursor)
     description: Set the cursor to show when hovering the view.
     detail: |
@@ -192,8 +195,60 @@ events:
   - callback: bool on_key_up(View* self, const KeyEvent& event)
     description: Emitted when releasing keyboard.
 
+  - callback: void on_drag_leave(View* self, DraggingInfo* info)>
+    description: Emitted when cursor leaves the view while dragging.
+    detail: |
+      This event will also be emitted before the `handle_drop` event when user
+      drops the data on the view.
+
   - callback: void on_size_changed(View* self)
     description: Emitted when the view's size has been changed.
 
   - callback: void on_capture_lost(View* self)
     description: Emitted when the mouse capture on view has been released.
+
+delegates:
+  - signature: int handle_drag_enter(View* self, DraggingInfo* info, const PointF& point)
+    description: |
+      Called when user drags the cursor over the view for the first time.
+    detail: |
+      A [`DragOperation`](dragoperation.html) should be returned, indicating
+      which dragging operation the destination will perform when cursor is
+      released.
+
+      This delegate will not be called if the view has not registered dragged
+      types, or if the dragged data does not belong to the registered type.
+
+      On Linux the dragged data is not yet available when this is called, you
+      should usually only read data in the `handle_drop` delegate.
+
+  - signature: int handle_drag_update(View* self, DraggingInfo* info, const PointF& point)
+    description: |
+      Called when user moves the cursor over the view while dragging.
+    detail: |
+      A [`DragOperation`](dragoperation.html) should be returned, indicating
+      which dragging operation the destination will perform when cursor is
+      released.
+
+      If this delegate is not implemented, the return value of previous
+      `handle_drag_enter` call will be returned.
+
+      This delegate is usually used when implementing a custom view with
+      multiple dropping areas, you only need to implement `handle_drag_enter`
+      for simple tasks.
+
+      On Linux the dragged data is not yet available when this is called, you
+      should usually only read data in the `handle_drop` delegate.
+
+  - signature: bool handle_drop(View* self, DraggingInfo* info, const PointF& point)
+    description: Called when user releases the dragged data on the view.
+    detail: |
+      Returning `true` will inform the drag source that the data has been
+      accepted with the drag operation returned by previous `handle_drag_enter`
+      or `handle_drag_update` call.
+
+      If the drag operation is `Move`, the drag source may also take actions
+      to "remove" the data on its side.
+
+      Returning `false` will inform the drag source that the drag has been
+      cancelled, and operating system may display some visual effects.

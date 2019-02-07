@@ -1,0 +1,45 @@
+name: DraggingInfo
+header: nativeui/dragging_info.h
+type: class
+namespace: nu
+description: Information about a dragging session.
+
+detail: |
+  This class can not be created by user, its instance can only be received in
+  the drag and drop events.
+
+class_properties:
+  - property: int DragOperationNone
+    lang: ['lua', 'js']
+    description: No drag operation.
+
+  - property: int DragOperationCopy
+    lang: ['lua', 'js']
+    description: Drag operation for `Copy`.
+
+  - property: int DragOperationMove
+    lang: ['lua', 'js']
+    description: Drag operation for `Move`.
+
+  - property: int DragOperationCopy
+    lang: ['lua', 'js']
+    description: Drag operation for `Copy`.
+
+methods:
+  - signature: bool IsDataAvailable(Clipboard::Data::Type type) const
+    description: Return whether the data of `type` is available.
+    detail: |
+      On Linux the dragged data is only available in the `handle_drop` delegate.
+
+  - signature: Clipboard::Data GetData(Clipboard::Data::Type type) const
+    description: Get the data of `type` from clipboard.
+    detail: |
+      On Linux the dragged data is only available in the `handle_drop` delegate.
+
+      You should always check the type of returned data before using it.
+
+  - signature: DragOperation GetDragOperation() const
+    description: Return the drag operation supported by drag source.
+    detail: |
+      Most drag sources support multiple types of operations, you should always
+      check whether an operation is supported by using bitwise AND operator.

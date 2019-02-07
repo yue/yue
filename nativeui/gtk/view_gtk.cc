@@ -6,6 +6,8 @@
 
 #include <gtk/gtk.h>
 
+#include <set>
+
 #include "base/strings/stringprintf.h"
 #include "nativeui/container.h"
 #include "nativeui/cursor.h"
@@ -14,6 +16,8 @@
 #include "nativeui/gfx/geometry/point_f.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/gfx/geometry/rect_f.h"
+#include "nativeui/gtk/clipboard_util.h"
+#include "nativeui/gtk/dragging_info_gtk.h"
 #include "nativeui/gtk/nu_container.h"
 #include "nativeui/gtk/widget_util.h"
 
@@ -29,6 +33,15 @@ struct NUViewPrivate {
   View* delegate;
   // Current view size.
   Size size;
+  // The registerd dragged types for the view.
+  std::set<Clipboard::Data::Type> dragged_types;
+  // The last drag operation, used for replying drag status.
+  int last_drag_operation = -1;
+  int final_drag_operation = -1;
+  // Received drag data.
+  std::map<Clipboard::Data::Type, Clipboard::Data> received_data;
+  // The current drag session.
+  GdkDragContext* drag_context = nullptr;
 };
 
 // Helper to set cursor for view.
@@ -109,6 +122,89 @@ gboolean OnKeyUp(GtkWidget* widget, GdkEvent* event, View* view) {
   return view->on_key_up.Emit(view, KeyEvent(event, widget));
 }
 
+bool OnDragMotion(GtkWidget* widget, GdkDragContext* context,
+                  gint x, gint y, guint time, NUViewPrivate* priv) {
+  // Check if type is registerd.
+  if (gtk_drag_dest_find_target(widget, context, nullptr) == GDK_NONE)
+    return false;
+
+  int r;
+  View* view = priv->delegate;
+  DraggingInfoGtk dragging_info(context);
+  PointF point(x, y);
+  if (priv->last_drag_operation == -1) {
+    // This is the first motion.
+    priv->drag_context = context;
+    if (!view->handle_drag_enter)
+      return false;
+    r = view->handle_drag_enter(view, &dragging_info, point);
+  } else {
+    if (view->handle_drag_update)
+      r = view->handle_drag_update(view, &dragging_info, point);
+    else
+      r = priv->last_drag_operation;
+  }
+
+  priv->last_drag_operation = r;
+  if (r == DRAG_OPERATION_NONE)
+    return false;
+  gdk_drag_status(context, static_cast<GdkDragAction>(r), time);
+  return true;
+}
+
+void OnDragLeave(GtkWidget* widget, GdkDragContext* context, guint time,
+                 NUViewPrivate* priv) {
+  priv->final_drag_operation = priv->last_drag_operation;
+  priv->last_drag_operation = -1;
+
+  View* view = priv->delegate;
+  if (view->on_drag_leave.IsEmpty())
+    return;
+  DraggingInfoGtk dragging_info(context);
+  view->on_drag_leave.Emit(view, &dragging_info);
+}
+
+bool OnDragDrop(GtkWidget* widget, GdkDragContext* context,
+                gint x, gint y, guint time, NUViewPrivate* priv) {
+  // This is the last step of drop, request data and wait.
+  for (auto type : priv->dragged_types)
+    gtk_drag_get_data(widget, context, GetAtomForType(type), time);
+  return true;
+}
+
+void OnDragDataReceived(GtkWidget* widget, GdkDragContext* context,
+                        gint x, gint y, GtkSelectionData* selection,
+                        guint info, guint time, NUViewPrivate* priv) {
+  // Do nothing if receiving data from old context.
+  if (priv->drag_context != context)
+    return;
+
+  // Don't continue until all data have been received.
+  auto type = static_cast<Clipboard::Data::Type>(info);
+  priv->received_data[type] = GetDataFromSelection(selection, type);
+  if (priv->received_data.size() < priv->dragged_types.size())
+    return;
+
+  // End of session.
+  priv->drag_context = nullptr;
+
+  // Emit events.
+  View* view = priv->delegate;
+  if (gtk_drag_dest_find_target(widget, context, nullptr) != GDK_NONE &&
+      view->handle_drop) {
+    DraggingInfoGtk dragging_info(context, std::move(priv->received_data));
+    if (view->handle_drop(view, &dragging_info, PointF(x, y))) {
+      gtk_drag_finish(context, true,
+                      priv->final_drag_operation & GDK_ACTION_MOVE, time);
+      return;
+    }
+  }
+
+  // Clear and fail.
+  priv->received_data.clear();
+  gtk_drag_finish(context, false, false, time);
+}
+
 }  // namespace
 
 void View::PlatformDestroy() {
@@ -146,6 +242,10 @@ void View::TakeOverView(NativeView view) {
   g_signal_connect(view, "leave-notify-event", G_CALLBACK(OnMouseEvent), this);
   g_signal_connect(view, "key-press-event", G_CALLBACK(OnKeyDown), this);
   g_signal_connect(view, "key-release-event", G_CALLBACK(OnKeyUp), this);
+  g_signal_connect(view, "drag-motion", G_CALLBACK(OnDragMotion), priv);
+  g_signal_connect(view, "drag-leave", G_CALLBACK(OnDragLeave), priv);
+  g_signal_connect(view, "drag-drop", G_CALLBACK(OnDragDrop), priv);
+  g_signal_connect(view, "drag-data-received", G_CALLBACK(OnDragDataReceived), priv);  // NOLINT
 }
 
 Vector2dF View::OffsetFromView(const View* from) const {
@@ -295,6 +395,33 @@ void View::SetMouseDownCanMoveWindow(bool yes) {
 
 bool View::IsMouseDownCanMoveWindow() const {
   return g_object_get_data(G_OBJECT(view_), "draggable");
+}
+
+void View::RegisterDraggedTypes(std::vector<Clipboard::Data::Type> types) {
+  auto* priv = static_cast<NUViewPrivate*>(
+      g_object_get_data(G_OBJECT(view_), "private"));
+  for (auto type : types)
+    priv->dragged_types.insert(type);
+
+  auto defaults = static_cast<GtkDestDefaults>(0);
+  if (priv->dragged_types.empty()) {
+    gtk_drag_dest_set(view_, defaults, nullptr, 0, GDK_ACTION_DEFAULT);
+    return;
+  }
+
+  GtkTargetList* targets = gtk_target_list_new(0, 0);
+  for (auto type : priv->dragged_types)
+    FillTargetList(targets, type, static_cast<int>(type));
+
+  int size = 0;
+  if (GtkTargetEntry* table = gtk_target_table_new_from_list(targets, &size)) {
+    auto action = static_cast<GdkDragAction>(GDK_ACTION_COPY |
+                                             GDK_ACTION_MOVE |
+                                             GDK_ACTION_LINK);
+    gtk_drag_dest_set(view_, defaults, table, size, action);
+    gtk_target_table_free(table, size);
+  }
+  gtk_target_list_unref(targets);
 }
 
 void View::PlatformSetCursor(Cursor* cursor) {

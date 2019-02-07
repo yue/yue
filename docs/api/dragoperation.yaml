@@ -1,0 +1,27 @@
+name: DragOperation
+header: nativeui/dragging_info.h
+type: enum
+namespace: nu
+description: Operations of dragging.
+
+detail: |
+  The `DragOperation` are integer masks that can be operated with bitwise
+  operators.
+
+  The `None` operation means dragging is not allowed, and it should not be used
+  together with other operations.
+
+lang_detail:
+  cpp: |
+    This type is an `enum` with following values:
+
+    * `DRAG_OPERATION_NONE`
+    * `DRAG_OPERATION_COPY`
+    * `DRAG_OPERATION_MOVE`
+    * `DRAG_OPERATION_LINK`
+
+  lua: &ref |
+    The values of `DragOperation` are available as the class properties of the
+    [`DraggingInfo`](dragginginfo.html) class.
+
+  js: *ref

@@ -38,6 +38,26 @@ Clipboard::Data& Clipboard::Data::operator=(Data&& that) {
   return *this;
 }
 
+Clipboard::Data Clipboard::Data::Clone() const {
+  Data ret;
+  ret.type_ = type_;
+  switch (type_) {
+    case Type::Text:
+    case Type::HTML:
+      new (&ret.str_) std::string(str_);
+      break;
+    case Type::Image:
+      new (&ret.image_) scoped_refptr<Image>(image_);
+      break;
+    case Type::FilePaths:
+      new (&ret.file_paths_) std::vector<base::FilePath>(file_paths_);
+      break;
+    case Type::None:
+      break;
+  }
+  return ret;
+}
+
 void Clipboard::Data::InternalCleanup() {
   switch (type_) {
     case Type::None:
