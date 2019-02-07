@@ -8,6 +8,7 @@
 #define LUA_TYPES_H_
 
 #include <map>
+#include <set>
 #include <string>
 #include <tuple>
 #include <utility>
@@ -251,6 +252,37 @@ struct Type<std::vector<T>> {
         return false;
       lua_pop(state, 1);
       out->push_back(std::move(value));
+    }
+    return true;
+  }
+};
+
+template<typename T>
+struct Type<std::set<T>> {
+  static constexpr const char* name = "table";
+  static inline void Push(State* state, const std::set<T>& vec) {
+    int size = static_cast<int>(vec.size());  // lua does not like size_t
+    lua_createtable(state, size, 0);
+    int i = 0;
+    for (const T& element : vec) {
+      Type<T>::Push(state, element);
+      lua_rawseti(state, -2, ++i);
+    }
+  }
+  static inline bool To(State* state, int index, std::set<T>* out) {
+    if (GetType(state, index) != LuaType::Table)
+      return false;
+    StackAutoReset reset(state);
+    lua_pushnil(state);
+    while (lua_next(state, index) != 0) {
+      if (GetType(state, -2) != LuaType::Number ||  // check array type
+          lua_tointeger(state, -2) != static_cast<int>(out->size() + 1))
+        return false;
+      T value;
+      if (!Type<T>::To(state, -1, &value))
+        return false;
+      lua_pop(state, 1);
+      out->insert(std::move(value));
     }
     return true;
   }

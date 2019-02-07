@@ -104,7 +104,7 @@ methods:
   - signature: bool IsMouseDownCanMoveWindow() const
     description: Return whether dragging the view would move the window.
 
-  - signature: void RegisterDraggedTypes(std::vector<Clipboard::Data::Type> types)
+  - signature: void RegisterDraggedTypes(std::set<Clipboard::Data::Type> types)
     description: Make the view a drag destination that accepets `types`.
 
   - signature: void SetCursor(Cursor* cursor)

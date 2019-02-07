@@ -6,6 +6,7 @@
 #define V8BINDING_TYPES_H_
 
 #include <map>
+#include <set>
 #include <string>
 #include <tuple>
 #include <utility>
@@ -265,10 +266,8 @@ struct Type<std::vector<T>> {
                                    const std::vector<T>& vec) {
     int size = static_cast<int>(vec.size());  // v8 does not like size_t
     auto arr = v8::Array::New(context->GetIsolate(), size);
-    for (int i = 0; i< size; ++i) {
-      if (arr->Set(context, i, Type<T>::ToV8(context, vec[i])).IsNothing())
-        break;
-    }
+    for (int i = 0; i< size; ++i)
+      arr->Set(context, i, Type<T>::ToV8(context, vec[i])).IsNothing();
     return arr;
   }
   static bool FromV8(v8::Local<v8::Context> context,
@@ -283,6 +282,36 @@ struct Type<std::vector<T>> {
       if (el.IsEmpty() ||
           !Type<T>::FromV8(context, el.ToLocalChecked(), &(*out)[i]))
         return false;
+    }
+    return true;
+  }
+};
+
+template<typename T>
+struct Type<std::set<T>> {
+  static constexpr const char* name = "Array";
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   const std::set<T>& vec) {
+    int size = static_cast<int>(vec.size());  // v8 does not like size_t
+    auto arr = v8::Array::New(context->GetIsolate(), size);
+    int i = 0;
+    for (const auto& element : vec)
+      arr->Set(context, i++, Type<T>::ToV8(context, element)).IsNothing();
+    return arr;
+  }
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     std::set<T>* out) {
+    if (!value->IsArray())
+      return false;
+    v8::Local<v8::Array> arr = value.As<v8::Array>();
+    for (uint32_t i = 0; i < arr->Length(); ++i) {
+      v8::MaybeLocal<v8::Value> el = arr->Get(context, i);
+      T element;
+      if (el.IsEmpty() ||
+          !Type<T>::FromV8(context, el.ToLocalChecked(), &element))
+        return false;
+      out->insert(std::move(element));
     }
     return true;
   }

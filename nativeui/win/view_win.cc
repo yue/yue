@@ -122,7 +122,7 @@ void ViewImpl::VisibilityChanged() {
     SetFocus(false);
 }
 
-void ViewImpl::RegisterDraggedTypes(std::vector<Clipboard::Data::Type> types) {
+void ViewImpl::RegisterDraggedTypes(std::set<Clipboard::Data::Type> types) {
   dragged_types_ = std::move(types);
   if (!dragged_types_.empty() && window())
     window()->RegisterDropTarget();
@@ -452,7 +452,7 @@ bool View::IsMouseDownCanMoveWindow() const {
   return view_->is_draggable();
 }
 
-void View::RegisterDraggedTypes(std::vector<Clipboard::Data::Type> types) {
+void View::RegisterDraggedTypes(std::set<Clipboard::Data::Type> types) {
   view_->RegisterDraggedTypes(std::move(types));
 }
 

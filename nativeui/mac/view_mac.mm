@@ -189,7 +189,7 @@ bool View::IsMouseDownCanMoveWindow() const {
   return [view_ mouseDownCanMoveWindow];
 }
 
-void View::RegisterDraggedTypes(std::vector<Clipboard::Data::Type> types) {
+void View::RegisterDraggedTypes(std::set<Clipboard::Data::Type> types) {
   NSMutableArray* newTypes = [NSMutableArray array];
   for (auto type : types) {
     switch (type) {

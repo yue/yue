@@ -5,8 +5,8 @@
 #ifndef NATIVEUI_VIEW_H_
 #define NATIVEUI_VIEW_H_
 
+#include <set>
 #include <string>
-#include <vector>
 
 #include "base/memory/ref_counted.h"
 #include "nativeui/clipboard.h"
@@ -92,7 +92,7 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   bool IsMouseDownCanMoveWindow() const;
 
   // Drag and drop.
-  void RegisterDraggedTypes(std::vector<Clipboard::Data::Type> types);
+  void RegisterDraggedTypes(std::set<Clipboard::Data::Type> types);
 
   // Custom cursor when mouse hovers the view.
   void SetCursor(Cursor* cursor);

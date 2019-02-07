@@ -5,7 +5,7 @@
 #ifndef NATIVEUI_WIN_VIEW_WIN_H_
 #define NATIVEUI_WIN_VIEW_WIN_H_
 
-#include <vector>
+#include <set>
 
 #include "nativeui/cursor.h"
 #include "nativeui/gfx/win/painter_win.h"
@@ -65,7 +65,7 @@ class ViewImpl {
   virtual void VisibilityChanged();
 
   // Drag and drop.
-  virtual void RegisterDraggedTypes(std::vector<Clipboard::Data::Type> types);
+  virtual void RegisterDraggedTypes(std::set<Clipboard::Data::Type> types);
 
   // Set styles.
   virtual void SetFont(Font* font);
@@ -187,7 +187,7 @@ class ViewImpl {
   bool is_tree_visible_ = true;
 
   // Accepted dragged types.
-  std::vector<Clipboard::Data::Type> dragged_types_;
+  std::set<Clipboard::Data::Type> dragged_types_;
 
   // The last returned drag operation.
   int last_drag_effect_ = DRAG_OPERATION_UNHANDLED;

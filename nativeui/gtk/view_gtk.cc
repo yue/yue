@@ -6,8 +6,6 @@
 
 #include <gtk/gtk.h>
 
-#include <set>
-
 #include "base/strings/stringprintf.h"
 #include "nativeui/container.h"
 #include "nativeui/cursor.h"
@@ -397,11 +395,10 @@ bool View::IsMouseDownCanMoveWindow() const {
   return g_object_get_data(G_OBJECT(view_), "draggable");
 }
 
-void View::RegisterDraggedTypes(std::vector<Clipboard::Data::Type> types) {
+void View::RegisterDraggedTypes(std::set<Clipboard::Data::Type> types) {
   auto* priv = static_cast<NUViewPrivate*>(
       g_object_get_data(G_OBJECT(view_), "private"));
-  for (auto type : types)
-    priv->dragged_types.insert(type);
+  priv->dragged_types = std::move(types);
 
   auto defaults = static_cast<GtkDestDefaults>(0);
   if (priv->dragged_types.empty()) {
