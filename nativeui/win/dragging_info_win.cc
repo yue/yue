@@ -39,7 +39,7 @@ bool DraggingInfoWin::IsDataAvailable(Data::Type type) const {
   FORMATETC format = {0};
   if (!GetFormatEtc(type, &format))
     return false;
-  return SUCCEEDED(data_->QueryGetData(&format));
+  return data_->QueryGetData(&format) == S_OK;
 }
 
 Clipboard::Data DraggingInfoWin::GetData(Data::Type type) const {
