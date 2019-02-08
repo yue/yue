@@ -35,6 +35,9 @@ class NATIVEUI_EXPORT Image : public base::RefCounted<Image> {
   // Create an image from memory.
   Image(const Buffer& buffer, float scale_factor);
 
+  // Whether the image is empty.
+  bool IsEmpty();
+
   // Get the size of image.
   SizeF GetSize() const;
 
@@ -69,7 +72,10 @@ class NATIVEUI_EXPORT Image : public base::RefCounted<Image> {
   float scale_factor_ = 1.f;
   NativeImage image_;
 
-#if defined(OS_MACOSX)
+#if defined(OS_LINUX)
+  // GTK does not have concept of empty image.
+  bool is_empty_ = false;
+#elif defined(OS_MACOSX)
   // The frame durations.
   std::vector<float> durations_;
 #endif

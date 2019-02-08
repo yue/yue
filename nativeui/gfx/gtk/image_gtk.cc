@@ -21,7 +21,7 @@ NativeImage CreateEmptyImage() {
 
 }  // namespace
 
-Image::Image() : image_(CreateEmptyImage()) {}
+Image::Image() : image_(CreateEmptyImage()), is_empty_(true) {}
 
 Image::Image(const base::FilePath& p)
     : scale_factor_(GetScaleFactorFromFilePath(p)),
@@ -29,8 +29,10 @@ Image::Image(const base::FilePath& p)
   // When file reading failed |image_| could be nullptr, having a null
   // native image is very dangerous so we create an empty image when it
   // happens.
-  if (!image_)
+  if (!image_) {
     image_ = CreateEmptyImage();
+    is_empty_ = true;
+  }
 }
 
 Image::Image(const Buffer& buffer, float scale_factor)
@@ -38,8 +40,10 @@ Image::Image(const Buffer& buffer, float scale_factor)
   GInputStream* stream = g_memory_input_stream_new_from_data(
       buffer.content(), buffer.size(), nullptr);
   image_ = gdk_pixbuf_animation_new_from_stream(stream, nullptr, nullptr);
-  if (!image_)
+  if (!image_) {
     image_ = CreateEmptyImage();
+    is_empty_ = true;
+  }
   g_object_unref(stream);
 }
 
@@ -47,7 +51,13 @@ Image::~Image() {
   g_object_unref(image_);
 }
 
+bool Image::IsEmpty() const {
+  return is_empty_;
+}
+
 SizeF Image::GetSize() const {
+  if (is_empty_)
+    return SizeF();
   return ScaleSize(SizeF(gdk_pixbuf_animation_get_width(image_),
                          gdk_pixbuf_animation_get_height(image_)),
                    1.f / scale_factor_);

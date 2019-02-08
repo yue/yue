@@ -99,6 +99,10 @@ Image::~Image() {
   [image_ release];
 }
 
+bool Image::IsEmpty() {
+  return [[image_ representations] count] == 0;
+}
+
 SizeF Image::GetSize() const {
   return SizeF([image_ size]);
 }

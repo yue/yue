@@ -678,12 +678,14 @@ struct Type<nu::Image> {
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
+        "createEmpty", &CreateOnHeap<nu::Image>,
         "createFromPath", &CreateOnHeap<nu::Image, const base::FilePath&>,
         "createFromBuffer", &CreateOnHeap<nu::Image, const nu::Buffer&, float>);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
+        "isEmpty", &nu::Image::IsEmpty,
         "getSize", &nu::Image::GetSize,
         "getScaleFactor", &nu::Image::GetScaleFactor);
   }
