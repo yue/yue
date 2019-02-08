@@ -15,21 +15,6 @@
 
 namespace nu {
 
-namespace {
-
-bool GetFormatEtc(Clipboard::Data::Type type, FORMATETC* format) {
-  int cf_type = ToCFType(type);
-  if (cf_type < 0)
-    return false;
-  format->cfFormat = static_cast<CLIPFORMAT>(cf_type);
-  format->dwAspect = DVASPECT_CONTENT;
-  format->lindex = -1;
-  format->tymed = TYMED_HGLOBAL;
-  return true;
-}
-
-}  // namespace
-
 DraggingInfoWin::DraggingInfoWin(IDataObject* data, int effect)
     : DraggingInfo(effect), data_(data) {}
 

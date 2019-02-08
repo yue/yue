@@ -19,6 +19,9 @@ int ToCFType(Clipboard::Data::Type type);
 // Return the CF format for HTML.
 UINT GetHTMLFormat();
 
+// Fill the format according to type.
+bool GetFormatEtc(Clipboard::Data::Type type, FORMATETC* format);
+
 // Read filenames from HDROP.
 void GetFilePathsFromHDrop(HDROP drop, std::vector<base::FilePath>* result);
 

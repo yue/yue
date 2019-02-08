@@ -211,10 +211,11 @@ class ClipboardImpl {
           return Data();
         return Data(std::move(result));
       }
-      default:
-        NOTREACHED() << "Can not get clipboard data without type";
+      case Data::Type::None:
         return Data();
     }
+    NOTREACHED() << "Invalid type: " << static_cast<int>(type);
+    return Data();
   }
 
   void SetData(std::vector<Data> objects) {
@@ -253,8 +254,10 @@ class ClipboardImpl {
           }
           break;
         }
+        case Data::Type::None:
+          break;
         default:
-          NOTREACHED() << "Can not set clipboard data without type";
+          NOTREACHED() << "Invalid type: " << static_cast<int>(data.type());
       }
     }
   }
@@ -298,8 +301,33 @@ class ClipboardImpl {
     BITMAPINFO* bitmap = static_cast<BITMAPINFO*>(::GetClipboardData(CF_DIBV5));
     if (!bitmap)
       return nullptr;
-    Gdiplus::Bitmap* ret = Gdiplus::Bitmap::FromBITMAPINFO(
-        bitmap, bitmap + sizeof(BITMAPINFO));
+
+    // For more information on BITMAPINFOHEADER and biBitCount definition,
+    // see https://docs.microsoft.com/en-us/previous-versions//dd183376(v=vs.85)
+    int color_table_length = 0;
+    switch (bitmap->bmiHeader.biBitCount) {
+      case 1:
+      case 4:
+      case 8:
+        color_table_length = bitmap->bmiHeader.biClrUsed
+            ? bitmap->bmiHeader.biClrUsed
+            : 1 << bitmap->bmiHeader.biBitCount;
+        break;
+      case 16:
+      case 32:
+        if (bitmap->bmiHeader.biCompression == BI_BITFIELDS)
+          color_table_length = 3;
+        break;
+      case 24:
+        break;
+      default:
+        NOTREACHED();
+    }
+    void* bits = reinterpret_cast<char*>(bitmap) +
+                 bitmap->bmiHeader.biSize +
+                 color_table_length * sizeof(RGBQUAD);
+
+    Gdiplus::Bitmap* ret = Gdiplus::Bitmap::FromBITMAPINFO(bitmap, bits);
     if (!ret)
       return nullptr;
     return new Image(ret);

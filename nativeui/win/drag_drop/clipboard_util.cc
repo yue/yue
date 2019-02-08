@@ -27,15 +27,27 @@ int ToCFType(Clipboard::Data::Type type) {
       return CF_DIBV5;
     case Clipboard::Data::Type::FilePaths:
       return CF_HDROP;
-    default:
-      NOTREACHED() << "Invalid clipboard data type: " << static_cast<int>(type);
+    case Clipboard::Data::Type::None:
       return -1;
   }
+  NOTREACHED() << "Invalid type: " << static_cast<int>(type);
+  return -1;
 }
 
 UINT GetHTMLFormat() {
   static UINT html_format = ::RegisterClipboardFormat(L"HTML Format");
   return html_format;
+}
+
+bool GetFormatEtc(Clipboard::Data::Type type, FORMATETC* format) {
+  int cf_type = ToCFType(type);
+  if (cf_type < 0)
+    return false;
+  format->cfFormat = static_cast<CLIPFORMAT>(cf_type);
+  format->dwAspect = DVASPECT_CONTENT;
+  format->lindex = -1;
+  format->tymed = TYMED_HGLOBAL;
+  return true;
 }
 
 void GetFilePathsFromHDrop(HDROP drop, std::vector<base::FilePath>* result) {
