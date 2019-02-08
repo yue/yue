@@ -5,6 +5,7 @@
 #include "nativeui/win/view_win.h"
 
 #include <utility>
+#include <vector>
 
 #include "nativeui/events/event.h"
 #include "nativeui/events/win/event_win.h"
@@ -122,12 +123,6 @@ void ViewImpl::VisibilityChanged() {
     SetFocus(false);
 }
 
-void ViewImpl::RegisterDraggedTypes(std::set<Clipboard::Data::Type> types) {
-  dragged_types_ = std::move(types);
-  if (!dragged_types_.empty() && window())
-    window()->RegisterDropTarget();
-}
-
 void ViewImpl::SetFont(Font* font) {
   font_ = font;
   Invalidate();
@@ -141,6 +136,12 @@ void ViewImpl::SetColor(Color color) {
 void ViewImpl::SetBackgroundColor(Color color) {
   background_color_ = color;
   Invalidate();
+}
+
+void ViewImpl::RegisterDraggedTypes(std::set<Clipboard::Data::Type> types) {
+  dragged_types_ = std::move(types);
+  if (!dragged_types_.empty() && window())
+    window()->RegisterDropTarget();
 }
 
 void ViewImpl::Draw(PainterWin* painter, const Rect& dirty) {
@@ -450,6 +451,24 @@ void View::SetMouseDownCanMoveWindow(bool yes) {
 
 bool View::IsMouseDownCanMoveWindow() const {
   return view_->is_draggable();
+}
+
+int View::StartDragWithImage(
+    std::vector<Clipboard::Data> data, int operations, Image* image) {
+  if (view_->window())
+    return view_->window()->StartDrag(std::move(data), operations, image);
+  return DRAG_OPERATION_NONE;
+}
+
+void View::CancelDrag() {
+  if (view_->window())
+    view_->window()->CancelDrag();
+}
+
+bool View::IsDragging() const {
+  if (view_->window())
+    return view_->window()->drag_drop_in_progress();
+  return false;
 }
 
 void View::RegisterDraggedTypes(std::set<Clipboard::Data::Type> types) {

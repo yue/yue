@@ -6,6 +6,10 @@
 #ifndef NATIVEUI_WIN_WINDOW_WIN_H_
 #define NATIVEUI_WIN_WINDOW_WIN_H_
 
+#include <set>
+#include <vector>
+
+#include "nativeui/win/drag_drop/drag_source.h"
 #include "nativeui/win/drag_drop/drop_target.h"
 #include "nativeui/win/focus_manager.h"
 #include "nativeui/win/util/win32_window.h"
@@ -13,12 +17,14 @@
 
 namespace nu {
 
-class DropTarget;
+class DataObject;
 
 class WindowImpl : public Win32Window,
+                   public DragSource::Delegate,
                    public DropTarget::Delegate {
  public:
   WindowImpl(const Window::Options& options, Window* delegate);
+  ~WindowImpl();
 
   void SetPixelBounds(const Rect& bounds);
   Rect GetPixelBounds();
@@ -42,6 +48,9 @@ class WindowImpl : public Win32Window,
   bool HasWindowStyle(LONG style) const;
   void ExecuteSystemMenuCommand(int command);
 
+  int StartDrag(
+      std::vector<Clipboard::Data> data, int operations, Image* image);
+  void CancelDrag();
   void RegisterDropTarget();
 
   // Min/max sizes.
@@ -54,6 +63,7 @@ class WindowImpl : public Win32Window,
   ViewImpl* captured_view() const { return captured_view_; }
   Color background_color() const { return background_color_; }
   bool has_shadow() const { return has_shadow_; }
+  bool drag_drop_in_progress() const { return drag_drop_in_progress_; }
   float scale_factor() const { return scale_factor_; }
   Window* delegate() { return delegate_; }
 
@@ -114,6 +124,11 @@ class WindowImpl : public Win32Window,
   LRESULT OnNCCalcSize(BOOL mode, LPARAM l_param);
   LRESULT OnSetCursor(UINT message, WPARAM w_param, LPARAM l_param);
 
+  // DragSource::Delegate:
+  void OnDragSourceCancel() override;
+  void OnDragSourceDrop() override;
+  void OnDragSourceMove() override;
+
   // DropTarget::Delegate:
   int OnDragEnter(IDataObject* data, int effect, const Point& point) override;
   int OnDragOver(IDataObject* data, int effect, const Point& point) override;
@@ -152,7 +167,11 @@ class WindowImpl : public Win32Window,
   bool has_shadow_ = true;
 
   // Drag and drop.
+  Microsoft::WRL::ComPtr<DragSource> drag_source_;
+  scoped_refptr<DataObject> drag_data_;
   scoped_refptr<DropTarget> drop_target_;
+
+  bool drag_drop_in_progress_ = false;
 
   // The scale factor of current window.
   float scale_factor_;

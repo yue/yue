@@ -11,6 +11,7 @@
 #include <memory>
 #include <string>
 #include <tuple>
+#include <utility>
 
 #include "base/strings/utf_string_conversions.h"
 #include "base/win/windows_version.h"
@@ -25,7 +26,8 @@
 #include "nativeui/gfx/win/painter_win.h"
 #include "nativeui/gfx/win/screen_win.h"
 #include "nativeui/menu_bar.h"
-#include "nativeui/win/drag_drop/drop_target.h"
+#include "nativeui/win/drag_drop/clipboard_util.h"
+#include "nativeui/win/drag_drop/data_object.h"
 #include "nativeui/win/menu_base_win.h"
 #include "nativeui/win/subwin_view.h"
 #include "nativeui/win/util/hwnd_util.h"
@@ -90,6 +92,11 @@ WindowImpl::WindowImpl(const Window::Options& options, Window* delegate)
     // Change default background color to transparent.
     background_color_ = Color(0, 0, 0, 0);
   }
+}
+
+WindowImpl::~WindowImpl() {
+  if (drag_drop_in_progress_)
+    CancelDrag();
 }
 
 void WindowImpl::SetPixelBounds(const Rect& bounds) {
@@ -223,6 +230,52 @@ bool WindowImpl::HasWindowStyle(LONG style) const {
 
 void WindowImpl::ExecuteSystemMenuCommand(int command) {
   SendMessage(hwnd(), WM_SYSCOMMAND, command, 0);
+}
+
+int WindowImpl::StartDrag(
+    std::vector<Clipboard::Data> data, int operations, Image* image) {
+  if (drag_source_)
+    return DRAG_OPERATION_NONE;
+
+  drag_source_ = DragSource::Create(this);
+  drag_data_ = new DataObject(std::move(data));
+  drag_drop_in_progress_ = true;
+
+  if (image) {
+    Microsoft::WRL::ComPtr<IDragSourceHelper> helper;
+    if (SUCCEEDED(CoCreateInstance(CLSID_DragDropHelper, 0,
+                                   CLSCTX_INPROC_SERVER,
+                                   IID_PPV_ARGS(&helper)))) {
+      // InitializeFromBitmap() takes ownership of |hbitmap|.
+      SHDRAGIMAGE sdi = {0};
+      sdi.sizeDragImage.cx = image->GetSize().width();
+      sdi.sizeDragImage.cy = image->GetSize().height();
+      sdi.crColorKey = 0x00FFFFFF;
+      sdi.hbmpDragImage = GetBitmapFromImage(image);
+      helper->InitializeFromBitmap(&sdi, drag_data_.get());
+    }
+  }
+
+  DWORD effect;
+  HRESULT result = DoDragDrop(
+      drag_data_.get(), drag_source_.Get(), operations, &effect);
+
+  drag_drop_in_progress_ = false;
+  drag_source_ = nullptr;
+  drag_data_ = nullptr;
+
+  if (result != DRAGDROP_S_DROP)
+    effect = DRAG_OPERATION_NONE;
+
+  return effect;
+}
+
+void WindowImpl::CancelDrag() {
+  if (drag_source_)
+    drag_source_->CancelDrag();
+  drag_drop_in_progress_ = false;
+  drag_source_ = nullptr;
+  drag_data_ = nullptr;
 }
 
 void WindowImpl::RegisterDropTarget() {
@@ -665,6 +718,16 @@ LRESULT WindowImpl::OnSetCursor(UINT message, WPARAM w_param, LPARAM l_param) {
   }
   ::SetCursor(::LoadCursor(NULL, cursor));
   return TRUE;
+}
+
+void WindowImpl::OnDragSourceCancel() {
+}
+
+void WindowImpl::OnDragSourceDrop() {
+  // data->set_in_drag_loop(false);
+}
+
+void WindowImpl::OnDragSourceMove() {
 }
 
 int WindowImpl::OnDragEnter(IDataObject* data, int effect, const Point& point) {

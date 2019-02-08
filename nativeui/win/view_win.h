@@ -64,13 +64,16 @@ class ViewImpl {
   // This view or parent view has changed its visibility.
   virtual void VisibilityChanged();
 
-  // Drag and drop.
-  virtual void RegisterDraggedTypes(std::set<Clipboard::Data::Type> types);
-
   // Set styles.
   virtual void SetFont(Font* font);
   virtual void SetColor(Color color);
   virtual void SetBackgroundColor(Color color);
+
+  /////////////////////////////////////////////////////////////////////////////
+  // Common APIs.
+
+  // Drag and drop.
+  void RegisterDraggedTypes(std::set<Clipboard::Data::Type> types);
 
   /////////////////////////////////////////////////////////////////////////////
   // Events
@@ -93,7 +96,15 @@ class ViewImpl {
   // Called when the view lost capture.
   virtual void OnCaptureLost();
 
-  // The drag and drop events.
+  /////////////////////////////////////////////////////////////////////////////
+  // Drag and drop
+
+  // Drop source events.
+  // virtual void OnDragSourceCancel();
+  // virtual void OnDragSourceDrop();
+  // virtual void OnDragSourceMove();
+
+  // Drop target events.
   virtual int OnDragEnter(IDataObject* data, int effect, const Point& point);
   virtual int OnDragUpdate(IDataObject* data, int effect, const Point& point);
   virtual void OnDragLeave(IDataObject* data);

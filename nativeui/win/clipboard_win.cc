@@ -8,8 +8,6 @@
 #include <algorithm>
 
 #include "base/strings/utf_string_conversions.h"
-#include "nativeui/gfx/canvas.h"
-#include "nativeui/gfx/painter.h"
 #include "nativeui/gfx/win/gdiplus.h"
 #include "nativeui/win/drag_drop/clipboard_util.h"
 #include "nativeui/win/util/win32_window.h"
@@ -235,17 +233,9 @@ class ClipboardImpl {
           WriteToClipboard(GetHTMLFormat(),
                            CreateGlobalData(HtmlToCFHtml(data.str(), "")));
           break;
-        case Data::Type::Image: {
-          scoped_refptr<Canvas> canvas = new Canvas(
-              data.image()->GetSize(), data.image()->GetScaleFactor());
-          canvas->GetPainter()->DrawImage(data.image(),
-                                          RectF(data.image()->GetSize()));
-          HBITMAP bitmap;
-          canvas->GetBitmap()->GetHBITMAP(Gdiplus::Color(0, 255, 255, 255),
-                                          &bitmap);
-          WriteToClipboard(CF_BITMAP, bitmap);
+        case Data::Type::Image:
+          WriteToClipboard(CF_BITMAP, GetBitmapFromImage(data.image()));
           break;
-        }
         case Data::Type::FilePaths: {
           STGMEDIUM* storage = GetStorageForFileNames(data.file_paths());
           if (storage) {

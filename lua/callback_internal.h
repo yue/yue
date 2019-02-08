@@ -94,10 +94,11 @@ class Invoker<IndicesHolder<indices...>, ArgTypes...>
   template<typename ReturnType>
   void DispatchToCallback(
       const std::function<ReturnType(ArgTypes...)>& callback) {
-    ReturnType&& r = callback(ArgumentHolder<indices, ArgTypes>::value...);
+    ReturnType r =
+        callback(std::move(ArgumentHolder<indices, ArgTypes>::value)...);
     // Convert result to lua if there is no error happened.
     if (!context_->has_error)
-      Push(context_->state, r);
+      Push(context_->state, std::move(r));
   }
 
   // In C++, you can declare the function foo(void), but you can't pass a void

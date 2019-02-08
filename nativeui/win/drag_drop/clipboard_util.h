@@ -25,6 +25,9 @@ bool GetFormatEtc(Clipboard::Data::Type type, FORMATETC* format);
 // Read filenames from HDROP.
 void GetFilePathsFromHDrop(HDROP drop, std::vector<base::FilePath>* result);
 
+// Convert image to HBITMAP.
+HBITMAP GetBitmapFromImage(Image* image);
+
 // Creates a new STGMEDIUM object to hold files.
 STGMEDIUM* GetStorageForFileNames(const std::vector<base::FilePath>& paths);
 

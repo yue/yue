@@ -4,6 +4,8 @@
 
 #include "nativeui/view.h"
 
+#include <utility>
+
 #include "base/strings/string_util.h"
 #include "nativeui/container.h"
 #include "nativeui/cursor.h"
@@ -65,6 +67,10 @@ void View::Layout() {
   // By default just make parent do layout.
   if (GetParent() && GetParent()->IsContainer())
     static_cast<Container*>(GetParent())->Layout();
+}
+
+int View::StartDrag(std::vector<Clipboard::Data> data, int operations) {
+  return StartDragWithImage(std::move(data), operations, nullptr);
 }
 
 void View::SetCursor(Cursor* cursor) {

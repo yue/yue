@@ -178,7 +178,8 @@ class Invoker<IndicesHolder<indices...>, ArgTypes...>
       const std::function<ReturnType(ArgTypes...)>& callback) {
     v8::MicrotasksScope script_scope(
         args_->isolate(), v8::MicrotasksScope::kRunMicrotasks);
-    args_->Return(callback(ArgumentHolder<indices, ArgTypes>::value...));
+    args_->Return(
+        callback(std::move(ArgumentHolder<indices, ArgTypes>::value)...));
   }
 
   // In C++, you can declare the function foo(void), but you can't pass a void
