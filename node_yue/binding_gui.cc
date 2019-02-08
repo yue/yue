@@ -773,11 +773,12 @@ struct Type<nu::Painter> {
         "fill", &nu::Painter::Fill,
         "strokeRect", &nu::Painter::StrokeRect,
         "fillRect", &nu::Painter::FillRect,
-        "measureText", &nu::Painter::MeasureText,
-        "drawText", &nu::Painter::DrawText,
+        "drawImage", &nu::Painter::DrawImage,
+        "drawImageFromRect", &nu::Painter::DrawImageFromRect,
         "drawCanvas", &nu::Painter::DrawCanvas,
         "drawCanvasFromRect", &nu::Painter::DrawCanvasFromRect,
-        "drawImage", &nu::Painter::DrawImage);
+        "measureText", &nu::Painter::MeasureText,
+        "drawText", &nu::Painter::DrawText);
   }
 };
 
