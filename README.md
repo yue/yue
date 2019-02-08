@@ -11,7 +11,7 @@ A library for creating native cross-platform GUI apps.
 ### Examples
 
 * [Sample apps (with screenshots)](https://github.com/yue/yue-sample-apps)
-* [Muban](https://github.com/yue/muban) - C++ example project
+* [Muban](https://github.com/yue/muban) - Build desktop apps with webview
 * [Wey](https://github.com/yue/wey) - Open source Slack app
 * [React-Yue](https://github.com/oyyd/react-yue) - Render the views of Yue with React.
 
@@ -28,11 +28,21 @@ copyright license to reproduce, prepare derivative works of, publicly display,
 publicly perform, sublicense, and distribute your contributions and such
 derivative works.
 
+The owners of the Yue project will also be granted the right to relicense the
+contributed source code and its derivative works.
+
+The documentations and build scripts are published under public domain, and
+contributions to those works will also be licensed so.
+
 ## License
 
 The Yue project is licensed under [LGPL v2.1][license] with following exception:
 
 * If you did not modify Yue's source code, you have the permission to statically
   link Yue with your project, regardless of the license of your project.
+
+The source code of Yue can also be distributed under other proprietary software
+friendly licenses if you make a commercial contract with the owners of the Yue
+project.
 
 [license]: https://github.com/yue/yue/blob/master/LICENSE
