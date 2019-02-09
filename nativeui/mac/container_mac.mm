@@ -4,7 +4,6 @@
 
 #include "nativeui/mac/container_mac.h"
 
-#include "base/logging.h"
 #include "nativeui/gfx/mac/painter_mac.h"
 
 @implementation NUContainer

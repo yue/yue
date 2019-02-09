@@ -11,6 +11,8 @@
 #include "nativeui/gfx/geometry/point_conversions.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/gfx/mac/painter_mac.h"
+#include "nativeui/mac/drag_drop/data_provider.h"
+#include "nativeui/mac/drag_drop/nested_run_loop.h"
 #include "nativeui/mac/events_handler.h"
 #include "nativeui/mac/mouse_capture.h"
 #include "nativeui/mac/nu_private.h"
@@ -187,6 +189,78 @@ void View::SetMouseDownCanMoveWindow(bool yes) {
 
 bool View::IsMouseDownCanMoveWindow() const {
   return [view_ mouseDownCanMoveWindow];
+}
+
+int View::StartDragWithImage(
+    std::vector<Clipboard::Data> data, int operations, Image* drag_image) {
+  // Cocoa throws exception without data in drag session.
+  if (data.empty())
+    return DRAG_OPERATION_NONE;
+
+  NUPrivate* priv = [view_ nuPrivate];
+  priv->supported_drag_operation = operations;
+  priv->data_source.reset([[DataProvider alloc] initWithData:std::move(data)]);
+
+  // Release capture before beginning the dragging session. Capture may have
+  // been acquired on the mouseDown, but capture is not required during the
+  // dragging session and the mouseUp that would release it will be suppressed.
+  ReleaseCapture();
+
+  // Synthesize an event for dragging, since we can't be sure that
+  // [NSApp currentEvent] will return a valid dragging event.
+  NSWindow* window = [view_ window];
+  NSPoint position = [window mouseLocationOutsideOfEventStream];
+  NSTimeInterval event_time = [[NSApp currentEvent] timestamp];
+  NSEvent* event = [NSEvent mouseEventWithType:NSLeftMouseDragged
+                                      location:position
+                                 modifierFlags:NSLeftMouseDraggedMask
+                                     timestamp:event_time
+                                  windowNumber:[window windowNumber]
+                                       context:nil
+                                   eventNumber:0
+                                    clickCount:1
+                                      pressure:1.0];
+
+  base::scoped_nsobject<NSPasteboardItem> item([[NSPasteboardItem alloc] init]);
+  [item setDataProvider:priv->data_source
+               forTypes:[[priv->data_source pasteboard] types]];
+
+  base::scoped_nsobject<NSDraggingItem> drag_item(
+      [[NSDraggingItem alloc] initWithPasteboardWriter:item.get()]);
+
+  // Set drag image.
+  if (drag_image) {
+    NSImage* image = drag_image->GetNative();
+    NSRect dragging_frame = NSMakeRect([event locationInWindow].x, 0,
+                                       [image size].width, [image size].height);
+    [drag_item setDraggingFrame:dragging_frame contents:image];
+  } else {
+    [drag_item setDraggingFrame:NSMakeRect(0, 0, 100, 100) contents:nil];
+  }
+
+  [view_ beginDraggingSessionWithItems:@[drag_item.get()]
+                                 event:event
+                                source:(id<NSDraggingSource>)view_];
+
+  // Since Drag and drop is asynchronous on Mac, we need to spin a nested run
+  // loop for consistency with other platforms.
+  NestedRunLoop run_loop;
+  priv->quit_dragging = [&run_loop, &priv]() {
+    run_loop.Quit();
+    priv->quit_dragging = nullptr;
+  };
+  run_loop.Run();
+  return priv->drag_result;
+}
+
+void View::CancelDrag() {
+  NUPrivate* priv = [view_ nuPrivate];
+  if (priv->quit_dragging)
+    priv->quit_dragging();
+}
+
+bool View::IsDragging() const {
+  return !![view_ nuPrivate]->quit_dragging;
 }
 
 void View::RegisterDraggedTypes(std::set<Clipboard::Data::Type> types) {

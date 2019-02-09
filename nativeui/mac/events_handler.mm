@@ -100,6 +100,17 @@ BOOL PerformDragOperation(NSView* self, SEL _cmd, id<NSDraggingInfo> info) {
   return view->handle_drop(view, &dragging_info, point);
 }
 
+NSDragOperation DraggingSessionSourceOperation(
+    NSView* self, SEL _cmd, NSDraggingSession*, NSDraggingContext) {
+  return [self nuPrivate]->supported_drag_operation;
+}
+
+void DraggingSessionEnded(NSView* self, SEL _cmd, NSDraggingSession*,
+                          NSPoint, NSDragOperation operation) {
+  [self nuPrivate]->drag_result = operation;
+  [self shell]->CancelDrag();
+}
+
 }  // namespace
 
 void AddMouseEventHandlerToClass(Class cl) {
@@ -125,13 +136,17 @@ void AddKeyEventHandlerToClass(Class cl) {
 
 void AddDragDropHandlerToClass(Class cl) {
   class_addMethod(cl, @selector(draggingEntered:),
-                  (IMP)DraggingEntered, "L@:@:^:");
+                  (IMP)DraggingEntered, "L@:@");
   class_addMethod(cl, @selector(draggingUpdated:),
-                  (IMP)DraggingUpdated, "L@:@:^:");
+                  (IMP)DraggingUpdated, "L@:@");
   class_addMethod(cl, @selector(draggingExited:),
-                  (IMP)DraggingExited, "v@:@:^:");
+                  (IMP)DraggingExited, "v@:@");
   class_addMethod(cl, @selector(performDragOperation:),
-                  (IMP)PerformDragOperation, "B@:@:^:");
+                  (IMP)PerformDragOperation, "B@:@");
+  class_addMethod(cl, @selector(draggingSession:sourceOperationMaskForDraggingContext:),
+                  (IMP)DraggingSessionSourceOperation, "L@:@L");
+  class_addMethod(cl, @selector(draggingSession:endedAtPoint:operation:),
+                  (IMP)DraggingSessionEnded, "v@:@{_NSPoint=ff}L");
 }
 
 bool DispatchMouseEvent(View* view, NSEvent* event) {

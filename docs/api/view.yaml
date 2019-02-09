@@ -104,8 +104,49 @@ methods:
   - signature: bool IsMouseDownCanMoveWindow() const
     description: Return whether dragging the view would move the window.
 
+  - signature: int StartDrag(std::vector<Clipboard::Data> data, int operations)
+    description: Like `StartDragWithImage` but do not set drag image.
+
+  - signature: int StartDragWithImage(std::vector<Clipboard::Data> data, int operations, Image* image)
+    description: Start a drag session.
+    detail: |
+      The return value is a [`DragOperation`](dragoperation.html) indicating the
+      result of dragging.
+
+      This method should only be called in the `on_mouse_down` event, when user
+      starts to drag the cursor.
+
+      This method is blocking that it does not return until the drag session is
+      finished or cancelled. During the call a nested UI message loop will run
+      and other events will still be emitted.
+
+      Note that on macOS certain views may have `IsMouseDownCanMoveWindow`
+      defaulting to `true`, which will prevent drag session to start. Make sure
+      to call `SetMouseDownCanMoveWindow(false)` for drag sources.
+    parameters:
+      data:
+        description: |
+          An array of [`Clipboard::Data`](clipboard_data.html) that will be
+          passed to drop target.
+      operations:
+        description: |
+          Must be one or more of [`DragOperation`](dragoperation.html) masks,
+          indicates which drag operations are supported.
+      image:
+        description: |
+          The image that will show beside the cursor when dragging.
+
+  - signature: void CancelDrag()
+    description: Cancel current drag session if the view is being used as drag source.
+
+  - signature: bool IsDragging() const
+    description: Return whether the view is being used as drag source.
+
   - signature: void RegisterDraggedTypes(std::set<Clipboard::Data::Type> types)
     description: Make the view a drag destination that accepets `types`.
+    parameters:
+      types:
+        description: An array of [`Clipboard::Data::Type`](clipboard_data_type.html).
 
   - signature: void SetCursor(Cursor* cursor)
     description: Set the cursor to show when hovering the view.
