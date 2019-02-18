@@ -1,9 +1,12 @@
 // Copyright 2016 Cheng Zhao. All rights reserved.
+// Copyright 2016 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
 #include "nativeui/mac/nu_view.h"
 
+#include "base/mac/foundation_util.h"
+#include "base/mac/scoped_cftyperef.h"
 #include "nativeui/browser.h"
 #include "nativeui/container.h"
 #include "nativeui/cursor.h"
@@ -24,6 +27,15 @@ namespace {
 // There is no way to know when another application has installed an event
 // monitor, we have to assume only current app can capture view.
 View* g_captured_view = nullptr;
+
+// It's much more convenient to return an NSString than a
+// base::ScopedCFTypeRef<CFStringRef>, since the methods on NSPasteboardItem
+// require an NSString*.
+NSString* UTIFromPboardType(NSString* type) {
+  return [base::mac::CFToNSCast(UTTypeCreatePreferredIdentifierForTag(
+      kUTTagClassNSPboardType, base::mac::NSToCFCast(type), kUTTypeData))
+      autorelease];
+}
 
 }  // namespace
 
@@ -221,9 +233,15 @@ int View::StartDragWithImage(
                                     clickCount:1
                                       pressure:1.0];
 
+  // The drag pasteboard only accepts UTI type strings.
+  NSArray* types = [[priv->data_source pasteboard] types];
+  NSMutableArray* newTypes = [NSMutableArray array];
+  for (NSString* type in types)
+    [newTypes addObject:UTIFromPboardType(type)];
+
   base::scoped_nsobject<NSPasteboardItem> item([[NSPasteboardItem alloc] init]);
   [item setDataProvider:priv->data_source
-               forTypes:[[priv->data_source pasteboard] types]];
+               forTypes:newTypes];
 
   base::scoped_nsobject<NSDraggingItem> drag_item(
       [[NSDraggingItem alloc] initWithPasteboardWriter:item.get()]);

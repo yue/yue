@@ -33,14 +33,18 @@ struct NUPrivate {
   bool is_content_view = false;
   bool wants_layer = false;  // default value for wantsLayer
   bool wants_layer_infected = false;  // infects the wantsLayer property
-  int last_drag_operation = -1;  // cached drop result (target side)
-  int supported_drag_operation = 0;  // supported drag operation (source side)
-  int drag_result = 0;  // cached drag result (source side)
-  std::function<void()> quit_dragging;  // quit current drag session
-  base::scoped_nsobject<DataProvider> data_source;  // data of drag source
   base::scoped_nsobject<NSCursor> cursor;
   base::scoped_nsobject<NSTrackingArea> tracking_area;
   std::unique_ptr<MouseCapture> mouse_capture;
+
+  // Drag target properties.
+  int last_drop_operation = -1;  // cached drop result
+
+  // Drag source properties.
+  int supported_drag_operation = 0;  // supported drag operation
+  int drag_result = 0;  // cached drag result
+  std::function<void()> quit_dragging;  // quit current drag session
+  base::scoped_nsobject<DataProvider> data_source;  // data of drag source
 };
 
 }  // namespace nu

@@ -64,18 +64,18 @@ NSDragOperation DraggingEntered(NSView* self, SEL _cmd, id<NSDraggingInfo> info)
   DraggingInfoMac dragging_info(info);
   PointF point([self convertPoint:[info draggingLocation] fromView:nil]);
   int r = view->handle_drag_enter(view, &dragging_info, point);
-  return [self nuPrivate]->last_drag_operation = r;
+  return [self nuPrivate]->last_drop_operation = r;
 }
 
 NSDragOperation DraggingUpdated(NSView* self, SEL _cmd, id<NSDraggingInfo> info) {
   View* view = [self shell];
   if (!view->handle_drag_update)
-    return [self nuPrivate]->last_drag_operation;
+    return [self nuPrivate]->last_drop_operation;
 
   DraggingInfoMac dragging_info(info);
   PointF point([self convertPoint:[info draggingLocation] fromView:nil]);
   int r = view->handle_drag_update(view, &dragging_info, point);
-  return [self nuPrivate]->last_drag_operation = r;
+  return [self nuPrivate]->last_drop_operation = r;
 }
 
 void DraggingExited(NSView* self, SEL _cmd, id<NSDraggingInfo> info) {
