@@ -99,7 +99,7 @@ Image::~Image() {
   [image_ release];
 }
 
-bool Image::IsEmpty() {
+bool Image::IsEmpty() const {
   return [[image_ representations] count] == 0;
 }
 

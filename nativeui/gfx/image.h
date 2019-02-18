@@ -36,7 +36,7 @@ class NATIVEUI_EXPORT Image : public base::RefCounted<Image> {
   Image(const Buffer& buffer, float scale_factor);
 
   // Whether the image is empty.
-  bool IsEmpty();
+  bool IsEmpty() const;
 
   // Get the size of image.
   SizeF GetSize() const;

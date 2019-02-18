@@ -34,8 +34,9 @@ Image::~Image() {
   delete image_;
 }
 
-bool Image::IsEmpty() {
-  return image_->GetWidth() == 0 || image_->GetHeight() == 0;
+bool Image::IsEmpty() const {
+  Gdiplus::Image* image = const_cast<Gdiplus::Image*>(image_);
+  return image->GetWidth() == 0 || image->GetHeight() == 0;
 }
 
 SizeF Image::GetSize() const {
