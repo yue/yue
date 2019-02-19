@@ -232,8 +232,9 @@ void WindowImpl::ExecuteSystemMenuCommand(int command) {
   SendMessage(hwnd(), WM_SYSCOMMAND, command, 0);
 }
 
-int WindowImpl::StartDrag(
-    std::vector<Clipboard::Data> data, int operations, Image* image) {
+int WindowImpl::DoDrag(std::vector<Clipboard::Data> data,
+                       int operations,
+                       const DragOptions& options) {
   if (drag_source_)
     return DRAG_OPERATION_NONE;
 
@@ -241,17 +242,18 @@ int WindowImpl::StartDrag(
   drag_data_ = new DataObject(std::move(data));
   drag_drop_in_progress_ = true;
 
-  if (image) {
+  if (options.image) {
     Microsoft::WRL::ComPtr<IDragSourceHelper> helper;
     if (SUCCEEDED(CoCreateInstance(CLSID_DragDropHelper, 0,
                                    CLSCTX_INPROC_SERVER,
                                    IID_PPV_ARGS(&helper)))) {
+      auto size = options.image->GetSize();
       // InitializeFromBitmap() takes ownership of |hbitmap|.
       SHDRAGIMAGE sdi = {0};
-      sdi.sizeDragImage.cx = image->GetSize().width();
-      sdi.sizeDragImage.cy = image->GetSize().height();
+      sdi.sizeDragImage.cx = size.width();
+      sdi.sizeDragImage.cy = size.height();
       sdi.crColorKey = 0x00FFFFFF;
-      sdi.hbmpDragImage = GetBitmapFromImage(image);
+      sdi.hbmpDragImage = GetBitmapFromImage(options.image.get());
       helper->InitializeFromBitmap(&sdi, drag_data_.get());
     }
   }

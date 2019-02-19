@@ -6,8 +6,14 @@
 
 namespace nu {
 
-DraggingInfo::DraggingInfo(int drag_operation)
-    : drag_operation_(drag_operation), weak_factory_(this) {}
+DragOptions::DragOptions() {}
+
+DragOptions::DragOptions(Image* image) : image(image) {}
+
+DragOptions::~DragOptions() {}
+
+DraggingInfo::DraggingInfo(int drag_operations)
+    : drag_operations_(drag_operations), weak_factory_(this) {}
 
 DraggingInfo::~DraggingInfo() {}
 

@@ -69,8 +69,9 @@ void View::Layout() {
     static_cast<Container*>(GetParent())->Layout();
 }
 
-int View::StartDrag(std::vector<Clipboard::Data> data, int operations) {
-  return StartDragWithImage(std::move(data), operations, nullptr);
+int View::DoDrag(std::vector<Clipboard::Data> data, int operations) {
+  DragOptions options;
+  return DoDragWithOptions(std::move(data), operations, options);
 }
 
 void View::SetCursor(Cursor* cursor) {

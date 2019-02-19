@@ -38,7 +38,7 @@ methods:
 
       You should always check the type of returned data before using it.
 
-  - signature: DragOperation GetDragOperation() const
+  - signature: int GetDragOperations() const
     description: Return the drag operation supported by drag source.
     detail: |
       Most drag sources support multiple types of operations, you should always

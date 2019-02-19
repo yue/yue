@@ -104,10 +104,10 @@ methods:
   - signature: bool IsMouseDownCanMoveWindow() const
     description: Return whether dragging the view would move the window.
 
-  - signature: int StartDrag(std::vector<Clipboard::Data> data, int operations)
-    description: Like `StartDragWithImage` but do not set drag image.
+  - signature: int DoDrag(std::vector<Clipboard::Data> data, int operations)
+    description: Like `DoDragWithOptions` but do not set drag image.
 
-  - signature: int StartDragWithImage(std::vector<Clipboard::Data> data, int operations, Image* image)
+  - signature: int DoDragWithOptions(std::vector<Clipboard::Data> data, int operations, const DragOptions& options)
     description: Start a drag session.
     detail: |
       The return value is a [`DragOperation`](dragoperation.html) indicating the

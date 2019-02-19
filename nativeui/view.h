@@ -93,9 +93,10 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   bool IsMouseDownCanMoveWindow() const;
 
   // Drag and drop.
-  int StartDrag(std::vector<Clipboard::Data> data, int operations);
-  int StartDragWithImage(
-      std::vector<Clipboard::Data> data, int operations, Image* image);
+  int DoDrag(std::vector<Clipboard::Data> data, int operations);
+  int DoDragWithOptions(std::vector<Clipboard::Data> data,
+                        int operations,
+                        const DragOptions& options);
   void CancelDrag();
   bool IsDragging() const;
   void RegisterDraggedTypes(std::set<Clipboard::Data::Type> types);

@@ -203,8 +203,9 @@ bool View::IsMouseDownCanMoveWindow() const {
   return [view_ mouseDownCanMoveWindow];
 }
 
-int View::StartDragWithImage(
-    std::vector<Clipboard::Data> data, int operations, Image* drag_image) {
+int View::DoDragWithOptions(std::vector<Clipboard::Data> data,
+                            int operations,
+                            const DragOptions& options) {
   // Cocoa throws exception without data in drag session.
   if (data.empty())
     return DRAG_OPERATION_NONE;
@@ -247,8 +248,8 @@ int View::StartDragWithImage(
       [[NSDraggingItem alloc] initWithPasteboardWriter:item.get()]);
 
   // Set drag image.
-  if (drag_image) {
-    NSImage* image = drag_image->GetNative();
+  if (options.image) {
+    NSImage* image = options.image->GetNative();
     NSRect dragging_frame = NSMakeRect([event locationInWindow].x, 0,
                                        [image size].width, [image size].height);
     [drag_item setDraggingFrame:dragging_frame contents:image];

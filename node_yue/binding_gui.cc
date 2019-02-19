@@ -668,7 +668,23 @@ struct Type<nu::DraggingInfo> {
     Set(context, templ,
         "isDataAvailable", &nu::DraggingInfo::IsDataAvailable,
         "getData", &nu::DraggingInfo::GetData,
-        "getDragOperation", &nu::DraggingInfo::GetDragOperation);
+        "getDragOperations", &nu::DraggingInfo::GetDragOperations);
+  }
+};
+
+template<>
+struct Type<nu::DragOptions> {
+  static constexpr const char* name = "yue.DragOptions";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::DragOptions* out) {
+    if (!value->IsObject())
+      return false;
+    v8::Local<v8::Object> obj = value.As<v8::Object>();
+    nu::Image* image;
+    if (Get(context, obj, "image", &image))
+      out->image = image;
+    return true;
   }
 };
 
@@ -1428,8 +1444,8 @@ struct Type<nu::View> {
         "hasCapture", &nu::View::HasCapture,
         "setMouseDownCanMoveWindow", &nu::View::SetMouseDownCanMoveWindow,
         "isMouseDownCanMoveWindow", &nu::View::IsMouseDownCanMoveWindow,
-        "startDrag", &nu::View::StartDrag,
-        "startDragWithImage", &nu::View::StartDragWithImage,
+        "doDrag", &nu::View::DoDrag,
+        "doDragWithOptions", &nu::View::DoDragWithOptions,
         "cancelDrag", &nu::View::CancelDrag,
         "isDragging", &nu::View::IsDragging,
         "registerDraggedTypes", &nu::View::RegisterDraggedTypes,

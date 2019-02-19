@@ -422,8 +422,9 @@ bool View::IsMouseDownCanMoveWindow() const {
   return g_object_get_data(G_OBJECT(view_), "draggable");
 }
 
-int View::StartDragWithImage(
-    std::vector<Clipboard::Data> objects, int operations, Image* drag_image) {
+int View::DoDragWithOptions(std::vector<Clipboard::Data> objects,
+                            int operations,
+                            const DragOptions& options) {
   auto* priv = static_cast<NUViewPrivate*>(
       g_object_get_data(G_OBJECT(view_), "private"));
   if (priv->drag_context)
@@ -439,10 +440,10 @@ int View::StartDragWithImage(
       nullptr, -1, -1);
 
   // Provide drag image if available.
-  if (drag_image)
+  if (options.image)
     gtk_drag_set_icon_pixbuf(
         priv->drag_context,
-        gdk_pixbuf_animation_get_static_image(drag_image->GetNative()),
+        gdk_pixbuf_animation_get_static_image(options.image->GetNative()),
         0, 0);
 
   // Block until the drag operation is done.

@@ -453,10 +453,11 @@ bool View::IsMouseDownCanMoveWindow() const {
   return view_->is_draggable();
 }
 
-int View::StartDragWithImage(
-    std::vector<Clipboard::Data> data, int operations, Image* image) {
+int View::DoDragWithOptions(std::vector<Clipboard::Data> data,
+                            int operations,
+                            const DragOptions& options) {
   if (view_->window())
-    return view_->window()->StartDrag(std::move(data), operations, image);
+    return view_->window()->DoDrag(std::move(data), operations, options);
   return DRAG_OPERATION_NONE;
 }
 

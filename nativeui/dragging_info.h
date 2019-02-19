@@ -5,6 +5,7 @@
 #ifndef NATIVEUI_DRAGGING_INFO_H_
 #define NATIVEUI_DRAGGING_INFO_H_
 
+#include "base/memory/ref_counted.h"
 #include "base/memory/weak_ptr.h"
 #include "nativeui/clipboard.h"
 
@@ -18,6 +19,16 @@
 
 namespace nu {
 
+// The options for starting a drag session.
+struct NATIVEUI_EXPORT DragOptions {
+  DragOptions();
+  explicit DragOptions(Image* image);
+  ~DragOptions();
+
+  scoped_refptr<Image> image;
+};
+
+// Getting information about dragged data in drag session.
 class NATIVEUI_EXPORT DraggingInfo {
  public:
   using Data = Clipboard::Data;
@@ -27,17 +38,17 @@ class NATIVEUI_EXPORT DraggingInfo {
   virtual bool IsDataAvailable(Data::Type type) const = 0;
   virtual Data GetData(Data::Type type) const = 0;
 
-  int GetDragOperation() const { return drag_operation_; }
+  int GetDragOperations() const { return drag_operations_; }
 
   base::WeakPtr<DraggingInfo> GetWeakPtr() {
     return weak_factory_.GetWeakPtr();
   }
 
  protected:
-  explicit DraggingInfo(int drag_operation);
+  explicit DraggingInfo(int drag_operations);
 
  private:
-  int drag_operation_ = DRAG_OPERATION_NONE;
+  int drag_operations_ = DRAG_OPERATION_NONE;
 
   base::WeakPtrFactory<DraggingInfo> weak_factory_;
 

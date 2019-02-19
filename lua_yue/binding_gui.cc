@@ -607,7 +607,20 @@ struct Type<nu::DraggingInfo> {
         "dragoperationlink", static_cast<int>(nu::DRAG_OPERATION_LINK),
         "isdataavailable", &nu::DraggingInfo::IsDataAvailable,
         "getdata", &nu::DraggingInfo::GetData,
-        "getdragoperation", &nu::DraggingInfo::GetDragOperation);
+        "getdragoperations", &nu::DraggingInfo::GetDragOperations);
+  }
+};
+
+template<>
+struct Type<nu::DragOptions> {
+  static constexpr const char* name = "yue.DragOptions";
+  static inline bool To(State* state, int index, nu::DragOptions* out) {
+    if (GetType(state, index) != LuaType::Table)
+      return false;
+    nu::Image* image;
+    if (RawGetAndPop(state, index, "image", &image))
+      out->image = image;
+    return true;
   }
 };
 
@@ -1269,8 +1282,8 @@ struct Type<nu::View> {
            "hascapture", &nu::View::HasCapture,
            "setmousedowncanmovewindow", &nu::View::SetMouseDownCanMoveWindow,
            "ismousedowncanmovewindow", &nu::View::IsMouseDownCanMoveWindow,
-           "startdrag", &nu::View::StartDrag,
-           "startdragwithimage", &nu::View::StartDragWithImage,
+           "dodrag", &nu::View::DoDrag,
+           "dodragwithoptions", &nu::View::DoDragWithOptions,
            "canceldrag", &nu::View::CancelDrag,
            "isdragging", &nu::View::IsDragging,
            "registerdraggedtypes", &nu::View::RegisterDraggedTypes,

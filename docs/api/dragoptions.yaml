@@ -1,0 +1,9 @@
+name: DragOptions
+header: nativeui/dragging_info.h
+type: struct
+namespace: nu
+description: Options for starting a drag operation.
+
+properties:
+  - property: scoped_refptr<Image> image
+    description: The image that will show under cursor when dragging.

@@ -48,8 +48,9 @@ class WindowImpl : public Win32Window,
   bool HasWindowStyle(LONG style) const;
   void ExecuteSystemMenuCommand(int command);
 
-  int StartDrag(
-      std::vector<Clipboard::Data> data, int operations, Image* image);
+  int DoDrag(std::vector<Clipboard::Data> data,
+             int operations,
+             const DragOptions& options);
   void CancelDrag();
   void RegisterDropTarget();
 
