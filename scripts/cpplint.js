@@ -43,7 +43,7 @@ const sourceFiles = listFiles([
 })
 
 // Call cpplint.
-const cpplint = path.join('tools', 'cpplint.py')
+const cpplint = path.join('building', 'tools', 'cpplint.py')
 while (sourceFiles.length) {
   const chunck = sourceFiles.splice(0, 100)
   const child = exec(`python ${cpplint} ${chunck.join(' ')}`)

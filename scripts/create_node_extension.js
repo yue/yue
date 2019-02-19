@@ -29,6 +29,11 @@ const args = [
   `node_runtime="${runtime}"`,
 ]
 
+if (targetOs != 'win') {
+  args.push('is_clang=true',
+            'clang_update_script="//building/tools/update-clang.py"')
+}
+
 if (targetOs == 'mac') {
   args.push('mac_deployment_target="10.9.0"',
             'mac_sdk_min="10.12"',
@@ -36,8 +41,7 @@ if (targetOs == 'mac') {
 }
 
 if (targetOs == 'linux') {
-  args.push('target_sysroot_dir="//third_party/"',
-            'is_clang=true')
+  args.push('target_sysroot_dir="//third_party/"')
 }
 
 console.log(`Creating native extension for ${runtime} ${nodever} ${targetCpu}...`)

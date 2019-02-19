@@ -1,5 +1,6 @@
 .DS_Store
 .tags*
+/building/tools/gn/
 /out/
 /third_party/llvm-build/
 /third_party/node-*/
@@ -7,7 +8,6 @@
 /third_party/debian_stretch_i386-sysroot/
 /third_party/debian_stretch_arm-sysroot/
 /third_party/debian_stretch_arm64-sysroot/
-/tools/gn/
 *.xcodeproj
 *.swp
 *.pyc

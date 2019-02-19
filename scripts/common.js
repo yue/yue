@@ -14,7 +14,7 @@ process.chdir(path.dirname(__dirname))
 process.env.DEPOT_TOOLS_WIN_TOOLCHAIN = 0
 
 // Expose ninja and gn to PATH.
-const gnDir = path.resolve('tools', 'gn')
+const gnDir = path.resolve('building', 'tools', 'gn')
 process.env.PATH = `${gnDir}${path.delimiter}${process.env.PATH}`
 
 // Get yue's version.

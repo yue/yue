@@ -71,11 +71,11 @@ const headers =
 for (const h of headers)
   addFileToZip(yuezip, h, '', 'include')
 const buildHeaders =
-  searchFiles('tools/gn/testing', '.h').concat(
-  searchFiles('tools/gn/third_party/googletest/src/googletest/include', '.h')).concat(
-  ['tools/gn/build/build_config.h', 'tools/gn/build/buildflag.h'])
+  searchFiles('building/tools/gn/testing', '.h').concat(
+  searchFiles('building/tools/gn/third_party/googletest/src/googletest/include', '.h')).concat(
+  ['building/tools/gn/build/build_config.h', 'building/tools/gn/build/buildflag.h'])
 for (const h of buildHeaders)
-  addFileToZip(yuezip, h, 'tools/gn', 'include')
+  addFileToZip(yuezip, h, 'building/tools/gn', 'include')
 for (const file of staticLibs[targetOs]) {
   addFileToZip(yuezip, `out/Release/${file}`, 'out/Release', 'Release')
   addFileToZip(yuezip, `out/Debug/${file}`, 'out/Debug', 'Debug')

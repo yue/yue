@@ -173,7 +173,7 @@ def InstallSysroot(target_platform, target_arch):
   # build/config/sysroot.gni.
   # TODO(thestig) Consider putting this elsewhere to avoid having to recreate
   # it on every build.
-  linux_dir = os.path.dirname(SCRIPT_DIR)
+  linux_dir = os.path.dirname(os.path.dirname(SCRIPT_DIR))
 
   sysroots_file = os.path.join(SCRIPT_DIR, 'sysroots.json')
   sysroots = json.load(open(sysroots_file))

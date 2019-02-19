@@ -15,7 +15,7 @@ jobs:
       x86:
         TARGET_CPU: x86
   steps:
-  - template: azure-pipelines-template.yml
+  - template: building/azure-pipelines-template.yml
 
 - job: macos_build
   displayName: 'Build for macOS'
@@ -26,7 +26,7 @@ jobs:
       x64:
         TARGET_CPU: x64
   steps:
-  - template: azure-pipelines-template.yml
+  - template: building/azure-pipelines-template.yml
 
 - job: linux_build
   displayName: 'Build for Linux'
@@ -59,4 +59,4 @@ jobs:
       sudo apt install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf libc6-dev-armhf-cross linux-libc-dev-armhf-cross binutils-aarch64-linux-gnu
     displayName: Install ARM toolchains
     condition: startsWith(variables['TARGET_CPU'], 'arm')
-  - template: azure-pipelines-template.yml
+  - template: building/azure-pipelines-template.yml

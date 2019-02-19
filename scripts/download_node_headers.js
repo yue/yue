@@ -38,7 +38,7 @@ if (fs.existsSync(process.platform === 'win32' ? lib_dir : node_dir)) {
 
 // Expose tar to PATH.
 if (process.platform == 'win32') {
-  const bindir = path.resolve('tools', 'win')
+  const bindir = path.resolve('building', 'tools', 'win')
   process.env.PATH = `${bindir}${path.delimiter}${process.env.PATH}`
 }
 
