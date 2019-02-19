@@ -25,7 +25,7 @@ int main(int argc, const char *argv[]) {
   window->Activate();
 
   // Quit when window is closed.
-  window->on_close.Connect([&state](nu::Window*) {
+  window->on_close.Connect([](nu::Window*) {
     nu::MessageLoop::Quit();
   });
 
