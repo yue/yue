@@ -2117,7 +2117,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::TableModel>(state, "TableModel");
   BindType<nu::AbstractTableModel>(state, "AbstractTableModel");
   BindType<nu::SimpleTableModel>(state, "SimpleTableModel");
-  BindType<nu::Table>(state, "TableModel");
+  BindType<nu::Table>(state, "Table");
   BindType<nu::TextEdit>(state, "TextEdit");
   BindType<nu::Tray>(state, "Tray");
 #if defined(OS_MACOSX)
