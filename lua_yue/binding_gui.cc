@@ -1941,7 +1941,16 @@ struct Type<nu::Table> {
            "setcolumnsvisible", &nu::Table::SetColumnsVisible,
            "iscolumnsvisible", &nu::Table::IsColumnsVisible,
            "setrowheight", &nu::Table::SetRowHeight,
-           "getrowheight", &nu::Table::GetRowHeight);
+           "getrowheight", &nu::Table::GetRowHeight,
+           "selectrow", &SelectRow,
+           "getselectedrow", &GetSelectedRow);
+  }
+  static void SelectRow(nu::Table* table, int row) {
+    table->SelectRow(row - 1);
+  }
+  static int GetSelectedRow(nu::Table* table) {
+    int index = table->GetSelectedRow();
+    return index == -1 ? -1 : index + 1;
   }
 };
 

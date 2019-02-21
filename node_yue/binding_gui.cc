@@ -2210,7 +2210,9 @@ struct Type<nu::Table> {
         "setColumnsVisible", &nu::Table::SetColumnsVisible,
         "isColumnsVisible", &nu::Table::IsColumnsVisible,
         "setRowHeight", &nu::Table::SetRowHeight,
-        "getRowHeight", &nu::Table::GetRowHeight);
+        "getRowHeight", &nu::Table::GetRowHeight,
+        "selectRow", &nu::Table::SelectRow,
+        "getSelectedRow", &nu::Table::GetSelectedRow);
   }
 };
 
