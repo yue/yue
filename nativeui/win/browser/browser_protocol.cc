@@ -102,10 +102,10 @@ IFACEMETHODIMP BrowserProtocol::Read(void *pv, ULONG cb, ULONG *pcbRead) {
   size_t nread = protocol_job_->Read(pv, cb);
   if (nread == 0) {
     sink_->ReportResult(S_OK, 0, NULL);
-    return S_OK;
+    return S_FALSE;
   }
   *pcbRead = static_cast<ULONG>(nread);
-  return S_FALSE;
+  return S_OK;
 }
 
 IFACEMETHODIMP BrowserProtocol::Seek(LARGE_INTEGER dlibMove,
