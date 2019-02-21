@@ -20,7 +20,18 @@ A library for creating native cross-platform GUI apps.
 Feel free to ask any kind of questions in the issues page, but please use
 English since other users may find your questions valuable.
 
-## Contributions
+## License
+
+The Yue project is licensed under [LGPL v2.1][license] with following exception:
+
+* If you did not modify Yue's source code, you have the permission to statically
+  link Yue with your project, regardless of the license of your project.
+
+The source code of Yue can also be distributed under other proprietary software
+friendly licenses if you make a commercial contract with the owners of the Yue
+project.
+
+## Contributor license agreement
 
 By sending a pull request, you hereby grant to owners and users of Yue project a
 perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable
@@ -33,16 +44,5 @@ contributed source code and its derivative works.
 
 The documentations and build scripts are published under public domain, and
 contributions to those works will also be licensed so.
-
-## License
-
-The Yue project is licensed under [LGPL v2.1][license] with following exception:
-
-* If you did not modify Yue's source code, you have the permission to statically
-  link Yue with your project, regardless of the license of your project.
-
-The source code of Yue can also be distributed under other proprietary software
-friendly licenses if you make a commercial contract with the owners of the Yue
-project.
 
 [license]: https://github.com/yue/yue/blob/master/LICENSE
