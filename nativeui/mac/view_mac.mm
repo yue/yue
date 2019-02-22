@@ -32,6 +32,9 @@ View* g_captured_view = nullptr;
 // base::ScopedCFTypeRef<CFStringRef>, since the methods on NSPasteboardItem
 // require an NSString*.
 NSString* UTIFromPboardType(NSString* type) {
+  // Some PboardType are already valid UTI strings.
+  if ([type rangeOfString:@"public."].location == 0)
+    return type;
   return [base::mac::CFToNSCast(UTTypeCreatePreferredIdentifierForTag(
       kUTTagClassNSPboardType, base::mac::NSToCFCast(type), kUTTypeData))
       autorelease];
