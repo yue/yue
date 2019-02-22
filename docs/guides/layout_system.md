@@ -1,6 +1,6 @@
 ---
 priority: 90
-description: How Views are arranged in Yue.
+description: How to manage the layout of Views.
 ---
 
 # Layout system
