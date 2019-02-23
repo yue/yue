@@ -1,0 +1,11 @@
+name: System::Color
+header: nativeui/system.h
+type: enum class
+namespace: nu
+description: System theme colors.
+
+enums:
+  - name: Text
+    description: Normal text color.
+  - name: DisabledText
+    description: Text color for disabled views.

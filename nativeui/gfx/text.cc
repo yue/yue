@@ -4,8 +4,8 @@
 
 #include "nativeui/gfx/text.h"
 
-#include "nativeui/app.h"
 #include "nativeui/gfx/font.h"
+#include "nativeui/system.h"
 
 namespace nu {
 
@@ -15,15 +15,14 @@ TextAttributes::TextAttributes(Font* font, Color color, TextAlign align,
       ellipsis(ellipsis) {}
 
 TextAttributes::TextAttributes()
-    : TextAttributes(App::GetCurrent()->GetDefaultFont(),
-                     App::GetCurrent()->GetColor(App::ThemeColor::Text)) {}
+    : TextAttributes(System::GetDefaultFont(),
+                     System::GetColor(System::Color::Text)) {}
 
 TextAttributes::TextAttributes(Font* font)
-    : TextAttributes(font,
-                     App::GetCurrent()->GetColor(App::ThemeColor::Text)) {}
+    : TextAttributes(font, System::GetColor(System::Color::Text)) {}
 
 TextAttributes::TextAttributes(Color color)
-    : TextAttributes(App::GetCurrent()->GetDefaultFont(), color) {}
+    : TextAttributes(System::GetDefaultFont(), color) {}
 
 TextAttributes::~TextAttributes() {
 }

@@ -1,0 +1,11 @@
+name: System::Path
+header: nativeui/system.h
+type: enum class
+namespace: nu
+description: Predefined filesystem paths.
+
+enums:
+  - name: AppData
+  - name: Cache
+  - name: Home
+  - name: Desktop

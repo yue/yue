@@ -219,41 +219,19 @@ struct Type<nu::MessageLoop> {
 };
 
 template<>
-struct Type<nu::App::ThemeColor> {
-  static constexpr const char* name = "yue.ThemeColor";
-  static bool FromV8(v8::Local<v8::Context> context,
-                     v8::Local<v8::Value> value,
-                     nu::App::ThemeColor* out) {
-    std::string id;
-    if (!vb::FromV8(context, value, &id))
-      return false;
-    if (id == "text")
-      *out = nu::App::ThemeColor::Text;
-    else if (id == "disabled-text")
-      *out = nu::App::ThemeColor::DisabledText;
-    else
-      return false;
-    return true;
-  }
-};
-
-template<>
 struct Type<nu::App> {
   static constexpr const char* name = "yue.App";
   static void BuildConstructor(v8::Local<v8::Context>, v8::Local<v8::Object>) {
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
-    Set(context, templ,
 #if defined(OS_MACOSX)
+    Set(context, templ,
         "setApplicationMenu",
         RefMethod(&nu::App::SetApplicationMenu, RefType::Reset, "appMenu"),
         "setDockBadgeLabel", &nu::App::SetDockBadgeLabel,
-        "getDockBadgeLabel", &nu::App::GetDockBadgeLabel,
+        "getDockBadgeLabel", &nu::App::GetDockBadgeLabel);
 #endif
-        "getColor", &nu::App::GetColor,
-        "getDefaultFont", &nu::App::GetDefaultFont,
-        "getClipboard", &nu::App::GetClipboard);
   }
 };
 
@@ -376,7 +354,7 @@ struct Type<nu::Font> {
         "getStyle", &nu::Font::GetStyle);
   }
   static nu::Font* GetDefault() {
-    return nu::App::GetCurrent()->GetDefaultFont();
+    return nu::System::GetDefaultFont();
   }
 };
 
@@ -541,6 +519,7 @@ struct Type<nu::Clipboard> {
   static constexpr const char* name = "yue.Clipboard";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
+    Set(context, constructor, "get", &nu::Clipboard::Get);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
@@ -2076,6 +2055,63 @@ struct Type<nu::Slider> {
 };
 
 template<>
+struct Type<nu::System::Color> {
+  static constexpr const char* name = "yue.System.Color";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::System::Color* out) {
+    std::string id;
+    if (!vb::FromV8(context, value, &id))
+      return false;
+    if (id == "text")
+      *out = nu::System::Color::Text;
+    else if (id == "disabled-text")
+      *out = nu::System::Color::DisabledText;
+    else
+      return false;
+    return true;
+  }
+};
+
+template<>
+struct Type<nu::System::Path> {
+  static constexpr const char* name = "yue.System.Path";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::System::Path* out) {
+    std::string id;
+    if (!vb::FromV8(context, value, &id))
+      return false;
+    if (id == "app-data")
+      *out = nu::System::Path::AppData;
+    else if (id == "cache")
+      *out = nu::System::Path::Cache;
+    else if (id == "home")
+      *out = nu::System::Path::Home;
+    else if (id == "desktop")
+      *out = nu::System::Path::Desktop;
+    else
+      return false;
+    return true;
+  }
+};
+
+template<>
+struct Type<nu::System> {
+  static constexpr const char* name = "yue.System";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+        "getColor", &nu::System::GetColor,
+        "getPath", &nu::System::GetPath,
+        "getDefaultFont", &nu::System::GetDefaultFont);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+  }
+};
+
+template<>
 struct Type<nu::Tab> {
   using base = nu::View;
   static constexpr const char* name = "yue.Tab";
@@ -2444,6 +2480,7 @@ void Initialize(v8::Local<v8::Object> exports) {
           "Group",             vb::Constructor<nu::Group>(),
           "Scroll",            vb::Constructor<nu::Scroll>(),
           "Slider",            vb::Constructor<nu::Slider>(),
+          "System",            vb::Constructor<nu::System>(),
           "TableModel",        vb::Constructor<nu::TableModel>(),
           "AbstractTableModel", vb::Constructor<nu::AbstractTableModel>(),
           "SimpleTableModel",  vb::Constructor<nu::SimpleTableModel>(),

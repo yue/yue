@@ -7,11 +7,11 @@ description: Native clipboard.
 
 detail: |
   The `Clipboard` class can not be created by user, its instance can only be
-  recevied by using [`App.GetClipboard`](app.html#getclipboard-type).
+  recevied via the `Get` class method.
 
   ```cpp
   // Get the default copy-paste clipboard.
-  nu::Clipboard* clipboard = nu::App::GetCurrent()->GetClipboard(nu::Clipboard::Type::CopyPaste);
+  nu::Clipboard* clipboard = nu::Clipboard::Get(nu::Clipboard::Type::CopyPaste);
 
   // Changing the content of clipboard with multiple formats of data.
   std::vector<nu::Clipboard::Data> objects;
@@ -36,7 +36,7 @@ detail: |
 
   ```lua
   -- Get the default copy-paste clipboard.
-  local clipboard = gui.app:getclipboard('copy-paste')
+  local clipboard = gui.Clipboard.get('copy-paste')
 
   -- Changing the content of clipboard with multiple formats of data.
   clipboard:setdata{
@@ -55,7 +55,7 @@ detail: |
 
   ```js
   // Get the default copy-paste clipboard.
-  const clipboard = gui.app.getClipboard('copy-paste')
+  const clipboard = gui.Clipboard.get('copy-paste')
 
   // Changing the content of clipboard with multiple formats of data.
   clipboard.setData([
@@ -70,6 +70,17 @@ detail: |
   if (data.type == 'text')
     console.log(data.value)
   ```
+
+class_methods:
+  - signature: Clipboard* Get(Clipboard::Type type)
+    description: Return the clipboard with `type`.
+    lang_detail:
+      cpp: |
+        The returned clipboard instance is managed by Yue, there is no need to
+        manually free it.
+
+        The `CopyPaste` clipboard will be return if The `type` argument is
+        omitted.
 
 methods:
   - signature: void Clear()

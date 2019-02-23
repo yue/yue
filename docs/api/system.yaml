@@ -1,0 +1,16 @@
+name: System
+component: gui
+header: nativeui/system.h
+type: class
+namespace: nu
+description: Get information about system settings.
+
+class_methods:
+  - signature: Color GetColor(System::Color name)
+    description: Return the theme color with `name`.
+
+  - signature: base::FilePath GetPath(System::Path name)
+    description: Return predefined filesystem path with `name`.
+
+  - signature: Font* GetDefaultFont()
+    description: Return the default font for displaying text.

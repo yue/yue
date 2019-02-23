@@ -12,8 +12,7 @@ class ClipboardTest : public testing::Test {
   using Data = nu::Clipboard::Data;
 
   void SetUp() override {
-    app_ = nu::App::GetCurrent();
-    clipboard_ = app_->GetClipboard();
+    clipboard_ = nu::Clipboard::Get();
     clipboard_->Clear();
 
     base::FilePath exe_path;
@@ -28,19 +27,18 @@ class ClipboardTest : public testing::Test {
   nu::Lifetime lifetime_;
   nu::State state_;
 
-  nu::App* app_;
   nu::Clipboard* clipboard_;
   base::FilePath image_path_;
 };
 
 TEST_F(ClipboardTest, Types) {
-  EXPECT_TRUE(app_->GetClipboard(nu::Clipboard::Type::CopyPaste)->GetNative());
+  EXPECT_TRUE(nu::Clipboard::Get(nu::Clipboard::Type::CopyPaste)->GetNative());
 #if defined(OS_MACOSX)
-  EXPECT_TRUE(app_->GetClipboard(nu::Clipboard::Type::Drag)->GetNative());
-  EXPECT_TRUE(app_->GetClipboard(nu::Clipboard::Type::Find)->GetNative());
-  EXPECT_TRUE(app_->GetClipboard(nu::Clipboard::Type::Font)->GetNative());
+  EXPECT_TRUE(nu::Clipboard::Get(nu::Clipboard::Type::Drag)->GetNative());
+  EXPECT_TRUE(nu::Clipboard::Get(nu::Clipboard::Type::Find)->GetNative());
+  EXPECT_TRUE(nu::Clipboard::Get(nu::Clipboard::Type::Font)->GetNative());
 #elif defined(OS_LINUX)
-  EXPECT_TRUE(app_->GetClipboard(nu::Clipboard::Type::Selection)->GetNative());
+  EXPECT_TRUE(nu::Clipboard::Get(nu::Clipboard::Type::Selection)->GetNative());
 #endif
 }
 

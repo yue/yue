@@ -5,13 +5,13 @@
 #include "nativeui/label.h"
 
 #include "base/strings/sys_string_conversions.h"
-#include "nativeui/app.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/mac/painter_mac.h"
 #include "nativeui/gfx/mac/text_mac.h"
 #include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/nu_view.h"
+#include "nativeui/system.h"
 
 @interface NULabel : NSView<NUView> {
  @private
@@ -100,9 +100,8 @@ Label::Label(const std::string& text) {
   TakeOverView([[NULabel alloc] init]);
   SetText(text);
   // Default styles.
-  App* app = App::GetCurrent();
-  [GetNative() setNUFont:app->GetDefaultFont()];
-  [GetNative() setNUColor:app->GetColor(App::ThemeColor::Text)];
+  [GetNative() setNUFont:System::GetDefaultFont()];
+  [GetNative() setNUColor:System::GetColor(System::Color::Text)];
 }
 
 Label::~Label() {

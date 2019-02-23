@@ -1,9 +1,9 @@
-// Copyright 2017 Cheng Zhao. All rights reserved.
+// Copyright 2019 Cheng Zhao. All rights reserved.
 // Copyright 2012 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by the license that can be found in the
-// LICENSE file.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE.chromium file.
 
-#include "nativeui/app.h"
+#include "nativeui/system.h"
 
 #include <dlfcn.h>
 #include <gdk/gdk.h>
@@ -182,13 +182,16 @@ Color GetFgColor(const std::string& css_selector) {
 
 }  // namespace
 
-Color App::PlatformGetColor(ThemeColor name) {
-  if (name == ThemeColor::Text)
-    return GetFgColor("GtkLabel");
-  else if (name == ThemeColor::DisabledText)
-    return GetFgColor("GtkLabel:disabled");
-  else
-    return Color();
+Color System::GetColor(System::Color name) {
+  switch (name) {
+    case System::Color::Text:
+      return GetFgColor("GtkLabel");
+    case System::Color::DisabledText:
+      return GetFgColor("GtkLabel:disabled");
+    default:
+      NOTREACHED() << "Unkown color name: " << static_cast<int>(name);
+      return nu::Color();
+  }
 }
 
 }  // namespace nu

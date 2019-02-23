@@ -6,6 +6,7 @@
 
 #include "base/lazy_instance.h"
 #include "base/threading/thread_local.h"
+#include "nativeui/gfx/font.h"
 #include "nativeui/protocol_job.h"
 #include "third_party/yoga/yoga/Yoga.h"
 
@@ -51,6 +52,19 @@ State::~State() {
 // static
 State* State::GetCurrent() {
   return lazy_tls_ptr.Pointer()->Get();
+}
+
+Font* State::GetDefaultFont() {
+  if (!default_font_)
+    default_font_ = new Font;
+  return default_font_.get();
+}
+
+Clipboard* State::GetClipboard(Clipboard::Type type) {
+  int index = static_cast<int>(type);
+  if (!clipboards_[index])
+    clipboards_[index].reset(new Clipboard(type));
+  return clipboards_[index].get();
 }
 
 }  // namespace nu

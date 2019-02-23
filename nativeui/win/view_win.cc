@@ -13,6 +13,7 @@
 #include "nativeui/gfx/screen.h"
 #include "nativeui/label.h"
 #include "nativeui/state.h"
+#include "nativeui/System.h"
 #include "nativeui/win/dragging_info_win.h"
 #include "nativeui/win/scroll_win.h"
 
@@ -20,8 +21,8 @@ namespace nu {
 
 ViewImpl::ViewImpl(ControlType type, View* delegate)
     : type_(type),
-      font_(App::GetCurrent()->GetDefaultFont()),
-      color_(App::GetCurrent()->GetColor(App::ThemeColor::Text)),
+      font_(System::GetDefaultFont()),
+      color_(System::GetColor(System::Color::Text)),
       scale_factor_(GetScaleFactor()),
       delegate_(delegate) {}
 

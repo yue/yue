@@ -200,36 +200,16 @@ struct Type<nu::MessageLoop> {
 };
 
 template<>
-struct Type<nu::App::ThemeColor> {
-  static constexpr const char* name = "yue.ThemeColor";
-  static inline bool To(State* state, int index, nu::App::ThemeColor* out) {
-    std::string id;
-    if (!lua::To(state, index, &id))
-      return false;
-    if (id == "text")
-      *out = nu::App::ThemeColor::Text;
-    else if (id == "disabled-text")
-      *out = nu::App::ThemeColor::DisabledText;
-    else
-      return false;
-    return true;
-  }
-};
-
-template<>
 struct Type<nu::App> {
   static constexpr const char* name = "yue.App";
   static void BuildMetaTable(State* state, int metatable) {
-    RawSet(state, metatable,
 #if defined(OS_MACOSX)
+    RawSet(state, metatable,
            "setapplicationmenu",
            RefMethod(&nu::App::SetApplicationMenu, RefType::Reset, "appmenu"),
            "setdockbadgelabel", &nu::App::SetDockBadgeLabel,
-           "getdockbadgelabel", &nu::App::GetDockBadgeLabel,
+           "getdockbadgelabel", &nu::App::GetDockBadgeLabel);
 #endif
-           "getcolor", &nu::App::GetColor,
-           "getdefaultfont", &nu::App::GetDefaultFont,
-           "getclipboard", &nu::App::GetClipboard);
   }
 };
 
@@ -348,7 +328,7 @@ struct Type<nu::Font> {
            "getstyle", &nu::Font::GetStyle);
   }
   static nu::Font* GetDefault() {
-    return nu::App::GetCurrent()->GetDefaultFont();
+    return nu::System::GetDefaultFont();
   }
 };
 
@@ -499,6 +479,7 @@ struct Type<nu::Clipboard> {
   static constexpr const char* name = "yue.Clipboard";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
+           "get", &nu::Clipboard::Get,
            "clear", &nu::Clipboard::Clear,
            "settext", &nu::Clipboard::SetText,
            "gettext", &nu::Clipboard::GetText,
@@ -1791,6 +1772,55 @@ struct Type<nu::Slider> {
 };
 
 template<>
+struct Type<nu::System::Color> {
+  static constexpr const char* name = "yue.System.Color";
+  static inline bool To(State* state, int index, nu::System::Color* out) {
+    std::string id;
+    if (!lua::To(state, index, &id))
+      return false;
+    if (id == "text")
+      *out = nu::System::Color::Text;
+    else if (id == "disabled-text")
+      *out = nu::System::Color::DisabledText;
+    else
+      return false;
+    return true;
+  }
+};
+
+template<>
+struct Type<nu::System::Path> {
+  static constexpr const char* name = "yue.System.Path";
+  static inline bool To(State* state, int index, nu::System::Path* out) {
+    std::string id;
+    if (!lua::To(state, index, &id))
+      return false;
+    if (id == "app-data")
+      *out = nu::System::Path::AppData;
+    else if (id == "cache")
+      *out = nu::System::Path::Cache;
+    else if (id == "home")
+      *out = nu::System::Path::Home;
+    else if (id == "desktop")
+      *out = nu::System::Path::Desktop;
+    else
+      return false;
+    return true;
+  }
+};
+
+template<>
+struct Type<nu::System> {
+  static constexpr const char* name = "yue.System";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "getcolor", &nu::System::GetColor,
+           "getpath", &nu::System::GetPath,
+           "getdefaultfont", &nu::System::GetDefaultFont);
+  }
+};
+
+template<>
 struct Type<nu::Tab> {
   using base = nu::View;
   static constexpr const char* name = "yue.Tab";
@@ -2127,6 +2157,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::Group>(state, "Group");
   BindType<nu::Scroll>(state, "Scroll");
   BindType<nu::Slider>(state, "Slider");
+  BindType<nu::System>(state, "System");
   BindType<nu::Tab>(state, "Tab");
   BindType<nu::TableModel>(state, "TableModel");
   BindType<nu::AbstractTableModel>(state, "AbstractTableModel");

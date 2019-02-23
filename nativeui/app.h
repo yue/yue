@@ -5,39 +5,19 @@
 #ifndef NATIVEUI_APP_H_
 #define NATIVEUI_APP_H_
 
-#include <array>
-#include <memory>
 #include <string>
-#include <unordered_map>
 
 #include "base/memory/weak_ptr.h"
-#include "nativeui/clipboard.h"
-#include "nativeui/gfx/color.h"
+#include "nativeui/nativeui_export.h"
 
 namespace nu {
 
-class Font;
 class MenuBar;
 
 // App wide APIs, this class is managed by State.
 class NATIVEUI_EXPORT App {
  public:
   static App* GetCurrent();
-
-  // Available theme names of colors.
-  enum class ThemeColor {
-    Text,
-    DisabledText,
-  };
-
-  // Return color of a theme component.
-  Color GetColor(ThemeColor name);
-
-  // Return the default GUI font.
-  Font* GetDefaultFont();
-
-  // Return clipboard instance.
-  Clipboard* GetClipboard(Clipboard::Type type = Clipboard::Type::CopyPaste);
 
 #if defined(OS_MACOSX)
   // Set the application menu.
@@ -57,17 +37,6 @@ class NATIVEUI_EXPORT App {
 
  private:
   friend class State;
-
-  Color PlatformGetColor(ThemeColor name);
-
-  // Cached theme colors.
-  std::unordered_map<int, Color> theme_colors_;
-
-  scoped_refptr<Font> default_font_;
-
-  // Array of available clipboards.
-  std::array<std::unique_ptr<Clipboard>,
-             static_cast<size_t>(Clipboard::Type::Count)> clipboards_;
 
 #if defined(OS_MACOSX)
   scoped_refptr<MenuBar> application_menu_;
