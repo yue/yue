@@ -6,6 +6,8 @@
 
 #include <gtk/gtk.h>
 
+#include <algorithm>
+
 #include "nativeui/gtk/widget_util.h"
 #include "nativeui/menu_bar.h"
 
@@ -37,6 +39,70 @@ struct NUWindowPrivate {
 inline NUWindowPrivate* GetPrivate(const Window* window) {
   return static_cast<NUWindowPrivate*>(g_object_get_data(
       G_OBJECT(window->GetNative()), "private"));
+}
+
+// Create a region from all opaque and semi-transparent points in the context.
+cairo_region_t* CreateRegionForNonAlphaArea(cairo_t* cr) {
+  // Calculate the extents of the context.
+  GdkRectangle extents;
+  double x1 = 0, y1 = 0, x2 = 0, y2 = 0;
+  cairo_clip_extents(cr, &x1, &y1, &x2, &y2);
+  extents.x = std::floor(x1);
+  extents.y = std::floor(y1);
+  extents.width = std::max(std::ceil(x2) - extents.x, 0.);
+  extents.height = std::max(std::ceil(y2) - extents.y, 0.);
+
+  // The entire surface is a region if there is no alpha channel.
+  cairo_surface_t* surface = cairo_get_target(cr);
+  if (cairo_surface_get_content(surface) == CAIRO_CONTENT_COLOR)
+    return cairo_region_create_rectangle(&extents);
+
+  cairo_surface_t* image;
+  if (cairo_surface_get_type(surface) != CAIRO_SURFACE_TYPE_IMAGE ||
+      cairo_image_surface_get_format(surface) != CAIRO_FORMAT_A8) {
+    // We work on A8 images to get full alpha channel.
+    image = cairo_image_surface_create(CAIRO_FORMAT_A8,
+                                       extents.width, extents.height);
+    cairo_t* cr = cairo_create(image);
+    cairo_set_source_surface(cr, surface, -extents.x, -extents.y);
+    cairo_paint(cr);
+    cairo_surface_flush(image);
+    cairo_destroy(cr);
+  } else {
+    image = cairo_surface_reference(surface);
+    cairo_surface_flush(image);
+  }
+
+  // Iterate through the image.
+  uint8_t* data = cairo_image_surface_get_data(image);
+  int stride = cairo_image_surface_get_stride(image);
+
+  cairo_region_t* region = cairo_region_create();
+  for (int y = 0; y < extents.height; y++) {
+    for (int x = 0; x < extents.width; x++) {
+      // Find a row with all transparent pixels.
+      int ps = x;
+      while (x < extents.width) {
+        // Only full-transparent pixels are treated as transparent, this is
+        // to match the behavior of macOS and Win32.
+        if (data[x] == 0)
+          break;
+        x++;
+      }
+
+      if (x > ps) {
+        // Add the row to region.
+        GdkRectangle rect = {ps, y, x - ps, 1};
+        cairo_region_union_rectangle(region, &rect);
+      }
+    }
+
+    data += stride;
+  }
+
+  cairo_surface_destroy(image);
+  cairo_region_translate(region, extents.x, extents.y);
+  return region;
 }
 
 // User clicks the close button.
@@ -89,8 +155,7 @@ void OnScreenChanged(GtkWidget* widget, GdkScreen* old_screen, Window* window) {
 
 // Set input shape for frameless transparent window.
 gboolean OnDraw(GtkWidget* widget, cairo_t* cr, NUWindowPrivate* priv) {
-  cairo_surface_t* surface = cairo_get_target(cr);
-  cairo_region_t* region = CreateRegionFromSurface(surface);
+  cairo_region_t* region = CreateRegionForNonAlphaArea(cr);
   gtk_widget_input_shape_combine_region(widget, region);
   cairo_region_destroy(region);
   // Only handle once.
