@@ -92,6 +92,8 @@ void SimpleTableModel::AddRow(Row data) {
   if (data.size() >= columns_) {
     rows_.emplace_back(std::move(data));
     NotifyRowInsertion(static_cast<uint32_t>(rows_.size()) - 1);
+  } else {
+    LOG(ERROR) << "AddRow failed because row length is less than column size.";
   }
 }
 
@@ -99,6 +101,8 @@ void SimpleTableModel::RemoveRowAt(uint32_t row) {
   if (row >= 0 && row < rows_.size()) {
     rows_.erase(rows_.begin() + row);
     NotifyRowDeletion(row);
+  } else {
+    LOG(ERROR) << "RemoveRow failed because row index is not in model.";
   }
 }
 
