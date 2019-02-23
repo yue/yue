@@ -110,8 +110,8 @@ methods:
   - signature: int DoDragWithOptions(std::vector<Clipboard::Data> data, int operations, const DragOptions& options)
     description: Start a drag session.
     detail: |
-      The return value is a [`DragOperation`](dragoperation.html) indicating the
-      result of dragging.
+      The return value is a `<!type>DragOperation` indicating the result of
+      dragging.
 
       This method should only be called in the `on_mouse_down` event, when user
       starts to drag the cursor.
@@ -126,12 +126,12 @@ methods:
     parameters:
       data:
         description: |
-          An array of [`Clipboard::Data`](clipboard_data.html) that will be
-          passed to drop target.
+          An array of `<!type>Clipboard::Data` that will be passed to drop
+          target.
       operations:
         description: |
-          Must be one or more of [`DragOperation`](dragoperation.html) masks,
-          indicates which drag operations are supported.
+          Must be one or more of `<!type>DragOperation` masks, indicates which
+          drag operations are supported.
       image:
         description: |
           The image that will show beside the cursor when dragging.
@@ -146,7 +146,7 @@ methods:
     description: Make the view a drag destination that accepets `types`.
     parameters:
       types:
-        description: An array of [`Clipboard::Data::Type`](clipboard_data_type.html).
+        description: An array of `<!type>Clipboard::Data::Type`.
 
   - signature: void SetCursor(Cursor* cursor)
     description: Set the cursor to show when hovering the view.
@@ -253,9 +253,8 @@ delegates:
     description: |
       Called when user drags the cursor over the view for the first time.
     detail: |
-      A [`DragOperation`](dragoperation.html) should be returned, indicating
-      which dragging operation the destination will perform when cursor is
-      released.
+      A `<!type>DragOperation` should be returned, indicating which dragging
+      operation the destination will perform when cursor is released.
 
       This delegate will not be called if the view has not registered dragged
       types, or if the dragged data does not belong to the registered type.
@@ -267,9 +266,8 @@ delegates:
     description: |
       Called when user moves the cursor over the view while dragging.
     detail: |
-      A [`DragOperation`](dragoperation.html) should be returned, indicating
-      which dragging operation the destination will perform when cursor is
-      released.
+      A `<!type>DragOperation` should be returned, indicating which dragging
+      operation the destination will perform when cursor is released.
 
       If this delegate is not implemented, the return value of previous
       `handle_drag_enter` call will be returned.

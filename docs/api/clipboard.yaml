@@ -92,7 +92,7 @@ methods:
     description: Set clipboard's content.
     parameters:
       objects:
-        description: An array of [`Clipboard::Data`](clipboard_data.html).
+        description: An array of `<!type>Clipboard::Data`.
 
   - signature: NativeClipboard GetNative() const
     lang: ['cpp']

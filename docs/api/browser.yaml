@@ -29,7 +29,7 @@ class_methods:
     detail: |
       When the browser sends a request with `scheme`, the `handler` will be
       called with `handler(url)`, and the `handler` must return an instance of
-      class that inherits from [`ProtocolJob`](./protocoljob.html).
+      class that inherits from `<!type>ProtocolJob`.
 
       The `handler` is guaranteed to be called in the main thread.
 

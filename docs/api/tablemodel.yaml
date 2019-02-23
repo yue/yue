@@ -7,19 +7,18 @@ description: Base class for models of Table.
 
 lang_detail:
   cpp: |
-    Users can implement a subclass of `TableModel` to feed `Table` any kind
-    of data source. It is required to call the `Notify` methods in subclasses
-    when data has been changed, so the `Table` can correctly update.
+    Users can implement a subclass of `TableModel` to feed `<!type>Table` any
+    kind of data source. It is required to call the `Notify` methods in
+    subclasses when data has been changed, so the `<!type>Table` can correctly
+    update.
 
-    For simple use cases, the [`SimpleTableModel`](simpletablemodel.html) can
-    be used.
+    For simple use cases, the `<!type>SimpleTableModel` can be used.
 
   lua: &ref |
-    For simple use cases, the [`SimpleTableModel`](simpletablemodel.html) can
-    be used.
+    For simple use cases, the `<!type>SimpleTableModel` can be used.
 
     For implementing a custom `TableModel`, please see
-    [`AbstractTableModel`](abstracttablemodel.html).
+    `<!type>AbstractTableModel`.
 
   js: *ref
 

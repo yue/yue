@@ -21,6 +21,14 @@ const renderer = new marked.Renderer()
 const oc = renderer.code.bind(renderer)
 renderer.code = (code, lang) => (!langs.includes(lang) || lang == renderer.lang) ? oc(code, lang) : ''
 
+// Automatically convert inline code.
+renderer.codespan = (code) => {
+  const match = code.match(/^&lt;\!(.*)&gt;(.*)$/)
+  if (match)
+    code = parseInlineCode(renderer.lang, match[1], match[2])
+  return code.startsWith('<') ? code : `<code>${code}</code>`
+}
+
 // Support highlighting in markdown.
 marked.setOptions({
   renderer,
@@ -409,6 +417,33 @@ function parseType(lang, str) {
   if (lang == 'cpp')
     type.name = str
   return type
+}
+
+// Convert inline code.
+function parseInlineCode(lang, type, code) {
+  switch (type) {
+    case 'type':
+      const info = parseType(lang, code)
+      return `<code><a class="type" href="${info.id}.html">${info.name}</a></code>`
+    case '':
+      return code
+    default:
+      throw Error(`Unknown type ${type} in inline code`)
+  }
+}
+
+// Convert a camelCase to dash string.
+function camelToDash(str) {
+  let ret = ''
+  let prevLowerCase = false
+  for (let s of str) {
+    const isUpperCase = s.toUpperCase() == s
+    if (isUpperCase && prevLowerCase)
+      ret += '-'
+    ret += s
+    prevLowerCase = !isUpperCase
+  }
+  return ret.replace(/-+/g, '-').toLowerCase()
 }
 
 // Put the extra parameter descriptions into signature object.

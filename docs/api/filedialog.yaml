@@ -52,15 +52,14 @@ methods:
     description: A bit array of `options`.
     lang_detail:
       cpp: |
-        Available options can be found in
-        [FileDialog::Option](filedialog_option.html).
+        Available options can be found in `<!type>FileDialog::Option`.
 
   - signature: void SetFilters(const std::vector<FileDialog::Filter>& filters)
     description: Set the file types that the dialog can open or save.
     parameters:
       filters:
         description: |
-          An array of [FileDialog::Filter](filedialog_filter.html) objects.
+          An array of `<!type>FileDialog::Filter` objects.
 
   - signature: std::vector<FileDialog::Filter> GetFilters() const
     lang: ['cpp']

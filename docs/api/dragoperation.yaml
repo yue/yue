@@ -22,6 +22,6 @@ lang_detail:
 
   lua: &ref |
     The values of `DragOperation` are available as the class properties of the
-    [`DraggingInfo`](dragginginfo.html) class.
+    `<!type>DraggingInfo` class.
 
   js: *ref

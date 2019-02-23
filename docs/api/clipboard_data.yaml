@@ -63,6 +63,6 @@ properties:
       The type of `value` depends on the `type` of data:
 
       * for `text` and `html` types, the `value` is a string;
-      * for `image` type, the `value` is [`Image`](image.html);
+      * for `image` type, the `value` is `<!type>Image`.
       * for `file-paths` type, the value is an array of string;
       * if the data is invalid, the `value` would be null.

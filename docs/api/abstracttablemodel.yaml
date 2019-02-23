@@ -7,13 +7,12 @@ inherit: TableModel
 description: Implement a custom TableModel.
 
 detail: |
-  To implement a custom `TableModel`, please implement all the methods in the
-  Delegates section. It is also required to call the `Notify` methods of
-  [`TableModel`](tablemodel.html) super class when data has been changed, so
-  the `Table` can correctly update.
+  To implement a custom `<!type>TableModel`, please implement all the methods
+  in the Delegates section. It is also required to call the `Notify` methods of
+  `<!type>TableModel` super class when data has been changed, so the
+  `<!type>Table` can correctly update.
 
-  For simple use cases, the [`SimpleTableModel`](simpletablemodel.html) can
-  be used.
+  For simple use cases, the `<!type>SimpleTableModel` can be used.
 
 delegates:
   - signature: uint32_t get_row_count(AbstractTableModel* self)

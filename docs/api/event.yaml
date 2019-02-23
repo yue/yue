@@ -43,8 +43,7 @@ properties:
     description: A bit array of keyboard modifiers of the event.
     lang_detail:
       cpp: |
-        Available modifiers can be found in
-        [KeyboardModifier](keyboardmodifier.html).
+        Available modifiers can be found in `<!type>KeyboardModifier`.
 
   - property: uint32_t timestamp
     description: |
