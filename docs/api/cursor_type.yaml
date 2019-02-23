@@ -4,35 +4,16 @@ type: enum class
 namespace: nu
 description: Type of cursor.
 
-lang_detail:
-  cpp: |
-    This type is an `enum class` with following values:
-    * `Cursor::Type::Default`
-    * `Cursor::Type::Hand`
-    * `Cursor::Type::Crosshair`
-    * `Cursor::Type::Progress`
-    * `Cursor::Type::Text`
-    * `Cursor::Type::NotAllowed`
-    * `Cursor::Type::Help`
-    * `Cursor::Type::Move`
-    * `Cursor::Type::ResizeEW`
-    * `Cursor::Type::ResizeNS`
-    * `Cursor::Type::ResizeNESW`
-    * `Cursor::Type::ResizeNWSE`
-
-  lua: &ref |
-    This type is a string with following possible values:
-    * `"default"`
-    * `"hand"`
-    * `"crosshair"`
-    * `"progress"`
-    * `"text"`
-    * `"not-allowed"`
-    * `"help"`
-    * `"move"`
-    * `"resize-ew"`
-    * `"resize-ns"`
-    * `"resize-nesw"`
-    * `"resize-nwse"`
-
-  js: *ref
+enums:
+  - name: Default
+  - name: Hand
+  - name: Crosshair
+  - name: Progress
+  - name: Text
+  - name: NotAllowed
+  - name: Help
+  - name: Move
+  - name: ResizeEW
+  - name: ResizeNS
+  - name: ResizeNESW
+  - name: ResizeNWSE

@@ -152,6 +152,16 @@ block content
   if doc.detail
     != markdown(doc.detail)
 
+  if doc.enums
+    p This type can have following values:
+    ul
+      each e in doc.enums
+        li
+          code #{e.name}
+          if e.description
+            |  - 
+            != imarkdown(e.description)
+
   if doc.global_functions
     +title('h2', 'global-functions', 'Global functions')
     each node in doc.global_functions

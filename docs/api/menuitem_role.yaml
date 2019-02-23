@@ -10,45 +10,24 @@ detail: |
   item, and Yue will automatically set labels, accelerators and actions for the
   menu item.
 
-lang_detail:
-  cpp: |
-    This type is an `enum class` with following values:
-    * `MenuItem::Role::Copy`
-    * `MenuItem::Role::Cut`
-    * `MenuItem::Role::Paste`
-    * `MenuItem::Role::SelectAll`
-    * `MenuItem::Role::Undo`
-    * `MenuItem::Role::Redo`
-
-    On macOS following values are also available:
-
-    * `MenuItem::Role::About`
-    * `MenuItem::Role::Hide`
-    * `MenuItem::Role::HideOthers`
-    * `MenuItem::Role::Unhide`
-    * `MenuItem::Role::Help`
-    * `MenuItem::Role::Window`
-    * `MenuItem::Role::Services`
-
-  lua: &ref |
-    This type is a string with following possible values:
-    * `"copy"`
-    * `"cut"`
-    * `"paste"`
-    * `"select-all"`
-    * `"undo"`
-    * `"redo"`
-
-    On macOS following values are also available:
-
-    * `"about"`
-    * `"hide"`
-    * `"hide-others"`
-    * `"unhide"`
-    * `"help"`
-    * `"window"`
-    * `"services"`
-
-  js: *ref
-
-
+enums:
+  - name: Copy
+  - name: Cut
+  - name: Paste
+  - name: SelectAll
+  - name: Undo
+  - name: Redo
+  - name: About
+    description: Only available on macOS.
+  - name: Hide
+    description: Only available on macOS.
+  - name: HideOthers
+    description: Only available on macOS.
+  - name: Unhide
+    description: Only available on macOS.
+  - name: Help
+    description: Only available on macOS.
+  - name: Window
+    description: Only available on macOS.
+  - name: Services
+    description: Only available on macOS.

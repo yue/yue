@@ -182,6 +182,9 @@ function pruneDocTree(lang, doc) {
 
   doc.detail = parseDetail(lang, doc)
 
+  if (doc.enums)
+    parseEnums(lang, doc)
+
   const categories = [ 'global_functions', 'constructors', 'class_properties',
                        'class_methods', 'properties', 'methods', 'events',
                        'delegates' ]
@@ -199,6 +202,16 @@ function pruneDocTree(lang, doc) {
   }
 
   return doc
+}
+
+// Parse declarations of enums.
+function parseEnums(lang, doc) {
+  for (const e of doc.enums) {
+    if (lang == 'cpp')
+      e.name = doc.name + '::' + e.name
+    else
+      e.name = `"${camelToDash(e.name)}"`
+  }
 }
 
 // Convert C++ representation to |lang| representation.
@@ -252,7 +265,7 @@ function convertModuleAndType(lang, node) {
   }
 
   let wrappedTypes = ['Painter', 'App', 'Lifetime', 'Signal']
-  let stringTypes = ['Accelerator', 'KeyboardCode', 'Font::Weight']
+  let stringTypes = ['Accelerator', 'KeyboardCode']
   let integerTypes = ['Color']
   if (node.type == 'refcounted' || wrappedTypes.includes(node.name))
     node.type = 'Class'
@@ -425,11 +438,20 @@ function parseInlineCode(lang, type, code) {
     case 'type':
       const info = parseType(lang, code)
       return `<code><a class="type" href="${info.id}.html">${info.name}</a></code>`
+    case 'enum class':
+      return parseEnumClass(lang, code)
     case '':
       return code
     default:
       throw Error(`Unknown type ${type} in inline code`)
   }
+}
+
+// Convert enum class values.
+function parseEnumClass(lang, name) {
+  if (lang == 'cpp')
+    return name
+  return `"${camelToDash(name)}"`
 }
 
 // Convert a camelCase to dash string.

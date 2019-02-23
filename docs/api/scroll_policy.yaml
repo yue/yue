@@ -4,18 +4,7 @@ type: enum class
 namespace: nu
 description: Scrollbar policy.
 
-lang_detail:
-  cpp: |
-    This type is an `enum class` with following values:
-    * `Scroll::Policy::Always`
-    * `Scroll::Policy::Never`
-    * `Scroll::Policy::Automatic`
-
-  lua: &ref |
-    This type is a string with following possible values:
-    * `"always"`
-    * `"never"`
-    * `"automatic"`
-
-  js: *ref
-
+enums:
+  - name: Always
+  - name: Never
+  - name: Automatic

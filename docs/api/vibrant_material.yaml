@@ -5,19 +5,8 @@ type: enum class
 namespace: nu
 description: The material of a `Vibrant` view.
 
-lang_detail:
-  cpp: |
-    This type is an `enum class` with following values:
-    * `Vibrant::Material::AppearanceBased`
-    * `Vibrant::Material::Light`
-    * `Vibrant::Material::Dark`
-    * `Vibrant::Material::Titlebar`
-
-  lua: &ref |
-    This type is a string with following possible values:
-    * `"appearance-based"`
-    * `"light"`
-    * `"dark"`
-    * `"titlebar"`
-
-  js: *ref
+enums:
+  - name: AppearanceBased
+  - name: Light
+  - name: Dark
+  - name: Titlebar

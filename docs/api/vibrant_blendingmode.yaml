@@ -5,15 +5,6 @@ type: enum class
 namespace: nu
 description: The blending mode of a `Vibrant` view.
 
-lang_detail:
-  cpp: |
-    This type is an `enum class` with following values:
-    * `Vibrant::BlendingMode::BehindWindow`
-    * `Vibrant::BlendingMode::WithinWindow`
-
-  lua: &ref |
-    This type is a string with following possible values:
-    * `"behind-window"`
-    * `"within-window"`
-
-  js: *ref
+enums:
+  - name: BehindWindow
+  - name: WithinWindow

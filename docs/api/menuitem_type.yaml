@@ -4,22 +4,9 @@ type: enum class
 namespace: nu
 description: Represent possible `Menuitem` types.
 
-lang_detail:
-  cpp: |
-    This type is an `enum class` with following values:
-    * `MenuItem::Type::Label`
-    * `MenuItem::Type::Checkbox`
-    * `MenuItem::Type::Radio`
-    * `MenuItem::Type::Separator`
-    * `MenuItem::Type::Submenu`
-
-  lua: &ref |
-    This type is a string with following possible values:
-    * `"label"`
-    * `"checkbox"`
-    * `"radio"`
-    * `"separator"`
-    * `"submenu"`
-
-  js: *ref
-
+enums:
+  - name: Label
+  - name: Checkbox
+  - name: Radio
+  - name: Separator
+  - name: Submenu

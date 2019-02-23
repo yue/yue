@@ -4,17 +4,7 @@ type: enum class
 namespace: nu
 description: Text alignment.
 
-lang_detail:
-  cpp: |
-    This type is an `enum class` with following values:
-    * `TextAlign::Start`
-    * `TextAlign::Center`
-    * `TextAlign::End`
-
-  lua: &ref |
-    This type is a string with following possible values:
-    * `"start"`
-    * `"center"`
-    * `"end"`
-
-  js: *ref
+enums:
+  - name: Start
+  - name: Center
+  - name: End

@@ -4,15 +4,6 @@ type: enum class
 namespace: nu
 description: Represent possible `Entry` types.
 
-lang_detail:
-  cpp: |
-    This type is an `enum class` with following values:
-    * `Entry::Type::Normal`
-    * `Entry::Type::Password`
-
-  lua: &ref |
-    This type is a string with following possible values:
-    * `"normal"`
-    * `"password"`
-
-  js: *ref
+enums:
+  - name: Normal
+  - name: Password

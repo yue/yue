@@ -4,19 +4,8 @@ type: enum class
 namespace: nu
 description: Possible display modes of `Toolbar`.
 
-lang_detail:
-  cpp: |
-    This type is an `enum class` with following values:
-      * `Toolbar::DisplayMode::Default`
-      * `Toolbar::DisplayMode::IconAndLabel`
-      * `Toolbar::DisplayMode::Icon`
-      * `Toolbar::DisplayMode::Label`
-
-  lua: &ref |
-    This type is a string with following possible values:
-    * `"default"`
-    * `"icon-and-label"`
-    * `"icon"`
-    * `"label"`
-
-  js: *ref
+enums:
+  - name: Default
+  - name: IconAndLabel
+  - name: Icon
+  - name: Label

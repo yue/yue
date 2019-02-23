@@ -4,21 +4,9 @@ type: enum class
 namespace: nu
 description: Type of clipboard data.
 
-lang_detail:
-  cpp: |
-    This type is an `enum class` with following values:
-    * `Clipboard::Data::Type::Text`
-    * `Clipboard::Data::Type::HTML`
-    * `Clipboard::Data::Type::Image`
-    * `Clipboard::Data::Type::FilePaths`
-    * `Clipboard::Data::Type::None`
-
-  lua: &ref |
-    This type is a string with following possible values:
-    * `"text"`
-    * `"html"`
-    * `"image"`
-    * `"file-paths"`
-    * `"none"`
-
-  js: *ref
+enums:
+  - name: Text
+  - name: HTML
+  - name: Image
+  - name: FilePaths
+  - name: None

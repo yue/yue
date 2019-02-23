@@ -4,31 +4,13 @@ type: enum class
 namespace: nu
 description: Type of `Table`'s column.
 
-lang_detail:
-  cpp: |
-    This type is an `enum class` with following values:
-    * `Table::ColumnType::Text`
-    * `Table::ColumnType::Edit`
-    * `Table::ColumnType::Custom`
-
-    The `Text` and `Edit` column types can only render String type of data, the
-    `Custom` supports arbitrary type data (except for native objects like `Image`)
-    but a drawing function has to be provided.
-
-    The `Text` column type renders readonly text. The `Edit` column type is like
-    `Text` but allows user to edit the text.
-
-  lua: &ref |
-    This type is a string with following possible values:
-    * `"text"`
-    * `"edit"`
-    * `"custom"`
-
-    The `text` and `edit` column types can only render String type of data, the
-    `custom` supports arbitrary type data (except for native objects like `Image`)
-    but a drawing function has to be provided.
-
-    The `text` column type renders readonly text. The `edit` column type is like
-    `Text` but allows user to edit the text.
-
-  js: *ref
+enums:
+  - name: Text
+    description: Renders readonly String value.
+  - name: Edit
+    description: Like `<!enum class>Text` but allows user to edit the text.
+  - name: Custom
+    description: |
+      Supports arbitrary type of data but a drawing function has to be provided.
+      Note that native objects like `Image` can not be passed to `Table` as
+      data.
