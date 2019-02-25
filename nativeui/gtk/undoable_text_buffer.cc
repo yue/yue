@@ -10,16 +10,11 @@
 #include <string>
 #include <utility>
 
-#include "base/strings/string_util.h"
 #include "nativeui/gtk/widget_util.h"
 
 namespace nu {
 
 namespace {
-
-inline bool IsWhiteSpace(const std::string& text) {
-  return text.length() == 1 && base::IsAsciiWhitespace(text[0]);
-}
 
 // Insert or Delete.
 enum ActionType {
@@ -30,110 +25,56 @@ enum ActionType {
 // An undoable action.
 struct UndoableAction {
   // Insert action.
-  UndoableAction(GtkTextIter* iter, const std::string& text)
-      : type(INSERT),
-        start(gtk_text_iter_get_offset(iter)),
-        text(text),
-        mergeable(!text.empty()) {
-  }
+  UndoableAction(GtkTextIter* iter, std::string&& text)
+      : type(INSERT), start(gtk_text_iter_get_offset(iter)), text(text) {}
 
   // Delete action.
   UndoableAction(GtkTextBuffer* buffer,
                  GtkTextIter* start_iter,
                  GtkTextIter* end_iter)
-      : type(INSERT),
+      : type(DELETE),
         start(gtk_text_iter_get_offset(start_iter)),
         end(gtk_text_iter_get_offset(end_iter)),
-        text(gtk_text_buffer_get_text(buffer, start_iter, end_iter, TRUE)),
-        mergeable(IsWhiteSpace(text)) {
+        text(gtk_text_buffer_get_text(buffer, start_iter, end_iter, TRUE)) {
     // Whether it is Delete or Backspace key.
     GtkTextIter insert_iter;
     gtk_text_buffer_get_iter_at_mark(buffer, &insert_iter,
                                      gtk_text_buffer_get_insert(buffer));
-    delete_key_used = gtk_text_iter_get_offset(&insert_iter) <= start;
+    is_delete = gtk_text_iter_get_offset(&insert_iter) <= start;
   }
 
   ActionType type;
   int start;
-  int end;
+  int end;  // only used by delete action
   std::string text;
-  bool mergeable;
-  bool delete_key_used;
+  bool is_delete;
 };
 
 // A structure holding the undo and redo stacks.
 struct UndoableData {
   std::stack<UndoableAction> undo_stack;
   std::stack<UndoableAction> redo_stack;
-  bool not_undoable_action = false;
-  bool undo_in_progress = true;
+  bool ignore_events = false;
 };
 
 void OnInsertText(GtkTextBuffer* buffer,
                   GtkTextIter* iter,
                   gchar* text, gint length,
                   UndoableData* data) {
-  if (!data->undo_in_progress)
-    data->redo_stack = std::stack<UndoableAction>();
-  if (data->not_undoable_action)
+  if (data->ignore_events)
     return;
-  UndoableAction cur(iter, std::string(text, length));
-  // Check whether we can merge multiple inserts.
-  // Will try to merge words or whitespace;
-  // Can't merge if |prev| and |cur| are not mergeable in the first place;
-  // Can't merge when user set the input bar somewhere else;
-  // Can't merge across word boundaries.
-  bool mergeable = false;
-  if (!data->undo_stack.empty()) {
-    UndoableAction& prev = data->undo_stack.top();
-    mergeable =
-        prev.mergeable && cur.mergeable &&
-        (prev.type == cur.type) &&
-        (static_cast<size_t>(cur.start) == prev.start + prev.text.length()) &&
-        (IsWhiteSpace(prev.text) != IsWhiteSpace(cur.text));
-  }
-  if (mergeable)
-    data->undo_stack.top().text += cur.text;
-  else
-    data->undo_stack.push(std::move(cur));
+  data->redo_stack = std::stack<UndoableAction>();
+  data->undo_stack.emplace(iter, std::string(text, length));
 }
 
 void OnDeleteRange(GtkTextBuffer* buffer,
                    GtkTextIter* start_iter,
                    GtkTextIter* end_iter,
                    UndoableData* data) {
-  if (!data->undo_in_progress)
-    data->redo_stack = std::stack<UndoableAction>();
-  if (data->not_undoable_action)
+  if (data->ignore_events)
     return;
-  UndoableAction cur(buffer, start_iter, end_iter);
-  // Check whether we can merge multiple deletions.
-  // Will try to merge words or whitespace;
-  // Can't merge if |prev| and |cur| are not mergeable in the first place;
-  // can't merge if delete and backspace key were both used;
-  // Can't merge across word boundaries.
-  bool mergeable = false;
-  if (!data->undo_stack.empty()) {
-    UndoableAction& prev = data->undo_stack.top();
-    mergeable =
-        prev.mergeable && cur.mergeable &&
-        (prev.type == cur.type) &&
-        (prev.delete_key_used == cur.delete_key_used) &&
-        (prev.start == cur.start || prev.start == cur.end) &&
-        (IsWhiteSpace(prev.text) != IsWhiteSpace(cur.text));
-  }
-  if (mergeable) {
-    UndoableAction& prev = data->undo_stack.top();
-    if (prev.start == cur.start) {  // delete key used
-      prev.text += cur.text;
-      prev.end += (cur.end - cur.start);
-    } else {  // backspace key used
-      prev.text = cur.text + prev.text;
-      prev.start = cur.start;
-    }
-    return;
-  }
-  data->undo_stack.push(std::move(cur));
+  data->redo_stack = std::stack<UndoableAction>();
+  data->undo_stack.emplace(buffer, start_iter, end_iter);
 }
 
 }  // namespace
@@ -155,10 +96,11 @@ void TextBufferUndo(GtkTextBuffer* buffer) {
       g_object_get_data(G_OBJECT(buffer), "undoable-data"));
   if (data->undo_stack.empty())
     return;
-  data->not_undoable_action = true;
-  data->undo_in_progress = true;
-  UndoableAction undo_action = data->undo_stack.top();
+
+  UndoableAction undo_action = std::move(data->undo_stack.top());
   data->undo_stack.pop();
+
+  data->ignore_events = true;
   if (undo_action.type == INSERT) {
     GtkTextIter start_iter, end_iter;
     gtk_text_buffer_get_iter_at_offset(buffer, &start_iter, undo_action.start);
@@ -171,7 +113,7 @@ void TextBufferUndo(GtkTextBuffer* buffer) {
     gtk_text_buffer_get_iter_at_offset(buffer, &start_iter, undo_action.start);
     gtk_text_buffer_insert(buffer, &start_iter,
                            undo_action.text.data(), undo_action.text.length());
-    if (undo_action.delete_key_used) {
+    if (undo_action.is_delete) {
       gtk_text_buffer_place_cursor(buffer, &start_iter);
     } else {
       GtkTextIter end_iter;
@@ -179,9 +121,9 @@ void TextBufferUndo(GtkTextBuffer* buffer) {
       gtk_text_buffer_place_cursor(buffer, &end_iter);
     }
   }
+  data->ignore_events = false;
+
   data->redo_stack.push(std::move(undo_action));
-  data->not_undoable_action = false;
-  data->undo_in_progress = false;
 }
 
 bool TextBufferCanUndo(GtkTextBuffer* buffer) {
@@ -195,10 +137,11 @@ void TextBufferRedo(GtkTextBuffer* buffer) {
       g_object_get_data(G_OBJECT(buffer), "undoable-data"));
   if (data->redo_stack.empty())
     return;
-  data->not_undoable_action = true;
-  data->undo_in_progress = true;
-  UndoableAction redo_action = data->redo_stack.top();
+
+  UndoableAction redo_action = std::move(data->redo_stack.top());
   data->redo_stack.pop();
+
+  data->ignore_events = true;
   if (redo_action.type == INSERT) {
     GtkTextIter start_iter, end_iter;
     gtk_text_buffer_get_iter_at_offset(buffer, &start_iter, redo_action.start);
@@ -214,9 +157,9 @@ void TextBufferRedo(GtkTextBuffer* buffer) {
     gtk_text_buffer_delete(buffer, &start_iter, &end_iter);
     gtk_text_buffer_place_cursor(buffer, &start_iter);
   }
-  data->undo_stack.push(std::move(redo_action));
-  data->not_undoable_action = false;
-  data->undo_in_progress = false;
+  data->ignore_events = false;
+
+  data->undo_stack.emplace(std::move(redo_action));
 }
 
 bool TextBufferCanRedo(GtkTextBuffer* buffer) {
