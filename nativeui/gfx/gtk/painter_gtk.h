@@ -52,10 +52,9 @@ class PainterGtk : public Painter {
   void DrawCanvas(Canvas* canvas, const RectF& rect) override;
   void DrawCanvasFromRect(Canvas* canvas, const RectF& src,
                           const RectF& dest) override;
+  void DrawAttributedText(AttributedText* text, const RectF& rect) override;
   TextMetrics MeasureText(const std::string& text, float width,
                           const TextAttributes& attributes) override;
-  void DrawText(const std::string& text, const RectF& rect,
-                const TextAttributes& attributes) override;
 
  private:
   // Common initailization used by constructors.

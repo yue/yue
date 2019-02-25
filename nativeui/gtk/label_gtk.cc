@@ -6,60 +6,48 @@
 
 #include <gtk/gtk.h>
 
-#include "nativeui/gtk/widget_util.h"
+#include "nativeui/gfx/attributed_text.h"
 
 namespace nu {
 
-Label::Label(const std::string& text) {
+namespace {
+
+inline float AlignToFloat(TextAlign align) {
+  if (align == TextAlign::Start)
+    return 0.f;
+  else if (align == TextAlign::End)
+    return 1.f;
+  else
+    return 0.5f;
+}
+
+}  // namespace
+
+NativeView Label::PlatformCreate() {
   GtkWidget* event_box = gtk_event_box_new();
-  GtkWidget* label = gtk_label_new(text.c_str());
+  GtkWidget* label = gtk_label_new(nullptr);
   gtk_widget_show(label);
   gtk_container_add(GTK_CONTAINER(event_box), label);
-  TakeOverView(event_box);
-  UpdateDefaultStyle();
+  return event_box;
 }
 
-Label::~Label() {
-}
-
-void Label::PlatformSetText(const std::string& text) {
+void Label::PlatformSetAttributedText(AttributedText* text) {
   auto* label = GTK_LABEL(gtk_bin_get_child(GTK_BIN(GetNative())));
-  gtk_label_set_text(label, text.c_str());
-}
 
-std::string Label::GetText() const {
-  auto* label = GTK_LABEL(gtk_bin_get_child(GTK_BIN(GetNative())));
-  return gtk_label_get_text(label);
-}
+  // Text and styles.
+  PangoLayout* layout = text->GetNative();
+  gtk_label_set_text(label, pango_layout_get_text(layout));
+  gtk_label_set_attributes(label, pango_layout_get_attributes(layout));
 
-void Label::SetAlign(TextAlign align) {
-  auto* label = GTK_LABEL(gtk_bin_get_child(GTK_BIN(GetNative())));
-  gfloat xalign, yalign;
-  gtk_misc_get_alignment(GTK_MISC(label), &xalign, &yalign);
-  if (align == TextAlign::Start)
-    xalign = 0.f;
-  else if (align == TextAlign::End)
-    xalign = 1.f;
-  else
-    xalign = 0.5f;
-  gtk_misc_set_alignment(GTK_MISC(label), xalign, yalign);
-}
-
-void Label::SetVAlign(TextAlign align) {
-  auto* label = GTK_LABEL(gtk_bin_get_child(GTK_BIN(GetNative())));
-  gfloat xalign, yalign;
-  gtk_misc_get_alignment(GTK_MISC(label), &xalign, &yalign);
-  if (align == TextAlign::Start)
-    yalign = 0.f;
-  else if (align == TextAlign::End)
-    yalign = 1.f;
-  else
-    yalign = 0.5f;
-  gtk_misc_set_alignment(GTK_MISC(label), xalign, yalign);
-}
-
-SizeF Label::GetMinimumSize() const {
-  return GetPreferredSizeForWidget(GetNative());
+  // Format.
+  const auto& format = text->GetFormat();
+  gtk_label_set_line_wrap(label, format.wrap);
+  gtk_label_set_ellipsize(GTK_LABEL(label),
+                          format.ellipsis ? PANGO_ELLIPSIZE_END
+                                          : PANGO_ELLIPSIZE_NONE);
+  gtk_misc_set_alignment(GTK_MISC(label),
+                         AlignToFloat(format.align),
+                         AlignToFloat(format.valign));
 }
 
 }  // namespace nu

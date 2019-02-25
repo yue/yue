@@ -1,7 +1,7 @@
 // Copyright 2016 Cheng Zhao. All rights reserved.
 // Copyright 2012 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by the license that can be found in the
-// LICENSE file.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE.chromium file.
 
 #include "nativeui/gfx/win/native_theme.h"
 

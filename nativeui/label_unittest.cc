@@ -8,7 +8,7 @@
 class LabelTest : public testing::Test {
  protected:
   void SetUp() override {
-    label_ = new nu::Label;
+    label_ = new nu::Label("");
   }
 
   nu::Lifetime lifetime_;

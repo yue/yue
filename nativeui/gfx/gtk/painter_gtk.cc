@@ -11,6 +11,7 @@
 
 #include <gtk/gtk.h>
 
+#include "nativeui/gfx/attributed_text.h"
 #include "nativeui/gfx/canvas.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/gfx/image.h"
@@ -188,6 +189,27 @@ void PainterGtk::DrawCanvasFromRect(Canvas* canvas, const RectF& src,
   cairo_restore(context_);
 }
 
+void PainterGtk::DrawAttributedText(AttributedText* text, const RectF& rect) {
+  // Don't draw outside.
+  cairo_save(context_);
+  ClipRect(rect);
+
+  // Vertical alignment.
+  RectF bounds = text->GetBoundsFor(rect.size());
+  RectF target = rect;
+  TextAlign valign = text->GetFormat().valign;
+  if (valign == TextAlign::Center)
+    target.Inset(0.f, (rect.height() - bounds.height()) / 2);
+  else if (valign == TextAlign::End)
+    target.Inset(0.f, rect.height() - bounds.height(), 0.f, 0.f);
+  cairo_move_to(context_, target.x(), target.y());
+
+  // Draw.
+  PangoLayout* layout = text->GetNative();
+  pango_cairo_show_layout(context_, layout);
+  cairo_restore(context_);
+}
+
 TextMetrics PainterGtk::MeasureText(const std::string& text, float width,
                                     const TextAttributes& attributes) {
   PangoLayout* layout = pango_cairo_create_layout(context_);
@@ -199,61 +221,6 @@ TextMetrics PainterGtk::MeasureText(const std::string& text, float width,
   pango_layout_get_pixel_size(layout, &bwidth, &bheight);
   g_object_unref(layout);
   return { SizeF(bwidth, bheight) };
-}
-
-void PainterGtk::DrawText(const std::string& text, const RectF& rect,
-                          const TextAttributes& attributes) {
-  PangoLayout* layout = pango_cairo_create_layout(context_);
-  pango_layout_set_font_description(layout, attributes.font->GetNative());
-  cairo_save(context_);
-
-  // Text size.
-  int width, height;
-  if (attributes.wrap) {
-    pango_layout_set_width(layout, std::floor(rect.width() * PANGO_SCALE));
-    pango_layout_set_height(layout, std::floor(rect.height() *PANGO_SCALE));
-  } else {
-    pango_layout_set_width(layout, -1);
-  }
-  pango_layout_set_text(layout, text.data(), text.length());
-  pango_layout_get_pixel_size(layout, &width, &height);
-
-  // Horizontal alignment.
-  RectF bounds(rect);
-  if (attributes.align == TextAlign::Center)
-    bounds.Inset((rect.width() - width) / 2.f, 0.f);
-  else if (attributes.align == TextAlign::End)
-    bounds.Inset(rect.width() - width, 0.f, 0.f, 0.f);
-
-  // Vertical alignment
-  if (attributes.valign == TextAlign::Center)
-    bounds.Inset(0.f, (rect.height() - height) / 2);
-  else if (attributes.valign == TextAlign::End)
-    bounds.Inset(0.f, rect.height() - height, 0.f, 0.f);
-
-  // Apply the color.
-  Color color = attributes.color;
-  cairo_set_source_rgba(context_, color.r() / 255., color.g() / 255.,
-                                  color.b() / 255., color.a() / 255.);
-
-  // Don't draw outside boundry.
-  ClipRect(rect);
-
-  // Draw text.
-  cairo_move_to(context_, bounds.x(), bounds.y());
-  if (attributes.ellipsis)
-    pango_layout_set_ellipsize(layout, PANGO_ELLIPSIZE_END);
-  if (attributes.wrap) {
-    pango_layout_set_wrap(layout, PANGO_WRAP_WORD_CHAR);
-    pango_layout_set_width(layout, bounds.width() * PANGO_SCALE);
-    pango_layout_set_height(layout, bounds.height() * PANGO_SCALE);
-  } else {
-    pango_layout_set_width(layout, -1);
-  }
-  pango_cairo_show_layout(context_, layout);
-
-  cairo_restore(context_);
-  g_object_unref(layout);
 }
 
 void PainterGtk::Initialize() {

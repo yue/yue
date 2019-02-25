@@ -13,6 +13,7 @@
 #include "nativeui/nativeui_export.h"
 
 #if defined(OS_WIN)
+#include <d2d1.h>
 #include <windows.h>
 #endif
 
@@ -45,6 +46,7 @@ class NATIVEUI_EXPORT Color {
   NSColor* ToNSColor() const;
 #elif defined(OS_WIN)
   COLORREF ToCOLORREF() const;
+  D2D1_COLOR_F ToD2D1Color() const;
 #elif defined(OS_LINUX)
   GdkRGBA ToGdkRGBA() const;
 #endif

@@ -19,8 +19,16 @@ enum class TextAlign {
   End,
 };
 
+// Options for drawing text.
+struct NATIVEUI_EXPORT TextFormat {
+  TextAlign align = TextAlign::Start;
+  TextAlign valign = TextAlign::Start;
+  bool wrap = true;
+  bool ellipsis = false;
+};
+
 // Attributes used for drawing the text.
-struct NATIVEUI_EXPORT TextAttributes {
+struct NATIVEUI_EXPORT TextAttributes : public TextFormat {
   // Full constructor.
   TextAttributes(Font* font,
                  Color color,
@@ -37,10 +45,6 @@ struct NATIVEUI_EXPORT TextAttributes {
 
   scoped_refptr<Font> font;
   Color color;
-  TextAlign align;
-  TextAlign valign;
-  bool wrap;
-  bool ellipsis;
 };
 
 // Result of text measurement.

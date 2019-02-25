@@ -68,7 +68,10 @@ std::string TextEdit::GetText() const {
   GtkTextIter start_iter, end_iter;
   gtk_text_buffer_get_start_iter(buffer, &start_iter);
   gtk_text_buffer_get_end_iter(buffer, &end_iter);
-  return gtk_text_buffer_get_text(buffer, &start_iter, &end_iter, false);
+  char* text = gtk_text_buffer_get_text(buffer, &start_iter, &end_iter, false);
+  std::string result(text);
+  g_free(text);
+  return result;
 }
 
 void TextEdit::Redo() {
@@ -151,7 +154,10 @@ std::string TextEdit::GetTextInRange(int start, int end) const {
   GtkTextIter start_iter, end_iter;
   gtk_text_buffer_get_iter_at_offset(buffer, &start_iter, start);
   gtk_text_buffer_get_iter_at_offset(buffer, &end_iter, end);
-  return gtk_text_buffer_get_text(buffer, &start_iter, &end_iter, false);
+  char* text = gtk_text_buffer_get_text(buffer, &start_iter, &end_iter, false);
+  std::string result(text);
+  g_free(text);
+  return result;
 }
 
 void TextEdit::InsertText(const std::string& text) {

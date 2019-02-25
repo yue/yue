@@ -206,8 +206,10 @@ LRESULT TableImpl::OnCustomDraw(NMLVCUSTOMDRAW* nm, int row) {
     // Reduce the cell area so the focus ring can show.
     int space = 1 * scale_factor();
     rect.Inset(space, space);
+    // Get window size (needed by PainterWin).
+    GetClientRect(hwnd(), &rc);
     // Draw.
-    PainterWin painter(nm->nmcd.hdc, scale_factor());
+    PainterWin painter(nm->nmcd.hdc, Rect(rc).size(), scale_factor());
     painter.TranslatePixel(rect.OffsetFromOrigin());
     painter.ClipRectPixel(Rect(rect.size()));
     options.on_draw(&painter,

@@ -45,6 +45,11 @@ class NATIVEUI_EXPORT Font : public base::RefCounted<Font> {
   // It is caller's responsibility to manage the lifetime of returned font.
   Font* Derive(float size_delta, Weight weight, Style style) const;
 
+#if defined(OS_WIN)
+  // Private: Return font name in UTF-16.
+  std::wstring GetName16() const;
+#endif
+
   // Return the specified font name in UTF-8.
   std::string GetName() const;
 

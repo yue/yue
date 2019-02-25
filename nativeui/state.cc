@@ -4,6 +4,11 @@
 
 #include "nativeui/state.h"
 
+#if defined(OS_WIN)
+#include <d2d1.h>
+#include <dwrite.h>
+#endif
+
 #include "base/lazy_instance.h"
 #include "base/threading/thread_local.h"
 #include "nativeui/gfx/font.h"
@@ -12,6 +17,7 @@
 
 #if defined(OS_WIN)
 #include "base/win/scoped_com_initializer.h"
+#include "nativeui/gfx/win/dwrite_text_renderer.h"
 #include "nativeui/gfx/win/native_theme.h"
 #include "nativeui/win/util/class_registrar.h"
 #include "nativeui/win/util/gdiplus_holder.h"

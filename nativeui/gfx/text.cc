@@ -11,8 +11,8 @@ namespace nu {
 
 TextAttributes::TextAttributes(Font* font, Color color, TextAlign align,
                                TextAlign valign, bool wrap, bool ellipsis)
-    : font(font), color(color), align(align), valign(valign), wrap(wrap),
-      ellipsis(ellipsis) {}
+    : TextFormat({align, valign, wrap, ellipsis}),
+      font(font), color(color) {}
 
 TextAttributes::TextAttributes()
     : TextAttributes(System::GetDefaultFont(),

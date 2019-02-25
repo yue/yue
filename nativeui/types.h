@@ -29,6 +29,7 @@ typedef struct _GtkMenuShell GtkMenuShell;
 typedef struct _GtkWidget GtkWidget;
 typedef struct _GtkWindow GtkWindow;
 typedef struct _PangoFontDescription PangoFontDescription;
+typedef struct _PangoLayout PangoLayout;
 typedef struct _cairo_surface cairo_surface_t;
 typedef struct _cairo cairo_t;
 typedef union _GdkEvent GdkEvent;
@@ -37,6 +38,7 @@ typedef union _GdkEvent GdkEvent;
 #if defined(OS_MACOSX)
 typedef struct CGContext* CGContextRef;
 #ifdef __OBJC__
+@class NSMutableAttributedString;
 @class NSBitmapImageRep;
 @class NSCursor;
 @class NSEvent;
@@ -52,6 +54,7 @@ typedef struct CGContext* CGContextRef;
 @class NSView;
 @class NSWindow;
 #else
+class NSMutableAttributedString;
 class NSBitmapImageRep;
 class NSCursor;
 class NSEvent;
@@ -67,25 +70,20 @@ class NSToolbar;
 struct NSView;
 class NSWindow;
 #endif  // __OBJC__
-#elif defined(OS_IOS)
-#ifdef __OBJC__
-@class UIFont;
-@class UIView;
-@class UIWindow;
-#else
-class UIFont;
-class UIView;
-class UIWindow;
-#endif  // __OBJC__
-#endif
+#endif  // defined(OS_MACOSX)
 
 #if defined(OS_WIN)
+#ifndef __IDWriteTextLayout_FWD_DEFINED__
+#define __IDWriteTextLayout_FWD_DEFINED__
+typedef struct IDWriteTextLayout IDWriteTextLayout;
+#endif  // __IDWriteTextLayout_FWD_DEFINED__
+
 namespace Gdiplus {
 class Font;
 class Graphics;
 class Image;
 }
-#endif
+#endif  // defined(OS_WIN)
 
 namespace nu {
 
@@ -101,6 +99,7 @@ struct MenuItemData;
 #endif
 
 #if defined(OS_MACOSX)
+using NativeAttributedText = NSMutableAttributedString*;
 using NativeClipboard = NSPasteboard*;
 using NativeCursor = NSCursor*;
 using NativeEvent = NSEvent*;
@@ -116,6 +115,7 @@ using NativeMenuItem = NSMenuItem*;
 using NativeToolbar = NSToolbar*;
 using NativeTray = NSStatusItem*;
 #elif defined(OS_LINUX)
+using NativeAttributedText = PangoLayout*;
 using NativeClipboard = GtkClipboard*;
 using NativeCursor = GdkCursor*;
 using NativeEvent = GdkEvent*;
@@ -130,6 +130,7 @@ using NativeMenu = GtkMenuShell*;
 using NativeMenuItem = GtkMenuItem*;
 using NativeTray = AppIndicator*;
 #elif defined(OS_WIN)
+using NativeAttributedText = IDWriteTextLayout*;
 using NativeClipboard = ClipboardImpl*;
 using NativeCursor = HCURSOR;
 using NativeEvent = Win32Message*;

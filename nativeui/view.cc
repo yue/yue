@@ -41,6 +41,7 @@ View::View() : view_(nullptr) {
   yoga_config_ = YGConfigNew();
   YGConfigCopy(yoga_config_, State::GetCurrent()->yoga_config());
   node_ = YGNodeNewWithConfig(yoga_config_);
+  YGNodeSetContext(node_, this);
 }
 
 View::~View() {
