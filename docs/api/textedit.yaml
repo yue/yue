@@ -6,6 +6,15 @@ namespace: nu
 inherit: View
 description: Plain text input view.
 
+detail: |
+  The selection range in `TextEdit` use 0-based index, the `start` and `end`
+  both start from 0, and `end` is the index of the character after the range.
+
+  Using -1 as `end` means the end of the text.
+
+  The range uses character index instead of byte index, be careful when using
+  programming languages without Unicode support.
+
 constructors:
   - signature: TextEdit()
     lang: ['cpp']
