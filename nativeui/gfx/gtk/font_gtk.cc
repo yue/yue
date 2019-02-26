@@ -6,18 +6,19 @@
 
 #include <gtk/gtk.h>
 
-#include "nativeui/label.h"
-
 namespace nu {
 
 namespace {
 
 PangoFontDescription* GetDefaultFontDescription() {
-  // Receive the default font from control.
-  scoped_refptr<nu::Label> label = new nu::Label;
-  gtk_widget_ensure_style(label->GetNative());
-  GtkStyle* style = gtk_widget_get_style(label->GetNative());
-  return pango_font_description_copy(style->font_desc);
+  GtkSettings* settings = gtk_settings_get_default();
+  gchar* font_name = nullptr;
+  g_object_get(settings, "gtk-font-name", &font_name, NULL);
+  CHECK(font_name) << "Failed to get default font name";
+
+  PangoFontDescription* desc = pango_font_description_from_string(font_name);
+  g_free(font_name);
+  return desc;
 }
 
 }  // namespace

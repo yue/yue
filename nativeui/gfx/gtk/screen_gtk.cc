@@ -6,7 +6,7 @@
 
 #include <gtk/gtk.h>
 
-#include "nativeui/label.h"
+#include "nativeui/slider.h"
 
 namespace nu {
 
@@ -16,8 +16,8 @@ float GetScaleFactor() {
     // The gtk-xft-dpi GtkSetting does not return us correct value, the only
     // reliable way to get scale factor on Linux seems to be calling the
     // gtk_widget_get_scale_factor API.
-    scoped_refptr<nu::Label> label = new nu::Label;
-    scale_factor = gtk_widget_get_scale_factor(label->GetNative());
+    scoped_refptr<nu::Slider> widget = new nu::Slider;
+    scale_factor = gtk_widget_get_scale_factor(widget->GetNative());
   }
   return scale_factor;
 }
