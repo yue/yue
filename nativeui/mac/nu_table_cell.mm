@@ -91,6 +91,10 @@
 - (void)setObjectValue:(id)obj {
   [super setObjectValue:obj];
 
+  // A nil value may be passed to do clear work.
+  if (!obj)
+    return;
+
   // Note: we have to store a copy of the value, the reference will be away
   // after current stack ends.
   const base::Value* value = static_cast<const base::Value*>(
