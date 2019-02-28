@@ -16,6 +16,7 @@
 #include "base/win/scoped_hglobal.h"
 #include "nativeui/gfx/canvas.h"
 #include "nativeui/gfx/painter.h"
+#include "nativeui/gfx/win/double_buffer.h"
 #include "nativeui/gfx/win/gdiplus.h"
 
 namespace nu {
@@ -66,15 +67,12 @@ void GetFilePathsFromHDrop(HDROP drop, std::vector<base::FilePath>* result) {
 }
 
 HBITMAP GetBitmapFromImage(Image* image) {
-  HBITMAP bitmap = NULL;
   if (!image)
-    return bitmap;
+    return NULL;
   scoped_refptr<Canvas> canvas = new Canvas(image->GetSize(),
                                             image->GetScaleFactor());
   canvas->GetPainter()->DrawImage(image, RectF(image->GetSize()));
-  canvas->GetBitmap()->GetHBITMAP(Gdiplus::Color(0, 255, 255, 255),
-                                  &bitmap);
-  return bitmap;
+  return canvas->GetBitmap()->GetCopiedBitmap();
 }
 
 STGMEDIUM* GetStorageForFileNames(const std::vector<base::FilePath>& paths) {

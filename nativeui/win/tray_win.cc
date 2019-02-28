@@ -10,6 +10,7 @@
 #include "nativeui/gfx/canvas.h"
 #include "nativeui/gfx/image.h"
 #include "nativeui/gfx/painter.h"
+#include "nativeui/gfx/win/double_buffer.h"
 #include "nativeui/gfx/win/gdiplus.h"
 #include "nativeui/menu.h"
 #include "nativeui/state.h"
@@ -75,7 +76,8 @@ void TrayImpl::SetImage(Image* icon) {
   int width = ::GetSystemMetrics(SM_CXSMICON);
   scoped_refptr<Canvas> canvas = new Canvas(SizeF(width, width));
   canvas->GetPainter()->DrawImage(icon, RectF(0, 0, width, width));
-  if (canvas->GetBitmap()->GetHICON(icon_.receive()) != Gdiplus::Ok)
+  if (canvas->GetBitmap()->GetGdiplusBitmap()->GetHICON(icon_.receive()) !=
+          Gdiplus::Ok)
     LOG(WARNING) << "Error converting image to HICON";
 
   // Create the icon.

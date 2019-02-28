@@ -18,6 +18,7 @@
 #include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/gfx/geometry/vector2d_conversions.h"
 #include "nativeui/gfx/image.h"
+#include "nativeui/gfx/win/double_buffer.h"
 #include "nativeui/state.h"
 
 namespace nu {
@@ -49,13 +50,7 @@ PainterWin::PainterWin(HDC hdc, float scale_factor)
   Initialize(scale_factor);
 }
 
-PainterWin::PainterWin(NativeBitmap bitmap, float scale_factor)
-    : graphics_(bitmap) {
-  Initialize(scale_factor);
-}
-
-PainterWin::~PainterWin() {
-}
+PainterWin::~PainterWin() {}
 
 void PainterWin::DrawNativeTheme(NativeTheme::Part part,
                                  ControlState state,
@@ -195,14 +190,17 @@ void PainterWin::DrawImageFromRect(Image* image, const RectF& src,
 }
 
 void PainterWin::DrawCanvas(Canvas* canvas, const RectF& rect) {
-  graphics_.DrawImage(canvas->GetBitmap(),
-                      ToGdi(ScaleRect(rect, scale_factor_)));
+  std::unique_ptr<Gdiplus::Bitmap> bitmap =
+      canvas->GetBitmap()->GetGdiplusBitmap();
+  graphics_.DrawImage(bitmap.get(), ToGdi(ScaleRect(rect, scale_factor_)));
 }
 
 void PainterWin::DrawCanvasFromRect(Canvas* canvas, const RectF& src,
                                     const RectF& dest) {
+  std::unique_ptr<Gdiplus::Bitmap> bitmap =
+      canvas->GetBitmap()->GetGdiplusBitmap();
   RectF ps = ScaleRect(src, canvas->GetScaleFactor());
-  graphics_.DrawImage(canvas->GetBitmap(),
+  graphics_.DrawImage(bitmap.get(),
                       ToGdi(ScaleRect(dest, scale_factor_)),
                       ps.x(), ps.y(), ps.width(), ps.height(),
                       Gdiplus::UnitPixel);

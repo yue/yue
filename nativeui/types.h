@@ -81,7 +81,6 @@ class UIWindow;
 
 #if defined(OS_WIN)
 namespace Gdiplus {
-class Bitmap;
 class Font;
 class Graphics;
 class Image;
@@ -92,6 +91,7 @@ namespace nu {
 
 #if defined(OS_WIN)
 class ClipboardImpl;
+class DoubleBuffer;
 class FileDialogImpl;
 class TrayImpl;
 class ViewImpl;
@@ -136,7 +136,7 @@ using NativeEvent = Win32Message*;
 using NativeFileDialog = FileDialogImpl*;
 using NativeView = ViewImpl*;
 using NativeWindow = WindowImpl*;
-using NativeBitmap = Gdiplus::Bitmap*;
+using NativeBitmap = DoubleBuffer*;
 using NativeFont = Gdiplus::Font*;
 using nativeGraphicsContext = Gdiplus::Graphics*;
 using NativeImage = Gdiplus::Image*;

@@ -24,13 +24,18 @@ HBITMAP CreateBitmap(HDC dc, const Size& size) {
 
 }  // namespace
 
+DoubleBuffer::DoubleBuffer(HWND hwnd, const Size& size)
+    : DoubleBuffer(::GetDC(hwnd), size, Rect(), Point()) {
+  copy_on_destruction_ = false;
+  ::ReleaseDC(hwnd, dc_);
+}
+
 DoubleBuffer::DoubleBuffer(HDC dc, const Size& size, const Rect& src,
                            const Point& dest)
     : dc_(dc), src_(src), dest_(dest),
       mem_dc_(::CreateCompatibleDC(dc)),
       mem_bitmap_(CreateBitmap(dc, size)),
-      select_bitmap_(mem_dc_.Get(), mem_bitmap_.get()) {
-}
+      select_bitmap_(mem_dc_.Get(), mem_bitmap_.get()) {}
 
 DoubleBuffer::~DoubleBuffer() {
   if (copy_on_destruction_) {
@@ -38,6 +43,38 @@ DoubleBuffer::~DoubleBuffer() {
     BitBlt(dc_, src_.x(), src_.y(), src_.width(), src_.height(),
            dc(), dest_.x(), dest_.y(), SRCCOPY);
   }
+}
+
+std::unique_ptr<Gdiplus::Bitmap> DoubleBuffer::GetGdiplusBitmap() const {
+  // Code from Microsoft/VSSDK-Extensibility-Samples:
+  // ArchivedSamples/High-DPI_Images_Icons/Cpp/VsUIGdiplusImage.cpp
+  //
+  // Copyright (c) Microsoft. All rights reserved.
+  // Licensed under the MIT license.
+  DIBSECTION dib = {0};
+  ::GetObject(mem_bitmap_.get(), sizeof(DIBSECTION), &dib);
+
+  int width = dib.dsBmih.biWidth;
+  int height = dib.dsBmih.biHeight;
+  int pitch = dib.dsBm.bmWidthBytes;
+  BYTE* bits = static_cast<BYTE*>(dib.dsBm.bmBits);
+
+  if (height < 0) {  // top-down
+    height = -height;
+  } else {  // bottom-up
+    // Adjust the Scan0 to the start of the last row.
+    bits += (height - 1) * pitch;
+    // and set the pitch to a -ve value.
+    pitch = -pitch;
+  }
+
+  return std::make_unique<Gdiplus::Bitmap>(
+      width, height, pitch, PixelFormat32bppARGB, bits);
+}
+
+HBITMAP DoubleBuffer::GetCopiedBitmap() const {
+  return static_cast<HBITMAP>(::CopyImage(mem_bitmap_.get(),
+                                          IMAGE_BITMAP, 0, 0, 0));
 }
 
 }  // namespace nu

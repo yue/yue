@@ -5,6 +5,8 @@
 #ifndef NATIVEUI_GFX_WIN_DOUBLE_BUFFER_H_
 #define NATIVEUI_GFX_WIN_DOUBLE_BUFFER_H_
 
+#include <memory>
+
 #include "base/win/scoped_gdi_object.h"
 #include "base/win/scoped_hdc.h"
 #include "base/win/scoped_select_object.h"
@@ -15,10 +17,17 @@ namespace nu {
 // Create a memory buffer for |dc| and copy the result back in destructor.
 class DoubleBuffer {
  public:
+  DoubleBuffer(HWND hwnd, const Size& size);
   DoubleBuffer(HDC dc, const Size& size, const Rect& src, const Point& dest);
   ~DoubleBuffer();
 
   void SetNoCopy() { copy_on_destruction_ = false; }
+
+  // Return a transparent GDI+ bitmap.
+  std::unique_ptr<Gdiplus::Bitmap> GetGdiplusBitmap() const;
+
+  // Return a copy of internal HBITMAP, must be freed by caller.
+  HBITMAP GetCopiedBitmap() const;
 
   HDC dc() const { return mem_dc_.Get(); }
 
