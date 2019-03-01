@@ -52,8 +52,16 @@ std::unique_ptr<Gdiplus::Bitmap> DoubleBuffer::GetGdiplusBitmap() const {
   // Copyright (c) Microsoft. All rights reserved.
   // Licensed under the MIT license.
   DIBSECTION dib = {0};
-  ::GetObject(mem_bitmap_.get(), sizeof(DIBSECTION), &dib);
+  if (::GetObject(mem_bitmap_.get(), sizeof(dib), &dib) != sizeof(DIBSECTION) ||
+      dib.dsBm.bmBitsPixel != 32) {
+    // Fall back to Gdiplus conversion.
+    return std::unique_ptr<Gdiplus::Bitmap>(
+        Gdiplus::Bitmap::FromHBITMAP(mem_bitmap_.get(), NULL));
+  }
 
+  // If we have a 32bpp DIB created by calling CreateDIBSection, assume that
+  // it's in ARGB format.
+  // This is the preferred format for full per-pixel alpha support.
   int width = dib.dsBmih.biWidth;
   int height = dib.dsBmih.biHeight;
   int pitch = dib.dsBm.bmWidthBytes;
@@ -70,11 +78,6 @@ std::unique_ptr<Gdiplus::Bitmap> DoubleBuffer::GetGdiplusBitmap() const {
 
   return std::make_unique<Gdiplus::Bitmap>(
       width, height, pitch, PixelFormat32bppARGB, bits);
-}
-
-HBITMAP DoubleBuffer::GetCopiedBitmap() const {
-  return static_cast<HBITMAP>(::CopyImage(mem_bitmap_.get(),
-                                          IMAGE_BITMAP, 0, 0, 0));
 }
 
 }  // namespace nu

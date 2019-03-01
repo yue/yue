@@ -23,11 +23,12 @@ class DoubleBuffer {
 
   void SetNoCopy() { copy_on_destruction_ = false; }
 
-  // Return a transparent GDI+ bitmap.
+  // Return a GDI+ bitmap with alpha channel.
+  //
+  // Note that the memory bitmap does not have alpha channel in it, to get a
+  // transparent HBITMAP we should usually get the GDI+ bitmap and then create
+  // HBITMAP with it.
   std::unique_ptr<Gdiplus::Bitmap> GetGdiplusBitmap() const;
-
-  // Return a copy of internal HBITMAP, must be freed by caller.
-  HBITMAP GetCopiedBitmap() const;
 
   HDC dc() const { return mem_dc_.Get(); }
 

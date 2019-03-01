@@ -52,13 +52,9 @@ Clipboard::Data DraggingInfoWin::GetData(Data::Type type) const {
       break;
     }
     case Data::Type::Image: {
-      base::win::ScopedHGlobal<BITMAPINFO*> data(medium.hGlobal);
-      if (data.get()) {
-        Gdiplus::Bitmap* bitmap = Gdiplus::Bitmap::FromBITMAPINFO(
-            data.get(), data.get() + sizeof(BITMAPINFO));
-        if (bitmap)
-          ret = Data(new Image(bitmap));
-      }
+      if (medium.hBitmap)
+        ret = Data(new Image(Gdiplus::Bitmap::FromHBITMAP(medium.hBitmap,
+                                                          NULL)));
       break;
     }
     case Data::Type::FilePaths: {

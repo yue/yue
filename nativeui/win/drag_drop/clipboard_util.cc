@@ -47,10 +47,15 @@ bool GetFormatEtc(Clipboard::Data::Type type, FORMATETC* format) {
   int cf_type = ToCFType(type);
   if (cf_type < 0)
     return false;
-  format->cfFormat = static_cast<CLIPFORMAT>(cf_type);
   format->dwAspect = DVASPECT_CONTENT;
   format->lindex = -1;
-  format->tymed = TYMED_HGLOBAL;
+  if (type == Clipboard::Data::Type::Image) {
+    format->cfFormat = CF_BITMAP;
+    format->tymed = TYMED_GDI;
+  } else {
+    format->cfFormat = static_cast<CLIPFORMAT>(cf_type);
+    format->tymed = TYMED_HGLOBAL;
+  }
   return true;
 }
 
@@ -67,12 +72,15 @@ void GetFilePathsFromHDrop(HDROP drop, std::vector<base::FilePath>* result) {
 }
 
 HBITMAP GetBitmapFromImage(Image* image) {
-  if (!image)
-    return NULL;
-  scoped_refptr<Canvas> canvas = new Canvas(image->GetSize(),
-                                            image->GetScaleFactor());
-  canvas->GetPainter()->DrawImage(image, RectF(image->GetSize()));
-  return canvas->GetBitmap()->GetCopiedBitmap();
+  HBITMAP bitmap = NULL;
+  if (image) {
+    scoped_refptr<Canvas> canvas = new Canvas(image->GetSize(),
+                                              image->GetScaleFactor());
+    canvas->GetPainter()->DrawImage(image, RectF(image->GetSize()));
+    canvas->GetBitmap()->GetGdiplusBitmap()->GetHBITMAP(
+        Gdiplus::Color(0, 255, 255, 255), &bitmap);
+  }
+  return bitmap;
 }
 
 STGMEDIUM* GetStorageForFileNames(const std::vector<base::FilePath>& paths) {
