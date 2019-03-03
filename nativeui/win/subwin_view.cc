@@ -100,14 +100,9 @@ void SubwinView::VisibilityChanged() {
 
 void SubwinView::SetFont(Font* new_font) {
   ViewImpl::SetFont(new_font);
-  // Get LogFontW from gdiplus font.
-  base::win::ScopedGetDC dc(hwnd());
-  Gdiplus::Graphics context(dc);
-  LOGFONTW logfont;
-  font()->GetNative()->GetLogFontW(&context, &logfont);
-  font_.reset(::CreateFontIndirect(&logfont));
   // Use it as control's default font.
-  SendMessage(hwnd(), WM_SETFONT, reinterpret_cast<WPARAM>(font_.get()), TRUE);
+  SendMessage(hwnd(), WM_SETFONT,
+              reinterpret_cast<WPARAM>(new_font->GetHFONT(hwnd())), TRUE);
 }
 
 void SubwinView::SetBackgroundColor(Color color) {

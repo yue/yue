@@ -6,6 +6,7 @@
 
 #include <algorithm>
 
+#include "base/strings/string_util.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/win/scoped_gdi_object.h"
 #include "base/win/scoped_hdc.h"
@@ -22,10 +23,11 @@ Font::Font() {
   SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, sizeof(metrics), &metrics, 0);
 
   TEXTMETRIC fm;
-  base::win::ScopedHFONT font(CreateFontIndirectW(&(metrics.lfMessageFont)));
+  hfont_ = ::CreateFontIndirectW(&(metrics.lfMessageFont));
+
   base::win::ScopedGetDC screen_dc(NULL);
   ScopedSetMapMode mode(screen_dc, MM_TEXT);
-  base::win::ScopedSelectObject scoped_font(screen_dc, font.get());
+  base::win::ScopedSelectObject scoped_font(screen_dc, hfont_);
   ::GetTextMetrics(screen_dc, &fm);
   float font_size = std::max<float>(1.f, fm.tmHeight - fm.tmInternalLeading);
 
@@ -52,14 +54,12 @@ Font::Font(const std::string& name, float size, Weight weight, Style style) {
 
 Font::~Font() {
   delete font_;
+  if (hfont_)
+    ::DeleteObject(hfont_);
 }
 
 std::string Font::GetName() const {
-  Gdiplus::FontFamily family;
-  font_->GetFamily(&family);
-  WCHAR buffer[LF_FACESIZE] = {0};
-  family.GetFamilyName(buffer);
-  return base::UTF16ToUTF8(buffer);
+  return base::UTF16ToUTF8(GetName16());
 }
 
 float Font::GetSize() const {
@@ -82,6 +82,27 @@ Font::Style Font::GetStyle() const {
 
 NativeFont Font::GetNative() const {
   return font_;
+}
+
+const std::wstring& Font::GetName16() const {
+  if (font_family_.empty()) {
+    Gdiplus::FontFamily family;
+    font_->GetFamily(&family);
+    family.GetFamilyName(base::WriteInto(&font_family_, LF_FACESIZE));
+    font_family_.resize(wcslen(font_family_.data()));
+  }
+  return font_family_;
+}
+
+HFONT Font::GetHFONT(HWND hwnd) const {
+  if (!hfont_) {
+    base::win::ScopedGetDC dc(hwnd);
+    Gdiplus::Graphics context(dc);
+    LOGFONTW logfont;
+    font_->GetLogFontW(&context, &logfont);
+    hfont_ = ::CreateFontIndirect(&logfont);
+  }
+  return hfont_;
 }
 
 }  // namespace nu

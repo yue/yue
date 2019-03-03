@@ -79,7 +79,6 @@ class SubwinView : public Win32Window, public ViewImpl {
   // Should switch focus when TAB is pressed.
   bool switch_focus_on_tab_ = true;
 
-  base::win::ScopedHFONT font_;
   base::win::ScopedGDIObject<HBRUSH> bg_brush_;
   WNDPROC proc_;
 };
