@@ -68,8 +68,6 @@ class PainterWin : public Painter {
   void DrawCanvasFromRect(Canvas* canvas, const RectF& src,
                           const RectF& dest) override;
   void DrawAttributedText(AttributedText* text, const RectF& rect) override;
-  TextMetrics MeasureText(const std::string& text, float width,
-                          const TextAttributes& attributes) override;
   // Unlike other platforms that drawing attributed text is basically the same
   // with drawing normal text, on Windows attributed text is drawn with the
   // DirectWrite and we have to create a bunch of COM objects everytime.

@@ -225,6 +225,7 @@ struct Type<nu::AttributedText> {
            "setfontfor", &nu::AttributedText::SetFontFor,
            "setcolor", &nu::AttributedText::SetColor,
            "setcolorfor", &nu::AttributedText::SetColorFor,
+           "getsize", &nu::AttributedText::GetSize,
            "getboundsfor", &nu::AttributedText::GetBoundsFor,
            "getformat", &nu::AttributedText::GetFormat,
            "gettext", &nu::AttributedText::GetText);
@@ -707,15 +708,6 @@ struct Type<nu::TextAttributes> {
 };
 
 template<>
-struct Type<nu::TextMetrics> {
-  static constexpr const char* name = "yue.TextMetrics";
-  static inline void Push(State* state, const nu::TextMetrics& metrics) {
-    NewTable(state, 0, 1);
-    RawSet(state, -1, "size", metrics.size);
-  }
-};
-
-template<>
 struct Type<nu::Painter> {
   static constexpr const char* name = "yue.Painter";
   static void BuildMetaTable(State* state, int metatable) {
@@ -747,7 +739,6 @@ struct Type<nu::Painter> {
            "drawcanvas", &nu::Painter::DrawCanvas,
            "drawcanvasfromrect", &nu::Painter::DrawCanvasFromRect,
            "drawattributedtext", &nu::Painter::DrawAttributedText,
-           "measuretext", &nu::Painter::MeasureText,
            "drawtext", &nu::Painter::DrawText);
   }
 };

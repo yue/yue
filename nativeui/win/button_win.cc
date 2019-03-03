@@ -9,14 +9,11 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/win/scoped_hdc.h"
 #include "nativeui/container.h"
+#include "nativeui/gfx/attributed_text.h"
 #include "nativeui/gfx/geometry/insets.h"
-#include "nativeui/gfx/geometry/point_conversions.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
-#include "nativeui/gfx/geometry/vector2d_conversions.h"
 #include "nativeui/gfx/image.h"
-#include "nativeui/gfx/win/screen_win.h"
-#include "nativeui/gfx/win/text_win.h"
 #include "nativeui/state.h"
 #include "nativeui/system.h"
 #include "nativeui/win/clickable.h"
@@ -39,23 +36,20 @@ class ButtonImpl : public Clickable {
   }
 
   void SetTitle(const base::string16& title) {
-    title_ = title;
-    OnDPIChanged();  // update component size
+    text_ = new AttributedText(
+        title, {TextAlign::Center, TextAlign::Center, false /* wrap */});
+    UpdateTitleBounds();
     Invalidate();
-  }
-
-  base::string16 GetTitle() const {
-    return title_;
   }
 
   void SetImage(Image* image) {
     image_ = image;
-    OnDPIChanged();  // update component size
+    image_size_ = image_ ? image_->GetSize() : SizeF();
     Invalidate();
   }
 
-  SizeF GetDIPPreferredSize() const {
-    SizeF preferred_size(text_size_);
+  SizeF GetPreferredSize() const {
+    SizeF preferred_size(title_size_);
     if (image_) {
       preferred_size.Enlarge(image_size_.width(), 0);
       preferred_size.set_height(std::max(image_size_.height(),
@@ -64,7 +58,6 @@ class ButtonImpl : public Clickable {
                type() == ControlType::Radio) {
       preferred_size.Enlarge(box_size_.width(), 0);
     }
-    preferred_size = ScaleSize(preferred_size, 1.f / scale_factor());
     preferred_size.Enlarge(kButtonPadding * 2, kButtonPadding * 2);
     return preferred_size;
   }
@@ -106,8 +99,8 @@ class ButtonImpl : public Clickable {
 
   // ViewImpl:
   void Draw(PainterWin* painter, const Rect& dirty) override {
-    SizeF size(size_allocation().size());
-    SizeF preferred_size = ScaleSize(GetDIPPreferredSize(), scale_factor());
+    SizeF size = delegate()->GetBounds().size();
+    SizeF preferred_size = GetPreferredSize();
 
     NativeTheme::ExtraParams params;
     params.button = params_;
@@ -115,7 +108,7 @@ class ButtonImpl : public Clickable {
     // Draw the button background,
     if (type() == ControlType::Button)
       painter->DrawNativeTheme(NativeTheme::Part::Button,
-                               state(), Rect(ToCeiledSize(size)), params);
+                               state(), Rect(size_allocation().size()), params);
 
     // Draw control background as a layer on button background.
     if (!background_color().transparent())
@@ -134,36 +127,31 @@ class ButtonImpl : public Clickable {
       // Draw image.
       PointF image_origin(origin);
       image_origin.set_y((size.height() - image_size_.height()) / 2.f);
-      image_origin = ScalePoint(image_origin, 1.f / scale_factor());
       image_origin.Offset(kButtonPadding, 0);
       painter->DrawImage(image_, RectF(image_origin, image_->GetSize()));
     } else {
       // Draw the box.
       PointF box_origin = origin;
       box_origin.Offset(0, (preferred_size.height() - box_size_.height()) / 2);
-      painter->DrawNativeTheme(type() == ControlType::Checkbox
-                                  ? NativeTheme::Part::Checkbox
-                                  : NativeTheme::Part::Radio,
-                               state(),
-                               Rect(ToFlooredPoint(box_origin), box_size_),
-                               params);
+      RectF box_bounds(box_origin, box_size_);
+      painter->DrawNativeTheme(
+          type() == ControlType::Checkbox ? NativeTheme::Part::Checkbox
+                                          : NativeTheme::Part::Radio,
+          state(),
+          ToNearestRect(ScaleRect(box_bounds, scale_factor())),
+          params);
     }
 
     // The bounds of text.
     RectF text_bounds(origin, preferred_size);
-    float padding = kButtonPadding * scale_factor();
-    text_bounds.Inset(padding, padding);
+    text_bounds.Inset(kButtonPadding, kButtonPadding);
     if (type() == ControlType::Button || image_)
       text_bounds.Inset(image_size_.width(), 0, 0, 0);
     else
       text_bounds.Inset(box_size_.width(), 0, 0, 0);
 
     // The text.
-    Color text_color = is_disabled() ?
-        System::GetColor(System::Color::DisabledText) : color();
-    TextAttributes attributes(font(), text_color, TextAlign::Center,
-                              TextAlign::Center);
-    painter->DrawTextPixel(title_, text_bounds.origin(), attributes);
+    painter->DrawAttributedText(text_.get(), text_bounds);
 
     // Draw focused ring.
     if (HasFocus()) {
@@ -172,8 +160,8 @@ class ButtonImpl : public Clickable {
         rect = Rect(size_allocation().size());
         rect.Inset(Insets(std::ceil(1 * scale_factor())));
       } else {
-        rect = ToEnclosingRect(text_bounds);
-        rect.Inset(-Insets(padding));
+        rect = ToNearestRect(ScaleRect(text_bounds, scale_factor()));
+        rect.Inset(-Insets(kButtonPadding));
       }
       painter->DrawFocusRect(rect);
     }
@@ -183,37 +171,48 @@ class ButtonImpl : public Clickable {
     // Size of checkbox.
     NativeTheme* theme = State::GetCurrent()->GetNativeTheme();
     base::win::ScopedGetDC dc(window() ? window()->hwnd() : NULL);
+    Size box_size;
     if (type() == ControlType::Checkbox)
-      box_size_ = theme->GetThemePartSize(dc, NativeTheme::Part::Checkbox,
-                                          state());
+      box_size = theme->GetThemePartSize(dc, NativeTheme::Part::Checkbox,
+                                         state());
     else if (type() == ControlType::Radio)
-      box_size_ = theme->GetThemePartSize(dc, NativeTheme::Part::Radio,
-                                          state());
-    // Size of title.
-    text_size_ = MeasureText(dc, title_, font());
-    // Size of image.
-    if (image_)
-      image_size_ = ScaleSize(image_->GetSize(), scale_factor());
-    else
-      image_size_ = SizeF();
+      box_size = theme->GetThemePartSize(dc, NativeTheme::Part::Radio,
+                                         state());
+    box_size_ = ScaleSize(SizeF(box_size), 1.f / scale_factor());
   }
 
+  void SetFont(Font* font) override {
+    ViewImpl::SetFont(font);
+    UpdateTitleBounds();
+  }
+
+  void SetState(ControlState state) override {
+    ViewImpl::SetState(state);
+    text_->SetColor(
+        System::GetColor(is_disabled() ? System::Color::DisabledText
+                                       : System::Color::Text));
+  }
+
+  AttributedText* text() const { return text_.get(); }
   NativeTheme::ButtonExtraParams* params() { return &params_; }
 
  private:
+  void UpdateTitleBounds() {
+    text_->SetFont(font());
+    title_size_ = text_->GetSize();
+  }
+
   NativeTheme::ButtonExtraParams params_ = {0};
 
   // The size of box for radio and checkbox.
-  Size box_size_;
-
+  SizeF box_size_;
   // Size of the text.
-  SizeF text_size_;
-
+  SizeF title_size_;
   // Size of the image.
   SizeF image_size_;
 
   Image* image_ = nullptr;  // managed by delegate
-  base::string16 title_;
+  scoped_refptr<AttributedText> text_;
 };
 
 }  // namespace
@@ -233,7 +232,7 @@ void Button::PlatformSetTitle(const std::string& title) {
 }
 
 std::string Button::GetTitle() const {
-  return base::UTF16ToUTF8(static_cast<ButtonImpl*>(GetNative())->GetTitle());
+  return static_cast<ButtonImpl*>(GetNative())->text()->GetText();
 }
 
 void Button::SetChecked(bool checked) {
@@ -251,7 +250,7 @@ void Button::PlatformSetImage(Image* image) {
 
 SizeF Button::GetMinimumSize() const {
   auto* button = static_cast<ButtonImpl*>(GetNative());
-  return button->GetDIPPreferredSize();
+  return button->GetPreferredSize();
 }
 
 }  // namespace nu

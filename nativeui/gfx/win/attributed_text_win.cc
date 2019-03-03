@@ -58,7 +58,12 @@ inline DWRITE_FONT_WEIGHT ToDWriteType(Font::Weight weight) {
 
 AttributedText::AttributedText(const std::string& text,
                                const TextFormat& format)
-    : format_(format), original_text_(base::UTF8ToUTF16(text)) {
+    : AttributedText(base::UTF8ToUTF16(text), format) {
+}
+
+AttributedText::AttributedText(const std::wstring& text,
+                               const TextFormat& format)
+    : format_(format), original_text_(text) {
   CHECK(CreateTextLayout(original_text_, format, &text_));
 }
 
@@ -79,6 +84,10 @@ void AttributedText::PlatformSetColorFor(Color color, int start, int end) {
   scoped_refptr<DrawingEffect> drawing_effect(new DrawingEffect);
   drawing_effect->fg_color = color;
   text_->SetDrawingEffect(drawing_effect.get(), range);
+}
+
+SizeF AttributedText::GetSize() const {
+  return GetBoundsFor(SizeF(FLT_MAX, 0)).size();
 }
 
 RectF AttributedText::GetBoundsFor(const SizeF& size) const {

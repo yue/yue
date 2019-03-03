@@ -5,12 +5,11 @@
 #include "nativeui/group.h"
 
 #include "base/strings/utf_string_conversions.h"
-#include "base/win/scoped_hdc.h"
+#include "nativeui/gfx/attributed_text.h"
 #include "nativeui/gfx/color.h"
 #include "nativeui/gfx/geometry/insets.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/gfx/geometry/vector2d.h"
-#include "nativeui/gfx/win/text_win.h"
 #include "nativeui/win/container_win.h"
 
 namespace nu {
@@ -18,7 +17,13 @@ namespace nu {
 namespace {
 
 // The offset of title to left of rect.
-const int kTitleLeftMargin = 5;
+const float kTitleLeftMargin = 5.f;
+
+// The padding between title and border.
+const float kTitlePadding = 2.f;
+
+// The padding between border and content.
+const float kPadding = 2.f;
 
 class GroupImpl : public ContainerImpl,
                   public ContainerImpl::Adapter {
@@ -27,25 +32,22 @@ class GroupImpl : public ContainerImpl,
       : ContainerImpl(delegate, this), delegate_(delegate) {}
 
   void SetTitle(const base::string16& title) {
-    title_ = title;
-    OnDPIChanged();  // update component size
+    text_ = new AttributedText(
+        title, {TextAlign::Center, TextAlign::Start, false /* wrap */});
+    text_->SetColor(color());
+    UpdateTitleBounds();
   }
 
-  base::string16 GetTitle() const {
-    return title_;
-  }
-
-  Insets GetBorder() const {
-    int padding = std::ceil(2 * scale_factor());
-    return Insets(title_bounds_.height() + padding, padding * 2,
-                  padding * 2, padding * 2);
+  InsetsF GetBorder() const {
+    return Insets(title_bounds_.height() + kPadding, kPadding * 2,
+                  kPadding * 2, kPadding * 2);
   }
 
   // ContainerImpl:
   void Layout() override {
-    Rect child_alloc(size_allocation());
+    RectF child_alloc(delegate_->GetBounds().size());
     child_alloc.Inset(GetBorder());
-    delegate_->GetContentView()->GetNative()->SizeAllocate(child_alloc);
+    delegate_->GetContentView()->SetBounds(child_alloc);
   }
 
   void ForEach(const std::function<bool(ViewImpl*)>& callback,
@@ -58,60 +60,71 @@ class GroupImpl : public ContainerImpl,
   }
 
   // ViewImpl:
-  void Draw(PainterWin* painter, const Rect& dirty) override {
+  void Draw(PainterWin* painter, const Rect& raw_dirty) override {
     // Draw title.
-    if (dirty.Intersects(ToEnclosedRect(title_bounds_))) {
-      TextAttributes attributes(font(), color(), TextAlign::Center,
-                                TextAlign::Center);
-      painter->DrawTextPixel(title_, title_bounds_.origin(), attributes);
-    }
+    RectF dirty = ScaleRect(RectF(raw_dirty), 1.f / scale_factor());
+    if (dirty.Intersects(title_bounds_))
+      painter->DrawAttributedText(text_.get(), title_bounds_);
 
     // Bounds of the content view.
-    Rect child_bounds(size_allocation().size());
-    Insets border = GetBorder();
+    RectF child_bounds(delegate_->GetBounds().size());
+    InsetsF border = GetBorder();
     child_bounds.Inset(border);
 
     // Draw border.
     painter->BeginPath();
-    painter->MoveToPixel(PointF(title_bounds_.x(),
-                                child_bounds.y() - border.top() / 2.0f));
-    painter->LineToPixel(PointF(child_bounds.x() - border.left() / 2.0f,
-                                child_bounds.y()  - border.top() / 2.0f));
-    painter->LineToPixel(PointF(child_bounds.x()   - border.left() / 2.0f,
-                                child_bounds.bottom() + border.bottom() / 2.f));
-    painter->LineToPixel(PointF(child_bounds.right()  + border.right() / 2,
-                                child_bounds.bottom() + border.bottom() / 2.f));
-    painter->LineToPixel(PointF(child_bounds.right() + border.right() / 2.f,
-                                child_bounds.y()   - border.top() / 2.f));
-    painter->LineToPixel(PointF(title_bounds_.right(),
-                                child_bounds.y()   - border.top() / 2.f));
+    painter->MoveTo(PointF(title_bounds_.x(),
+                           child_bounds.y() - border.top() / 2.0f));
+    painter->LineTo(PointF(child_bounds.x() - border.left() / 2.0f,
+                           child_bounds.y()  - border.top() / 2.0f));
+    painter->LineTo(PointF(child_bounds.x()   - border.left() / 2.0f,
+                           child_bounds.bottom() + border.bottom() / 2.f));
+    painter->LineTo(PointF(child_bounds.right()  + border.right() / 2,
+                           child_bounds.bottom() + border.bottom() / 2.f));
+    painter->LineTo(PointF(child_bounds.right() + border.right() / 2.f,
+                           child_bounds.y()   - border.top() / 2.f));
+    painter->LineTo(PointF(title_bounds_.right(),
+                           child_bounds.y()   - border.top() / 2.f));
     painter->SetColor(Color(255, 170, 170, 170));
     painter->Stroke();
 
     // Draw child.
-    child_bounds.Intersects(dirty);
+    child_bounds.Intersect(dirty);
     if (child_bounds.IsEmpty())
       return;
     Vector2d child_offset(border.left(), border.top());
     painter->Save();
-    painter->ClipRectPixel(child_bounds);
-    painter->TranslatePixel(child_offset);
+    painter->ClipRect(child_bounds);
+    painter->Translate(child_offset);
     delegate_->GetContentView()->GetNative()->Draw(
-        painter, child_bounds - child_offset);
+        painter,
+        ToEnclosedRect(ScaleRect(child_bounds - child_offset, scale_factor())));
     painter->Restore();
   }
 
-  void OnDPIChanged() override {
-    base::win::ScopedGetDC dc(window() ? window()->hwnd() : NULL);
-    // Update the rect of the title.
-    title_bounds_ = RectF(PointF(kTitleLeftMargin * scale_factor(), 0),
-                          MeasureText(dc, title_, font()));
+  void SetFont(Font* font) override {
+    ViewImpl::SetFont(font);
+    UpdateTitleBounds();
   }
 
+  void SetColor(Color color) override {
+    ViewImpl::SetColor(color);
+    text_->SetColor(color);
+  }
+
+  AttributedText* text() const { return text_.get(); }
+
  private:
+  void UpdateTitleBounds() {
+    text_->SetFont(font());
+    SizeF size = text_->GetSize();
+    title_bounds_.SetRect(kTitleLeftMargin, 0,
+                          size.width() + 2 * kTitlePadding, size.height());
+  }
+
   Group* delegate_;
   RectF title_bounds_;
-  base::string16 title_;
+  scoped_refptr<AttributedText> text_;
 };
 
 }  // namespace
@@ -131,14 +144,15 @@ void Group::SetTitle(const std::string& title) {
 }
 
 std::string Group::GetTitle() const {
-  return base::UTF16ToUTF8(static_cast<GroupImpl*>(GetNative())->GetTitle());
+  GroupImpl* group = static_cast<GroupImpl*>(GetNative());
+  return group->text()->GetText();
 }
 
 SizeF Group::GetBorderSize() const {
   GroupImpl* group = static_cast<GroupImpl*>(GetNative());
-  Rect bounds;
+  RectF bounds;
   bounds.Inset(-group->GetBorder());
-  return ScaleSize(SizeF(bounds.size()), 1.0f / group->scale_factor());
+  return bounds.size();
 }
 
 }  // namespace nu

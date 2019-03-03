@@ -13,7 +13,6 @@
 #include "nativeui/gfx/canvas.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/gfx/image.h"
-#include "nativeui/gfx/mac/text_mac.h"
 
 namespace nu {
 
@@ -246,11 +245,6 @@ void PainterMac::DrawAttributedText(AttributedText* text, const RectF& rect) {
   [text->GetNative() drawWithRect:bounds.ToCGRect()
                           options:draw_options
                           context:nil];
-}
-
-TextMetrics PainterMac::MeasureText(const std::string& text, float width,
-                                    const TextAttributes& attributes) {
-  return nu::MeasureText(text, width, attributes);
 }
 
 }  // namespace nu

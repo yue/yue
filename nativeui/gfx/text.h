@@ -47,11 +47,6 @@ struct NATIVEUI_EXPORT TextAttributes : public TextFormat {
   Color color;
 };
 
-// Result of text measurement.
-struct TextMetrics {
-  SizeF size;
-};
-
 }  // namespace nu
 
 #endif  // NATIVEUI_GFX_TEXT_H_

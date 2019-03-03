@@ -94,6 +94,13 @@ void AttributedText::PlatformSetColorFor(Color color, int start, int end) {
   pango_attr_list_insert(attrs, fg_attr);  // ownership taken
 }
 
+SizeF AttributedText::GetSize() const {
+  pango_layout_set_width(text_, -1);
+  int width, height;
+  pango_layout_get_pixel_size(text_, &width, &height);
+  return SizeF(width, height);
+}
+
 RectF AttributedText::GetBoundsFor(const SizeF& size) const {
   if (format_.wrap) {
     pango_layout_set_width(text_, size.width() * PANGO_SCALE);

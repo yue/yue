@@ -4,9 +4,7 @@
 
 #include "nativeui/entry.h"
 
-#include "base/win/scoped_hdc.h"
-#include "nativeui/gfx/screen.h"
-#include "nativeui/gfx/win/text_win.h"
+#include "nativeui/gfx/attributed_text.h"
 #include "nativeui/win/edit_view.h"
 
 namespace nu {
@@ -20,13 +18,6 @@ class EntryImpl : public EditView {
   explicit EntryImpl(Entry* delegate)
       : EditView(delegate, ES_AUTOHSCROLL | WS_CHILD | WS_VISIBLE) {
     SetPlainText();
-  }
-
-  SizeF GetPreferredSize() const {
-    base::win::ScopedGetDC dc(window() ? window()->hwnd() : NULL);
-    SizeF size = MeasureText(dc, L"some text", font());
-    float height = size.height() / scale_factor() + 2 * kEntryPadding;
-    return SizeF(0, height);
   }
 
   // SubwinView:
@@ -75,7 +66,10 @@ std::string Entry::GetText() const {
 }
 
 SizeF Entry::GetMinimumSize() const {
-  return static_cast<EntryImpl*>(GetNative())->GetPreferredSize();
+  scoped_refptr<AttributedText> attributed_text =
+      new AttributedText(L"some text", TextFormat());
+  attributed_text->SetFont(GetNative()->font());
+  return SizeF(0, attributed_text->GetSize().height() + 2 * kEntryPadding);
 }
 
 }  // namespace nu

@@ -24,8 +24,6 @@ void AttributedText::SetFontFor(Font* font, int start, int end) {
   if (RangeInvalid(start, end))
     return;
   PlatformSetFontFor(font, start, end);
-  // Do a AddRef/ReleaseRef to prevent leak if the font is a floating pointer.
-  scoped_refptr<Font>{font};
 }
 
 void AttributedText::SetColor(Color color) {

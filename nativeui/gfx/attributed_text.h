@@ -21,12 +21,16 @@ class SizeF;
 class NATIVEUI_EXPORT AttributedText : public base::RefCounted<AttributedText> {
  public:
   AttributedText(const std::string& text, const TextFormat& format);
+#if defined(OS_WIN)
+  AttributedText(const std::wstring& text, const TextFormat& format);
+#endif
 
   void SetFont(Font* font);
   void SetFontFor(Font* font, int start, int end);
   void SetColor(Color font);
   void SetColorFor(Color font, int start, int end);
 
+  SizeF GetSize() const;
   RectF GetBoundsFor(const SizeF& size) const;
   std::string GetText() const;
 

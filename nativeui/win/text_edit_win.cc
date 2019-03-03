@@ -10,6 +10,7 @@
 
 #include "base/strings/utf_string_conversions.h"
 #include "base/win/scoped_hdc.h"
+#include "nativeui/gfx/attributed_text.h"
 #include "nativeui/gfx/win/gdiplus.h"
 #include "nativeui/win/edit_view.h"
 #include "nativeui/win/util/hwnd_util.h"
@@ -19,7 +20,6 @@ namespace nu {
 namespace {
 
 const int kTextEditPadding = 2;
-const int kLinePadding = 1;
 
 class TextEditImpl : public EditView {
  public:
@@ -27,31 +27,6 @@ class TextEditImpl : public EditView {
       : EditView(delegate, WS_VSCROLL | ES_MULTILINE) {
     set_switch_focus_on_tab(false);
     SetPlainText();
-  }
-
-  RectF GetTextBounds() const {
-    // Lines in the TextEdit.
-    int lines = ::SendMessageW(hwnd(), EM_GETLINECOUNT, 0, 0L);
-    // MeasureString does not measure last empty line, append a char to force
-    // MeasureString to consider the last line.
-    base::string16 text = GetWindowString(hwnd());
-    if (lines > 1 && text[text.size() - 1] == L'\n')
-      text += L'a';
-    // Calculate the text bounds.
-    base::win::ScopedGetDC dc(window() ? window()->hwnd() : NULL);
-    float width = size_allocation().width();
-    Gdiplus::Graphics graphics(dc);
-    Gdiplus::RectF rect;
-    Gdiplus::StringFormat format;
-    graphics.MeasureString(text.data(), static_cast<int>(text.length()),
-                           font()->GetNative(),
-                           Gdiplus::RectF(0.f, 0.f, width, FLT_MAX),
-                           &format, &rect, nullptr, nullptr);
-    // The richedit adds padding between lines.
-    rect.Height += (lines - 1) * kLinePadding;
-    return RectF(0, 0,
-                 rect.Width + 2 * kTextEditPadding,
-                 rect.Height + 2 * kTextEditPadding);
   }
 
  protected:
@@ -181,7 +156,15 @@ void TextEdit::SetScrollbarPolicy(Scroll::Policy h_policy,
 
 RectF TextEdit::GetTextBounds() const {
   auto* edit = static_cast<TextEditImpl*>(GetNative());
-  return ScaleRect(RectF(edit->GetTextBounds()), 1.0f / edit->scale_factor());
+  // Calculate the text bounds.
+  scoped_refptr<AttributedText> attributed_text =
+      new AttributedText(GetWindowString(edit->hwnd()), TextFormat());
+  attributed_text->SetFont(edit->font());
+  RectF bounds = attributed_text->GetBoundsFor(SizeF(GetBounds().size()));
+  // The richedit adds paddings.
+  return RectF(0, 0,
+               bounds.width() + 2 * kTextEditPadding,
+               bounds.height() + 2 * kTextEditPadding);
 }
 
 }  // namespace nu

@@ -11,7 +11,7 @@
 #include <utility>
 
 #include "base/strings/utf_string_conversions.h"
-#include "nativeui/gfx/win/text_win.h"
+#include "nativeui/gfx/attributed_text.h"
 #include "nativeui/table_model.h"
 #include "nativeui/win/util/hwnd_util.h"
 
@@ -104,8 +104,10 @@ int TableImpl::GetRowHeight() const {
     if (ImageList_GetIconSize(image_list_, &cx, &cy))
       return cy;
   }
-  // Default row height be able to draw full text.
-  return std::ceil(MeasureText(L"bp", font()).height());
+  // Default row height should be able to draw full text.
+  scoped_refptr<AttributedText> text = new AttributedText(L"bp", {});
+  text->SetFont(font());
+  return std::ceil(text->GetSize().height());
 }
 
 void TableImpl::OnPaint(HDC dc) {
@@ -363,7 +365,7 @@ void Table::SetRowHeight(float height) {
 
 float Table::GetRowHeight() const {
   auto* table = static_cast<TableImpl*>(GetNative());
-  return table->GetRowHeight() / table->scale_factor();
+  return table->GetRowHeight();
 }
 
 void Table::SelectRow(int row) {

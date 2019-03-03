@@ -116,11 +116,5 @@ methods:
   - signature: void DrawCanvasFromRect(Canvas* canvas, const RectF& src, const RectF& dest)
     description: Draw the specified portion of `canvas` at `src` to fit `rect`.
 
-  - signature: TextMetrics MeasureText(const std::string& text, float width, const TextAttributes& attributes)
-    description: Measure the `text` with `attributes`, with maximum `width`.
-    parameters:
-      width:
-        description: Maximum width, passing `-1` to indicate unlimited width.
-
   - signature: void DrawText(const std::string& text, const RectF& rect, const TextAttributes& attributes)
     description: Draw `text` with `attributes` bounded by `rect`.

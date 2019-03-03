@@ -8,8 +8,8 @@
 
 #include "base/strings/utf_string_conversions.h"
 #include "nativeui/events/event.h"
+#include "nativeui/gfx/attributed_text.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
-#include "nativeui/gfx/win/text_win.h"
 #include "nativeui/win/container_win.h"
 
 namespace nu {
@@ -19,7 +19,7 @@ namespace {
 // Draws the tab items.
 class TabItem : public ViewImpl {
  public:
-  static const int kHPadding = 2;
+  static const int kHPadding = 3;
   static const int kVPadding = 1;
   static const int kTPadding = 1;
 
@@ -28,10 +28,10 @@ class TabItem : public ViewImpl {
   ~TabItem() {}
 
   void SetTitle(base::string16 title) {
-    title_ = std::move(title);
-    size_ = ToCeiledSize(MeasureText(title_, font()));
-    size_.Enlarge(2 * kHPadding * scale_factor(),
-                  2 * kVPadding * scale_factor());
+    text_ = new AttributedText(
+        title, {TextAlign::Center, TextAlign::Center, false /* wrap */});
+    text_->SetColor(color());
+    UpdateTitleBounds();
     Invalidate();
   }
 
@@ -40,12 +40,6 @@ class TabItem : public ViewImpl {
     SetState(selected_ ? ControlState::Pressed : ControlState::Normal);
   }
 
-  bool selected() const { return selected_; }
-  Size size() const { return size_; }
-
-  std::function<void(TabItem*)> on_select;
-
- protected:
   // ViewImpl:
   void Draw(PainterWin* painter, const Rect& dirty) override {
     // The selected item overflows 1-pixel on bottom, so the border of tab
@@ -59,8 +53,8 @@ class TabItem : public ViewImpl {
     painter->DrawNativeTheme(NativeTheme::Part::TabItem, state(), rect, params);
 
     // Draw title.
-    TextAttributes attr(font(), color(), TextAlign::Center, TextAlign::Center);
-    painter->DrawTextPixel(title_, rect, attr);
+    painter->DrawAttributedText(text_.get(),
+                                ScaleRect(RectF(rect), 1.f / scale_factor()));
   }
 
   void OnMouseEnter(NativeEvent event) override {
@@ -87,10 +81,31 @@ class TabItem : public ViewImpl {
     return true;
   }
 
+  void SetFont(Font* font) override {
+    ViewImpl::SetFont(font);
+    UpdateTitleBounds();
+  }
+
+  void SetColor(Color color) override {
+    ViewImpl::SetColor(color);
+    text_->SetColor(color);
+  }
+
+  bool selected() const { return selected_; }
+  SizeF size() const { return size_; }
+
+  std::function<void(TabItem*)> on_select;
+
  private:
+  void UpdateTitleBounds() {
+    text_->SetFont(font());
+    size_ = text_->GetSize();
+    size_.Enlarge(2 * kHPadding, 2 * kVPadding);
+  }
+
   bool selected_ = false;
-  base::string16 title_;
-  Size size_;
+  scoped_refptr<AttributedText> text_;
+  SizeF size_;
 };
 
 // Implementation of the whole tab area, which draws the tab panel.
@@ -161,13 +176,12 @@ class TabImpl : public ContainerImpl,
     return content ? content->GetNative() : nullptr;
   }
 
-  Size GetMinimumSize() const {
+  SizeF GetMinimumSize() const {
     int width = std::accumulate(
         items_.begin(), items_.end(), 0,
         [](int a, auto& b) { return a + b->size_allocation().width(); });
-    Size size(width, GetItemsHeight());
-    size.Enlarge(2 * kContentPadding * scale_factor(),
-                 2 * kContentPadding * scale_factor());
+    SizeF size(width / scale_factor(), GetItemsHeight());
+    size.Enlarge(2 * kContentPadding, 2 * kContentPadding);
     return size;
   }
 
@@ -178,10 +192,12 @@ class TabImpl : public ContainerImpl,
   void Layout() override {
     // Place items.
     int x = 0;
+    int height = std::ceil(GetItemsHeight() * scale_factor());
     for (auto& item : items_) {
-      Rect rect(size_allocation().origin(), item->size());
+      Rect rect(size_allocation().origin(),
+                ToCeiledSize(ScaleSize(item->size(), scale_factor())));
       rect.Offset(x, 0);
-      rect.set_height(GetItemsHeight());
+      rect.set_height(height);
       if (!item->selected())
         rect.Inset(0, TabItem::kTPadding * scale_factor(), 0, 0);
       item->set_size_allocation(rect);
@@ -194,7 +210,7 @@ class TabImpl : public ContainerImpl,
       Rect rect(size_allocation());
       rect.Inset(kContentPadding * scale_factor(),
                  kContentPadding * scale_factor());
-      rect.Inset(0, GetItemsHeight() - 1 * scale_factor(), 0, 0);
+      rect.Inset(0, height - 1 * scale_factor(), 0, 0);
       content->SizeAllocate(rect);
     }
 
@@ -236,26 +252,20 @@ class TabImpl : public ContainerImpl,
     ViewImpl::SetColor(color);
     for (auto& item : items_)
       item->SetColor(color);
-    Invalidate();
   }
 
   void Draw(PainterWin* painter, const Rect& dirty) override {
     // Draw panel background.
     Rect rect(size_allocation().size());
-    if (!items_.empty())
-      rect.Inset(0, GetItemsHeight() - 1, 0, 0);
+    if (!items_.empty()) {
+      int height = std::ceil(GetItemsHeight() * scale_factor() - 1);
+      rect.Inset(0, height, 0, 0);
+    }
     NativeTheme::ExtraParams params;
     painter->DrawNativeTheme(NativeTheme::Part::TabPanel,
                              state(), rect, params);
 
-    // Draw items.
-    for (auto& item : items_)
-      DrawChild(item.get(), painter, dirty);
-
-    // Draw content view.
-    ViewImpl* content = GetSelectedPage();
-    if (content)
-      DrawChild(content, painter, dirty);
+    ContainerImpl::Draw(painter, dirty);
   }
 
   void OnDPIChanged() override {
@@ -267,15 +277,16 @@ class TabImpl : public ContainerImpl,
  private:
   int GetItemsHeight() const {
     if (items_height_ == -1) {
+      scoped_refptr<AttributedText> text = new AttributedText(L"bp", {});
+      text->SetFont(font());
       items_height_ =
-          std::ceil(MeasureText(L"bp", font()).height()) +
-          (2 * TabItem::kVPadding + TabItem::kTPadding) * scale_factor() +
+          std::ceil(text->GetSize().height()) +
+          2 * TabItem::kVPadding + TabItem::kTPadding +
           1;  // leave a 1-pixel line so selected item can overflow
     }
     return items_height_;
   }
 
-  scoped_refptr<Font> item_font_;
   mutable int items_height_ = -1;
 
   TabItem* selected_item_ = nullptr;
@@ -315,7 +326,7 @@ int Tab::GetSelectedPageIndex() const {
 
 SizeF Tab::GetMinimumSize() const {
   TabImpl* tab = static_cast<TabImpl*>(GetNative());
-  return ScaleSize(SizeF(tab->GetMinimumSize()), 1.0f / tab->scale_factor());
+  return tab->GetMinimumSize();
 }
 
 }  // namespace nu

@@ -44,6 +44,10 @@ void AttributedText::PlatformSetColorFor(Color color, int start, int end) {
                 range:NSMakeRange(start, IndexToLength(text_, start, end))];
 }
 
+SizeF AttributedText::GetSize() const {
+  return SizeF([text_ size]);
+}
+
 RectF AttributedText::GetBoundsFor(const SizeF& size) const {
   int draw_options = 0;
   if (format_.wrap)
