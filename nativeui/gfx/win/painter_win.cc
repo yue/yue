@@ -88,28 +88,67 @@ void PainterWin::ClosePath() {
 }
 
 void PainterWin::MoveTo(const PointF& point) {
-  MoveToPixel(ScalePoint(point, scale_factor_));
+  path_.StartFigure();
+  use_gdi_current_point_ = false;
+  current_point_ = ToGdi(ScalePoint(point, scale_factor_));
 }
 
 void PainterWin::LineTo(const PointF& point) {
-  LineToPixel(ScalePoint(point, scale_factor_));
+  Gdiplus::PointF start;
+  if (!GetCurrentPoint(&start)) {
+    MoveTo(point);
+    return;
+  }
+  use_gdi_current_point_ = true;
+  path_.AddLine(start, ToGdi(ScalePoint(point, scale_factor_)));
 }
 
 void PainterWin::BezierCurveTo(const PointF& cp1,
                                const PointF& cp2,
                                const PointF& ep) {
-  BezierCurveToPixel(ScalePoint(cp1, scale_factor_),
-                     ScalePoint(cp2, scale_factor_),
-                     ScalePoint(ep, scale_factor_));
+  Gdiplus::PointF start;
+  if (!GetCurrentPoint(&start)) {
+    MoveTo(ep);
+    return;
+  }
+  use_gdi_current_point_ = true;
+  path_.AddBezier(start,
+                  ToGdi(ScalePoint(cp1, scale_factor_)),
+                  ToGdi(ScalePoint(cp2, scale_factor_)),
+                  ToGdi(ScalePoint(ep, scale_factor_)));
 }
 
 void PainterWin::Arc(const PointF& point, float radius, float sa, float ea) {
-  ArcPixel(ScalePoint(point, scale_factor_), radius * scale_factor_, sa, ea,
-           false);
+  PointF p = ScalePoint(point, scale_factor_);
+  radius *= scale_factor_;
+  bool anticlockwise = false;
+
+  // Normalize the angle.
+  float angle;
+  if (anticlockwise) {
+    if (ea > sa) {
+      while (ea >= sa)
+        ea -= 2.0f * static_cast<float>(M_PI);
+    }
+    angle = sa - ea;
+  } else {
+    if (ea < sa) {
+      while (ea <= sa)
+        ea += 2.0f * static_cast<float>(M_PI);
+    }
+    angle = ea - sa;
+  }
+
+  use_gdi_current_point_ = true;
+  path_.AddArc(p.x() - radius, p.y() - radius, 2.0f * radius, 2.0f * radius,
+               sa / M_PI * 180.0f,
+               (anticlockwise ? -angle : angle) / M_PI * 180.0f);
 }
 
 void PainterWin::Rect(const RectF& rect) {
-  RectPixel(ScaleRect(rect, scale_factor_));
+  path_.AddRectangle(ToGdi(ScaleRect(rect, scale_factor_)));
+  // Drawing rectangle should update current point.
+  MoveTo(rect.origin());
 }
 
 void PainterWin::Clip() {
@@ -169,7 +208,11 @@ void PainterWin::Fill() {
 }
 
 void PainterWin::StrokeRect(const RectF& rect) {
-  StrokeRectPixel(ToEnclosingRect(ScaleRect(rect, scale_factor_)));
+  Gdiplus::Pen pen(ToGdi(top().stroke_color), top().line_width);
+  graphics_.DrawRectangle(&pen, ToGdi(ScaleRect(rect, scale_factor_)));
+  // Should clear current path.
+  use_gdi_current_point_ = true;
+  path_.Reset();
 }
 
 void PainterWin::FillRect(const RectF& rect) {
@@ -234,66 +277,7 @@ void PainterWin::DrawAttributedText(AttributedText* text, const RectF& rect) {
 
 void PainterWin::DrawText(const std::string& text, const RectF& rect,
                           const TextAttributes& attributes) {
-  DrawTextPixel(base::UTF8ToUTF16(text),
-                ToEnclosingRect(ScaleRect(rect, scale_factor_)), attributes);
-}
-
-void PainterWin::MoveToPixel(const PointF& point) {
-  path_.StartFigure();
-  use_gdi_current_point_ = false;
-  current_point_ = ToGdi(point);
-}
-
-void PainterWin::LineToPixel(const PointF& point) {
-  Gdiplus::PointF start;
-  if (!GetCurrentPoint(&start)) {
-    MoveToPixel(point);
-    return;
-  }
-  use_gdi_current_point_ = true;
-  path_.AddLine(start, ToGdi(point));
-}
-
-void PainterWin::BezierCurveToPixel(const PointF& cp1,
-                                    const PointF& cp2,
-                                    const PointF& ep) {
-  Gdiplus::PointF start;
-  if (!GetCurrentPoint(&start)) {
-    MoveToPixel(ep);
-    return;
-  }
-  use_gdi_current_point_ = true;
-  path_.AddBezier(start, ToGdi(cp1), ToGdi(cp2), ToGdi(ep));
-}
-
-void PainterWin::ArcPixel(const PointF& p, float radius, float sa, float ea,
-                          bool anticlockwise) {
-  // Normalize the angle.
-  float angle;
-  if (anticlockwise) {
-    if (ea > sa) {
-      while (ea >= sa)
-        ea -= 2.0f * static_cast<float>(M_PI);
-    }
-    angle = sa - ea;
-  } else {
-    if (ea < sa) {
-      while (ea <= sa)
-        ea += 2.0f * static_cast<float>(M_PI);
-    }
-    angle = ea - sa;
-  }
-
-  use_gdi_current_point_ = true;
-  path_.AddArc(p.x() - radius, p.y() - radius, 2.0f * radius, 2.0f * radius,
-               sa / M_PI * 180.0f,
-               (anticlockwise ? -angle : angle) / M_PI * 180.0f);
-}
-
-void PainterWin::RectPixel(const RectF& rect) {
-  path_.AddRectangle(ToGdi(rect));
-  // Drawing rectangle should update current point.
-  MoveToPixel(rect.origin());
+  DrawText(base::UTF8ToUTF16(text), rect, attributes);
 }
 
 void PainterWin::ClipRectPixel(const nu::Rect& rect) {
@@ -308,14 +292,6 @@ void PainterWin::TranslatePixel(const Vector2d& offset) {
                                Gdiplus::MatrixOrderAppend);
 }
 
-void PainterWin::StrokeRectPixel(const nu::Rect& rect) {
-  Gdiplus::Pen pen(ToGdi(top().stroke_color), top().line_width);
-  graphics_.DrawRectangle(&pen, ToGdi(rect));
-  // Should clear current path.
-  use_gdi_current_point_ = true;
-  path_.Reset();
-}
-
 void PainterWin::FillRectPixel(const nu::Rect& rect) {
   Gdiplus::SolidBrush brush(ToGdi(top().fill_color));
   graphics_.FillRectangle(&brush, ToGdi(rect));
@@ -324,8 +300,8 @@ void PainterWin::FillRectPixel(const nu::Rect& rect) {
   path_.Reset();
 }
 
-void PainterWin::DrawTextPixel(const base::string16& text, const nu::Rect& rect,
-                               const TextAttributes& attributes) {
+void PainterWin::DrawText(const base::string16& text, const RectF& rect,
+                          const TextAttributes& attributes) {
   Gdiplus::SolidBrush brush(ToGdi(attributes.color));
   Gdiplus::StringFormat format;
   format.SetAlignment(ToGdi(attributes.align));
@@ -336,15 +312,8 @@ void PainterWin::DrawTextPixel(const base::string16& text, const nu::Rect& rect,
     format.SetTrimming(Gdiplus::StringTrimmingEllipsisCharacter);
   graphics_.DrawString(
       text.c_str(), static_cast<int>(text.size()),
-      attributes.font->GetNative(), ToGdi(RectF(rect)), &format, &brush);
-}
-
-void PainterWin::DrawTextPixel(const base::string16& text, const PointF& point,
-                               const TextAttributes& attributes) {
-  Gdiplus::SolidBrush brush(ToGdi(attributes.color));
-  graphics_.DrawString(
-      text.c_str(), static_cast<int>(text.size()),
-      attributes.font->GetNative(), ToGdi(point), &brush);
+      attributes.font->GetNative(), ToGdi(ScaleRect(rect, scale_factor_)),
+      &format, &brush);
 }
 
 void PainterWin::Initialize(float scale_factor) {

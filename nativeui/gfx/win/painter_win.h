@@ -77,22 +77,16 @@ class PainterWin : public Painter {
                 const TextAttributes& attributes) override;
 
   // The pixel versions.
-  void MoveToPixel(const PointF& point);
-  void LineToPixel(const PointF& point);
-  void BezierCurveToPixel(const PointF& cp1,
-                          const PointF& cp2,
-                          const PointF& ep);
-  void ArcPixel(const PointF& point, float r, float sa, float ea,
-                bool anticlockwise);
-  void RectPixel(const RectF& rect);
   void ClipRectPixel(const nu::Rect& rect);
   void TranslatePixel(const Vector2d& offset);
   void StrokeRectPixel(const nu::Rect& rect);
   void FillRectPixel(const nu::Rect& rect);
-  void DrawTextPixel(const base::string16& text, const nu::Rect& rect,
-                     const TextAttributes& attributes);
-  void DrawTextPixel(const base::string16& text, const PointF& point,
-                     const TextAttributes& attributes);
+
+  // The UTF16 versions
+  void DrawText(const base::string16& text, const RectF& rect,
+                const TextAttributes& attributes);
+  void DrawText(const base::string16& text, const PointF& point,
+                const TextAttributes& attributes);
 
  private:
   // Used for common initialization.
