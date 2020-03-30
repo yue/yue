@@ -93,8 +93,8 @@ struct Type<T, typename std::enable_if<
   static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                           T callback) {
     using RunType = typename internal::FunctorTraits<T>::RunType;
-    return CreateFunctionTemplate(
-        context, std::function<RunType>(callback))->GetFunction();
+    return CreateFunctionTemplate(context, std::function<RunType>(callback))
+               ->GetFunction(context).ToLocalChecked();
   }
 };
 
@@ -106,8 +106,9 @@ struct Type<T, typename std::enable_if<
   static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                           T callback) {
     using RunType = typename internal::FunctorTraits<T>::RunType;
-    return CreateFunctionTemplate(context,  std::function<RunType>(callback),
-                                  HolderIsFirstArgument)->GetFunction();
+    return CreateFunctionTemplate(context, std::function<RunType>(callback),
+                                  HolderIsFirstArgument)->GetFunction(context)
+                                                        .ToLocalChecked();
   }
 };
 

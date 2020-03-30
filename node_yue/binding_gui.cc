@@ -1479,15 +1479,18 @@ struct Type<nu::View> {
   }
   static void SetStyle(
       Arguments* args,
+      v8::Local<v8::Context> context,
       const std::map<std::string, v8::Local<v8::Value>>& styles) {
     nu::View* view;
     if (!args->GetHolder(&view))
       return;
     for (const auto& it : styles) {
       if (it.second->IsNumber())
-        view->SetStyleProperty(it.first, it.second->NumberValue());
+        view->SetStyleProperty(
+            it.first, it.second->NumberValue(context).ToChecked());
       else
-        view->SetStyleProperty(it.first, *v8::String::Utf8Value(it.second));
+        view->SetStyleProperty(
+            it.first, *v8::String::Utf8Value(args->isolate(), it.second));
     }
     view->Layout();
   }

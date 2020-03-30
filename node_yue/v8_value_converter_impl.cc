@@ -338,7 +338,7 @@ std::unique_ptr<base::Value> V8ValueConverterImpl::FromV8ValueImpl(
   }
 
   if (val->IsString()) {
-    v8::String::Utf8Value utf8(val);
+    v8::String::Utf8Value utf8(isolate, val);
     return base::MakeUnique<base::Value>(std::string(*utf8, utf8.length()));
   }
 
@@ -360,7 +360,7 @@ std::unique_ptr<base::Value> V8ValueConverterImpl::FromV8ValueImpl(
     if (!reg_exp_allowed_)
       // JSON.stringify converts to an object.
       return FromV8Object(val.As<v8::Object>(), state, isolate);
-    return base::MakeUnique<base::Value>(*v8::String::Utf8Value(val));
+    return base::MakeUnique<base::Value>(*v8::String::Utf8Value(isolate, val));
   }
 
   // v8::Value doesn't have a ToArray() method for some reason.
@@ -410,7 +410,8 @@ std::unique_ptr<base::Value> V8ValueConverterImpl::FromV8Array(
       child_v8 = v8::Null(isolate);
     }
 
-    if (!val->HasRealIndexedProperty(i)) {
+    if (!val->HasRealIndexedProperty(isolate->GetCurrentContext(), i)
+             .FromMaybe(false)) {
       result->Append(base::MakeUnique<base::Value>());
       continue;
     }
@@ -478,7 +479,11 @@ std::unique_ptr<base::Value> V8ValueConverterImpl::FromV8Object(
     return base::MakeUnique<base::DictionaryValue>();
 
   std::unique_ptr<base::DictionaryValue> result(new base::DictionaryValue());
-  v8::Local<v8::Array> property_names(val->GetOwnPropertyNames());
+  v8::Local<v8::Array> property_names;
+  if (!val->GetOwnPropertyNames(isolate->GetCurrentContext())
+           .ToLocal(&property_names)) {
+    return std::move(result);
+  }
 
   for (uint32_t i = 0; i < property_names->Length(); ++i) {
     v8::Local<v8::Value> key(property_names->Get(i));
@@ -486,13 +491,13 @@ std::unique_ptr<base::Value> V8ValueConverterImpl::FromV8Object(
     // Extend this test to cover more types as necessary and if sensible.
     if (!key->IsString() &&
         !key->IsNumber()) {
-      NOTREACHED() << "Key \"" << *v8::String::Utf8Value(key)
+      NOTREACHED() << "Key \"" << *v8::String::Utf8Value(isolate, key)
                    << "\" "
                       "is neither a string nor a number";
       continue;
     }
 
-    v8::String::Utf8Value name_utf8(key);
+    v8::String::Utf8Value name_utf8(isolate, key);
 
     v8::TryCatch try_catch(isolate);
     v8::Local<v8::Value> child_v8 = val->Get(key);

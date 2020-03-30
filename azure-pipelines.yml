@@ -20,7 +20,7 @@ jobs:
 - job: macos_build
   displayName: 'Build for macOS'
   pool:
-    vmImage: 'macOS-10.13'
+    vmImage: 'macOS-10.14'
   strategy:
     matrix:
       x64:

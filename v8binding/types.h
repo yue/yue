@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "base/strings/string_piece.h"
+#include "base/strings/string_util.h"
 #include "v8.h"  // NOLINT(build/include)
 #include "v8binding/template_util.h"
 
@@ -114,10 +115,10 @@ struct Type<std::string> {
                      std::string* out) {
     if (value->IsString()) {
       v8::Local<v8::String> str = v8::Local<v8::String>::Cast(value);
-      int length = str->Utf8Length();
+      int length = str->Utf8Length(context->GetIsolate());
       if (length > 0) {
         out->resize(length);
-        str->WriteUtf8(&out->front(), length, nullptr,
+        str->WriteUtf8(context->GetIsolate(), &out->front(), length, nullptr,
                        v8::String::NO_NULL_TERMINATION);
       } else {
         out->clear();
@@ -199,8 +200,13 @@ struct Type<base::string16> {
                      base::string16* out) {
     if (!value->IsString())
       return false;
-    v8::String::Value s(value);
-    out->assign(reinterpret_cast<const base::char16*>(*s), s.length());
+    v8::Local<v8::String> str = v8::Local<v8::String>::Cast(value);
+    int length = str->Length();
+    // Note that the reinterpret cast is because on Windows string16 is an alias
+    // to wstring, and hence has character type wchar_t not uint16_t.
+    str->Write(context->GetIsolate(),
+               reinterpret_cast<uint16_t*>(base::WriteInto(out, length + 1)), 0,
+               length);
     return true;
   }
 };
