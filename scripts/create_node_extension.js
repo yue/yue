@@ -29,18 +29,15 @@ const args = [
   `node_runtime="${runtime}"`,
 ]
 
-if (targetOs != 'win') {
-  args.push('is_clang=true',
-            'clang_update_script="//building/tools/update-clang.py"')
-}
-
 if (targetOs == 'mac') {
   args.push('mac_deployment_target="10.9.0"',
             'mac_sdk_min="10.12"',
-            'use_xcode_clang=false')
+            'use_xcode_clang=true')
 }
 
 if (targetOs == 'linux') {
+  args.push('is_clang=true',
+            'clang_update_script="//building/tools/update-clang.py"')
   args.push('target_sysroot_dir="//third_party/"')
 }
 

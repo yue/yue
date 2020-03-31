@@ -14,10 +14,8 @@ let sysrootArch = {
   arm64: 'arm64',
 }[targetCpu]
 
-if (process.platform != 'win32') {
-  execSync('python building/tools/update-clang.py')
-}
 if (process.platform == 'linux') {
+  execSync('python building/tools/update-clang.py')
   execSync(`python building/tools/install-sysroot.py --arch ${sysrootArch}`)
 }
 
@@ -51,19 +49,18 @@ const releaseConfig = [
 if (targetOs != 'win') {
   // Don't set official build for Windows, which increases the size of libyue.
   releaseConfig.push('is_official_build=true')
-
-  // Use our custom clang script.
-  commonConfig.push('is_clang=true',
-                    'clang_update_script="//building/tools/update-clang.py"')
 }
 
 if (targetOs == 'mac') {
   commonConfig.push('mac_deployment_target="10.9.0"',
                     'mac_sdk_min="10.12"',
-                    'use_xcode_clang=false')
+                    'use_xcode_clang=true')
 }
 
 if (targetOs == 'linux') {
+  // Use our custom clang script.
+  commonConfig.push('is_clang=true',
+                    'clang_update_script="//building/tools/update-clang.py"')
   // Use custom sysroot.
   commonConfig.push('target_sysroot_dir="//third_party/"')
   // This flag caused weird compilation errors when building on Linux.
