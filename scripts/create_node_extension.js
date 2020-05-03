@@ -24,6 +24,7 @@ const args = [
   'is_debug=false',
   'is_official_build=true',
   'use_sysroot=true',
+  'use_allocator="none"',
   `target_cpu="${targetCpu}"`,
   // Set node nodever and runtime.
   `node_version="${nodever}"`,

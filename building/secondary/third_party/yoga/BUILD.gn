@@ -6,7 +6,6 @@ config("yoga_config") {
 
 source_set("yoga") {
   sources = [
-    "yoga/CompactValue.h",
     "yoga/Utils.cpp",
     "yoga/Utils.h",
     "yoga/YGConfig.cpp",

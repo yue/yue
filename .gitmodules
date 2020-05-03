@@ -1,27 +1,12 @@
 [submodule "third_party/modp_b64"]
 	path = third_party/modp_b64
 	url = https://chromium.googlesource.com/chromium/src/third_party/modp_b64
-[submodule "third_party/icu"]
-	path = third_party/icu
-	url = https://chromium.googlesource.com/chromium/deps/icu
-[submodule "third_party/zlib"]
-	path = third_party/zlib
-	url = https://chromium.googlesource.com/chromium/src/third_party/zlib
-[submodule "third_party/tcmalloc/chromium"]
-	path = third_party/tcmalloc/chromium
-	url = https://chromium.googlesource.com/chromium/src/third_party/tcmalloc/chromium
 [submodule "base"]
 	path = base
 	url = https://github.com/yue/base
 [submodule "third_party/yoga"]
 	path = third_party/yoga
 	url = https://github.com/facebook/yoga
-[submodule "third_party/yxml"]
-	path = third_party/yxml
-	url = git://g.blicky.net/yxml.git
-[submodule "third_party/ced/src"]
-	path = third_party/ced/src
-	url = https://github.com/google/compact_enc_det.git
 [submodule "third_party/lua"]
 	path = third_party/lua
 	url = https://github.com/ejoy/lua.git
