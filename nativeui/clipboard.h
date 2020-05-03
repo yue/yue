@@ -11,6 +11,13 @@
 #include "base/memory/weak_ptr.h"
 #include "nativeui/gfx/image.h"
 
+#if defined(OS_LINUX)
+// X11 headers define macros for these function names which screw with us.
+#if defined(None)
+#undef None
+#endif
+#endif
+
 namespace nu {
 
 // Native clipboard, can only be obtained from App.

@@ -106,7 +106,7 @@ cairo_region_t* CreateRegionForNonAlphaArea(cairo_t* cr) {
 }
 
 // User clicks the close button.
-gboolean OnClose(GtkWidget* widget, GdkEvent* event, Window* window) {
+gboolean OnDelete(GtkWidget* widget, GdkEvent* event, Window* window) {
   if (!window->should_close || window->should_close(window))
     window->Close();
 
@@ -154,7 +154,8 @@ void OnScreenChanged(GtkWidget* widget, GdkScreen* old_screen, Window* window) {
 }
 
 // Set input shape for frameless transparent window.
-gboolean OnDraw(GtkWidget* widget, cairo_t* cr, NUWindowPrivate* priv) {
+gboolean OnDrawBackground(GtkWidget* widget, cairo_t* cr,
+                          NUWindowPrivate* priv) {
   cairo_region_t* region = CreateRegionForNonAlphaArea(cr);
   gtk_widget_input_shape_combine_region(widget, region);
   cairo_region_destroy(region);
@@ -190,7 +191,7 @@ void Window::PlatformInit(const Options& options) {
   gtk_window_set_focus_on_map(window_, false);
 
   // Window events.
-  g_signal_connect(window_, "delete-event", G_CALLBACK(OnClose), this);
+  g_signal_connect(window_, "delete-event", G_CALLBACK(OnDelete), this);
   g_signal_connect(window_, "map-event", G_CALLBACK(OnMap), priv);
   g_signal_connect(window_, "window-state-event",
                    G_CALLBACK(OnWindowState), priv);
@@ -262,7 +263,7 @@ void Window::PlatformSetContentView(View* view) {
     if (!priv->is_draw_handler_set) {
       priv->is_draw_handler_set = true;
       priv->draw_handler_id = g_signal_connect_after(
-          G_OBJECT(window_), "draw", G_CALLBACK(OnDraw), priv);
+          G_OBJECT(window_), "draw", G_CALLBACK(OnDrawBackground), priv);
     }
   }
 }

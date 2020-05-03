@@ -14,7 +14,7 @@ namespace nu {
 
 namespace {
 
-void OnClick(GtkButton*, Button* button) {
+void OnButtonClick(GtkButton*, Button* button) {
   button->on_click.Emit(button);
 }
 
@@ -28,7 +28,7 @@ Button::Button(const std::string& title, Type type) {
   else if (type == Type::Radio)
     TakeOverView(gtk_radio_button_new_with_label(nullptr, title.c_str()));
   UpdateDefaultStyle();
-  g_signal_connect(GetNative(), "clicked", G_CALLBACK(OnClick), this);
+  g_signal_connect(GetNative(), "clicked", G_CALLBACK(OnButtonClick), this);
 }
 
 Button::~Button() {

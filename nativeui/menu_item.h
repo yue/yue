@@ -12,6 +12,13 @@
 #include "nativeui/signal.h"
 #include "nativeui/types.h"
 
+#if defined(OS_LINUX)
+// X11 headers define macros for these function names which screw with us.
+#if defined(None)
+#undef None
+#endif
+#endif
+
 namespace nu {
 
 class AcceleratorManager;

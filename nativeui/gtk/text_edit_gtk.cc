@@ -15,7 +15,7 @@ namespace nu {
 
 namespace {
 
-GtkPolicyType PolicyToGTK(Scroll::Policy policy) {
+GtkPolicyType ToGTK(Scroll::Policy policy) {
   if (policy == Scroll::Policy::Always)
     return GTK_POLICY_ALWAYS;
   else if (policy == Scroll::Policy::Never)
@@ -192,7 +192,7 @@ void TextEdit::SetOverlayScrollbar(bool overlay) {
 void TextEdit::SetScrollbarPolicy(Scroll::Policy h_policy,
                                   Scroll::Policy v_policy) {
   gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(GetNative()),
-                                 PolicyToGTK(h_policy), PolicyToGTK(v_policy));
+                                 ToGTK(h_policy), ToGTK(v_policy));
 }
 
 RectF TextEdit::GetTextBounds() const {

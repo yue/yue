@@ -16,7 +16,7 @@ void OnActivate(GtkEntry*, Entry* entry) {
   entry->on_activate.Emit(entry);
 }
 
-void OnTextChange(GtkEditable*, Entry* entry) {
+void OnEntryTextChange(GtkEditable*, Entry* entry) {
   entry->on_text_change.Emit(entry);
 }
 
@@ -33,7 +33,7 @@ Entry::Entry(Type type) {
   }
 
   g_signal_connect(GetNative(), "activate", G_CALLBACK(OnActivate), this);
-  g_signal_connect(GetNative(), "changed", G_CALLBACK(OnTextChange), this);
+  g_signal_connect(GetNative(), "changed", G_CALLBACK(OnEntryTextChange), this);
 }
 
 Entry::~Entry() {

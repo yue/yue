@@ -9,6 +9,13 @@
 
 #include "nativeui/view.h"
 
+#if defined(OS_LINUX)
+// X11 headers define macros for these function names which screw with us.
+#if defined(Always)
+#undef Always
+#endif
+#endif
+
 namespace nu {
 
 class NATIVEUI_EXPORT Scroll : public View {

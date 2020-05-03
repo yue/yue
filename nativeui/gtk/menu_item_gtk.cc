@@ -94,7 +94,7 @@ void OnStockClick(GtkWidget*, MenuItem* item) {
 }
 
 // Normal handling of the clicking.
-void OnClick(GtkMenuItem*, MenuItem* item) {
+void OnItemClick(GtkMenuItem*, MenuItem* item) {
   item->on_click.Emit(item);
 }
 
@@ -157,7 +157,7 @@ void MenuItem::PlatformInit() {
       case Type::Checkbox: item = gtk_check_menu_item_new(); break;
       case Type::Separator: item = gtk_separator_menu_item_new(); break;
     }
-    g_signal_connect(item, "activate", G_CALLBACK(OnClick), this);
+    g_signal_connect(item, "activate", G_CALLBACK(OnItemClick), this);
   }
 
   gtk_widget_show(item);

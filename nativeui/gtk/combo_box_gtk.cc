@@ -10,7 +10,7 @@ namespace nu {
 
 namespace {
 
-void OnTextChange(GObject* widget, ComboBox* combbox) {
+void OnComTextChange(GObject* widget, ComboBox* combbox) {
   if (g_object_get_data(widget, "ignore-change")) {
     g_object_set_data(widget, "ignore-change", nullptr);
     return;
@@ -22,7 +22,7 @@ void OnTextChange(GObject* widget, ComboBox* combbox) {
 
 ComboBox::ComboBox() : Picker(gtk_combo_box_text_new_with_entry()) {
   GtkWidget* entry = gtk_bin_get_child(GTK_BIN(GetNative()));
-  g_signal_connect(entry, "changed", G_CALLBACK(OnTextChange), this);
+  g_signal_connect(entry, "changed", G_CALLBACK(OnComTextChange), this);
 }
 
 ComboBox::~ComboBox() {
