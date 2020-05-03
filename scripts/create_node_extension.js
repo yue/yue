@@ -18,6 +18,7 @@ const runtime = argv[0]
 const nodever = argv[1].startsWith('v') ? argv[1] : `v${argv[1]}`
 
 const args = [
+  'use_jumbo_build=true',
   // Same with Release build.
   'is_component_build=false',
   'is_debug=false',
