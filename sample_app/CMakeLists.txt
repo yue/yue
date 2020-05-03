@@ -63,7 +63,7 @@ if(WIN32)
                         setupapi.lib powrprof.lib ws2_32.lib dbghelp.lib
                         shlwapi.lib version.lib winmm.lib psapi.lib dwmapi.lib
                         propsys.lib comctl32.lib gdi32.lib gdiplus.lib
-                        urlmon.lib
+                        urlmon.lib userenv.lib
                         optimized ${LIBYUE_DIR}/Release/libyue.lib
                         debug ${LIBYUE_DIR}/Debug/libyue.lib)
   foreach(flag_var
