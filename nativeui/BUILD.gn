@@ -2,6 +2,7 @@
 # Use of this source code is governed by the license that can be found in the
 # LICENSE file.
 
+import("//build/config/jumbo.gni")
 import("//testing/test.gni")
 
 if (!is_component_build) {
@@ -14,7 +15,7 @@ if (!is_component_build) {
   }
 }
 
-component("nativeui") {
+jumbo_component("nativeui") {
   sources = [
     "nativeui.h",
     "nativeui_export.h",

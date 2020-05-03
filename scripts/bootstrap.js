@@ -46,6 +46,10 @@ const releaseConfig = [
   'use_sysroot=true',
 ]
 
+if (process.env.CI === 'true') {
+  commonConfig.push('use_jumbo_build=true')
+}
+
 if (targetOs != 'win') {
   // Don't set official build for Windows, which increases the size of libyue.
   releaseConfig.push('is_official_build=true')
