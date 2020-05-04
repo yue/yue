@@ -5,9 +5,9 @@
 #ifndef NATIVEUI_WIN_BROWSER_WIN_H_
 #define NATIVEUI_WIN_BROWSER_WIN_H_
 
-#include <exdisp.h>
+#include <unknwn.h>
+#include <exdisp.h>  // NOLINT
 #include <mshtml.h>
-#include <ole2.h>
 #include <wrl.h>
 
 #include "nativeui/browser.h"

@@ -33,8 +33,9 @@ if (targetOs != 'linux' || targetCpu == 'x64') {
 execSync('node ./scripts/build.js out/Release')
 execSync('node ./scripts/build.js out/Debug')
 
-// Test  distributions.
-execSync(`node ./scripts/test_libyue.js`)
+// Test distributions.
+if (targetCpu === 'x64')
+  execSync(`node ./scripts/test_libyue.js`)
 
 // Build node extensions.
 const runtimes = {

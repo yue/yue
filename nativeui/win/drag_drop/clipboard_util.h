@@ -6,6 +6,10 @@
 #ifndef NATIVEUI_WIN_DRAG_DROP_CLIPBOARD_UTIL_H_
 #define NATIVEUI_WIN_DRAG_DROP_CLIPBOARD_UTIL_H_
 
+#include <windows.h>
+#include <shellapi.h>  // NOLINT
+#include <objidl.h>  // NOLINT
+
 #include <string>
 #include <vector>
 

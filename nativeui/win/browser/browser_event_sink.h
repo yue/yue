@@ -5,7 +5,8 @@
 #ifndef NATIVEUI_WIN_BROWSER_BROWSER_EVENT_SINK_H_
 #define NATIVEUI_WIN_BROWSER_BROWSER_EVENT_SINK_H_
 
-#include <exdisp.h>
+#include <unknwn.h>
+#include <exdisp.h>  // NOLINT
 #include <ole2.h>
 
 #include "base/macros.h"

@@ -4,7 +4,8 @@
 
 #include "nativeui/win/browser/browser_external_sink.h"
 
-#include <exdisp.h>
+#include <unknwn.h>
+#include <exdisp.h>  // NOLINT
 #include <shlwapi.h>
 
 #include <memory>

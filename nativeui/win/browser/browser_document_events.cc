@@ -4,7 +4,8 @@
 
 #include "nativeui/win/browser/browser_document_events.h"
 
-#include <exdisp.h>
+#include <unknwn.h>
+#include <exdisp.h>  // NOLINT
 #include <mshtmdid.h>
 #include <mshtml.h>
 #include <shlwapi.h>

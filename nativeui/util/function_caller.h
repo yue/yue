@@ -54,7 +54,7 @@ struct CallContext {
 
 // Converters for various types.
 template<typename T>
-inline bool GetArgument(CallContext* context, base::Value* arg, T* value) {
+inline void GetArgument(CallContext* context, base::Value* arg, T* value) {
   // Just use default value by default.
   context->current_arg++;
 }

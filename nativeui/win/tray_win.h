@@ -5,6 +5,9 @@
 #ifndef NATIVEUI_WIN_TRAY_WIN_H_
 #define NATIVEUI_WIN_TRAY_WIN_H_
 
+#include <windows.h>
+#include <shellapi.h>  // NOLINT
+
 #include "base/win/scoped_gdi_object.h"
 #include "nativeui/tray.h"
 

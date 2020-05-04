@@ -6,6 +6,7 @@
 #include "nativeui/win/window_win.h"
 
 #include <dwmapi.h>
+#include <shellapi.h>
 
 #include <limits>
 #include <memory>

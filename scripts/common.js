@@ -84,6 +84,19 @@ const download = (url, callback, log=true) => {
   })
 }
 
+// Return all the files recursivley.
+function searchFiles(dir, suffix, list = []) {
+  return fs.readdirSync(dir).reduce((list, filename) => {
+    const p = path.join(dir, filename)
+    const stat = fs.statSync(p)
+    if (stat.isFile() && filename.endsWith(suffix))
+      list.push(p)
+    else if (stat.isDirectory())
+      searchFiles(p, suffix, list)
+    return list
+  }, list)
+}
+
 // Helper around execSync.
 const execSyncWrapper = (command, options = {}) => {
   // Print command output by default.
@@ -122,6 +135,7 @@ module.exports = {
   targetOs,
   mkdir,
   download,
+  searchFiles,
   execSync: execSyncWrapper,
   spawnSync: spawnSyncWrapper,
 }

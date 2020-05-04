@@ -27,7 +27,6 @@ execSync(`node scripts/download_node_headers.js node ${process.version} ${target
 const commonConfig = [
   'fatal_linker_warnings=false',
   `target_cpu="${targetCpu}"`,
-  'use_allocator="none"',
   'node_runtime="node"',
   `node_version="${process.version}"`,
 ]

@@ -1,10 +1,12 @@
 # Copyright 2016 Cheng Zhao. All rights reserved.
 
+import("//build/config/jumbo.gni")
+
 config("yoga_config") {
   include_dirs = [ "//third_party/yoga/yoga" ]
 }
 
-source_set("yoga") {
+jumbo_source_set("yoga") {
   sources = [
     "yoga/Utils.cpp",
     "yoga/Utils.h",

@@ -4,7 +4,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {argv, version, targetCpu, targetOs, execSync, mkdir} = require('./common')
+const {version, targetOs, execSync, spawnSync, mkdir} = require('./common')
 
 const fs = require('fs')
 const os = require('os')
@@ -12,13 +12,12 @@ const path = require('path')
 const extract = require('./libs/extract-zip')
 
 // Our work dir.
-const zipname = `libyue_${version}_${targetOs}_${targetCpu}`
+const zipname = `libyue_${version}_${targetOs}`
 const tmppath = path.join(os.tmpdir(), zipname)
 
 // Bulid and package.
 console.log('Building libyue...')
 execSync('node scripts/build.js out/Release')
-execSync('node scripts/build.js out/Debug')
 console.log('Zipping and unzipping libyue...')
 execSync('node scripts/create_dist.js')
 extract(`out/Dist/${zipname}.zip`, {dir: tmppath}, runTests)
@@ -28,9 +27,6 @@ function runTests(error) {
     console.error(error)
     process.exit(1)
   }
-  if (targetCpu !== 'x64' && targetOs !== 'win') {
-    return
-  }
   process.chdir(tmppath)
   generateProject()
   buildProject()
@@ -38,30 +34,20 @@ function runTests(error) {
 }
 
 function generateProject() {
-  if (process.platform == 'linux') {
-    mkdir('Release')
-    execSync('cmake -D CMAKE_BUILD_TYPE=Release ..', {cwd: 'Release'})
-    mkdir('Debug')
-    execSync('cmake -D CMAKE_BUILD_TYPE=Debug ..', {cwd: 'Debug'})
-  } else if (process.platform == 'darwin') {
+  if (process.platform == 'linux' || process.platform == 'darwin') {
     mkdir('build')
-    execSync('cmake .. -G Xcode', {cwd: 'build'})
+    execSync('cmake ..', {cwd: 'build'})
   } else if (process.platform == 'win32') {
-    mkdir('build')
-    if (targetCpu == 'x64')
-      execSync('cmake .. -G "Visual Studio 15 2017 Win64"', {cwd: 'build'})
-    else if (targetCpu == 'x86')
-      execSync('cmake .. -G "Visual Studio 15 2017"', {cwd: 'build'})
+    mkdir('build_x64')
+    mkdir('build_Win32')
+    spawnSync('cmake', ['..', '-G', 'Visual Studio 15 2017 Win64'], {cwd: 'build_x64'})
+    spawnSync('cmake', ['..', '-G', 'Visual Studio 15 2017'], {cwd: 'build_Win32'})
   }
 }
 
 function buildProject() {
-  if (process.platform == 'linux') {
-    execSync('make', {cwd: 'Release'})
-    execSync('make', {cwd: 'Debug'})
-  } else if (process.platform == 'darwin') {
-    execSync('xcodebuild -configuration Release', {cwd: 'build'})
-    execSync('xcodebuild -configuration Debug', {cwd: 'build'})
+  if (process.platform == 'linux' || process.platform == 'darwin') {
+    execSync(`make -j ${os.cpus().length}`, {cwd: 'build'})
   } else if (process.platform == 'win32') {
     const vsPaths = [
       'C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\MSBuild\\15.0\\Bin',
@@ -69,10 +55,9 @@ function buildProject() {
       process.env.PATH
     ]
     const env = Object.assign(process.env, {PATH: vsPaths.join(path.delimiter)})
-    const platform = targetCpu == 'x64' ? 'x64' : 'Win32'
-    execSync(`msbuild.exe YueSampleApp.sln /p:Configuration=Release /p:Platform=${platform}`,
-             {cwd: 'build', env})
-    execSync(`msbuild.exe YueSampleApp.sln /p:Configuration=Debug /p:Platform=${platform}`,
-             {cwd: 'build', env})
+    for (const platform of ['x64', 'Win32']) {
+      spawnSync('msbuild', ['YueSampleApp.sln', '/p:Configuration=Release', '/p:Platform=' + platform],
+                {cwd: 'build_' + platform, env})
+    }
   }
 }

@@ -9,8 +9,4 @@ group("default") {
     "//lua_yue:yue_runtime",
     "//sample_app",
   ]
-
-  if (!is_component_build) {
-    deps += [ "//nativeui:libyue" ]
-  }
 }

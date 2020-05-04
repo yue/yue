@@ -5,7 +5,8 @@
 #ifndef NATIVEUI_WIN_BROWSER_BROWSER_HTML_MONIKER_H_
 #define NATIVEUI_WIN_BROWSER_BROWSER_HTML_MONIKER_H_
 
-#include <exdisp.h>
+#include <unknwn.h>
+#include <exdisp.h>  // NOLINT
 #include <mshtmhst.h>
 #include <ole2.h>
 #include <wrl.h>

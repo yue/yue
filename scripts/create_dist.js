@@ -4,24 +4,11 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {version, targetCpu, targetOs, mkdir, execSync} = require('./common')
+const {version, targetCpu, targetOs, searchFiles, execSync} = require('./common')
 
-const fs = require('fs')
 const path = require('path')
+const fs = require('./libs/fs-extra')
 const JSZip = require('./libs/jszip')
-
-// C++ static library.
-const staticLibs = {
-  linux: [
-    'libyue.a',
-  ],
-  mac: [
-    'libyue.a',
-  ],
-  win: [
-    'libyue.lib',
-  ],
-}
 
 // Lua loadable module.
 const luaFiles = {
@@ -50,79 +37,43 @@ const exeFiles = {
 }
 
 // Clear previous distributions.
-mkdir('out/Dist')
-fs.readdirSync('out/Dist').forEach((f) => {
-  if (f.endsWith('.zip'))
-    fs.unlinkSync(`out/Dist/${f}`)
-})
+fs.removeSync('out/Dist')
+fs.ensureDirSync('out/Dist')
 
 // Strip binaries for Linux.
 if (targetOs == 'linux') {
-  const list = staticLibs.linux.concat(luaFiles.linux).concat(exeFiles.linux)
+  const list = luaFiles.linux.concat(exeFiles.linux)
   for (const file of list)
     strip(`out/Release/${file}`)
 }
-
-// Zip the static library and headers.
-const yuezip = new JSZip()
-const headers =
-  searchFiles('base', '.h').concat(
-  searchFiles('nativeui', '.h'))
-for (const h of headers)
-  addFileToZip(yuezip, h, '', 'include')
-const buildHeaders =
-  searchFiles('building/tools/gn/testing', '.h').concat(
-  searchFiles('building/tools/gn/third_party/googletest/src/googletest/include', '.h')).concat(
-  ['building/tools/gn/build/build_config.h', 'building/tools/gn/build/buildflag.h'])
-for (const h of buildHeaders)
-  addFileToZip(yuezip, h, 'building/tools/gn', 'include')
-for (const file of staticLibs[targetOs]) {
-  addFileToZip(yuezip, `out/Release/${file}`, 'out/Release', 'Release')
-  addFileToZip(yuezip, `out/Debug/${file}`, 'out/Debug', 'Debug')
-}
-for (const config of ['Debug', 'Release']) {
-  if (targetOs == 'win') {
-    const pdbs = searchFiles(`out/${config}/obj`, '.pdb')
-    for (const p of pdbs)
-      addFileToZip(yuezip, p, path.dirname(p), config)
-  }
-  const gens = searchFiles(`out/${config}/gen`, '.h')
-  for (const h of gens)
-    addFileToZip(yuezip, h, `out/${config}/gen`, `${config}/include`)
-}
-addFileToZip(yuezip, 'sample_app/CMakeLists.txt', 'sample_app')
-addFileToZip(yuezip, 'sample_app/main.cc', '')
-generateZip('libyue', [], yuezip)
 
 // Zip other binaries.
 generateZip('yue_runtime', exeFiles[targetOs])
 generateZip('lua_yue_lua_5.3', luaFiles[targetOs])
 
+// Zip sources.
+if (targetCpu == 'x64') {
+  execSync('node ./scripts/create_source_dist.js')
+  const zip = addFileToZip(new JSZip(), 'out/Dist/source', 'out/Dist/source')
+  addFileToZip(zip, 'sample_app/CMakeLists.txt', 'sample_app')
+  addFileToZip(zip, 'sample_app/main.cc', '')
+  addLicenseToZip(zip)
+  writeZipToFile(zip, `libyue_${version}_${targetOs}`)
+}
+
 // Zip docs, but only do it for linux/x64 when running on CI, to avoid uploading
 // docs for multiple times.
 if (process.env.CI != 'true' || (targetOs == 'linux' && targetCpu == 'x64')) {
   execSync('node ./scripts/create_docs.js')
-  addFileToZip(new JSZip(), 'out/Dist/docs', 'out/Dist/docs')
-    .generateNodeStream({
-      streamFiles:true,
-      compression: 'DEFLATE',
-      compressionOptions: {
-        level: 9
-      }
-    }).pipe(fs.createWriteStream(`out/Dist/yue_docs_${version}.zip`))
+  writeZipToFile(addFileToZip(new JSZip(), 'out/Dist/docs', 'out/Dist/docs'),
+                 `yue_docs_${version}`)
 }
 
 function generateZip(name, list, zip = new JSZip()) {
-  const zipname = `${name}_${version}_${targetOs}_${targetCpu}`
   for (let file of list)
     addFileToZip(zip, `out/Release/${file}`, 'out/Release')
-  zip.file('LICENSE', collectLicenses())
-  zip.generateNodeStream({
-      streamFiles:true,
-      compression: 'DEFLATE',
-      compressionOptions: {
-        level: 9
-      }}).pipe(fs.createWriteStream(`out/Dist/${zipname}.zip`))
+  addLicenseToZip(zip)
+  writeZipToFile(zip, `${name}_${version}_${targetOs}_${targetCpu}`)
 }
 
 function addFileToZip(zip, file, base, prefix = '', suffix = '') {
@@ -154,16 +105,18 @@ function addFileToZip(zip, file, base, prefix = '', suffix = '') {
   return zip
 }
 
-function searchFiles(dir, suffix, list = []) {
-  return fs.readdirSync(dir).reduce((list, filename) => {
-    const p = path.join(dir, filename)
-    const stat = fs.statSync(p)
-    if (stat.isFile() && filename.endsWith(suffix))
-      list.push(p)
-    else if (stat.isDirectory())
-      searchFiles(p, suffix, list)
-    return list
-  }, list)
+const licenses = collectLicenses()
+function addLicenseToZip(zip) {
+  zip.file('LICENSE', collectLicenses())
+}
+
+function writeZipToFile(zip, name) {
+  zip.generateNodeStream({
+      streamFiles: true,
+      compression: 'DEFLATE',
+      compressionOptions: {
+        level: 9
+      }}).pipe(fs.createWriteStream(`out/Dist/${name}.zip`))
 }
 
 function strip(file) {

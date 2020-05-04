@@ -5,16 +5,6 @@
 import("//build/config/jumbo.gni")
 import("//testing/test.gni")
 
-if (!is_component_build) {
-  static_library("libyue") {
-    complete_static_lib = true
-    output_prefix_override = true  # do not add "lib" prefix
-    output_dir = root_out_dir
-
-    deps = [ ":nativeui" ]
-  }
-}
-
 jumbo_component("nativeui") {
   sources = [
     "nativeui.h",
@@ -159,6 +149,7 @@ jumbo_component("nativeui") {
     "gfx/win/screen_win.cc",
     "gfx/win/screen_win.h",
     "gfx/win/text_win.cc",
+    "gfx/win/text_win.h",
     "gfx/win/gdiplus.h",
     "gfx/win/native_theme.cc",
     "gfx/win/native_theme.h",
@@ -216,6 +207,7 @@ jumbo_component("nativeui") {
     "gtk/combo_box_gtk.cc",
     "gtk/container_gtk.cc",
     "gtk/cursor_gtk.cc",
+    "gtk/drag_operation_gtk.h",
     "gtk/dragging_info_gtk.cc",
     "gtk/dragging_info_gtk.h",
     "gtk/entry_gtk.cc",

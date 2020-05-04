@@ -6,6 +6,7 @@
 #define NATIVEUI_GFX_WIN_GDIPLUS_H_
 
 #include <windows.h>
+#include <objidl.h>  // NOLINT
 
 // Work around the compilation problems when using gdiplus.
 #include <algorithm>
