@@ -94,7 +94,7 @@ struct Type<bool> {
                      bool* out) {
     if (!value->IsBoolean())
       return false;
-    *out = value->BooleanValue(context).ToChecked();
+    *out = value->BooleanValue(context->GetIsolate());
     return true;
   }
 };

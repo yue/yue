@@ -216,8 +216,8 @@ v8::Local<v8::Value> V8ValueConverterImpl::ToV8ValueImpl(
       std::string val;
       CHECK(value->GetAsString(&val));
       return v8::String::NewFromUtf8(
-          isolate, val.c_str(), v8::String::kNormalString,
-          static_cast<int>(val.length()));
+          isolate, val.c_str(), v8::NewStringType::kNormal,
+          static_cast<int>(val.length())).ToLocalChecked();
     }
 
     case base::Value::Type::LIST:
@@ -284,8 +284,9 @@ v8::Local<v8::Value> V8ValueConverterImpl::ToV8Object(
 
     v8::Maybe<bool> maybe = result->CreateDataProperty(
         context,
-        v8::String::NewFromUtf8(isolate, key.c_str(), v8::String::kNormalString,
-                                static_cast<int>(key.length())),
+        v8::String::NewFromUtf8(
+            isolate, key.c_str(), v8::NewStringType::kNormal,
+            static_cast<int>(key.length())).ToLocalChecked(),
         child_v8);
     if (!maybe.IsJust() || !maybe.FromJust())
       LOG(ERROR) << "Failed to set property with key " << key;
@@ -323,7 +324,7 @@ std::unique_ptr<base::Value> V8ValueConverterImpl::FromV8ValueImpl(
     return base::MakeUnique<base::Value>(val->ToBoolean(isolate)->Value());
 
   if (val->IsInt32())
-    return base::MakeUnique<base::Value>(val->ToInt32(isolate)->Value());
+    return base::MakeUnique<base::Value>(val.As<v8::Int32>()->Value());
 
   if (val->IsNumber()) {
     double val_as_double = val.As<v8::Number>()->Value();
@@ -351,7 +352,7 @@ std::unique_ptr<base::Value> V8ValueConverterImpl::FromV8ValueImpl(
     if (!date_allowed_)
       // JSON.stringify would convert this to a string, but an object is more
       // consistent within this class.
-      return FromV8Object(val->ToObject(isolate), state, isolate);
+      return FromV8Object(val.As<v8::Object>(), state, isolate);
     v8::Date* date = v8::Date::Cast(*val);
     return base::MakeUnique<base::Value>(date->ValueOf() / 1000.0);
   }
@@ -404,8 +405,10 @@ std::unique_ptr<base::Value> V8ValueConverterImpl::FromV8Array(
   // Only fields with integer keys are carried over to the ListValue.
   for (uint32_t i = 0; i < val->Length(); ++i) {
     v8::TryCatch try_catch(isolate);
-    v8::Local<v8::Value> child_v8 = val->Get(i);
-    if (try_catch.HasCaught()) {
+    v8::Local<v8::Value> child_v8;
+    v8::MaybeLocal<v8::Value> maybe_child =
+        val->Get(isolate->GetCurrentContext(), i);
+    if (try_catch.HasCaught() || !maybe_child.ToLocal(&child_v8)) {
       LOG(ERROR) << "Getter for index " << i << " threw an exception.";
       child_v8 = v8::Null(isolate);
     }
@@ -486,7 +489,8 @@ std::unique_ptr<base::Value> V8ValueConverterImpl::FromV8Object(
   }
 
   for (uint32_t i = 0; i < property_names->Length(); ++i) {
-    v8::Local<v8::Value> key(property_names->Get(i));
+    v8::Local<v8::Value> key =
+        property_names->Get(isolate->GetCurrentContext(), i).ToLocalChecked();
 
     // Extend this test to cover more types as necessary and if sensible.
     if (!key->IsString() &&
@@ -500,11 +504,12 @@ std::unique_ptr<base::Value> V8ValueConverterImpl::FromV8Object(
     v8::String::Utf8Value name_utf8(isolate, key);
 
     v8::TryCatch try_catch(isolate);
-    v8::Local<v8::Value> child_v8 = val->Get(key);
-
-    if (try_catch.HasCaught()) {
-      LOG(WARNING) << "Getter for property " << *name_utf8
-                   << " threw an exception.";
+    v8::Local<v8::Value> child_v8;
+    v8::MaybeLocal<v8::Value> maybe_child =
+        val->Get(isolate->GetCurrentContext(), key);
+    if (try_catch.HasCaught() || !maybe_child.ToLocal(&child_v8)) {
+      LOG(ERROR) << "Getter for property " << *name_utf8
+                 << " threw an exception.";
       child_v8 = v8::Null(isolate);
     }
 

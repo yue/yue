@@ -40,8 +40,8 @@ if (targetCpu === 'x64')
 // Build node extensions.
 const runtimes = {
   node: [
-    '10.19.0',
-    '12.16.1',
+    '12.16.3',
+    '14.1.0',
   ],
   electron: [
   ],
