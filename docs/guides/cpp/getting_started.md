@@ -121,7 +121,7 @@ tutorial if you are too lazy to learn CMake.
 
    ```bash
    cmake .. -D CMAKE_BUILD_TYPE=Release
-   open YueSampleApp.xcodeproj
+   open Yue.xcodeproj
    ```
 
    __Linux__
@@ -138,7 +138,7 @@ tutorial if you are too lazy to learn CMake.
 
    ```bash
    cmake .. -G "Visual Studio 15 2017 Win64"
-   start YueSampleApp.sln
+   start Yue.sln
    ```
 
 [base]: https://chromium.googlesource.com/chromium/src/base/

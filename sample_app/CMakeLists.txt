@@ -3,13 +3,16 @@ cmake_minimum_required(VERSION 3.4)
 # Target macOS version, Have to set this before creating project.
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.10)
 
-# Project name and executable name.
-project(YueSampleApp)
-set(APP_NAME "sample_app")
-set(LIBYUE "yue")
+# Project name.
+project(Yue)
+set(LIBYUE "Yue")
 
-# The main executable.
-add_executable(${APP_NAME} ${APP_NAME}/main.cc)
+# Define the sample_app if there is no app specified.
+if(NOT DEFINED APP_NAME)
+  set(APP_NAME "sample_app")
+  add_executable(${APP_NAME} sample_app/main.cc)
+  target_link_libraries(${APP_NAME} ${LIBYUE})
+endif()
 
 # The Yue library to link to.
 if(APPLE)
@@ -20,18 +23,16 @@ elseif(UNIX AND NOT APPLE)
   file(GLOB_RECURSE YUE_SOURCES src/linux/*.cc src/linux/*.c)
 endif()
 add_library(${LIBYUE} ${YUE_SOURCES})
-target_include_directories(${LIBYUE} PUBLIC "${CMAKE_SOURCE_DIR}/include")
-target_link_libraries(${APP_NAME} ${LIBYUE})
+# file(GLOB_RECURSE YUE_HEADERS include/*.h)
+# target_sources(${LIBYUE} PUBLIC ${YUE_HEADERS})
+target_include_directories(${LIBYUE} PUBLIC include)
 
 # Use C++14 standard.
-set_target_properties(${APP_NAME} ${LIBYUE} PROPERTIES
-                      CXX_STANDARD 14
-                      CXX_STANDARD_REQUIRED ON
-                      CXX_EXTENSIONS ON)
+target_compile_features(${LIBYUE} PUBLIC cxx_std_14)
 
 # macOS configuration.
 if(APPLE)
-  target_include_directories(${LIBYUE} PRIVATE "${CMAKE_SOURCE_DIR}/src/mac")
+  target_include_directories(${LIBYUE} PRIVATE src/mac)
   find_library(APPKIT AppKit)
   find_library(IOKIT IOKit)
   find_library(SECURITY Security)
@@ -46,9 +47,9 @@ endif()
 
 # win32 configuration
 if(WIN32)
-  set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  set_property(DIRECTORY ${CMAKE_SOURCE_DIR}
                PROPERTY VS_STARTUP_PROJECT ${APP_NAME})
-  target_include_directories(${LIBYUE} PRIVATE "${CMAKE_SOURCE_DIR}/src/win")
+  target_include_directories(${LIBYUE} PRIVATE src/win)
   target_compile_definitions(${LIBYUE} PUBLIC
                              _WINDOWS WIN32 WIN32_LEAN_AND_MEAN NOMINMAX
                              _UNICODE UNICODE)
@@ -68,7 +69,7 @@ endif()
 
 # Linux configuration
 if(UNIX AND NOT APPLE)
-  target_include_directories(${LIBYUE} PRIVATE "${CMAKE_SOURCE_DIR}/src/linux")
+  target_include_directories(${LIBYUE} PRIVATE src/linux)
   find_package(PkgConfig)
   pkg_search_module(GTK3 REQUIRED gtk+-3.0)
   pkg_search_module(X11 REQUIRED x11)
