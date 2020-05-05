@@ -5,15 +5,10 @@ description: How to use Yue with Lua.
 
 # Getting started
 
-Lua support in Yue is currently experimental, there are two modes provided:
-
-* A standalone runtime of Lua 5.3 that ships Yue as built-in module;
-* A loadable module built for Lua 5.3.
-
-They can be downloaded in the [Releases](https://github.com/yue/yue/releases)
-page, the standalone runtime is in the `yue_runtime_VERSION_PLATFORM_ARCH.zip`
-archive, the loadable module is in the `lua_yue_LUA-VERSION_VERSION_PLATFORM_ARCH.zip`
-archive.
+Currently Lua support in Yue is experimental, and a loadable module built
+for Lua 5.3 is provided which can be downloaded from the
+[Releases](https://github.com/yue/yue/releases) page. The filename is
+`lua_yue_LUA-VERSION_VERSION_PLATFORM_ARCH.zip`.
 
 There are plans on making Yue available in LuaRocks.
 

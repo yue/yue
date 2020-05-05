@@ -23,32 +23,17 @@ const luaFiles = {
   ],
 }
 
-// Independent executable.
-const exeFiles = {
-  linux: [
-    'yue_runtime',
-  ],
-  mac: [
-    'yue_runtime',
-  ],
-  win: [
-    'yue_runtime.exe',
-  ],
-}
-
 // Clear previous distributions.
 fs.removeSync('out/Dist')
 fs.ensureDirSync('out/Dist')
 
 // Strip binaries for Linux.
 if (targetOs == 'linux') {
-  const list = luaFiles.linux.concat(exeFiles.linux)
-  for (const file of list)
+  for (const file of luaFiles[targetOs])
     strip(`out/Release/${file}`)
 }
 
 // Zip other binaries.
-generateZip('yue_runtime', exeFiles[targetOs])
 generateZip('lua_yue_lua_5.3', luaFiles[targetOs])
 
 // Zip sources.
