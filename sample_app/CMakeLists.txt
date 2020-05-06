@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.4)
+cmake_minimum_required(VERSION 3.13)
 
 # Target macOS version, Have to set this before creating project.
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.10)
@@ -7,11 +7,13 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET 10.10)
 project(Yue)
 set(LIBYUE "Yue")
 
-# Define the sample_app if there is no app specified.
-if(NOT DEFINED APP_NAME)
+# Define the sample_app if this is the top dir.
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
   set(APP_NAME "sample_app")
   add_executable(${APP_NAME} sample_app/main.cc)
   target_link_libraries(${APP_NAME} ${LIBYUE})
+  set_property(DIRECTORY ${CMAKE_SOURCE_DIR}
+               PROPERTY VS_STARTUP_PROJECT ${APP_NAME})
 endif()
 
 # The Yue library to link to.
@@ -23,8 +25,6 @@ elseif(UNIX AND NOT APPLE)
   file(GLOB_RECURSE YUE_SOURCES src/linux/*.cc src/linux/*.c)
 endif()
 add_library(${LIBYUE} ${YUE_SOURCES})
-# file(GLOB_RECURSE YUE_HEADERS include/*.h)
-# target_sources(${LIBYUE} PUBLIC ${YUE_HEADERS})
 target_include_directories(${LIBYUE} PUBLIC include)
 
 # Use C++14 standard.
@@ -41,14 +41,12 @@ if(APPLE)
                         ${APPKIT} ${IOKIT} ${SECURITY} ${WEBKIT})
   set_target_properties(${LIBYUE} PROPERTIES COMPILE_FLAGS
                         "-Wno-deprecated-declarations")
-  set_target_properties(${APP_NAME} PROPERTIES LINK_FLAGS
-                        "-Wl,-dead_strip")
+  target_link_options(${LIBYUE} PUBLIC
+                      "-Wl,-dead_strip")
 endif()
 
 # win32 configuration
 if(WIN32)
-  set_property(DIRECTORY ${CMAKE_SOURCE_DIR}
-               PROPERTY VS_STARTUP_PROJECT ${APP_NAME})
   target_include_directories(${LIBYUE} PRIVATE src/win)
   target_compile_definitions(${LIBYUE} PUBLIC
                              _WINDOWS WIN32 WIN32_LEAN_AND_MEAN NOMINMAX
@@ -60,11 +58,11 @@ if(WIN32)
                         urlmon.lib userenv.lib)
   set_target_properties(${LIBYUE} PROPERTIES COMPILE_FLAGS
                         "/wd4244 /wd4267 /wd4312 /wd4838 /wd4996")
-  set_target_properties(${APP_NAME} PROPERTIES LINK_FLAGS
-                        "/DELAYLOAD:setupapi.dll \
-                         /DELAYLOAD:powrprof.dll \
-                         /DELAYLOAD:dwmapi.dll \
-                         /SUBSYSTEM:WINDOWS")
+  target_link_options(${LIBYUE} PUBLIC
+                      "/DELAYLOAD:setupapi.dll \
+                       /DELAYLOAD:powrprof.dll \
+                       /DELAYLOAD:dwmapi.dll \
+                       /SUBSYSTEM:WINDOWS")
 endif()
 
 # Linux configuration
@@ -89,6 +87,6 @@ if(UNIX AND NOT APPLE)
                         ${WEBKIT2GTK_LIBRARIES})
   set_target_properties(${LIBYUE} PROPERTIES COMPILE_FLAGS
                         "-fdata-sections -ffunction-sections -Wno-deprecated-declarations")
-  set_target_properties(${APP_NAME} PROPERTIES LINK_FLAGS
-                        "-Wl,--as-needed -Wl,--gc-section")
+  target_link_options(${LIBYUE} PUBLIC
+                      "-Wl,--as-needed,--gc-section")
 endif()

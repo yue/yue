@@ -70,25 +70,29 @@ int main(int argc, const char *argv[]) {
 
 ## Building the program from source code
 
-There is no assumption on which build system you should use, to use Yue, you can
+There is no assumption on which build system you should use. To use Yue, you can
 download the `libyue_VERSION_PLATFORM.zip` archive from the [Releases][releases]
 page, which includes header and source files of Yue.
 
 The `libyue` zip archive includes following files:
 
 * `include` - Headers of `nativeui` and `base` libraries.
-* `src` - Source code.
+* `src`
+  * `mac` - Source code for macOS platform.
+  * `linux` - Source code for Linux platform.
+  * `win` - Source code for Win32 platform.
 * `sample_app` - A sample app using Yue.
 * `CMakeLists.txt` - An example cmake file building the sample app.
 
 Note that since `base` and `nativeui` are very complex codebases,
 implementations for different platforms have been split into different files,
-and it would cause headaches when building them with different build systems.
+and it would cause headaches when building them directly with build systems
+other than `GN`.
 
-In order to make it simple to embed Yue into other systems, the `libyue` zip
-archives include processed source code files: each platform gets its own source
-code archives, which can be added to any build system without worrying about
-adding special compiling rules.
+So in order to make it simple to embed Yue into other build systems, the
+`libyue` zip archives include processed source code files: each platform gets
+its own source code archives, which can be added to any build system directly
+without worrying about adding special compiling rules.
 
 If you are working on a cross-platform app and want to build for all platforms,
 you can simply download all the source code archives and merge them together.
@@ -96,13 +100,10 @@ The C++ files for each platform are organized into different subdirectories
 under `src`, and you only need to add rules to tell your build system to build
 each subdirectory on each platform.
 
+### CMake
+
 The `CMakeLists.txt` shipped in the `libyue` zip archives provides an example
-of building apps with Yue from source code using cmake.
-
-### Quick start with CMake
-
-CMake can generate projects according to your preferences, this is a quick start
-tutorial if you are too lazy to learn CMake.
+of building apps with Yue from source code using CMake. To try it:
 
 1. [Download CMake](https://cmake.org/download/).
 
@@ -120,26 +121,35 @@ tutorial if you are too lazy to learn CMake.
    __macOS__
 
    ```bash
-   cmake .. -D CMAKE_BUILD_TYPE=Release
+   cmake .. -G Xcode
    open Yue.xcodeproj
    ```
 
    __Linux__
 
    ```bash
-   cmake .. -D CMAKE_BUILD_TYPE=Release ..
+   cmake .. -D CMAKE_BUILD_TYPE=Release
    make
    ```
 
    __Windows__
 
-   Note that on Windows you need to manually specify the version of Visual
-   Studio and the architecture to build for.
-
    ```bash
    cmake .. -G "Visual Studio 15 2017 Win64"
    start Yue.sln
    ```
+
+### Reuse the `CMakeLists.txt`
+
+The provided `CMakeLists.txt` file is also designed to be reused by existing
+CMake projects directly:
+
+```cmake
+add_subdirectory(libyue)
+target_link_libraries(YourApp Yue)
+```
+
+A live example can be found at https://github.com/yue/muban.
 
 [base]: https://chromium.googlesource.com/chromium/src/base/
 [releases]: https://github.com/yue/yue/releases
