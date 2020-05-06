@@ -32,6 +32,7 @@ if (targetOs != 'linux' || targetCpu == 'x64') {
 // Build common targets.
 execSync('node ./scripts/build.js out/Release')
 execSync('node ./scripts/build.js out/Debug')
+execSync('node scripts/create_dist.js')
 
 // Test distributions.
 if (targetCpu === 'x64')
