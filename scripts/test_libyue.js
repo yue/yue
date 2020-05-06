@@ -56,8 +56,13 @@ function buildProject() {
     ]
     const env = Object.assign(process.env, {PATH: vsPaths.join(path.delimiter)})
     for (const platform of ['x64', 'Win32']) {
-      spawnSync('msbuild', ['Yue.sln', '/p:Configuration=Release', '/p:Platform=' + platform],
-                {cwd: 'build_' + platform, env})
+      spawnSync(
+        'msbuild',
+        ['Yue.sln',
+          '/maxcpucount:' + os.cpus().length,
+          '/p:Configuration=Release',
+          '/p:Platform=' + platform],
+        {cwd: 'build_' + platform, env})
     }
   }
 }
