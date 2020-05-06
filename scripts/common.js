@@ -115,7 +115,10 @@ const spawnSyncWrapper = (exec, args, options = {}) => {
   // Merge the custom env to global env.
   if (options.env)
     options.env = Object.assign(options.env, process.env)
-  return spawnSync(exec, args, options)
+  const result = spawnSync(exec, args, options)
+  if (result.error)
+    throw error
+  return result
 }
 
 // Don't log out Node.js stack trace.
