@@ -1,7 +1,12 @@
 cmake_minimum_required(VERSION 3.13)
 
-# Target macOS version, Have to set this before creating project.
-set(CMAKE_OSX_DEPLOYMENT_TARGET 10.10)
+if(APPLE)
+  # Target macOS version, Have to set this before creating project.
+  set(CMAKE_OSX_DEPLOYMENT_TARGET 10.10)
+elseif(WIN32)
+  # Use Windows 10 SDK.
+  set(CMAKE_SYSTEM_VERSION 10.0)
+endif()
 
 # Project name.
 project(Yue)
@@ -59,10 +64,7 @@ if(WIN32)
   set_target_properties(${LIBYUE} PROPERTIES COMPILE_FLAGS
                         "/wd4244 /wd4267 /wd4312 /wd4838 /wd4996")
   target_link_options(${LIBYUE} PUBLIC
-                      "/DELAYLOAD:setupapi.dll \
-                       /DELAYLOAD:powrprof.dll \
-                       /DELAYLOAD:dwmapi.dll \
-                       /SUBSYSTEM:WINDOWS")
+                      "/DELAYLOAD:setupapi.dll;/DELAYLOAD:powrprof.dll;/DELAYLOAD:dwmapi.dll;/SUBSYSTEM:WINDOWS")
 endif()
 
 # Linux configuration
