@@ -35,7 +35,7 @@ execSync('node ./scripts/build.js out/Debug')
 execSync('node scripts/create_dist.js')
 
 // Test distributions.
-if (targetCpu === 'x64')
+if (targetCpu == 'x64' || targetOs == 'win')
   execSync(`node ./scripts/test_libyue.js`)
 
 // Build node extensions.

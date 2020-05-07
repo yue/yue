@@ -37,35 +37,39 @@ function runTests(error) {
 }
 
 function generateProject() {
-  if (process.platform == 'linux' || process.platform == 'darwin') {
+  if (targetOs == 'win') {
+    if (targetCpu == 'x86') {
+      fs.ensureDirSync('build_Win32')
+      spawnSync('cmake', ['..', '-G', 'Visual Studio 15 2017'],
+                {cwd: 'build_Win32'})
+    } else {
+      fs.ensureDirSync('build_x64')
+      spawnSync('cmake', ['..', '-G', 'Visual Studio 15 2017 Win64'],
+                {cwd: 'build_x64'})
+    }
+  } else {
     fs.ensureDirSync('build')
     execSync('cmake ..', {cwd: 'build'})
-  } else if (process.platform == 'win32') {
-    fs.ensureDirSync('build_x64')
-    fs.ensureDirSync('build_Win32')
-    spawnSync('cmake', ['..', '-G', 'Visual Studio 15 2017 Win64'], {cwd: 'build_x64'})
-    spawnSync('cmake', ['..', '-G', 'Visual Studio 15 2017'], {cwd: 'build_Win32'})
   }
 }
 
 function buildProject() {
-  if (process.platform == 'linux' || process.platform == 'darwin') {
-    execSync(`make -j ${os.cpus().length}`, {cwd: 'build'})
-  } else if (process.platform == 'win32') {
+  if (targetOs == 'win') {
     const vsPaths = [
       'C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\MSBuild\\15.0\\Bin',
       'C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Enterprise\\MSBuild\\15.0\\Bin',
       process.env.PATH
     ]
     const env = Object.assign(process.env, {PATH: vsPaths.join(path.delimiter)})
-    for (const platform of ['x64', 'Win32']) {
-      spawnSync(
-        'msbuild',
-        ['Yue.sln',
-          '/maxcpucount:' + os.cpus().length,
-          '/p:Configuration=Release',
-          '/p:Platform=' + platform],
-        {cwd: 'build_' + platform, env})
-    }
+    const platform = targetCpu == 'x64' ? 'x64' : 'Win32'
+    spawnSync(
+      'msbuild',
+      ['Yue.sln',
+        '/maxcpucount:' + os.cpus().length,
+        '/p:Configuration=Release',
+        '/p:Platform=' + platform],
+      {cwd: 'build_' + platform, env})
+  } else {
+    execSync(`make -j ${os.cpus().length}`, {cwd: 'build'})
   }
 }
