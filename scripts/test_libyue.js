@@ -4,11 +4,11 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {version, targetOs, execSync, spawnSync, mkdir} = require('./common')
+const {version, targetCpu, targetOs, execSync, spawnSync} = require('./common')
 
-const fs = require('fs')
 const os = require('os')
 const path = require('path')
+const fs = require('./libs/fs-extra')
 const extract = require('./libs/extract-zip')
 
 // Our work dir.
@@ -17,9 +17,8 @@ const tmppath = path.join(os.tmpdir(), zipname)
 
 // Bulid and package.
 console.log('Building libyue...')
-execSync('node scripts/build.js out/Release')
-console.log('Zipping and unzipping libyue...')
-execSync('node scripts/create_dist.js')
+execSync('node scripts/create_source_dist.js')
+console.log('Unzipping libyue...')
 extract(`out/Dist/${zipname}.zip`, {dir: tmppath}, runTests)
 
 function runTests(error) {
@@ -30,16 +29,20 @@ function runTests(error) {
   process.chdir(tmppath)
   generateProject()
   buildProject()
+  // On CI, we have to remove the zip file on non-x64 platforms to avoid
+  // uploading the source dist unnecessarily.
+  if (process.env.CI == 'true' && targetCpu != 'x64')
+    fs.removeSync(`out/Dist/${zipname}.zip`)
   console.log(tmppath)
 }
 
 function generateProject() {
   if (process.platform == 'linux' || process.platform == 'darwin') {
-    mkdir('build')
+    fs.ensureDirSync('build')
     execSync('cmake ..', {cwd: 'build'})
   } else if (process.platform == 'win32') {
-    mkdir('build_x64')
-    mkdir('build_Win32')
+    fs.ensureDirSync('build_x64')
+    fs.ensureDirSync('build_Win32')
     spawnSync('cmake', ['..', '-G', 'Visual Studio 15 2017 Win64'], {cwd: 'build_x64'})
     spawnSync('cmake', ['..', '-G', 'Visual Studio 15 2017'], {cwd: 'build_Win32'})
   }

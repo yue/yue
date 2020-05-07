@@ -4,7 +4,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {targetCpu, targetOs, searchFiles, execSync, spawnSync} = require('./common')
+const {version, targetCpu, targetOs, searchFiles, execSync, spawnSync} = require('./common')
+const {createZip} = require('./zip_utils')
 
 const path = require('path')
 const fs = require('./libs/fs-extra')
@@ -56,6 +57,12 @@ for (const parent in EXTRA_HEADERS) {
       CopySource(h, path.join(targetDir, 'include'), parent)
   }
 }
+
+createZip({withLicense: true})
+  .addFile('out/Dist/source', 'out/Dist/source')
+  .addFile('sample_app/CMakeLists.txt', 'sample_app')
+  .addFile('sample_app/main.cc')
+  .writeToFile(`libyue_${version}_${targetOs}`)
 
 function DescribeAll(target, sources, headers) {
   const deps = new Set()

@@ -4,10 +4,10 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {version, argv, targetCpu, targetOs, mkdir, execSync, spawnSync} = require('./common')
+const {version, argv, targetCpu, targetOs, strip, execSync, spawnSync} = require('./common')
+const {createZip} = require('./zip_utils')
 
-const fs = require('fs')
-const JSZip = require('./libs/jszip')
+const fs = require('./libs/fs-extra')
 
 if (argv.length != 2) {
   console.error('Usage: create_node_extension runtime nodever')
@@ -53,26 +53,13 @@ execSync('ninja -C out/Node node_yue')
 let shortver = nodever.substring(1, nodever.lastIndexOf('.'))
 if (runtime == "node")
   shortver = shortver.substring(0, shortver.lastIndexOf('.'))
-const zipname = `node_yue_${runtime}_${shortver}_${version}_${targetOs}_${targetCpu}`
 
 // Strip the binaries on Linux.
-if (targetOs == 'linux') {
-  let strip = 'strip'
-  if (targetCpu == 'arm')
-    strip = 'arm-linux-gnueabihf-strip'
-  else if (targetCpu == 'arm64')
-    strip = 'aarch64-linux-gnu-strip'
-  execSync(`${strip} out/Node/gui.node`)
-}
+if (targetOs == 'linux')
+  strip('out/Node/gui.node')
 
 // Create zip archive of the node module.
-mkdir('out/Dist')
-let zip = new JSZip()
-zip.file('gui.node', fs.readFileSync('out/Node/gui.node'))
-zip.generateNodeStream({
-  streamFiles:true,
-  compression: 'DEFLATE',
-  compressionOptions: {
-    level: 9
-  }
-}).pipe(fs.createWriteStream(`out/Dist/${zipname}.zip`))
+fs.ensureDirSync('out/Dist')
+createZip({withLicense: true})
+  .addFile('out/Node/gui.node', 'out/Node')
+  .writeToFile(`node_yue_${runtime}_${shortver}_${version}_${targetOs}_${targetCpu}`)

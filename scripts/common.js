@@ -50,11 +50,17 @@ const argv = process.argv.slice(2).filter((arg) => {
   }
 })
 
-// Make dir and ignore error.
-function mkdir(dir) {
-  if (fs.existsSync(dir)) return
-  mkdir(path.dirname(dir))
-  fs.mkdirSync(dir)
+function strip(file) {
+  // TODO(zcbenz): Use |file| command to determine type.
+  if (!file.endsWith('.so') && path.basename(file) != 'yue')
+    return
+  // TODO(zcbenz): Copy the debug symbols out before striping.
+  let strip = 'strip'
+  if (targetCpu == 'arm')
+    strip = 'arm-linux-gnueabihf-strip'
+  else if (targetCpu == 'arm64')
+    strip = 'aarch64-linux-gnu-strip'
+  spawnSyncWrapper(strip, [file])
 }
 
 // Helper to download an URL.
@@ -136,7 +142,7 @@ module.exports = {
   argv,
   targetCpu,
   targetOs,
-  mkdir,
+  strip,
   download,
   searchFiles,
   execSync: execSyncWrapper,

@@ -4,10 +4,10 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {version, mkdir} = require('./common')
+const {version} = require('./common')
 
-const fs     = require('fs')
 const path   = require('path')
+const fs     = require('./libs/fs-extra')
 const marked = require('./libs/marked')
 const yaml   = loadYaml()
 const pug    = loadPug()
@@ -35,7 +35,7 @@ for (let lang of langs) {
   renderer.lang = lang
 
   const langdir = path.join(gendir, lang)
-  mkdir(langdir)
+  fs.ensureDirSync(langdir)
 
   // Parse all API docs.
   const docs = fs.readdirSync('docs/api').reduce((docs, file) => {
@@ -78,7 +78,7 @@ for (let lang of langs) {
   // Generate pages for guides.
   for (let guide of guides) {
     const guidedir = path.join(langdir, 'guides')
-    mkdir(guidedir)
+    fs.ensureDirSync(guidedir)
     const html = pug.renderFile('docs/layout/guide.pug', {
       page: 'guide',
       doc: guide,
@@ -90,7 +90,7 @@ for (let lang of langs) {
   // Read API docs and generate HTML pages.
   for (let doc of docs) {
     const apidir = path.join(langdir, 'api')
-    mkdir(apidir)
+    fs.ensureDirSync(apidir)
     // Output JSON files.
     fs.writeFileSync(path.join(apidir, `${doc.id}.json`),
                      JSON.stringify(doc, null, '  '))
