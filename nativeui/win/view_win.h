@@ -158,7 +158,7 @@ class ViewImpl {
   // Returns the DPI of current view.
   float scale_factor() const { return scale_factor_; }
 
-  Cursor* cursor() const { return delegate_->cursor(); }
+  Cursor* cursor() const { return delegate_ ? delegate_->cursor() : nullptr; }
   Font* font() const { return font_; }
   Color color() const { return color_; }
   Color background_color() const { return background_color_; }
