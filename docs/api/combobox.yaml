@@ -3,11 +3,11 @@ component: gui
 header: nativeui/combo_box.h
 type: refcounted
 namespace: nu
-inherit: ComboBox
+inherit: Picker
 description: Choose a single item from a list of items or type a custom value.
 
 detail: |
-  The `ComboBox` behaves differently from `ComboBox` that:
+  The `ComboBox` behaves differently from `Picker` that:
   1. no item is selected by default;
   2. duplicate items are allowed.
 
