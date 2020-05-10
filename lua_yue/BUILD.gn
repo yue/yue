@@ -85,6 +85,7 @@ source_set("lua_yue_util") {
 
 test("lua_yue_unittests") {
   sources = [
+    "binding_gui_unittest.cc",
     "binding_signal_unittest.cc",
     "binding_values_unittest.cc",
     "test/run_all_unittests.cc",

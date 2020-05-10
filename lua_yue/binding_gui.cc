@@ -2081,11 +2081,16 @@ inline void BindType(lua::State* state, const char* name) {
 }
 
 extern "C" int luaopen_yue_gui(lua::State* state) {
-  // Initialize nativeui.
-  lua::NewUserData<nu::Lifetime>(state);
-  lua::NewUserData<nu::State>(state);
   // The exports table.
   lua::NewTable(state);
+
+  // Initialize nativeui.
+  lua::Push(state, "__lifetime_ptr");
+  lua::NewUserData<nu::Lifetime>(state);
+  lua_rawset(state, -3);
+  lua::Push(state, "__state_ptr");
+  lua::NewUserData<nu::State>(state);
+  lua_rawset(state, -3);
 
   // Classes.
   BindType<nu::Lifetime>(state, "Lifetime");
