@@ -416,7 +416,7 @@ jumbo_component("nativeui") {
 
   if (is_linux) {
     public_deps = [
-      "//build/config/linux/gtk3",
+      "//build/config/linux/gtk",
     ]
     public_configs = [
       "//build/config/linux:x11",

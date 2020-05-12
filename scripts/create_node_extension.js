@@ -22,8 +22,6 @@ const args = [
   // Same with Release build.
   'is_component_build=false',
   'is_debug=false',
-  'is_official_build=true',
-  'use_sysroot=true',
   `target_cpu="${targetCpu}"`,
   // Set node nodever and runtime.
   `node_version="${nodever}"`,
@@ -38,8 +36,10 @@ if (targetOs == 'mac') {
 
 if (targetOs == 'linux') {
   args.push('is_clang=true',
-            'clang_update_script="//building/tools/update-clang.py"')
-  args.push('target_sysroot_dir="//third_party/"')
+            'clang_update_script="//building/tools/update-clang.py"',
+            'use_sysroot=true',
+            'target_sysroot_dir="//third_party/"',
+            'debian_platform="stretch"')
 }
 
 console.log(`Creating native extension for ${runtime} ${nodever} ${targetCpu}...`)

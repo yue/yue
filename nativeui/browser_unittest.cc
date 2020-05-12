@@ -391,8 +391,8 @@ TEST_F(BrowserTest, LargeFileProtocol) {
         "<html><body><script id='s'>" + content + "</script>"
         "<div id='after'>text</div></body></html>");
   });
-  browser_->on_finish_navigation.Connect([&content](nu::Browser* browser,
-                                                    const std::string& url) {
+  browser_->on_finish_navigation.Connect([](nu::Browser* browser,
+                                            const std::string& url) {
     std::string command =
         "document.getElementById('after').textContent.length === 4";
     browser->ExecuteJavaScript(command, [](bool success, base::Value result) {

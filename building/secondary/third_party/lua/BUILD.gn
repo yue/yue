@@ -95,6 +95,9 @@ source_set("lua") {
     configs -= [ "//build/config/gcc:symbol_visibility_hidden" ]
     configs += [ "//build/config/gcc:symbol_visibility_default" ]
   }
+  if (is_linux) {
+    cflags_c = [ "-Wno-string-plus-int" ]
+  }
 
   public_configs = [ ":lua_config" ]
 }

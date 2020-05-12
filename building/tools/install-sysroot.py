@@ -18,6 +18,8 @@
 # time chrome's build dependencies are changed but should also be updated
 # periodically to include upstream security fixes from Debian.
 
+from __future__ import print_function
+
 import hashlib
 import json
 import platform
@@ -27,7 +29,12 @@ import re
 import shutil
 import subprocess
 import sys
-import urllib2
+try:
+    # For Python 3.0 and later
+    from urllib.request import urlopen
+except ImportError:
+    # Fall back to Python 2's urllib2
+    from urllib2 import urlopen
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -37,6 +44,14 @@ URL_PATH = 'gh-contractor-zcbenz/toolchain'
 
 VALID_ARCHS = ('arm', 'arm64', 'i386', 'amd64', 'mips', 'mips64el')
 
+ARCH_TRANSLATIONS = {
+    'x64': 'amd64',
+    'x86': 'i386',
+    'mipsel': 'mips',
+    'mips64': 'mips64el',
+}
+
+DEFAULT_TARGET_PLATFORM = 'stretch'
 
 class Error(Exception):
   pass
@@ -54,136 +69,57 @@ def GetSha1(filename):
   return sha1.hexdigest()
 
 
-def DetectHostArch():
-  # Figure out host arch using build/detect_host_arch.py and
-  # set target_arch to host arch
-  detected_host_arch = detect_host_arch.HostArch()
-  if detected_host_arch == 'x64':
-    return 'amd64'
-  if detected_host_arch == 'ia32':
-    return 'i386'
-  if detected_host_arch == 'arm':
-    return 'arm'
-  if detected_host_arch == 'arm64':
-    return 'arm64'
-  if detected_host_arch == 'mips':
-    return 'mips'
-  if detected_host_arch == 'mips64':
-    return 'mips64el'
-  if detected_host_arch == 'ppc':
-    return 'ppc'
-  if detected_host_arch == 's390':
-    return 's390'
-
-  raise Error('Unrecognized host arch: %s' % detected_host_arch)
-
-
-def DetectTargetArch():
-  """Attempt for determine target architecture.
-
-  This works by looking for target_arch in GYP_DEFINES.
-  """
-  # TODO(agrieve): Make this script not depend on GYP_DEFINES so that it works
-  #     with GN as well.
-  gyp_environment.SetEnvironment()
-  supplemental_includes = gyp_chromium.GetSupplementalFiles()
-  gyp_defines = gyp_chromium.GetGypVars(supplemental_includes)
-  target_arch = gyp_defines.get('target_arch')
-  if target_arch == 'x64':
-    return 'amd64'
-  if target_arch == 'ia32':
-    return 'i386'
-  if target_arch == 'arm':
-    return 'arm'
-  if target_arch == 'arm64':
-    return 'arm64'
-  if target_arch == 'mipsel':
-    return 'mips'
-  if target_arch == 'mips64el':
-    return 'mips64el'
-
-  return None
-
-
-def InstallDefaultSysroots(host_arch):
-  """Install the default set of sysroot images.
-
-  This includes at least the sysroot for host architecture, and the 32-bit
-  sysroot for building the v8 snapshot image.  It can also include the cross
-  compile sysroot for ARM/MIPS if cross compiling environment can be detected.
-
-  Another reason we're installing this by default is so that developers can
-  compile and run on our supported platforms without having to worry about
-  flipping things back and forth and whether the sysroots have been downloaded
-  or not.
-  """
-  InstallDefaultSysrootForArch(host_arch)
-
-  if host_arch == 'amd64':
-    InstallDefaultSysrootForArch('i386')
-
-  # If we can detect a non-standard target_arch such as ARM or MIPS,
-  # then install the sysroot too.  Don't attempt to install arm64
-  # since this is currently and android-only architecture.
-  target_arch = DetectTargetArch()
-  if target_arch and target_arch not in (host_arch, 'i386'):
-    InstallDefaultSysrootForArch(target_arch)
-
-
 def main(args):
   parser = optparse.OptionParser('usage: %prog [OPTIONS]', description=__doc__)
-  parser.add_option('--running-as-hook', action='store_true',
-                    default=False, help='Used when running from gclient hooks.'
-                                        ' Installs default sysroot images.')
-  parser.add_option('--arch', type='choice', choices=VALID_ARCHS,
+  parser.add_option('--arch',
                     help='Sysroot architecture: %s' % ', '.join(VALID_ARCHS))
   parser.add_option('--all', action='store_true',
                     help='Install all sysroot images (useful when updating the'
                          ' images)')
+  parser.add_option('--print-hash',
+                    help='Print the hash of the sysroot for the given arch.')
   options, _ = parser.parse_args(args)
-  if options.running_as_hook and not sys.platform.startswith('linux'):
+  if not sys.platform.startswith('linux'):
     return 0
 
-  if options.running_as_hook:
-    host_arch = DetectHostArch()
-    # PPC/s390 don't use sysroot, see http://crbug.com/646169
-    if host_arch in ['ppc','s390']:
-      return 0
-    InstallDefaultSysroots(host_arch)
-  elif options.arch:
-    InstallDefaultSysrootForArch(options.arch)
+  if options.print_hash:
+    arch = options.print_hash
+    print(GetSysrootDict(DEFAULT_TARGET_PLATFORM,
+                         ARCH_TRANSLATIONS.get(arch, arch))['Sha1Sum'])
+    return 0
+  if options.arch:
+    InstallSysroot(DEFAULT_TARGET_PLATFORM,
+                   ARCH_TRANSLATIONS.get(options.arch, options.arch))
   elif options.all:
     for arch in VALID_ARCHS:
-      InstallDefaultSysrootForArch(arch)
+      InstallSysroot(DEFAULT_TARGET_PLATFORM, arch)
   else:
-    print 'You much specify either --arch, --all or --running-as-hook'
+    print('You much specify one of the options.')
     return 1
 
   return 0
 
 
-def InstallDefaultSysrootForArch(target_arch):
+def GetSysrootDict(target_platform, target_arch):
   if target_arch not in VALID_ARCHS:
     raise Error('Unknown architecture: %s' % target_arch)
-  InstallSysroot('Stretch', target_arch)
-
-
-def InstallSysroot(target_platform, target_arch):
-  # The sysroot directory should match the one specified in
-  # build/config/sysroot.gni.
-  # TODO(thestig) Consider putting this elsewhere to avoid having to recreate
-  # it on every build.
-  linux_dir = os.path.dirname(os.path.dirname(SCRIPT_DIR))
 
   sysroots_file = os.path.join(SCRIPT_DIR, 'sysroots.json')
   sysroots = json.load(open(sysroots_file))
-  sysroot_key = '%s_%s' % (target_platform.lower(), target_arch)
+  sysroot_key = '%s_%s' % (target_platform, target_arch)
   if sysroot_key not in sysroots:
     raise Error('No sysroot for: %s %s' % (target_platform, target_arch))
-  sysroot_dict = sysroots[sysroot_key]
-  revision = sysroot_dict['Revision']
+  return sysroots[sysroot_key]
+
+
+def InstallSysroot(target_platform, target_arch):
+  sysroot_dict = GetSysrootDict(target_platform, target_arch)
   tarball_filename = sysroot_dict['Tarball']
   tarball_sha1sum = sysroot_dict['Sha1Sum']
+  revision = sysroot_dict['Revision']
+  # TODO(thestig) Consider putting this elsewhere to avoid having to recreate
+  # it on every build.
+  linux_dir = os.path.dirname(os.path.dirname(SCRIPT_DIR))
   sysroot = os.path.join(linux_dir, 'third_party', sysroot_dict['SysrootDir'])
 
   url = '%s/%s/%s/%s' % (URL_PREFIX, URL_PATH, revision, tarball_filename)
@@ -194,22 +130,22 @@ def InstallSysroot(target_platform, target_arch):
       if s.read() == url:
         return
 
-  print 'Installing Debian %s %s root image: %s' % \
-      (target_platform, target_arch, sysroot)
+  print('Installing Debian %s %s root image: %s' % \
+      (target_platform, target_arch, sysroot))
   if os.path.isdir(sysroot):
     shutil.rmtree(sysroot)
   os.mkdir(sysroot)
   tarball = os.path.join(sysroot, tarball_filename)
-  print 'Downloading %s' % url
+  print('Downloading %s' % url)
   sys.stdout.flush()
   sys.stderr.flush()
   for _ in range(3):
     try:
-      response = urllib2.urlopen(url)
+      response = urlopen(url)
       with open(tarball, "wb") as f:
         f.write(response.read())
       break
-    except:
+    except Exception:  # Ignore exceptions.
       pass
   else:
     raise Error('Failed to download %s' % url)
@@ -217,8 +153,7 @@ def InstallSysroot(target_platform, target_arch):
   if sha1sum != tarball_sha1sum:
     raise Error('Tarball sha1sum is wrong.'
                 'Expected %s, actual: %s' % (tarball_sha1sum, sha1sum))
-  subprocess.check_call(['tar', '--no-same-owner', '--no-same-permissions',
-                         '-xf', tarball, '-C', sysroot])
+  subprocess.check_call(['tar', 'xf', tarball, '-C', sysroot])
   os.remove(tarball)
 
   with open(stamp, 'w') as s:

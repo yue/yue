@@ -33,26 +33,18 @@ const commonConfig = [
 const componentConfig = [
   'is_component_build=true',
   'is_debug=true',
-  'use_sysroot=false',
 ]
 const debugConfig = [
   'is_component_build=false',
   'is_debug=true',
-  'use_sysroot=true',
 ]
 const releaseConfig = [
   'is_component_build=false',
   'is_debug=false',
-  'use_sysroot=true',
 ]
 
 if (process.env.CI === 'true') {
   commonConfig.push('use_jumbo_build=true')
-}
-
-if (targetOs != 'win') {
-  // Don't set official build for Windows, which increases the size of libyue.
-  releaseConfig.push('is_official_build=true')
 }
 
 if (targetOs == 'mac') {
@@ -66,9 +58,13 @@ if (targetOs == 'linux') {
   commonConfig.push('is_clang=true',
                     'clang_update_script="//building/tools/update-clang.py"')
   // Use custom sysroot.
-  commonConfig.push('target_sysroot_dir="//third_party/"')
-  // This flag caused weird compilation errors when building on Linux.
-  debugConfig.push('enable_iterator_debugging=false')
+  const sysrootArgs = [
+    'use_sysroot=true',
+    'target_sysroot_dir="//third_party/"',
+    'debian_platform="stretch"',
+  ]
+  Array.prototype.push.apply(debugConfig, sysrootArgs)
+  Array.prototype.push.apply(releaseConfig, sysrootArgs)
 }
 
 gen('out/Component', componentConfig)

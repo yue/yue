@@ -48,13 +48,13 @@ if (targetOs === 'mac') {
 } else if (targetOs === 'win') {
   EXTRA_HEADERS['out/Source/gen'] = [ 'base/trace_event/etw_manifest' ]
   // This file is needed by Windows, but marked as posix.
-  CopySource('base/posix/eintr_wrapper.h', path.join(targetDir, 'include'))
+  CopySource('//base/posix/eintr_wrapper.h', path.join(targetDir, 'include'))
 }
 for (const parent in EXTRA_HEADERS) {
   for (const dir of EXTRA_HEADERS[parent]) {
     const headers = searchFiles(path.join(parent, dir), '.h')
     for (const h of headers)
-      CopySource(h, path.join(targetDir, 'include'), parent)
+      CopySource('//' + h, path.join(targetDir, 'include'), parent)
   }
 }
 
@@ -87,12 +87,12 @@ function Descibe(target, sources, deps) {
   const desc = Object.values(JSON.parse(String(ret)))[0]
   if (desc.sources) {
     for (const s of desc.sources)
-      sources.add(s.substr(2))
+      sources.add(s)
   }
   if (desc.public) {
     for (const p of desc.public) {
       if (p.endsWith('.h'))
-        sources.add(p.substr(2))
+        sources.add(p)
     }
   }
   if (desc.deps) {
@@ -102,7 +102,7 @@ function Descibe(target, sources, deps) {
   if (desc.type === 'action') {
     for (const o of desc.outputs) {
       if (o.endsWith('.h'))
-        sources.add(o.substr(2))
+        sources.add(o)
     }
   }
   return sources
@@ -135,13 +135,31 @@ function MergeSources(sources, headers, from) {
 }
 
 function CopySource(file, targetDir, baseDir = '') {
-  let targetName = file.substr(baseDir.length)
+  let originalName = file
+  let targetName
+  if (file.startsWith('//')) {
+    // When file starts with '//', it is relative path.
+    targetName = file = file.substr(2)
+  } else {
+    // The absolute path on Windows may looks like '/c:/cygiwn/home'.
+    if (process.platform == 'win32' && /^\/\w:/.test(file))
+      file = file.substr(1)
+    // the targetName must be relative.
+    targetName = path.relative(process.cwd(), file)
+  }
+  targetName = targetName.substr(baseDir.length)
+  // Move generated headers out of 'out/Source/gen/'.
   if (file.startsWith('out'))
     targetName = path.join.apply(path, path.normalize(file).split(path.sep).slice(3))
+  // Rename cpp files to cc.
   if (targetName.endsWith('.cpp'))
     targetName = targetName.substr(0, targetName.length - 3) + 'cc'
-  fs.copySync(file, path.join(targetDir, targetName),
-              {errorOnExist: true})
+  try {
+    fs.copySync(file, path.join(targetDir, targetName),
+                {errorOnExist: true})
+  } catch (e) {
+    throw new Error('Unable to copy file', originalName, e.message)
+  }
 }
 
 function IsSourceFile(f) {
