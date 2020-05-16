@@ -4,12 +4,12 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
+const {argv, download} = require('./common')
+
 const cp    = require('child_process')
 const fs    = require('fs')
 const path  = require('path')
 const zlib  = require('zlib')
-
-const {argv, download} = require('./common')
 
 if (argv.length != 3) {
   console.error('Usage: download_node_headers runtime version cpu')

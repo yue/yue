@@ -13,6 +13,9 @@ process.chdir(path.dirname(__dirname))
 // We are not using toolchain from depot_tools.
 process.env.DEPOT_TOOLS_WIN_TOOLCHAIN = 0
 
+// Allow searching modules from libs/.
+module.parent.paths.push(path.resolve(__dirname, '..', 'third_party', 'bundled_node_modules'))
+
 // Expose ninja and gn to PATH.
 const gnDir = path.resolve('building', 'tools', 'gn')
 process.env.PATH = `${gnDir}${path.delimiter}${process.env.PATH}`

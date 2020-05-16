@@ -8,7 +8,7 @@ const {version, targetCpu, targetOs, strip, execSync} = require('./common')
 const {createZip} = require('./zip_utils')
 
 const path = require('path')
-const fs = require('./libs/fs-extra')
+const fs = require('fs-extra')
 
 // Clear previous distributions.
 fs.removeSync('out/Dist')

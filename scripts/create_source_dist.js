@@ -8,7 +8,7 @@ const {version, targetCpu, targetOs, searchFiles, execSync, spawnSync} = require
 const {createZip} = require('./zip_utils')
 
 const path = require('path')
-const fs = require('./libs/fs-extra')
+const fs = require('fs-extra')
 
 // Do a jumbo build to prepare for searching files.
 const args = [

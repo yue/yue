@@ -8,8 +8,8 @@ const {version, targetCpu, targetOs, execSync, spawnSync} = require('./common')
 
 const os = require('os')
 const path = require('path')
-const fs = require('./libs/fs-extra')
-const extract = require('./libs/extract-zip')
+const fs = require('fs-extra')
+const extract = require('extract-zip')
 
 // Our work dir.
 const zipname = `libyue_${version}_${targetOs}`

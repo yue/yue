@@ -7,7 +7,7 @@
 const {version, argv, targetCpu, targetOs, strip, execSync, spawnSync} = require('./common')
 const {createZip} = require('./zip_utils')
 
-const fs = require('./libs/fs-extra')
+const fs = require('fs-extra')
 
 if (argv.length != 2) {
   console.error('Usage: create_node_extension runtime nodever')

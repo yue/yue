@@ -379,10 +379,11 @@ TEST_F(BrowserTest, LargeFileProtocol) {
   // Serve the pug.js, which should be large enough.
   base::FilePath exe_path;
   PathService::Get(base::FILE_EXE, &exe_path);
-  base::FilePath file = exe_path.DirName().DirName().DirName()
-                                .Append(FILE_PATH_LITERAL("scripts"))
-                                .Append(FILE_PATH_LITERAL("libs"))
-                                .Append(FILE_PATH_LITERAL("pug.js"));
+  base::FilePath file =
+      exe_path.DirName().DirName().DirName()
+              .Append(FILE_PATH_LITERAL("third_party"))
+              .Append(FILE_PATH_LITERAL("bundled_node_modules"))
+              .Append(FILE_PATH_LITERAL("pug.js"));
   std::string content;
   ASSERT_TRUE(base::ReadFileToString(file, &content));
   nu::Browser::RegisterProtocol("large", [&](const std::string& url) {

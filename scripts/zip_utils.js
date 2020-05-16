@@ -4,7 +4,7 @@
 
 const path = require('path')
 const fs = require('fs')
-const JSZip = require('./libs/jszip')
+const JSZip = require('../third_party/bundled_node_modules/jszip')
 
 class ZipFile {
   constructor(options = {withLicense: false}) {

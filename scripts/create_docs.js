@@ -7,8 +7,8 @@
 const {version} = require('./common')
 
 const path   = require('path')
-const fs     = require('./libs/fs-extra')
-const marked = require('./libs/marked')
+const fs     = require('fs-extra')
+const marked = require('marked')
 const yaml   = loadYaml()
 const pug    = loadPug()
 const hljs   = loadHighlight()
@@ -121,7 +121,7 @@ for (let lang of langs) {
 // Load js-yaml from its browserify pack.
 function loadYaml() {
   const vm = require('vm')
-  const script = new vm.Script(fs.readFileSync(`${__dirname}/libs/yaml.js`))
+  const script = new vm.Script(fs.readFileSync('third_party/bundled_node_modules/yaml.js'))
   const sandbox = {}
   script.runInNewContext(sandbox)
   return sandbox.jsyaml
@@ -130,7 +130,7 @@ function loadYaml() {
 // Load pug.js from its browserify pack.
 function loadPug() {
   const vm = require('vm')
-  const script = new vm.Script(fs.readFileSync(`${__dirname}/libs/pug.js`))
+  const script = new vm.Script(fs.readFileSync('third_party/bundled_node_modules/pug.js'))
   const sandbox = {fs: fs}
   script.runInNewContext(sandbox)
   return sandbox.require('pug')
@@ -139,7 +139,7 @@ function loadPug() {
 // Load hightlight.js from its browserify pack.
 function loadHighlight() {
   const vm = require('vm')
-  const script = new vm.Script(fs.readFileSync(`${__dirname}/libs/highlight.js`))
+  const script = new vm.Script(fs.readFileSync('third_party/bundled_node_modules/highlight.js'))
   const sandbox = {}
   sandbox.window = sandbox
   script.runInNewContext(sandbox)
