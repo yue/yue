@@ -6,6 +6,7 @@ description: Options for creating browser.
 
 properties:
   - property: bool devtools
+    optional: true
     description: Whether the browser can show devtools, default is `false`.
     detail: |
       Depending on platform, the option to show devtools is usually in the
@@ -15,12 +16,14 @@ properties:
       Currently this option is not working on Windows.
 
   - property: bool context_menu
+    optional: true
     description: Whether to use builtin context menu, default is `false`.
     detail: |
       On macOS due to the limitation of system APIs, right-clicking certain
       elements would still popup a menu with Services items.
 
   - property: bool allow_file_access_from_files
+    optional: true
     description: Whether file access is allowed from file URLs, default is `false`.
     platform: ['macOS', 'Linux']
     detail: |
@@ -30,5 +33,6 @@ properties:
       `XMLHttpRequest` of a local file, for example.
 
   - property: bool hardware_acceleration
+    optional: true
     description: Whether to enable hardware acceleration, default is `true`.
     platform: ['Linux']

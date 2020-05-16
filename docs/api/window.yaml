@@ -200,11 +200,6 @@ methods:
     platform: ['Windows', 'Linux']
     description: Return the window menu bar.
 
-  - signature: void SetFullSizeContentView(bool full)
-    platform: ['macOS']
-    description: |
-      Set the `NSFullSizeContentViewWindowMask` style on the window.
-
   - signature: Window* GetParentWindow() const
     description: Return the parent window.
 

@@ -266,12 +266,11 @@ function convertModuleAndType(lang, node) {
 
   let wrappedTypes = ['Painter', 'App', 'Lifetime', 'Signal']
   let stringTypes = ['Accelerator', 'KeyboardCode']
-  let integerTypes = ['Color']
   if (node.type == 'refcounted' || wrappedTypes.includes(node.name))
     node.type = 'Class'
   else if (node.type == 'enum class' || stringTypes.includes(node.name))
     node.type = lang == 'lua' ? 'string' : 'String'
-  else if (node.type == 'enum' || integerTypes.includes(node.name))
+  else if (node.type == 'enum')
     node.type = lang == 'lua' ? 'integer' : 'Integer'
   else
     node.type = lang == 'lua' ? 'table' : 'Object'

@@ -8,22 +8,28 @@ detail: By default text is drew at top-left corner using system font and color.
 
 properties:
   - property: scoped_refptr<Font> font
+    optional: true
     description: Font for drawing text, default is system UI font.
 
   - property: Color color
+    optional: true
     description: Text color, default is system UI text color.
 
   - property: TextAlign align
+    optional: true
     description: Horizontal text align, default is to the start of layout.
 
   - property: TextAlign valign
+    optional: true
     description: Vertical text align, default is to the start of layout.
 
   - property: bool wrap
+    optional: true
     description: Whether to wrap lines, default is `true`.
     detail: Lines are wrapped at word boundaries.
 
   - property: bool ellipsis
+    optional: true
     description: |
       Whether to show ellipsis (...) at the end of the last visible line if the
       text doesn't fit into the bounds specified, default is `false`.

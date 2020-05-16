@@ -6,10 +6,12 @@ description: Options for creating window.
 
 properties:
   - property: bool frame
+    optional: true
     description: |
       Whether window has native frame, default is `true`.
 
   - property: bool transparent
+    optional: true
     description: |
       Whether window is transparent, default is `false`.
 
@@ -18,6 +20,7 @@ properties:
 
   - property: bool show_traffic_lights
     platform: ['macOS']
+    optional: true
     description: |
       Whether to show window buttons for frameless window, default is `false`.
 

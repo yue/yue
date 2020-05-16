@@ -33,7 +33,7 @@ methods:
   - signature: void SetStep(float step)
     description: Set the step value of the slider.
 
-  - signature: float GetValue() const
+  - signature: float GetStep() const
     description: Return the step value of the slider.
 
   - signature: void SetRange(float min, float max)

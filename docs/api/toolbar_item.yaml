@@ -6,19 +6,25 @@ description: Represent an item of `Toolbar`.
 
 properties:
   - property: std::string label
+    optional: true
     description: Item's label.
 
   - property: SizeF min_size
+    optional: true
     description: Item's minimum size.
 
   - property: SizeF max_size
+    optional: true
     description: Item's maximum size.
 
   - property: scoped_refptr<Image> image
+    optional: true
     description: Item's image.
 
   - property: scoped_refptr<View> view
+    optional: true
     description: Item's custom view.
 
   - property: std::function<void(Toolbar*, const std::string&)> on_click
+    optional: true
     description: Function called when item is clicked.
