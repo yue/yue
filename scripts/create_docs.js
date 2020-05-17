@@ -371,6 +371,11 @@ function parseType(lang, str) {
     } else if (type.name == 'scoped_refptr') {
       type.name = match[2]
     }
+    // For js we want to pass some more information for TypeScript.
+    if (lang == 'js') {
+      if (type.name == 'std::vector' || type.name == 'std::set')
+        type.elementType = parseType(lang, match[2])
+    }
   }
   // No need to convert types for C++.
   let builtin = true
@@ -397,6 +402,7 @@ function parseType(lang, str) {
       case 'Any': type.name = 'any'; break
       case 'std::function': type.name = 'function'; break
       case 'std::vector': type.name = 'table'; break
+      case 'std::set': type.name = 'table'; break
       case 'base::FilePath': type.name = 'string'; break
       case 'base::Value': type.name = 'any'; break
       default: builtin = false
@@ -417,6 +423,7 @@ function parseType(lang, str) {
       case 'Any': type.name = 'Any'; break
       case 'std::function': type.name = 'Function'; break
       case 'std::vector': type.name = 'Array'; break
+      case 'std::set': type.name = 'Array'; break
       case 'base::FilePath': type.name = 'String'; break
       case 'base::Value': type.name = 'Any'; break
       default: builtin = false

@@ -37,4 +37,8 @@ if (process.env.CI != 'true' || (targetOs == 'linux' && targetCpu == 'x64')) {
   createZip()
     .addFile('out/Dist/docs', 'out/Dist/docs')
     .writeToFile(`yue_docs_${version}`)
+  execSync('node ./scripts/create_typescript_declarations.js')
+  createZip()
+    .addFile('out/Dist/index.d.ts', 'out/Dist')
+    .writeToFile(`node_yue_types_${version}`)
 }

@@ -28,7 +28,7 @@ class_methods:
     lang: ['lua', 'js']
     description: *ref2
 
-  - signature: Image CreateFromBuffer(const nu::Buffer& buffer, float scale_factor)
+  - signature: Image CreateFromBuffer(const Buffer& buffer, float scale_factor)
     lang: ['lua', 'js']
     description: *ref3
 

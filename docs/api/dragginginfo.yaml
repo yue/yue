@@ -21,10 +21,6 @@ class_properties:
     lang: ['lua', 'js']
     description: Drag operation for `Move`.
 
-  - property: int DragOperationCopy
-    lang: ['lua', 'js']
-    description: Drag operation for `Copy`.
-
 methods:
   - signature: bool IsDataAvailable(Clipboard::Data::Type type) const
     description: Return whether the data of `type` is available.

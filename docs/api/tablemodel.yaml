@@ -24,11 +24,13 @@ lang_detail:
 
 methods:
   - signature: uint32_t GetRowCount() const
+    abstract: true
     description: Return how many rows are in the model.
     lang_detail:
       cpp: This is a pure virtual method, subclass must override this method.
 
   - signature: const base::Value* GetValue(uint32_t column, uint32_t row) const
+    abstract: true
     lang: ['cpp']
     description: Return the reference to the data at `column` and `row`.
     detail: |
@@ -38,6 +40,7 @@ methods:
       This is a pure virtual method, subclass must override this method.
 
   - signature: Any GetValue(uint32_t column, uint32_t row) const
+    abstract: true
     lang: ['lua', 'js']
     description: Return the data at `column` and `row`.
     detail: |
@@ -45,6 +48,7 @@ methods:
       objects (for example `Image`s) can not be passed to renderer.
 
   - signature: void SetValue(uint32_t column, uint32_t row, base::Value value)
+    abstract: true
     description: Change the `value` at `column` and `row`.
     lang_detail:
       cpp: This is a pure virtual method, subclass must override this method.

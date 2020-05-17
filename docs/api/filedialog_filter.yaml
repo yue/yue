@@ -20,6 +20,6 @@ properties:
     lang: ['lua', 'js']
     description: Filter's description.
 
-  - property: Array extensions
+  - property: std::vector<std::string> extensions
     lang: ['lua', 'js']
     description: An array of filename extensions for the filter.
