@@ -37,6 +37,9 @@ execSync('node scripts/create_dist.js')
 // Test distributions.
 if (targetCpu == 'x64' || targetOs == 'win')
   execSync(`node ./scripts/test_libyue.js`)
+// Test typescript types.
+if (targetCpu == 'x64' && targetOs == 'linux')
+  execSync(`node ./scripts/test_typescript_declarations.js`)
 
 // Build node extensions.
 const runtimes = {
