@@ -43,6 +43,10 @@ struct CallbackParamTraits<const T&> {
   typedef T LocalType;
 };
 template<typename T>
+struct CallbackParamTraits<T&&> {
+  typedef T LocalType;
+};
+template<typename T>
 struct CallbackParamTraits<const T*> {
   typedef T* LocalType;
 };

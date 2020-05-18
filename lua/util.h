@@ -5,16 +5,18 @@
 #ifndef LUA_UTIL_H_
 #define LUA_UTIL_H_
 
+#include <utility>
+
 namespace lua {
 
 template<typename T, typename... ArgTypes>
-T* CreateOnHeap(ArgTypes... args) {
-  return new T(args...);
+T* CreateOnHeap(ArgTypes&&... args) {
+  return new T(std::forward<ArgTypes>(args)...);
 }
 
 template<typename T, typename... ArgTypes>
-T CreateOnStack(ArgTypes... args) {
-  return T(args...);
+T CreateOnStack(ArgTypes&&... args) {
+  return T(std::forward<ArgTypes>(args)...);
 }
 
 }  // namespace lua
