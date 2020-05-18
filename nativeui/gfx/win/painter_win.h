@@ -63,8 +63,7 @@ class PainterWin : public Painter {
                           const RectF& dest) override;
   TextMetrics MeasureText(const std::string& text, float width,
                           const TextAttributes& attributes) override;
-  void DrawText(const std::string& text, const RectF& rect,
-                const TextAttributes& attributes) override;
+  void DrawAttributedText(AttributedText* text, const RectF& rect) override;
 
   // The pixel versions.
   void MoveToPixel(const PointF& point);

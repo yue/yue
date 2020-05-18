@@ -20,6 +20,7 @@ namespace Gdiplus {
 #include "nativeui/gfx/color.h"
 #include "nativeui/gfx/geometry/rect.h"
 #include "nativeui/gfx/geometry/rect_f.h"
+#include "nativeui/gfx/text.h"
 
 namespace nu {
 
@@ -42,6 +43,16 @@ inline Gdiplus::Point ToGdi(const Point& point) {
 
 inline Gdiplus::Color ToGdi(const Color& color) {
   return Gdiplus::Color(color.a(), color.r(), color.g(), color.b());
+}
+
+inline Gdiplus::StringAlignment ToGdi(TextAlign align) {
+  switch (align) {
+    case TextAlign::Start: return Gdiplus::StringAlignmentNear;
+    case TextAlign::Center: return Gdiplus::StringAlignmentCenter;
+    case TextAlign::End: return Gdiplus::StringAlignmentFar;
+  }
+  NOTREACHED();
+  return Gdiplus::StringAlignmentNear;
 }
 
 }  // namespace nu

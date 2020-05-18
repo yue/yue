@@ -258,6 +258,34 @@ struct Type<nu::App> {
 };
 
 template<>
+struct Type<nu::AttributedText> {
+  static constexpr const char* name = "yue.AttributedText";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+        "create", &CreateOnHeap<nu::AttributedText,
+                                const std::string&,
+                                nu::TextFormat>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "setFont", &nu::AttributedText::SetFont,
+#if !defined(OS_WIN)
+        "setFontFor", &nu::AttributedText::SetFontFor,
+#endif
+        "setColor", &nu::AttributedText::SetColor,
+#if !defined(OS_WIN)
+        "setColorFor", &nu::AttributedText::SetColorFor,
+#endif
+        "getBoundsFor", &nu::AttributedText::GetBoundsFor,
+        "setFormat", &nu::AttributedText::SetFormat,
+        "getFormat", &nu::AttributedText::GetFormat,
+        "getText", &nu::AttributedText::GetText);
+  }
+};
+
+template<>
 struct Type<nu::Font::Weight> {
   static constexpr const char* name = "yue.Font.Weight";
   static bool FromV8(v8::Local<v8::Context> context,
@@ -726,6 +754,43 @@ struct Type<nu::TextAlign> {
       return false;
     return true;
   }
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   nu::TextAlign align) {
+    switch (align) {
+      case nu::TextAlign::Center:
+        return vb::ToV8(context, "center");
+      case nu::TextAlign::End:
+        return vb::ToV8(context, "end");
+      default:
+        return vb::ToV8(context, "start");
+    }
+  }
+};
+
+template<>
+struct Type<nu::TextFormat> {
+  static constexpr const char* name = "yue.TextFormat";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::TextFormat* out) {
+    if (!value->IsObject())
+      return false;
+    v8::Local<v8::Object> obj = value.As<v8::Object>();
+    Get(context, obj, "align", &out->align);
+    Get(context, obj, "valign", &out->valign);
+    Get(context, obj, "wrap", &out->wrap);
+    Get(context, obj, "ellipsis", &out->ellipsis);
+    return true;
+  }
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   const nu::TextFormat& options) {
+    v8::Local<v8::Object> obj = v8::Object::New(context->GetIsolate());
+    Set(context, obj, "align", options.align);
+    Set(context, obj, "valign", options.valign);
+    Set(context, obj, "wrap", options.wrap);
+    Set(context, obj, "ellipsis", options.ellipsis);
+    return obj;
+  }
 };
 
 template<>
@@ -734,17 +799,13 @@ struct Type<nu::TextAttributes> {
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::TextAttributes* out) {
-    if (!value->IsObject())
+    if (!Type<nu::TextFormat>::FromV8(context, value, out))
       return false;
     v8::Local<v8::Object> obj = value.As<v8::Object>();
     nu::Font* font;
     if (Get(context, obj, "font", &font))
       out->font = font;
     Get(context, obj, "color", &out->color);
-    Get(context, obj, "align", &out->align);
-    Get(context, obj, "valign", &out->valign);
-    Get(context, obj, "wrap", &out->wrap);
-    Get(context, obj, "ellipsis", &out->ellipsis);
     return true;
   }
 };
@@ -796,6 +857,7 @@ struct Type<nu::Painter> {
         "drawCanvas", &nu::Painter::DrawCanvas,
         "drawCanvasFromRect", &nu::Painter::DrawCanvasFromRect,
         "measureText", &nu::Painter::MeasureText,
+        "drawAttributedText", &nu::Painter::DrawAttributedText,
         "drawText", &nu::Painter::DrawText);
   }
 };
@@ -1903,7 +1965,9 @@ struct Type<nu::Label> {
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
-        "create", &CreateOnHeap<nu::Label, const std::string&>);
+        "create", &CreateOnHeap<nu::Label, const std::string&>,
+        "createWithAttributedText",
+         &CreateOnHeap<nu::Label, nu::AttributedText*>);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
@@ -1911,7 +1975,10 @@ struct Type<nu::Label> {
         "setText", &nu::Label::SetText,
         "getText", &nu::Label::GetText,
         "setAlign", &nu::Label::SetAlign,
-        "setVAlign", &nu::Label::SetVAlign);
+        "setVAlign", &nu::Label::SetVAlign,
+        "setAttributedText",
+        RefMethod(&nu::Label::SetAttributedText, RefType::Reset, "atext"),
+        "getAttributedText", &nu::Label::GetAttributedText);
   }
 };
 
@@ -2412,6 +2479,7 @@ void Initialize(v8::Local<v8::Object> exports) {
   vb::Set(context, exports,
           // Classes.
           "App",               vb::Constructor<nu::App>(),
+          "AttributedText",    vb::Constructor<nu::AttributedText>(),
           "Font",              vb::Constructor<nu::Font>(),
           "Canvas",            vb::Constructor<nu::Canvas>(),
           "Clipboard",         vb::Constructor<nu::Clipboard>(),

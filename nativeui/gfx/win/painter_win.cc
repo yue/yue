@@ -12,12 +12,14 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/win/scoped_gdi_object.h"
 #include "base/win/scoped_select_object.h"
+#include "nativeui/gfx/attributed_text.h"
 #include "nativeui/gfx/canvas.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/gfx/geometry/point_conversions.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/gfx/geometry/vector2d_conversions.h"
 #include "nativeui/gfx/image.h"
+#include "nativeui/gfx/win/attributed_text_win.h"
 #include "nativeui/gfx/win/double_buffer.h"
 #include "nativeui/state.h"
 
@@ -31,16 +33,6 @@ inline float AreaOfTriangleFormedByPoints(const PointF& p1,
   return p1.x() * (p2.y() - p3.y()) +
          p2.x() * (p3.y() - p1.y()) +
          p3.x() * (p1.y() - p2.y());
-}
-
-Gdiplus::StringAlignment ToGdi(TextAlign align) {
-  switch (align) {
-    case TextAlign::Start: return Gdiplus::StringAlignmentNear;
-    case TextAlign::Center: return Gdiplus::StringAlignmentCenter;
-    case TextAlign::End: return Gdiplus::StringAlignmentFar;
-  }
-  NOTREACHED();
-  return Gdiplus::StringAlignmentNear;
 }
 
 }  // namespace
@@ -222,10 +214,13 @@ TextMetrics PainterWin::MeasureText(const std::string& text, float width,
   return { ScaleSize(SizeF(rect.Width, rect.Height), 1.0f / scale_factor_) };
 }
 
-void PainterWin::DrawText(const std::string& text, const RectF& rect,
-                          const TextAttributes& attributes) {
-  DrawTextPixel(base::UTF8ToUTF16(text),
-                ToEnclosingRect(ScaleRect(rect, scale_factor_)), attributes);
+void PainterWin::DrawAttributedText(AttributedText* text, const RectF& rect) {
+  AttributedTextImpl* str = text->GetNative();
+  graphics_.DrawString(
+      str->text.data(), static_cast<int>(str->text.size()),
+      str->font->GetNative(),
+      ToGdi(ScaleRect(rect, scale_factor_)),
+      &str->format, str->brush.get());
 }
 
 void PainterWin::MoveToPixel(const PointF& point) {

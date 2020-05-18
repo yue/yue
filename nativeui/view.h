@@ -105,8 +105,8 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   void SetCursor(Cursor* cursor);
 
   // Display related styles.
-  void SetFont(Font* font);
-  void SetColor(Color color);
+  virtual void SetFont(Font* font);
+  virtual void SetColor(Color color);
   void SetBackgroundColor(Color color);
 
   // Set layout related styles without doing layout.

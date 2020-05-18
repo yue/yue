@@ -12,9 +12,12 @@
 
 namespace nu {
 
+class AttributedText;
+
 class NATIVEUI_EXPORT Label : public View {
  public:
   explicit Label(const std::string& text = "");
+  explicit Label(AttributedText* text);
 
   // View class name.
   static const char kClassName[];
@@ -24,15 +27,26 @@ class NATIVEUI_EXPORT Label : public View {
   void SetAlign(TextAlign align);
   void SetVAlign(TextAlign align);
 
+  void SetAttributedText(AttributedText* text);
+  AttributedText* GetAttributedText() const { return text_.get(); }
+
   // View:
   const char* GetClassName() const override;
-  SizeF GetMinimumSize() const override;
+  void SetFont(Font* font) override;
+  void SetColor(Color color) override;
 
  protected:
   ~Label() override;
 
  private:
-  void PlatformSetText(const std::string& text);
+  void Init();
+
+  // Mark the yoga node as dirty.
+  void MarkDirty();
+
+  NativeView PlatformCreate();
+
+  scoped_refptr<AttributedText> text_;
 };
 
 }  // namespace nu

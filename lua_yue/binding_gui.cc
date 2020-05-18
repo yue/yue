@@ -234,6 +234,39 @@ struct Type<nu::App> {
 };
 
 template<>
+struct Type<nu::AttributedText> {
+  static constexpr const char* name = "yue.AttributedText";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateOnHeap<nu::AttributedText,
+                                   const std::string&,
+                                   nu::TextFormat>,
+           "setformat", &nu::AttributedText::SetFormat,
+           "getformat", &nu::AttributedText::GetFormat,
+           "setfont", &nu::AttributedText::SetFont,
+#if !defined(OS_WIN)
+           "setfontfor", &SetFontFor,
+#endif
+           "setcolor", &nu::AttributedText::SetColor,
+#if !defined(OS_WIN)
+           "setcolorfor", &SetColorFor,
+#endif
+           "getboundsfor", &nu::AttributedText::GetBoundsFor,
+           "gettext", &nu::AttributedText::GetText);
+  }
+#if !defined(OS_WIN)
+  static void SetFontFor(nu::AttributedText* text, nu::Font* font,
+                         int start, int end) {
+    text->SetFontFor(font, start - 1, end - 1);
+  }
+  static void SetColorFor(nu::AttributedText* text, nu::Color color,
+                          int start, int end) {
+    text->SetColorFor(color, start - 1, end - 1);
+  }
+#endif
+};
+
+template<>
 struct Type<nu::Font::Weight> {
   static constexpr const char* name = "yue.Font.Weight";
   static inline bool To(State* state, int index, nu::Font::Weight* out) {
@@ -657,22 +690,52 @@ struct Type<nu::TextAlign> {
       return false;
     return true;
   }
+  static inline void Push(State* state, nu::TextAlign align) {
+    switch (align) {
+      case nu::TextAlign::Center:
+        lua::Push(state, "center");
+        break;
+      case nu::TextAlign::End:
+        lua::Push(state, "end");
+        break;
+      default:
+        lua::Push(state, "start");
+        break;
+    }
+  }
+};
+
+template<>
+struct Type<nu::TextFormat> {
+  static constexpr const char* name = "yue.TextFormat";
+  static inline bool To(State* state, int index, nu::TextFormat* out) {
+    if (GetType(state, index) != LuaType::Table)
+      return false;
+    RawGetAndPop(state, index, "align", &out->align);
+    RawGetAndPop(state, index, "valign", &out->valign);
+    RawGetAndPop(state, index, "wrap", &out->wrap);
+    RawGetAndPop(state, index, "ellipsis", &out->ellipsis);
+    return true;
+  }
+  static inline void Push(State* state, const nu::TextFormat& options) {
+    NewTable(state, 0, 4);
+    RawSet(state, -1, "align", options.align);
+    RawSet(state, -1, "valign", options.valign);
+    RawSet(state, -1, "wrap", options.wrap);
+    RawSet(state, -1, "ellipsis", options.ellipsis);
+  }
 };
 
 template<>
 struct Type<nu::TextAttributes> {
   static constexpr const char* name = "yue.TextAttributes";
   static inline bool To(State* state, int index, nu::TextAttributes* out) {
-    if (GetType(state, index) != LuaType::Table)
+    if (!Type<nu::TextFormat>::To(state, index, out))
       return false;
     nu::Font* font;
     if (RawGetAndPop(state, index, "font", &font))
       out->font = font;
     RawGetAndPop(state, index, "color", &out->color);
-    RawGetAndPop(state, index, "align", &out->align);
-    RawGetAndPop(state, index, "valign", &out->valign);
-    RawGetAndPop(state, index, "wrap", &out->wrap);
-    RawGetAndPop(state, index, "ellipsis", &out->ellipsis);
     return true;
   }
 };
@@ -718,6 +781,7 @@ struct Type<nu::Painter> {
            "drawcanvas", &nu::Painter::DrawCanvas,
            "drawcanvasfromrect", &nu::Painter::DrawCanvasFromRect,
            "measuretext", &nu::Painter::MeasureText,
+           "drawattributedtext", &nu::Painter::DrawAttributedText,
            "drawtext", &nu::Painter::DrawText);
   }
 };
@@ -1642,10 +1706,15 @@ struct Type<nu::Label> {
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::Label, const std::string&>,
+           "createwithattributedtext",
+           &CreateOnHeap<nu::Label, nu::AttributedText*>,
            "settext", &nu::Label::SetText,
            "gettext", &nu::Label::GetText,
            "setalign", &nu::Label::SetAlign,
-           "setvalign", &nu::Label::SetVAlign);
+           "setvalign", &nu::Label::SetVAlign,
+           "setattributedtext",
+           RefMethod(&nu::Label::SetAttributedText, RefType::Reset, "atext"),
+           "getattributedtext", &nu::Label::GetAttributedText);
   }
 };
 
@@ -2096,6 +2165,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::Lifetime>(state, "Lifetime");
   BindType<nu::MessageLoop>(state, "MessageLoop");
   BindType<nu::App>(state, "App");
+  BindType<nu::AttributedText>(state, "AttributedText");
   BindType<nu::Font>(state, "Font");
   BindType<nu::Canvas>(state, "Canvas");
   BindType<nu::Clipboard>(state, "Clipboard");
