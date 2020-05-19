@@ -21,6 +21,9 @@ class SizeF;
 class NATIVEUI_EXPORT AttributedText : public base::RefCounted<AttributedText> {
  public:
   AttributedText(const std::string& text, TextFormat format);
+#if defined(OS_WIN)
+  AttributedText(base::string16 text, TextFormat format);
+#endif
 
   void SetFormat(TextFormat format);
   const TextFormat& GetFormat() const { return format_; }
@@ -32,6 +35,10 @@ class NATIVEUI_EXPORT AttributedText : public base::RefCounted<AttributedText> {
 
   RectF GetBoundsFor(const SizeF& size) const;
   std::string GetText() const;
+
+  // Private: Get one line's size.
+  SizeF GetOneLineSize() const;
+  float GetOneLineHeight() const;
 
   NativeAttributedText GetNative() const { return text_; }
 

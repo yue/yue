@@ -78,10 +78,6 @@ class PainterWin : public Painter {
   void TranslatePixel(const Vector2d& offset);
   void StrokeRectPixel(const nu::Rect& rect);
   void FillRectPixel(const nu::Rect& rect);
-  void DrawTextPixel(const base::string16& text, const nu::Rect& rect,
-                     const TextAttributes& attributes);
-  void DrawTextPixel(const base::string16& text, const PointF& point,
-                     const TextAttributes& attributes);
 
  private:
   // Used for common initialization.

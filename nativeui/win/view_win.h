@@ -69,6 +69,9 @@ class ViewImpl {
   virtual void SetColor(Color color);
   virtual void SetBackgroundColor(Color color);
 
+  // Set control's state.
+  virtual void SetState(ControlState state);
+
   /////////////////////////////////////////////////////////////////////////////
   // Common APIs.
 
@@ -128,10 +131,6 @@ class ViewImpl {
   // Invalidate the whole view.
   void Invalidate();
 
-  // Set control's state.
-  void SetState(ControlState state);
-  ControlState state() const { return state_; }
-
   // Change the bounds without invalidating.
   void set_size_allocation(const Rect& bounds) { size_allocation_ = bounds; }
   Rect size_allocation() const { return size_allocation_; }
@@ -162,6 +161,7 @@ class ViewImpl {
   Font* font() const { return font_; }
   Color color() const { return color_; }
   Color background_color() const { return background_color_; }
+  ControlState state() const { return state_; }
 
   WindowImpl* window() const { return window_; }
   ViewImpl* parent() const { return parent_; }

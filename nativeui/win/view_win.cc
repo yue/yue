@@ -138,6 +138,11 @@ void ViewImpl::SetBackgroundColor(Color color) {
   Invalidate();
 }
 
+void ViewImpl::SetState(ControlState state) {
+  state_ = state;
+  Invalidate();
+}
+
 void ViewImpl::RegisterDraggedTypes(std::set<Clipboard::Data::Type> types) {
   dragged_types_ = std::move(types);
   if (!dragged_types_.empty() && window())
@@ -315,11 +320,6 @@ void ViewImpl::SetVisible(bool visible) {
 
 void ViewImpl::Invalidate() {
   Invalidate(size_allocation_);
-}
-
-void ViewImpl::SetState(ControlState state) {
-  state_ = state;
-  Invalidate();
 }
 
 void ViewImpl::ParentChanged() {

@@ -154,8 +154,6 @@ jumbo_component("nativeui") {
     "gfx/win/scoped_set_map_mode.h",
     "gfx/win/screen_win.cc",
     "gfx/win/screen_win.h",
-    "gfx/win/text_win.cc",
-    "gfx/win/text_win.h",
     "gfx/win/gdiplus.h",
     "gfx/win/native_theme.cc",
     "gfx/win/native_theme.h",

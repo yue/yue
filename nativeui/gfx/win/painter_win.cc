@@ -306,29 +306,6 @@ void PainterWin::FillRectPixel(const nu::Rect& rect) {
   path_.Reset();
 }
 
-void PainterWin::DrawTextPixel(const base::string16& text, const nu::Rect& rect,
-                               const TextAttributes& attributes) {
-  Gdiplus::SolidBrush brush(ToGdi(attributes.color));
-  Gdiplus::StringFormat format;
-  format.SetAlignment(ToGdi(attributes.align));
-  format.SetLineAlignment(ToGdi(attributes.valign));
-  if (!attributes.wrap)
-    format.SetFormatFlags(Gdiplus::StringFormatFlagsNoWrap);
-  if (attributes.ellipsis)
-    format.SetTrimming(Gdiplus::StringTrimmingEllipsisCharacter);
-  graphics_.DrawString(
-      text.c_str(), static_cast<int>(text.size()),
-      attributes.font->GetNative(), ToGdi(RectF(rect)), &format, &brush);
-}
-
-void PainterWin::DrawTextPixel(const base::string16& text, const PointF& point,
-                               const TextAttributes& attributes) {
-  Gdiplus::SolidBrush brush(ToGdi(attributes.color));
-  graphics_.DrawString(
-      text.c_str(), static_cast<int>(text.size()),
-      attributes.font->GetNative(), ToGdi(point), &brush);
-}
-
 void PainterWin::Initialize(float scale_factor) {
   use_gdi_current_point_ = true;
   scale_factor_ = scale_factor;

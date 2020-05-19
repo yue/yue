@@ -4,7 +4,10 @@
 
 #include "nativeui/gfx/attributed_text.h"
 
+#include <utility>
+
 #include "nativeui/gfx/font.h"
+#include "nativeui/gfx/geometry/rect_f.h"
 
 namespace nu {
 
@@ -41,6 +44,14 @@ void AttributedText::SetColorFor(Color color, int start, int end) {
   if (RangeInvalid(start, end))
     return;
   PlatformSetColorFor(color, start, end);
+}
+
+SizeF AttributedText::GetOneLineSize() const {
+  return GetBoundsFor(SizeF(FLT_MAX, FLT_MAX)).size();
+}
+
+float AttributedText::GetOneLineHeight() const {
+  return GetOneLineSize().height();
 }
 
 }  // namespace nu

@@ -14,9 +14,13 @@
 
 namespace nu {
 
-AttributedText::AttributedText(const std::string& text, TextFormat format) {
+AttributedText::AttributedText(const std::string& text, TextFormat format)
+    : AttributedText(base::UTF8ToUTF16(text), std::move(format)) {
+}
+
+AttributedText::AttributedText(base::string16 text, TextFormat format) {
   text_ = new AttributedTextImpl;
-  text_->text = base::UTF8ToUTF16(text);
+  text_->text = std::move(text);
   SetFormat(std::move(format));
   // Set default font and color.
   TextAttributes default_attributes;
@@ -52,15 +56,20 @@ void AttributedText::PlatformSetColorFor(Color color, int start, int end) {
 }
 
 RectF AttributedText::GetBoundsFor(const SizeF& size) const {
-  // https://stackoverflow.com/questions/1203087/why-is-graphics-measurestring-returning-a-higher-than-expected-number
+  // MeasureString does not take account of the last new line, add a character
+  // to make it behave the same with other platforms.
+  bool ends_with_newline = text_->text.size() > 0 &&
+                           text_->text[text_->text.size() - 1] == L'\n';
+  const base::string16& text = ends_with_newline ? text_->text + L"a"
+                                                 : text_->text;
+
   base::win::ScopedGetDC dc(NULL);
   Gdiplus::Graphics graphics(dc);
+  // https://stackoverflow.com/questions/1203087/why-is-graphics-measurestring-returning-a-higher-than-expected-number
   graphics.SetTextRenderingHint(Gdiplus::TextRenderingHintAntiAlias);
   Gdiplus::RectF rect;
-  graphics.MeasureString(text_->text.data(),
-                         static_cast<int>(text_->text.size()),
-                         text_->font->GetNative(),
-                         Gdiplus::PointF(0., 0.),
+  graphics.MeasureString(text.data(), static_cast<int>(text.size()),
+                         text_->font->GetNative(), Gdiplus::PointF(0., 0.),
                          &rect);
   float scale_factor = GetScalingFactorFromDPI(::GetDeviceCaps(dc, LOGPIXELSX));
   return RectF(0., 0., rect.Width / scale_factor, rect.Height / scale_factor);
