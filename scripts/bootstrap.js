@@ -63,8 +63,8 @@ if (targetOs == 'linux') {
     'target_sysroot_dir="//third_party/"',
     'debian_platform="stretch"',
   ]
-  Array.prototype.push.apply(debugConfig, sysrootArgs)
-  Array.prototype.push.apply(releaseConfig, sysrootArgs)
+  debugConfig.push(...sysrootArgs)
+  releaseConfig.push(...sysrootArgs)
 }
 
 gen('out/Component', componentConfig)
