@@ -231,6 +231,7 @@ jumbo_component("nativeui") {
     "gtk/table_gtk.cc",
     "gtk/text_edit_gtk.cc",
     "gtk/tray_gtk.cc",
+    "gtk/scoped_gobject.h",
     "gtk/view_gtk.cc",
     "gtk/window_gtk.cc",
     "mac/events_handler.h",

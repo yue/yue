@@ -12,6 +12,7 @@
 #include "base/strings/string_split.h"
 #include "base/strings/string_tokenizer.h"
 #include "base/strings/string_util.h"
+#include "nativeui/gtk/scoped_gobject.h"
 #include "nativeui/gtk/widget_util.h"
 
 #if GTK_MAJOR_VERSION > 2
@@ -23,20 +24,45 @@
 #define GTK_STATE_FLAG_CHECKED static_cast<GtkStateFlags>(1 << 11)
 #endif
 
+// Function availability can be tested by checking if the address of gtk_* is
+// not nullptr.
+#define WEAK_GTK_FN(x) extern "C" __attribute__((weak)) decltype(x) x
+
+WEAK_GTK_FN(gtk_widget_path_iter_set_object_name);
+WEAK_GTK_FN(gtk_widget_path_iter_set_state);
+
 namespace nu {
+
+using ScopedStyleContext = ScopedGObject<GtkStyleContext>;
+using ScopedCssProvider = ScopedGObject<GtkCssProvider>;
+
+template <>
+inline void ScopedStyleContext::Unref() {
+  // Versions of GTK earlier than 3.15.4 had a bug where a g_assert
+  // would be triggered when trying to free a GtkStyleContext that had
+  // a parent whose only reference was the child context in question.
+  // This is a hack to work around that case.  See GTK commit
+  // "gtkstylecontext: Don't try to emit a signal when finalizing".
+  GtkStyleContext* context = obj_;
+  while (context) {
+    GtkStyleContext* parent = gtk_style_context_get_parent(context);
+    if (parent && G_OBJECT(context)->ref_count == 1 &&
+        !GtkVersionCheck(3, 15, 4)) {
+      g_object_ref(parent);
+      gtk_style_context_set_parent(context, nullptr);
+      g_object_unref(context);
+    } else {
+      g_object_unref(context);
+      return;
+    }
+    context = parent;
+  }
+}
 
 namespace {
 
-void* GetGtkSharedLibrary() {
-  std::string lib_name =
-      "libgtk-" + std::to_string(GTK_MAJOR_VERSION) + ".so.0";
-  static void* gtk_lib = dlopen(lib_name.c_str(), RTLD_LAZY);
-  DCHECK(gtk_lib);
-  return gtk_lib;
-}
-
-GtkStyleContext* AppendCssNodeToStyleContext(GtkStyleContext* context,
-                                             const std::string& css_node) {
+ScopedStyleContext AppendCssNodeToStyleContext(GtkStyleContext* context,
+                                               const std::string& css_node) {
   GtkWidgetPath* path =
       context ? gtk_widget_path_copy(gtk_style_context_get_path(context))
               : gtk_widget_path_new();
@@ -44,8 +70,10 @@ GtkStyleContext* AppendCssNodeToStyleContext(GtkStyleContext* context,
   enum {
     CSS_TYPE,
     CSS_NAME,
+    CSS_OBJECT_NAME,
     CSS_CLASS,
     CSS_PSEUDOCLASS,
+    CSS_NONE,
   } part_type = CSS_TYPE;
   static const struct {
     const char* name;
@@ -63,7 +91,7 @@ GtkStyleContext* AppendCssNodeToStyleContext(GtkStyleContext* context,
       {"checked", GTK_STATE_FLAG_CHECKED},
   };
   GtkStateFlags state = GTK_STATE_FLAG_NORMAL;
-  base::StringTokenizer t(css_node, ".:#");
+  base::StringTokenizer t(css_node, ".:#()");
   t.set_options(base::StringTokenizer::RETURN_DELIMS);
   while (t.GetNext()) {
     if (t.token_is_delim()) {
@@ -72,8 +100,14 @@ GtkStyleContext* AppendCssNodeToStyleContext(GtkStyleContext* context,
         gtk_widget_path_append_type(path, G_TYPE_NONE);
       }
       switch (*t.token_begin()) {
-        case '#':
+        case '(':
           part_type = CSS_NAME;
+          break;
+        case ')':
+          part_type = CSS_NONE;
+          break;
+        case '#':
+          part_type = CSS_OBJECT_NAME;
           break;
         case '.':
           part_type = CSS_CLASS;
@@ -85,32 +119,30 @@ GtkStyleContext* AppendCssNodeToStyleContext(GtkStyleContext* context,
           NOTREACHED();
       }
     } else {
-      static auto* _gtk_widget_path_iter_set_object_name =
-          reinterpret_cast<void (*)(GtkWidgetPath*, gint, const char*)>(dlsym(
-              GetGtkSharedLibrary(), "gtk_widget_path_iter_set_object_name"));
       switch (part_type) {
-        case CSS_NAME: {
+        case CSS_NAME:
+          gtk_widget_path_iter_set_name(path, -1, t.token().c_str());
+          break;
+        case CSS_OBJECT_NAME:
           if (GtkVersionCheck(3, 20)) {
-            _gtk_widget_path_iter_set_object_name(path, -1, t.token().c_str());
+            DCHECK(gtk_widget_path_iter_set_object_name);
+            gtk_widget_path_iter_set_object_name(path, -1, t.token().c_str());
           } else {
             gtk_widget_path_iter_add_class(path, -1, t.token().c_str());
           }
           break;
-        }
         case CSS_TYPE: {
           GType type = g_type_from_name(t.token().c_str());
-          DCHECK(type);
           gtk_widget_path_append_type(path, type);
-          if (GtkVersionCheck(3, 20)) {
-            if (t.token() == "GtkLabel")
-              _gtk_widget_path_iter_set_object_name(path, -1, "label");
+          if (GtkVersionCheck(3, 20) && t.token() == "GtkLabel") {
+            DCHECK(gtk_widget_path_iter_set_object_name);
+            gtk_widget_path_iter_set_object_name(path, -1, "label");
           }
           break;
         }
-        case CSS_CLASS: {
+        case CSS_CLASS:
           gtk_widget_path_iter_add_class(path, -1, t.token().c_str());
           break;
-        }
         case CSS_PSEUDOCLASS: {
           GtkStateFlags state_flag = GTK_STATE_FLAG_NORMAL;
           for (const auto& pseudo_class_entry : pseudo_classes) {
@@ -122,19 +154,18 @@ GtkStyleContext* AppendCssNodeToStyleContext(GtkStyleContext* context,
           state = static_cast<GtkStateFlags>(state | state_flag);
           break;
         }
+        case CSS_NONE:
+          NOTREACHED();
       }
     }
   }
 
   if (GtkVersionCheck(3, 14)) {
-    static auto* _gtk_widget_path_iter_set_state =
-        reinterpret_cast<void (*)(GtkWidgetPath*, gint, GtkStateFlags)>(
-            dlsym(GetGtkSharedLibrary(), "gtk_widget_path_iter_set_state"));
-    DCHECK(_gtk_widget_path_iter_set_state);
-    _gtk_widget_path_iter_set_state(path, -1, state);
+    DCHECK(gtk_widget_path_iter_set_state);
+    gtk_widget_path_iter_set_state(path, -1, state);
   }
 
-  GtkStyleContext* child_context = gtk_style_context_new();
+  ScopedStyleContext child_context(gtk_style_context_new());
   gtk_style_context_set_path(child_context, path);
   if (GtkVersionCheck(3, 14)) {
     gtk_style_context_set_state(child_context, state);
@@ -151,10 +182,10 @@ GtkStyleContext* AppendCssNodeToStyleContext(GtkStyleContext* context,
   return child_context;
 }
 
-GtkStyleContext* GetStyleContextFromCss(const std::string& css_selector) {
+ScopedStyleContext GetStyleContextFromCss(const std::string& css_selector) {
   // Prepend a window node to the selector since all widgets must live
   // in a window, but we don't want to specify that every time.
-  auto* context =
+  auto context =
       AppendCssNodeToStyleContext(nullptr, "GtkWindow#window.background");
 
   for (const auto& widget_type :
@@ -167,17 +198,18 @@ GtkStyleContext* GetStyleContextFromCss(const std::string& css_selector) {
 
 Color GetFgColorFromStyleContext(GtkStyleContext* context) {
   GdkRGBA color;
+#if GTK_CHECK_VERSION(3, 90, 0)
+  gtk_style_context_get_color(context, &color);
+#else
   gtk_style_context_get_color(context, gtk_style_context_get_state(context),
                               &color);
+#endif
   return Color(color.alpha * 255, color.red * 255, color.green * 255,
                color.blue * 255);
 }
 
 Color GetFgColor(const std::string& css_selector) {
-  GtkStyleContext* context = GetStyleContextFromCss(css_selector);
-  Color color = GetFgColorFromStyleContext(context);
-  g_object_unref(context);
-  return color;
+  return GetFgColorFromStyleContext(GetStyleContextFromCss(css_selector));
 }
 
 }  // namespace
