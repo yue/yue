@@ -33,7 +33,7 @@ void AttributedText::SetFontFor(Font* font, int start, int end) {
     return;
   PlatformSetFontFor(font, start, end);
   // Do a AddRef/ReleaseRef to prevent leak if the font is a floating pointer.
-  scoped_refptr<Font>{font};
+  base::WrapRefCounted(font);
 }
 
 void AttributedText::SetColor(Color color) {

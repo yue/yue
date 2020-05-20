@@ -139,8 +139,6 @@ jumbo_component("nativeui") {
     "gfx/mac/painter_mac.h",
     "gfx/mac/painter_mac.mm",
     "gfx/mac/screen_mac.mm",
-    "gfx/mac/text_mac.h",
-    "gfx/mac/text_mac.mm",
     "gfx/win/attributed_text_win.cc",
     "gfx/win/attributed_text_win.h",
     "gfx/win/canvas_win.cc",

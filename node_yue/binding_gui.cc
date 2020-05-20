@@ -265,7 +265,7 @@ struct Type<nu::AttributedText> {
     Set(context, constructor,
         "create", &CreateOnHeap<nu::AttributedText,
                                 const std::string&,
-                                nu::TextFormat>);
+                                nu::TextAttributes>);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {

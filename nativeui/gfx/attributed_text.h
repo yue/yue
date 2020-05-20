@@ -21,8 +21,9 @@ class SizeF;
 class NATIVEUI_EXPORT AttributedText : public base::RefCounted<AttributedText> {
  public:
   AttributedText(const std::string& text, TextFormat format);
+  AttributedText(const std::string& text, TextAttributes att);
 #if defined(OS_WIN)
-  AttributedText(base::string16 text, TextFormat format);
+  AttributedText(base::string16 text, TextAttributes att);
 #endif
 
   void SetFormat(TextFormat format);

@@ -27,6 +27,12 @@ AttributedText::AttributedText(const std::string& text, TextFormat format)
                 initWithString:base::SysUTF8ToNSString(text)]),
       format_(std::move(format)) {}
 
+AttributedText::AttributedText(const std::string& text, TextAttributes att)
+    : AttributedText(text, att.ToTextFormat()) {
+  SetFont(att.font.get());
+  SetColor(att.color);
+}
+
 AttributedText::~AttributedText() {
   [text_ release];
 }

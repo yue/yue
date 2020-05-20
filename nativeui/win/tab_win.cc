@@ -30,8 +30,8 @@ class TabItem : public ViewImpl {
   void SetTitle(base::string16 title) {
     text_ = new AttributedText(
         std::move(title),
-        {TextAlign::Center, TextAlign::Center, false /* wrap */});
-    text_->SetColor(color());
+        TextAttributes(font(), color(), TextAlign::Center, TextAlign::Center,
+                       false /* wrap */));
     UpdateTitleBounds();
     Invalidate();
   }
@@ -84,6 +84,7 @@ class TabItem : public ViewImpl {
 
   void SetFont(Font* font) override {
     ViewImpl::SetFont(font);
+    text_->SetFont(font);
     UpdateTitleBounds();
   }
 
@@ -99,7 +100,6 @@ class TabItem : public ViewImpl {
 
  private:
   void UpdateTitleBounds() {
-    text_->SetFont(font());
     size_ = text_->GetOneLineSize();
     size_.Enlarge(2 * kHPadding, 2 * kVPadding);
   }
@@ -278,8 +278,8 @@ class TabImpl : public ContainerImpl,
  private:
   int GetItemsHeight() const {
     if (items_height_ == -1) {
-      scoped_refptr<AttributedText> text = new AttributedText(L"bp", {});
-      text->SetFont(font());
+      scoped_refptr<AttributedText> text =
+          new AttributedText(L"bp", TextAttributes(font()));
       items_height_ =
           std::ceil(text->GetOneLineHeight()) +
           2 * TabItem::kVPadding + TabItem::kTPadding +

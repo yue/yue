@@ -4,6 +4,8 @@
 
 #include "nativeui/gfx/text.h"
 
+#include <utility>
+
 #include "nativeui/app.h"
 #include "nativeui/gfx/font.h"
 
@@ -18,6 +20,11 @@ TextAttributes::TextAttributes()
     : TextAttributes(App::GetCurrent()->GetDefaultFont(),
                      App::GetCurrent()->GetColor(App::ThemeColor::Text)) {}
 
+TextAttributes::TextAttributes(TextFormat format)
+    : TextFormat(std::move(format)),
+      font(App::GetCurrent()->GetDefaultFont()),
+      color(App::GetCurrent()->GetColor(App::ThemeColor::Text)) {}
+
 TextAttributes::TextAttributes(Font* font)
     : TextAttributes(font,
                      App::GetCurrent()->GetColor(App::ThemeColor::Text)) {}
@@ -25,7 +32,13 @@ TextAttributes::TextAttributes(Font* font)
 TextAttributes::TextAttributes(Color color)
     : TextAttributes(App::GetCurrent()->GetDefaultFont(), color) {}
 
-TextAttributes::~TextAttributes() {
+TextAttributes::TextAttributes(const TextAttributes&) = default;
+TextAttributes::TextAttributes(TextAttributes&&) = default;
+
+TextAttributes::~TextAttributes() = default;
+
+TextFormat TextAttributes::ToTextFormat() const {
+  return {align, valign, wrap, ellipsis};
 }
 
 }  // namespace nu

@@ -14,18 +14,21 @@
 
 namespace nu {
 
+// Win32 requires specifying font and color when drawing text, so convert format
+// to attributes to pass default font and color implicitly.
 AttributedText::AttributedText(const std::string& text, TextFormat format)
-    : AttributedText(base::UTF8ToUTF16(text), std::move(format)) {
-}
+    : AttributedText(base::UTF8ToUTF16(text),
+                     TextAttributes(std::move(format))) {}
 
-AttributedText::AttributedText(base::string16 text, TextFormat format) {
+AttributedText::AttributedText(const std::string& text, TextAttributes att)
+    : AttributedText(base::UTF8ToUTF16(text), std::move(att)) {}
+
+AttributedText::AttributedText(base::string16 text, TextAttributes att) {
   text_ = new AttributedTextImpl;
   text_->text = std::move(text);
-  SetFormat(std::move(format));
-  // Set default font and color.
-  TextAttributes default_attributes;
-  SetFont(default_attributes.font.get());
-  SetColor(default_attributes.color);
+  SetFormat(att.ToTextFormat());
+  SetFont(att.font.get());
+  SetColor(att.color);
 }
 
 AttributedText::~AttributedText() {

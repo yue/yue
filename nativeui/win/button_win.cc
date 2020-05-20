@@ -38,7 +38,8 @@ class ButtonImpl : public Clickable {
   void SetTitle(base::string16 title) {
     text_ = new AttributedText(
         std::move(title),
-        {TextAlign::Center, TextAlign::Center, false /* wrap */});
+        TextAttributes(font(), color(), TextAlign::Center, TextAlign::Center,
+                       false /* wrap */));
     UpdateTitleBounds();
     Invalidate();
   }
@@ -184,7 +185,13 @@ class ButtonImpl : public Clickable {
 
   void SetFont(Font* font) override {
     ViewImpl::SetFont(font);
+    text_->SetFont(font);
     UpdateTitleBounds();
+  }
+
+  void SetColor(Color color) override {
+    ViewImpl::SetColor(color);
+    text_->SetColor(color);
   }
 
   void SetState(ControlState state) override {
@@ -199,7 +206,6 @@ class ButtonImpl : public Clickable {
 
  private:
   void UpdateTitleBounds() {
-    text_->SetFont(font());
     title_size_ = text_->GetOneLineSize();
   }
 

@@ -221,6 +221,8 @@ void PainterWin::DrawAttributedText(AttributedText* text, const RectF& rect) {
       str->font->GetNative(),
       ToGdi(ScaleRect(rect, scale_factor_)),
       &str->format, str->brush.get());
+  // Do a AddRef/ReleaseRef to prevent leak if the text is a floating pointer.
+  base::WrapRefCounted(text);
 }
 
 void PainterWin::MoveToPixel(const PointF& point) {

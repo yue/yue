@@ -13,7 +13,6 @@
 #include "nativeui/gfx/canvas.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/gfx/image.h"
-#include "nativeui/gfx/mac/text_mac.h"
 
 namespace nu {
 
@@ -220,7 +219,16 @@ void PainterMac::DrawCanvasFromRect(Canvas* canvas, const RectF& src,
 
 TextMetrics PainterMac::MeasureText(const std::string& text, float width,
                                     const TextAttributes& attributes) {
-  return nu::MeasureText(text, width, attributes);
+  NSDictionary* attrs_dict = @{
+     NSFontAttributeName: attributes.font->GetNative(),
+  };
+  base::scoped_nsobject<NSAttributedString> attributed_str(
+      [[NSAttributedString alloc] initWithString:base::SysUTF8ToNSString(text)
+                                      attributes:attrs_dict]);
+  CGRect bounds = [attributed_str
+      boundingRectWithSize:CGSizeMake(width, -1)
+                   options:NSStringDrawingUsesLineFragmentOrigin];
+  return { SizeF(bounds.size) };
 }
 
 void PainterMac::DrawAttributedText(AttributedText* text, const RectF& rect) {
@@ -251,6 +259,9 @@ void PainterMac::DrawAttributedText(AttributedText* text, const RectF& rect) {
   [text->GetNative() drawWithRect:bounds.ToCGRect()
                           options:draw_options
                           context:nil];
+
+  // Do a AddRef/ReleaseRef to prevent leak if the text is a floating pointer.
+  base::WrapRefCounted(text);
 }
 
 }  // namespace nu

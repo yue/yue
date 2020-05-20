@@ -105,8 +105,8 @@ int TableImpl::GetRowHeight() const {
       return cy;
   }
   // Default row height should be able to draw full text.
-  scoped_refptr<AttributedText> text = new AttributedText(L"bp", {});
-  text->SetFont(font());
+  scoped_refptr<AttributedText> text =
+      new AttributedText(L"bp", TextAttributes(font()));
   return std::ceil(text->GetOneLineHeight());
 }
 

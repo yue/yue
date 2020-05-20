@@ -38,10 +38,16 @@ struct NATIVEUI_EXPORT TextAttributes : public TextFormat {
                  bool ellipsis = false);
   ~TextAttributes();
 
+  // Copy and move constructors.
+  TextAttributes(const TextAttributes&);
+  TextAttributes(TextAttributes&&);
+
   // Helpers.
   TextAttributes();
+  TextAttributes(TextFormat format);  // NOLINT
   explicit TextAttributes(Font* font);
   explicit TextAttributes(Color color);
+  TextFormat ToTextFormat() const;
 
   scoped_refptr<Font> font;
   Color color;

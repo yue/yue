@@ -221,6 +221,9 @@ void PainterGtk::DrawAttributedText(AttributedText* text, const RectF& rect) {
   PangoLayout* layout = text->GetNative();
   pango_cairo_show_layout(context_, layout);
   cairo_restore(context_);
+
+  // Do a AddRef/ReleaseRef to prevent leak if the text is a floating pointer.
+  base::WrapRefCounted(text);
 }
 
 void PainterGtk::Initialize() {

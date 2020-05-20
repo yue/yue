@@ -34,8 +34,8 @@ class GroupImpl : public ContainerImpl,
   void SetTitle(base::string16 title) {
     text_ = new AttributedText(
         std::move(title),
-        {TextAlign::Center, TextAlign::Start, false /* wrap */});
-    text_->SetColor(color());
+        TextAttributes(font(), color(), TextAlign::Center, TextAlign::Center,
+                       false /* wrap */));
     UpdateTitleBounds();
   }
 
@@ -105,6 +105,7 @@ class GroupImpl : public ContainerImpl,
 
   void SetFont(Font* font) override {
     ViewImpl::SetFont(font);
+    text_->SetFont(font);
     UpdateTitleBounds();
   }
 
@@ -117,7 +118,6 @@ class GroupImpl : public ContainerImpl,
 
  private:
   void UpdateTitleBounds() {
-    text_->SetFont(font());
     SizeF size = text_->GetOneLineSize();
     title_bounds_.SetRect(kTitleLeftMargin, 0,
                           size.width() + 2 * kTitlePadding, size.height());

@@ -240,7 +240,7 @@ struct Type<nu::AttributedText> {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::AttributedText,
                                    const std::string&,
-                                   nu::TextFormat>,
+                                   nu::TextAttributes>,
            "setformat", &nu::AttributedText::SetFormat,
            "getformat", &nu::AttributedText::GetFormat,
            "setfont", &nu::AttributedText::SetFont,

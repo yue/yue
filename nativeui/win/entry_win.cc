@@ -67,8 +67,7 @@ std::string Entry::GetText() const {
 
 SizeF Entry::GetMinimumSize() const {
   scoped_refptr<AttributedText> text =
-      new AttributedText(L"some text", TextFormat());
-  text->SetFont(GetNative()->font());
+      new AttributedText(L"some text", TextAttributes(GetNative()->font()));
   return SizeF(0, text->GetOneLineHeight() + 2 * kEntryPadding);
 }
 
