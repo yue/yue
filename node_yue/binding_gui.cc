@@ -219,25 +219,6 @@ struct Type<nu::MessageLoop> {
 };
 
 template<>
-struct Type<nu::App::ThemeColor> {
-  static constexpr const char* name = "yue.ThemeColor";
-  static bool FromV8(v8::Local<v8::Context> context,
-                     v8::Local<v8::Value> value,
-                     nu::App::ThemeColor* out) {
-    std::string id;
-    if (!vb::FromV8(context, value, &id))
-      return false;
-    if (id == "text")
-      *out = nu::App::ThemeColor::Text;
-    else if (id == "disabled-text")
-      *out = nu::App::ThemeColor::DisabledText;
-    else
-      return false;
-    return true;
-  }
-};
-
-template<>
 struct Type<nu::App> {
   static constexpr const char* name = "yue.App";
   static void BuildConstructor(v8::Local<v8::Context>, v8::Local<v8::Object>) {
@@ -583,6 +564,25 @@ struct Type<nu::Clipboard> {
 };
 
 template<>
+struct Type<nu::Color::Name> {
+  static constexpr const char* name = "yue.ColorName";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::Color::Name* out) {
+    std::string id;
+    if (!vb::FromV8(context, value, &id))
+      return false;
+    if (id == "text")
+      *out = nu::Color::Name::Text;
+    else if (id == "disabled-text")
+      *out = nu::Color::Name::DisabledText;
+    else
+      return false;
+    return true;
+  }
+};
+
+template<>
 struct Type<nu::Color> {
   static constexpr const char* name = "yue.Color";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
@@ -607,6 +607,7 @@ struct Type<nu::Color> {
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
+        "get", &nu::Color::Get,
         "rgb", &CreateOnStack<nu::Color, unsigned, unsigned, unsigned>,
         "argb", &CreateOnStack<nu::Color, unsigned, unsigned, unsigned,
                                unsigned>);

@@ -22,19 +22,9 @@ lang_detail:
     This class can not be created by user, you can only receive its global
     instance from the `app` property of the module:
 
-    ```lua
-    local gui = require('yue.gui')
-    gui.app:getcolor('text')
-    ```
-
   js: |
     This class can not be created by user, you can only receive its global
     instance from the `app` property of the module:
-
-    ```js
-    const gui = require('gui')
-    gui.app.getColor('text')
-    ```
 
 class_methods:
   - signature: App* GetCurrent()
@@ -57,9 +47,6 @@ methods:
   - signature: std::string GetDockBadgeLabel() const
     platform: ['macOS']
     description: Get the label displayed in dock’s badging area.
-
-  - signature: Color GetColor(App::ThemeColor name)
-    description: Return color of a theme component.
 
   - signature: Font* GetDefaultFont()
     description: Return the default font for displaying text.

@@ -8,7 +8,6 @@
 #include <array>
 #include <memory>
 #include <string>
-#include <unordered_map>
 
 #include "base/memory/weak_ptr.h"
 #include "nativeui/clipboard.h"
@@ -24,13 +23,8 @@ class NATIVEUI_EXPORT App {
  public:
   static App* GetCurrent();
 
-  // Available theme names of colors.
-  enum class ThemeColor {
-    Text,
-    DisabledText,
-  };
-
-  // Return color of a theme component.
+  // Deprecated: Return color of a theme component.
+  using ThemeColor = Color::Name;
   Color GetColor(ThemeColor name);
 
   // Return the default GUI font.
@@ -57,11 +51,6 @@ class NATIVEUI_EXPORT App {
 
  private:
   friend class State;
-
-  Color PlatformGetColor(ThemeColor name);
-
-  // Cached theme colors.
-  std::unordered_map<int, Color> theme_colors_;
 
   scoped_refptr<Font> default_font_;
 

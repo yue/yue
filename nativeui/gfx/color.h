@@ -33,6 +33,14 @@ namespace nu {
 // A class to represent colors.
 class NATIVEUI_EXPORT Color {
  public:
+  // Available names of colors.
+  enum class Name {
+    Text,
+    DisabledText,
+  };
+
+  static Color Get(Name name);
+
   explicit Color(const std::string& hex);
   explicit Color(uint32_t value) : value_(value) {}
   Color(unsigned a, unsigned r, unsigned g, unsigned b)
@@ -74,6 +82,8 @@ class NATIVEUI_EXPORT Color {
   }
 
  private:
+  static Color PlatformGet(Name name);
+
   uint32_t value_;
 };
 

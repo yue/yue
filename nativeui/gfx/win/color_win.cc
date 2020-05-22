@@ -6,6 +6,17 @@
 
 namespace nu {
 
+// static
+Color Color::PlatformGet(Name name) {
+  int index = 0;
+  if (name == Name::Text)
+    index = COLOR_WINDOWTEXT;
+  else if (name == Name::DisabledText)
+    index = COLOR_GRAYTEXT;
+  DWORD color = ::GetSysColor(index);
+  return Color(GetRValue(color), GetGValue(color), GetBValue(color));
+}
+
 COLORREF Color::ToCOLORREF() const {
   return RGB(r(), g(), b());
 }

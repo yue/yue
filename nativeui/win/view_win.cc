@@ -21,7 +21,7 @@ namespace nu {
 ViewImpl::ViewImpl(ControlType type, View* delegate)
     : type_(type),
       font_(App::GetCurrent()->GetDefaultFont()),
-      color_(App::GetCurrent()->GetColor(App::ThemeColor::Text)),
+      color_(Color::Get(Color::Name::Text)),
       scale_factor_(GetScaleFactor()),
       delegate_(delegate) {}
 

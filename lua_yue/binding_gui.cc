@@ -200,23 +200,6 @@ struct Type<nu::MessageLoop> {
 };
 
 template<>
-struct Type<nu::App::ThemeColor> {
-  static constexpr const char* name = "yue.ThemeColor";
-  static inline bool To(State* state, int index, nu::App::ThemeColor* out) {
-    std::string id;
-    if (!lua::To(state, index, &id))
-      return false;
-    if (id == "text")
-      *out = nu::App::ThemeColor::Text;
-    else if (id == "disabled-text")
-      *out = nu::App::ThemeColor::DisabledText;
-    else
-      return false;
-    return true;
-  }
-};
-
-template<>
 struct Type<nu::App> {
   static constexpr const char* name = "yue.App";
   static void BuildMetaTable(State* state, int metatable) {
@@ -542,6 +525,23 @@ struct Type<nu::Clipboard> {
 };
 
 template<>
+struct Type<nu::Color::Name> {
+  static constexpr const char* name = "yue.ColorName";
+  static inline bool To(State* state, int index, nu::Color::Name* out) {
+    std::string id;
+    if (!lua::To(state, index, &id))
+      return false;
+    if (id == "text")
+      *out = nu::Color::Name::Text;
+    else if (id == "disabled-text")
+      *out = nu::Color::Name::DisabledText;
+    else
+      return false;
+    return true;
+  }
+};
+
+template<>
 struct Type<nu::Color> {
   static constexpr const char* name = "yue.Color";
   static inline void Push(State* state, nu::Color color) {
@@ -565,6 +565,7 @@ struct Type<nu::Color> {
   }
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
+           "get", &nu::Color::Get,
            "rgb", &CreateOnStack<nu::Color, unsigned, unsigned, unsigned>,
            "argb", &CreateOnStack<nu::Color, unsigned, unsigned, unsigned,
                                   unsigned>);

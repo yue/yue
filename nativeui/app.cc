@@ -24,13 +24,7 @@ App::~App() {
 }
 
 Color App::GetColor(ThemeColor name) {
-  int key = static_cast<int>(name);
-  auto it = theme_colors_.find(key);
-  if (it != theme_colors_.end())
-    return it->second;
-  Color color = PlatformGetColor(name);
-  theme_colors_[key] = color;
-  return color;
+  return Color::Get(name);
 }
 
 Font* App::GetDefaultFont() {

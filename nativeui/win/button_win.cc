@@ -8,7 +8,6 @@
 
 #include "base/strings/utf_string_conversions.h"
 #include "base/win/scoped_hdc.h"
-#include "nativeui/app.h"
 #include "nativeui/container.h"
 #include "nativeui/gfx/attributed_text.h"
 #include "nativeui/gfx/geometry/insets.h"
@@ -196,9 +195,8 @@ class ButtonImpl : public Clickable {
 
   void SetState(ControlState state) override {
     ViewImpl::SetState(state);
-    text_->SetColor(App::GetCurrent()->GetColor(
-        is_disabled() ? App::ThemeColor::DisabledText
-                      : App::ThemeColor::Text));
+    text_->SetColor(Color::Get(is_disabled() ? Color::Name::DisabledText
+                                             : Color::Name::Text));
   }
 
   AttributedText* text() const { return text_.get(); }

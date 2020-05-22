@@ -18,16 +18,15 @@ TextAttributes::TextAttributes(Font* font, Color color, TextAlign align,
 
 TextAttributes::TextAttributes()
     : TextAttributes(App::GetCurrent()->GetDefaultFont(),
-                     App::GetCurrent()->GetColor(App::ThemeColor::Text)) {}
+                     Color::Get(Color::Name::Text)) {}
 
 TextAttributes::TextAttributes(TextFormat format)
     : TextFormat(std::move(format)),
       font(App::GetCurrent()->GetDefaultFont()),
-      color(App::GetCurrent()->GetColor(App::ThemeColor::Text)) {}
+      color(Color::Get(Color::Name::Text)) {}
 
 TextAttributes::TextAttributes(Font* font)
-    : TextAttributes(font,
-                     App::GetCurrent()->GetColor(App::ThemeColor::Text)) {}
+    : TextAttributes(font, Color::Get(Color::Name::Text)) {}
 
 TextAttributes::TextAttributes(Color color)
     : TextAttributes(App::GetCurrent()->GetDefaultFont(), color) {}

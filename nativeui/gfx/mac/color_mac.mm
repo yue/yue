@@ -6,7 +6,27 @@
 
 #import <Cocoa/Cocoa.h>
 
+#include "nativeui/gfx/geometry/safe_integer_conversions.h"
+
 namespace nu {
+
+// static
+Color Color::PlatformGet(Name name) {
+  NSColor* color;
+  if (name == Name::Text)
+    color = [NSColor textColor];
+  else if (name == Name::DisabledText)
+    color = [NSColor disabledControlTextColor];
+  else
+    color = [NSColor blackColor];
+  CGFloat red, green, blue, alpha;
+  color = [color colorUsingColorSpace:[NSColorSpace deviceRGBColorSpace]];
+  [color getRed:&red green:&green blue:&blue alpha:&alpha];
+  return Color(ToRoundedInt(255. * alpha),
+               ToRoundedInt(255. * red),
+               ToRoundedInt(255. * green),
+               ToRoundedInt(255. * blue));
+}
 
 NSColor* Color::ToNSColor() const {
   return [NSColor colorWithCalibratedRed:r() / 255.0

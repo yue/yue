@@ -6,6 +6,7 @@
 #define NATIVEUI_STATE_H_
 
 #include <memory>
+#include <unordered_map>
 
 #include "base/memory/ref_counted.h"
 #include "nativeui/app.h"
@@ -51,6 +52,9 @@ class NATIVEUI_EXPORT State {
   UINT GetNextCommandID();
 #endif
 
+  // Internal: Return the colors cache.
+  std::unordered_map<int, Color>& theme_colors() { return theme_colors_; }
+
   // Internal: Return the default yoga config.
   YGConfigRef yoga_config() const { return yoga_config_; }
 
@@ -70,6 +74,9 @@ class NATIVEUI_EXPORT State {
   // https://msdn.microsoft.com/en-us/library/11861byt.aspx
   UINT next_command_id_ = 0x8000;
 #endif
+
+  // Cached colors.
+  std::unordered_map<int, Color> theme_colors_;
 
   // The app instance.
   App app_;

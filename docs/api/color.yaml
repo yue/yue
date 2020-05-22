@@ -70,6 +70,9 @@ constructors:
         description: 8-bit blue channel value.
 
 class_methods:
+  - signature: Color Get(Color::Name name)
+    description: Return the color with theme `name`.
+
   - signature: Color rgb(unsigned r, unsigned g, unsigned b)
     lang: ['lua', 'js']
     description: Create an opaque RGB color.
