@@ -23,6 +23,8 @@ class ScopedCOMInitializer;
 
 namespace nu {
 
+class Font;
+
 #if defined(OS_WIN)
 class ClassRegistrar;
 class GdiplusHolder;
@@ -52,6 +54,9 @@ class NATIVEUI_EXPORT State {
   UINT GetNextCommandID();
 #endif
 
+  // Internal: Return the default font.
+  scoped_refptr<Font>& default_font() { return default_font_; }
+
   // Internal: Return the colors cache.
   std::unordered_map<int, Color>& theme_colors() { return theme_colors_; }
 
@@ -74,6 +79,8 @@ class NATIVEUI_EXPORT State {
   // https://msdn.microsoft.com/en-us/library/11861byt.aspx
   UINT next_command_id_ = 0x8000;
 #endif
+
+  scoped_refptr<Font> default_font_;
 
   // Cached colors.
   std::unordered_map<int, Color> theme_colors_;

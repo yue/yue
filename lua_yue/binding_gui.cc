@@ -356,15 +356,12 @@ struct Type<nu::Font> {
     RawSet(state, index,
            "create", &CreateOnHeap<nu::Font, const std::string&, float,
                                    nu::Font::Weight, nu::Font::Style>,
-           "default", &GetDefault,
+           "default", &nu::Font::Default,
            "derive", &nu::Font::Derive,
            "getname", &nu::Font::GetName,
            "getsize", &nu::Font::GetSize,
            "getweight", &nu::Font::GetWeight,
            "getstyle", &nu::Font::GetStyle);
-  }
-  static nu::Font* GetDefault() {
-    return nu::App::GetCurrent()->GetDefaultFont();
   }
 };
 

@@ -48,9 +48,6 @@ methods:
     platform: ['macOS']
     description: Get the label displayed in dock’s badging area.
 
-  - signature: Font* GetDefaultFont()
-    description: Return the default font for displaying text.
-
   - signature: Clipboard* GetClipboard(Clipboard::Type type)
     description: Return the clipboard with `type`.
     lang_detail:

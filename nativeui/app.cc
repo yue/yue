@@ -18,19 +18,14 @@ App* App::GetCurrent() {
 App::App() : weak_factory_(this) {
 }
 
-App::~App() {
-  // The GUI members must be destroyed before we shutdown GUI engine.
-  default_font_ = nullptr;
-}
+App::~App() = default;
 
 Color App::GetColor(ThemeColor name) {
   return Color::Get(name);
 }
 
 Font* App::GetDefaultFont() {
-  if (!default_font_)
-    default_font_ = new Font;
-  return default_font_.get();
+  return Font::Default();
 }
 
 Clipboard* App::GetClipboard(Clipboard::Type type) {

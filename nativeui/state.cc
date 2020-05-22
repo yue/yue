@@ -6,6 +6,7 @@
 
 #include "base/lazy_instance.h"
 #include "base/threading/thread_local.h"
+#include "nativeui/gfx/font.h"
 #include "nativeui/protocol_job.h"
 #include "third_party/yoga/yoga/Yoga.h"
 

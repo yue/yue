@@ -6,7 +6,6 @@
 
 #include <utility>
 
-#include "nativeui/app.h"
 #include "nativeui/gfx/font.h"
 
 namespace nu {
@@ -17,19 +16,18 @@ TextAttributes::TextAttributes(Font* font, Color color, TextAlign align,
       font(font), color(color) {}
 
 TextAttributes::TextAttributes()
-    : TextAttributes(App::GetCurrent()->GetDefaultFont(),
-                     Color::Get(Color::Name::Text)) {}
+    : TextAttributes(Font::Default(), Color::Get(Color::Name::Text)) {}
 
 TextAttributes::TextAttributes(TextFormat format)
     : TextFormat(std::move(format)),
-      font(App::GetCurrent()->GetDefaultFont()),
+      font(Font::Default()),
       color(Color::Get(Color::Name::Text)) {}
 
 TextAttributes::TextAttributes(Font* font)
     : TextAttributes(font, Color::Get(Color::Name::Text)) {}
 
 TextAttributes::TextAttributes(Color color)
-    : TextAttributes(App::GetCurrent()->GetDefaultFont(), color) {}
+    : TextAttributes(Font::Default(), color) {}
 
 TextAttributes::TextAttributes(const TextAttributes&) = default;
 TextAttributes::TextAttributes(TextAttributes&&) = default;

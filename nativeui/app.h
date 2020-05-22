@@ -27,7 +27,7 @@ class NATIVEUI_EXPORT App {
   using ThemeColor = Color::Name;
   Color GetColor(ThemeColor name);
 
-  // Return the default GUI font.
+  // Deprecated: Return the default GUI font.
   Font* GetDefaultFont();
 
   // Return clipboard instance.
@@ -51,8 +51,6 @@ class NATIVEUI_EXPORT App {
 
  private:
   friend class State;
-
-  scoped_refptr<Font> default_font_;
 
   // Array of available clipboards.
   std::array<std::unique_ptr<Clipboard>,

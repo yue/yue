@@ -11,8 +11,6 @@
 #include "nativeui/events/win/event_win.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/gfx/screen.h"
-#include "nativeui/label.h"
-#include "nativeui/state.h"
 #include "nativeui/win/dragging_info_win.h"
 #include "nativeui/win/scroll_win.h"
 
@@ -20,7 +18,7 @@ namespace nu {
 
 ViewImpl::ViewImpl(ControlType type, View* delegate)
     : type_(type),
-      font_(App::GetCurrent()->GetDefaultFont()),
+      font_(Font::Default()),
       color_(Color::Get(Color::Name::Text)),
       scale_factor_(GetScaleFactor()),
       delegate_(delegate) {}

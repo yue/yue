@@ -15,6 +15,9 @@ namespace nu {
 
 class NATIVEUI_EXPORT Font : public base::RefCounted<Font> {
  public:
+  // Get the cached default font.
+  static Font* Default();
+
   // Standard font weights as used in Pango and Windows. The values must match
   // https://msdn.microsoft.com/en-us/library/system.windows.fontweights(v=vs.110).aspx
   enum class Weight {
@@ -35,8 +38,6 @@ class NATIVEUI_EXPORT Font : public base::RefCounted<Font> {
     Italic = 1,
   };
 
-  // Create default system UI font.
-  Font();
   // Create a Font implementation with the specified |name|
   // (encoded in UTF-8), DIP |size|, |weight| and |style|.
   Font(const std::string& name, float size, Weight weight, Style style);
@@ -69,6 +70,9 @@ class NATIVEUI_EXPORT Font : public base::RefCounted<Font> {
 #endif
 
  protected:
+  // Create default system UI font.
+  Font();
+
   virtual ~Font();
 
  private:

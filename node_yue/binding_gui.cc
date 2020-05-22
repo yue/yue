@@ -373,7 +373,7 @@ struct Type<nu::Font> {
     Set(context, constructor,
         "create", &CreateOnHeap<nu::Font, const std::string&, float,
                                 nu::Font::Weight, nu::Font::Style>,
-        "default", &GetDefault);
+        "default", &nu::Font::Default);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
@@ -383,9 +383,6 @@ struct Type<nu::Font> {
         "getSize", &nu::Font::GetSize,
         "getWeight", &nu::Font::GetWeight,
         "getStyle", &nu::Font::GetStyle);
-  }
-  static nu::Font* GetDefault() {
-    return nu::App::GetCurrent()->GetDefaultFont();
   }
 };
 
