@@ -1,0 +1,61 @@
+name: AttributedText
+component: gui
+header: nativeui/gfx/attributed_text.h
+type: refcounted
+namespace: nu
+description: Text with styles.
+
+detail: |
+  On Windows, due to the limitations of GdiPlus, it is only supported to change
+  the whole text's color and font, i.e. the `SetFontFor` and `SetColorFor` APIs
+  are unsupported.
+
+constructors:
+  - signature: AttributedText(const std::string& text, TextFormat format)
+    lang: ['cpp']
+    description: |
+      Create an `AttributedText` with `format` and default font and color.
+
+  - signature: AttributedText(const std::string& text, TextAttributes attributes)
+    lang: ['cpp']
+    description: Create an `AttributedText` with `attributes`.
+
+class_methods:
+  - signature: AttributedText* Create(TextAttributes attributes)
+    lang: ['lua', 'js']
+    description: Create an `AttributedText`.
+
+methods:
+  - signature: void SetFormat(TextFormat format)
+    description: Overwrite styles with `format`.
+
+  - signature: const TextFormat& GetFormat() const
+    description: Return current styles.
+
+  - signature: void SetFont(Font* font)
+    description: Set the whole text's `font`.
+
+  - signature: void SetFontFor(Font* font, int start, int end)
+    platform: ['macOS', 'Linux']
+    description: |
+      Set the `font` of text between character range `[start, end)`. Passing
+      `-1` as `end` means the rest of the text.
+
+  - signature: void SetColor(Color color)
+    description: Set the whole text's `color`.
+
+  - signature: void SetColorFor(Color font, int start, int end)
+    platform: ['macOS', 'Linux']
+    description: |
+      Set the `color` of text between character range `[start, end)`. Passing
+      `-1` as `end` means the rest of the text.
+
+  - signature: RectF GetBoundsFor(const SizeF& size) const
+    description: Return the bounds required to draw the text within `size`.
+
+  - signature: std::string GetText() const
+    description: Return the plain text.
+
+  - signature: NativeAttributedText GetNative() const
+    lang: ['cpp']
+    description: Return the native instance wrapped by the class.

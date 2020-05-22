@@ -1,0 +1,29 @@
+name: TextFormat
+header: nativeui/gfx/text.h
+type: struct
+namespace: nu
+description: Options for layouting text.
+
+properties:
+  - property: TextAlign align
+    optional: true
+    description: Horizontal text align, default is to the start of layout.
+
+  - property: TextAlign valign
+    optional: true
+    description: Vertical text align, default is to the start of layout.
+
+  - property: bool wrap
+    optional: true
+    description: Whether to wrap lines, default is `true`.
+    detail: Lines are wrapped at word boundaries.
+
+  - property: bool ellipsis
+    optional: true
+    description: |
+      Whether to show ellipsis (...) at the end of the last visible line if the
+      text doesn't fit into the bounds specified, default is `false`.
+    detail: |
+      The text is broken at the boundary of the last character.
+
+      On Linux, `ellipsis` does not have effect if `wrap` is `false`.

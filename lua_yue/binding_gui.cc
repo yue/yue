@@ -257,11 +257,11 @@ struct Type<nu::AttributedText> {
 #if !defined(OS_WIN)
   static void SetFontFor(nu::AttributedText* text, nu::Font* font,
                          int start, int end) {
-    text->SetFontFor(font, start - 1, end - 1);
+    text->SetFontFor(font, start - 1, end <= 0 ? end : end - 1);
   }
   static void SetColorFor(nu::AttributedText* text, nu::Color color,
                           int start, int end) {
-    text->SetColorFor(color, start - 1, end - 1);
+    text->SetColorFor(color, start - 1, end <= 0 ? end : end - 1);
   }
 #endif
 };
