@@ -28,8 +28,8 @@ process.on('uncaughtException', (error) => {
 
 execSync('node scripts/create_typescript_declarations.js')
 execSync(`git clone https://github.com/yue/node-gui "${cwd}"`)
-fs.copySync('out/Dist/index.d.ts', path.join(cwd, 'index.d.ts'))
 execSync('npm install', {cwd})
+fs.copySync('out/Dist/index.d.ts', path.join(cwd, 'index.d.ts'))
 execSync('npm pack', {cwd})
 
 // Cleanup.
