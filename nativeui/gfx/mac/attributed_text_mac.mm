@@ -22,13 +22,10 @@ inline int IndexToLength(NSAttributedString* str, int start, int end) {
 
 }  // namespace
 
-AttributedText::AttributedText(const std::string& text, TextFormat format)
+AttributedText::AttributedText(const std::string& text, TextAttributes att)
     : text_([[NSMutableAttributedString alloc]
                 initWithString:base::SysUTF8ToNSString(text)]),
-      format_(std::move(format)) {}
-
-AttributedText::AttributedText(const std::string& text, TextAttributes att)
-    : AttributedText(text, att.ToTextFormat()) {
+      format_(att.ToTextFormat()) {
   SetFont(att.font.get());
   SetColor(att.color);
 }

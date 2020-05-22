@@ -19,6 +19,11 @@ inline bool RangeInvalid(int start, int end) {
 
 }  // namespace
 
+// The system does not specify default system font and color for AttributedText
+// so convert format to attributes to pass default font and color implicitly.
+AttributedText::AttributedText(const std::string& text, TextFormat format)
+    : AttributedText(text, TextAttributes(std::move(format))) {}
+
 void AttributedText::SetFormat(TextFormat format) {
   format_ = std::move(format);
   PlatformUpdateFormat();

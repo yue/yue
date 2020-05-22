@@ -35,11 +35,6 @@ void FillPangoAttributeIndex(PangoAttribute* attr, PangoLayout* layout,
 
 }  // namespace
 
-// GTK requires specifying font and color when drawing text, so convert format
-// to attributes to pass default font and color implicitly.
-AttributedText::AttributedText(const std::string& text, TextFormat format)
-    : AttributedText(text, TextAttributes(std::move(format))) {}
-
 AttributedText::AttributedText(const std::string& text, TextAttributes att) {
   static PangoContext* context = nullptr;
   if (!context) {
