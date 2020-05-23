@@ -5,8 +5,6 @@
 #ifndef NATIVEUI_APP_H_
 #define NATIVEUI_APP_H_
 
-#include <array>
-#include <memory>
 #include <string>
 
 #include "base/memory/weak_ptr.h"
@@ -30,7 +28,7 @@ class NATIVEUI_EXPORT App {
   // Deprecated: Return the default GUI font.
   Font* GetDefaultFont();
 
-  // Return clipboard instance.
+  // Deprecated: Return clipboard instance.
   Clipboard* GetClipboard(Clipboard::Type type = Clipboard::Type::CopyPaste);
 
 #if defined(OS_MACOSX)
@@ -51,10 +49,6 @@ class NATIVEUI_EXPORT App {
 
  private:
   friend class State;
-
-  // Array of available clipboards.
-  std::array<std::unique_ptr<Clipboard>,
-             static_cast<size_t>(Clipboard::Type::Count)> clipboards_;
 
 #if defined(OS_MACOSX)
   scoped_refptr<MenuBar> application_menu_;

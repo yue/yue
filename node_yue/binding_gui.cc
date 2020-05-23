@@ -547,6 +547,9 @@ struct Type<nu::Clipboard> {
   static constexpr const char* name = "yue.Clipboard";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+        "get", &nu::Clipboard::Get,
+        "fromType", &nu::Clipboard::FromType);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {

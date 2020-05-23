@@ -5,6 +5,7 @@
 #ifndef NATIVEUI_STATE_H_
 #define NATIVEUI_STATE_H_
 
+#include <array>
 #include <memory>
 #include <unordered_map>
 
@@ -54,6 +55,9 @@ class NATIVEUI_EXPORT State {
   UINT GetNextCommandID();
 #endif
 
+  // Internal: Return the clipboards.
+  Clipboard* GetClipboard(Clipboard::Type type);
+
   // Internal: Return the default font.
   scoped_refptr<Font>& default_font() { return default_font_; }
 
@@ -79,6 +83,10 @@ class NATIVEUI_EXPORT State {
   // https://msdn.microsoft.com/en-us/library/11861byt.aspx
   UINT next_command_id_ = 0x8000;
 #endif
+
+  // Array of available clipboards.
+  std::array<std::unique_ptr<Clipboard>,
+             static_cast<size_t>(Clipboard::Type::Count)> clipboards_;
 
   scoped_refptr<Font> default_font_;
 

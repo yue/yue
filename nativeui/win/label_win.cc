@@ -4,6 +4,7 @@
 
 #include "nativeui/label.h"
 
+#include "nativeui/gfx/attributed_text.h"
 #include "nativeui/win/view_win.h"
 
 namespace nu {

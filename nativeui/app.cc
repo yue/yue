@@ -29,10 +29,7 @@ Font* App::GetDefaultFont() {
 }
 
 Clipboard* App::GetClipboard(Clipboard::Type type) {
-  int index = static_cast<int>(type);
-  if (!clipboards_[index])
-    clipboards_[index].reset(new Clipboard(type));
-  return clipboards_[index].get();
+  return Clipboard::FromType(type);
 }
 
 }  // namespace nu

@@ -31,11 +31,19 @@ base::LazyInstance<base::ThreadLocalPointer<State>>::Leaky lazy_tls_ptr =
 
 }  // namespace
 
+// static
+State* State::GetCurrent() {
+  return lazy_tls_ptr.Pointer()->Get();
+}
+
 State::State() : yoga_config_(YGConfigNew()) {
   DCHECK_EQ(GetCurrent(), nullptr) << "should only have one state per thread";
 
   lazy_tls_ptr.Pointer()->Set(this);
   PlatformInit();
+
+  for (int i = 0; i < static_cast<int>(Clipboard::Type::Count); ++i)
+    clipboards_[i].reset(new Clipboard(static_cast<Clipboard::Type>(i)));
 }
 
 State::~State() {
@@ -49,9 +57,8 @@ State::~State() {
   base::debug::LeakTracker<ProtocolJob>::CheckForLeaks();
 }
 
-// static
-State* State::GetCurrent() {
-  return lazy_tls_ptr.Pointer()->Get();
+Clipboard* State::GetClipboard(Clipboard::Type type) {
+  return clipboards_[static_cast<size_t>(type)].get();
 }
 
 }  // namespace nu

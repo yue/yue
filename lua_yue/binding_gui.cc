@@ -512,6 +512,8 @@ struct Type<nu::Clipboard> {
   static constexpr const char* name = "yue.Clipboard";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
+           "get", &nu::Clipboard::Get,
+           "fromtype", &nu::Clipboard::FromType,
            "clear", &nu::Clipboard::Clear,
            "settext", &nu::Clipboard::SetText,
            "gettext", &nu::Clipboard::GetText,

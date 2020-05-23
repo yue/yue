@@ -22,9 +22,17 @@ lang_detail:
     This class can not be created by user, you can only receive its global
     instance from the `app` property of the module:
 
+    ```lua
+    gui.app:getapplicationmenu()
+    ```
+
   js: |
     This class can not be created by user, you can only receive its global
     instance from the `app` property of the module:
+
+    ```js
+    gui.app.getApplicationMenu()
+    ```
 
 class_methods:
   - signature: App* GetCurrent()
@@ -47,13 +55,3 @@ methods:
   - signature: std::string GetDockBadgeLabel() const
     platform: ['macOS']
     description: Get the label displayed in dock’s badging area.
-
-  - signature: Clipboard* GetClipboard(Clipboard::Type type)
-    description: Return the clipboard with `type`.
-    lang_detail:
-      cpp: |
-        The returned clipboard instance is managed by App, there is no need to
-        manually free it.
-
-        The `CopyPaste` clipboard will be return if The `type` argument is
-        omitted.

@@ -6,6 +6,8 @@
 
 #include <utility>
 
+#include "nativeui/state.h"
+
 namespace nu {
 
 Clipboard::Data::Data() : type_(Type::None) {}
@@ -93,6 +95,16 @@ void Clipboard::Data::InternalMoveConstructFrom(Data&& that) {
           std::move(that.file_paths_));
       break;
   }
+}
+
+// static
+Clipboard* Clipboard::Get() {
+  return State::GetCurrent()->GetClipboard(Type::CopyPaste);
+}
+
+// static
+Clipboard* Clipboard::FromType(Type type) {
+  return State::GetCurrent()->GetClipboard(type);
 }
 
 Clipboard::Clipboard(Type type)
