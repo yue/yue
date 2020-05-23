@@ -2438,7 +2438,7 @@ bool GetRuntime(
       !versions->IsObject())
     return false;
   std::string tmp;
-  *is_electron =  vb::Get(context, versions, "electron", &tmp) && !tmp.empty();
+  *is_electron = vb::Get(context, versions, "electron", &tmp) && !tmp.empty();
   *is_yode =  vb::Get(context, versions, "yode", &tmp) && !tmp.empty();
   return true;
 }
@@ -2449,9 +2449,10 @@ void MemoryPressureNotification(v8::Local<v8::Context> context, int level) {
       static_cast<v8::MemoryPressureLevel>(level));
 }
 
-void Initialize(v8::Local<v8::Object> exports) {
-  v8::Isolate* isolate = v8::Isolate::GetCurrent();
-  v8::Local<v8::Context> context = isolate->GetCurrentContext();
+void Initialize(v8::Local<v8::Object> exports,
+                v8::Local<v8::Value> unused,
+                v8::Local<v8::Context> context,
+                void* priv) {
   CHECK(GetRuntime(context, &is_electron, &is_yode));
 
 #if defined(OS_WIN)
@@ -2540,4 +2541,4 @@ void Initialize(v8::Local<v8::Object> exports) {
 
 }  // namespace node_yue
 
-NODE_MODULE(gui, node_yue::Initialize)
+NODE_MODULE_CONTEXT_AWARE(gui, node_yue::Initialize);

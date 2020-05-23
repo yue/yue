@@ -6,26 +6,72 @@
 
 #include <node_buffer.h>
 
+#include "nativeui/gfx/mac/painter_mac.h"
+#include "nativeui/mac/nu_private.h"
+#include "nativeui/mac/nu_view.h"
+
+@interface NUChromeView : NSView<NUView> {
+ @private
+  nu::NUPrivate private_;
+  scoped_refptr<nu::AttributedText> text_;
+}
+@end
+
+@implementation NUChromeView
+
+- (void)drawRect:(NSRect)dirtyRect {
+  if ([[self subviews] count])
+    return;
+
+  if (!text_) {
+    text_ = new nu::AttributedText(
+        "No WebContents found",
+        nu::TextAttributes(nu::Font::Default(), nu::Color(255, 0, 0),
+                           nu::TextAlign::Center, nu::TextAlign::Center));
+  }
+
+  nu::PainterMac painter;
+  painter.SetColor(nu::Color(0xFF, 0xFF, 0xFF));
+  painter.FillRect(nu::RectF(dirtyRect));
+  painter.DrawAttributedText(text_.get(),
+                             nu::RectF(nu::SizeF([self frame].size)));
+}
+
+- (nu::NUPrivate*)nuPrivate {
+  return &private_;
+}
+
+- (void)setNUFont:(nu::Font*)font {
+}
+
+- (void)setNUColor:(nu::Color)color {
+}
+
+- (void)setNUBackgroundColor:(nu::Color)color {
+}
+
+- (void)setNUEnabled:(BOOL)enabled {
+}
+
+- (BOOL)isNUEnabled {
+  return YES;
+}
+
+@end
+
 namespace node_yue {
 
 // static
 const char ChromeView::kClassName[] = "ChromeView";
 
 ChromeView::ChromeView(v8::Local<v8::Value> buf) {
+  NSView* view = [[NUChromeView alloc] init];
   if (node::Buffer::HasInstance(buf) &&
       node::Buffer::Length(buf) == sizeof(NSView*)) {
-    NSView* view = *reinterpret_cast<NSView**>(node::Buffer::Data(buf));
-    TakeOverView(view);
-  } else {
-    // Show a warning text as fallback.
-    scoped_refptr<nu::Label> label(new nu::Label("Invalid WebContentsView"));
-    label->SetColor(nu::Color(255, 255, 255));
-    label->SetBackgroundColor(nu::Color(255, 0, 0));
-    // Retain the view form nu::Label and use it as ChromeView.
-    NSView* view = label->GetNative();
-    [view retain];
-    TakeOverView(view);
+    NSView* page = *reinterpret_cast<NSView**>(node::Buffer::Data(buf));
+    [view addSubview:page];
   }
+  TakeOverView(view);
 }
 
 ChromeView::~ChromeView() {
