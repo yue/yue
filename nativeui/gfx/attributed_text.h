@@ -29,8 +29,8 @@ class NATIVEUI_EXPORT AttributedText : public base::RefCounted<AttributedText> {
   void SetFormat(TextFormat format);
   const TextFormat& GetFormat() const { return format_; }
 
-  void SetFont(Font* font);
-  void SetFontFor(Font* font, int start, int end);
+  void SetFont(scoped_refptr<Font> font);
+  void SetFontFor(scoped_refptr<Font> font, int start, int end);
   void SetColor(Color color);
   void SetColorFor(Color color, int start, int end);
 
@@ -50,7 +50,7 @@ class NATIVEUI_EXPORT AttributedText : public base::RefCounted<AttributedText> {
   friend class base::RefCounted<AttributedText>;
 
   void PlatformUpdateFormat();
-  void PlatformSetFontFor(Font* font, int start, int end);
+  void PlatformSetFontFor(scoped_refptr<Font> font, int start, int end);
   void PlatformSetColorFor(Color color, int start, int end);
 
   NativeAttributedText text_;

@@ -54,7 +54,8 @@ class PainterGtk : public Painter {
                           const RectF& dest) override;
   TextMetrics MeasureText(const std::string& text, float width,
                           const TextAttributes& attributes) override;
-  void DrawAttributedText(AttributedText* text, const RectF& rect) override;
+  void DrawAttributedText(scoped_refptr<AttributedText> text,
+                          const RectF& rect) override;
 
  private:
   // Common initailization used by constructors.

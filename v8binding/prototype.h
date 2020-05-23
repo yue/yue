@@ -95,6 +95,25 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
   }
 };
 
+// Helper for scoped_refptr.
+template<typename T>
+struct Type<scoped_refptr<T>> {
+  static constexpr const char* name = Type<T>::name;
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   scoped_refptr<T> ptr) {
+    return vb::ToV8(context, ptr.get());
+  }
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     scoped_refptr<T>* out) {
+    T* out_ptr;
+    if (!vb::FromV8(context, value, &out_ptr))
+      return false;
+    *out = out_ptr;
+    return true;
+  }
+};
+
 // The default type information for WeakPtr class.
 template<typename T>
 struct Type<T*, typename std::enable_if<std::is_base_of<

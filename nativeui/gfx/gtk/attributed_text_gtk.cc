@@ -78,7 +78,8 @@ void AttributedText::PlatformUpdateFormat() {
     pango_layout_set_width(text_, -1);
 }
 
-void AttributedText::PlatformSetFontFor(Font* font, int start, int end) {
+void AttributedText::PlatformSetFontFor(scoped_refptr<Font> font,
+                                        int start, int end) {
   PangoAttribute* font_attr = pango_attr_font_desc_new(font->GetNative());
   FillPangoAttributeIndex(font_attr, text_, start, end);
 

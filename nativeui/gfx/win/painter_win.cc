@@ -214,15 +214,14 @@ TextMetrics PainterWin::MeasureText(const std::string& text, float width,
   return { ScaleSize(SizeF(rect.Width, rect.Height), 1.0f / scale_factor_) };
 }
 
-void PainterWin::DrawAttributedText(AttributedText* text, const RectF& rect) {
+void PainterWin::DrawAttributedText(scoped_refptr<AttributedText> text,
+                                    const RectF& rect) {
   AttributedTextImpl* str = text->GetNative();
   graphics_.DrawString(
       str->text.data(), static_cast<int>(str->text.size()),
       str->font->GetNative(),
       ToGdi(ScaleRect(rect, scale_factor_)),
       &str->format, str->brush.get());
-  // Do a AddRef/ReleaseRef to prevent leak if the text is a floating pointer.
-  base::WrapRefCounted(text);
 }
 
 void PainterWin::MoveToPixel(const PointF& point) {

@@ -89,7 +89,8 @@ class NATIVEUI_EXPORT Painter {
                                   const TextAttributes& attributes) = 0;
 
   // Draw attributed |text|.
-  virtual void DrawAttributedText(AttributedText* text, const RectF& rect) = 0;
+  virtual void DrawAttributedText(scoped_refptr<AttributedText> text,
+                                  const RectF& rect) = 0;
 
   // Draw |text| with additional |attributes|.
   virtual void DrawText(const std::string& text, const RectF& rect,

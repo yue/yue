@@ -152,7 +152,7 @@ class ButtonImpl : public Clickable {
       text_bounds.Inset(box_size_.width(), 0, 0, 0);
 
     // The text.
-    painter->DrawAttributedText(text_.get(), text_bounds);
+    painter->DrawAttributedText(text_, text_bounds);
 
     // Draw focused ring.
     if (HasFocus()) {

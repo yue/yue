@@ -40,10 +40,11 @@ void AttributedText::PlatformUpdateFormat() {
   text_->format.SetFormatFlags(flags);
 }
 
-void AttributedText::PlatformSetFontFor(Font* font, int start, int end) {
+void AttributedText::PlatformSetFontFor(scoped_refptr<Font> font,
+                                        int start, int end) {
   CHECK(start == 0 && end == -1)
       << "AttributedText.SetFontFor does not work on Windows";
-  text_->font = font;
+  text_->font = std::move(font);
 }
 
 void AttributedText::PlatformSetColorFor(Color color, int start, int end) {

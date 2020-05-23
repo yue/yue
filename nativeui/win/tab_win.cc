@@ -54,7 +54,7 @@ class TabItem : public ViewImpl {
     painter->DrawNativeTheme(NativeTheme::Part::TabItem, state(), rect, params);
 
     // Draw title.
-    painter->DrawAttributedText(text_.get(),
+    painter->DrawAttributedText(text_,
                                 ScaleRect(RectF(rect), 1.f / scale_factor()));
   }
 

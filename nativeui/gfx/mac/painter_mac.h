@@ -55,7 +55,8 @@ class PainterMac : public Painter {
                           const RectF& dest) override;
   TextMetrics MeasureText(const std::string& text, float width,
                           const TextAttributes& attributes) override;
-  void DrawAttributedText(AttributedText* text, const RectF& rect) override;
+  void DrawAttributedText(scoped_refptr<AttributedText> text,
+                          const RectF& rect) override;
 
  private:
   // APIs of Core Graphics operate on current context, while we don't set

@@ -231,7 +231,8 @@ TextMetrics PainterMac::MeasureText(const std::string& text, float width,
   return { SizeF(bounds.size) };
 }
 
-void PainterMac::DrawAttributedText(AttributedText* text, const RectF& rect) {
+void PainterMac::DrawAttributedText(scoped_refptr<AttributedText> text,
+                                    const RectF& rect) {
   // We still need the NSStringDrawingUsesLineFragmentOrigin flag even when
   // drawing single line, otherwise Cocoa would reserve space for an empty line.
   const TextFormat& format = text->GetFormat();
@@ -259,9 +260,6 @@ void PainterMac::DrawAttributedText(AttributedText* text, const RectF& rect) {
   [text->GetNative() drawWithRect:bounds.ToCGRect()
                           options:draw_options
                           context:nil];
-
-  // Do a AddRef/ReleaseRef to prevent leak if the text is a floating pointer.
-  base::WrapRefCounted(text);
 }
 
 }  // namespace nu

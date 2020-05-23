@@ -35,9 +35,9 @@ Label::Label(const std::string& text) {
   SetText(text);
 }
 
-Label::Label(AttributedText* text) {
+Label::Label(scoped_refptr<AttributedText> text) {
   Init();
-  SetAttributedText(text);
+  SetAttributedText(std::move(text));
 }
 
 Label::~Label() {}
@@ -68,8 +68,8 @@ void Label::SetVAlign(TextAlign align) {
   MarkDirty();
 }
 
-void Label::SetAttributedText(AttributedText* text) {
-  text_ = text;
+void Label::SetAttributedText(scoped_refptr<AttributedText> text) {
+  text_ = std::move(text);
   MarkDirty();
 }
 

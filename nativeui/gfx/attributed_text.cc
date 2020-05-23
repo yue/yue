@@ -29,16 +29,14 @@ void AttributedText::SetFormat(TextFormat format) {
   PlatformUpdateFormat();
 }
 
-void AttributedText::SetFont(Font* font) {
-  SetFontFor(font, 0, -1);
+void AttributedText::SetFont(scoped_refptr<Font> font) {
+  SetFontFor(std::move(font), 0, -1);
 }
 
-void AttributedText::SetFontFor(Font* font, int start, int end) {
+void AttributedText::SetFontFor(scoped_refptr<Font> font, int start, int end) {
   if (RangeInvalid(start, end))
     return;
-  PlatformSetFontFor(font, start, end);
-  // Do a AddRef/ReleaseRef to prevent leak if the font is a floating pointer.
-  base::WrapRefCounted(font);
+  PlatformSetFontFor(std::move(font), start, end);
 }
 
 void AttributedText::SetColor(Color color) {

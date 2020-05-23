@@ -99,6 +99,22 @@ struct Type<T*, typename std::enable_if<std::is_base_of<
   }
 };
 
+// Helper for scoped_refptr.
+template<typename T>
+struct Type<scoped_refptr<T>> {
+  static constexpr const char* name = Type<T>::name;
+  static bool To(State* state, int index, scoped_refptr<T>* out) {
+    T* out_ptr;
+    if (!lua::To(state, index, &out_ptr))
+      return false;
+    *out = out_ptr;
+    return true;
+  }
+  static inline void Push(State* state, scoped_refptr<T> ptr) {
+    lua::Push(state, ptr.get());
+  }
+};
+
 // The default type information for WeakPtr class.
 template<typename T>
 struct Type<T*, typename std::enable_if<std::is_base_of<

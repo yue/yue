@@ -37,7 +37,8 @@ AttributedText::~AttributedText() {
 void AttributedText::PlatformUpdateFormat() {
 }
 
-void AttributedText::PlatformSetFontFor(Font* font, int start, int end) {
+void AttributedText::PlatformSetFontFor(scoped_refptr<Font> font,
+                                        int start, int end) {
   [text_ addAttribute:NSFontAttributeName
                 value:font->GetNative()
                 range:NSMakeRange(start, IndexToLength(text_, start, end))];

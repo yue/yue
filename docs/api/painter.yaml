@@ -122,5 +122,8 @@ methods:
       width:
         description: Maximum width, passing `-1` to indicate unlimited width.
 
+  - signature: void DrawAttributedText(scoped_refptr<AttributedText> text, const RectF& rect)
+    description: Draw `text` bounded by `rect`.
+
   - signature: void DrawText(const std::string& text, const RectF& rect, const TextAttributes& attributes)
     description: Draw `text` with `attributes` bounded by `rect`.

@@ -202,7 +202,8 @@ TextMetrics PainterGtk::MeasureText(const std::string& text, float width,
   return { SizeF(bwidth, bheight) };
 }
 
-void PainterGtk::DrawAttributedText(AttributedText* text, const RectF& rect) {
+void PainterGtk::DrawAttributedText(scoped_refptr<AttributedText> text,
+                                    const RectF& rect) {
   // Don't draw outside.
   cairo_save(context_);
   ClipRect(rect);
@@ -221,9 +222,6 @@ void PainterGtk::DrawAttributedText(AttributedText* text, const RectF& rect) {
   PangoLayout* layout = text->GetNative();
   pango_cairo_show_layout(context_, layout);
   cairo_restore(context_);
-
-  // Do a AddRef/ReleaseRef to prevent leak if the text is a floating pointer.
-  base::WrapRefCounted(text);
 }
 
 void PainterGtk::Initialize() {

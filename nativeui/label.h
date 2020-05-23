@@ -17,7 +17,7 @@ class AttributedText;
 class NATIVEUI_EXPORT Label : public View {
  public:
   explicit Label(const std::string& text = "");
-  explicit Label(AttributedText* text);
+  explicit Label(scoped_refptr<AttributedText> text);
 
   // View class name.
   static const char kClassName[];
@@ -27,7 +27,7 @@ class NATIVEUI_EXPORT Label : public View {
   void SetAlign(TextAlign align);
   void SetVAlign(TextAlign align);
 
-  void SetAttributedText(AttributedText* text);
+  void SetAttributedText(scoped_refptr<AttributedText> text);
   AttributedText* GetAttributedText() const { return text_.get(); }
 
   // View:

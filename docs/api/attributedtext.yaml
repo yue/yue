@@ -32,10 +32,10 @@ methods:
   - signature: const TextFormat& GetFormat() const
     description: Return current styles.
 
-  - signature: void SetFont(Font* font)
+  - signature: void SetFont(scoped_refptr<Font> font)
     description: Set the whole text's `font`.
 
-  - signature: void SetFontFor(Font* font, int start, int end)
+  - signature: void SetFontFor(scoped_refptr<Font> font, int start, int end)
     platform: ['macOS', 'Linux']
     description: |
       Set the `font` of text between character range `[start, end)`. Passing
