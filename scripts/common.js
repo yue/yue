@@ -106,6 +106,21 @@ function searchFiles(dir, suffix, list = []) {
   }, list)
 }
 
+// Turn stream into Promise.
+function streamPromise(stream) {
+  return new Promise((resolve, reject) => {
+    stream.on('end', () => {
+      resolve('end')
+    })
+    stream.on('finish', () => {
+      resolve('finish')
+    })
+    stream.on('error', (error) => {
+      reject(error)
+    })
+  })
+}
+
 // Helper around execSync.
 const execSyncWrapper = (command, options = {}) => {
   // Print command output by default.
@@ -148,6 +163,7 @@ module.exports = {
   strip,
   download,
   searchFiles,
+  streamPromise,
   execSync: execSyncWrapper,
   spawnSync: spawnSyncWrapper,
 }

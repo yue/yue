@@ -13,10 +13,7 @@ const fs = require('fs-extra')
 // Our work dir.
 const zipname = `node_yue_types_${version}`
 const cwd = path.join(os.tmpdir(), zipname)
-try {
-  fs.removeSync(cwd)
-} catch {}
-fs.ensureDirSync(cwd)
+fs.emptyDirSync(cwd)
 
 // Print working dir when quit unexpected.
 process.removeAllListeners('uncaughtException')

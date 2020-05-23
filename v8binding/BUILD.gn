@@ -21,16 +21,6 @@ config("node_config") {
     node_dir + "/deps/v8/include",
   ]
 
-  if (node_runtime == "chakracore") {
-    include_dirs += [
-      node_dir + "/deps/chakrashim/include",
-    ]
-  } else if (node_runtime == "electron") {
-    defines += [
-      "ELECTRON_BUILD",
-    ]
-  }
-
   if (is_mac) {
     ldflags = [
       "-undefined", "dynamic_lookup",

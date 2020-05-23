@@ -4,24 +4,26 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {argv, download} = require('./common')
+const {argv, streamPromise} = require('./common')
 
-const cp    = require('child_process')
-const fs    = require('fs')
 const path  = require('path')
-const zlib  = require('zlib')
+const os    = require('os')
+const tar   = require('tar')
+const fs    = require('fs-extra')
+const fetch = require('node-fetch')
 
-if (argv.length != 3) {
-  console.error('Usage: download_node_headers runtime version cpu')
+if (argv.length != 4) {
+  console.error('Usage: download_node_headers runtime version os cpu')
   process.exit(1)
 }
 
 const runtime = argv[0]
 const version = argv[1].startsWith('v') ? argv[1] : `v${argv[1]}`
-const targetCpu = argv[2]
+const targetOs = argv[2]
+const targetCpu = argv[3]
 
 const prefix = {
-  electron: 'https://gh-contractor-zcbenz.s3.amazonaws.com/atom-shell/dist',
+  electron: 'https://electronjs.org/headers',
   node: 'https://nodejs.org/dist',
 }
 
@@ -30,42 +32,57 @@ if (!(runtime in prefix)) {
   process.exit(2)
 }
 
-const node_dir = path.join('third_party', `node-${version}`)
-const lib_dir = path.join(node_dir, targetCpu)
-if (fs.existsSync(process.platform === 'win32' ? lib_dir : node_dir)) {
+const nodeDir = path.join('third_party', `node-${version}`)
+const libDir = path.join(nodeDir, targetCpu)
+if (fs.existsSync(targetOs == 'win' ? libDir : nodeDir)) {
   process.exit(0)
 }
+fs.emptyDirSync(nodeDir)
 
-// Expose tar to PATH.
-if (process.platform == 'win32') {
-  const bindir = path.resolve('building', 'tools', 'win')
-  process.env.PATH = `${bindir}${path.delimiter}${process.env.PATH}`
-}
+// Our work dir.
+const zipname = `node-headers-${version}`
+const cwd = path.join(os.tmpdir(), zipname)
+fs.emptyDirSync(cwd)
 
-const suffix = runtime == 'electron' ? '' : '-headers'
-const url = `${prefix[runtime]}/${version}/node-${version}${suffix}.tar.gz`
-download(url, (response) => {
-  response.pipe(zlib.createGunzip())
-          .pipe(cp.exec(`tar xf - node-${version}`, {cwd: 'third_party'}).stdin)
-
-  // Download node.lib on Windows.
-  if (process.platform == 'win32') {
-    response.on('end', () => {
-      if (targetCpu == 'x64')
-        downloadNodeLib('x64')
-      else if (targetCpu == 'x86')
-        downloadNodeLib('x86')
-      else
-        throw new Error(`Unsupported targetCpu: ${targetCpu}`)
-    })
-  }
+// Print working dir when quit unexpected.
+process.on('unhandledRejection', (error) => {
+  console.error('Working dir:', cwd)
+  console.error(error)
+  process.exit(1)
 })
 
-function downloadNodeLib(arch) {
-  const name = runtime == 'electron' ? 'iojs' : 'node'
-  const lib = `${prefix[runtime]}/${version}/win-${arch}/${name}.lib`
-  download(lib, (response) => {
-    fs.mkdirSync(lib_dir)
-    response.pipe(fs.createWriteStream(path.join(lib_dir, 'node.lib')))
-  })
+main()
+
+async function main() {
+  const url = `${prefix[runtime]}/${version}/node-${version}-headers.tar.gz`
+  const file = path.join(cwd, 'node_headers.tar.gz')
+  const res = await fetch(url)
+  await streamPromise(res.body.pipe(fs.createWriteStream(file)))
+  await tar.x({file, cwd})
+
+  const subdir = runtime == 'electron' ? 'node_headers' : `node-${version}`
+  await fs.move(path.join(cwd, subdir, 'include'),
+                path.join(nodeDir, 'include'))
+
+  // Download node.lib on Windows.
+  if (targetOs == 'win') {
+    if (targetCpu == 'x64')
+      await downloadNodeLib('x64')
+    else if (targetCpu == 'x86')
+      await downloadNodeLib('x86')
+    else if (targetCpu == 'arm64')
+      await downloadNodeLib('arm64')
+    else
+      throw new Error(`Unsupported targetCpu: ${targetCpu}`)
+  }
+
+  await fs.remove(cwd)
+}
+
+async function downloadNodeLib(arch) {
+  await fs.emptyDir(libDir)
+  const url = `${prefix[runtime]}/${version}/win-${arch}/node.lib`
+  const res = await fetch(url)
+  res.body.pipe(fs.createWriteStream(path.join(libDir, 'node.lib')))
+  return streamPromise(res.body)
 }

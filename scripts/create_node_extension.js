@@ -45,7 +45,7 @@ if (targetOs == 'linux') {
 console.log(`Creating native extension for ${runtime} ${nodever} ${targetCpu}...`)
 
 // Build the node module.
-execSync(`node ./scripts/download_node_headers.js ${runtime} ${nodever} ${targetCpu}`)
+execSync(`node ./scripts/download_node_headers.js ${runtime} ${nodever} ${targetOs} ${targetCpu}`)
 spawnSync('gn', ['gen', 'out/Node', `--args=${args.join(' ')}`])
 execSync('ninja -C out/Node node_yue')
 
