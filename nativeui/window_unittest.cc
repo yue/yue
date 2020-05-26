@@ -53,6 +53,16 @@ TEST_F(WindowTest, ContentView) {
   EXPECT_EQ(window_->GetContentView(), view.get());
 }
 
+TEST_F(WindowTest, ContentViewWindow) {
+  scoped_refptr<nu::Container> view(new nu::Container);
+  window_->SetContentView(view.get());
+  EXPECT_EQ(view->GetWindow(), window_.get());
+  EXPECT_EQ(view->GetParent(), nullptr);
+  window_ = nullptr;
+  EXPECT_EQ(view->GetWindow(), nullptr);
+  EXPECT_EQ(view->GetParent(), nullptr);
+}
+
 TEST_F(WindowTest, OnClose) {
   bool closed = false;
   window_->on_close.Connect([&closed](nu::Window*) { closed = true; });

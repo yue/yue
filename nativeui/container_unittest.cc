@@ -64,6 +64,15 @@ TEST_F(ContainerTest, RemoveChildView) {
   EXPECT_EQ(container_->ChildAt(0), v2);
 }
 
+TEST_F(ContainerTest, WindowReference) {
+  scoped_refptr<nu::Label> v1 = new nu::Label;
+  EXPECT_EQ(v1->GetWindow(), nullptr);
+  container_->AddChildView(v1.get());
+  EXPECT_EQ(v1->GetWindow(), window_.get());
+  container_->RemoveChildView(v1.get());
+  EXPECT_EQ(v1->GetWindow(), nullptr);
+}
+
 TEST_F(ContainerTest, SetBounds) {
   scoped_refptr<TestContainer> c = new TestContainer;
   EXPECT_EQ(c->layout_count(), 0);

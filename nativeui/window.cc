@@ -31,6 +31,8 @@ Window::Window(const Options& options)
 
 Window::~Window() {
   PlatformDestroy();
+  YGConfigFree(yoga_config_);
+  content_view_->BecomeContentView(nullptr);
 }
 
 void Window::SetContentView(View* view) {
