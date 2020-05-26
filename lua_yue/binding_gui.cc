@@ -774,6 +774,7 @@ struct Type<nu::Painter> {
            "setlinewidth", &nu::Painter::SetLineWidth,
            "stroke", &nu::Painter::Stroke,
            "fill", &nu::Painter::Fill,
+           "clear", &nu::Painter::Clear,
            "strokerect", &nu::Painter::StrokeRect,
            "fillrect", &nu::Painter::FillRect,
            "drawimage", &nu::Painter::DrawImage,

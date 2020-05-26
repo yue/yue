@@ -98,6 +98,9 @@ methods:
   - signature: void Fill()
     description: Draw a solid shape by filling current path's content area.
 
+  - signature: void Clear()
+    description: Fill the whole area with transparent color.
+
   - signature: void StrokeRect(const RectF& rect)
     description: Draw a rectangular outline.
 

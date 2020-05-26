@@ -32,7 +32,7 @@ DoubleBuffer::DoubleBuffer(HWND hwnd, const Size& size)
 
 DoubleBuffer::DoubleBuffer(HDC dc, const Size& size, const Rect& src,
                            const Point& dest)
-    : dc_(dc), src_(src), dest_(dest),
+    : dc_(dc), size_(size), src_(src), dest_(dest),
       mem_dc_(::CreateCompatibleDC(dc)),
       mem_bitmap_(CreateBitmap(dc, size)),
       select_bitmap_(mem_dc_.Get(), mem_bitmap_.get()) {}

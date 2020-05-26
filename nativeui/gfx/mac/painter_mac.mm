@@ -55,16 +55,18 @@ class GraphicsContextScope {
 
 }  // namespace
 
-PainterMac::PainterMac()
+PainterMac::PainterMac(NSView* view)
     : target_context_(nil),  // no context switching
       context_(reinterpret_cast<CGContextRef>(
-                   [[NSGraphicsContext currentContext] graphicsPort])) {
+                   [[NSGraphicsContext currentContext] graphicsPort])),
+      size_(view.bounds.size) {
 }
 
-PainterMac::PainterMac(NativeBitmap bitmap, float scale_factor)
+PainterMac::PainterMac(NativeBitmap bitmap, SizeF size, float scale_factor)
     : target_context_([[NSGraphicsContext
           graphicsContextWithGraphicsPort:bitmap flipped:YES] retain]),
-      context_(bitmap) {
+      context_(bitmap),
+      size_(std::move(size)) {
   // There is no way to directly set scale factor for NSGraphicsContext, so just
   // do scaling. The quality of image does not seem to be affected by this.
   Scale(Vector2dF(scale_factor, scale_factor));
@@ -159,6 +161,10 @@ void PainterMac::Stroke() {
 
 void PainterMac::Fill() {
   CGContextFillPath(context_);
+}
+
+void PainterMac::Clear() {
+  CGContextClearRect(context_, RectF(size_).ToCGRect());
 }
 
 void PainterMac::StrokeRect(const RectF& rect) {

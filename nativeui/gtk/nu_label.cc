@@ -4,6 +4,7 @@
 
 #include "nativeui/gtk/nu_label.h"
 
+#include "nativeui/gfx/attributed_text.h"
 #include "nativeui/gfx/gtk/painter_gtk.h"
 #include "nativeui/label.h"
 
@@ -51,7 +52,7 @@ static gboolean nu_label_draw(GtkWidget* widget, cairo_t* cr) {
                         0, 0, width, height);
 
   auto* label = NU_LABEL(widget)->priv->label;
-  PainterGtk painter(cr);
+  PainterGtk painter(cr, SizeF(width, height));
   painter.DrawAttributedText(label->GetAttributedText(),
                              RectF(0, 0, width, height));
   return false;

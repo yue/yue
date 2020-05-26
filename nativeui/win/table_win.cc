@@ -209,7 +209,7 @@ LRESULT TableImpl::OnCustomDraw(NMLVCUSTOMDRAW* nm, int row) {
     int space = 1 * scale_factor();
     rect.Inset(space, space);
     // Draw.
-    PainterWin painter(nm->nmcd.hdc, scale_factor());
+    PainterWin painter(nm->nmcd.hdc, rect.size(), scale_factor());
     painter.TranslatePixel(rect.OffsetFromOrigin());
     painter.ClipRectPixel(Rect(rect.size()));
     options.on_draw(&painter,

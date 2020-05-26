@@ -15,9 +15,9 @@ namespace nu {
 class PainterGtk : public Painter {
  public:
   // Create painter for |context|.
-  explicit PainterGtk(cairo_t* context);
+  PainterGtk(cairo_t* context, SizeF size);
   // Create graphics context for |surface| and use it for drawing.
-  PainterGtk(cairo_surface_t* surface, float scale_factor);
+  PainterGtk(cairo_surface_t* surface, SizeF size, float scale_factor);
   // PainterGtk should be created on stack for best performance.
   ~PainterGtk() override;
 
@@ -44,6 +44,7 @@ class PainterGtk : public Painter {
   void SetLineWidth(float width) override;
   void Stroke() override;
   void Fill() override;
+  void Clear() override;
   void StrokeRect(const RectF& rect) override;
   void FillRect(const RectF& rect) override;
   void DrawImage(Image* image, const RectF& rect) override;
@@ -74,6 +75,8 @@ class PainterGtk : public Painter {
 
   // The nativeui drawing context.
   cairo_t* context_;
+
+  SizeF size_;
 
   // Whether the context should be destroyed on exit.
   bool is_context_managed_;

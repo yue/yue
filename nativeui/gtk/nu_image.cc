@@ -53,7 +53,7 @@ static gboolean nu_image_draw(GtkWidget* widget, cairo_t* cr) {
 
   int width = gtk_widget_get_allocated_width(widget);
   int height = gtk_widget_get_allocated_height(widget);
-  PainterGtk painter(cr);
+  PainterGtk painter(cr, SizeF(width, height));
   painter.DrawImage(priv->image, RectF(0, 0, width, height));
   return false;
 }

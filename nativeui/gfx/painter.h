@@ -68,6 +68,9 @@ class NATIVEUI_EXPORT Painter {
   // Draw a solid shape by filling current path's content area.
   virtual void Fill() = 0;
 
+  // Fill the whole context with transparent color.
+  virtual void Clear() = 0;
+
   // Draw a single pixel |rect|.
   virtual void StrokeRect(const RectF& rect) = 0;
 

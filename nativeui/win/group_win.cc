@@ -94,7 +94,7 @@ class GroupImpl : public ContainerImpl,
     if (child_bounds.IsEmpty())
       return;
     Vector2d child_offset(border.left(), border.top());
-    painter->Save();
+    painter->SaveWithSize(child_bounds.size());
     painter->ClipRect(child_bounds);
     painter->Translate(child_offset);
     delegate_->GetContentView()->GetNative()->Draw(

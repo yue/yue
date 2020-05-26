@@ -19,7 +19,7 @@
 @implementation NULabel
 
 - (void)drawRect:(NSRect)dirtyRect {
-  nu::PainterMac painter;
+  nu::PainterMac painter(self);
   painter.SetColor(background_color_);
   painter.FillRect(nu::RectF(dirtyRect));
 

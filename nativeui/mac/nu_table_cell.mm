@@ -34,7 +34,7 @@
 
 - (void)drawRect:(NSRect)dirtyRect {
   if (options_.on_draw) {
-    nu::PainterMac painter;
+    nu::PainterMac painter(self);
     options_.on_draw(&painter, nu::RectF(dirtyRect), value_);
   }
 }

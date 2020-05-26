@@ -31,9 +31,11 @@ class DoubleBuffer {
   std::unique_ptr<Gdiplus::Bitmap> GetGdiplusBitmap() const;
 
   HDC dc() const { return mem_dc_.Get(); }
+  Size size() const { return size_; }
 
  private:
   HDC dc_;
+  Size size_;
   Rect src_;
   Point dest_;
   base::win::ScopedCreateDC mem_dc_;

@@ -8,6 +8,7 @@
 #include <math.h>
 
 #include <memory>
+#include <utility>
 
 #include "base/strings/utf_string_conversions.h"
 #include "base/win/scoped_gdi_object.h"
@@ -15,8 +16,8 @@
 #include "nativeui/gfx/attributed_text.h"
 #include "nativeui/gfx/canvas.h"
 #include "nativeui/gfx/font.h"
-#include "nativeui/gfx/geometry/point_conversions.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
+#include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/geometry/vector2d_conversions.h"
 #include "nativeui/gfx/image.h"
 #include "nativeui/gfx/win/attributed_text_win.h"
@@ -37,9 +38,9 @@ inline float AreaOfTriangleFormedByPoints(const PointF& p1,
 
 }  // namespace
 
-PainterWin::PainterWin(HDC hdc, float scale_factor)
-    : graphics_(hdc) {
-  Initialize(scale_factor);
+PainterWin::PainterWin(HDC hdc, Size size, float scale_factor)
+    : graphics_(hdc), scale_factor_(scale_factor) {
+  Initialize(std::move(size), scale_factor);
 }
 
 PainterWin::~PainterWin() {}
@@ -157,6 +158,14 @@ void PainterWin::Fill() {
   Gdiplus::SolidBrush brush(ToGdi(top().fill_color));
   graphics_.FillPath(&brush, &path_);
   path_.Reset();
+}
+
+void PainterWin::Clear() {
+  auto state = graphics_.Save();
+  Gdiplus::SolidBrush brush(Gdiplus::Color(0, 0, 0, 0));
+  graphics_.SetCompositingMode(Gdiplus::CompositingModeSourceCopy);
+  graphics_.FillRectangle(&brush, ToGdi(nu::Rect(top().size)));
+  graphics_.Restore(state);
 }
 
 void PainterWin::StrokeRect(const RectF& rect) {
@@ -307,17 +316,23 @@ void PainterWin::FillRectPixel(const nu::Rect& rect) {
   path_.Reset();
 }
 
-void PainterWin::Initialize(float scale_factor) {
-  use_gdi_current_point_ = true;
-  scale_factor_ = scale_factor;
+void PainterWin::SaveWithSize(SizeF size) {
+  SaveWithSize(ToRoundedSize(ScaleSize(size, scale_factor_)));
+}
 
+void PainterWin::SaveWithSize(Size size) {
+  Save();
+  top().size = std::move(size);
+}
+
+void PainterWin::Initialize(Size size, float scale_factor) {
   // Use high quality rendering.
   graphics_.SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
   graphics_.SetInterpolationMode(Gdiplus::InterpolationModeHighQuality);
   graphics_.SetPixelOffsetMode(Gdiplus::PixelOffsetModeHighQuality);
   graphics_.SetTextRenderingHint(Gdiplus::TextRenderingHintAntiAlias);
   // Initial state.
-  states_.emplace(scale_factor, Color(), Color());
+  states_.emplace(std::move(size), scale_factor, Color(), Color());
 }
 
 bool PainterWin::GetCurrentPoint(Gdiplus::PointF* point) {

@@ -163,7 +163,7 @@ static gboolean nu_container_draw(GtkWidget* widget, cairo_t* cr) {
                         0, 0, width, height);
 
   Container* delegate = NU_CONTAINER(widget)->priv->delegate;
-  PainterGtk painter(cr);
+  PainterGtk painter(cr, SizeF(width, height));
   delegate->on_draw.Emit(delegate, &painter, nu::RectF(0, 0, width, height));
 
   for (int i = 0; i < delegate->ChildCount(); ++i)

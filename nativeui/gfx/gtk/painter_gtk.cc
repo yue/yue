@@ -7,9 +7,10 @@
 
 #include "nativeui/gfx/gtk/painter_gtk.h"
 
+#include <gtk/gtk.h>
 #include <math.h>
 
-#include <gtk/gtk.h>
+#include <utility>
 
 #include "nativeui/gfx/attributed_text.h"
 #include "nativeui/gfx/canvas.h"
@@ -18,14 +19,16 @@
 
 namespace nu {
 
-PainterGtk::PainterGtk(cairo_t* context)
+PainterGtk::PainterGtk(cairo_t* context, SizeF size)
     : context_(context),
+      size_(std::move(size)),
       is_context_managed_(false) {
   Initialize();
 }
 
-PainterGtk::PainterGtk(cairo_surface_t* surface, float scale_factor)
+PainterGtk::PainterGtk(cairo_surface_t* surface, SizeF size, float scale_factor)
     : context_(cairo_create(surface)),
+      size_(std::move(size)),
       is_context_managed_(true) {
   Initialize();
 }
@@ -125,6 +128,13 @@ void PainterGtk::Stroke() {
 void PainterGtk::Fill() {
   SetSourceColor(false);
   cairo_fill(context_);
+}
+
+void PainterGtk::Clear() {
+  cairo_save(context_);
+  cairo_set_operator(context_, CAIRO_OPERATOR_CLEAR);
+  cairo_paint(context_);
+  cairo_restore(context_);
 }
 
 void PainterGtk::StrokeRect(const RectF& rect) {

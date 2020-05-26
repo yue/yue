@@ -17,7 +17,7 @@ Canvas::Canvas(const SizeF& size, float scale_factor)
     : scale_factor_(scale_factor),
       size_(size.IsEmpty() ? SizeF(1, 1) : size),  // can't have empty canvas
       bitmap_(PlatformCreateBitmap(size_, scale_factor)),
-      painter_(PlatformCreatePainter(bitmap_, scale_factor)) {
+      painter_(PlatformCreatePainter(bitmap_, size_, scale_factor)) {
 }
 
 Canvas::~Canvas() {

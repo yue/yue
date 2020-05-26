@@ -49,6 +49,7 @@ class NATIVEUI_EXPORT Canvas : public base::RefCounted<Canvas> {
                                            float scale_factor);
   static void PlatformDestroyBitmap(NativeBitmap bitmap);
   static Painter* PlatformCreatePainter(NativeBitmap bitmap,
+                                        const SizeF& size,
                                         float scale_factor);
 
   float scale_factor_;

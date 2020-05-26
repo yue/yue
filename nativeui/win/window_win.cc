@@ -450,7 +450,7 @@ void WindowImpl::OnPaint(HDC) {
     // Draw.
     {
       // Background.
-      PainterWin painter(buffer.dc(), scale_factor_);
+      PainterWin painter(buffer.dc(), bounds.size(), scale_factor_);
       painter.SetColor(background_color_);
       painter.FillRectPixel(dirty);
 

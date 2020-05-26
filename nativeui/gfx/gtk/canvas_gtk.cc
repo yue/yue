@@ -26,8 +26,9 @@ void Canvas::PlatformDestroyBitmap(NativeBitmap bitmap) {
 
 // static
 Painter* Canvas::PlatformCreatePainter(NativeBitmap bitmap,
+                                       const SizeF& size,
                                        float scale_factor) {
-  return new PainterGtk(bitmap, scale_factor);
+  return new PainterGtk(bitmap, size, scale_factor);
 }
 
 }  // namespace nu

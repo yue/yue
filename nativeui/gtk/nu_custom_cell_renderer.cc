@@ -114,7 +114,7 @@ static void nu_custom_cell_renderer_render(GtkCellRenderer* cell,
   cairo_rectangle(cr, 0, 0, cell_area->width, cell_area->height);
   cairo_clip(cr);
 
-  PainterGtk painter(cr);
+  PainterGtk painter(cr, SizeF(cell_area->width, cell_area->height));
   priv->options.on_draw(&painter,
                         nu::RectF(0, 0, cell_area->width, cell_area->height),
                         priv->value);

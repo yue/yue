@@ -176,7 +176,7 @@ void ContainerImpl::DrawChild(ViewImpl* child, PainterWin* painter,
   // Move the painting origin for child.
   Vector2d child_origin = child->size_allocation().OffsetFromOrigin() -
                           size_allocation().OffsetFromOrigin();
-  painter->Save();
+  painter->SaveWithSize(child->size_allocation().size());
   painter->TranslatePixel(child_origin);
   painter->ClipRectPixel(Rect(child->size_allocation().size()));
   child->Draw(painter, child_dirty - child_origin);

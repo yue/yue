@@ -30,7 +30,7 @@
                            nu::TextAlign::Center, nu::TextAlign::Center));
   }
 
-  nu::PainterMac painter;
+  nu::PainterMac painter(self);
   painter.SetColor(nu::Color(0xFF, 0xFF, 0xFF));
   painter.FillRect(nu::RectF(dirtyRect));
   painter.DrawAttributedText(text_.get(),

@@ -40,7 +40,7 @@
     return;
 
   nu::RectF dirty(dirtyRect);
-  nu::PainterMac painter;
+  nu::PainterMac painter(self);
   painter.SetColor(background_color_);
   painter.FillRect(dirty);
   shell->on_draw.Emit(shell, &painter, dirty);

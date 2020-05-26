@@ -16,9 +16,9 @@ namespace nu {
 class PainterMac : public Painter {
  public:
   // Create painter for the current context.
-  PainterMac();
+  explicit PainterMac(NSView* view);
   // Create graphics context for |bitmap| and use it for drawing.
-  PainterMac(CGContextRef bitmap, float scale_factor);
+  PainterMac(CGContextRef bitmap, SizeF size, float scale_factor);
   // PainterMac should be created on stack for best performance.
   ~PainterMac() override;
 
@@ -45,6 +45,7 @@ class PainterMac : public Painter {
   void SetLineWidth(float width) override;
   void Stroke() override;
   void Fill() override;
+  void Clear() override;
   void StrokeRect(const RectF& rect) override;
   void FillRect(const RectF& rect) override;
   void DrawImage(Image* image, const RectF& rect) override;
@@ -65,6 +66,7 @@ class PainterMac : public Painter {
   NSGraphicsContext* target_context_;
 
   CGContextRef context_;
+  SizeF size_;
 };
 
 }  // namespace nu

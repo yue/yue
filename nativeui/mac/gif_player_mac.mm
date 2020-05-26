@@ -50,7 +50,7 @@
   if (![self shell])
     return;
 
-  nu::PainterMac painter;
+  nu::PainterMac painter(self);
   painter.SetColor(background_color_);
   painter.FillRect(nu::RectF(dirtyRect));
 

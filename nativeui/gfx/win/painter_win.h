@@ -7,6 +7,7 @@
 
 #include <stack>
 #include <string>
+#include <utility>
 
 #include "nativeui/gfx/painter.h"
 #include "nativeui/gfx/win/gdiplus.h"
@@ -17,7 +18,7 @@ namespace nu {
 class PainterWin : public Painter {
  public:
   // Paint on the HDC.
-  PainterWin(HDC hdc, float scale_factor);
+  PainterWin(HDC hdc, Size size, float scale_factor);
   // PainterWin should be created on stack for best performance.
   ~PainterWin() override;
 
@@ -53,6 +54,7 @@ class PainterWin : public Painter {
   void SetLineWidth(float width) override;
   void Stroke() override;
   void Fill() override;
+  void Clear() override;
   void StrokeRect(const RectF& rect) override;
   void FillRect(const RectF& rect) override;
   void DrawImage(Image* image, const RectF& rect) override;
@@ -66,7 +68,7 @@ class PainterWin : public Painter {
   void DrawAttributedText(scoped_refptr<AttributedText> text,
                           const RectF& rect) override;
 
-  // The pixel versions.
+  // Internal: The pixel versions.
   void MoveToPixel(const PointF& point);
   void LineToPixel(const PointF& point);
   void BezierCurveToPixel(const PointF& cp1,
@@ -80,9 +82,13 @@ class PainterWin : public Painter {
   void StrokeRectPixel(const nu::Rect& rect);
   void FillRectPixel(const nu::Rect& rect);
 
+  // Internal: Save with the information of relevant size.
+  void SaveWithSize(SizeF size);
+  void SaveWithSize(Size size);
+
  private:
   // Used for common initialization.
-  void Initialize(float scale_factor);
+  void Initialize(Size size, float scale_factor);
 
   // Get current point.
   bool GetCurrentPoint(Gdiplus::PointF* point);
@@ -93,10 +99,15 @@ class PainterWin : public Painter {
 
   // The saved state.
   struct PainterState {
-    PainterState(float line_width, Color stroke_color, Color fill_color)
-        : line_width(line_width),
+    PainterState(Size size,
+                 float line_width,
+                 Color stroke_color,
+                 Color fill_color)
+        : size(std::move(size)),
+          line_width(line_width),
           stroke_color(stroke_color),
           fill_color(fill_color) {}
+    Size size;
     float line_width;
     Color stroke_color;
     Color fill_color;
@@ -116,8 +127,9 @@ class PainterWin : public Painter {
   // Current position, used when gdi+ does not have one.
   Gdiplus::PointF current_point_;
   // Whether gdi+ has a record of current point.
-  bool use_gdi_current_point_;
+  bool use_gdi_current_point_ = true;
 
+  Size size_;
   float scale_factor_;
 };
 
