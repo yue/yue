@@ -7,7 +7,7 @@
 #include <gtk/gtk.h>
 #include <webkit2/webkit2.h>
 
-#include "nativeui/gtk/undoable_text_buffer.h"
+#include "nativeui/gtk/util/undoable_text_buffer.h"
 #include "nativeui/menu.h"
 #include "nativeui/menu_bar.h"
 #include "nativeui/window.h"

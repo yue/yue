@@ -7,7 +7,7 @@
 #include "base/values.h"
 #include "nativeui/gtk/nu_custom_cell_renderer.h"
 #include "nativeui/gtk/nu_tree_model.h"
-#include "nativeui/gtk/widget_util.h"
+#include "nativeui/gtk/util/widget_util.h"
 #include "nativeui/table_model.h"
 
 namespace nu {

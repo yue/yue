@@ -8,8 +8,8 @@
 #include <gtk/gtk.h>
 
 #include "nativeui/gfx/font.h"
-#include "nativeui/gtk/undoable_text_buffer.h"
-#include "nativeui/gtk/widget_util.h"
+#include "nativeui/gtk/util/undoable_text_buffer.h"
+#include "nativeui/gtk/util/widget_util.h"
 
 namespace nu {
 

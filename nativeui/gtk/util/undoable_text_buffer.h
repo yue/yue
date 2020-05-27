@@ -2,8 +2,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef NATIVEUI_GTK_UNDOABLE_TEXT_BUFFER_H_
-#define NATIVEUI_GTK_UNDOABLE_TEXT_BUFFER_H_
+#ifndef NATIVEUI_GTK_UTIL_UNDOABLE_TEXT_BUFFER_H_
+#define NATIVEUI_GTK_UTIL_UNDOABLE_TEXT_BUFFER_H_
 
 typedef struct _GtkTextBuffer GtkTextBuffer;
 
@@ -21,4 +21,4 @@ bool TextBufferCanRedo(GtkTextBuffer* buffer);
 
 }  // namespace nu
 
-#endif  // NATIVEUI_GTK_UNDOABLE_TEXT_BUFFER_H_
+#endif  // NATIVEUI_GTK_UTIL_UNDOABLE_TEXT_BUFFER_H_

@@ -2,7 +2,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/gtk/widget_util.h"
+#include "nativeui/gtk/util/widget_util.h"
 
 #include "base/logging.h"
 #include "nativeui/gfx/color.h"

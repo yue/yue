@@ -10,7 +10,7 @@
 #include "base/strings/string_tokenizer.h"
 #include "base/strings/string_util.h"
 #include "nativeui/gtk/scoped_gobject.h"
-#include "nativeui/gtk/widget_util.h"
+#include "nativeui/gtk/util/widget_util.h"
 
 #if GTK_MAJOR_VERSION > 2
 // These constants are defined in gtk/gtkenums.h in Gtk3.12 or later.

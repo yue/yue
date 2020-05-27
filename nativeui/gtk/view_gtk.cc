@@ -14,10 +14,10 @@
 #include "nativeui/gfx/geometry/point_f.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/gfx/geometry/rect_f.h"
-#include "nativeui/gtk/clipboard_util.h"
 #include "nativeui/gtk/dragging_info_gtk.h"
 #include "nativeui/gtk/nu_container.h"
-#include "nativeui/gtk/widget_util.h"
+#include "nativeui/gtk/util/clipboard_util.h"
+#include "nativeui/gtk/util/widget_util.h"
 
 namespace nu {
 

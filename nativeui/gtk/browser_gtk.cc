@@ -9,7 +9,7 @@
 
 #include "base/json/json_reader.h"
 #include "nativeui/gtk/nu_protocol_stream.h"
-#include "nativeui/gtk/widget_util.h"
+#include "nativeui/gtk/util/widget_util.h"
 
 namespace nu {
 

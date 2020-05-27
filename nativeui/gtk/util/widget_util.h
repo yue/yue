@@ -2,8 +2,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef NATIVEUI_GTK_WIDGET_UTIL_H_
-#define NATIVEUI_GTK_WIDGET_UTIL_H_
+#ifndef NATIVEUI_GTK_UTIL_WIDGET_UTIL_H_
+#define NATIVEUI_GTK_UTIL_WIDGET_UTIL_H_
 
 #include <gtk/gtk.h>
 
@@ -55,4 +55,4 @@ void Delete(void* ptr) {
 
 }  // namespace nu
 
-#endif  // NATIVEUI_GTK_WIDGET_UTIL_H_
+#endif  // NATIVEUI_GTK_UTIL_WIDGET_UTIL_H_

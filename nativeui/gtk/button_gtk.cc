@@ -8,7 +8,7 @@
 
 #include "nativeui/gfx/image.h"
 #include "nativeui/gtk/nu_image.h"
-#include "nativeui/gtk/widget_util.h"
+#include "nativeui/gtk/util/widget_util.h"
 
 namespace nu {
 

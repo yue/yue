@@ -2,8 +2,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef NATIVEUI_GTK_CLIPBOARD_UTIL_H_
-#define NATIVEUI_GTK_CLIPBOARD_UTIL_H_
+#ifndef NATIVEUI_GTK_UTIL_CLIPBOARD_UTIL_H_
+#define NATIVEUI_GTK_UTIL_CLIPBOARD_UTIL_H_
 
 #include <gtk/gtk.h>
 
@@ -38,4 +38,4 @@ Clipboard::Data GetDataFromClipboard(GtkClipboard* clipboard,
 
 }  // namespace nu
 
-#endif  // NATIVEUI_GTK_CLIPBOARD_UTIL_H_
+#endif  // NATIVEUI_GTK_UTIL_CLIPBOARD_UTIL_H_

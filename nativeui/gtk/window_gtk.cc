@@ -8,7 +8,7 @@
 
 #include <algorithm>
 
-#include "nativeui/gtk/widget_util.h"
+#include "nativeui/gtk/util/widget_util.h"
 #include "nativeui/menu_bar.h"
 
 namespace nu {
