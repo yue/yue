@@ -5,6 +5,9 @@
 #include "nativeui/gfx/font.h"
 
 #include <gtk/gtk.h>
+#include <pango/pangofc-fontmap.h>
+
+#include "nativeui/gtk/util/fontconfig.h"
 
 namespace nu {
 
@@ -21,6 +24,23 @@ PangoFontDescription* GetDefaultFontDescription() {
   return desc;
 }
 
+PangoFontDescription* FontDescriptionFromPath(const base::FilePath& path) {
+  // Add the font path to FcConfig first.
+  FcConfig* config = GetGlobalFontConfig();
+  FcConfigAppFontAddFile(
+      config, reinterpret_cast<const FcChar8*>(path.value().c_str()));
+  FcFontSet* font_set = FcConfigGetFonts(config, FcSetApplication);
+  // And then receive the FcPattern from FcConfig.
+  if (font_set) {
+    for (int i = 0; i < font_set->nfont; ++i) {
+      FcPattern* pattern = font_set->fonts[i];
+      if (GetFilename(pattern) == path.value())
+        return pango_fc_font_description_from_pattern(pattern, FALSE);
+    }
+  }
+  return GetDefaultFontDescription();
+}
+
 }  // namespace
 
 Font::Font() : font_(GetDefaultFontDescription()) {
@@ -33,6 +53,11 @@ Font::Font(const std::string& name, float size, Weight weight, Style style)
   pango_font_description_set_weight(font_, static_cast<PangoWeight>(weight));
   if (style == Style::Italic)
     pango_font_description_set_style(font_, PANGO_STYLE_ITALIC);
+}
+
+Font::Font(const base::FilePath& path, float size)
+    : font_(FontDescriptionFromPath(path)) {
+  pango_font_description_set_absolute_size(font_, size * PANGO_SCALE);
 }
 
 Font::~Font() {

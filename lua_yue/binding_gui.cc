@@ -356,6 +356,8 @@ struct Type<nu::Font> {
     RawSet(state, index,
            "create", &CreateOnHeap<nu::Font, const std::string&, float,
                                    nu::Font::Weight, nu::Font::Style>,
+           "createfrompath", &CreateOnHeap<nu::Font, const base::FilePath&,
+                                           float>,
            "default", &nu::Font::Default,
            "derive", &nu::Font::Derive,
            "getname", &nu::Font::GetName,

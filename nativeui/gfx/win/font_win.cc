@@ -6,6 +6,7 @@
 
 #include <algorithm>
 
+#include "base/files/file_path.h"
 #include "base/strings/string_util.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/win/scoped_gdi_object.h"
@@ -23,11 +24,11 @@ Font::Font() {
   SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, sizeof(metrics), &metrics, 0);
 
   TEXTMETRIC fm;
-  hfont_ = ::CreateFontIndirectW(&(metrics.lfMessageFont));
+  hfont_.reset(::CreateFontIndirectW(&(metrics.lfMessageFont)));
 
   base::win::ScopedGetDC screen_dc(NULL);
   ScopedSetMapMode mode(screen_dc, MM_TEXT);
-  base::win::ScopedSelectObject scoped_font(screen_dc, hfont_);
+  base::win::ScopedSelectObject scoped_font(screen_dc, hfont_.get());
   ::GetTextMetrics(screen_dc, &fm);
   float font_size = std::max<float>(1.f, fm.tmHeight - fm.tmInternalLeading);
 
@@ -52,10 +53,35 @@ Font::Font(const std::string& name, float size, Weight weight, Style style) {
                             Gdiplus::UnitPoint);
 }
 
+Font::Font(const base::FilePath& path, float size)
+    : font_collection_(new Gdiplus::PrivateFontCollection) {
+  // Create font collection from path.
+  font_collection_->AddFontFile(path.value().c_str());
+  int count = font_collection_->GetFamilyCount();
+  if (count > 0) {
+    // Receive the first font family.
+    Gdiplus::FontFamily family;
+    font_collection_->GetFamilies(1, &family, &count);
+    // Find out the first style that matches.
+    for (int style = Gdiplus::FontStyleRegular;
+         style <= Gdiplus::FontStyleStrikeout; ++style) {
+      if (family.IsStyleAvailable(style)) {
+        font_ = new Gdiplus::Font(&family,
+                                  // Converting DPI-aware pixel size to point.
+                                  size * 72.f / 96.f,
+                                  style,
+                                  Gdiplus::UnitPoint);
+        return;
+      }
+    }
+  }
+
+  // Use default font as fallback.
+  font_ = Default()->GetNative()->Clone();
+}
+
 Font::~Font() {
   delete font_;
-  if (hfont_)
-    ::DeleteObject(hfont_);
 }
 
 std::string Font::GetName() const {
@@ -95,14 +121,14 @@ const std::wstring& Font::GetName16() const {
 }
 
 HFONT Font::GetHFONT(HWND hwnd) const {
-  if (!hfont_) {
+  if (!hfont_.is_valid()) {
     base::win::ScopedGetDC dc(hwnd);
     Gdiplus::Graphics context(dc);
     LOGFONTW logfont;
     font_->GetLogFontW(&context, &logfont);
-    hfont_ = ::CreateFontIndirect(&logfont);
+    hfont_.reset(::CreateFontIndirect(&logfont));
   }
-  return hfont_;
+  return hfont_.get();
 }
 
 }  // namespace nu

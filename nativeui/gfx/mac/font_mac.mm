@@ -1,16 +1,36 @@
 // Copyright 2016 Cheng Zhao. All rights reserved.
-// Use of this source code is governed by the license that can be found in the
-// LICENSE file.
+// Copyright 2020 The Chromium Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE.chromium file.
 
 #include "nativeui/gfx/font.h"
 
 #include <Cocoa/Cocoa.h>
 
+#include "base/files/file_path.h"
+#include "base/mac/foundation_util.h"
 #include "base/strings/sys_string_conversions.h"
 
 namespace nu {
 
 namespace {
+
+// TODO(zcbenz): Use the one from |base| after updated to lastest |base|.
+base::ScopedCFTypeRef<CFURLRef> FilePathToCFURL(const base::FilePath& path) {
+  // The function's docs promise that it does not require an NSAutoreleasePool.
+  // A straightforward way to accomplish this is to use *Create* functions,
+  // combined with base::ScopedCFTypeRef.
+  const std::string& path_string = path.value();
+  base::ScopedCFTypeRef<CFStringRef> path_cfstring(CFStringCreateWithBytes(
+      kCFAllocatorDefault, reinterpret_cast<const UInt8*>(path_string.data()),
+      path_string.length(), kCFStringEncodingUTF8,
+      /*isExternalRepresentation=*/FALSE));
+  if (!path_cfstring)
+    return base::ScopedCFTypeRef<CFURLRef>();
+  return base::ScopedCFTypeRef<CFURLRef>(CFURLCreateWithFileSystemPath(
+      kCFAllocatorDefault, path_cfstring, kCFURLPOSIXPathStyle,
+      /*isDirectory=*/FALSE));
+}
 
 // Convert between Cocoa font weight and our own font weight enums.
 CGFloat FontWeightToNS(Font::Weight weight) {
@@ -96,6 +116,17 @@ NSFont* NSFontWithSpec(const std::string& font_name, float font_size,
   return [NSFont systemFontOfSize:font_size];
 }
 
+// Returns au autoreleased font by reading from file.
+NSFont* NSFontFromPath(const base::FilePath& path, float size) {
+  base::ScopedCFTypeRef<CFURLRef> url = FilePathToCFURL(path);
+  base::ScopedCFTypeRef<CFArrayRef> descriptors(
+      CTFontManagerCreateFontDescriptorsFromURL(url));
+  NSArray* descriptors_list = base::mac::CFToNSCast(descriptors);
+  for (NSFontDescriptor* descriptor in descriptors_list)
+    return [NSFont fontWithDescriptor:descriptor size:size];
+  return [NSFont systemFontOfSize:13];
+}
+
 }  // namespace
 
 Font::Font()
@@ -104,6 +135,9 @@ Font::Font()
 
 Font::Font(const std::string& name, float size, Weight weight, Style style)
     : font_([NSFontWithSpec(name, size, weight, style) retain]) {}
+
+Font::Font(const base::FilePath& path, float size)
+    : font_([NSFontFromPath(path, size) retain]) {}
 
 Font::~Font() {
   [font_ release];

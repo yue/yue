@@ -233,6 +233,8 @@ jumbo_component("nativeui") {
     "gtk/window_gtk.cc",
     "gtk/util/clipboard_util.cc",
     "gtk/util/clipboard_util.h",
+    "gtk/util/fontconfig.cc",
+    "gtk/util/fontconfig.h",
     "gtk/util/undoable_text_buffer.cc",
     "gtk/util/undoable_text_buffer.h",
     "gtk/util/widget_util.cc",
@@ -424,6 +426,8 @@ jumbo_component("nativeui") {
     public_configs = [
       "//build/config/linux:x11",
       ":webkitgtk",
+      ":fontconfig",
+      ":pango",
     ]
 
     # Not sure why it is not added in base.
@@ -491,5 +495,13 @@ if (is_linux) {
 
   pkg_config("webkitgtk") {
     packages = [ "webkit2gtk-4.0" ]
+  }
+
+  pkg_config("fontconfig") {
+    packages = [ "fontconfig" ]
+  }
+
+  pkg_config("pango") {
+    packages = [ "pangoft2" ]
   }
 }

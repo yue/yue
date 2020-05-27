@@ -12,6 +12,12 @@ constructors:
       Create a Font implementation with the specified `name`, DIP `size`,
       `weight` and `style`.
 
+  - signature: Font(const base::FilePath& path, float size)
+    lang: ['cpp']
+    description: &ref2 |
+      Create a Font by reading from |path|. If the font file contains multiple
+      families or weights, only the first encountered font will be used.
+
 class_methods:
   - signature: Font* Default()
     description: Return the default font used for displaying text.
@@ -19,6 +25,10 @@ class_methods:
   - signature: Font* Create(const std::string& name, float size, Font::Weight weight, Font::Style style)
     lang: ['lua', 'js']
     description: *ref1
+
+  - signature: Font* CreateFromPath(const base::FilePath& path, float size)
+    lang: ['lua', 'js']
+    description: *ref2
 
 methods:
   - signature: Font* Derive(float size_delta, Font::Weight weight, Font::Style style) const

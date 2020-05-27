@@ -71,19 +71,27 @@ endif()
 if(UNIX AND NOT APPLE)
   target_include_directories(${LIBYUE} PRIVATE src/linux)
   find_package(PkgConfig)
+  pkg_search_module(FONTCONFIG REQUIRED fontconfig)
+  pkg_search_module(PANGO REQUIRED pangoft2)
   pkg_search_module(GTK3 REQUIRED gtk+-3.0)
   pkg_search_module(X11 REQUIRED x11)
   pkg_search_module(WEBKIT2GTK REQUIRED webkit2gtk-4.0)
   target_include_directories(${LIBYUE} PUBLIC
+                             ${FONTCONFIG_INCLUDE_DIRS}
+                             ${PANGO_INCLUDE_DIRS}
                              ${GTK3_INCLUDE_DIRS}
                              ${X11_INCLUDE_DIRS}
                              ${WEBKIT2GTK_INCLUDE_DIRS})
   target_compile_options(${LIBYUE} PUBLIC
+                         ${FONTCONFIG_CFLAGS_OTHER}
+                         ${PANGO_CFLAGS_OTHER}
                          ${GTK3_CFLAGS_OTHER}
                          ${X11_CFLAGS_OTHER}
                          ${WEBKIT2GTK_CFLAGS_OTHER})
   target_link_libraries(${LIBYUE} PUBLIC
                         pthread dl atomic
+                        ${FONTCONFIG_LIBRARIES}
+                        ${PANGO_LIBRARIES}
                         ${GTK3_LIBRARIES}
                         ${X11_LIBRARIES}
                         ${WEBKIT2GTK_LIBRARIES})

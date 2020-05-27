@@ -373,6 +373,7 @@ struct Type<nu::Font> {
     Set(context, constructor,
         "create", &CreateOnHeap<nu::Font, const std::string&, float,
                                 nu::Font::Weight, nu::Font::Style>,
+        "createFromPath", &CreateOnHeap<nu::Font, const base::FilePath&, float>,
         "default", &nu::Font::Default);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
