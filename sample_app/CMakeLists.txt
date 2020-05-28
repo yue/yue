@@ -60,7 +60,7 @@ if(WIN32)
                         setupapi.lib powrprof.lib ws2_32.lib dbghelp.lib
                         shlwapi.lib version.lib winmm.lib psapi.lib dwmapi.lib
                         propsys.lib comctl32.lib gdi32.lib gdiplus.lib
-                        urlmon.lib userenv.lib)
+                        urlmon.lib userenv.lib delayimp.lib)
   set_target_properties(${LIBYUE} PROPERTIES COMPILE_FLAGS
                         "/wd4244 /wd4267 /wd4312 /wd4838 /wd4996")
   target_link_options(${LIBYUE} PUBLIC
