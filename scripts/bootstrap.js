@@ -41,6 +41,7 @@ const debugConfig = [
 const releaseConfig = [
   'is_component_build=false',
   'is_debug=false',
+  'is_official_build=true',
 ]
 
 if (process.env.CI === 'true') {

@@ -22,6 +22,7 @@ const args = [
   // Same with Release build.
   'is_component_build=false',
   'is_debug=false',
+  'is_official_build=true',
   `target_cpu="${targetCpu}"`,
   // Set node nodever and runtime.
   `node_version="${nodever}"`,
