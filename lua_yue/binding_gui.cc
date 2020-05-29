@@ -199,6 +199,44 @@ struct Type<nu::MessageLoop> {
   }
 };
 
+#if defined(OS_MACOSX)
+template<>
+struct Type<nu::App::ActivationPolicy> {
+  static constexpr const char* name = "yue.AppActivationPolicy";
+  static inline bool To(State* state, int index,
+                        nu::App::ActivationPolicy* out) {
+    std::string policy;
+    if (!lua::To(state, index, &policy))
+      return false;
+    if (policy == "regular") {
+      *out = nu::App::ActivationPolicy::Regular;
+      return true;
+    } else if (policy == "accessory") {
+      *out = nu::App::ActivationPolicy::Accessory;
+      return true;
+    } else if (policy == "prohibited") {
+      *out = nu::App::ActivationPolicy::Prohibited;
+      return true;
+    } else {
+      return false;
+    }
+  }
+  static inline void Push(State* state, nu::App::ActivationPolicy policy) {
+    switch (policy) {
+      case nu::App::ActivationPolicy::Regular:
+        lua::Push(state, "regular");
+        break;
+      case nu::App::ActivationPolicy::Accessory:
+        lua::Push(state, "accessory");
+        break;
+      case nu::App::ActivationPolicy::Prohibited:
+        lua::Push(state, "prohibited");
+        break;
+    }
+  }
+};
+#endif
+
 template<>
 struct Type<nu::App> {
   static constexpr const char* name = "yue.App";
@@ -209,6 +247,8 @@ struct Type<nu::App> {
            RefMethod(&nu::App::SetApplicationMenu, RefType::Reset, "appmenu"),
            "setdockbadgelabel", &nu::App::SetDockBadgeLabel,
            "getdockbadgelabel", &nu::App::GetDockBadgeLabel,
+           "setactivationpolicy", &nu::App::SetActivationPolicy,
+           "getactivationpolicy", &nu::App::GetActivationPolicy,
 #endif
            "getcolor", &nu::App::GetColor,
            "getdefaultfont", &nu::App::GetDefaultFont,

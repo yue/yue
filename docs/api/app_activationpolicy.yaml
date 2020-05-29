@@ -1,0 +1,23 @@
+name: App::ActivationPolicy
+platform: ['macOS']
+header: nativeui/app.h
+type: enum class
+namespace: nu
+description: Activation policies that control how the app is activated.
+
+enums:
+  - name: Regular
+    description: |
+      The application is an ordinary app that appears in the Dock and may have
+      a user interface.
+
+  - name: Accessory
+    description: |
+      The application does not appear in the Dock and does not have a menu bar,
+      but it may be activated programmatically or by clicking on one of its
+      windows.
+
+  - name: Prohibited
+    description: |
+      The application does not appear in the Dock and may not create windows or
+      be activated.

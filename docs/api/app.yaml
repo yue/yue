@@ -55,3 +55,11 @@ methods:
   - signature: std::string GetDockBadgeLabel() const
     platform: ['macOS']
     description: Get the label displayed in dock’s badging area.
+
+  - signature: void SetActivationPolicy(App::ActivationPolicy policy)
+    platform: ['macOS']
+    description: Modify the app's activation policy.
+
+  - signature: App::ActivationPolicy GetActivationPolicy() const
+    platform: ['macOS']
+    description: Return app's activation policy.

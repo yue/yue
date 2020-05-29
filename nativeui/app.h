@@ -39,6 +39,15 @@ class NATIVEUI_EXPORT App {
   // Dock functions.
   void SetDockBadgeLabel(const std::string& text);
   std::string GetDockBadgeLabel() const;
+
+  // Activation policy.
+  enum class ActivationPolicy {
+    Regular,
+    Accessory,
+    Prohibited,
+  };
+  void SetActivationPolicy(ActivationPolicy policy);
+  ActivationPolicy GetActivationPolicy() const;
 #endif
 
   base::WeakPtr<App> GetWeakPtr() { return weak_factory_.GetWeakPtr(); }

@@ -218,6 +218,45 @@ struct Type<nu::MessageLoop> {
   }
 };
 
+#if defined(OS_MACOSX)
+template<>
+struct Type<nu::App::ActivationPolicy> {
+  static constexpr const char* name = "yue.AppActivationPolicy";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::App::ActivationPolicy* out) {
+    std::string policy;
+    if (!vb::FromV8(context, value, &policy))
+      return false;
+    if (policy == "regular") {
+      *out = nu::App::ActivationPolicy::Regular;
+      return true;
+    } else if (policy == "accessory") {
+      *out = nu::App::ActivationPolicy::Accessory;
+      return true;
+    } else if (policy == "prohibited") {
+      *out = nu::App::ActivationPolicy::Prohibited;
+      return true;
+    } else {
+      return false;
+    }
+  }
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   nu::App::ActivationPolicy policy) {
+    switch (policy) {
+      case nu::App::ActivationPolicy::Regular:
+        return vb::ToV8(context, "regular");
+      case nu::App::ActivationPolicy::Accessory:
+        return vb::ToV8(context, "accessory");
+      case nu::App::ActivationPolicy::Prohibited:
+        return vb::ToV8(context, "prohibited");
+    }
+    NOTREACHED();
+    return v8::Undefined(context->GetIsolate());
+  }
+};
+#endif
+
 template<>
 struct Type<nu::App> {
   static constexpr const char* name = "yue.App";
@@ -231,6 +270,8 @@ struct Type<nu::App> {
         RefMethod(&nu::App::SetApplicationMenu, RefType::Reset, "appMenu"),
         "setDockBadgeLabel", &nu::App::SetDockBadgeLabel,
         "getDockBadgeLabel", &nu::App::GetDockBadgeLabel,
+        "setActivationPolicy", &nu::App::SetActivationPolicy,
+        "getActivationPolicy", &nu::App::GetActivationPolicy,
 #endif
         "getColor", &nu::App::GetColor,
         "getDefaultFont", &nu::App::GetDefaultFont,

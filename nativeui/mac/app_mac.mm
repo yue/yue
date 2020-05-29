@@ -27,4 +27,31 @@ std::string App::GetDockBadgeLabel() const {
   return base::SysNSStringToUTF8([[NSApp dockTile] badgeLabel]);
 }
 
+void App::SetActivationPolicy(ActivationPolicy policy) {
+  NSApplicationActivationPolicy p = NSApplicationActivationPolicyRegular;
+  switch (policy) {
+    case ActivationPolicy::Regular:
+      p = NSApplicationActivationPolicyRegular;
+      break;
+    case ActivationPolicy::Accessory:
+      p = NSApplicationActivationPolicyAccessory;
+      break;
+    case ActivationPolicy::Prohibited:
+      p = NSApplicationActivationPolicyProhibited;
+      break;
+  }
+  [NSApp setActivationPolicy:p];
+}
+
+App::ActivationPolicy App::GetActivationPolicy() const {
+  switch ([NSApp activationPolicy]) {
+    case NSApplicationActivationPolicyRegular:
+      return ActivationPolicy::Regular;
+    case NSApplicationActivationPolicyAccessory:
+      return ActivationPolicy::Accessory;
+    case NSApplicationActivationPolicyProhibited:
+      return ActivationPolicy::Prohibited;
+  }
+}
+
 }  // namespace nu
