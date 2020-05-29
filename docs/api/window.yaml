@@ -192,6 +192,10 @@ methods:
     description: |
       Return whether the window has `NSFullSizeContentViewWindowMask` style.
 
+  - signature: void SetSkipTaskbar(bool skip)
+    platform: ['Windows', 'Linux']
+    description: Set whether to hide the window from taskbar.
+
   - signature: void SetMenuBar(MenuBar* menubar)
     platform: ['Windows', 'Linux']
     description: Set the window menu bar.

@@ -1307,6 +1307,7 @@ struct Type<nu::Window> {
            "isfullsizecontentview", &nu::Window::IsFullSizeContentView,
 #endif
 #if defined(OS_WIN) || defined(OS_LINUX)
+           "setskiptaskbar", &nu::Window::SetSkipTaskbar,
            "setmenubar",
            RefMethod(&nu::Window::SetMenuBar, RefType::Reset, "menubar"),
            "getmenubar", &nu::Window::GetMenuBar,

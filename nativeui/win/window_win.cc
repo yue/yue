@@ -1002,6 +1002,19 @@ void Window::SetBackgroundColor(Color color) {
   window_->SetBackgroundColor(color);
 }
 
+void Window::SetSkipTaskbar(bool skip) {
+  Microsoft::WRL::ComPtr<ITaskbarList> taskbar;
+  if (FAILED(::CoCreateInstance(CLSID_TaskbarList, nullptr,
+                                CLSCTX_INPROC_SERVER,
+                                IID_PPV_ARGS(&taskbar))) ||
+      FAILED(taskbar->HrInit()))
+    return;
+  if (skip)
+    taskbar->DeleteTab(window_->hwnd());
+  else
+    taskbar->AddTab(window_->hwnd());
+}
+
 void Window::PlatformSetMenuBar(MenuBar* menu_bar) {
   ::SetMenu(window_->hwnd(), menu_bar ? menu_bar->GetNative() : NULL);
 }

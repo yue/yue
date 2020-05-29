@@ -109,6 +109,7 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
 #endif
 
 #if defined(OS_WIN) || defined(OS_LINUX)
+  void SetSkipTaskbar(bool skip);
   void SetMenuBar(MenuBar* menu_bar);
   MenuBar* GetMenuBar() const { return menu_bar_.get(); }
 #endif

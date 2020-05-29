@@ -555,6 +555,10 @@ void Window::SetBackgroundColor(Color color) {
                                        GTK_STATE_FLAG_NORMAL, &gcolor);
 }
 
+void Window::SetSkipTaskbar(bool skip) {
+  gtk_window_set_skip_taskbar_hint(window_, skip);
+}
+
 void Window::PlatformSetMenuBar(MenuBar* menu_bar) {
   GtkContainer* vbox = GTK_CONTAINER(gtk_bin_get_child(GTK_BIN(window_)));
   if (menu_bar_)
