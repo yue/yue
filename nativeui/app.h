@@ -40,6 +40,11 @@ class NATIVEUI_EXPORT App {
   void SetDockBadgeLabel(const std::string& text);
   std::string GetDockBadgeLabel() const;
 
+  // Activations.
+  void Activate(bool force);
+  void Deactivate();
+  bool IsActive() const;
+
   // Activation policy.
   enum class ActivationPolicy {
     Regular,

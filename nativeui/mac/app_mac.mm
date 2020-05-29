@@ -27,6 +27,18 @@ std::string App::GetDockBadgeLabel() const {
   return base::SysNSStringToUTF8([[NSApp dockTile] badgeLabel]);
 }
 
+void App::Activate(bool force) {
+  [NSApp activateIgnoringOtherApps:force];
+}
+
+void App::Deactivate() {
+  [NSApp deactivate];
+}
+
+bool App::IsActive() const {
+  return [NSApp isActive];
+}
+
 void App::SetActivationPolicy(ActivationPolicy policy) {
   NSApplicationActivationPolicy p = NSApplicationActivationPolicyRegular;
   switch (policy) {

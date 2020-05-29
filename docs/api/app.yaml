@@ -56,6 +56,25 @@ methods:
     platform: ['macOS']
     description: Get the label displayed in dock’s badging area.
 
+  - signature: void Activate(bool force)
+    platform: ['macOS']
+    description: Make current app the active app.
+    detail: |
+      The `force` parameter is normally set to false. When the Finder launches
+      an app, using a value of false for `force` allows the app to become active
+      if the user waits for it to launch, but the app remains unobtrusive if the
+      user activates another app. Regardless of the setting of flag, there may
+      be a time lag before the app activates—you should not assume the app will
+      be active immediately after sending this message.
+
+  - signature: void Deactivate()
+    platform: ['macOS']
+    description: Deactivate current app.
+
+  - signature: bool IsActive()
+    platform: ['macOS']
+    description: Return whether current app is the active app.
+
   - signature: void SetActivationPolicy(App::ActivationPolicy policy)
     platform: ['macOS']
     description: Modify the app's activation policy.

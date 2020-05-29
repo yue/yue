@@ -247,6 +247,9 @@ struct Type<nu::App> {
            RefMethod(&nu::App::SetApplicationMenu, RefType::Reset, "appmenu"),
            "setdockbadgelabel", &nu::App::SetDockBadgeLabel,
            "getdockbadgelabel", &nu::App::GetDockBadgeLabel,
+           "activate", &nu::App::Activate,
+           "deactivate", &nu::App::Deactivate,
+           "isactive", &nu::App::IsActive,
            "setactivationpolicy", &nu::App::SetActivationPolicy,
            "getactivationpolicy", &nu::App::GetActivationPolicy,
 #endif
