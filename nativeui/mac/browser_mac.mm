@@ -56,7 +56,7 @@
   base::scoped_nsobject<NUScriptMessageHandler> handler_;
 }
 - (id)initWithShell:(nu::Browser*)shell
-            options:(const nu::Browser::Options&)options;
+            options:(nu::Browser::Options)options;
 - (void)willDestroy;
 - (void)updateBindings;
 @end
@@ -64,8 +64,8 @@
 @implementation NUWebView
 
 - (id)initWithShell:(nu::Browser*)shell
-            options:(const nu::Browser::Options&)options {
-  options_ = options;
+            options:(nu::Browser::Options)options {
+  options_ = std::move(options);
   shell_ = shell;
   // Initialize with configuration.
   handler_.reset([[NUScriptMessageHandler alloc] initWithShell:shell]);
@@ -220,8 +220,9 @@
 
 namespace nu {
 
-void Browser::PlatformInit(const Options& options) {
-  NUWebView* webview = [[NUWebView alloc] initWithShell:this options:options];
+void Browser::PlatformInit(Options options) {
+  NUWebView* webview = [[NUWebView alloc] initWithShell:this
+                                                options:std::move(options)];
   [webview setUIDelegate:[[NUWebUIDelegate alloc] init]];
   [webview setNavigationDelegate:[[NUNavigationDelegate alloc] init]];
   TakeOverView(webview);

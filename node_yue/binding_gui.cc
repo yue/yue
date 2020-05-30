@@ -1857,6 +1857,9 @@ struct Type<nu::Browser::Options> {
         "contextMenu", &out->context_menu,
         "allowFileAccessFromFiles", &out->allow_file_access_from_files,
         "hardwareAcceleration", &out->hardware_acceleration);
+#if defined(OS_WIN) && defined(WEBVIEW2_SUPPORT)
+    Get(context, obj, "webview2Support", &out->webview2_support);
+#endif
     return true;
   }
 };
@@ -1868,7 +1871,7 @@ struct Type<nu::Browser> {
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
-        "create", &CreateOnHeap<nu::Browser, const nu::Browser::Options&>,
+        "create", &CreateOnHeap<nu::Browser, nu::Browser::Options>,
         "registerProtocol", &nu::Browser::RegisterProtocol,
         "unregisterProtocol", &nu::Browser::UnregisterProtocol);
   }

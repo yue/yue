@@ -2,7 +2,9 @@
 .tags*
 /building/tools/gn/
 /out/
+/third_party/nuget.exe
 /third_party/llvm-build/
+/third_party/Microsoft.Web.WebView2.*/
 /third_party/node-*/
 /third_party/debian_stretch_amd64-sysroot/
 /third_party/debian_stretch_i386-sysroot/

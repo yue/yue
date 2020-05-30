@@ -6,7 +6,9 @@
 
 #include <shellscalingapi.h>
 
-#include "base/logging.h"
+#include "base/base_paths.h"
+#include "base/path_service.h"
+#include "base/scoped_native_library.h"
 #include "base/win/scoped_com_initializer.h"
 #include "base/win/windows_version.h"
 #include "nativeui/gfx/screen.h"
@@ -88,6 +90,23 @@ void State::InitializeCOM() {
     com_initializer_.reset(new base::win::ScopedCOMInitializer);
     ole_initializer_.reset(new ScopedOleInitializer);
   }
+}
+
+bool State::InitWebView2Loader() {
+  if (!webview2_loader_) {
+    // First try to do a global search.
+    webview2_loader_.reset(
+        new base::ScopedNativeLibrary(base::FilePath(L"WebView2Loader.dll")));
+    // Then search from dir the contains current module.
+    if (!webview2_loader_->is_valid()) {
+      base::FilePath module_path;
+      if (PathService::Get(base::FILE_MODULE, &module_path)) {
+        auto dll_path = module_path.DirName().Append(L"WebView2Loader.dll");
+        webview2_loader_.reset(new base::ScopedNativeLibrary(dll_path));
+      }
+    }
+  }
+  return webview2_loader_->is_valid();
 }
 
 HWND State::GetSubwinHolder() {

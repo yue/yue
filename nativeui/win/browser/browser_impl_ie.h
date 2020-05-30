@@ -22,7 +22,7 @@ namespace nu {
 // Implementation of Browser based on IE.
 class BrowserImplIE : public BrowserImpl {
  public:
-  BrowserImplIE(const Browser::Options& options, Browser* delegate);
+  BrowserImplIE(Browser::Options options, Browser* delegate);
   ~BrowserImplIE() override;
 
   void LoadURL(base::string16 str) override;

@@ -1651,6 +1651,9 @@ struct Type<nu::Browser::Options> {
           "contextmenu", &out->context_menu,
           "allowfileaccessfromfiles", &out->allow_file_access_from_files,
           "hardwareacceleration", &out->hardware_acceleration);
+#if defined(OS_WIN) && defined(WEBVIEW2_SUPPORT)
+      RawGetAndPop(state, index, "webview2support", &out->webview2_support);
+#endif
     }
     return true;
   }
@@ -1662,7 +1665,7 @@ struct Type<nu::Browser> {
   static constexpr const char* name = "yue.Browser";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
-           "create", &CreateOnHeap<nu::Browser, const nu::Browser::Options&>,
+           "create", &CreateOnHeap<nu::Browser, nu::Browser::Options>,
            "registerprotocol", &nu::Browser::RegisterProtocol,
            "unregisterprotocol", &nu::Browser::UnregisterProtocol,
            "loadurl", &nu::Browser::LoadURL,

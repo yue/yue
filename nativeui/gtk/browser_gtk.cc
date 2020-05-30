@@ -184,7 +184,7 @@ void OnProtocolRequest(WebKitURISchemeRequest* request,
 
 }  // namespace
 
-void Browser::PlatformInit(const Options& options) {
+void Browser::PlatformInit(Options options) {
   // Install native bindings script.
   WebKitUserContentManager* manager = webkit_user_content_manager_new();
   g_signal_connect(manager, "script-message-received::yue",

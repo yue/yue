@@ -5,6 +5,10 @@
 import("//build/config/jumbo.gni")
 import("//testing/test.gni")
 
+declare_args() {
+  webview2_support = true
+}
+
 jumbo_component("nativeui") {
   sources = [
     "nativeui.h",
@@ -457,6 +461,15 @@ jumbo_component("nativeui") {
       "//build/win:default_exe_manifest",
     ]
     configs -= [ "//build/config/win:lean_and_mean" ]
+
+    if (webview2_support) {
+      public_configs = [ ":webview2" ]
+      deps += [ ":copy_webview2_loader" ]
+      sources += [
+        "win/webview2/browser_impl_webview2.cc",
+        "win/webview2/browser_impl_webview2.h",
+      ]
+    }
   }
 }
 
@@ -505,5 +518,24 @@ if (is_linux) {
 
   pkg_config("pango") {
     packages = [ "pangoft2" ]
+  }
+}
+
+if (webview2_support && is_win) {
+  webview2 = "Microsoft.Web.WebView2.0.9.488"
+
+  config("webview2") {
+    include_dirs = [ "//third_party/$webview2/build/native/include" ]
+    libs = [
+      "//third_party/$webview2/build/native/$target_cpu/WebView2Guid.lib",
+      "//third_party/$webview2/build/native/$target_cpu/WebView2Loader.dll.lib",
+    ]
+    defines = ["WEBVIEW2_SUPPORT"]
+    ldflags = [ "/DELAYLOAD:WebView2Loader.dll" ]
+  }
+
+  copy("copy_webview2_loader") {
+    sources = [ "//third_party/$webview2/build/native/$target_cpu/WebView2Loader.dll" ]
+    outputs = [ "$root_out_dir/WebView2Loader.dll" ]
   }
 }

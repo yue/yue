@@ -27,9 +27,12 @@ class NATIVEUI_EXPORT Browser : public View {
     bool context_menu = false;
     bool allow_file_access_from_files = false;
     bool hardware_acceleration = true;
+#if defined(OS_WIN) && defined(WEBVIEW2_SUPPORT)
+    bool webview2_support = false;
+#endif
   };
 
-  explicit Browser(const Options& options);
+  explicit Browser(Options options);
 
   // View class name.
   static const char kClassName[];
@@ -102,7 +105,7 @@ class NATIVEUI_EXPORT Browser : public View {
   ~Browser() override;
 
  private:
-  void PlatformInit(const Options& options);
+  void PlatformInit(Options options);
   void PlatformDestroy();
   void PlatformUpdateBindings();
 

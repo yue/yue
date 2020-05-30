@@ -6,6 +6,8 @@
 
 #include <shlguid.h>
 
+#include <utility>
+
 #include "base/strings/utf_string_conversions.h"
 #include "base/win/scoped_bstr.h"
 #include "base/win/scoped_variant.h"
@@ -46,8 +48,8 @@ bool VARIANTToJSON(IDispatchEx* script,
 
 }  // namespace
 
-BrowserImplIE::BrowserImplIE(const Browser::Options& options, Browser* delegate)
-    : BrowserImpl(options, delegate),
+BrowserImplIE::BrowserImplIE(Browser::Options options, Browser* delegate)
+    : BrowserImpl(std::move(options), delegate),
       external_sink_(new BrowserExternalSink(delegate)),
       ole_site_(new BrowserOleSite(this, external_sink_.Get())),
       event_sink_(new BrowserEventSink(this)),

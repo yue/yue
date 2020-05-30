@@ -18,6 +18,10 @@
 #include "nativeui/win/browser/browser_impl_ie.h"
 #include "nativeui/win/browser/browser_protocol_factory.h"
 
+#if defined(WEBVIEW2_SUPPORT)
+#include "nativeui/win/webview2/browser_impl_webview2.h"
+#endif
+
 namespace nu {
 
 namespace {
@@ -36,8 +40,19 @@ BrowserImpl::BrowserImpl(Browser::Options options, Browser* delegate)
   State::GetCurrent()->InitializeCOM();
 }
 
-void Browser::PlatformInit(const Options& options) {
+///////////////////////////////////////////////////////////////////////////////
+// Public Browser API implementation.
+
+void Browser::PlatformInit(Options options) {
+#if defined(WEBVIEW2_SUPPORT)
+  // Initialize webview2 loader dll.
+  if (options.webview2_support && State::GetCurrent()->InitWebView2Loader())
+    TakeOverView(new BrowserImplWebview2(options, this));
+  else
+    TakeOverView(new BrowserImplIE(options, this));
+#else
   TakeOverView(new BrowserImplIE(options, this));
+#endif
 }
 
 void Browser::PlatformDestroy() {
