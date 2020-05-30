@@ -16,29 +16,28 @@
 #include "nativeui/win/browser/browser_html_moniker.h"
 #include "nativeui/win/browser/browser_ole_site.h"
 #include "nativeui/win/browser_win.h"
-#include "nativeui/win/subwin_view.h"
 
 namespace nu {
 
 // Implementation of Browser based on IE.
-class BrowserImplIE : public SubwinView {
+class BrowserImplIE : public BrowserImpl {
  public:
   BrowserImplIE(const Browser::Options& options, Browser* delegate);
   ~BrowserImplIE() override;
 
-  void LoadURL(const base::string16& str);
-  void LoadHTML(const base::string16& str, const base::string16& base_url);
-  base::string16 GetURL();
-  base::string16 GetTitle();
-  bool Eval(const base::string16& code, base::string16* result);
+  void LoadURL(base::string16 str) override;
+  void LoadHTML(base::string16 str, base::string16 base_url) override;
+  base::string16 GetURL() override;
+  base::string16 GetTitle() override;
+  bool Eval(base::string16 code, base::string16* result) override;
 
-  void GoBack();
-  bool CanGoBack() const;
-  void GoForward();
-  bool CanGoForward() const;
-  void Reload();
-  void Stop();
-  bool IsLoading() const;
+  void GoBack() override;
+  bool CanGoBack() const override;
+  void GoForward() override;
+  bool CanGoForward() const override;
+  void Reload() override;
+  void Stop() override;
+  bool IsLoading() const override;
 
   template<typename T>
   bool GetBrowser(Microsoft::WRL::ComPtr<T>* out) {
@@ -47,7 +46,6 @@ class BrowserImplIE : public SubwinView {
 
   void set_can_go_back(bool b) { can_go_back_ = b; }
   void set_can_go_forward(bool b) { can_go_forward_ = b; }
-  const Browser::Options& options() const { return options_; }
 
  protected:
   // ViewImpl:
@@ -98,8 +96,6 @@ class BrowserImplIE : public SubwinView {
 
   Microsoft::WRL::ComPtr<IWebBrowser2> browser_;
   Microsoft::WRL::ComPtr<IHTMLDocument2> document_;
-
-  Browser::Options options_;
 
   // Whether we have loaded the HTML.
   bool is_html_loaded_ = false;

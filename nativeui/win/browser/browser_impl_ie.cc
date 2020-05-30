@@ -10,7 +10,6 @@
 #include "base/win/scoped_bstr.h"
 #include "base/win/scoped_variant.h"
 #include "nativeui/events/win/event_win.h"
-#include "nativeui/state.h"
 #include "nativeui/win/browser/browser_util.h"
 #include "nativeui/win/util/dispatch_invoke.h"
 #include "nativeui/win/util/hwnd_util.h"
@@ -48,15 +47,11 @@ bool VARIANTToJSON(IDispatchEx* script,
 }  // namespace
 
 BrowserImplIE::BrowserImplIE(const Browser::Options& options, Browser* delegate)
-    : SubwinView(delegate),
+    : BrowserImpl(options, delegate),
       external_sink_(new BrowserExternalSink(delegate)),
       ole_site_(new BrowserOleSite(this, external_sink_.Get())),
       event_sink_(new BrowserEventSink(this)),
-      document_events_(new BrowserDocumentEvents(this)),
-      options_(options) {
-  set_focusable(true);
-  // Initialize COM and OLE.
-  State::GetCurrent()->InitializeCOM();
+      document_events_(new BrowserDocumentEvents(this)) {
   // Use the latest IE version.
   FixIECompatibleMode();
 
@@ -105,7 +100,7 @@ BrowserImplIE::~BrowserImplIE() {
   ole_object->SetClientSite(nullptr);
 }
 
-void BrowserImplIE::LoadURL(const base::string16& str) {
+void BrowserImplIE::LoadURL(base::string16 str) {
   if (!browser_)
     return;
   html_moniker_.Reset();
@@ -114,8 +109,8 @@ void BrowserImplIE::LoadURL(const base::string16& str) {
   browser_->Navigate(url, nullptr, nullptr, nullptr, nullptr);
 }
 
-void BrowserImplIE::LoadHTML(const base::string16& str,
-                           const base::string16& base_url) {
+void BrowserImplIE::LoadHTML(base::string16 str,
+                             base::string16 base_url) {
   if (!browser_)
     return;
   html_moniker_ = new BrowserHTMLMoniker;
@@ -141,7 +136,7 @@ base::string16 BrowserImplIE::GetTitle() {
   return base::string16(title);
 }
 
-bool BrowserImplIE::Eval(const base::string16& code, base::string16* result) {
+bool BrowserImplIE::Eval(base::string16 code, base::string16* result) {
   if (!document_)
     return false;
   Microsoft::WRL::ComPtr<IDispatch> script_disp;

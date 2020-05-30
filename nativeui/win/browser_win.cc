@@ -14,6 +14,7 @@
 #include "base/json/json_reader.h"
 #include "base/strings/utf_string_conversions.h"
 #include "nativeui/message_loop.h"
+#include "nativeui/state.h"
 #include "nativeui/win/browser/browser_impl_ie.h"
 #include "nativeui/win/browser/browser_protocol_factory.h"
 
@@ -27,6 +28,14 @@ std::map<base::string16,
 
 }  // namespace
 
+BrowserImpl::BrowserImpl(Browser::Options options, Browser* delegate)
+    : SubwinView(delegate),
+      options_(std::move(options)) {
+  set_focusable(true);
+  // Initialize COM and OLE.
+  State::GetCurrent()->InitializeCOM();
+}
+
 void Browser::PlatformInit(const Options& options) {
   TakeOverView(new BrowserImplIE(options, this));
 }
@@ -35,21 +44,21 @@ void Browser::PlatformDestroy() {
 }
 
 void Browser::LoadURL(const std::string& url) {
-  static_cast<BrowserImplIE*>(GetNative())->LoadURL(base::UTF8ToUTF16(url));
+  static_cast<BrowserImpl*>(GetNative())->LoadURL(base::UTF8ToUTF16(url));
 }
 
 void Browser::LoadHTML(const std::string& html, const std::string& base_url) {
-  auto* browser = static_cast<BrowserImplIE*>(GetNative());
+  auto* browser = static_cast<BrowserImpl*>(GetNative());
   browser->LoadHTML(base::UTF8ToUTF16(html), base::UTF8ToUTF16(base_url));
 }
 
 std::string Browser::GetURL() {
-  auto* browser = static_cast<BrowserImplIE*>(GetNative());
+  auto* browser = static_cast<BrowserImpl*>(GetNative());
   return base::UTF16ToUTF8(browser->GetURL());
 }
 
 std::string Browser::GetTitle() {
-  auto* browser = static_cast<BrowserImplIE*>(GetNative());
+  auto* browser = static_cast<BrowserImpl*>(GetNative());
   return base::UTF16ToUTF8(browser->GetTitle());
 }
 
@@ -62,7 +71,7 @@ void Browser::SetUserAgent(const std::string& ua) {
 
 void Browser::ExecuteJavaScript(const std::string& code,
                                 const ExecutionCallback& callback) {
-  auto* browser = static_cast<BrowserImplIE*>(GetNative());
+  auto* browser = static_cast<BrowserImpl*>(GetNative());
   base::string16 json;
   bool success = browser->Eval(base::UTF8ToUTF16(code),
                                callback ? &json : nullptr);
@@ -76,31 +85,31 @@ void Browser::ExecuteJavaScript(const std::string& code,
 }
 
 void Browser::GoBack() {
-  static_cast<BrowserImplIE*>(GetNative())->GoBack();
+  static_cast<BrowserImpl*>(GetNative())->GoBack();
 }
 
 bool Browser::CanGoBack() const {
-  return static_cast<BrowserImplIE*>(GetNative())->CanGoBack();
+  return static_cast<BrowserImpl*>(GetNative())->CanGoBack();
 }
 
 void Browser::GoForward() {
-  static_cast<BrowserImplIE*>(GetNative())->GoForward();
+  static_cast<BrowserImpl*>(GetNative())->GoForward();
 }
 
 bool Browser::CanGoForward() const {
-  return static_cast<BrowserImplIE*>(GetNative())->CanGoForward();
+  return static_cast<BrowserImpl*>(GetNative())->CanGoForward();
 }
 
 void Browser::Reload() {
-  static_cast<BrowserImplIE*>(GetNative())->Reload();
+  static_cast<BrowserImpl*>(GetNative())->Reload();
 }
 
 void Browser::Stop() {
-  static_cast<BrowserImplIE*>(GetNative())->Stop();
+  static_cast<BrowserImpl*>(GetNative())->Stop();
 }
 
 bool Browser::IsLoading() const {
-  return static_cast<BrowserImplIE*>(GetNative())->IsLoading();
+  return static_cast<BrowserImpl*>(GetNative())->IsLoading();
 }
 
 void Browser::PlatformUpdateBindings() {
