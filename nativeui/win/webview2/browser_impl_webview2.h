@@ -16,7 +16,9 @@ namespace nu {
 
 class BrowserImplWebview2 : public BrowserImpl {
  public:
-  BrowserImplWebview2(Browser::Options options, Browser* delegate);
+  BrowserImplWebview2(Browser::Options options,
+                      BrowserHolder* holder,
+                      Browser* delegate);
   ~BrowserImplWebview2() override;
 
   void LoadURL(base::string16 str) override;
@@ -33,9 +35,9 @@ class BrowserImplWebview2 : public BrowserImpl {
   void Stop() override;
   bool IsLoading() const override;
 
- protected:
-  // ViewImpl:
-  void SizeAllocate(const Rect& bounds) override;
+  void SetBounds(RECT rect) override;
+  bool HasFocus() const override;
+  bool OnMouseWheel(NativeEvent event) override;
 
  private:
   HRESULT OnEnvCreated(HRESULT res, ICoreWebView2Environment* env);

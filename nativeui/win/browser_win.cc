@@ -32,48 +32,125 @@ std::map<base::string16,
 
 }  // namespace
 
-BrowserImpl::BrowserImpl(Browser::Options options, Browser* delegate)
-    : SubwinView(delegate),
-      options_(std::move(options)) {
+///////////////////////////////////////////////////////////////////////////////
+// BrowserHolder
+
+BrowserHolder::BrowserHolder(Browser::Options options, Browser* delegate)
+    : SubwinView(delegate) {
   set_focusable(true);
   // Initialize COM and OLE.
   State::GetCurrent()->InitializeCOM();
+
+#if defined(WEBVIEW2_SUPPORT)
+  if (options.webview2_support && State::GetCurrent()->InitWebView2Loader())
+    impl_.reset(new BrowserImplWebview2(std::move(options), this, delegate));
+  else
+#endif
+    impl_.reset(new BrowserImplIE(std::move(options), this, delegate));
+}
+
+BrowserHolder::~BrowserHolder() {
+}
+
+#if defined(WEBVIEW2_SUPPORT)
+void BrowserHolder::OnWebView2Completed(bool success) {
+  if (success) {
+    // Make webview fill the window if it is added.
+    impl_->SetBounds(Rect(size_allocation().size()).ToRECT());
+  } else {
+    // Fall back to IE if WebView2 is not available.
+    impl_.reset(new BrowserImplIE(std::move(impl_->options()), this,
+                                  impl_->delegate()));
+  }
+}
+#endif
+
+void BrowserHolder::SizeAllocate(const Rect& bounds) {
+  SubwinView::SizeAllocate(bounds);
+  impl_->SetBounds({0, 0, bounds.width(), bounds.height()});
+}
+
+bool BrowserHolder::HasFocus() const {
+  return impl_->HasFocus();
+}
+
+bool BrowserHolder::OnMouseWheel(NativeEvent event) {
+  return impl_->OnMouseWheel(event);
+}
+
+LRESULT BrowserHolder::OnMouseWheelFromSelf(
+    UINT message, WPARAM w_param, LPARAM l_param) {
+  // We might receive WM_MOUSEWHEEL in the shell hwnd when scrolled to edges,
+  // do not pass the event to SubwinView otherwise we will have stack overflow.
+  if (window()) {
+    // Do nothing if the event happened inside the view.
+    POINT p = { CR_GET_X_LPARAM(l_param), CR_GET_Y_LPARAM(l_param) };
+    ::ScreenToClient(window()->hwnd(), &p);
+    if (size_allocation().Contains(Point(p)))
+      return 0;
+  }
+  return ::DefWindowProc(hwnd(), message, w_param, l_param);
+}
+
+bool BrowserHolder::ProcessWindowMessage(HWND window,
+                                         UINT message,
+                                         WPARAM w_param,
+                                         LPARAM l_param,
+                                         LRESULT* result) {
+  if (impl_ &&
+      impl_->ProcessWindowMessage(window, message, w_param, l_param, result)) {
+    return true;
+  }
+  return SubwinView::ProcessWindowMessage(
+      window, message, w_param, l_param, result);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// BrowserImpl
+
+BrowserImpl::BrowserImpl(Browser::Options options,
+                         BrowserHolder* holder,
+                         Browser* delegate)
+    : options_(std::move(options)), holder_(holder), delegate_(delegate) {}
+
+BrowserImpl::~BrowserImpl() = default;
+
+bool BrowserImpl::ProcessWindowMessage(HWND window,
+                                       UINT message,
+                                       WPARAM w_param,
+                                       LPARAM l_param,
+                                       LRESULT* result) {
+  return false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Public Browser API implementation.
 
 void Browser::PlatformInit(Options options) {
-#if defined(WEBVIEW2_SUPPORT)
-  // Initialize webview2 loader dll.
-  if (options.webview2_support && State::GetCurrent()->InitWebView2Loader())
-    TakeOverView(new BrowserImplWebview2(options, this));
-  else
-    TakeOverView(new BrowserImplIE(options, this));
-#else
-  TakeOverView(new BrowserImplIE(options, this));
-#endif
+  TakeOverView(new BrowserHolder(options, this));
 }
 
 void Browser::PlatformDestroy() {
 }
 
 void Browser::LoadURL(const std::string& url) {
-  static_cast<BrowserImpl*>(GetNative())->LoadURL(base::UTF8ToUTF16(url));
+  auto* browser = static_cast<BrowserHolder*>(GetNative())->impl();
+  browser->LoadURL(base::UTF8ToUTF16(url));
 }
 
 void Browser::LoadHTML(const std::string& html, const std::string& base_url) {
-  auto* browser = static_cast<BrowserImpl*>(GetNative());
+  auto* browser = static_cast<BrowserHolder*>(GetNative())->impl();
   browser->LoadHTML(base::UTF8ToUTF16(html), base::UTF8ToUTF16(base_url));
 }
 
 std::string Browser::GetURL() {
-  auto* browser = static_cast<BrowserImpl*>(GetNative());
+  auto* browser = static_cast<BrowserHolder*>(GetNative())->impl();
   return base::UTF16ToUTF8(browser->GetURL());
 }
 
 std::string Browser::GetTitle() {
-  auto* browser = static_cast<BrowserImpl*>(GetNative());
+  auto* browser = static_cast<BrowserHolder*>(GetNative())->impl();
   return base::UTF16ToUTF8(browser->GetTitle());
 }
 
@@ -86,7 +163,7 @@ void Browser::SetUserAgent(const std::string& ua) {
 
 void Browser::ExecuteJavaScript(const std::string& code,
                                 const ExecutionCallback& callback) {
-  auto* browser = static_cast<BrowserImpl*>(GetNative());
+  auto* browser = static_cast<BrowserHolder*>(GetNative())->impl();
   base::string16 json;
   bool success = browser->Eval(base::UTF8ToUTF16(code),
                                callback ? &json : nullptr);
@@ -100,31 +177,38 @@ void Browser::ExecuteJavaScript(const std::string& code,
 }
 
 void Browser::GoBack() {
-  static_cast<BrowserImpl*>(GetNative())->GoBack();
+  auto* browser = static_cast<BrowserHolder*>(GetNative())->impl();
+  browser->GoBack();
 }
 
 bool Browser::CanGoBack() const {
-  return static_cast<BrowserImpl*>(GetNative())->CanGoBack();
+  auto* browser = static_cast<BrowserHolder*>(GetNative())->impl();
+  return browser->CanGoBack();
 }
 
 void Browser::GoForward() {
-  static_cast<BrowserImpl*>(GetNative())->GoForward();
+  auto* browser = static_cast<BrowserHolder*>(GetNative())->impl();
+  browser->GoForward();
 }
 
 bool Browser::CanGoForward() const {
-  return static_cast<BrowserImpl*>(GetNative())->CanGoForward();
+  auto* browser = static_cast<BrowserHolder*>(GetNative())->impl();
+  return browser->CanGoForward();
 }
 
 void Browser::Reload() {
-  static_cast<BrowserImpl*>(GetNative())->Reload();
+  auto* browser = static_cast<BrowserHolder*>(GetNative())->impl();
+  browser->Reload();
 }
 
 void Browser::Stop() {
-  static_cast<BrowserImpl*>(GetNative())->Stop();
+  auto* browser = static_cast<BrowserHolder*>(GetNative())->impl();
+  browser->Stop();
 }
 
 bool Browser::IsLoading() const {
-  return static_cast<BrowserImpl*>(GetNative())->IsLoading();
+  auto* browser = static_cast<BrowserHolder*>(GetNative())->impl();
+  return browser->IsLoading();
 }
 
 void Browser::PlatformUpdateBindings() {

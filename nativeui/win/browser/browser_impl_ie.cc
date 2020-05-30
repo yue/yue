@@ -48,8 +48,10 @@ bool VARIANTToJSON(IDispatchEx* script,
 
 }  // namespace
 
-BrowserImplIE::BrowserImplIE(Browser::Options options, Browser* delegate)
-    : BrowserImpl(std::move(options), delegate),
+BrowserImplIE::BrowserImplIE(Browser::Options options,
+                             BrowserHolder* holder,
+                             Browser* delegate)
+    : BrowserImpl(std::move(options), holder, delegate),
       external_sink_(new BrowserExternalSink(delegate)),
       ole_site_(new BrowserOleSite(this, external_sink_.Get())),
       event_sink_(new BrowserEventSink(this)),
@@ -191,13 +193,11 @@ bool BrowserImplIE::IsLoading() const {
   return loading;
 }
 
-void BrowserImplIE::SizeAllocate(const Rect& bounds) {
-  SubwinView::SizeAllocate(bounds);
+void BrowserImplIE::SetBounds(RECT rect) {
   Microsoft::WRL::ComPtr<IOleInPlaceObject> in_place;
   if (FAILED(browser_.As(&in_place)))
     return;
-  RECT rc = { 0, 0, bounds.width(), bounds.height() };
-  in_place->SetObjectRects(&rc, &rc);
+  in_place->SetObjectRects(&rect, &rect);
 }
 
 bool BrowserImplIE::HasFocus() const {
@@ -217,20 +217,6 @@ bool BrowserImplIE::OnMouseWheel(NativeEvent event) {
   return true;
 }
 
-LRESULT BrowserImplIE::OnMouseWheelFromSelf(
-    UINT message, WPARAM w_param, LPARAM l_param) {
-  // We might receive WM_MOUSEWHEEL in the shell hwnd when scrolled to edges,
-  // do not pass the event to SubwinView otherwise we will have stack overflow.
-  if (window()) {
-    // Do nothing if the event happened inside the view.
-    POINT p = { CR_GET_X_LPARAM(l_param), CR_GET_Y_LPARAM(l_param) };
-    ::ScreenToClient(window()->hwnd(), &p);
-    if (size_allocation().Contains(Point(p)))
-      return 0;
-  }
-  return ::DefWindowProc(hwnd(), message, w_param, l_param);
-}
-
 void BrowserImplIE::OnDestroy() {
   // The HWND of the window can be destroyed before the destructor is called.
   CleanupBrowserHWND();
@@ -238,7 +224,7 @@ void BrowserImplIE::OnDestroy() {
 
 void BrowserImplIE::OnSetFocus(HWND hwnd) {
   // Still mark this control as focused.
-  SubwinView::OnSetFocus(hwnd);
+  holder()->OnSetFocus(hwnd);
   SetMsgHandled(false);
   // But move the focus to the IE control.
   Microsoft::WRL::ComPtr<IOleInPlaceActiveObject> in_place_active;
@@ -327,20 +313,21 @@ void BrowserImplIE::OnDocumentReady() {
 
 // static
 LRESULT BrowserImplIE::BrowserWndProc(HWND hwnd,
-                                    UINT message,
-                                    WPARAM w_param,
-                                    LPARAM l_param) {
+                                      UINT message,
+                                      WPARAM w_param,
+                                      LPARAM l_param) {
   // Get the nu::Browser HWND.
   HWND nu_hwnd = ::GetParent(::GetParent(::GetParent(hwnd)));
-  auto* self = static_cast<BrowserImplIE*>(GetWindowUserData(nu_hwnd));
-  DCHECK(self);
+  auto* holder = static_cast<BrowserHolder*>(GetWindowUserData(nu_hwnd));
+  DCHECK(holder);
+  auto* self = static_cast<BrowserImplIE*>(holder->impl());
   // Interpret key shortcuts.
   switch (message) {
     case WM_KEYUP:
     case WM_KEYDOWN:
       // Ask if ViewImpl wants to handle the key.
-      self->OnKeyEvent(message, w_param, l_param);
-      if (self->IsMsgHandled())
+      holder->OnKeyEvent(message, w_param, l_param);
+      if (holder->IsMsgHandled())
         return true;
       // Then pass the key as accelerator to browser.
       Microsoft::WRL::ComPtr<IOleInPlaceActiveObject> in_place_active;

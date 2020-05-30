@@ -43,8 +43,9 @@ base::FilePath GetUserDataDir() {
 }  // namespace
 
 BrowserImplWebview2::BrowserImplWebview2(Browser::Options options,
+                                         BrowserHolder* holder,
                                          Browser* delegate)
-    : BrowserImpl(std::move(options), delegate) {
+    : BrowserImpl(std::move(options), holder, delegate) {
   auto callback =
       Microsoft::WRL::Callback<
           ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>(
@@ -104,10 +105,17 @@ bool BrowserImplWebview2::IsLoading() const {
   return false;
 }
 
-void BrowserImplWebview2::SizeAllocate(const Rect& bounds) {
-  SubwinView::SizeAllocate(bounds);
+void BrowserImplWebview2::SetBounds(RECT rect) {
   if (controller_)
-    controller_->put_Bounds({0, 0, bounds.width(), bounds.height()});
+    controller_->put_Bounds(rect);
+}
+
+bool BrowserImplWebview2::HasFocus() const {
+  return false;
+}
+
+bool BrowserImplWebview2::OnMouseWheel(NativeEvent event) {
+  return false;
 }
 
 HRESULT BrowserImplWebview2::OnEnvCreated(HRESULT res,
@@ -126,16 +134,14 @@ HRESULT BrowserImplWebview2::OnEnvCreated(HRESULT res,
 
 HRESULT BrowserImplWebview2::OnControllerCreated(
     HRESULT res, ICoreWebView2Controller* controller) {
-  if (FAILED(res))
-    return res;
-  if (FAILED(controller->get_CoreWebView2(&webview_)))
+  if (SUCCEEDED(res) && SUCCEEDED(controller->get_CoreWebView2(&webview_))) {
+    controller_ = controller;
+    holder()->OnWebView2Completed(true);
+    return S_OK;
+  } else {
+    holder()->OnWebView2Completed(false);
     return E_FAIL;
-  controller_ = controller;
-  if (window())
-    controller_->put_Bounds({0, 0,
-                             size_allocation().width(),
-                             size_allocation().height()});
-  return S_OK;
+  }
 }
 
 }  // namespace nu

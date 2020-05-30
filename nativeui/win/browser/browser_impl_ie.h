@@ -22,7 +22,9 @@ namespace nu {
 // Implementation of Browser based on IE.
 class BrowserImplIE : public BrowserImpl {
  public:
-  BrowserImplIE(Browser::Options options, Browser* delegate);
+  BrowserImplIE(Browser::Options options,
+                BrowserHolder* holder,
+                Browser* delegate);
   ~BrowserImplIE() override;
 
   void LoadURL(base::string16 str) override;
@@ -39,6 +41,10 @@ class BrowserImplIE : public BrowserImpl {
   void Stop() override;
   bool IsLoading() const override;
 
+  void SetBounds(RECT rect) override;
+  bool HasFocus() const override;
+  bool OnMouseWheel(NativeEvent event) override;
+
   template<typename T>
   bool GetBrowser(Microsoft::WRL::ComPtr<T>* out) {
     return SUCCEEDED(browser_.As(out));
@@ -48,16 +54,7 @@ class BrowserImplIE : public BrowserImpl {
   void set_can_go_forward(bool b) { can_go_forward_ = b; }
 
  protected:
-  // ViewImpl:
-  void SizeAllocate(const Rect& bounds) override;
-  bool HasFocus() const override;
-  bool OnMouseWheel(NativeEvent event) override;
-
-  // SubwinView:
-  LRESULT OnMouseWheelFromSelf(
-      UINT message, WPARAM w_param, LPARAM l_param) override;
-
-  CR_BEGIN_MSG_MAP_EX(BrowserImplIE, SubwinView)
+  CR_BEGIN_MSG_MAP_EX(BrowserImplIE, BrowserImpl)
     CR_MSG_WM_DESTROY(OnDestroy)
     CR_MSG_WM_SETFOCUS(OnSetFocus)
     CR_MESSAGE_HANDLER_EX(WM_PARENTNOTIFY, OnParentNotify)
