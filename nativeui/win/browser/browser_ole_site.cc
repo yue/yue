@@ -6,11 +6,11 @@
 
 #include <shlwapi.h>
 
-#include "nativeui/win/browser_win.h"
+#include "nativeui/win/browser/browser_impl_ie.h"
 
 namespace nu {
 
-BrowserOleSite::BrowserOleSite(BrowserImpl* browser,
+BrowserOleSite::BrowserOleSite(BrowserImplIE* browser,
                                BrowserExternalSink* external_sink)
     : ref_(0), browser_(browser), external_sink_(external_sink) {
 }

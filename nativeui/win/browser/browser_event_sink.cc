@@ -10,7 +10,7 @@
 #include <string>
 
 #include "base/strings/utf_string_conversions.h"
-#include "nativeui/win/browser_win.h"
+#include "nativeui/win/browser/browser_impl_ie.h"
 
 namespace nu {
 
@@ -25,7 +25,7 @@ std::string URLToString(BSTR str) {
 
 }  // namespace
 
-BrowserEventSink::BrowserEventSink(BrowserImpl* browser)
+BrowserEventSink::BrowserEventSink(BrowserImplIE* browser)
     : ref_(0), browser_(browser) {
 }
 

@@ -13,11 +13,11 @@
 
 namespace nu {
 
-class BrowserImpl;
+class BrowserImplIE;
 
 class BrowserEventSink : public IDispatch {
  public:
-  explicit BrowserEventSink(BrowserImpl* browser);
+  explicit BrowserEventSink(BrowserImplIE* browser);
   ~BrowserEventSink();
 
   // Mark we are loading html string.
@@ -52,7 +52,7 @@ class BrowserEventSink : public IDispatch {
   bool IsMainFrame(DISPPARAMS* pDispParams) const;
 
   ULONG ref_;
-  BrowserImpl* browser_;
+  BrowserImplIE* browser_;
 
   bool is_load_html_ = false;
 

@@ -16,14 +16,14 @@
 
 namespace nu {
 
-class BrowserImpl;
+class BrowserImplIE;
 
 class BrowserOleSite : public IOleClientSite,
                        public IOleInPlaceSite,
                        public IOleCommandTarget,
                        public IDocHostUIHandler {
  public:
-  BrowserOleSite(BrowserImpl* browser, BrowserExternalSink* external_sink);
+  BrowserOleSite(BrowserImplIE* browser, BrowserExternalSink* external_sink);
   ~BrowserOleSite();
 
   // IUnknown
@@ -110,7 +110,7 @@ class BrowserOleSite : public IOleClientSite,
 
  private:
   ULONG ref_;
-  BrowserImpl* browser_;
+  BrowserImplIE* browser_;
 
   Microsoft::WRL::ComPtr<BrowserExternalSink> external_sink_;
 

@@ -14,7 +14,7 @@
 
 namespace nu {
 
-BrowserDocumentEvents::BrowserDocumentEvents(BrowserImpl* browser)
+BrowserDocumentEvents::BrowserDocumentEvents(BrowserImplIE* browser)
     : ref_(0), browser_(browser) {
 }
 

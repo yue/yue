@@ -11,11 +11,11 @@
 
 namespace nu {
 
-class BrowserImpl;
+class BrowserImplIE;
 
 class BrowserDocumentEvents : public IDispatch {
  public:
-  explicit BrowserDocumentEvents(BrowserImpl* browser);
+  explicit BrowserDocumentEvents(BrowserImplIE* browser);
   ~BrowserDocumentEvents();
 
   // IUnknown
@@ -45,7 +45,7 @@ class BrowserDocumentEvents : public IDispatch {
 
  private:
   ULONG ref_;
-  BrowserImpl* browser_;
+  BrowserImplIE* browser_;
 
   DISALLOW_COPY_AND_ASSIGN(BrowserDocumentEvents);
 };
