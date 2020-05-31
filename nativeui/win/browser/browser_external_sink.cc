@@ -106,7 +106,7 @@ IFACEMETHODIMP BrowserExternalSink::Invoke(
   return browser_->InvokeBindings(
       base::UTF16ToUTF8(pDispParams->rgvarg[2].bstrVal),
       base::UTF16ToUTF8(pDispParams->rgvarg[1].bstrVal),
-      std::move(*pv.release())) ? S_OK : E_INVALIDARG;
+      std::move(*pv)) ? S_OK : E_INVALIDARG;
 }
 
 }  // namespace nu

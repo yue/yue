@@ -54,7 +54,7 @@ AsarArchive::AsarArchive(base::File file, bool extended_format)
   if (!value || !value->is_dict())
     return;
   content_offset_ += 8 + size;
-  header_ = std::move(*value.release());
+  header_ = std::move(*value);
 }
 
 AsarArchive::~AsarArchive() {

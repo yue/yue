@@ -39,7 +39,7 @@ base::Value JSResultToBaseValue(WebKitJavascriptResult* js_result) {
   std::unique_ptr<base::Value> result = base::JSONReader::Read(json_str);
   if (!result)
     return base::Value();
-  return std::move(*result.release());
+  return std::move(*result);
 }
 
 gboolean OnContextMenu(WebKitWebView* widget,

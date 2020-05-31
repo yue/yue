@@ -416,7 +416,7 @@ void Browser::ExecuteJavaScript(const std::string& code,
     std::string json_str = base::UTF16ToUTF8(json);
     MessageLoop::PostTask([=]() {
       std::unique_ptr<base::Value> pv = base::JSONReader::Read(json_str);
-      callback(success, pv ? std::move(*(pv.release())) : base::Value());
+      callback(success, pv ? std::move(*pv) : base::Value());
     });
   }
 }
