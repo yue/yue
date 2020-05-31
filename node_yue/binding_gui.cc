@@ -1853,13 +1853,17 @@ struct Type<nu::Browser::Options> {
     if (obj.IsEmpty())
       return false;
     Get(context, obj,
-        "devtools", &out->devtools,
-        "contextMenu", &out->context_menu,
+#if defined(OS_MACOSX) || defined(OS_LINUX)
         "allowFileAccessFromFiles", &out->allow_file_access_from_files,
-        "hardwareAcceleration", &out->hardware_acceleration);
-#if defined(OS_WIN) && defined(WEBVIEW2_SUPPORT)
-    Get(context, obj, "webview2Support", &out->webview2_support);
 #endif
+#if defined(OS_LINUX)
+        "hardwareAcceleration", &out->hardware_acceleration,
+#endif
+#if defined(OS_WIN) && defined(WEBVIEW2_SUPPORT)
+        "webview2Support", &out->webview2_support,
+#endif
+        "devtools", &out->devtools,
+        "contextMenu", &out->context_menu);
     return true;
   }
 };

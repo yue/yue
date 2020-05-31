@@ -11,11 +11,8 @@
 #include <memory>
 #include <utility>
 
-#include "base/json/json_reader.h"
 #include "base/strings/utf_string_conversions.h"
-#include "base/win/scoped_bstr.h"
-#include "base/win/scoped_variant.h"
-#include "nativeui/win/browser_win.h"
+#include "nativeui/win/browser/browser_impl_ie.h"
 
 namespace nu {
 
@@ -25,7 +22,7 @@ const DISPID kInvokeId = 1000;
 
 }  // namespace
 
-BrowserExternalSink::BrowserExternalSink(Browser* browser)
+BrowserExternalSink::BrowserExternalSink(BrowserImplIE* browser)
     : ref_(0), browser_(browser) {
 }
 
@@ -70,7 +67,7 @@ IFACEMETHODIMP BrowserExternalSink::GetIDsOfNames(
     __RPC__in_range(0, 16384) UINT cNames,
     LCID lcid,
     __RPC__out_ecount_full(cNames) DISPID *rgDispId) {
-  if (browser_->stop_serving())
+  if (browser_->delegate()->stop_serving())
     return DISP_E_UNKNOWNNAME;
   if (cNames == 1 && base::StringPiece16(rgszNames[0]) == L"postMessage") {
     rgDispId[0] = kInvokeId;
@@ -88,25 +85,15 @@ IFACEMETHODIMP BrowserExternalSink::Invoke(
     _Out_opt_ VARIANT *pVarResult,
     _Out_opt_ EXCEPINFO *pExcepInfo,
     _Out_opt_ UINT *puArgErr) {
-  if (browser_->stop_serving())
+  if (browser_->delegate()->stop_serving())
     return E_INVALIDARG;
   if (dispIdMember != kInvokeId || !(wFlags & DISPATCH_METHOD))
     return E_INVALIDARG;
-  if (pDispParams->cArgs != 3 ||
-      pDispParams->rgvarg[0].vt != VT_BSTR ||
-      pDispParams->rgvarg[1].vt != VT_BSTR ||
-      pDispParams->rgvarg[2].vt != VT_BSTR)
+  if (pDispParams->cArgs != 1 ||
+      pDispParams->rgvarg[0].vt != VT_BSTR)
     return E_INVALIDARG;
-  std::unique_ptr<base::Value> pv = base::JSONReader::Read(
-      base::UTF16ToUTF8(pDispParams->rgvarg[0].bstrVal));
-  if (!pv || !pv->is_list()) {
-    LOG(ERROR) << "Invalid message passed: " << pDispParams->rgvarg[0].bstrVal;
-    return E_INVALIDARG;
-  }
-  return browser_->InvokeBindings(
-      base::UTF16ToUTF8(pDispParams->rgvarg[2].bstrVal),
-      base::UTF16ToUTF8(pDispParams->rgvarg[1].bstrVal),
-      std::move(*pv)) ? S_OK : E_INVALIDARG;
+  return browser_->delegate()->InvokeBindings(
+     base::UTF16ToUTF8(pDispParams->rgvarg[0].bstrVal)) ? S_OK : E_INVALIDARG;
 }
 
 }  // namespace nu

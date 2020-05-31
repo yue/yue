@@ -5,15 +5,17 @@
 #ifndef NATIVEUI_WIN_UTIL_DISPATCH_INVOKE_H_
 #define NATIVEUI_WIN_UTIL_DISPATCH_INVOKE_H_
 
+#include <dispex.h>
+
 #include "base/win/scoped_bstr.h"
 #include "base/win/scoped_variant.h"
 
 namespace nu {
 
-bool Invoke(IDispatchEx* script,
-            const wchar_t* name,
-            WORD flags,
-            base::win::ScopedVariant* result) {
+inline bool Invoke(IDispatchEx* script,
+                   const wchar_t* name,
+                   WORD flags,
+                   base::win::ScopedVariant* result) {
   base::win::ScopedBstr name_str(name);
   DISPID name_id;
   if (FAILED(script->GetDispID(name_str, 0, &name_id)))

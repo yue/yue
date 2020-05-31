@@ -29,8 +29,7 @@ std::string JSStringToString(JSStringRef js) {
 base::Value JSResultToBaseValue(WebKitJavascriptResult* js_result) {
   auto* context = webkit_javascript_result_get_global_context(js_result);
   auto* value = webkit_javascript_result_get_value(js_result);
-  // While manually iterating the value should be more efficient, their API is
-  // such a pain to use.
+  // TODO(zcbenz): Convert types directly instead of using JSON parsing.
   JSStringRef json = JSValueCreateJSONString(context, value, 0, nullptr);
   if (!json)
     return base::Value();
@@ -121,15 +120,13 @@ void OnScriptMessage(WebKitUserContentManager* manager,
                      Browser* browser) {
   if (browser->stop_serving() || !js_result)
     return;
-  base::Value args = JSResultToBaseValue(js_result);
-  if (!args.is_list() || args.GetList().size() != 3 ||
-      !args.GetList()[0].is_string() ||
-      !args.GetList()[1].is_string() ||
-      !args.GetList()[2].is_list())
+  auto* context = webkit_javascript_result_get_global_context(js_result);
+  auto* value = webkit_javascript_result_get_value(js_result);
+  if (!JSValueIsString(context, value))
     return;
-  browser->InvokeBindings(args.GetList()[0].GetString(),
-                          args.GetList()[1].GetString(),
-                          std::move(args.GetList()[2]));
+  JSStringRef str = JSValueToStringCopy(context, value, nullptr);
+  browser->InvokeBindings(JSStringToString(str));
+  JSStringRelease(str);
 }
 
 void OnNullProtocolRequest(WebKitURISchemeRequest* request, gpointer) {

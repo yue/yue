@@ -6,6 +6,7 @@
 #define NATIVEUI_WIN_BROWSER_WIN_H_
 
 #include <memory>
+#include <string>
 
 #include "nativeui/browser.h"
 #include "nativeui/win/subwin_view.h"
@@ -21,14 +22,18 @@ class BrowserHolder : public SubwinView {
   ~BrowserHolder() override;
 
 #if defined(WEBVIEW2_SUPPORT)
-  void OnWebView2Completed(bool success);
+  void OnWebView2Completed(BrowserImpl* sender, bool success);
 #endif
 
+  bool browser_created() const { return browser_created_; }
   BrowserImpl* impl() const { return impl_.get(); }
+
+  Browser* delegate() { return static_cast<Browser*>(SubwinView::delegate()); }
 
  protected:
   // ViewImpl:
   void SizeAllocate(const Rect& bounds) override;
+  void SetFocus(bool focus) override;
   bool HasFocus() const override;
   bool OnMouseWheel(NativeEvent event) override;
 
@@ -42,22 +47,27 @@ class BrowserHolder : public SubwinView {
                             LRESULT* result) override;
 
  private:
+  bool browser_created_ = false;
+
   std::unique_ptr<BrowserImpl> impl_;
 };
 
 // Interface for implementing browsers.
 class BrowserImpl {
  public:
-  BrowserImpl(Browser::Options options,
-              BrowserHolder* holder,
-              Browser* delegate);
+  BrowserImpl(Browser::Options options, BrowserHolder* holder);
   virtual ~BrowserImpl();
+
+  virtual bool IsWebView2() const { return false; }
 
   virtual void LoadURL(base::string16 str) = 0;
   virtual void LoadHTML(base::string16 str, base::string16 base_url) = 0;
   virtual base::string16 GetURL() = 0;
   virtual base::string16 GetTitle() = 0;
-  virtual bool Eval(base::string16 code, base::string16* result) = 0;
+  virtual void SetUserAgent(const std::string& user_agent) = 0;
+  virtual void ExecuteJavaScript(
+      base::string16 code,
+      const Browser::ExecutionCallback& callback) = 0;
 
   virtual void GoBack() = 0;
   virtual bool CanGoBack() const = 0;
@@ -67,8 +77,11 @@ class BrowserImpl {
   virtual void Stop() = 0;
   virtual bool IsLoading() const = 0;
 
+  virtual void UpdateBindings() {}
   virtual void SetBounds(RECT rect) = 0;
+  virtual void Focus() = 0;
   virtual bool HasFocus() const = 0;
+  virtual void OnMove() {}
   virtual bool OnMouseWheel(NativeEvent event) = 0;
 
   virtual bool ProcessWindowMessage(HWND window,
@@ -79,7 +92,7 @@ class BrowserImpl {
 
   Browser::Options& options() { return options_; }
   BrowserHolder* holder() { return holder_; }
-  Browser* delegate() { return delegate_; }
+  Browser* delegate() { return holder_->delegate(); }
 
   WindowImpl* window() { return holder_->window(); }
   HWND hwnd() { return holder_->hwnd(); }
@@ -87,7 +100,6 @@ class BrowserImpl {
  private:
   Browser::Options options_;
   BrowserHolder* holder_;
-  Browser* delegate_;
 };
 
 }  // namespace nu

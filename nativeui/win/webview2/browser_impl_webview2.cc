@@ -4,12 +4,16 @@
 
 #include "nativeui/win/webview2/browser_impl_webview2.h"
 
+#include <string>
 #include <utility>
 
 #include "base/base_paths.h"
 #include "base/base_paths_win.h"
 #include "base/file_version_info.h"
+#include "base/json/json_reader.h"
 #include "base/path_service.h"
+#include "base/strings/utf_string_conversions.h"
+#include "base/win/scoped_co_mem.h"
 
 namespace nu {
 
@@ -42,106 +46,416 @@ base::FilePath GetUserDataDir() {
 
 }  // namespace
 
+// static
+bool BrowserImplWebview2::RegisterProtocol(
+    base::string16 scheme,
+    const Browser::ProtocolHandler& handler) {
+  return false;
+}
+
+// static
+void BrowserImplWebview2::UnregisterProtocol(base::string16 scheme) {
+}
+
 BrowserImplWebview2::BrowserImplWebview2(Browser::Options options,
-                                         BrowserHolder* holder,
-                                         Browser* delegate)
-    : BrowserImpl(std::move(options), holder, delegate) {
+                                         BrowserHolder* holder)
+    : BrowserImpl(std::move(options), holder),
+      weak_factory_(this) {
+  base::WeakPtr<BrowserImplWebview2> self = weak_factory_.GetWeakPtr();
   auto callback =
       Microsoft::WRL::Callback<
           ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>(
-              this, &BrowserImplWebview2::OnEnvCreated);
+              [self](HRESULT res, ICoreWebView2Environment* env) {
+                if (!self)
+                  return E_FAIL;
+                return self->OnEnvCreated(res, env);
+              });
   if (FAILED(::CreateCoreWebView2EnvironmentWithOptions(
                  nullptr, GetUserDataDir().value().c_str(), nullptr,
                  callback.Get()))) {
+    CreationFailed();
     return;
   }
 }
 
 BrowserImplWebview2::~BrowserImplWebview2() {
+  if (controller_) {
+    controller_->Close();
+    controller_->remove_GotFocus(on_got_focus_);
+    controller_->remove_LostFocus(on_lost_focus_);
+  }
+  if (webview_) {
+    webview_->remove_WindowCloseRequested(on_close_);
+    webview_->remove_HistoryChanged(on_history_changed_);
+    webview_->remove_NavigationStarting(on_navigation_starting_);
+    webview_->remove_NavigationCompleted(on_navigation_completed_);
+    webview_->remove_DocumentTitleChanged(on_document_title_changed_);
+    webview_->remove_SourceChanged(on_source_changed_);
+    webview_->remove_WebMessageReceived(on_web_message_received_);
+  }
+}
+
+bool BrowserImplWebview2::IsWebView2() const {
+  return true;
 }
 
 void BrowserImplWebview2::LoadURL(base::string16 str) {
-  if (webview_)
-    webview_->Navigate(str.c_str());
+  if (!webview_)
+    return;
+  bool should_update_bindings = delegate()->HasBindings() && is_first_load_;
+  is_first_load_ = false;
+  if (should_update_bindings) {
+    // The binding script is not added until the first load.
+    UpdateBindings();
+    // Do the load after the binding script is added.
+    base::WeakPtr<BrowserImplWebview2> ref = weak_factory_.GetWeakPtr();
+    pending_load_ = [ref, str]() {
+      if (ref)
+        ref->LoadURL(std::move(str));
+    };
+    return;
+  }
+  webview_->Navigate(str.c_str());
 }
 
 void BrowserImplWebview2::LoadHTML(base::string16 str,
                                    base::string16 base_url) {
+  if (!webview_)
+    return;
+  bool should_update_bindings = delegate()->HasBindings() && is_first_load_;
+  is_first_load_ = false;
+  if (should_update_bindings) {
+    // The binding script is not added until the first load.
+    UpdateBindings();
+    // Do the load after the binding script is added.
+    base::WeakPtr<BrowserImplWebview2> ref = weak_factory_.GetWeakPtr();
+    pending_load_ = [ref, str, base_url]() {
+      if (ref)
+        ref->LoadHTML(std::move(str), std::move(base_url));
+    };
+    return;
+  }
+  // WebView2 does not support setting base URL.
+  webview_->NavigateToString(str.c_str());
 }
 
 base::string16 BrowserImplWebview2::GetURL() {
-  return base::string16();
+  base::win::ScopedCoMem<wchar_t> url;
+  if (webview_)
+    webview_->get_Source(&url);
+  return url.get() ? url.get() : base::string16();
 }
 
 base::string16 BrowserImplWebview2::GetTitle() {
-  return base::string16();
+  base::win::ScopedCoMem<wchar_t> title;
+  if (webview_)
+    webview_->get_DocumentTitle(&title);
+  return title.get() ? title.get() : base::string16();
 }
 
-bool BrowserImplWebview2::Eval(base::string16 code, base::string16* result) {
-  return false;
+void BrowserImplWebview2::SetUserAgent(const std::string& ua) {
+  // WebView2 does not provide API to change user agent.
+}
+
+void BrowserImplWebview2::ExecuteJavaScript(
+    base::string16 code,
+    const Browser::ExecutionCallback& callback) {
+  if (webview_) {
+    auto handler =
+        Microsoft::WRL::Callback<ICoreWebView2ExecuteScriptCompletedHandler>(
+            [callback](HRESULT res, LPCWSTR json) -> HRESULT {
+              if (!callback)
+                return S_OK;
+              base::Value result;
+              if (SUCCEEDED(res)) {
+                auto pv = base::JSONReader::Read(base::UTF16ToUTF8(json));
+                if (pv)
+                  result = std::move(*pv);
+              }
+              // |res| would be S_OK even when the code throws, currently there
+              // is no way to know if the executaion succeeded.
+              callback(SUCCEEDED(res), std::move(result));
+              return S_OK;
+            });
+    webview_->ExecuteScript(code.c_str(), handler.Get());
+  }
 }
 
 void BrowserImplWebview2::GoBack() {
+  if (webview_)
+    webview_->GoBack();
 }
 
 bool BrowserImplWebview2::CanGoBack() const {
-  return false;
+  BOOL can = false;
+  if (webview_)
+    webview_->get_CanGoBack(&can);
+  return can;
 }
 
 void BrowserImplWebview2::GoForward() {
+  if (webview_)
+    webview_->GoForward();
 }
 
 bool BrowserImplWebview2::CanGoForward() const {
-  return false;
+  BOOL can = false;
+  if (webview_)
+    webview_->get_CanGoForward(&can);
+  return can;
 }
 
 void BrowserImplWebview2::Reload() {
+  if (webview_)
+    webview_->Reload();
 }
 
 void BrowserImplWebview2::Stop() {
+  if (webview_)
+    webview_->Stop();
 }
 
 bool BrowserImplWebview2::IsLoading() const {
-  return false;
+  return is_loading_;
+}
+
+void BrowserImplWebview2::UpdateBindings() {
+  if (is_first_load_ || !delegate()->HasBindings() || !webview_)
+    return;
+  // Schedule another update if there is already one.
+  if (is_script_adding_) {
+    pending_script_update_ = true;
+    return;
+  }
+  // Clear current script.
+  if (!script_id_.empty())
+    webview_->RemoveScriptToExecuteOnDocumentCreated(script_id_.c_str());
+  // Add script asyncronously.
+  is_script_adding_ = true;
+  base::WeakPtr<BrowserImplWebview2> ref = weak_factory_.GetWeakPtr();
+  auto callback =
+      Microsoft::WRL::Callback<
+          ICoreWebView2AddScriptToExecuteOnDocumentCreatedCompletedHandler>(
+              [ref](HRESULT res, PCWSTR id) {
+                if (!ref)
+                  return E_FAIL;
+                BrowserImplWebview2* self = ref.get();
+                self->is_script_adding_ = false;
+                self->script_id_ = id;
+                // Some tasks happened during the update.
+                if (self->pending_script_update_) {
+                  self->pending_script_update_ = false;
+                  self->UpdateBindings();
+                }
+                if (self->pending_load_) {
+                  self->pending_load_();
+                  self->pending_load_ = nullptr;
+                }
+                return S_OK;
+              });
+  webview_->AddScriptToExecuteOnDocumentCreated(
+      base::UTF8ToUTF16(delegate()->GetBindingScript()).c_str(),
+      callback.Get());
 }
 
 void BrowserImplWebview2::SetBounds(RECT rect) {
+  if (!controller_)
+    return;
+  // Make sure the visibility is synced with parent subwin.
+  BOOL parent_visible = ::IsWindowVisible(hwnd());
+  BOOL visible = true;
+  controller_->get_IsVisible(&visible);
+  if (visible != parent_visible)
+    controller_->put_IsVisible(parent_visible);
+  // Resize the webview to sync with parent subwin.
+  controller_->put_Bounds(rect);
+}
+
+void BrowserImplWebview2::Focus() {
   if (controller_)
-    controller_->put_Bounds(rect);
+    controller_->MoveFocus(COREWEBVIEW2_MOVE_FOCUS_REASON_PROGRAMMATIC);
 }
 
 bool BrowserImplWebview2::HasFocus() const {
-  return false;
+  return has_focus_;
+}
+
+void BrowserImplWebview2::OnMove() {
+  if (controller_)
+    controller_->NotifyParentWindowPositionChanged();
 }
 
 bool BrowserImplWebview2::OnMouseWheel(NativeEvent event) {
   return false;
 }
 
-HRESULT BrowserImplWebview2::OnEnvCreated(HRESULT res,
-                                          ICoreWebView2Environment* env) {
-  if (FAILED(res))
-    return res;
+HRESULT BrowserImplWebview2::CreationFailed() {
+  holder()->OnWebView2Completed(this, false);
+  return E_FAIL;
+}
+
+void BrowserImplWebview2::OnReady() {
+  // Set options.
+  Microsoft::WRL::ComPtr<ICoreWebView2Settings> settings;
+  if (SUCCEEDED(webview_->get_Settings(&settings))) {
+    settings->put_AreDefaultContextMenusEnabled(options().context_menu);
+    settings->put_AreDevToolsEnabled(options().devtools);
+    settings->put_IsWebMessageEnabled(true);
+  }
+  // Register event handlers.
+  controller_->add_GotFocus(
+      Microsoft::WRL::Callback<
+          ICoreWebView2FocusChangedEventHandler>(
+              this, &BrowserImplWebview2::OnGotFocus).Get(),
+      &on_got_focus_);
+  controller_->add_LostFocus(
+      Microsoft::WRL::Callback<
+          ICoreWebView2FocusChangedEventHandler>(
+              this, &BrowserImplWebview2::OnLostFocus).Get(),
+      &on_lost_focus_);
+  webview_->add_WindowCloseRequested(
+      Microsoft::WRL::Callback<
+          ICoreWebView2WindowCloseRequestedEventHandler>(
+              this, &BrowserImplWebview2::OnClose).Get(),
+      &on_close_);
+  webview_->add_HistoryChanged(
+      Microsoft::WRL::Callback<
+          ICoreWebView2HistoryChangedEventHandler>(
+              this, &BrowserImplWebview2::OnHistoryChanged).Get(),
+      &on_history_changed_);
+  webview_->add_NavigationStarting(
+      Microsoft::WRL::Callback<
+          ICoreWebView2NavigationStartingEventHandler>(
+              this, &BrowserImplWebview2::OnNavigationStarting).Get(),
+      &on_navigation_starting_);
+  webview_->add_NavigationCompleted(
+      Microsoft::WRL::Callback<
+          ICoreWebView2NavigationCompletedEventHandler>(
+              this, &BrowserImplWebview2::OnNavigationCompleted).Get(),
+      &on_navigation_completed_);
+  webview_->add_DocumentTitleChanged(
+      Microsoft::WRL::Callback<
+          ICoreWebView2DocumentTitleChangedEventHandler>(
+              this, &BrowserImplWebview2::OnDocumentTitleChanged).Get(),
+      &on_document_title_changed_);
+  webview_->add_SourceChanged(
+      Microsoft::WRL::Callback<
+          ICoreWebView2SourceChangedEventHandler>(
+              this, &BrowserImplWebview2::OnSourceChanged).Get(),
+      &on_source_changed_);
+  webview_->add_WebMessageReceived(
+      Microsoft::WRL::Callback<
+          ICoreWebView2WebMessageReceivedEventHandler>(
+              this, &BrowserImplWebview2::OnWebMessageReceived).Get(),
+      &on_web_message_received_);
+  webview_->AddWebResourceRequestedFilter(
+      L"*", COREWEBVIEW2_WEB_RESOURCE_CONTEXT_ALL);
+  // Notify the holder.
+  holder()->OnWebView2Completed(this, true);
+}
+
+HRESULT BrowserImplWebview2::OnEnvCreated(
+    HRESULT res, ICoreWebView2Environment* env) {
+  if (options().webview2_force_ie || FAILED(res))
+    return CreationFailed();
+  base::WeakPtr<BrowserImplWebview2> self = weak_factory_.GetWeakPtr();
   auto callback =
       Microsoft::WRL::Callback<
           ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>(
-              this, &BrowserImplWebview2::OnControllerCreated);
+              [self](HRESULT res, ICoreWebView2Controller* controller) {
+                if (!self)
+                  return E_FAIL;
+                return self->OnControllerCreated(res, controller);
+              });
   if (FAILED(env->CreateCoreWebView2Controller(hwnd(), callback.Get())))
-    return E_FAIL;
+    return CreationFailed();
   env_ = env;
   return S_OK;
 }
 
 HRESULT BrowserImplWebview2::OnControllerCreated(
     HRESULT res, ICoreWebView2Controller* controller) {
-  if (SUCCEEDED(res) && SUCCEEDED(controller->get_CoreWebView2(&webview_))) {
-    controller_ = controller;
-    holder()->OnWebView2Completed(true);
-    return S_OK;
+  if (FAILED(res) || FAILED(controller->get_CoreWebView2(&webview_)))
+    return CreationFailed();
+  controller_ = controller;
+  OnReady();
+  return S_OK;
+}
+
+HRESULT BrowserImplWebview2::OnGotFocus(ICoreWebView2Controller* sender,
+                                        IUnknown* args) {
+  if (window())
+    window()->focus_manager()->TakeFocus(holder());
+  has_focus_ = true;
+  return S_OK;
+}
+
+HRESULT BrowserImplWebview2::OnLostFocus(ICoreWebView2Controller*, IUnknown*) {
+  has_focus_ = false;
+  return S_OK;
+}
+
+HRESULT BrowserImplWebview2::OnClose(ICoreWebView2* sender, IUnknown* args) {
+  delegate()->on_close.Emit(delegate());
+  return S_OK;
+}
+
+HRESULT BrowserImplWebview2::OnHistoryChanged(ICoreWebView2*, IUnknown*) {
+  delegate()->on_update_command.Emit(delegate());
+  return S_OK;
+}
+
+HRESULT BrowserImplWebview2::OnNavigationStarting(
+    ICoreWebView2*, ICoreWebView2NavigationStartingEventArgs* args) {
+  is_loading_ = true;
+  delegate()->on_change_loading.Emit(delegate());
+
+  base::win::ScopedCoMem<wchar_t> url;
+  args->get_Uri(&url);
+  delegate()->on_start_navigation.Emit(
+      delegate(), url.get() ? base::UTF16ToUTF8(url.get()) : std::string());
+  return S_OK;
+}
+
+HRESULT BrowserImplWebview2::OnNavigationCompleted(
+    ICoreWebView2*, ICoreWebView2NavigationCompletedEventArgs* args) {
+  is_loading_ = false;
+  delegate()->on_change_loading.Emit(delegate());
+
+  BOOL success = false;
+  args->get_IsSuccess(&success);
+  std::string url = delegate()->GetURL();
+  if (success) {
+    delegate()->on_finish_navigation.Emit(delegate(), url);
   } else {
-    holder()->OnWebView2Completed(false);
-    return E_FAIL;
+    COREWEBVIEW2_WEB_ERROR_STATUS error =
+        COREWEBVIEW2_WEB_ERROR_STATUS_UNKNOWN;
+    args->get_WebErrorStatus(&error);
+    delegate()->on_fail_navigation.Emit(delegate(), url,
+                                        static_cast<int>(error));
   }
+  return S_OK;
+}
+
+HRESULT BrowserImplWebview2::OnDocumentTitleChanged(
+    ICoreWebView2*, IUnknown* args) {
+  delegate()->on_update_title.Emit(delegate(), delegate()->GetTitle());
+  return S_OK;
+}
+
+HRESULT BrowserImplWebview2::OnSourceChanged(
+    ICoreWebView2*, ICoreWebView2SourceChangedEventArgs* args) {
+  delegate()->on_commit_navigation.Emit(delegate(), delegate()->GetURL());
+  return S_OK;
+}
+
+HRESULT BrowserImplWebview2::OnWebMessageReceived(
+    ICoreWebView2*, ICoreWebView2WebMessageReceivedEventArgs* args) {
+  base::win::ScopedCoMem<wchar_t> message;
+  if (FAILED(args->TryGetWebMessageAsString(&message)) || !message.get())
+    return E_INVALIDARG;
+  return delegate()->InvokeBindings(
+     base::UTF16ToUTF8(message.get())) ? S_OK : E_INVALIDARG;
 }
 
 }  // namespace nu

@@ -1647,13 +1647,17 @@ struct Type<nu::Browser::Options> {
     if (GetType(state, index) == LuaType::Table) {
       RawGetAndPop(
           state, index,
-          "devtools", &out->devtools,
-          "contextmenu", &out->context_menu,
+#if defined(OS_MACOSX) || defined(OS_LINUX)
           "allowfileaccessfromfiles", &out->allow_file_access_from_files,
-          "hardwareacceleration", &out->hardware_acceleration);
-#if defined(OS_WIN) && defined(WEBVIEW2_SUPPORT)
-      RawGetAndPop(state, index, "webview2support", &out->webview2_support);
 #endif
+#if defined(OS_LINUX)
+          "hardwareacceleration", &out->hardware_acceleration,
+#endif
+#if defined(OS_WIN) && defined(WEBVIEW2_SUPPORT)
+          "webview2support", &out->webview2_support,
+#endif
+          "devtools", &out->devtools,
+          "contextmenu", &out->context_menu);
     }
     return true;
   }

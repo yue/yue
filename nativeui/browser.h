@@ -25,10 +25,16 @@ class NATIVEUI_EXPORT Browser : public View {
   struct Options {
     bool devtools = false;
     bool context_menu = false;
+#if defined(OS_MACOSX) || defined(OS_LINUX)
     bool allow_file_access_from_files = false;
+#endif
+#if defined(OS_LINUX)
     bool hardware_acceleration = true;
+#endif
 #if defined(OS_WIN) && defined(WEBVIEW2_SUPPORT)
     bool webview2_support = false;
+    // Used for testing the creation failure of WebView2.
+    bool webview2_force_ie = false;
 #endif
   };
 
@@ -45,6 +51,9 @@ class NATIVEUI_EXPORT Browser : public View {
   // View:
   const char* GetClassName() const override;
 
+#if defined(OS_WIN)
+  bool IsWebView2() const;
+#endif
   void LoadURL(const std::string& url);
   void LoadHTML(const std::string& html, const std::string& base_url);
   std::string GetURL();
@@ -64,6 +73,7 @@ class NATIVEUI_EXPORT Browser : public View {
   void SetBindingName(const std::string& name);
   void AddRawBinding(const std::string& name, const BindingFunc& func);
   void RemoveBinding(const std::string& name);
+  bool HasBindings() const;
 
   // Automatically deduce argument types.
   template<typename Sig>
@@ -91,15 +101,17 @@ class NATIVEUI_EXPORT Browser : public View {
   Signal<void(Browser*, const std::string&)> on_finish_navigation;
 
   // Internal: Called from web pages to invoke native bindings.
-  bool InvokeBindings(const std::string& key,
-                      const std::string& name,
-                      base::Value args);
+  bool InvokeBindings(const std::string& json_arg);
 
   // Internal: Generate the user script to inject bindings.
   std::string GetBindingScript();
 
   // Internal: Access to bindings properties.
   bool stop_serving() const { return stop_serving_; }
+
+#if defined(OS_WIN) && defined(WEBVIEW2_SUPPORT)
+  std::function<void()>& pending_load() { return pending_load_; }
+#endif
 
  protected:
   ~Browser() override;
@@ -112,6 +124,11 @@ class NATIVEUI_EXPORT Browser : public View {
   // Prevent malicous calls to native bindings.
   std::string security_key_;
   bool stop_serving_ = false;
+
+#if defined(OS_WIN) && defined(WEBVIEW2_SUPPORT)
+  // The pending op when LoadURL is called before webview is ready.
+  std::function<void()> pending_load_;
+#endif
 
   std::string binding_name_;
   std::map<std::string, BindingFunc> bindings_;

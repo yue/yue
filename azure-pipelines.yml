@@ -19,6 +19,13 @@ jobs:
       x86:
         TARGET_CPU: x86
   steps:
+  - powershell: |
+      Start-BitsTransfer -Source 'https://go.microsoft.com/fwlink/?linkid=2084649&Channel=Canary&language=en-us' -Destination EdgeSetup.exe
+      if (-not (Test-Path 'EdgeSetup.exe')) {
+        Throw 'Failed to download Edge'
+      }
+      Start-Process -Wait -FilePath './EdgeSetup.exe' -ArgumentList '/silent', '/install'
+    displayName: Install Edge Canary
   - template: building/azure-pipelines-template.yml
 
 - job: macos_build

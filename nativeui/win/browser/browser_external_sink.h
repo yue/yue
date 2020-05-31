@@ -11,11 +11,11 @@
 
 namespace nu {
 
-class Browser;
+class BrowserImplIE;
 
 class BrowserExternalSink : public IDispatch {
  public:
-  explicit BrowserExternalSink(Browser* browser);
+  explicit BrowserExternalSink(BrowserImplIE* browser);
   ~BrowserExternalSink();
 
   // IUnknown
@@ -45,7 +45,7 @@ class BrowserExternalSink : public IDispatch {
 
  private:
   ULONG ref_;
-  Browser* browser_;
+  BrowserImplIE* browser_;
 
   DISALLOW_COPY_AND_ASSIGN(BrowserExternalSink);
 };

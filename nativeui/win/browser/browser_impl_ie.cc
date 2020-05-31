@@ -9,53 +9,55 @@
 #include <utility>
 
 #include "base/strings/utf_string_conversions.h"
-#include "base/win/scoped_bstr.h"
-#include "base/win/scoped_variant.h"
 #include "nativeui/events/win/event_win.h"
+#include "nativeui/message_loop.h"
+#include "nativeui/win/browser/browser_protocol_factory.h"
 #include "nativeui/win/browser/browser_util.h"
-#include "nativeui/win/util/dispatch_invoke.h"
 #include "nativeui/win/util/hwnd_util.h"
 
 namespace nu {
 
 namespace {
 
-// Convert a VARIANT to JSON string.
-bool VARIANTToJSON(IDispatchEx* script,
-                   const base::win::ScopedVariant& value,
-                   base::string16* result) {
-  // Can't pass empty VARIANT to IE.
-  if (value.type() == VT_EMPTY) {
-    *result = L"undefined";
-    return true;
-  }
-  // Find the javascript JSON object.
-  base::win::ScopedVariant json_var;
-  if (!Invoke(script, L"JSON", DISPATCH_PROPERTYGET, &json_var))
-    return false;
-  Microsoft::WRL::ComPtr<IDispatch> json_disp =
-      static_cast<IDispatch*>(json_var.ptr()->pdispVal);
-  Microsoft::WRL::ComPtr<IDispatchEx> json_obj;
-  if (FAILED(json_disp.As(&json_obj)) || !json_obj)
-    return false;
-  // Invoke the JSON.stringify method.
-  base::win::ScopedVariant str;
-  if (!Invoke(json_obj.Get(), L"stringify", DISPATCH_METHOD, &str, value))
-    return false;
-  *result = str.ptr()->bstrVal;
-  return true;
-}
+// Stores the protocol factories.
+std::map<base::string16,
+         Microsoft::WRL::ComPtr<BrowserProtocolFactory>> g_protocol_factories;
 
 }  // namespace
 
-BrowserImplIE::BrowserImplIE(Browser::Options options,
-                             BrowserHolder* holder,
-                             Browser* delegate)
-    : BrowserImpl(std::move(options), holder, delegate),
-      external_sink_(new BrowserExternalSink(delegate)),
+// static
+bool BrowserImplIE::RegisterProtocol(base::string16 scheme,
+                                     const Browser::ProtocolHandler& handler) {
+  Microsoft::WRL::ComPtr<IInternetSession> session;
+  if (FAILED(::CoInternetGetSession(0, &session, 0)))
+    return false;
+  Microsoft::WRL::ComPtr<BrowserProtocolFactory> factory =
+      new BrowserProtocolFactory(handler);
+  g_protocol_factories[scheme] = factory;
+  session->RegisterNameSpace(factory.Get(),
+                             BrowserProtocolFactory::CLSID_BROWSER_PROTOCOL,
+                             scheme.c_str(),
+                             0, NULL, 0);
+  return true;
+}
+
+// static
+void BrowserImplIE::UnregisterProtocol(base::string16 scheme) {
+  Microsoft::WRL::ComPtr<IInternetSession> session;
+  if (FAILED(::CoInternetGetSession(0, &session, 0)))
+    return;
+  session->UnregisterNameSpace(g_protocol_factories[scheme].Get(),
+                               scheme.c_str());
+  g_protocol_factories.erase(scheme);
+}
+
+BrowserImplIE::BrowserImplIE(Browser::Options options, BrowserHolder* holder)
+    : BrowserImpl(std::move(options), holder),
+      external_sink_(new BrowserExternalSink(this)),
       ole_site_(new BrowserOleSite(this, external_sink_.Get())),
       event_sink_(new BrowserEventSink(this)),
-      document_events_(new BrowserDocumentEvents(this)) {
+      document_events_(new BrowserDocumentEvents(this)),
+      weak_factory_(this) {
   // Use the latest IE version.
   FixIECompatibleMode();
 
@@ -140,22 +142,30 @@ base::string16 BrowserImplIE::GetTitle() {
   return base::string16(title);
 }
 
-bool BrowserImplIE::Eval(base::string16 code, base::string16* result) {
-  if (!document_)
-    return false;
-  Microsoft::WRL::ComPtr<IDispatch> script_disp;
-  if (FAILED(document_->get_Script(&script_disp)) || !script_disp)
-    return false;
-  Microsoft::WRL::ComPtr<IDispatchEx> script;
-  if (FAILED(script_disp.As(&script)))
-    return false;
-  base::win::ScopedVariant arg(code.c_str(), static_cast<UINT>(code.length()));
-  base::win::ScopedVariant ret;
-  if (!Invoke(script.Get(), L"eval", DISPATCH_METHOD, &ret, arg))
-    return false;
-  if (result && !VARIANTToJSON(script.Get(), ret, result))
-    return false;
-  return true;
+void BrowserImplIE::SetUserAgent(const std::string& ua) {
+  // Unfortunately we can only set global user agent.
+  ::UrlMkSetSessionOption(URLMON_OPTION_USERAGENT_REFRESH, NULL, 0, 0);
+  ::UrlMkSetSessionOption(URLMON_OPTION_USERAGENT,
+                          (LPVOID)ua.c_str(), (WORD)ua.size(), 0);  // NOLINT
+}
+
+void BrowserImplIE::ExecuteJavaScript(
+    base::string16 code,
+    const Browser::ExecutionCallback& callback) {
+  // IE executes the script syncronously but we need async behavior to keep
+  // consistency with other platforms, so delay the task to next tick.
+  //
+  // Note that std::function does not support move-only types, so we have to
+  // keep a copy of all arguments instead of using std::bind.
+  auto ref = weak_factory_.GetWeakPtr();
+  MessageLoop::PostTask([ref, code, callback]() {
+    if (ref) {
+      base::Value result;
+      bool success = ref->Eval(code, &result);
+      if (callback)
+        callback(success, std::move(result));
+    }
+  });
 }
 
 void BrowserImplIE::GoBack() {
@@ -200,6 +210,14 @@ void BrowserImplIE::SetBounds(RECT rect) {
   in_place->SetObjectRects(&rect, &rect);
 }
 
+void BrowserImplIE::Focus() {
+  Microsoft::WRL::ComPtr<IOleInPlaceActiveObject> in_place_active;
+  if (FAILED(browser_.As(&in_place_active)))
+    return;
+  in_place_active->OnFrameWindowActivate(TRUE);
+  in_place_active->OnDocWindowActivate(TRUE);
+}
+
 bool BrowserImplIE::HasFocus() const {
   return ::GetFocus() == browser_hwnd_;
 }
@@ -217,21 +235,17 @@ bool BrowserImplIE::OnMouseWheel(NativeEvent event) {
   return true;
 }
 
+bool BrowserImplIE::GetScript(Microsoft::WRL::ComPtr<IDispatchEx>* out) {
+  if (!document_)
+    return false;
+  Microsoft::WRL::ComPtr<IDispatch> script_disp;
+  return SUCCEEDED(document_->get_Script(&script_disp)) && script_disp &&
+         SUCCEEDED(script_disp.As(out));
+}
+
 void BrowserImplIE::OnDestroy() {
   // The HWND of the window can be destroyed before the destructor is called.
   CleanupBrowserHWND();
-}
-
-void BrowserImplIE::OnSetFocus(HWND hwnd) {
-  // Still mark this control as focused.
-  holder()->OnSetFocus(hwnd);
-  SetMsgHandled(false);
-  // But move the focus to the IE control.
-  Microsoft::WRL::ComPtr<IOleInPlaceActiveObject> in_place_active;
-  if (FAILED(browser_.As(&in_place_active)))
-    return;
-  in_place_active->OnFrameWindowActivate(TRUE);
-  in_place_active->OnDocWindowActivate(TRUE);
 }
 
 LRESULT BrowserImplIE::OnParentNotify(UINT msg, WPARAM w_param, LPARAM) {
@@ -244,6 +258,19 @@ LRESULT BrowserImplIE::OnParentNotify(UINT msg, WPARAM w_param, LPARAM) {
     SetMsgHandled(false);
   }
   return 0;
+}
+
+bool BrowserImplIE::Eval(base::string16 code, base::Value* result) {
+  Microsoft::WRL::ComPtr<IDispatchEx> script;
+  if (!GetScript(&script))
+    return false;
+  base::win::ScopedVariant arg(code.c_str(), static_cast<UINT>(code.length()));
+  base::win::ScopedVariant ret;
+  if (!Invoke(script.Get(), L"eval", DISPATCH_METHOD, &ret, arg))
+    return false;
+  if (result)
+    *result = VARIANTToValue(script.Get(), ret);
+  return true;
 }
 
 void BrowserImplIE::ReceiveBrowserHWND() {
@@ -323,6 +350,10 @@ LRESULT BrowserImplIE::BrowserWndProc(HWND hwnd,
   auto* self = static_cast<BrowserImplIE*>(holder->impl());
   // Interpret key shortcuts.
   switch (message) {
+    case WM_SETFOCUS:
+      if (holder->window())
+        holder->window()->focus_manager()->TakeFocus(holder);
+      break;
     case WM_KEYUP:
     case WM_KEYDOWN:
       // Ask if ViewImpl wants to handle the key.

@@ -85,6 +85,7 @@ void SubwinView::SetFocus(bool focus) {
   } else {
     if (window())
       window()->focus_manager()->RemoveFocus(this);
+    // Keyboard focus would be moved to parent hwnd.
     ::SendMessage(hwnd(), WM_KILLFOCUS, 0, 0L);
   }
 }

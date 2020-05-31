@@ -22,9 +22,11 @@ const luaFiles = {
 }
 if (targetOs == 'linux')
   strip(`out/Release/${luaFiles[targetOs]}`)
-createZip({withLicense: true})
-  .addFile(`out/Release/${luaFiles[targetOs]}`, 'out/Release')
-  .writeToFile(`lua_yue_lua_5.3_${version}_${targetOs}_${targetCpu}`)
+const luaZip = createZip({withLicense: true})
+if (targetOs == 'win')
+  luaZip.addFile('out/Release/WebView2Loader.dll', 'out/Release')
+luaZip.addFile(`out/Release/${luaFiles[targetOs]}`, 'out/Release')
+      .writeToFile(`lua_yue_lua_5.3_${version}_${targetOs}_${targetCpu}`)
 
 // Zip sources, but do it for x64 on CI.
 if (process.env.CI != 'true' || targetCpu == 'x64')

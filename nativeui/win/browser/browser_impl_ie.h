@@ -10,6 +10,9 @@
 #include <mshtml.h>
 #include <wrl.h>
 
+#include <string>
+
+#include "base/memory/weak_ptr.h"
 #include "nativeui/win/browser/browser_document_events.h"
 #include "nativeui/win/browser/browser_event_sink.h"
 #include "nativeui/win/browser/browser_external_sink.h"
@@ -22,16 +25,21 @@ namespace nu {
 // Implementation of Browser based on IE.
 class BrowserImplIE : public BrowserImpl {
  public:
-  BrowserImplIE(Browser::Options options,
-                BrowserHolder* holder,
-                Browser* delegate);
+  static bool RegisterProtocol(base::string16 scheme,
+                               const Browser::ProtocolHandler& handler);
+  static void UnregisterProtocol(base::string16 scheme);
+
+  BrowserImplIE(Browser::Options options, BrowserHolder* holder);
   ~BrowserImplIE() override;
 
   void LoadURL(base::string16 str) override;
   void LoadHTML(base::string16 str, base::string16 base_url) override;
   base::string16 GetURL() override;
   base::string16 GetTitle() override;
-  bool Eval(base::string16 code, base::string16* result) override;
+  void SetUserAgent(const std::string& user_agent) override;
+  void ExecuteJavaScript(
+      base::string16 code,
+      const Browser::ExecutionCallback& callback) override;
 
   void GoBack() override;
   bool CanGoBack() const override;
@@ -42,8 +50,11 @@ class BrowserImplIE : public BrowserImpl {
   bool IsLoading() const override;
 
   void SetBounds(RECT rect) override;
+  void Focus() override;
   bool HasFocus() const override;
   bool OnMouseWheel(NativeEvent event) override;
+
+  bool GetScript(Microsoft::WRL::ComPtr<IDispatchEx>* out);
 
   template<typename T>
   bool GetBrowser(Microsoft::WRL::ComPtr<T>* out) {
@@ -56,7 +67,6 @@ class BrowserImplIE : public BrowserImpl {
  protected:
   CR_BEGIN_MSG_MAP_EX(BrowserImplIE, BrowserImpl)
     CR_MSG_WM_DESTROY(OnDestroy)
-    CR_MSG_WM_SETFOCUS(OnSetFocus)
     CR_MESSAGE_HANDLER_EX(WM_PARENTNOTIFY, OnParentNotify)
   CR_END_MSG_MAP()
 
@@ -64,9 +74,10 @@ class BrowserImplIE : public BrowserImpl {
   friend class BrowserEventSink;
 
   void OnDestroy();
-  void OnSetFocus(HWND hwnd);
   LRESULT OnParentNotify(UINT msg, WPARAM w_param, LPARAM l_param);
   LRESULT IgnoreEvent(UINT msg, WPARAM w_param, LPARAM l_param);
+
+  bool Eval(base::string16 code, base::Value* result);
 
   // Get the HWND of the IE control and add hooks.
   void ReceiveBrowserHWND();
@@ -100,6 +111,8 @@ class BrowserImplIE : public BrowserImpl {
   // Browser states.
   bool can_go_back_ = false;
   bool can_go_forward_ = false;
+
+  base::WeakPtrFactory<BrowserImplIE> weak_factory_;
 };
 
 }  // namespace nu

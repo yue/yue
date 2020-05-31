@@ -4,14 +4,14 @@
 
 #include "nativeui/browser.h"
 
+#include <memory>
 #include <utility>
 
 #include "base/base64.h"
+#include "base/json/json_reader.h"
 #include "base/json/string_escape.h"
 #include "base/rand_util.h"
 #include "base/strings/stringprintf.h"
-
-#include "nativeui/protocol_file_job.h"
 
 namespace nu {
 
@@ -58,11 +58,27 @@ void Browser::RemoveBinding(const std::string& name) {
     PlatformUpdateBindings();
 }
 
-bool Browser::InvokeBindings(const std::string& key,
-                             const std::string& method,
-                             base::Value args) {
+bool Browser::HasBindings() const {
+  return !bindings_.empty();
+}
+
+bool Browser::InvokeBindings(const std::string& json_str) {
   if (stop_serving_)
     return false;
+
+  std::unique_ptr<base::Value> tup = base::JSONReader::Read(json_str);
+  if (!tup)
+    return false;
+  if (!tup->is_list() || tup->GetList().size() != 3 ||
+      !tup->GetList()[0].is_string() ||
+      !tup->GetList()[1].is_string() ||
+      !tup->GetList()[2].is_list())
+    return false;
+
+  const std::string& key = tup->GetList()[0].GetString();
+  const std::string& method = tup->GetList()[1].GetString();
+  base::Value args = std::move(tup->GetList()[2]);
+
   if (key != security_key_) {
     stop_serving_ = true;
     LOG(ERROR) << "Recevied invalid key, stop serving navite bindings";
@@ -92,19 +108,17 @@ std::string Browser::GetBindingScript() {
     code += base::StringPrintf(
         "binding[\"%s\"] = function() {"
         "  var args = Array.prototype.slice.call(arguments);"
-#if defined(OS_WIN)
-        // On WebKit we can only pass one argument.
-        "  external.postMessage(key, \"%s\", JSON.stringify(args));"
-#else
-        "  external.postMessage([key, \"%s\", args]);"
-#endif
+        "  external.postMessage(JSON.stringify([key, \"%s\", args]));"
         "};",
         it.first.c_str(), it.first.c_str());
   }
   code += base::StringPrintf("})(\"%s\", %s, %s);",
                              security_key_.c_str(),
 #if defined(OS_WIN)
-                             "window.external",
+#if defined(WEBVIEW2_SUPPORT)
+                             IsWebView2() ? "window.chrome.webview" :
+#endif
+                                            "window.external",
 #else
                              "window.webkit.messageHandlers.yue",
 #endif

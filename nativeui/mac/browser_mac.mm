@@ -35,15 +35,9 @@
       didReceiveScriptMessage:(WKScriptMessage*)message {
   if (shell_->stop_serving() || ![message.name isEqualToString:@"yue"])
     return;
-  base::Value args = nu::NSValueToBaseValue(message.body);
-  if (!args.is_list() || args.GetList().size() != 3 ||
-      !args.GetList()[0].is_string() ||
-      !args.GetList()[1].is_string() ||
-      !args.GetList()[2].is_list())
+  if (![message.body isKindOfClass:[NSString class]])
     return;
-  shell_->InvokeBindings(args.GetList()[0].GetString(),
-                         args.GetList()[1].GetString(),
-                         std::move(args.GetList()[2]));
+  shell_->InvokeBindings(base::SysNSStringToUTF8(message.body));
 }
 
 @end

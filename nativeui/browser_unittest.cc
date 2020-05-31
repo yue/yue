@@ -11,10 +11,25 @@
 #include "nativeui/nativeui.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-class BrowserTest : public testing::Test {
+enum TestOptions {
+  DEFAULT,
+#if defined(OS_WIN) && defined(WEBVIEW2_SUPPORT)
+  WEBVIEW2,
+  WEBVIEW2_IE,
+#endif
+};
+
+class BrowserTest : public testing::TestWithParam<TestOptions> {
  protected:
   void SetUp() override {
-    browser_ = new nu::Browser(nu::Browser::Options());
+    nu::Browser::Options options;
+#if defined(OS_WIN) && defined(WEBVIEW2_SUPPORT)
+    if (GetParam() == WEBVIEW2 || GetParam() == WEBVIEW2_IE)
+      options.webview2_support = true;
+    if (GetParam() == WEBVIEW2_IE)
+      options.webview2_force_ie = true;
+#endif
+    browser_ = new nu::Browser(options);
   }
 
   nu::Lifetime lifetime_;
@@ -22,7 +37,30 @@ class BrowserTest : public testing::Test {
   scoped_refptr<nu::Browser> browser_;
 };
 
-TEST_F(BrowserTest, LoadURL) {
+#if defined(OS_WIN) && defined(WEBVIEW2_SUPPORT)
+TEST_P(BrowserTest, WebView2) {
+  TestOptions param = GetParam();
+  browser_->on_finish_navigation.Connect([=](nu::Browser* browser,
+                                             const std::string& url) {
+    nu::MessageLoop::Quit();
+    if (param == DEFAULT)
+      EXPECT_EQ(browser->IsWebView2(), false);
+    else if (param == WEBVIEW2)
+      EXPECT_EQ(browser->IsWebView2(), true);
+    else if (param == WEBVIEW2_IE)
+      EXPECT_EQ(browser->IsWebView2(), false);
+  });
+  browser_->LoadURL("about:blank");
+  nu::MessageLoop::Run();
+}
+#endif
+
+TEST_P(BrowserTest, DestroyAndCreate) {
+  browser_ = nullptr;
+  browser_ = new nu::Browser(nu::Browser::Options());
+}
+
+TEST_P(BrowserTest, LoadURL) {
   browser_->on_finish_navigation.Connect([](nu::Browser* browser,
                                             const std::string& url) {
     nu::MessageLoop::Quit();
@@ -35,7 +73,7 @@ TEST_F(BrowserTest, LoadURL) {
   nu::MessageLoop::Run();
 }
 
-TEST_F(BrowserTest, LoadHTML) {
+TEST_P(BrowserTest, LoadHTML) {
   browser_->on_finish_navigation.Connect([](nu::Browser*,
                                             const std::string& url) {
     nu::MessageLoop::Quit();
@@ -47,9 +85,9 @@ TEST_F(BrowserTest, LoadHTML) {
   nu::MessageLoop::Run();
 }
 
-TEST_F(BrowserTest, Navigation) {
+TEST_P(BrowserTest, Navigation) {
   int state = 0;
-  const std::string u = "about:blank";
+  const std::string u = "http://example.com/";
   browser_->on_start_navigation.Connect([&](nu::Browser*,
                                             const std::string& url) {
     EXPECT_EQ(state, 0);
@@ -74,7 +112,7 @@ TEST_F(BrowserTest, Navigation) {
   nu::MessageLoop::Run();
 }
 
-TEST_F(BrowserTest, LoadHTMLNavigation) {
+TEST_P(BrowserTest, LoadHTMLNavigation) {
   bool start_called = false;
   bool commit_called = false;
   bool finish_called = false;
@@ -100,7 +138,7 @@ TEST_F(BrowserTest, LoadHTMLNavigation) {
   nu::MessageLoop::Run();
 }
 
-TEST_F(BrowserTest, FailNavigation) {
+TEST_P(BrowserTest, FailNavigation) {
   browser_->on_finish_navigation.Connect([](nu::Browser*, const std::string&) {
     ASSERT_TRUE(false) << "Should not emit FinishNavigation";
   });
@@ -118,7 +156,7 @@ TEST_F(BrowserTest, FailNavigation) {
   nu::MessageLoop::Run();
 }
 
-TEST_F(BrowserTest, LoadHTMLWithScript) {
+TEST_P(BrowserTest, LoadHTMLWithScript) {
   browser_->on_finish_navigation.Connect([](nu::Browser* browser,
                                             const std::string& url) {
     browser->ExecuteJavaScript("window.test",
@@ -136,7 +174,11 @@ TEST_F(BrowserTest, LoadHTMLWithScript) {
   nu::MessageLoop::Run();
 }
 
-TEST_F(BrowserTest, LoadHTMLBaseURL) {
+TEST_P(BrowserTest, LoadHTMLBaseURL) {
+#if defined(OS_WIN) && defined(WEBVIEW2_SUPPORT)
+  if (browser_->IsWebView2())
+    return;
+#endif
   browser_->on_finish_navigation.Connect([](nu::Browser* browser,
                                             const std::string& url) {
     browser->ExecuteJavaScript("var a = document.createElement('a');"
@@ -156,7 +198,7 @@ TEST_F(BrowserTest, LoadHTMLBaseURL) {
   nu::MessageLoop::Run();
 }
 
-TEST_F(BrowserTest, Title) {
+TEST_P(BrowserTest, Title) {
   std::string next_title = "t1";
   browser_->on_update_title.Connect([&](nu::Browser* browser,
                                         const std::string& title) {
@@ -181,7 +223,11 @@ TEST_F(BrowserTest, Title) {
   nu::MessageLoop::Run();
 }
 
-TEST_F(BrowserTest, UserAgent) {
+TEST_P(BrowserTest, UserAgent) {
+#if defined(OS_WIN) && defined(WEBVIEW2_SUPPORT)
+  if (browser_->IsWebView2())
+    return;
+#endif
   std::string user_agent = "MyBrowser v1.0";
   browser_->SetUserAgent(user_agent);
   browser_->on_finish_navigation.Connect([&](nu::Browser* browser,
@@ -199,7 +245,7 @@ TEST_F(BrowserTest, UserAgent) {
   nu::MessageLoop::Run();
 }
 
-TEST_F(BrowserTest, ExecuteJavaScript) {
+TEST_P(BrowserTest, ExecuteJavaScript) {
   browser_->on_finish_navigation.Connect([](nu::Browser* browser,
                                             const std::string& url) {
     browser->ExecuteJavaScript("location.href",
@@ -216,7 +262,7 @@ TEST_F(BrowserTest, ExecuteJavaScript) {
   nu::MessageLoop::Run();
 }
 
-TEST_F(BrowserTest, ExecuteJavaScriptComplexResult) {
+TEST_P(BrowserTest, ExecuteJavaScriptComplexResult) {
   browser_->on_finish_navigation.Connect([](nu::Browser* browser,
                                             const std::string& url) {
     browser->ExecuteJavaScript("r = {a: true, b: {c: [], d: 'te' + 'st'}}; r",
@@ -235,27 +281,19 @@ TEST_F(BrowserTest, ExecuteJavaScriptComplexResult) {
   nu::MessageLoop::Run();
 }
 
-TEST_F(BrowserTest, AddBinding) {
-  bool bo = false;
-  std::string st;
-  base::Value va;
+TEST_P(BrowserTest, AddBinding) {
   std::function<void(nu::Browser*, bool, const std::string&, base::Value)>
-      handler = [&](nu::Browser*, bool b, const std::string& s, base::Value v) {
-    bo = b;
-    st = s;
-    va = std::move(v);
+      handler = [](nu::Browser*, bool b, const std::string& s, base::Value v) {
+    nu::MessageLoop::Quit();
+    EXPECT_EQ(b, true);
+    EXPECT_EQ(s, "string");
+    EXPECT_TRUE(v.is_dict());
   };
   browser_->AddBinding("method", handler);
   browser_->on_finish_navigation.Connect([&](nu::Browser* browser,
                                              const std::string& url) {
     browser->ExecuteJavaScript("window.method(true, 'string', {k: 'v'})",
-                               [&](bool success, base::Value result) {
-      nu::MessageLoop::Quit();
-      EXPECT_EQ(success, true);
-      EXPECT_EQ(bo, true);
-      EXPECT_EQ(st, "string");
-      EXPECT_TRUE(va.is_dict());
-    });
+                               nullptr);
   });
   nu::MessageLoop::PostTask([&]() {
     browser_->LoadHTML("<body><script></script></body>", "about:blank");
@@ -266,21 +304,24 @@ TEST_F(BrowserTest, AddBinding) {
 void DummyFunction(const std::string&) {
 }
 
-TEST_F(BrowserTest, AddBindingFunctionPointer) {
+TEST_P(BrowserTest, AddBindingFunctionPointer) {
   browser_->AddBinding("method", &DummyFunction);
 }
 
-TEST_F(BrowserTest, AddBindingCapturelessLabmda) {
+TEST_P(BrowserTest, AddBindingCapturelessLabmda) {
   browser_->AddBinding("method", []() {});
 }
 
-TEST_F(BrowserTest, SetBindingName) {
+TEST_P(BrowserTest, SetBindingName) {
   browser_->SetBindingName("binding");
   browser_->AddRawBinding("method", [](nu::Browser*, base::Value) {});
   browser_->on_finish_navigation.Connect([](nu::Browser* browser,
                                             const std::string& url) {
     browser->ExecuteJavaScript("window.method()",
                                [=](bool success, base::Value result) {
+#if defined(OS_WIN) && defined(WEBVIEW2_SUPPORT)
+      if (!browser->IsWebView2())
+#endif
       EXPECT_EQ(success, false);
       browser->ExecuteJavaScript("window.binding.method()",
                                  [](bool success, base::Value result) {
@@ -295,19 +336,24 @@ TEST_F(BrowserTest, SetBindingName) {
   nu::MessageLoop::Run();
 }
 
-TEST_F(BrowserTest, MalicousCall) {
+TEST_P(BrowserTest, MalicousCall) {
   bool called = false;
   browser_->AddRawBinding("method", [&called](nu::Browser*, base::Value) {
     called = true;
   });
   browser_->on_finish_navigation.Connect([&called](nu::Browser* browser,
                                                    const std::string& url) {
-    browser->ExecuteJavaScript(
+      std::string kPostMessage =
 #if defined(OS_WIN)
-        "window.external.postMessage('1', 'method', '[]')",
-#else
-        "window.webkit.messageHandlers.yue.postMessage(['1', 'method', []])",
+#if defined(WEBVIEW2_SUPPORT)
+        browser->IsWebView2() ? "window.chrome.webview.postMessage" :
 #endif
+                                "window.external.postMessage";
+#else
+        "window.webkit.messageHandlers.yue.postMessage";
+#endif
+    browser->ExecuteJavaScript(
+        kPostMessage + "('[\"1\", \"method\", []]')",
         [&called, browser](bool success, base::Value result) {
       EXPECT_EQ(called, false);
       browser->ExecuteJavaScript("window.method()",
@@ -323,7 +369,11 @@ TEST_F(BrowserTest, MalicousCall) {
   nu::MessageLoop::Run();
 }
 
-TEST_F(BrowserTest, StringProtocol) {
+TEST_P(BrowserTest, StringProtocol) {
+#if defined(OS_WIN) && defined(WEBVIEW2_SUPPORT)
+  if (browser_->IsWebView2())
+    return;
+#endif
   browser_->on_finish_navigation.Connect([](nu::Browser* browser,
                                             const std::string& url) {
     EXPECT_EQ(url, "str://host/path");
@@ -346,7 +396,11 @@ TEST_F(BrowserTest, StringProtocol) {
   nu::MessageLoop::Run();
 }
 
-TEST_F(BrowserTest, FileProtocol) {
+TEST_P(BrowserTest, FileProtocol) {
+#if defined(OS_WIN) && defined(WEBVIEW2_SUPPORT)
+  if (browser_->IsWebView2())
+    return;
+#endif
   // Write html to file.
   base::ScopedTempDir dir;
   ASSERT_TRUE(dir.CreateUniqueTempDir());
@@ -375,7 +429,11 @@ TEST_F(BrowserTest, FileProtocol) {
   nu::MessageLoop::Run();
 }
 
-TEST_F(BrowserTest, LargeFileProtocol) {
+TEST_P(BrowserTest, LargeFileProtocol) {
+#if defined(OS_WIN) && defined(WEBVIEW2_SUPPORT)
+  if (browser_->IsWebView2())
+    return;
+#endif
   // Serve the pug.js, which should be large enough.
   base::FilePath exe_path;
   PathService::Get(base::FILE_EXE, &exe_path);
@@ -408,3 +466,15 @@ TEST_F(BrowserTest, LargeFileProtocol) {
   });
   nu::MessageLoop::Run();
 }
+
+using ::testing::Values;
+
+#if defined(OS_WIN)
+INSTANTIATE_TEST_CASE_P(IE, BrowserTest, Values(DEFAULT));
+#if defined(WEBVIEW2_SUPPORT)
+INSTANTIATE_TEST_CASE_P(WebView2, BrowserTest, Values(WEBVIEW2));
+INSTANTIATE_TEST_CASE_P(WebView2FallbackIE, BrowserTest, Values(WEBVIEW2_IE));
+#endif  // defined(WEBVIEW2_SUPPORT)
+#else
+INSTANTIATE_TEST_CASE_P(WebKit, BrowserTest, Values(DEFAULT));
+#endif

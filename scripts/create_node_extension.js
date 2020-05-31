@@ -61,6 +61,8 @@ if (targetOs == 'linux')
 
 // Create zip archive of the node module.
 fs.ensureDirSync('out/Dist')
-createZip({withLicense: true})
-  .addFile('out/Node/gui.node', 'out/Node')
-  .writeToFile(`node_yue_${runtime}_${shortver}_${version}_${targetOs}_${targetCpu}`)
+const zip = createZip({withLicense: true})
+if (targetOs == 'win')
+  zip.addFile('out/Node/WebView2Loader.dll', 'out/Node')
+zip.addFile('out/Node/gui.node', 'out/Node')
+   .writeToFile(`node_yue_${runtime}_${shortver}_${version}_${targetOs}_${targetCpu}`)
