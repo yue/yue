@@ -87,7 +87,7 @@ template<typename Dict, typename Key, typename Value, typename... ArgTypes>
 inline bool Set(v8::Local<v8::Context> context, Dict dict,
                 const Key& key, const Value& value,
                 const ArgTypes&... args) {
-  return Set(context, dict, key, value) && Set(context, dict, args...);
+  return Set(context, dict, key, value) & Set(context, dict, args...);
 }
 
 // Helper for getting from Object.
@@ -104,8 +104,7 @@ inline bool Get(v8::Local<v8::Context> context, v8::Local<v8::Object> object,
 template<typename Key, typename Value, typename... ArgTypes>
 inline bool Get(v8::Local<v8::Context> context, v8::Local<v8::Object> object,
                 const Key& key, Value* out, const ArgTypes&... args) {
-  return Get(context, object, key, out) &&
-         Get(context, object, args...);
+  return Get(context, object, key, out) & Get(context, object, args...);
 }
 
 // Return a hidden map attached to object.
