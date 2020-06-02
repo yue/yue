@@ -332,6 +332,12 @@ void WindowImpl::OnSize(UINT param, const Size& size) {
 }
 
 void WindowImpl::OnFocus(HWND old) {
+  // Refocusing a window wouldn't bring focus back to child window, we have
+  // to manually focus to recover focus state.
+  ViewImpl* focused_view = focus_manager()->focused_view();
+  if (focused_view && focused_view->type() == ControlType::Subwin)
+    focused_view->SetFocus(true);
+
   delegate_->on_focus.Emit(delegate_);
   SetMsgHandled(false);
 }
