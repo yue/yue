@@ -50,9 +50,9 @@ class BrowserImplWebview2 : public BrowserImpl {
   void Focus() override;
   bool HasFocus() const override;
   void OnMove() override;
-  bool OnMouseWheel(NativeEvent event) override;
 
  private:
+  void ReceiveBrowserHWND();
   HRESULT CreationFailed();
   void OnReady();
 

@@ -6,10 +6,10 @@
 
 #include <shlguid.h>
 
+#include <map>
 #include <utility>
 
 #include "base/strings/utf_string_conversions.h"
-#include "nativeui/events/win/event_win.h"
 #include "nativeui/message_loop.h"
 #include "nativeui/win/browser/browser_protocol_factory.h"
 #include "nativeui/win/browser/browser_util.h"
@@ -219,20 +219,7 @@ void BrowserImplIE::Focus() {
 }
 
 bool BrowserImplIE::HasFocus() const {
-  return ::GetFocus() == browser_hwnd_;
-}
-
-bool BrowserImplIE::OnMouseWheel(NativeEvent event) {
-  // For WM_MOUSEWHEEL received from the parent window, forward it to the
-  // browser hwnd.
-  if (!browser_hwnd_ || !window())
-    return false;
-  POINT p = { CR_GET_X_LPARAM(event->l_param),
-              CR_GET_Y_LPARAM(event->l_param) };
-  ::ClientToScreen(window()->hwnd(), &p);
-  ::SendMessage(browser_hwnd_, event->message, event->w_param,
-                MAKELPARAM(p.x, p.y));
-  return true;
+  return ::GetFocus() == browser_hwnd();
 }
 
 bool BrowserImplIE::GetScript(Microsoft::WRL::ComPtr<IDispatchEx>* out) {
@@ -275,34 +262,37 @@ bool BrowserImplIE::Eval(base::string16 code, base::Value* result) {
 
 void BrowserImplIE::ReceiveBrowserHWND() {
   // This function is called whenever navigation happens, stop once succeeded.
-  if (browser_hwnd_)
+  if (browser_hwnd())
     return;
 
   // Find the HWND of the actual IE control.
+  HWND browser_hwnd = NULL;
   Microsoft::WRL::ComPtr<IServiceProvider> service_provider;
   Microsoft::WRL::ComPtr<IOleWindow> ole_window;
   if (FAILED(browser_.As(&service_provider)) ||
       FAILED(service_provider->QueryService(SID_SShellBrowser,
                                             IID_PPV_ARGS(&ole_window))) ||
-      FAILED(ole_window->GetWindow(&browser_hwnd_))) {
+      FAILED(ole_window->GetWindow(&browser_hwnd))) {
     PLOG(ERROR) << "Failed to get browser HWND";
     return;
   }
-  if (browser_hwnd_)
-    browser_hwnd_ = ::FindWindowEx(browser_hwnd_, nullptr,
-                                   L"Shell DocObject View", nullptr);
-  if (browser_hwnd_)
-    browser_hwnd_ = ::FindWindowEx(browser_hwnd_, nullptr,
-                                   L"Internet Explorer_Server", nullptr);
+  if (browser_hwnd)
+    browser_hwnd = ::FindWindowEx(browser_hwnd, nullptr,
+                                  L"Shell DocObject View", nullptr);
+  if (browser_hwnd)
+    browser_hwnd = ::FindWindowEx(browser_hwnd, nullptr,
+                                  L"Internet Explorer_Server", nullptr);
 
   // Hook window message proc on IE control.
-  if (browser_hwnd_)
-    browser_proc_ = SetWindowProc(browser_hwnd_, &BrowserWndProc);
+  if (browser_hwnd) {
+    holder()->ReportBrowserHWND(browser_hwnd);
+    browser_proc_ = SetWindowProc(browser_hwnd, &BrowserWndProc);
+  }
 }
 
 void BrowserImplIE::CleanupBrowserHWND() {
-  if (browser_hwnd_)
-    SetWindowProc(browser_hwnd_, browser_proc_);
+  if (browser_hwnd())
+    SetWindowProc(browser_hwnd(), browser_proc_);
 }
 
 void BrowserImplIE::OnDocumentReady() {

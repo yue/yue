@@ -10,6 +10,7 @@
 #include <utility>
 
 #include "base/strings/utf_string_conversions.h"
+#include "nativeui/events/win/event_win.h"
 #include "nativeui/state.h"
 #include "nativeui/win/browser/browser_impl_ie.h"
 
@@ -45,6 +46,10 @@ BrowserHolder::BrowserHolder(Browser::Options options, Browser* delegate)
 }
 
 BrowserHolder::~BrowserHolder() {
+}
+
+void BrowserHolder::ReportBrowserHWND(HWND hwnd) {
+  browser_hwnd_ = hwnd;
 }
 
 #if defined(WEBVIEW2_SUPPORT)
@@ -88,7 +93,16 @@ bool BrowserHolder::HasFocus() const {
 }
 
 bool BrowserHolder::OnMouseWheel(NativeEvent event) {
-  return impl_->OnMouseWheel(event);
+  // For WM_MOUSEWHEEL received from the parent window, forward it to the
+  // browser hwnd.
+  if (!browser_hwnd_ || !window())
+    return false;
+  POINT p = { CR_GET_X_LPARAM(event->l_param),
+              CR_GET_Y_LPARAM(event->l_param) };
+  ::ClientToScreen(window()->hwnd(), &p);
+  ::SendMessage(browser_hwnd_, event->message, event->w_param,
+                MAKELPARAM(p.x, p.y));
+  return true;
 }
 
 LRESULT BrowserHolder::OnMouseWheelFromSelf(

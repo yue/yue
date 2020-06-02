@@ -52,7 +52,6 @@ class BrowserImplIE : public BrowserImpl {
   void SetBounds(RECT rect) override;
   void Focus() override;
   bool HasFocus() const override;
-  bool OnMouseWheel(NativeEvent event) override;
 
   bool GetScript(Microsoft::WRL::ComPtr<IDispatchEx>* out);
 
@@ -75,7 +74,6 @@ class BrowserImplIE : public BrowserImpl {
 
   void OnDestroy();
   LRESULT OnParentNotify(UINT msg, WPARAM w_param, LPARAM l_param);
-  LRESULT IgnoreEvent(UINT msg, WPARAM w_param, LPARAM l_param);
 
   bool Eval(base::string16 code, base::Value* result);
 
@@ -99,7 +97,6 @@ class BrowserImplIE : public BrowserImpl {
   Microsoft::WRL::ComPtr<BrowserEventSink> event_sink_;
   Microsoft::WRL::ComPtr<BrowserDocumentEvents> document_events_;
   Microsoft::WRL::ComPtr<BrowserHTMLMoniker> html_moniker_;
-  HWND browser_hwnd_ = NULL;
   WNDPROC browser_proc_ = nullptr;
 
   Microsoft::WRL::ComPtr<IWebBrowser2> browser_;

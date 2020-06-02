@@ -21,11 +21,13 @@ class BrowserHolder : public SubwinView {
   BrowserHolder(Browser::Options options, Browser* delegate);
   ~BrowserHolder() override;
 
+  void ReportBrowserHWND(HWND hwnd);
 #if defined(WEBVIEW2_SUPPORT)
   void OnWebView2Completed(BrowserImpl* sender, bool success);
 #endif
 
   bool browser_created() const { return browser_created_; }
+  HWND browser_hwnd() const { return browser_hwnd_; }
   BrowserImpl* impl() const { return impl_.get(); }
 
   Browser* delegate() { return static_cast<Browser*>(SubwinView::delegate()); }
@@ -48,6 +50,7 @@ class BrowserHolder : public SubwinView {
 
  private:
   bool browser_created_ = false;
+  HWND browser_hwnd_ = NULL;
 
   std::unique_ptr<BrowserImpl> impl_;
 };
@@ -82,7 +85,6 @@ class BrowserImpl {
   virtual void Focus() = 0;
   virtual bool HasFocus() const = 0;
   virtual void OnMove() {}
-  virtual bool OnMouseWheel(NativeEvent event) = 0;
 
   virtual bool ProcessWindowMessage(HWND window,
                                     UINT message,
@@ -93,6 +95,7 @@ class BrowserImpl {
   Browser::Options& options() { return options_; }
   BrowserHolder* holder() { return holder_; }
   Browser* delegate() { return holder_->delegate(); }
+  HWND browser_hwnd() const { return holder_->browser_hwnd(); }
 
   WindowImpl* window() { return holder_->window(); }
   HWND hwnd() { return holder_->hwnd(); }

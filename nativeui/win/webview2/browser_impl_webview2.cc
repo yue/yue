@@ -116,6 +116,7 @@ void BrowserImplWebview2::LoadURL(base::string16 str) {
     return;
   }
   webview_->Navigate(str.c_str());
+  ReceiveBrowserHWND();
 }
 
 void BrowserImplWebview2::LoadHTML(base::string16 str,
@@ -137,6 +138,7 @@ void BrowserImplWebview2::LoadHTML(base::string16 str,
   }
   // WebView2 does not support setting base URL.
   webview_->NavigateToString(str.c_str());
+  ReceiveBrowserHWND();
 }
 
 base::string16 BrowserImplWebview2::GetURL() {
@@ -285,8 +287,17 @@ void BrowserImplWebview2::OnMove() {
     controller_->NotifyParentWindowPositionChanged();
 }
 
-bool BrowserImplWebview2::OnMouseWheel(NativeEvent event) {
-  return false;
+void BrowserImplWebview2::ReceiveBrowserHWND() {
+  if (browser_hwnd())
+    return;
+  HWND win = ::FindWindowEx(hwnd(), nullptr, L"Chrome_WidgetWin_0", nullptr);
+  if (!win)
+    return;
+  win = ::FindWindowEx(win, nullptr, L"Chrome_WidgetWin_1", nullptr);
+  if (!win)
+    return;
+  holder()->ReportBrowserHWND(::FindWindowEx(
+      win, nullptr, L"Chrome_RenderWidgetHostHWND", nullptr));
 }
 
 HRESULT BrowserImplWebview2::CreationFailed() {
