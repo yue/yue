@@ -125,6 +125,12 @@ void WindowImpl::AdvanceFocus() {
                               IsShiftPressed());
 }
 
+void WindowImpl::FocusWithoutEvent() {
+  ignore_focus_ = true;
+  ::SetFocus(hwnd());
+  ignore_focus_ = false;
+}
+
 bool WindowImpl::HandleKeyEvent(const KeyEvent& event) {
   if (event.type == EventType::KeyDown && delegate_->GetMenuBar()) {
     Accelerator accelerator(event);
@@ -332,6 +338,9 @@ void WindowImpl::OnSize(UINT param, const Size& size) {
 }
 
 void WindowImpl::OnFocus(HWND old) {
+  if (ignore_focus_)
+    return;
+
   // Refocusing a window wouldn't bring focus back to child window, we have
   // to manually focus to recover focus state.
   ViewImpl* focused_view = focus_manager()->focused_view();

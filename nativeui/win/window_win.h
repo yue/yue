@@ -32,6 +32,9 @@ class WindowImpl : public Win32Window,
 
   void AdvanceFocus();
 
+  // Make the window HWND acquire focus without triggering focus events.
+  void FocusWithoutEvent();
+
   bool HandleKeyEvent(const KeyEvent& event);
 
   void SetCapture(ViewImpl* view);
@@ -141,6 +144,9 @@ class WindowImpl : public Win32Window,
 
   FocusManager focus_manager_;
   bool mouse_in_window_ = false;
+
+  // Ignore focus event.
+  bool ignore_focus_ = false;
 
   // True the first time nccalc is called on a sizable widget.
   bool is_first_nccalc_ = true;

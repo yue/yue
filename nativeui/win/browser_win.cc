@@ -80,11 +80,19 @@ void BrowserHolder::SizeAllocate(const Rect& bounds) {
 void BrowserHolder::SetFocus(bool focus) {
   if (focus) {
     impl_->Focus();
-  } else {
-    if (window())
-      window()->focus_manager()->RemoveFocus(this);
-    // Keyboard focus would be moved to parent hwnd.
-    ::SendMessage(hwnd(), WM_KILLFOCUS, 0, 0L);
+  } else if (window()) {
+    window()->focus_manager()->RemoveFocus(this);
+    // Focus on parent window if the browser has the focus.
+    //
+    // Note that we don't use WM_KILLFOCUS message as it would move focus to
+    // parent HWND which is the holder, and it then would enter the code path
+    // of moving focus out of browser with TAB in WebView2.
+    //
+    // Also note that we have to test if browser_hwnd has the focus before
+    // focusing on window, since SetFocus(false) might be called when another
+    // subwin control has already got focus via mouse clicking.
+    if (browser_hwnd() && ::GetFocus() == browser_hwnd())
+      window()->FocusWithoutEvent();
   }
 }
 

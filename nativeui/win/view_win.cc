@@ -185,8 +185,8 @@ bool ViewImpl::OnMouseClick(NativeEvent event) {
   // want to move focus to other view later.
   if (is_focusable() && window() && event->message == WM_LBUTTONDOWN &&
       type() != ControlType::Subwin) {  // subwin handles clicking on its own
-    ::SetFocus(window()->hwnd());  // need this to take focus from subwin
-    window_->focus_manager()->TakeFocus(this);
+    window()->FocusWithoutEvent();  // need this to take focus from subwin
+    window()->focus_manager()->TakeFocus(this);
   }
 
   if (!delegate())

@@ -264,12 +264,17 @@ void BrowserImplWebview2::UpdateBindings() {
 void BrowserImplWebview2::SetBounds(RECT rect) {
   if (!controller_)
     return;
-  // Make sure the visibility is synced with parent subwin.
+  // WebView2 might hide itself if the holder is not visible at first, make
+  // sure it is shown.
+  //
+  // Note that we never call put_IsVisible(false) to hide the webview, because
+  // there are some bug in WebView2 that calling put_IsVisible(false) would
+  // trigger GotFocus/LostFocus events that mess our focus system.
   BOOL parent_visible = ::IsWindowVisible(hwnd());
   BOOL visible = true;
   controller_->get_IsVisible(&visible);
-  if (visible != parent_visible)
-    controller_->put_IsVisible(parent_visible);
+  if (parent_visible && !visible)
+    controller_->put_IsVisible(true);
   // Resize the webview to sync with parent subwin.
   controller_->put_Bounds(rect);
 }
