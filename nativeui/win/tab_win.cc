@@ -155,10 +155,9 @@ class TabImpl : public ContainerImpl,
   }
 
   void SetSelectedItem(TabItem* item) {
-    auto* tab = static_cast<Tab*>(delegate());
     if (selected_item_) {
       selected_item_->SetSelected(false);
-      tab->PageAt(selected_item_index_)->SetVisible(false);
+      tab()->PageAt(selected_item_index_)->SetVisible(false);
     }
 
     selected_item_ = item;
@@ -169,7 +168,7 @@ class TabImpl : public ContainerImpl,
     selected_item_->SetSelected(true);
 
     // Update visibility and layout for new page.
-    View* page = tab->PageAt(selected_item_index_);
+    View* page = tab()->PageAt(selected_item_index_);
     page->SetVisible(true);
     Layout();
 
@@ -178,7 +177,7 @@ class TabImpl : public ContainerImpl,
     if (window())
       window()->focus_manager()->AdvanceFocus(view, false);
 
-    tab->on_selected_page_change.Emit(tab);
+    tab()->on_selected_page_change.Emit(tab());
   }
 
   ViewImpl* GetSelectedPage() const {
@@ -214,9 +213,9 @@ class TabImpl : public ContainerImpl,
       x += rect.width();
     }
 
-    // Place content view.
-    ViewImpl* content = GetSelectedPage();
-    if (content) {
+    // Resize all pages to avoid flash when switching tabs.
+    for (int i = 0; i < tab()->PageCount(); ++i) {
+      ViewImpl* content = tab()->PageAt(i)->GetNative();
       Rect rect(size_allocation());
       rect.Inset(kContentPadding * scale_factor(),
                  kContentPadding * scale_factor());
@@ -231,12 +230,11 @@ class TabImpl : public ContainerImpl,
                bool reverse) override {
     if (items_.empty())
       return;
-    auto* tab = static_cast<Tab*>(delegate());
     for (int i = reverse ? static_cast<int>(items_.size()) - 1 : 0;
          reverse ? (i >= 0) : (i < static_cast<int>(items_.size()));
          reverse ? --i : ++i) {
       if (!callback(items_[i].get()) ||
-          !callback(tab->PageAt(i)->GetNative()))
+          !callback(tab()->PageAt(i)->GetNative()))
         break;
     }
   }
@@ -296,6 +294,8 @@ class TabImpl : public ContainerImpl,
     }
     return items_height_;
   }
+
+  Tab* tab() const { return static_cast<Tab*>(delegate()); }
 
   mutable int items_height_ = -1;
 
