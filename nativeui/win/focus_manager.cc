@@ -30,9 +30,11 @@ void FocusManager::TakeFocus(ViewImpl* view) {
 }
 
 void FocusManager::AdvanceFocus(ViewImpl* view, bool reverse) {
-  // We can not advance focus in a non-container view.
-  if (view->type() < ControlType::Container)
+  // Just focus the view if it is not a container.
+  if (view->type() < ControlType::Container) {
+    view->SetFocus(true);
     return;
+  }
 
   // Should we focus on next view.
   bool focus_on_next_view = focused_view_ == nullptr;

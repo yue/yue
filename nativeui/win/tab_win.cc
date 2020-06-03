@@ -167,8 +167,17 @@ class TabImpl : public ContainerImpl,
         std::find_if(items_.begin(), items_.end(),
                      [item](auto& it) { return it.get() == item; }));
     selected_item_->SetSelected(true);
-    tab->PageAt(selected_item_index_)->SetVisible(true);
+
+    // Update visibility and layout for new page.
+    View* page = tab->PageAt(selected_item_index_);
+    page->SetVisible(true);
     Layout();
+
+    // Move focus to the selected page.
+    ViewImpl* view = page->GetNative();
+    if (window())
+      window()->focus_manager()->AdvanceFocus(view, false);
+
     tab->on_selected_page_change.Emit(tab);
   }
 
