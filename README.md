@@ -42,7 +42,7 @@ derivative works.
 The owners of the Yue project will also be granted the right to relicense the
 contributed source code and its derivative works.
 
-The documentations and build scripts are published under public domain, and
-contributions to those works will also be licensed so.
+The files under `docs/`, `scripts/` and `sample_app/` are published under
+public domain, and contributions to those works will also be licensed so.
 
 [license]: https://github.com/yue/yue/blob/master/LICENSE

@@ -151,5 +151,20 @@ target_link_libraries(YourApp Yue)
 
 A live example can be found at https://github.com/yue/muban.
 
+### Notes on WebView2
+
+Currently building with WebView2 on Windows requires installing the
+[Microsoft.Web.WebView2](https://www.nuget.org/packages/Microsoft.Web.WebView2)
+nuget package, and CMake does not have very good support for nuget packages
+for now.
+
+So WebView2 support is disabled by default in libyue, to compile with support
+for WebView2, you have to manually add the `WEBVIEW2_SUPPORT` to defines, and
+then reference the WebView2 nuget package in the Visual Studio solution
+yourself.
+
+Until there is better support of nuget in CMake, no further documentation on
+building with WebView2 will be provided.
+
 [base]: https://chromium.googlesource.com/chromium/src/base/
 [releases]: https://github.com/yue/yue/releases

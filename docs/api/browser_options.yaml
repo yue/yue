@@ -13,7 +13,7 @@ properties:
       context menu, so you should also enable builtin context menu when using
       this option.
 
-      Currently this option is not working on Windows.
+      This option is not working on Windows when IE is used as backend.
 
   - property: bool context_menu
     optional: true
@@ -36,3 +36,11 @@ properties:
     optional: true
     description: Whether to enable hardware acceleration, default is `true`.
     platform: ['Linux']
+
+  - property: bool webview2_support
+    optional: true
+    description: Whether to use WebView2 as backend, default is `false`.
+    platform: ['Windows']
+    detail: |
+      Please read [WebView2 support](./browser.html#webview2-support) for more
+      information.

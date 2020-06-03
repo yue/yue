@@ -441,6 +441,8 @@ function parseType(lang, str) {
 // Convert inline code.
 function parseInlineCode(lang, type, code) {
   switch (type) {
+    case 'name':
+      return parseName(lang, code)
     case 'type':
       const info = parseType(lang, code)
       return `<code><a class="type" href="${info.id}.html">${info.name}</a></code>`

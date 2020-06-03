@@ -2,6 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+// Avoid compiling this file with other build systems.
+#if defined(WEBVIEW2_SUPPORT)
+
 #include "nativeui/win/webview2/browser_impl_webview2.h"
 
 #include <string>
@@ -516,3 +519,5 @@ HRESULT BrowserImplWebview2::OnWebMessageReceived(
 }
 
 }  // namespace nu
+
+#endif  // defined(WEBVIEW2_SUPPORT)

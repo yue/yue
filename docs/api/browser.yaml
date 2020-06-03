@@ -10,9 +10,31 @@ detail: |
   minimum version required is 10.10, for Linux it is required to install the
   `webkit2gtk` library with at least version 2.8.
 
+  On Windows the latest version of IE installed would be used by default.
+
   On Linux due to poor support of hardware acceleration, the browser may fail to
-  show anything, when that happens you can set `WEBKIT_DISABLE_COMPOSITING_MODE`
-  environment variable to disable hardware acceleration.
+  show anything, in that case you may want to disable hardware acceleration.
+
+  ## WebView2 support
+
+  On Windows there is support for using
+  [WebView2](https://docs.microsoft.com/en-us/microsoft-edge/webview2/) as
+  browser backend, to enable it, you need to:
+
+  1. Set the `<!name>webview2_support` option to `true`.
+  2. Ship the `WebView2Loader.dll` file together with your program.
+  3. Have users install Chromium-based Microsoft Edge on their machines.
+
+  There are also a few things to notice:
+  1. When WebView2 failed to initialize for any reason, the browser will
+  fallback to use IE as backend quietly.
+  2. If you don't use WebView2, it is safe to remove the `WebView2Loader.dll`
+  file.
+  3. As WebView2 is still being developed, stable versions of Edge may have
+  various problems with WebView2, it is usually suggested to install Edge Canary
+  to have best experience.
+  4. Some `Browser` APIs are not implemented with WebView2 backend, due to lack
+  of APIs in WebView2.
 
 constructors:
   - signature: Browser(const Browser::Options& options)
@@ -33,8 +55,11 @@ class_methods:
 
       The `handler` is guaranteed to be called in the main thread.
 
+      This API is not supported on Windows with WebView2 backend.
+
   - signature: void UnregisterProtocol(const std::string& scheme);
     description: Unregister the custom protocol with `scheme`.
+    detail: This API is not supported on Windows with WebView2 backend.
 
 class_properties:
   - property: const char* kClassName
@@ -47,6 +72,7 @@ methods:
 
   - signature: void LoadHTML(const std::string& html, const std::string& baseurl)
     description: Set the webpage contents and base URL.
+    detail: On Windows with WebView2 backend, `baseurl` is not respected.
     parameters:
       html:
         description: The string to use as the contents of the webpage.
@@ -65,6 +91,8 @@ methods:
       On Windows, due to Internet Explorer's limitations, calling `SetUserAgent`
       would change all web pages' user agents in current process.
 
+      This API is not supported on Windows with WebView2 backend.
+
   - signature: void ExecuteJavaScript(const std::string& code, const std::function<void(bool, base::Value)>& callback);
     description: Evaluate `code` in browser and get the evaluated result.
     detail: |
@@ -74,6 +102,9 @@ methods:
 
       Note that due to limitations of system toolkits, the execution may fail if
       the result of `code` can not be fully converted to JSON.
+
+      On Windows with WebView2 backend, the `success` may be true even when
+      exception is threw in the executed code.
 
   - signature: void GoBack()
     description: Navigate to the back item in the back-forward list.

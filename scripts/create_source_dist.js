@@ -16,9 +16,6 @@ const args = [
   'is_debug=false',
   `target_cpu="${targetCpu}"`,
   'use_jumbo_build=true',
-  // Building webview2 requires downloading nuget packages, add it after
-  // figuring out how to make it optional in cmake.
-  'webview2_support=false',
 ]
 fs.removeSync('out/Source')
 process.env.JUMBO_INCLUDE_FILE_CONTENTS = 'true'
