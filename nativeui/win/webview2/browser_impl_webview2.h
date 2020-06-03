@@ -60,6 +60,8 @@ class BrowserImplWebview2 : public BrowserImpl {
   HRESULT OnControllerCreated(HRESULT res, ICoreWebView2Controller* controller);
   HRESULT OnGotFocus(ICoreWebView2Controller* sender, IUnknown* args);
   HRESULT OnLostFocus(ICoreWebView2Controller* sender, IUnknown* args);
+  HRESULT OnAcceleratorKeyPressed(ICoreWebView2Controller*,
+                                  ICoreWebView2AcceleratorKeyPressedEventArgs*);
   HRESULT OnClose(ICoreWebView2* sender, IUnknown* args);
   HRESULT OnHistoryChanged(ICoreWebView2* sender, IUnknown* args);
   HRESULT OnNavigationStarting(ICoreWebView2*,
@@ -88,6 +90,7 @@ class BrowserImplWebview2 : public BrowserImpl {
 
   EventRegistrationToken on_got_focus_;
   EventRegistrationToken on_lost_focus_;
+  EventRegistrationToken on_accelerator_key_pressed_;
   EventRegistrationToken on_close_;
   EventRegistrationToken on_history_changed_;
   EventRegistrationToken on_navigation_starting_;

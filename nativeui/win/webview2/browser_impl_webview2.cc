@@ -83,6 +83,7 @@ BrowserImplWebview2::~BrowserImplWebview2() {
     controller_->Close();
     controller_->remove_GotFocus(on_got_focus_);
     controller_->remove_LostFocus(on_lost_focus_);
+    controller_->remove_AcceleratorKeyPressed(on_accelerator_key_pressed_);
   }
   if (webview_) {
     webview_->remove_WindowCloseRequested(on_close_);
@@ -324,6 +325,11 @@ void BrowserImplWebview2::OnReady() {
           ICoreWebView2FocusChangedEventHandler>(
               this, &BrowserImplWebview2::OnLostFocus).Get(),
       &on_lost_focus_);
+  controller_->add_AcceleratorKeyPressed(
+      Microsoft::WRL::Callback<
+          ICoreWebView2AcceleratorKeyPressedEventHandler>(
+              this, &BrowserImplWebview2::OnAcceleratorKeyPressed).Get(),
+      &on_accelerator_key_pressed_);
   webview_->add_WindowCloseRequested(
       Microsoft::WRL::Callback<
           ICoreWebView2WindowCloseRequestedEventHandler>(
@@ -359,8 +365,6 @@ void BrowserImplWebview2::OnReady() {
           ICoreWebView2WebMessageReceivedEventHandler>(
               this, &BrowserImplWebview2::OnWebMessageReceived).Get(),
       &on_web_message_received_);
-  webview_->AddWebResourceRequestedFilter(
-      L"*", COREWEBVIEW2_WEB_RESOURCE_CONTEXT_ALL);
   // Notify the holder.
   holder()->OnWebView2Completed(this, true);
 }
@@ -403,6 +407,43 @@ HRESULT BrowserImplWebview2::OnGotFocus(ICoreWebView2Controller* sender,
 
 HRESULT BrowserImplWebview2::OnLostFocus(ICoreWebView2Controller*, IUnknown*) {
   has_focus_ = false;
+  return S_OK;
+}
+
+HRESULT BrowserImplWebview2::OnAcceleratorKeyPressed(
+    ICoreWebView2Controller*,
+    ICoreWebView2AcceleratorKeyPressedEventArgs* args) {
+  COREWEBVIEW2_KEY_EVENT_KIND kind;
+  if (FAILED(args->get_KeyEventKind(&kind)))
+    return S_OK;
+  UINT key;
+  if (FAILED(args->get_VirtualKey(&key)))
+    return S_OK;
+  INT l_param;
+  if (FAILED(args->get_KeyEventLParam(&l_param)))
+    return S_OK;
+  UINT message;
+  switch (kind) {
+    case COREWEBVIEW2_KEY_EVENT_KIND_KEY_DOWN:
+      message = WM_KEYDOWN;
+      break;
+    case COREWEBVIEW2_KEY_EVENT_KIND_KEY_UP:
+      message = WM_KEYUP;
+      break;
+    case COREWEBVIEW2_KEY_EVENT_KIND_SYSTEM_KEY_DOWN:
+      message = WM_SYSKEYDOWN;
+      break;
+    case COREWEBVIEW2_KEY_EVENT_KIND_SYSTEM_KEY_UP:
+      message = WM_SYSKEYUP;
+      break;
+  }
+  // Ask if ViewImpl wants to handle the key.
+  holder()->OnKeyEvent(message, key, l_param);
+  if (holder()->IsMsgHandled()) {
+    args->put_Handled(true);
+    return S_OK;
+  }
+  args->put_Handled(false);
   return S_OK;
 }
 
