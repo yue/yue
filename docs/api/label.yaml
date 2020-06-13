@@ -11,10 +11,18 @@ constructors:
     lang: ['cpp']
     description: Create a new `Label` with `text`.
 
+  - signature: Label(scoped_refptr<AttributedText> text)
+    lang: ['cpp']
+    description: Create a new `Label` with attributed `text`.
+
 class_methods:
   - signature: Label* Create(const std::string& text)
     lang: ['lua', 'js']
     description: Create a new `Label` with `text`.
+
+  - signature: Label* CreateWithAttributedText(scoped_refptr<AttributedText> text)
+    lang: ['lua', 'js']
+    description: Create a new `Label` with attributed `text`.
 
 class_properties:
   - property: const char* kClassName
@@ -33,3 +41,9 @@ methods:
 
   - signature: void SetVAlign(TextAlign align)
     description: Set vertical text alignment.
+
+  - signature: void SetAttributedText(scoped_refptr<AttributedText> text)
+    description: Set the attributed text to display.
+
+  - signature: AttributedText* GetAttributedText() const
+    description: Return the attributed text displayed.
