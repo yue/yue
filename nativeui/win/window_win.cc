@@ -302,8 +302,7 @@ void WindowImpl::OnCaptureChanged(HWND window) {
 void WindowImpl::OnClose() {
   if (!delegate_->should_close ||
       delegate_->should_close(delegate_)) {
-    delegate_->CloseAllChildWindows();
-    delegate_->on_close.Emit(delegate_);
+    delegate_->NotifyWindowClosed();
     SetMsgHandled(false);
   }
 }

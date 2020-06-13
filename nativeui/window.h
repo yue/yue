@@ -119,8 +119,8 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
   void RemoveChildWindow(Window* child);
   std::vector<Window*> GetChildWindows() const;
 
-  // Internal: Destroy all child windows.
-  void CloseAllChildWindows();
+  // Internal: Destroy all child windows and notify window is closed.
+  void NotifyWindowClosed();
 
   // Get the native window object.
   NativeWindow GetNative() const { return window_; }
@@ -160,6 +160,9 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
 
   // The yoga config for window's children.
   YGConfigRef yoga_config_;
+
+  // Whehter window has been closed.
+  bool is_closed_ = false;
 
 #if defined(OS_MACOSX)
   scoped_refptr<Toolbar> toolbar_;

@@ -95,11 +95,14 @@ std::vector<Window*> Window::GetChildWindows() const {
   return result;
 }
 
-void Window::CloseAllChildWindows() {
+void Window::NotifyWindowClosed() {
+  DCHECK(!is_closed_);
+  is_closed_ = true;
   for (const auto& i : child_windows_) {
     i->should_close = nullptr;  // don't give user a chance to cancel.
     i->Close();
   }
+  on_close.Emit(this);
 }
 
 }  // namespace nu

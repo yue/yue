@@ -38,9 +38,7 @@
 }
 
 - (void)windowWillClose:(NSNotification*)notification {
-  // Cocoa does not automatically close child windows.
-  shell_->CloseAllChildWindows();
-  shell_->on_close.Emit(shell_);
+  shell_->NotifyWindowClosed();
 }
 
 - (void)windowDidBecomeMain:(NSNotification*)notification {
@@ -109,6 +107,11 @@ void Window::PlatformDestroy() {
   // Clear the delegate class.
   [[window_ delegate] release];
   [window_ setDelegate:nil];
+
+  // The [window_ release] won't close the window, we have to explicitly ask
+  // window to close.
+  if (!is_closed_)
+    [window_ close];
 
   [window_ release];
 }
