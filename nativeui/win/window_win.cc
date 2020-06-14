@@ -121,6 +121,7 @@ Rect WindowImpl::GetContentPixelBounds() {
 }
 
 void WindowImpl::AdvanceFocus() {
+  focus_manager_.set_show_focus_ring(true);
   focus_manager_.AdvanceFocus(delegate_->GetContentView()->GetNative(),
                               IsShiftPressed());
 }
@@ -436,8 +437,18 @@ LRESULT WindowImpl::OnKeyEvent(UINT message, WPARAM w_param, LPARAM l_param) {
 }
 
 void WindowImpl::OnChar(UINT ch, UINT repeat, UINT flags) {
-  if (ch == VK_TAB)
-    AdvanceFocus();
+  if (ch == VK_TAB) {
+    if (!focus_manager()->show_focus_ring() &&
+        focus_manager()->focused_view()) {
+      // When pressing TAB on window for the first time, and there is a focused
+      // view, make the focus ring show on the view.
+      focus_manager()->set_show_focus_ring(true);
+      focus_manager()->focused_view()->Invalidate();
+    } else {
+      // Otherwise advance focus to next view.
+      AdvanceFocus();
+    }
+  }
 }
 
 void WindowImpl::OnPaint(HDC) {

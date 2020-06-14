@@ -29,12 +29,16 @@ class FocusManager {
   // Returns whether a view has been focused.
   void AdvanceFocus(ViewImpl* view, bool reverse);
 
+  void set_show_focus_ring(bool b) { show_focus_ring_ = b; }
+  bool show_focus_ring() const { return show_focus_ring_; }
+
   ViewImpl* focused_view() const { return focused_view_; }
 
  private:
   bool DoAdvanceFocus(ContainerImpl* container, bool reverse,
                       bool* focus_on_next_view);
 
+  bool show_focus_ring_ = false;
   ViewImpl* focused_view_ = nullptr;
 
   DISALLOW_COPY_AND_ASSIGN(FocusManager);

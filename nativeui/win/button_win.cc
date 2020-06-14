@@ -36,8 +36,8 @@ class ButtonImpl : public Clickable {
 
   void MakeDefault() {
     params_.is_default = true;
+    set_is_default(true);
     SetFocus(true);
-    Invalidate();
   }
 
   void SetTitle(base::string16 title) {
@@ -108,7 +108,7 @@ class ButtonImpl : public Clickable {
   void SetParent(ViewImpl* parent) override {
     ViewImpl::SetParent(parent);
     // Make sure the default button has focus after changing window.
-    if (params_.is_default)
+    if (window() && is_default())
       SetFocus(true);
   }
 
@@ -168,7 +168,8 @@ class ButtonImpl : public Clickable {
     painter->DrawAttributedText(text_, text_bounds);
 
     // Draw focused ring.
-    if (HasFocus()) {
+    if (HasFocus() && window() &&
+        window()->focus_manager()->show_focus_ring()) {
       Rect rect;
       if (type() == ControlType::Button) {
         rect = Rect(size_allocation().size());

@@ -26,11 +26,17 @@ class Clickable : public ViewImpl {
   void OnCaptureLost() override;
   bool OnKeyEvent(NativeEvent event) override;
 
+  void set_is_default(bool d) { is_default_ = d; }
+  bool is_default() const { return is_default_; }
+
   bool is_hovering() const { return is_hovering_; }
   bool is_capturing() const { return is_capturing_; }
 
  private:
   void ResetState();
+
+  // Whether this is default button.
+  bool is_default_ = false;
 
   bool is_hovering_ = false;
   bool is_capturing_ = false;

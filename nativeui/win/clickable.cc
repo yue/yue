@@ -79,6 +79,11 @@ void Clickable::OnCaptureLost() {
 bool Clickable::OnKeyEvent(NativeEvent event) {
   if (ViewImpl::OnKeyEvent(event))
     return true;
+  // Only accept keyboard operation when focus ring is showing, or when current
+  // view is default button.
+  if ((!window() || !window()->focus_manager()->show_focus_ring()) &&
+      !is_default())
+    return false;
   KeyEvent client_event(event, this);
   // Pressing ENTER would trigger click immediately.
   if (client_event.type == EventType::KeyDown &&

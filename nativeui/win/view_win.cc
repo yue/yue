@@ -186,7 +186,7 @@ bool ViewImpl::OnMouseClick(NativeEvent event) {
   if (is_focusable() && window() && event->message == WM_LBUTTONDOWN &&
       type() != ControlType::Subwin) {  // subwin handles clicking on its own
     window()->FocusWithoutEvent();  // need this to take focus from subwin
-    SetFocus(true);
+    window()->focus_manager()->TakeFocus(this);
   }
 
   if (!delegate())
