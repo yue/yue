@@ -9,6 +9,7 @@
 #include "nativeui/gfx/image.h"
 #include "nativeui/gtk/nu_image.h"
 #include "nativeui/gtk/util/widget_util.h"
+#include "nativeui/window.h"
 
 namespace nu {
 
@@ -16,6 +17,15 @@ namespace {
 
 void OnButtonClick(GtkButton*, Button* button) {
   button->on_click.Emit(button);
+}
+
+void MakeButtonDefault(GtkWidget* button, void* = nullptr) {
+  GtkWidget* toplevel = gtk_widget_get_toplevel(button);
+  if (toplevel && GTK_IS_WINDOW(toplevel)) {
+    gtk_window_set_default(GTK_WINDOW(toplevel), button);
+    gtk_widget_grab_default(button);
+    gtk_widget_grab_focus(button);
+  }
 }
 
 }  // namespace
@@ -32,6 +42,16 @@ Button::Button(const std::string& title, Type type) {
 }
 
 Button::~Button() {
+}
+
+void Button::MakeDefault() {
+  GtkWidget* button = GetNative();
+  g_object_set_data(G_OBJECT(button), "default", this);
+  gtk_widget_set_can_default(button, TRUE);
+  if (GetWindow())
+    MakeButtonDefault(button);
+  else
+    g_signal_connect(button, "realize", G_CALLBACK(MakeButtonDefault), nullptr);
 }
 
 void Button::PlatformSetTitle(const std::string& title) {

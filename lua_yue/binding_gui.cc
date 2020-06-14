@@ -1567,6 +1567,7 @@ struct Type<nu::Button> {
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &Create,
+           "makedefault", &nu::Button::MakeDefault,
            "settitle", &nu::Button::SetTitle,
            "gettitle", &nu::Button::GetTitle,
 #if defined(OS_MACOSX)

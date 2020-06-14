@@ -25,6 +25,7 @@ class NATIVEUI_EXPORT Button : public View {
   // View class name.
   static const char kClassName[];
 
+  void MakeDefault();
   void SetTitle(const std::string& title);
   std::string GetTitle() const;
   void SetChecked(bool checked);

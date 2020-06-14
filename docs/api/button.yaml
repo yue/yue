@@ -33,6 +33,9 @@ class_properties:
     description: The class name of this view.
 
 methods:
+  - signature: void MakeDefault()
+    description: Mark this button as default button.
+
   - signature: void SetTitle(const std::string& title)
     description: Set button title.
 

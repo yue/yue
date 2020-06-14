@@ -1751,6 +1751,7 @@ struct Type<nu::Button> {
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
+        "makeDefault", &nu::Button::MakeDefault,
         "setTitle", &nu::Button::SetTitle,
         "getTitle", &nu::Button::GetTitle,
 #if defined(OS_MACOSX)

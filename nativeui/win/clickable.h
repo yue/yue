@@ -18,18 +18,23 @@ class Clickable : public ViewImpl {
   virtual void OnClick() {}
 
   // ViewImpl:
+  void SetFocus(bool focus) override;
   void OnMouseEnter(NativeEvent event) override;
   void OnMouseMove(NativeEvent event) override;
   void OnMouseLeave(NativeEvent event) override;
   bool OnMouseClick(NativeEvent event) override;
   void OnCaptureLost() override;
+  bool OnKeyEvent(NativeEvent event) override;
 
   bool is_hovering() const { return is_hovering_; }
   bool is_capturing() const { return is_capturing_; }
 
  private:
+  void ResetState();
+
   bool is_hovering_ = false;
   bool is_capturing_ = false;
+  bool is_space_pressing_ = false;
 };
 
 }  // namespace nu

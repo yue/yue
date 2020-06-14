@@ -34,6 +34,12 @@ class ButtonImpl : public Clickable {
     OnDPIChanged();  // update component size
   }
 
+  void MakeDefault() {
+    params_.is_default = true;
+    SetFocus(true);
+    Invalidate();
+  }
+
   void SetTitle(base::string16 title) {
     text_ = new AttributedText(
         std::move(title),
@@ -99,6 +105,13 @@ class ButtonImpl : public Clickable {
   }
 
   // ViewImpl:
+  void SetParent(ViewImpl* parent) override {
+    ViewImpl::SetParent(parent);
+    // Make sure the default button has focus after changing window.
+    if (params_.is_default)
+      SetFocus(true);
+  }
+
   void Draw(PainterWin* painter, const Rect& dirty) override {
     SizeF size = delegate()->GetBounds().size();
     SizeF preferred_size = GetPreferredSize();
@@ -228,6 +241,11 @@ Button::Button(const std::string& title, Type type) {
 }
 
 Button::~Button() {
+}
+
+void Button::MakeDefault() {
+  auto* button = static_cast<ButtonImpl*>(GetNative());
+  button->MakeDefault();
 }
 
 void Button::PlatformSetTitle(const std::string& title) {

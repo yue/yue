@@ -4,6 +4,7 @@
 
 #include "nativeui/win/clickable.h"
 
+#include "nativeui/events/event.h"
 #include "nativeui/events/win/event_win.h"
 #include "nativeui/win/window_win.h"
 
@@ -16,9 +17,17 @@ Clickable::Clickable(ControlType type, View* delegate)
 Clickable::~Clickable() {
 }
 
+void Clickable::SetFocus(bool focus) {
+  ViewImpl::SetFocus(focus);
+  if (!focus && is_space_pressing_) {
+    is_space_pressing_ = false;
+    ResetState();
+  }
+}
+
 void Clickable::OnMouseEnter(NativeEvent event) {
   is_hovering_ = true;
-  if (!is_disabled())
+  if (!is_disabled() && !is_space_pressing_)
     SetState(is_capturing_ ? ControlState::Pressed : ControlState::Hovered);
   ViewImpl::OnMouseEnter(event);
 }
@@ -38,8 +47,8 @@ void Clickable::OnMouseMove(NativeEvent event) {
 
 void Clickable::OnMouseLeave(NativeEvent event) {
   is_hovering_ = false;
-  if (!is_disabled())
-    SetState(is_capturing_ ? ControlState::Hovered : ControlState::Normal);
+  if (!is_disabled() && !is_space_pressing_)
+    ResetState();
   ViewImpl::OnMouseLeave(event);
 }
 
@@ -63,6 +72,36 @@ bool Clickable::OnMouseClick(NativeEvent event) {
 
 void Clickable::OnCaptureLost() {
   is_capturing_ = false;
+  if (!is_space_pressing_)
+    ResetState();
+}
+
+bool Clickable::OnKeyEvent(NativeEvent event) {
+  if (ViewImpl::OnKeyEvent(event))
+    return true;
+  KeyEvent client_event(event, this);
+  // Pressing ENTER would trigger click immediately.
+  if (client_event.type == EventType::KeyDown &&
+      client_event.key == VKEY_RETURN) {
+    OnClick();
+    return true;
+  }
+  // Pressing SPACE is similar to mouse clicking.
+  if (client_event.key == VKEY_SPACE) {
+    if (client_event.type == EventType::KeyDown) {
+      is_space_pressing_ = true;
+      SetState(ControlState::Pressed);
+    } else {
+      is_space_pressing_ = false;
+      OnClick();
+      ResetState();
+    }
+    return true;
+  }
+  return false;
+}
+
+void Clickable::ResetState() {
   SetState(is_hovering_ ? ControlState::Hovered : ControlState::Normal);
 }
 

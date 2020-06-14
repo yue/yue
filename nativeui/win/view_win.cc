@@ -94,7 +94,7 @@ void ViewImpl::ClipRectForChild(const ViewImpl* child, Rect* rect) const {
 }
 
 void ViewImpl::SetFocus(bool focus) {
-  if (is_focused_ == focus)
+  if (is_focused_ == focus || !window())
     return;
   is_focused_ = focus;
   if (window()) {
@@ -186,7 +186,7 @@ bool ViewImpl::OnMouseClick(NativeEvent event) {
   if (is_focusable() && window() && event->message == WM_LBUTTONDOWN &&
       type() != ControlType::Subwin) {  // subwin handles clicking on its own
     window()->FocusWithoutEvent();  // need this to take focus from subwin
-    window()->focus_manager()->TakeFocus(this);
+    SetFocus(true);
   }
 
   if (!delegate())

@@ -133,6 +133,11 @@ Button::~Button() {
   [button setTarget:nil];
 }
 
+void Button::MakeDefault() {
+  NSButton* button = static_cast<NSButton*>(GetNative());
+  [button setKeyEquivalent:@"\r"];
+}
+
 void Button::PlatformSetTitle(const std::string& title) {
   static_cast<NSButton*>(GetNative()).title = base::SysUTF8ToNSString(title);
 }
