@@ -50,6 +50,18 @@ void GifPlayer::StopAnimationTimer() {
   }
 }
 
+void GifPlayer::Paint(Painter* painter) {
+  // Calulate image position.
+  nu::RectF bounds = GetBounds();
+  nu::SizeF size = image_->GetSize();
+  nu::RectF rect((bounds.width() - size.width()) / 2,
+                 (bounds.height() - size.height()) / 2,
+                 size.width(), size.height());
+
+  // Paint.
+  painter->DrawImage(image_.get(), rect);
+}
+
 const char* GifPlayer::GetClassName() const {
   return kClassName;
 }

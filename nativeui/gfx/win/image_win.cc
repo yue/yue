@@ -45,8 +45,4 @@ SizeF Image::GetSize() const {
                    1.f / scale_factor_);
 }
 
-NativeImage Image::GetNative() const {
-  return image_;
-}
-
 }  // namespace nu

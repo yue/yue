@@ -7,16 +7,14 @@
 
 #include <memory>
 
+#include "nativeui/gfx/painter.h"
 #include "nativeui/message_loop.h"
 #include "nativeui/view.h"
-
-#if defined(OS_LINUX)
-typedef struct _GdkPixbufAnimationIter GdkPixbufAnimationIter;
-#endif
 
 namespace nu {
 
 class Image;
+class Painter;
 
 class NATIVEUI_EXPORT GifPlayer : public View {
  public:
@@ -36,16 +34,14 @@ class NATIVEUI_EXPORT GifPlayer : public View {
   // Internal: Pause the animation.
   void StopAnimationTimer();
 
+  // Internal: Draw the animation frame.
+  void Paint(Painter* painter);
+
   // Internal: Whether the image can animate.
   bool CanAnimate() const;
 
   // Internal: Schedule to draw next animation frame.
   void ScheduleFrame();
-
-#if defined(OS_LINUX)
-  // Internal: Return current animation frame.
-  GdkPixbufAnimationIter* GetFrame();
-#endif
 
   // View:
   const char* GetClassName() const override;
@@ -57,9 +53,7 @@ class NATIVEUI_EXPORT GifPlayer : public View {
  private:
   void PlatformSetImage(Image* image);
 
-#if defined(OS_LINUX)
-  GdkPixbufAnimationIter* iter_ = nullptr;
-#elif defined(OS_MACOSX)
+#if defined(OS_MACOSX)
   unsigned int frames_count_ = 0;
   unsigned int frame_ = 0;
   NSBitmapImageRep* animation_rep_ = nullptr;

@@ -18,6 +18,10 @@
 #include <ImageIO/ImageIO.h>
 #endif
 
+#if defined(OS_LINUX)
+typedef struct _GdkPixbufAnimationIter GdkPixbufAnimationIter;
+#endif
+
 namespace nu {
 
 class NATIVEUI_EXPORT Image : public base::RefCounted<Image> {
@@ -51,7 +55,7 @@ class NATIVEUI_EXPORT Image : public base::RefCounted<Image> {
   bool WriteToFile(const std::string& format, const base::FilePath& target);
 
   // Return the native instance of image object.
-  NativeImage GetNative() const;
+  NativeImage GetNative() const { return image_; }
 
 #if defined(OS_MACOSX)
   // Internal: Return the image representaion that has animations.
@@ -59,6 +63,14 @@ class NATIVEUI_EXPORT Image : public base::RefCounted<Image> {
 
   // Internal: Get the duration of animations.
   float GetAnimationDuration(int index) const;
+#endif
+
+#if defined(OS_LINUX)
+  // Internal: Advance the frame iter.
+  void AdvanceFrame();
+
+  // Internal: Return current animation frame.
+  GdkPixbufAnimationIter* iter() const { return iter_; }
 #endif
 
  protected:
@@ -75,6 +87,8 @@ class NATIVEUI_EXPORT Image : public base::RefCounted<Image> {
 #if defined(OS_LINUX)
   // GTK does not have concept of empty image.
   bool is_empty_ = false;
+  // The animation frame.
+  GdkPixbufAnimationIter* iter_ = nullptr;
 #elif defined(OS_MACOSX)
   // The frame durations.
   std::vector<float> durations_;

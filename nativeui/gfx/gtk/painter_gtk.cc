@@ -169,8 +169,11 @@ void PainterGtk::DrawImageFromRect(Image* image, const RectF& src,
   float y_scale = dest.height() / ps.height();
   if (x_scale != 1.0f || y_scale != 1.0f)
     cairo_scale(context_, x_scale, y_scale);
+  // Choose the correct image.
+  GdkPixbuf* pixbuf = image->iter() ?
+      gdk_pixbuf_animation_iter_get_pixbuf(image->iter()) :
+      gdk_pixbuf_animation_get_static_image(image->GetNative());
   // Draw.
-  GdkPixbuf* pixbuf = gdk_pixbuf_animation_get_static_image(image->GetNative());
   gdk_cairo_set_source_pixbuf(context_, pixbuf, -ps.x(), -ps.y());
   cairo_paint(context_);
   cairo_restore(context_);

@@ -54,19 +54,8 @@
   painter.SetColor(background_color_);
   painter.FillRect(nu::RectF(dirtyRect));
 
-  nu::Image* image = static_cast<nu::GifPlayer*>([self shell])->GetImage();
-  if (!image)
-    return;
-
-  // Calulate image position.
-  nu::RectF bounds = [self shell]->GetBounds();
-  nu::SizeF size = image->GetSize();
-  nu::RectF rect((bounds.width() - size.width()) / 2,
-                 (bounds.height() - size.height()) / 2,
-                 size.width(), size.height());
-
-  // Paint.
-  painter.DrawImage(image, rect);
+  auto* gif = static_cast<nu::GifPlayer*>([self shell]);
+  gif->Paint(&painter);
 }
 
 - (void)viewDidHide {

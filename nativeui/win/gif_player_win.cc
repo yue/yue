@@ -20,19 +20,9 @@ class GifPlayerImpl : public ViewImpl {
   // ViewImpl:
   void Draw(PainterWin* painter, const Rect& dirty) override {
     ViewImpl::Draw(painter, dirty);
-    Image* image = static_cast<GifPlayer*>(delegate())->GetImage();
-    if (!image)
-      return;
 
-    // Calulate image position.
-    RectF bounds = delegate()->GetBounds();
-    SizeF size = image->GetSize();
-    RectF rect((bounds.width() - size.width()) / 2,
-               (bounds.height() - size.height()) / 2,
-               size.width(), size.height());
-
-    // Paint.
-    painter->DrawImage(image, rect);
+    auto* gif = static_cast<GifPlayer*>(delegate());
+    gif->Paint(painter);
   }
 
   void VisibilityChanged() override {

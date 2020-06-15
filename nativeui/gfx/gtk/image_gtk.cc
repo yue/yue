@@ -49,6 +49,8 @@ Image::Image(const Buffer& buffer, float scale_factor)
 
 Image::~Image() {
   g_object_unref(image_);
+  if (iter_)
+    g_object_unref(iter_);
 }
 
 bool Image::IsEmpty() const {
@@ -70,8 +72,13 @@ bool Image::WriteToFile(const std::string& format,
                          nullptr, nullptr);
 }
 
-NativeImage Image::GetNative() const {
-  return image_;
+void Image::AdvanceFrame() {
+  GTimeVal time;
+  g_get_current_time(&time);
+  if (iter_)
+    gdk_pixbuf_animation_iter_advance(iter_, &time);
+  else
+    iter_ = gdk_pixbuf_animation_get_iter(image_, &time);
 }
 
 }  // namespace nu

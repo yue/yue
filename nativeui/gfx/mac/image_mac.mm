@@ -107,10 +107,6 @@ SizeF Image::GetSize() const {
   return SizeF([image_ size]);
 }
 
-NativeImage Image::GetNative() const {
-  return image_;
-}
-
 NSBitmapImageRep* Image::GetAnimationRep() const {
   for (NSBitmapImageRep* rep in [image_ representations]) {
     if (![rep isKindOfClass:[NSBitmapImageRep class]])

@@ -6,6 +6,7 @@
 
 #include <gtk/gtk.h>
 
+#include "nativeui/gfx/gtk/painter_gtk.h"
 #include "nativeui/gfx/image.h"
 
 namespace nu {
@@ -24,22 +25,8 @@ gboolean OnDraw(GtkWidget* widget, cairo_t* cr, GifPlayer* view) {
   gtk_render_background(gtk_widget_get_style_context(widget), cr,
                         0, 0, width, height);
 
-  // Calulate image position.
-  GdkPixbuf* pixbuf = view->CanAnimate() ?
-      gdk_pixbuf_animation_iter_get_pixbuf(view->GetFrame()) :
-      gdk_pixbuf_animation_get_static_image(image->GetNative());
-  float scale = 1.f / image->GetScaleFactor();
-  float image_width = gdk_pixbuf_get_width(pixbuf) * scale;
-  float image_height = gdk_pixbuf_get_height(pixbuf) * scale;
-  cairo_translate(cr, (width - image_width) / 2, (height - image_height) / 2);
-
-  // Scale if needed.
-  if (scale != 1.f)
-    cairo_scale(cr, scale, scale);
-
-  // Paint.
-  gdk_cairo_set_source_pixbuf(cr, pixbuf, 0, 0);
-  cairo_paint(cr);
+  PainterGtk painter(cr, SizeF(width, height));
+  view->Paint(&painter);
   return FALSE;
 }
 
@@ -65,19 +52,12 @@ GifPlayer::GifPlayer() {
 }
 
 GifPlayer::~GifPlayer() {
-  if (iter_)
-    g_object_unref(iter_);
   if (timer_ > 0)
     StopAnimationTimer();
 }
 
 void GifPlayer::PlatformSetImage(Image* image) {
   SchedulePaint();
-  // Reset iterator after changing image.
-  if (iter_) {
-    g_object_unref(iter_);
-    iter_ = nullptr;
-  }
   // Start animation by default.
   SetAnimating(!!image);
 }
@@ -87,31 +67,16 @@ bool GifPlayer::CanAnimate() const {
 }
 
 void GifPlayer::ScheduleFrame() {
-  if (iter_) {
-    // Advance frame.
-    GTimeVal time;
-    g_get_current_time(&time);
-    gdk_pixbuf_animation_iter_advance(iter_, &time);
-  } else {
-    GetFrame();
-  }
+  // Advance frame.
+  image_->AdvanceFrame();
   // Emit draw event.
   SchedulePaint();
   // Schedule next call.
   if (is_animating_) {
     timer_ = MessageLoop::SetTimeout(
-        gdk_pixbuf_animation_iter_get_delay_time(iter_),
+        gdk_pixbuf_animation_iter_get_delay_time(image_->iter()),
         std::bind(&GifPlayer::ScheduleFrame, this));
   }
-}
-
-GdkPixbufAnimationIter* GifPlayer::GetFrame() {
-  if (!iter_) {
-    GTimeVal time;
-    g_get_current_time(&time);
-    iter_ = gdk_pixbuf_animation_get_iter(image_->GetNative(), &time);
-  }
-  return iter_;
 }
 
 }  // namespace nu
