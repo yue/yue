@@ -39,6 +39,15 @@ bool GifPlayer::IsAnimating() const {
   return is_animating_;
 }
 
+void GifPlayer::SetScale(ImageScale scale) {
+  scale_ = scale;
+  SchedulePaint();
+}
+
+ImageScale GifPlayer::GetScale() const {
+  return scale_;
+}
+
 bool GifPlayer::IsPlaying() const {
   return timer_ != 0;
 }
@@ -52,11 +61,37 @@ void GifPlayer::StopAnimationTimer() {
 
 void GifPlayer::Paint(Painter* painter) {
   // Calulate image position.
-  nu::RectF bounds = GetBounds();
-  nu::SizeF size = image_->GetSize();
-  nu::RectF rect((bounds.width() - size.width()) / 2,
-                 (bounds.height() - size.height()) / 2,
-                 size.width(), size.height());
+  RectF bounds = GetBounds();
+  SizeF size = image_->GetSize();
+  RectF rect;
+  switch (scale_) {
+    case ImageScale::None:
+      rect = RectF((bounds.width() - size.width()) / 2,
+                   (bounds.height() - size.height()) / 2,
+                   size.width(), size.height());
+      break;
+    case ImageScale::Fill:
+      rect = RectF(bounds.size());
+      break;
+    case ImageScale::Down:
+      if (bounds.width() > size.width() && bounds.height() > size.height()) {
+        rect = RectF((bounds.width() - size.width()) / 2,
+                     (bounds.height() - size.height()) / 2,
+                     size.width(), size.height());
+        break;
+      } else {
+        // Fallthrough to ImageScale::UpOrDown code.
+      }
+    case ImageScale::UpOrDown: {
+      float ratio = std::min(bounds.width() / size.width(),
+                             bounds.height() / size.height());
+      size = ScaleSize(size, ratio);
+      rect = RectF((bounds.width() - size.width()) / 2,
+                   (bounds.height() - size.height()) / 2,
+                   size.width(), size.height());
+      break;
+    }
+  }
 
   // Paint.
   painter->DrawImage(image_.get(), rect);
@@ -67,7 +102,7 @@ const char* GifPlayer::GetClassName() const {
 }
 
 SizeF GifPlayer::GetMinimumSize() const {
-  if (image_)
+  if (image_ && scale_ == ImageScale::None)
     return image_->GetSize();
   else
     return SizeF();

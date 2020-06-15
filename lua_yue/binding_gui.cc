@@ -1816,6 +1816,45 @@ struct Type<nu::Picker> {
 };
 
 template<>
+struct Type<nu::ImageScale> {
+  static constexpr const char* name = "ImageScale";
+  static inline bool To(State* state, int index, nu::ImageScale* out) {
+    std::string scale;
+    if (!lua::To(state, index, &scale))
+      return false;
+    if (scale == "none") {
+      *out = nu::ImageScale::None;
+      return true;
+    } else if (scale == "fill") {
+      *out = nu::ImageScale::Fill;
+      return true;
+    } else if (scale == "down") {
+      *out = nu::ImageScale::Down;
+      return true;
+    } else if (scale == "up-or-down") {
+      *out = nu::ImageScale::UpOrDown;
+      return true;
+    } else {
+      return false;
+    }
+  }
+  static inline void Push(State* state, nu::ImageScale scale) {
+    switch (scale) {
+      case nu::ImageScale::None:
+        return lua::Push(state, "none");
+      case nu::ImageScale::Fill:
+        return lua::Push(state, "fill");
+      case nu::ImageScale::Down:
+        return lua::Push(state, "down");
+      case nu::ImageScale::UpOrDown:
+        return lua::Push(state, "up-or-down");
+    }
+    NOTREACHED();
+    return lua::Push(state, nullptr);
+  }
+};
+
+template<>
 struct Type<nu::GifPlayer> {
   using base = nu::View;
   static constexpr const char* name = "yue.GifPlayer";
@@ -1825,7 +1864,9 @@ struct Type<nu::GifPlayer> {
            "setimage", &nu::GifPlayer::SetImage,
            "getimage", &nu::GifPlayer::GetImage,
            "setanimating", &nu::GifPlayer::SetAnimating,
-           "isanimating", &nu::GifPlayer::IsAnimating);
+           "isanimating", &nu::GifPlayer::IsAnimating,
+           "setscale", &nu::GifPlayer::SetScale,
+           "getscale", &nu::GifPlayer::GetScale);
   }
 };
 

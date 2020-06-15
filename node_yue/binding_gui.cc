@@ -2079,6 +2079,48 @@ struct Type<nu::Picker> {
 };
 
 template<>
+struct Type<nu::ImageScale> {
+  static constexpr const char* name = "ImageScale";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::ImageScale* out) {
+    std::string scale;
+    if (!vb::FromV8(context, value, &scale))
+      return false;
+    if (scale == "none") {
+      *out = nu::ImageScale::None;
+      return true;
+    } else if (scale == "fill") {
+      *out = nu::ImageScale::Fill;
+      return true;
+    } else if (scale == "down") {
+      *out = nu::ImageScale::Down;
+      return true;
+    } else if (scale == "up-or-down") {
+      *out = nu::ImageScale::UpOrDown;
+      return true;
+    } else {
+      return false;
+    }
+  }
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   nu::ImageScale scale) {
+    switch (scale) {
+      case nu::ImageScale::None:
+        return vb::ToV8(context, "none");
+      case nu::ImageScale::Fill:
+        return vb::ToV8(context, "fill");
+      case nu::ImageScale::Down:
+        return vb::ToV8(context, "down");
+      case nu::ImageScale::UpOrDown:
+        return vb::ToV8(context, "up-or-down");
+    }
+    NOTREACHED();
+    return v8::Undefined(context->GetIsolate());
+  }
+};
+
+template<>
 struct Type<nu::GifPlayer> {
   using base = nu::View;
   static constexpr const char* name = "yue.GifPlayer";
@@ -2093,7 +2135,9 @@ struct Type<nu::GifPlayer> {
         "setImage", &nu::GifPlayer::SetImage,
         "getImage", &nu::GifPlayer::GetImage,
         "setAnimating", &nu::GifPlayer::SetAnimating,
-        "isAnimating", &nu::GifPlayer::IsAnimating);
+        "isAnimating", &nu::GifPlayer::IsAnimating,
+        "setScale", &nu::GifPlayer::SetScale,
+        "getScale", &nu::GifPlayer::GetScale);
   }
 };
 

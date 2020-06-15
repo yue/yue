@@ -9,6 +9,7 @@
 
 #include "nativeui/gfx/painter.h"
 #include "nativeui/message_loop.h"
+#include "nativeui/standard_enums.h"
 #include "nativeui/view.h"
 
 namespace nu {
@@ -27,6 +28,8 @@ class NATIVEUI_EXPORT GifPlayer : public View {
   Image* GetImage() const;
   void SetAnimating(bool animates);
   bool IsAnimating() const;
+  void SetScale(ImageScale scale);
+  ImageScale GetScale() const;
 
   // Internal: Is animation being played.
   bool IsPlaying() const;
@@ -66,6 +69,7 @@ class NATIVEUI_EXPORT GifPlayer : public View {
   MessageLoop::TimerId timer_ = 0;
 
   bool is_animating_ = false;
+  ImageScale scale_ = ImageScale::None;
   scoped_refptr<Image> image_;
 };
 

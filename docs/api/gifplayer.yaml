@@ -45,3 +45,10 @@ methods:
 
   - signature: bool IsAnimating() const
     description: Return whether the image is animating.
+
+  - signature: void SetScale(ImageScale scale)
+    description: Set the scaling mode.
+    detail: The default scaling mode is `<!enum class>None`.
+
+  - signature: ImageScale GetScale() const
+    description: Return the scaling mode.
