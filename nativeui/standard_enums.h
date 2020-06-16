@@ -14,6 +14,11 @@ enum class ImageScale {
   UpOrDown,
 };
 
+enum class Orientation {
+  Horizontal,
+  Vertical,
+};
+
 }  // namespace nu
 
 #endif  // NATIVEUI_STANDARD_ENUMS_H_

@@ -33,6 +33,7 @@
 #include "nativeui/progress_bar.h"
 #include "nativeui/protocol_asar_job.h"
 #include "nativeui/scroll.h"
+#include "nativeui/separator.h"
 #include "nativeui/slider.h"
 #include "nativeui/state.h"
 #include "nativeui/tab.h"

@@ -1,0 +1,22 @@
+name: Separator
+component: gui
+header: nativeui/separator.h
+type: refcounted
+namespace: nu
+inherit: View
+description: A horizontal or vertical line.
+
+constructors:
+  - signature: Separator(Orientation orientation)
+    lang: ['cpp']
+    description: Create a new `Separator` with `orientation`.
+
+class_methods:
+  - signature: Separator* Create(Orientation orientation)
+    lang: ['lua', 'js']
+    description: Create a new `Separator` with `orientation`.
+
+class_properties:
+  - property: const char* kClassName
+    lang: ['cpp']
+    description: The class name of this view.

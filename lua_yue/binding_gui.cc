@@ -161,6 +161,74 @@ struct Type<nu::PointF> {
 };
 
 template<>
+struct Type<nu::ImageScale> {
+  static constexpr const char* name = "ImageScale";
+  static inline bool To(State* state, int index, nu::ImageScale* out) {
+    std::string scale;
+    if (!lua::To(state, index, &scale))
+      return false;
+    if (scale == "none") {
+      *out = nu::ImageScale::None;
+      return true;
+    } else if (scale == "fill") {
+      *out = nu::ImageScale::Fill;
+      return true;
+    } else if (scale == "down") {
+      *out = nu::ImageScale::Down;
+      return true;
+    } else if (scale == "up-or-down") {
+      *out = nu::ImageScale::UpOrDown;
+      return true;
+    } else {
+      return false;
+    }
+  }
+  static inline void Push(State* state, nu::ImageScale scale) {
+    switch (scale) {
+      case nu::ImageScale::None:
+        return lua::Push(state, "none");
+      case nu::ImageScale::Fill:
+        return lua::Push(state, "fill");
+      case nu::ImageScale::Down:
+        return lua::Push(state, "down");
+      case nu::ImageScale::UpOrDown:
+        return lua::Push(state, "up-or-down");
+    }
+    NOTREACHED();
+    return lua::Push(state, nullptr);
+  }
+};
+
+template<>
+struct Type<nu::Orientation> {
+  static constexpr const char* name = "Orientation";
+  static inline bool To(State* state, int index, nu::Orientation* out) {
+    std::string orientation;
+    if (!lua::To(state, index, &orientation))
+      return false;
+    if (orientation == "horizontal") {
+      *out = nu::Orientation::Horizontal;
+      return true;
+    } else if (orientation == "vertical") {
+      *out = nu::Orientation::Vertical;
+      return true;
+    } else {
+      return false;
+    }
+  }
+  static inline void Push(State* state, nu::Orientation orientation) {
+    switch (orientation) {
+      case nu::Orientation::Horizontal:
+        return lua::Push(state, "horizontal");
+      case nu::Orientation::Vertical:
+        return lua::Push(state, "vertical");
+    }
+    NOTREACHED();
+    return lua::Push(state, nullptr);
+  }
+};
+
+template<>
 struct Type<nu::Accelerator> {
   static constexpr const char* name = "yue.Accelerator";
   static inline bool To(State* state, int index, nu::Accelerator* out) {
@@ -1816,45 +1884,6 @@ struct Type<nu::Picker> {
 };
 
 template<>
-struct Type<nu::ImageScale> {
-  static constexpr const char* name = "ImageScale";
-  static inline bool To(State* state, int index, nu::ImageScale* out) {
-    std::string scale;
-    if (!lua::To(state, index, &scale))
-      return false;
-    if (scale == "none") {
-      *out = nu::ImageScale::None;
-      return true;
-    } else if (scale == "fill") {
-      *out = nu::ImageScale::Fill;
-      return true;
-    } else if (scale == "down") {
-      *out = nu::ImageScale::Down;
-      return true;
-    } else if (scale == "up-or-down") {
-      *out = nu::ImageScale::UpOrDown;
-      return true;
-    } else {
-      return false;
-    }
-  }
-  static inline void Push(State* state, nu::ImageScale scale) {
-    switch (scale) {
-      case nu::ImageScale::None:
-        return lua::Push(state, "none");
-      case nu::ImageScale::Fill:
-        return lua::Push(state, "fill");
-      case nu::ImageScale::Down:
-        return lua::Push(state, "down");
-      case nu::ImageScale::UpOrDown:
-        return lua::Push(state, "up-or-down");
-    }
-    NOTREACHED();
-    return lua::Push(state, nullptr);
-  }
-};
-
-template<>
 struct Type<nu::GifPlayer> {
   using base = nu::View;
   static constexpr const char* name = "yue.GifPlayer";
@@ -1933,6 +1962,16 @@ struct Type<nu::Scroll> {
 #endif
            "setscrollbarpolicy", &nu::Scroll::SetScrollbarPolicy,
            "getscrollbarpolicy", &nu::Scroll::GetScrollbarPolicy);
+  }
+};
+
+template<>
+struct Type<nu::Separator> {
+  using base = nu::View;
+  static constexpr const char* name = "Separator";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateOnHeap<nu::Separator, nu::Orientation>);
   }
 };
 
@@ -2292,6 +2331,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::GifPlayer>(state, "GifPlayer");
   BindType<nu::Group>(state, "Group");
   BindType<nu::Scroll>(state, "Scroll");
+  BindType<nu::Separator>(state, "Separator");
   BindType<nu::Slider>(state, "Slider");
   BindType<nu::Tab>(state, "Tab");
   BindType<nu::TableModel>(state, "TableModel");

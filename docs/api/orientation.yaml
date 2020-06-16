@@ -1,0 +1,9 @@
+name: Orientation
+header: nativeui/standard_enums.h
+type: enum class
+namespace: nu
+description: Horizontal or vertical orientation.
+
+enums:
+  - name: Horizontal
+  - name: Vertical

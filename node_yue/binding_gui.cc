@@ -171,6 +171,80 @@ struct Type<nu::PointF> {
 };
 
 template<>
+struct Type<nu::ImageScale> {
+  static constexpr const char* name = "ImageScale";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::ImageScale* out) {
+    std::string scale;
+    if (!vb::FromV8(context, value, &scale))
+      return false;
+    if (scale == "none") {
+      *out = nu::ImageScale::None;
+      return true;
+    } else if (scale == "fill") {
+      *out = nu::ImageScale::Fill;
+      return true;
+    } else if (scale == "down") {
+      *out = nu::ImageScale::Down;
+      return true;
+    } else if (scale == "up-or-down") {
+      *out = nu::ImageScale::UpOrDown;
+      return true;
+    } else {
+      return false;
+    }
+  }
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   nu::ImageScale scale) {
+    switch (scale) {
+      case nu::ImageScale::None:
+        return vb::ToV8(context, "none");
+      case nu::ImageScale::Fill:
+        return vb::ToV8(context, "fill");
+      case nu::ImageScale::Down:
+        return vb::ToV8(context, "down");
+      case nu::ImageScale::UpOrDown:
+        return vb::ToV8(context, "up-or-down");
+    }
+    NOTREACHED();
+    return v8::Undefined(context->GetIsolate());
+  }
+};
+
+template<>
+struct Type<nu::Orientation> {
+  static constexpr const char* name = "Orientation";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::Orientation* out) {
+    std::string orientation;
+    if (!vb::FromV8(context, value, &orientation))
+      return false;
+    if (orientation == "horizontal") {
+      *out = nu::Orientation::Horizontal;
+      return true;
+    } else if (orientation == "vertical") {
+      *out = nu::Orientation::Vertical;
+      return true;
+    } else {
+      return false;
+    }
+  }
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   nu::Orientation orientation) {
+    switch (orientation) {
+      case nu::Orientation::Horizontal:
+        return vb::ToV8(context, "horizontal");
+      case nu::Orientation::Vertical:
+        return vb::ToV8(context, "vertical");
+    }
+    NOTREACHED();
+    return v8::Undefined(context->GetIsolate());
+  }
+};
+
+template<>
 struct Type<nu::Accelerator> {
   static constexpr const char* name = "yue.Accelerator";
   static bool FromV8(v8::Local<v8::Context> context,
@@ -2079,48 +2153,6 @@ struct Type<nu::Picker> {
 };
 
 template<>
-struct Type<nu::ImageScale> {
-  static constexpr const char* name = "ImageScale";
-  static bool FromV8(v8::Local<v8::Context> context,
-                     v8::Local<v8::Value> value,
-                     nu::ImageScale* out) {
-    std::string scale;
-    if (!vb::FromV8(context, value, &scale))
-      return false;
-    if (scale == "none") {
-      *out = nu::ImageScale::None;
-      return true;
-    } else if (scale == "fill") {
-      *out = nu::ImageScale::Fill;
-      return true;
-    } else if (scale == "down") {
-      *out = nu::ImageScale::Down;
-      return true;
-    } else if (scale == "up-or-down") {
-      *out = nu::ImageScale::UpOrDown;
-      return true;
-    } else {
-      return false;
-    }
-  }
-  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
-                                   nu::ImageScale scale) {
-    switch (scale) {
-      case nu::ImageScale::None:
-        return vb::ToV8(context, "none");
-      case nu::ImageScale::Fill:
-        return vb::ToV8(context, "fill");
-      case nu::ImageScale::Down:
-        return vb::ToV8(context, "down");
-      case nu::ImageScale::UpOrDown:
-        return vb::ToV8(context, "up-or-down");
-    }
-    NOTREACHED();
-    return v8::Undefined(context->GetIsolate());
-  }
-};
-
-template<>
 struct Type<nu::GifPlayer> {
   using base = nu::View;
   static constexpr const char* name = "yue.GifPlayer";
@@ -2216,6 +2248,20 @@ struct Type<nu::Scroll> {
 #endif
         "setScrollbarPolicy", &nu::Scroll::SetScrollbarPolicy,
         "getScrollbarPolicy", &nu::Scroll::GetScrollbarPolicy);
+  }
+};
+
+template<>
+struct Type<nu::Separator> {
+  using base = nu::View;
+  static constexpr const char* name = "Separator";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+        "create", &CreateOnHeap<nu::Separator, nu::Orientation>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
   }
 };
 
@@ -2612,6 +2658,7 @@ void Initialize(v8::Local<v8::Object> exports,
           "GifPlayer",         vb::Constructor<nu::GifPlayer>(),
           "Group",             vb::Constructor<nu::Group>(),
           "Scroll",            vb::Constructor<nu::Scroll>(),
+          "Separator",         vb::Constructor<nu::Separator>(),
           "Slider",            vb::Constructor<nu::Slider>(),
           "TableModel",        vb::Constructor<nu::TableModel>(),
           "AbstractTableModel", vb::Constructor<nu::AbstractTableModel>(),
