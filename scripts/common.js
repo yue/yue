@@ -55,7 +55,9 @@ const argv = process.argv.slice(2).filter((arg) => {
 
 function strip(file) {
   // TODO(zcbenz): Use |file| command to determine type.
-  if (!file.endsWith('.so') && path.basename(file) != 'yue')
+  if (!file.endsWith('.so') &&
+      !file.endsWith('.node') &&
+      path.basename(file) != 'yue')
     return
   // TODO(zcbenz): Copy the debug symbols out before striping.
   let strip = 'strip'
