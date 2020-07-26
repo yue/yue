@@ -100,7 +100,9 @@ class ScopedClipboard {
 
 class ClipboardWindow : public Win32Window {
  public:
-  ClipboardWindow() : Win32Window(L"", HWND_MESSAGE, 0) {}
+  explicit ClipboardWindow(Clipboard* delegate)
+      : Win32Window(L"", HWND_MESSAGE, 0),
+        delegate_(delegate) {}
 
  private:
   bool ProcessWindowMessage(HWND window,
@@ -120,6 +122,9 @@ class ClipboardWindow : public Win32Window {
       // the clipboard before it exits.
       // We always set data, so there isn't a need to actually do anything here.
       break;
+    case WM_CLIPBOARDUPDATE:
+      delegate_->on_change.Emit(delegate_);
+      break;
     case WM_DRAWCLIPBOARD:
       break;
     case WM_DESTROY:
@@ -132,6 +137,8 @@ class ClipboardWindow : public Win32Window {
     *result = 0;
     return true;
   }
+
+  Clipboard* delegate_;
 };
 
 template <typename charT>
@@ -171,7 +178,7 @@ class ClipboardImpl {
  public:
   using Data = Clipboard::Data;
 
-  ClipboardImpl() {}
+  explicit ClipboardImpl(Clipboard* delegate) : clipboard_owner_(delegate) {}
   ~ClipboardImpl() {}
 
   bool IsDataAvailable(Data::Type type) const {
@@ -250,6 +257,14 @@ class ClipboardImpl {
           NOTREACHED() << "Invalid type: " << static_cast<int>(data.type());
       }
     }
+  }
+
+  void StartWatching() {
+    ::AddClipboardFormatListener(clipboard_owner_.hwnd());
+  }
+
+  void StopWatching() {
+    ::RemoveClipboardFormatListener(clipboard_owner_.hwnd());
   }
 
  private:
@@ -343,7 +358,7 @@ class ClipboardImpl {
 // Public Clipboard API implementation.
 
 NativeClipboard Clipboard::PlatformCreate(Type type) {
-  return new ClipboardImpl;
+  return new ClipboardImpl(this);
 }
 
 void Clipboard::PlatformDestroy() {
@@ -360,6 +375,14 @@ Clipboard::Data Clipboard::GetData(Data::Type type) const {
 
 void Clipboard::SetData(std::vector<Data> objects) {
   clipboard_->SetData(std::move(objects));
+}
+
+void Clipboard::PlatformStartWatching() {
+  clipboard_->StartWatching();
+}
+
+void Clipboard::PlatformStopWatching() {
+  clipboard_->StopWatching();
 }
 
 }  // namespace nu

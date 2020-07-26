@@ -153,3 +153,16 @@ TEST_F(ClipboardTest, NotAvailable) {
   data = clipboard_->GetData(Data::Type::FilePaths);
   EXPECT_EQ(data.type(), Data::Type::None);
 }
+
+TEST_F(ClipboardTest, OnChange) {
+  bool changed = false;
+  clipboard_->Clear();
+  clipboard_->on_change.Connect([&changed](nu::Clipboard*) {
+    changed = true;
+    nu::MessageLoop::Quit();
+  });
+  clipboard_->StartWatching();
+  clipboard_->SetText("some text");
+  nu::MessageLoop::Run();
+  EXPECT_EQ(changed, true);
+}

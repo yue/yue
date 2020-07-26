@@ -632,7 +632,11 @@ struct Type<nu::Clipboard> {
            "gettext", &nu::Clipboard::GetText,
            "isdataavailable", &nu::Clipboard::IsDataAvailable,
            "getdata", &nu::Clipboard::GetData,
-           "setdata", &nu::Clipboard::SetData);
+           "setdata", &nu::Clipboard::SetData,
+           "startwatching", &nu::Clipboard::StartWatching,
+           "stopwatching", &nu::Clipboard::StopWatching);
+    RawSetProperty(state, index,
+                   "onchange", &nu::Clipboard::on_change);
   }
 };
 

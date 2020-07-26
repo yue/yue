@@ -23,6 +23,10 @@ void ClipboardClear(GtkClipboard* clipboard,
   delete objects;
 }
 
+void OnClipboardOnwerChange(GtkClipboard*, GdkEvent*, Clipboard* clipboard) {
+  clipboard->on_change.Emit(clipboard);
+}
+
 }  // namespace
 
 NativeClipboard Clipboard::PlatformCreate(Type type) {
@@ -68,6 +72,18 @@ void Clipboard::SetData(std::vector<Data> objects) {
   if (table)
     gtk_target_table_free(table, number);
   gtk_target_list_unref(targets);
+}
+
+void Clipboard::PlatformStartWatching() {
+  DCHECK_EQ(signal_, 0u);
+  signal_ = g_signal_connect(GetNative(), "owner-change",
+                             G_CALLBACK(OnClipboardOnwerChange), this);
+}
+
+void Clipboard::PlatformStopWatching() {
+  DCHECK_GT(signal_, 0u);
+  g_signal_handler_disconnect(GetNative(), signal_);
+  signal_ = 0;
 }
 
 }  // namespace nu

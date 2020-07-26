@@ -107,6 +107,25 @@ methods:
       objects:
         description: An array of `<!type>Clipboard::Data`.
 
+  - signature: void StartWatching()
+    description: Start watching clipboard's content.
+    detail: |
+      The `<!name>on_change` event will be emitted when clipboard's content has
+      been changed.
+
+      On macOS, due to lack of system notifications for clipboard events, this
+      event is implemented by polling every 500ms.
+
+  - signature: void StopWatching()
+    description: Stop watching clipboard's content.
+
   - signature: NativeClipboard GetNative() const
     lang: ['cpp']
     description: Return the native handle of clipboard.
+
+events:
+  - callback: void on_change(Clipboard* self)
+    description: Emitted when clipboard's content has been changed.
+    detail: |
+      The `<!name>StartWatching` method must be called first to make this event
+      work.

@@ -111,6 +111,7 @@ Clipboard::Clipboard(Type type)
     : type_(type), clipboard_(PlatformCreate(type)), weak_factory_(this) {}
 
 Clipboard::~Clipboard() {
+  StopWatching();
   PlatformDestroy();
 }
 
@@ -128,6 +129,20 @@ std::string Clipboard::GetText() const {
   Data data = GetData(Data::Type::Text);
   return data.type() == Data::Type::Text ? std::move(data.str())
                                          : std::string();
+}
+
+void Clipboard::StartWatching() {
+  if (is_watching_)
+    return;
+  is_watching_ = true;
+  PlatformStartWatching();
+}
+
+void Clipboard::StopWatching() {
+  if (!is_watching_)
+    return;
+  is_watching_ = false;
+  PlatformStopWatching();
 }
 
 }  // namespace nu

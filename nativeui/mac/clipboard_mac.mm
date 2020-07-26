@@ -15,6 +15,8 @@ namespace nu {
 
 namespace {
 
+const int kPollingTimeout = 500;
+
 const char kMarkupPrefix[] = "<meta charset='utf-8'>";
 
 // If there is RTF data on the pasteboard, returns an HTML version of it.
@@ -161,6 +163,28 @@ void Clipboard::SetData(std::vector<Data> objects) {
       default:
         NOTREACHED() << "Can not set clipboard data without type";
     }
+  }
+}
+
+void Clipboard::PlatformStartWatching() {
+  DCHECK_EQ(timer_, 0u);
+  change_count_ = [clipboard_ changeCount];
+  timer_ = MessageLoop::SetTimeout(kPollingTimeout,
+                                   std::bind(&Clipboard::OnTimer, this));
+}
+
+void Clipboard::PlatformStopWatching() {
+  DCHECK_GT(timer_, 0u);
+  MessageLoop::ClearTimeout(timer_);
+  timer_ = 0;
+}
+
+void Clipboard::OnTimer() {
+  timer_ = MessageLoop::SetTimeout(kPollingTimeout,
+                                   std::bind(&Clipboard::OnTimer, this));
+  if (change_count_ != [clipboard_ changeCount]) {
+    change_count_ = [clipboard_ changeCount];
+    on_change.Emit(this);
   }
 }
 

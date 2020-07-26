@@ -10,6 +10,8 @@
 
 #include "base/memory/weak_ptr.h"
 #include "nativeui/gfx/image.h"
+#include "nativeui/message_loop.h"
+#include "nativeui/signal.h"
 
 #if defined(OS_LINUX)
 // X11 headers define macros for these function names which screw with us.
@@ -115,9 +117,15 @@ class NATIVEUI_EXPORT Clipboard {
   Data GetData(Data::Type type) const;
   void SetData(std::vector<Data> objects);
 
+  void StartWatching();
+  void StopWatching();
+
   NativeClipboard GetNative() const { return clipboard_; }
 
   base::WeakPtr<Clipboard> GetWeakPtr() { return weak_factory_.GetWeakPtr(); }
+
+  // Events.
+  Signal<void(Clipboard*)> on_change;
 
  private:
   friend class State;
@@ -126,9 +134,25 @@ class NATIVEUI_EXPORT Clipboard {
 
   NativeClipboard PlatformCreate(Type type);
   void PlatformDestroy();
+  void PlatformStartWatching();
+  void PlatformStopWatching();
+
+#if defined(OS_MACOSX)
+  void OnTimer();
+#endif
 
   Type type_;
   NativeClipboard clipboard_;
+
+  bool is_watching_ = false;
+#if defined(OS_MACOSX)
+  // Timer-based clipboard watching.
+  MessageLoop::TimerId timer_ = 0;
+  int change_count_ = 0;
+#elif defined(OS_LINUX)
+  // Signal-based clipboard watching.
+  ulong signal_ = 0;
+#endif
 
   base::WeakPtrFactory<Clipboard> weak_factory_;
 
