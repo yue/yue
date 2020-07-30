@@ -23,7 +23,7 @@ class EntryImpl : public EditView {
   // SubwinView:
   void OnCommand(UINT code, int command) override {
     Entry* entry = static_cast<Entry*>(delegate());
-    if (code == EN_CHANGE)
+    if (code == EN_CHANGE && !is_editing())
       entry->on_text_change.Emit(entry);
   }
 

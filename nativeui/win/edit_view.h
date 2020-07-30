@@ -30,8 +30,12 @@ class EditView : public SubwinView {
   void Paste();
   void SelectAll();
 
+  bool is_editing() const { return is_editing_; }
+
  private:
   void LoadRichEdit();
+
+  bool is_editing_ = false;
 };
 
 }  // namespace nu

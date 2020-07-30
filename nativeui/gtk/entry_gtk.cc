@@ -16,8 +16,9 @@ void OnActivate(GtkEntry*, Entry* entry) {
   entry->on_activate.Emit(entry);
 }
 
-void OnEntryTextChange(GtkEditable*, Entry* entry) {
-  entry->on_text_change.Emit(entry);
+void OnEntryTextChange(GtkEditable* widget, Entry* entry) {
+  if (!g_object_get_data(G_OBJECT(widget), "is-editing"))
+    entry->on_text_change.Emit(entry);
 }
 
 }  // namespace
@@ -40,7 +41,9 @@ Entry::~Entry() {
 }
 
 void Entry::SetText(const std::string& text) {
+  g_object_set_data(G_OBJECT(GetNative()), "is-editing", this);
   gtk_entry_set_text(GTK_ENTRY(GetNative()), text.c_str());
+  g_object_set_data(G_OBJECT(GetNative()), "is-editing", nullptr);
 }
 
 std::string Entry::GetText() const {
