@@ -68,7 +68,9 @@ bool TrayHost::ProcessWindowMessage(
 
     switch (l_param) {
       case WM_LBUTTONDOWN:
+      case WM_LBUTTONUP:
       case WM_RBUTTONDOWN:
+      case WM_RBUTTONUP:
       case WM_CONTEXTMENU:
         tray->HandleClickEvent(l_param);
         return true;

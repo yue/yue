@@ -45,11 +45,15 @@ TrayImpl::~TrayImpl() {
 }
 
 void TrayImpl::HandleClickEvent(UINT message) {
-  if (message == WM_LBUTTONDOWN)
+  if (message == WM_LBUTTONDOWN) {
     delegate_->on_click.Emit(delegate_);
-  else if ((message == WM_RBUTTONDOWN || message == WM_CONTEXTMENU) &&
-           delegate_->GetMenu())
+  } else if (message == WM_RBUTTONUP && delegate_->GetMenu()) {
+    // MSDN: To display a context menu for a notification icon, the current
+    // window must be the foreground window before the application calls
+    // TrackPopupMenu or TrackPopupMenuEx.
+    ::SetForegroundWindow(State::GetCurrent()->GetSubwinHolder());
     delegate_->GetMenu()->Popup();
+  }
 }
 
 void TrayImpl::ResetIcon() {
