@@ -4,6 +4,8 @@
 
 #include "nativeui/gfx/attributed_text.h"
 
+#include <math.h>
+
 #include <gtk/gtk.h>
 #include <pango/pango.h>
 
@@ -100,7 +102,11 @@ void AttributedText::PlatformSetColorFor(Color color, int start, int end) {
 
 RectF AttributedText::GetBoundsFor(const SizeF& size) const {
   if (format_.wrap) {
-    pango_layout_set_width(text_, size.width() * PANGO_SCALE);
+    // Yoga may pass 0 as width to indicate no wrapping.
+    if (size.width() == 0 || isnan(size.width()))
+      pango_layout_set_width(text_, -1);
+    else
+      pango_layout_set_width(text_, size.width() * PANGO_SCALE);
     pango_layout_set_height(text_, size.height() * PANGO_SCALE);
   }
   int width, height;

@@ -4,6 +4,8 @@
 
 #include "nativeui/gif_player.h"
 
+#include <algorithm>
+
 #include "nativeui/gfx/image.h"
 
 namespace nu {

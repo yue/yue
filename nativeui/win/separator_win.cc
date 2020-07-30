@@ -12,7 +12,7 @@ namespace {
 
 class SeparatorImpl : public SubwinView {
  public:
-  SeparatorImpl(Separator* delegate)
+  explicit SeparatorImpl(Separator* delegate)
       : SubwinView(delegate, L"static",
                    SS_ETCHEDHORZ | WS_CHILD | WS_VISIBLE) {}
 };
