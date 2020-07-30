@@ -21,7 +21,7 @@ constructors:
     description: Create an `AttributedText` with `attributes`.
 
 class_methods:
-  - signature: AttributedText* Create(TextAttributes attributes)
+  - signature: AttributedText* Create(const std::string& text, TextAttributes attributes)
     lang: ['lua', 'js']
     description: Create an `AttributedText`.
 
