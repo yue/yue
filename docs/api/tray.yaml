@@ -11,6 +11,8 @@ detail: |
   * On Linux tray items are displayed as app indicators.
   * On Linux there is no fallback when app indicators are not supported.
   * On Linux app indicator can only show when it has menu attached.
+  * On Windows you have to explicitly remove the tray item on exit, otherwise
+    a zombie icon would be left.
 
 constructors:
   - signature: Tray(Image* icon)
@@ -33,6 +35,9 @@ class_methods:
     description: Create a tray item with only `title`.
 
 methods:
+  - signature: void Remove()
+    description: Remove the tray item.
+
   - signature: void SetTitle(const std::string& title)
     platform: ['macOS', 'linux']
     description: Set title to be displayed aside item's icon.

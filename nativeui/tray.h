@@ -26,6 +26,7 @@ class NATIVEUI_EXPORT Tray : public base::RefCounted<Tray> {
   explicit Tray(const std::string& title);
 #endif
 
+  void Remove();
   void SetTitle(const std::string& title);
   void SetImage(Image* icon);
   void SetMenu(Menu* menu);

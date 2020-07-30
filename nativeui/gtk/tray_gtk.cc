@@ -163,10 +163,15 @@ Tray::Tray(Image* icon)
 }
 
 Tray::~Tray() {
+  Remove();
+}
+
+void Tray::Remove() {
   if (!tray_)
     return;
   app_indicator_set_status(tray_, APP_INDICATOR_STATUS_PASSIVE);
   g_object_unref(tray_);
+  tray_ = nullptr;
 }
 
 void Tray::SetTitle(const std::string& title) {

@@ -28,6 +28,10 @@ Tray::~Tray() {
   [tray_ release];
 }
 
+void Tray::Remove() {
+  [[NSStatusBar systemStatusBar] removeStatusItem:tray_];
+}
+
 void Tray::SetTitle(const std::string& title) {
   [tray_ setTitle:base::SysUTF8ToNSString(title)];
 }

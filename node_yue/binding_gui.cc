@@ -1423,6 +1423,7 @@ struct Type<nu::Tray> {
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
+        "remove", &nu::Tray::Remove,
         "setTitle", &nu::Tray::SetTitle,
         "setImage", &nu::Tray::SetImage,
         "setMenu", RefMethod(&nu::Tray::SetMenu, RefType::Reset, "menu"));

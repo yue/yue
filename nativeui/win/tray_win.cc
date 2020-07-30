@@ -36,12 +36,18 @@ TrayImpl::TrayImpl(Tray* delegate)
 }
 
 TrayImpl::~TrayImpl() {
-  host_->Remove(this);
+  Remove();
+}
 
-  // Remove our icon.
+void TrayImpl::Remove() {
+  if (!host_)
+    return;
   NOTIFYICONDATA icon_data;
   InitIconData(&icon_data);
   Shell_NotifyIcon(NIM_DELETE, &icon_data);
+
+  host_->Remove(this);
+  host_ = nullptr;
 }
 
 void TrayImpl::HandleClickEvent(UINT message) {
@@ -57,6 +63,8 @@ void TrayImpl::HandleClickEvent(UINT message) {
 }
 
 void TrayImpl::ResetIcon() {
+  if (!host_)
+    return;
   NOTIFYICONDATA icon_data;
   InitIconData(&icon_data);
   // Delete any previously existing icon.
@@ -76,6 +84,8 @@ void TrayImpl::ResetIcon() {
 }
 
 void TrayImpl::SetImage(Image* icon) {
+  if (!host_)
+    return;
   // Convert image to bitmap icon.
   int width = ::GetSystemMetrics(SM_CXSMICON);
   scoped_refptr<Canvas> canvas = new Canvas(SizeF(width, width));
@@ -110,6 +120,10 @@ Tray::Tray(Image* icon) : tray_(new TrayImpl(this)) {
 
 Tray::~Tray() {
   delete tray_;
+}
+
+void Tray::Remove() {
+  tray_->Remove();
 }
 
 void Tray::SetTitle(const std::string& title) {

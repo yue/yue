@@ -1276,6 +1276,7 @@ struct Type<nu::Tray> {
            "createwithtitle", &CreateOnHeap<nu::Tray, const std::string&>,
 #endif
            "createwithimage", &CreateOnHeap<nu::Tray, nu::Image*>,
+           "remove", &nu::Tray::Remove,
            "settitle", &nu::Tray::SetTitle,
            "setimage", &nu::Tray::SetImage,
            "setmenu", RefMethod(&nu::Tray::SetMenu, RefType::Reset, "menu"));

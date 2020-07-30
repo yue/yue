@@ -20,6 +20,7 @@ class TrayImpl {
   explicit TrayImpl(Tray* delegate);
   ~TrayImpl();
 
+  void Remove();
   void HandleClickEvent(UINT message);
   void ResetIcon();
   void SetImage(Image* icon);
