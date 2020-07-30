@@ -7,6 +7,7 @@
 #import <Cocoa/Cocoa.h>
 
 #include "base/mac/scoped_cftyperef.h"
+#include "base/strings/pattern.h"
 #include "base/strings/sys_string_conversions.h"
 
 namespace nu {
@@ -68,6 +69,11 @@ Image::Image(const base::FilePath& p)
         CGImageSourceCreateWithURL((__bridge CFURLRef)[NSURL fileURLWithPath:u],
                                    nullptr));
     durations_ = GetFrameDurations(rep, source);
+  }
+  // Is template image.
+  if (base::MatchPattern(p.value(), "*Template.*") ||
+      base::MatchPattern(p.value(), "*Template@*x.*")) {
+    [image_ setTemplate:YES];
   }
 }
 
