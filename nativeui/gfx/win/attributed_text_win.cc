@@ -10,6 +10,7 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/win/scoped_hdc.h"
 #include "nativeui/gfx/attributed_text.h"
+#include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/win/screen_win.h"
 
 namespace nu {
@@ -62,15 +63,18 @@ RectF AttributedText::GetBoundsFor(const SizeF& size) const {
                                                  : text_->text;
 
   base::win::ScopedGetDC dc(NULL);
+  float scale_factor = GetScalingFactorFromDPI(::GetDeviceCaps(dc, LOGPIXELSX));
+
   Gdiplus::Graphics graphics(dc);
   // https://stackoverflow.com/questions/1203087/why-is-graphics-measurestring-returning-a-higher-than-expected-number
   graphics.SetTextRenderingHint(Gdiplus::TextRenderingHintAntiAlias);
+  Gdiplus::RectF bounds = ToGdi(RectF(ScaleSize(size, scale_factor)));
   Gdiplus::RectF rect;
   graphics.MeasureString(text.data(), static_cast<int>(text.size()),
-                         text_->font->GetNative(), Gdiplus::PointF(0., 0.),
+                         text_->font->GetNative(), bounds,
                          &rect);
-  float scale_factor = GetScalingFactorFromDPI(::GetDeviceCaps(dc, LOGPIXELSX));
-  return RectF(0., 0., rect.Width / scale_factor, rect.Height / scale_factor);
+  return RectF(rect.X / scale_factor, rect.Y / scale_factor,
+               rect.Width / scale_factor, rect.Height / scale_factor);
 }
 
 std::string AttributedText::GetText() const {
