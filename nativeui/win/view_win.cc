@@ -177,7 +177,7 @@ void ViewImpl::OnMouseLeave(NativeEvent event) {
 
 bool ViewImpl::OnMouseClick(NativeEvent event) {
   // If the view is disabled, prevent future processes.
-  if (is_disabled())
+  if (!is_enabled())
     return true;
 
   // Clicking a view should move the focus to it.
@@ -215,7 +215,7 @@ void ViewImpl::OnCaptureLost() {
 }
 
 bool ViewImpl::OnKeyEvent(NativeEvent event) {
-  if (!delegate())
+  if (!is_enabled() || !delegate())
     return false;
   KeyEvent client_event(event, this);
   if (client_event.type == EventType::KeyDown &&
@@ -405,11 +405,13 @@ bool View::IsTreeVisible() const {
 }
 
 void View::SetEnabled(bool enable) {
+  GetNative()->set_enabled(enable);
   GetNative()->SetState(enable ? ControlState::Normal : ControlState::Disabled);
+  GetNative()->SetFocus(false);
 }
 
 bool View::IsEnabled() const {
-  return !GetNative()->is_disabled();
+  return GetNative()->is_enabled();
 }
 
 void View::Focus() {

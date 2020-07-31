@@ -27,7 +27,7 @@ void Clickable::SetFocus(bool focus) {
 
 void Clickable::OnMouseEnter(NativeEvent event) {
   is_hovering_ = true;
-  if (!is_disabled() && !is_space_pressing_)
+  if (is_enabled() && !is_space_pressing_)
     SetState(is_capturing_ ? ControlState::Pressed : ControlState::Hovered);
   ViewImpl::OnMouseEnter(event);
 }
@@ -47,7 +47,7 @@ void Clickable::OnMouseMove(NativeEvent event) {
 
 void Clickable::OnMouseLeave(NativeEvent event) {
   is_hovering_ = false;
-  if (!is_disabled() && !is_space_pressing_)
+  if (is_enabled() && !is_space_pressing_)
     ResetState();
   ViewImpl::OnMouseLeave(event);
 }
@@ -107,7 +107,8 @@ bool Clickable::OnKeyEvent(NativeEvent event) {
 }
 
 void Clickable::ResetState() {
-  SetState(is_hovering_ ? ControlState::Hovered : ControlState::Normal);
+  if (is_enabled())
+    SetState(is_hovering_ ? ControlState::Hovered : ControlState::Normal);
 }
 
 }  // namespace nu

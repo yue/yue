@@ -209,8 +209,8 @@ class ButtonImpl : public Clickable {
 
   void SetState(ControlState state) override {
     ViewImpl::SetState(state);
-    text_->SetColor(Color::Get(is_disabled() ? Color::Name::DisabledText
-                                             : Color::Name::Text));
+    text_->SetColor(Color::Get(is_enabled() ? Color::Name::Text
+                                            : Color::Name::DisabledText));
   }
 
   AttributedText* text() const { return text_.get(); }

@@ -141,12 +141,13 @@ class ViewImpl {
   // Whether the view and its parent are visible.
   bool is_tree_visible() const { return is_tree_visible_; }
 
-  // Whether the view is disabled.
-  bool is_disabled() const { return state_ == ControlState::Disabled; }
+  // Whether the view is enabled.
+  void set_enabled(bool b) { is_enabled_ = b; }
+  bool is_enabled() const { return is_enabled_; }
 
   // Whether the view can get focus.
   void set_focusable(bool focusable) { focusable_ = focusable; }
-  bool is_focusable() const { return focusable_; }
+  bool is_focusable() const { return is_enabled() && focusable_; }
 
   void set_draggable(bool draggable) { draggable_ = draggable; }
   bool is_draggable() const { return draggable_; }
@@ -196,6 +197,9 @@ class ViewImpl {
 
   // Whether the view and its parent are visible.
   bool is_tree_visible_ = true;
+
+  // The enabled state.
+  bool is_enabled_ = true;
 
   // Accepted dragged types.
   std::set<Clipboard::Data::Type> dragged_types_;
