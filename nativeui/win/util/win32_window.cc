@@ -62,11 +62,12 @@ Win32Window::~Win32Window() {
 }
 
 HICON Win32Window::GetDefaultWindowIcon() const {
-  return nullptr;
+  // Use the icon of the exe by default.
+  return LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(1));
 }
 
 HICON Win32Window::GetSmallWindowIcon() const {
-  return nullptr;
+  return GetDefaultWindowIcon();
 }
 
 LRESULT Win32Window::OnWndProc(UINT message, WPARAM w_param, LPARAM l_param) {
