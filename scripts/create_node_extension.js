@@ -36,7 +36,8 @@ if (targetOs == 'mac') {
 }
 
 if (targetOs == 'linux') {
-  args.push('is_clang=true',
+  args.push('use_cfi_icall=false',
+            'is_clang=true',
             'clang_update_script="//building/tools/update-clang.py"',
             'use_sysroot=true',
             'target_sysroot_dir="//third_party/"',

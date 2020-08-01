@@ -57,6 +57,8 @@ if (targetOs == 'mac') {
 }
 
 if (targetOs == 'linux') {
+  // This flag prevents using dynamical loaded function pointers.
+  commonConfig.push('use_cfi_icall=false')
   // Use our custom clang script.
   commonConfig.push('is_clang=true',
                     'clang_update_script="//building/tools/update-clang.py"')
