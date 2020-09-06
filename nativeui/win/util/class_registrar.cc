@@ -45,7 +45,7 @@ ATOM ClassRegistrar::RetrieveClassAtom(const ClassInfo& class_info) {
 
   // No class found, need to register one.
   base::string16 name = base::string16(kBaseClassName) +
-      base::IntToString16(registered_count_++);
+      base::NumberToString16(registered_count_++);
 
   WNDCLASSEX window_class;
   base::win::InitializeWindowClass(

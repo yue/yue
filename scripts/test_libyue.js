@@ -4,7 +4,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {version, targetCpu, targetOs, execSync, spawnSync} = require('./common')
+const {version, clang, targetCpu, targetOs, execSync, spawnSync} = require('./common')
 
 const os = require('os')
 const path = require('path')
@@ -19,6 +19,7 @@ const tmppath = path.join(os.tmpdir(), zipname)
 console.log('Building libyue...')
 execSync('node scripts/create_source_dist.js')
 console.log('Unzipping libyue...')
+fs.removeSync(tmppath)
 extract(`out/Dist/${zipname}.zip`, {dir: tmppath}, runTests)
 
 function runTests(error) {
@@ -38,15 +39,13 @@ function runTests(error) {
 
 function generateProject() {
   if (targetOs == 'win') {
-    if (targetCpu == 'x86') {
-      fs.ensureDirSync('build_Win32')
-      spawnSync('cmake', ['..', '-G', 'Visual Studio 15 2017'],
-                {cwd: 'build_Win32'})
-    } else {
-      fs.ensureDirSync('build_x64')
-      spawnSync('cmake', ['..', '-G', 'Visual Studio 15 2017 Win64'],
-                {cwd: 'build_x64'})
-    }
+    const buildDir = `build_${targetCpu}`
+    fs.ensureDirSync(buildDir)
+    const platform = targetCpu == 'x64' ? 'x64' : 'Win32'
+    const args = ['-S', '.', '-G', 'Visual Studio 16 2019', '-B', buildDir, '-A', platform]
+    if (clang)
+      args.push('-T', 'ClangCL')
+    spawnSync('cmake', args)
   } else {
     fs.ensureDirSync('build')
     execSync('cmake ..', {cwd: 'build'})
@@ -54,22 +53,27 @@ function generateProject() {
 }
 
 function buildProject() {
+  const cpus = os.cpus().length
   if (targetOs == 'win') {
-    const vsPaths = [
-      'C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\MSBuild\\15.0\\Bin',
-      'C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Enterprise\\MSBuild\\15.0\\Bin',
-      process.env.PATH
-    ]
-    const env = Object.assign(process.env, {PATH: vsPaths.join(path.delimiter)})
-    const platform = targetCpu == 'x64' ? 'x64' : 'Win32'
-    spawnSync(
-      'msbuild',
-      ['Yue.sln',
-        '/maxcpucount:' + os.cpus().length,
-        '/p:Configuration=Release',
-        '/p:Platform=' + platform],
-      {cwd: 'build_' + platform, env})
+    if (clang) {
+      execSync(`cmake --build build_${targetCpu} --config Debug --parallel ${cpus}`)
+    } else {
+      const vsPaths = [
+        'C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\MSBuild\\Current\\Bin',
+        'C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\MSBuild\\Current\\Bin',
+        process.env.PATH
+      ]
+      const env = Object.assign(process.env, {PATH: vsPaths.join(path.delimiter)})
+      const platform = targetCpu == 'x64' ? 'x64' : 'Win32'
+      spawnSync(
+        'msbuild',
+        ['Yue.sln',
+          '/maxcpucount:' + cpus,
+          '/p:Configuration=Release',
+          '/p:Platform=' + platform],
+        {cwd: `build_${targetCpu}`, env})
+    }
   } else {
-    execSync(`make -j ${os.cpus().length}`, {cwd: 'build'})
+    execSync(`make -j ${cpus}`, {cwd: 'build'})
   }
 }

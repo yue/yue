@@ -10,7 +10,7 @@
 #include <string>
 #include <utility>
 
-#include "base/logging.h"
+#include "base/notreached.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/win/scoped_hglobal.h"
 #include "nativeui/win/drag_drop/clipboard_util.h"
@@ -274,7 +274,7 @@ FormatEtcEnumerator* FormatEtcEnumerator::CloneFromOther(
                  [](FORMATETC& format_etc) {
                    FORMATETC clone = {0};
                    CloneFormatEtc(&format_etc, &clone);
-                   return std::move(clone);
+                   return clone;
                  });
   // Carry over
   e->cursor_ = other->cursor_;

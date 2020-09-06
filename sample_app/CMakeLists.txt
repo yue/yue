@@ -32,8 +32,8 @@ endif()
 add_library(${LIBYUE} ${YUE_SOURCES})
 target_include_directories(${LIBYUE} PUBLIC include)
 
-# Use C++14 standard.
-target_compile_features(${LIBYUE} PUBLIC cxx_std_14)
+# Use C++17 standard.
+target_compile_features(${LIBYUE} PUBLIC cxx_std_17)
 
 # macOS configuration.
 if(APPLE)
@@ -42,8 +42,10 @@ if(APPLE)
   find_library(IOKIT IOKit)
   find_library(SECURITY Security)
   find_library(WEBKIT WebKit)
+  find_library(OD OpenDirectory)
   target_link_libraries(${LIBYUE} PUBLIC
-                        ${APPKIT} ${IOKIT} ${SECURITY} ${WEBKIT})
+                        ${APPKIT} ${IOKIT} ${SECURITY} ${WEBKIT} ${OD})
+  target_compile_definitions(${LIBYUE} PUBLIC SYSTEM_NATIVE_UTF8)
   set_target_properties(${LIBYUE} PROPERTIES COMPILE_FLAGS
                         "-Wno-deprecated-declarations")
   target_link_options(${LIBYUE} PUBLIC
@@ -58,11 +60,12 @@ if(WIN32)
                              _UNICODE UNICODE)
   target_link_libraries(${LIBYUE} PUBLIC
                         setupapi.lib powrprof.lib ws2_32.lib dbghelp.lib
-                        shlwapi.lib version.lib winmm.lib psapi.lib dwmapi.lib
-                        propsys.lib comctl32.lib gdi32.lib gdiplus.lib
-                        urlmon.lib userenv.lib delayimp.lib)
+                        shlwapi.lib version.lib winmm.lib wbemuuid.lib
+                        psapi.lib dwmapi.lib propsys.lib comctl32.lib
+                        gdi32.lib gdiplus.lib urlmon.lib userenv.lib
+                        delayimp.lib)
   set_target_properties(${LIBYUE} PROPERTIES COMPILE_FLAGS
-                        "/wd4244 /wd4267 /wd4312 /wd4838 /wd4996")
+                        "/wd4244")
   target_link_options(${LIBYUE} PUBLIC
                       "/DELAYLOAD:setupapi.dll;/DELAYLOAD:powrprof.dll;/DELAYLOAD:dwmapi.dll;/SUBSYSTEM:WINDOWS")
 endif()
@@ -95,6 +98,7 @@ if(UNIX AND NOT APPLE)
                         ${GTK3_LIBRARIES}
                         ${X11_LIBRARIES}
                         ${WEBKIT2GTK_LIBRARIES})
+  target_compile_definitions(${LIBYUE} PUBLIC USE_GLIB)
   set_target_properties(${LIBYUE} PROPERTIES COMPILE_FLAGS
                         "-fdata-sections -ffunction-sections -Wno-deprecated-declarations")
   target_link_options(${LIBYUE} PUBLIC

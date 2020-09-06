@@ -66,7 +66,7 @@ bool Browser::InvokeBindings(const std::string& json_str) {
   if (stop_serving_)
     return false;
 
-  std::unique_ptr<base::Value> tup = base::JSONReader::Read(json_str);
+  base::Optional<base::Value> tup = base::JSONReader::Read(json_str);
   if (!tup)
     return false;
   if (!tup->is_list() || tup->GetList().size() != 3 ||

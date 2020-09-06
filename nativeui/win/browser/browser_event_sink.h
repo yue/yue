@@ -18,7 +18,7 @@ class BrowserImplIE;
 class BrowserEventSink : public IDispatch {
  public:
   explicit BrowserEventSink(BrowserImplIE* browser);
-  ~BrowserEventSink();
+  virtual ~BrowserEventSink();
 
   // Mark we are loading html string.
   void set_load_html(bool is) { is_load_html_ = is; }

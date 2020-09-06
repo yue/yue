@@ -21,6 +21,7 @@ class ScrollImpl : public ContainerImpl,
                    public ContainerImpl::Adapter {
  public:
   explicit ScrollImpl(Scroll* delegate);
+  ~ScrollImpl() override;
 
   void SetOrigin(const Vector2d& origin);
   void SetContentSize(const Size& size);

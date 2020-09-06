@@ -25,7 +25,7 @@ class TabItem : public ViewImpl {
 
   TabItem() : ViewImpl(ControlType::View, nullptr) {}
 
-  ~TabItem() {}
+  ~TabItem() final {}
 
   void SetTitle(base::string16 title) {
     text_ = new AttributedText(

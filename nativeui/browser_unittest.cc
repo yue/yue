@@ -436,7 +436,7 @@ TEST_P(BrowserTest, LargeFileProtocol) {
 #endif
   // Serve the pug.js, which should be large enough.
   base::FilePath exe_path;
-  PathService::Get(base::FILE_EXE, &exe_path);
+  base::PathService::Get(base::FILE_EXE, &exe_path);
   base::FilePath file =
       exe_path.DirName().DirName().DirName()
               .Append(FILE_PATH_LITERAL("third_party"))

@@ -18,7 +18,7 @@ class BrowserProtocol : public IInternetProtocol,
                         public IInternetProtocolInfo {
  public:
   explicit BrowserProtocol(const Browser::ProtocolHandler& handler);
-  ~BrowserProtocol();
+  virtual ~BrowserProtocol();
 
   // IUnknown
   STDMETHOD(QueryInterface)(REFIID riid, void **ppvObject);

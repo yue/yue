@@ -10,6 +10,7 @@
 #include "base/path_service.h"
 #include "base/scoped_native_library.h"
 #include "base/win/scoped_com_initializer.h"
+#include "base/win/win_util.h"
 #include "base/win/windows_version.h"
 #include "nativeui/gfx/screen.h"
 #include "nativeui/gfx/win/native_theme.h"
@@ -18,61 +19,12 @@
 #include "nativeui/win/util/scoped_ole_initializer.h"
 #include "nativeui/win/util/subwin_holder.h"
 #include "nativeui/win/util/tray_host.h"
-#include "third_party/yoga/yoga/Yoga.h"
+#include "third_party/yoga/Yoga.h"
 
 namespace nu {
 
-namespace {
-
-// Win8.1 supports monitor-specific DPI scaling.
-bool SetProcessDpiAwarenessWrapper(PROCESS_DPI_AWARENESS value) {
-  typedef HRESULT(WINAPI *SetProcessDpiAwarenessPtr)(PROCESS_DPI_AWARENESS);
-  SetProcessDpiAwarenessPtr set_process_dpi_awareness_func =
-      reinterpret_cast<SetProcessDpiAwarenessPtr>(
-          GetProcAddress(GetModuleHandleA("user32.dll"),
-                         "SetProcessDpiAwarenessInternal"));
-  if (set_process_dpi_awareness_func) {
-    HRESULT hr = set_process_dpi_awareness_func(value);
-    if (SUCCEEDED(hr)) {
-      VLOG(1) << "SetProcessDpiAwareness succeeded.";
-      return true;
-    } else if (hr == E_ACCESSDENIED) {
-      LOG(ERROR) << "Access denied error from SetProcessDpiAwareness. "
-          "Function called twice, or manifest was used.";
-    }
-  }
-  return false;
-}
-
-// This function works for Windows Vista through Win8. Win8.1 must use
-// SetProcessDpiAwareness[Wrapper].
-BOOL SetProcessDPIAwareWrapper() {
-  typedef BOOL(WINAPI *SetProcessDPIAwarePtr)(VOID);
-  SetProcessDPIAwarePtr set_process_dpi_aware_func =
-      reinterpret_cast<SetProcessDPIAwarePtr>(
-      GetProcAddress(GetModuleHandleA("user32.dll"),
-                      "SetProcessDPIAware"));
-  return set_process_dpi_aware_func &&
-    set_process_dpi_aware_func();
-}
-
-void EnableHighDPISupport() {
-  // Enable per-monitor DPI for Win10 or above instead of Win8.1 since Win8.1
-  // does not have EnableChildWindowDpiMessage, necessary for correct non-client
-  // area scaling across monitors.
-  bool allowed_platform = base::win::GetVersion() >= base::win::VERSION_WIN10;
-  PROCESS_DPI_AWARENESS process_dpi_awareness =
-      allowed_platform ? PROCESS_PER_MONITOR_DPI_AWARE
-                       : PROCESS_SYSTEM_DPI_AWARE;
-  if (!SetProcessDpiAwarenessWrapper(process_dpi_awareness)) {
-    SetProcessDPIAwareWrapper();
-  }
-}
-
-}  // namespace
-
 void State::PlatformInit() {
-  EnableHighDPISupport();
+  base::win::EnableHighDPISupport();
 
   YGConfigSetPointScaleFactor(yoga_config(), GetScaleFactor());
 
@@ -100,7 +52,7 @@ bool State::InitWebView2Loader() {
     // Then search from dir the contains current module.
     if (!webview2_loader_->is_valid()) {
       base::FilePath module_path;
-      if (PathService::Get(base::FILE_MODULE, &module_path)) {
+      if (base::PathService::Get(base::FILE_MODULE, &module_path)) {
         auto dll_path = module_path.DirName().Append(L"WebView2Loader.dll");
         webview2_loader_.reset(new base::ScopedNativeLibrary(dll_path));
       }

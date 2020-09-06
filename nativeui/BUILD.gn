@@ -431,6 +431,10 @@ jumbo_component("nativeui") {
 
   defines = [ "NATIVEUI_IMPLEMENTATION" ]
 
+  if (is_clang) {
+    cflags_cc = [ "-Wno-overloaded-virtual" ]
+  }
+
   if (is_linux) {
     public_deps = [
       "//build/config/linux/gtk",
@@ -446,9 +450,9 @@ jumbo_component("nativeui") {
     libs = [ "atomic" ]
 
     # Do not warn on using deprecated GTK APIs.
-    cflags_cc = [ "-Wno-deprecated-declarations" ]
+    cflags_cc += [ "-Wno-deprecated-declarations" ]
   } else if (is_mac) {
-    libs = [
+    frameworks = [
       "AppKit.framework",
       "WebKit.framework",
     ]

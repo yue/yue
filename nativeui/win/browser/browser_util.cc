@@ -33,7 +33,7 @@ inline void WriteKey(const wchar_t* exe, const wchar_t* key, DWORD value) {
 
 void FixIECompatibleMode() {
   base::FilePath exe_path;
-  if (!PathService::Get(base::FILE_EXE, &exe_path))
+  if (!base::PathService::Get(base::FILE_EXE, &exe_path))
     return;
   base::string16 exe_name = exe_path.BaseName().value();
 

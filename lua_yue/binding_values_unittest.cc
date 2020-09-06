@@ -20,7 +20,7 @@ class YueValuesTest : public testing::Test {
 };
 
 TEST_F(YueValuesTest, ValueConversions) {
-  std::unique_ptr<base::Value> in = base::JSONReader::Read(
+  base::Optional<base::Value> in = base::JSONReader::Read(
       "{ \"a\": 1.0, \"b\": { \"c\": [\"t\", \"e\"], \"d\": \"st\" } }");
   lua::Push(state_, *in);
   base::Value out;

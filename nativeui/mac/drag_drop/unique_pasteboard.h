@@ -9,6 +9,7 @@
 #import <AppKit/AppKit.h>
 
 #include "base/mac/scoped_nsobject.h"
+#include "base/macros.h"
 
 namespace nu {
 

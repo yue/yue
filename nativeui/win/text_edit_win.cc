@@ -18,7 +18,6 @@ namespace nu {
 namespace {
 
 const int kTextEditPadding = 2;
-const int kLinePadding = 1;
 
 class TextEditImpl : public EditView {
  public:

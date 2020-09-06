@@ -7,7 +7,7 @@
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
 
-#include "base/logging.h"
+#include "base/notreached.h"
 #include "nativeui/events/gtk/keyboard_code_conversion_gtk.h"
 
 namespace nu {

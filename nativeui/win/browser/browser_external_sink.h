@@ -16,7 +16,7 @@ class BrowserImplIE;
 class BrowserExternalSink : public IDispatch {
  public:
   explicit BrowserExternalSink(BrowserImplIE* browser);
-  ~BrowserExternalSink();
+  virtual ~BrowserExternalSink();
 
   // IUnknown
   STDMETHOD(QueryInterface)(REFIID riid, void **ppvObject);

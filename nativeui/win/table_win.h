@@ -15,7 +15,7 @@ namespace nu {
 class TableImpl : public SubwinView {
  public:
   explicit TableImpl(Table* delegate);
-  ~TableImpl();
+  ~TableImpl() final;
 
   static const int kDefaultColumnWidth = 50;
 

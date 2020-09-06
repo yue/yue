@@ -5,7 +5,7 @@
 #include "nativeui/state.h"
 
 #include "nativeui/mac/events_handler.h"
-#include "third_party/yoga/yoga/Yoga.h"
+#include "third_party/yoga/Yoga.h"
 
 namespace nu {
 

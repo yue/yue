@@ -4,6 +4,7 @@
 
 #include "nativeui/win/util/scoped_ole_initializer.h"
 
+#include "base/check_op.h"
 #include "base/logging.h"
 
 namespace nu {

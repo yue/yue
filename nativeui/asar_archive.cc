@@ -10,6 +10,7 @@
 
 #include "base/json/json_reader.h"
 #include "base/pickle.h"
+#include "base/stl_util.h"
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/string_split.h"
 #include "base/strings/utf_string_conversions.h"
@@ -50,7 +51,7 @@ AsarArchive::AsarArchive(base::File file, bool extended_format)
     return;
 
   // Parse header.
-  std::unique_ptr<base::Value> value = base::JSONReader::Read(header);
+  base::Optional<base::Value> value = base::JSONReader::Read(header);
   if (!value || !value->is_dict())
     return;
   content_offset_ += 8 + size;

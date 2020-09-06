@@ -10,6 +10,9 @@
 namespace nu {
 
 struct MenuItemData {
+  MenuItemData();
+  ~MenuItemData();
+
   int id = 0;
   std::string label;
   std::wstring accelerator;

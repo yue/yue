@@ -9,7 +9,9 @@
 #include <gtk/gtk.h>
 
 #include "base/base_paths.h"
+#include "base/check.h"
 #include "base/files/file_path.h"
+#include "base/logging.h"
 #include "base/path_service.h"
 #include "base/strings/stringprintf.h"
 #include "nativeui/gfx/image.h"
@@ -131,7 +133,7 @@ std::string GenerateAppIndicatorId() {
   static std::string exe_name;
   if (exe_name.empty()) {
     base::FilePath exe_path;
-    if (PathService::Get(base::FILE_EXE, &exe_path))
+    if (base::PathService::Get(base::FILE_EXE, &exe_path))
       exe_name = exe_path.BaseName().value();
     else
       exe_name = "yue";

@@ -16,7 +16,7 @@ class BrowserProtocolFactory : public IClassFactory {
   static const GUID CLSID_BROWSER_PROTOCOL;
 
   explicit BrowserProtocolFactory(const Browser::ProtocolHandler& handler);
-  ~BrowserProtocolFactory();
+  virtual ~BrowserProtocolFactory();
 
   // IUnknown
   STDMETHOD(QueryInterface)(REFIID riid, void **ppvObject);
@@ -26,8 +26,8 @@ class BrowserProtocolFactory : public IClassFactory {
   // IClassFactory
   HRESULT STDMETHODCALLTYPE CreateInstance(IUnknown *pUnkOuter,
                                            REFIID riid,
-                                           void **ppvObject);
-  HRESULT STDMETHODCALLTYPE LockServer(BOOL fLock);
+                                           void **ppvObject) override;
+  HRESULT STDMETHODCALLTYPE LockServer(BOOL fLock) override;
 
  private:
   ULONG ref_;

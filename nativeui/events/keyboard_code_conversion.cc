@@ -7,6 +7,7 @@
 
 #include <algorithm>
 
+#include "base/stl_util.h"
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/string_util.h"
 
@@ -213,7 +214,7 @@ KeyboardCode KeyboardCodeFromKeyIdentifier(const std::string& s,
 
   const KeyCodeMap* ptr = std::lower_bound(
       std::begin(kKeyCodesMap), std::end(kKeyCodesMap), from);
-  if (ptr >= kKeyCodesMap + arraysize(kKeyCodesMap) || ptr->name != str)
+  if (ptr >= kKeyCodesMap + base::size(kKeyCodesMap) || ptr->name != str)
     return VKEY_UNKNOWN;
 
   return ptr->keycode;

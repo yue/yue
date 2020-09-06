@@ -112,7 +112,7 @@ void BrowserImplIE::LoadURL(base::string16 str) {
   html_moniker_.Reset();
   event_sink_->set_load_html(false);
   base::win::ScopedBstr url(str.c_str());
-  browser_->Navigate(url, nullptr, nullptr, nullptr, nullptr);
+  browser_->Navigate(url.Get(), nullptr, nullptr, nullptr, nullptr);
 }
 
 void BrowserImplIE::LoadHTML(base::string16 str,
@@ -124,22 +124,22 @@ void BrowserImplIE::LoadHTML(base::string16 str,
   event_sink_->set_load_html(true);
   is_html_loaded_ = false;
   base::win::ScopedBstr url(L"about:blank");
-  browser_->Navigate(url, nullptr, nullptr, nullptr, nullptr);
+  browser_->Navigate(url.Get(), nullptr, nullptr, nullptr, nullptr);
 }
 
 base::string16 BrowserImplIE::GetURL() {
   base::win::ScopedBstr url;
   browser_->get_LocationURL(url.Receive());
-  return url.Length() == 0 ? L"about:blank" : url;
+  return url.Length() == 0 ? L"about:blank" : url.Get();
 }
 
 base::string16 BrowserImplIE::GetTitle() {
   base::win::ScopedBstr title;
   if (document_)
     document_->get_title(title.Receive());
-  if (!title)
+  if (!title.Get())
     return base::string16();
-  return base::string16(title);
+  return base::string16(title.Get());
 }
 
 void BrowserImplIE::SetUserAgent(const std::string& ua) {

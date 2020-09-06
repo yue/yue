@@ -5,6 +5,7 @@
 #ifndef NATIVEUI_MAC_NU_PRIVATE_H_
 #define NATIVEUI_MAC_NU_PRIVATE_H_
 
+#include <functional>
 #include <memory>
 
 #include "base/mac/scoped_nsobject.h"

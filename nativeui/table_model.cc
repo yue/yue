@@ -6,6 +6,7 @@
 
 #include <utility>
 
+#include "base/logging.h"
 #include "nativeui/table.h"
 
 namespace nu {

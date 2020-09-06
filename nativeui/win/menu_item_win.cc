@@ -61,6 +61,9 @@ void OnRoleClick(MenuItem* self) {
 
 }  // namespace
 
+MenuItemData::MenuItemData() {}
+MenuItemData::~MenuItemData() {}
+
 void MenuItem::Click() {
   if (type_ == Type::Checkbox)
     SetChecked(!IsChecked());

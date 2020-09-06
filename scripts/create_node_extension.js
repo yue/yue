@@ -4,7 +4,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {version, argv, targetCpu, targetOs, strip, execSync, spawnSync} = require('./common')
+const {version, clang, argv, config, targetCpu, targetOs, strip, execSync, spawnSync} = require('./common')
 const {createZip} = require('./zip_utils')
 
 const fs = require('fs-extra')
@@ -17,29 +17,17 @@ if (argv.length != 2) {
 const runtime = argv[0]
 const nodever = argv[1].startsWith('v') ? argv[1] : `v${argv[1]}`
 
-const args = [
+const args = config.concat([
   'use_jumbo_build=true',
+  `node_version="${nodever}"`,
+  `node_runtime="${runtime}"`,
   // Same with Release build.
   'is_component_build=false',
   'is_debug=false',
   'is_official_build=true',
-  `target_cpu="${targetCpu}"`,
-  // Set node nodever and runtime.
-  `node_version="${nodever}"`,
-  `node_runtime="${runtime}"`,
-]
-
-if (targetOs == 'mac') {
-  args.push('mac_deployment_target="10.9.0"',
-            'mac_sdk_min="10.12"',
-            'use_xcode_clang=true')
-}
-
+])
 if (targetOs == 'linux') {
-  args.push('use_cfi_icall=false',
-            'is_clang=true',
-            'clang_update_script="//building/tools/update-clang.py"',
-            'use_sysroot=true',
+  args.push('use_sysroot=true',
             'target_sysroot_dir="//third_party/"',
             'debian_platform="stretch"')
 }

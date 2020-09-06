@@ -12,13 +12,13 @@ build scripts before actually building Yue.
 * x64 operating system
 * Git
 * Python 2.7 (used by [GN][gn])
-* Node.js 8 or later (used by Yue's build scripts)
+* Node.js 10 or later (used by Yue's build scripts)
 
 ### Windows
 
-* Visual Studio 2017 with Update 3.x
+* Visual Studio 2019
   * "Desktop development with C++" component
-  * 10.0.15063 Windows 10 SDK
+  * Latest Windows 10 SDK
 
 ### Linux
 
@@ -27,9 +27,9 @@ build scripts before actually building Yue.
 
 ### macOS
 
-* macOS >= 10.12
-* Xcode >= 8
-  * OS X 10.12 SDK
+* macOS >= 10.15
+* Xcode >= 11
+  * macOS 10.15 SDK
 
 ## Bootstrapping
 

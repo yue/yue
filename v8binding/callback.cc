@@ -4,6 +4,7 @@
 
 #include "v8binding/callback.h"
 
+#include "base/notreached.h"
 #include "base/time/time.h"
 
 namespace vb {

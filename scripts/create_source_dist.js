@@ -4,20 +4,19 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {version, targetCpu, targetOs, searchFiles, execSync, spawnSync} = require('./common')
+const {version, config, targetOs, searchFiles, execSync, spawnSync} = require('./common')
 const {createZip} = require('./zip_utils')
 
 const path = require('path')
 const fs = require('fs-extra')
 
 // Do a jumbo build to prepare for searching files.
-const args = [
+const args = config.concat([
+  'use_jumbo_build=true',
   'is_component_build=false',
   'is_debug=false',
-  `target_cpu="${targetCpu}"`,
-  'use_jumbo_build=true',
-]
-fs.removeSync('out/Source')
+])
+fs.emptyDirSync('out/Source')
 process.env.JUMBO_INCLUDE_FILE_CONTENTS = 'true'
 spawnSync('gn', ['gen', 'out/Source', `--args=${args.join(' ')}`])
 spawnSync('ninja', ['-C', 'out/Source', 'nativeui'])
@@ -29,7 +28,7 @@ DescribeAll('nativeui', sources, headers)
 
 // Copy source files out.
 const targetDir = 'out/Dist/source'
-fs.ensureDirSync(targetDir)
+fs.emptyDirSync(targetDir)
 for (const file of sources)
   CopySource(file, path.join(targetDir, 'src', targetOs))
 for (const file of headers)
@@ -46,7 +45,8 @@ const EXTRA_HEADERS = {
 if (targetOs === 'mac') {
   EXTRA_HEADERS[''] = [ 'third_party/apple_apsl' ]
 } else if (targetOs === 'win') {
-  EXTRA_HEADERS['out/Source/gen'] = [ 'base/trace_event/etw_manifest' ]
+  CopySource('//base/win/windows_defines.inc', path.join(targetDir, 'include'))
+  CopySource('//base/win/windows_undefines.inc', path.join(targetDir, 'include'))
   // This file is needed by Windows, but marked as posix.
   CopySource('//base/posix/eintr_wrapper.h', path.join(targetDir, 'include'))
 }
@@ -137,6 +137,7 @@ function MergeSources(sources, headers, from) {
 function CopySource(file, targetDir, baseDir = '') {
   let originalName = file
   let targetName
+  file = file.replace(/\\/g, '/')
   if (file.startsWith('//')) {
     // When file starts with '//', it is relative path.
     targetName = file = file.substr(2)
@@ -144,12 +145,16 @@ function CopySource(file, targetDir, baseDir = '') {
     // The absolute path on Windows may looks like '/c:/cygiwn/home'.
     if (process.platform == 'win32' && /^\/\w:/.test(file))
       file = file.substr(1)
-    // the targetName must be relative.
-    targetName = path.relative(process.cwd(), file)
+    // the paths must be relative.
+    targetName = file = path.relative(process.cwd(), file)
   }
   targetName = targetName.substr(baseDir.length)
-  // Move generated headers out of 'out/Source/gen/'.
-  if (file.startsWith('out'))
+  // Move generated headers out of dirs.
+  if (file.startsWith('building/tools/gn/'))
+    targetName = path.join.apply(path, path.normalize(file).split(path.sep).slice(3))
+  else if (file.startsWith('out/Source/gen/building/tools/gn/'))
+    targetName = path.join.apply(path, path.normalize(file).split(path.sep).slice(6))
+  else if (file.startsWith('out/Source/gen/'))
     targetName = path.join.apply(path, path.normalize(file).split(path.sep).slice(3))
   // Rename cpp files to cc.
   if (targetName.endsWith('.cpp'))
@@ -158,7 +163,7 @@ function CopySource(file, targetDir, baseDir = '') {
     fs.copySync(file, path.join(targetDir, targetName),
                 {errorOnExist: true})
   } catch (e) {
-    throw new Error('Unable to copy file', originalName, e.message)
+    throw new Error(`Unable to copy file ${originalName}: ${e.message}`)
   }
 }
 

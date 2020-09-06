@@ -6,6 +6,7 @@
 
 #import <Cocoa/Cocoa.h>
 
+#include "base/stl_util.h"
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/menu.h"
 
@@ -54,7 +55,7 @@ SEL g_sels_map[] = {
 };
 
 static_assert(
-    arraysize(g_sels_map) == static_cast<size_t>(MenuItem::Role::ItemCount),
+    base::size(g_sels_map) == static_cast<size_t>(MenuItem::Role::ItemCount),
     "g_sels_map should be updated with roles");
 
 }  // namespace

@@ -23,6 +23,8 @@ ViewImpl::ViewImpl(ControlType type, View* delegate)
       scale_factor_(GetScaleFactor()),
       delegate_(delegate) {}
 
+ViewImpl::~ViewImpl() {}
+
 void ViewImpl::SizeAllocate(const Rect& size_allocation) {
   if (size_allocation == size_allocation_)
     return;
@@ -173,6 +175,10 @@ void ViewImpl::OnMouseLeave(NativeEvent event) {
     return;
   event->w_param = 2;
   delegate()->on_mouse_leave.Emit(delegate(), MouseEvent(event, this));
+}
+
+bool ViewImpl::OnMouseWheel(NativeEvent event) {
+  return false;
 }
 
 bool ViewImpl::OnMouseClick(NativeEvent event) {

@@ -8,9 +8,10 @@
 #include <tuple>
 #include <utility>
 
+#include "base/logging.h"
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/string_util.h"
-#include "third_party/yoga/yoga/Yoga.h"
+#include "third_party/yoga/Yoga.h"
 
 namespace nu {
 

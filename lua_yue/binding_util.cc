@@ -98,7 +98,7 @@ std::string ConvertToString(lua::State* state, int index, InspectContext* ctx) {
       break;
     case lua::LuaType::Number:
       if (lua_isinteger(state, index))
-        str = base::IntToString(lua_tointeger(state, index));
+        str = base::NumberToString(lua_tointeger(state, index));
       else
         str = base::NumberToString(lua_tonumber(state, index));
       break;

@@ -13,8 +13,16 @@
 #include "nativeui/state.h"
 #include "nativeui/util/yoga_util.h"
 #include "nativeui/window.h"
-#include "third_party/yoga/yoga/YGNodePrint.h"
-#include "third_party/yoga/yoga/Yoga.h"
+#include "third_party/yoga/Yoga.h"
+
+// This header required DEBUG to be defined.
+#if defined(DEBUG)
+#include "third_party/yoga/YGNodePrint.h"
+#else
+#define DEBUG
+#include "third_party/yoga/YGNodePrint.h"
+#undef DEBUG
+#endif
 
 namespace nu {
 
@@ -116,7 +124,7 @@ std::string View::GetComputedLayout() const {
   auto options = static_cast<YGPrintOptions>(YGPrintOptionsLayout |
                                              YGPrintOptionsStyle |
                                              YGPrintOptionsChildren);
-  facebook::yoga::YGNodeToString(&result, node_, options, 0);
+  facebook::yoga::YGNodeToString(result, node_, options, 0);
   return result;
 }
 

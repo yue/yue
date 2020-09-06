@@ -4,6 +4,7 @@
 
 #include "nativeui/menu_item.h"
 
+#include "base/stl_util.h"
 #include "nativeui/accelerator_manager.h"
 #include "nativeui/menu.h"
 
@@ -38,7 +39,7 @@ struct {
 };
 
 static_assert(
-    arraysize(g_roles_map) == static_cast<size_t>(MenuItem::Role::ItemCount),
+    base::size(g_roles_map) == static_cast<size_t>(MenuItem::Role::ItemCount),
     "g_roles_map should be updated with roles");
 
 // Get the MenuItem type from its role.

@@ -4,6 +4,7 @@
 
 #include "nativeui/clipboard.h"
 
+#include "base/notreached.h"
 #include "nativeui/gtk/util/clipboard_util.h"
 
 namespace nu {

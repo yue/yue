@@ -28,7 +28,7 @@ class ComboBoxImpl : public PickerImpl {
 
  protected:
   // PickerImpl:
-  void OnCommand(UINT code, int command) {
+  void OnCommand(UINT code, int command) override {
     ComboBox* combobox = static_cast<ComboBox*>(delegate());
     if (code == CBN_EDITCHANGE)
       combobox->on_text_change.Emit(combobox);

@@ -10,6 +10,7 @@
 #include <string>
 #include <utility>
 
+#include "base/logging.h"
 #include "base/template_util.h"
 #include "lua/call_context.h"
 #include "lua/handle.h"

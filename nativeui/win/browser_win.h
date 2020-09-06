@@ -61,7 +61,7 @@ class BrowserImpl {
   BrowserImpl(Browser::Options options, BrowserHolder* holder);
   virtual ~BrowserImpl();
 
-  virtual bool IsWebView2() const { return false; }
+  virtual bool IsWebView2() const;
 
   virtual void LoadURL(base::string16 str) = 0;
   virtual void LoadHTML(base::string16 str, base::string16 base_url) = 0;

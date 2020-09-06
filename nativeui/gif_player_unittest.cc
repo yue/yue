@@ -12,7 +12,7 @@ class GifPlayerTest : public testing::Test {
   void SetUp() override {
     gif_ = new nu::GifPlayer();
     base::FilePath exe_path;
-    PathService::Get(base::FILE_EXE, &exe_path);
+    base::PathService::Get(base::FILE_EXE, &exe_path);
     base::FilePath dir = exe_path.DirName().DirName().DirName()
                                  .Append(FILE_PATH_LITERAL("nativeui"))
                                  .Append(FILE_PATH_LITERAL("test"))

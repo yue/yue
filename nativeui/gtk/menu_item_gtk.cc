@@ -30,7 +30,7 @@ struct {
 };
 
 static_assert(
-    arraysize(g_stock_map) == static_cast<size_t>(MenuItem::Role::ItemCount),
+    base::size(g_stock_map) == static_cast<size_t>(MenuItem::Role::ItemCount),
     "Stock items should map the roles");
 
 // Handling stock item clicking.

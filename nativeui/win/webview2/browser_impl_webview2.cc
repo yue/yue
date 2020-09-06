@@ -29,7 +29,7 @@ namespace {
 base::string16 GetApplicationName() {
   base::string16 name;
   base::FilePath path;
-  if (PathService::Get(base::FILE_EXE, &path)) {
+  if (base::PathService::Get(base::FILE_EXE, &path)) {
     auto info = FileVersionInfo::CreateFileVersionInfo(path);
     if (info && !info->product_name().empty())
       name = info->product_name();
@@ -42,8 +42,8 @@ base::string16 GetApplicationName() {
 // C:\Users\USER_NAME\AppData\Local\APPLICATION_NAME
 base::FilePath GetUserDataDir() {
   base::FilePath path;
-  if (!PathService::Get(base::DIR_LOCAL_APP_DATA, &path))
-    PathService::Get(base::DIR_TEMP, &path);
+  if (!base::PathService::Get(base::DIR_LOCAL_APP_DATA, &path))
+    base::PathService::Get(base::DIR_TEMP, &path);
   return path.Append(GetApplicationName());
 }
 

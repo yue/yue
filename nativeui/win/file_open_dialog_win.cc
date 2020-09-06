@@ -39,7 +39,7 @@ ComPtr<IFileOpenDialog> FileOpenDialogImpl::Initialize() const {
                      nullptr,
                      CLSCTX_INPROC_SERVER,
                      IID_PPV_ARGS(&ptr));
-  return std::move(ptr);
+  return ptr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

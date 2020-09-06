@@ -17,6 +17,7 @@ namespace Gdiplus {
 
 #include <gdiplus.h>  // NOLINT
 
+#include "base/notreached.h"
 #include "nativeui/gfx/color.h"
 #include "nativeui/gfx/geometry/rect.h"
 #include "nativeui/gfx/geometry/rect_f.h"

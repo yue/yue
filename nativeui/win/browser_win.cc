@@ -160,6 +160,10 @@ BrowserImpl::BrowserImpl(Browser::Options options, BrowserHolder* holder)
 
 BrowserImpl::~BrowserImpl() = default;
 
+bool BrowserImpl::IsWebView2() const {
+  return false;
+}
+
 bool BrowserImpl::ProcessWindowMessage(HWND window,
                                        UINT message,
                                        WPARAM w_param,

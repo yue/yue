@@ -4,9 +4,10 @@
 
 #include "nativeui/window.h"
 
+#include "base/logging.h"
 #include "nativeui/container.h"
 #include "nativeui/menu_bar.h"
-#include "third_party/yoga/yoga/Yoga.h"
+#include "third_party/yoga/Yoga.h"
 
 #if defined(OS_MACOSX)
 #include "nativeui/toolbar.h"

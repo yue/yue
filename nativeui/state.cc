@@ -8,7 +8,7 @@
 #include "base/threading/thread_local.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/protocol_job.h"
-#include "third_party/yoga/yoga/Yoga.h"
+#include "third_party/yoga/Yoga.h"
 
 #if defined(OS_WIN)
 #include "base/scoped_native_library.h"
@@ -53,8 +53,8 @@ State::~State() {
   DCHECK_EQ(GetCurrent(), this);
   lazy_tls_ptr.Pointer()->Set(nullptr);
 
-  DCHECK_EQ(YGNodeGetInstanceCount(), 0) <<
-      "There are instances of nu::View leaked on exit";
+  DCHECK_EQ(YGConfigGetInstanceCount(), 0) <<
+      "There are instances of YGConfig leaked on exit";
   base::debug::LeakTracker<ProtocolJob>::CheckForLeaks();
 }
 

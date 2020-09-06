@@ -65,9 +65,6 @@ class Win32Window {
   // If necessary, this registers the window class.
   ATOM GetWindowClassAtom();
 
-  // Style of the class to use.
-  UINT class_style_;
-
   // The window handle.
   HWND hwnd_ = NULL;
 

@@ -24,7 +24,7 @@ class BrowserOleSite : public IOleClientSite,
                        public IDocHostUIHandler {
  public:
   BrowserOleSite(BrowserImplIE* browser, BrowserExternalSink* external_sink);
-  ~BrowserOleSite();
+  virtual ~BrowserOleSite();
 
   // IUnknown
   STDMETHOD(QueryInterface)(REFIID riid, void **ppvObject);

@@ -85,17 +85,19 @@ source_set("lua") {
 
   if (is_win) {
     defines = [ "LUA_BUILD_AS_DLL" ]
-    cflags = [
-      "/wd4310",  # cast truncates constant value
-      "/wd4324",  # structure was padded due to alignment specifier
-    ]
+    if (!is_clang) {
+      cflags = [
+        "/wd4310",  # cast truncates constant value
+        "/wd4324",  # structure was padded due to alignment specifier
+      ]
+    }
   }
   if (is_posix) {
     defines = [ "LUA_USE_POSIX" ]
     configs -= [ "//build/config/gcc:symbol_visibility_hidden" ]
     configs += [ "//build/config/gcc:symbol_visibility_default" ]
   }
-  if (is_linux) {
+  if (is_clang) {
     cflags_c = [ "-Wno-string-plus-int" ]
   }
 

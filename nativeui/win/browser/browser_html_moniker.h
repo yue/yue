@@ -19,7 +19,7 @@ namespace nu {
 class BrowserHTMLMoniker : public IMoniker {
  public:
   BrowserHTMLMoniker();
-  ~BrowserHTMLMoniker();
+  virtual ~BrowserHTMLMoniker();
 
   void LoadHTML(const base::string16& str, const base::string16& base_url);
 

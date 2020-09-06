@@ -15,6 +15,12 @@
 
 namespace nu {
 
+AttributedTextImpl::AttributedTextImpl()
+    // https://stackoverflow.com/questions/1203087
+    : format(Gdiplus::StringFormat::GenericTypographic()) {}
+
+AttributedTextImpl::~AttributedTextImpl() {}
+
 AttributedText::AttributedText(const std::string& text, TextAttributes att)
     : AttributedText(base::UTF8ToUTF16(text), std::move(att)) {}
 

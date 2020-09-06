@@ -6,6 +6,7 @@
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
 
+#include "base/notreached.h"
 #include "base/strings/string_split.h"
 #include "base/strings/string_tokenizer.h"
 #include "base/strings/string_util.h"

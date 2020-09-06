@@ -19,7 +19,7 @@ class TrayHost : public Win32Window {
   static const UINT kMessage = WM_APP + 1;
 
   TrayHost();
-  ~TrayHost();
+  ~TrayHost() final;
 
   UINT NextIconId();
 

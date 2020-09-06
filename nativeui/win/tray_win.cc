@@ -90,8 +90,8 @@ void TrayImpl::SetImage(Image* icon) {
   int width = ::GetSystemMetrics(SM_CXSMICON);
   scoped_refptr<Canvas> canvas = new Canvas(SizeF(width, width));
   canvas->GetPainter()->DrawImage(icon, RectF(0, 0, width, width));
-  if (canvas->GetBitmap()->GetGdiplusBitmap()->GetHICON(icon_.receive()) !=
-          Gdiplus::Ok)
+  if (canvas->GetBitmap()->GetGdiplusBitmap()->GetHICON(
+          base::win::ScopedHICON::Receiver(icon_).get()) != Gdiplus::Ok)
     LOG(WARNING) << "Error converting image to HICON";
 
   // Create the icon.

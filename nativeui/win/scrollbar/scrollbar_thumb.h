@@ -29,9 +29,6 @@ class ScrollbarThumb : public Clickable {
  private:
   NativeTheme::ScrollbarThumbExtraParams params_ = {0};
 
-  bool is_hovering_ = false;
-  bool is_capturing_ = false;
-
   Point pressed_point_;
   int last_value_ = 0;
 

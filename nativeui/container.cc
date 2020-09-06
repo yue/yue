@@ -8,7 +8,7 @@
 #include <limits>
 
 #include "base/logging.h"
-#include "third_party/yoga/yoga/Yoga.h"
+#include "third_party/yoga/Yoga.h"
 
 namespace nu {
 

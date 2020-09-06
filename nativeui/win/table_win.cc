@@ -157,7 +157,7 @@ LRESULT TableImpl::OnNotify(int code, LPNMHDR pnmh) {
 LRESULT TableImpl::OnGetDispInfo(NMLVDISPINFO* nm, int column, int row) {
   // When editing the sub item, hide the text.
   if (edit_proc_ && column == edit_column_ && row == edit_row_) {
-    nm->item.pszText = TEXT("");
+    nm->item.pszText = const_cast<wchar_t*>(static_cast<const wchar_t*>(L""));
     return TRUE;
   }
 
@@ -221,7 +221,7 @@ LRESULT TableImpl::OnCustomDraw(NMLVCUSTOMDRAW* nm, int row) {
 
 LRESULT TableImpl::OnBeginEdit(NMLVDISPINFO* nm, int row) {
   // Find out the column.
-  LVHITTESTINFO hit = {0};
+  LVHITTESTINFO hit = {{0}};
   ::GetCursorPos(&hit.pt);
   ::ScreenToClient(hwnd(), &hit.pt);
   ListView_SubItemHitTest(hwnd(), &hit);

@@ -57,6 +57,7 @@ source_set("v8binding") {
     "v8binding.h",
   ]
 
+  deps = [ "//base" ]
   public_configs = [ ":node_config" ]
 }
 

@@ -24,7 +24,7 @@ class WindowImpl : public Win32Window,
                    public DropTarget::Delegate {
  public:
   WindowImpl(const Window::Options& options, Window* delegate);
-  ~WindowImpl();
+  ~WindowImpl() override;
 
   void SetPixelBounds(const Rect& bounds);
   Rect GetPixelBounds();

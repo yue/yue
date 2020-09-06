@@ -6,6 +6,7 @@
 
 #include <utility>
 
+#include "base/notreached.h"
 #include "nativeui/state.h"
 
 namespace nu {

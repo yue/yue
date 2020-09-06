@@ -10,7 +10,10 @@
 
 #import <Carbon/Carbon.h>
 
+#include "base/check.h"
+#include "base/check_op.h"
 #include "base/logging.h"
+#include "base/stl_util.h"
 
 namespace nu {
 
@@ -447,7 +450,7 @@ int MacKeyCodeForWindowsKeyCode(KeyboardCode keycode,
   const KeyCodeMap* ptr = std::lower_bound(
       std::begin(kKeyCodesMap), std::end(kKeyCodesMap), from);
 
-  if (ptr >= kKeyCodesMap + arraysize(kKeyCodesMap) ||
+  if (ptr >= kKeyCodesMap + base::size(kKeyCodesMap) ||
       ptr->keycode != keycode || ptr->macKeycode == -1)
     return -1;
 

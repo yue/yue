@@ -4,7 +4,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {targetCpu, targetOs, execSync, spawnSync} = require('./common')
+const {config, clang, targetCpu, targetOs, execSync, spawnSync} = require('./common')
 
 // Get the arch of sysroot.
 let sysrootArch = {
@@ -14,8 +14,10 @@ let sysrootArch = {
   arm64: 'arm64',
 }[targetCpu]
 
-if (process.platform == 'linux') {
+if (clang) {
   execSync('python building/tools/update-clang.py')
+}
+if (process.platform == 'linux') {
   execSync(`python building/tools/install-sysroot.py --arch ${sysrootArch}`)
 } else if (process.platform == 'win32') {
   execSync('node scripts/download_nuget_packages.js')
@@ -26,12 +28,13 @@ execSync('git submodule update --init --recursive')
 execSync('node scripts/download_gn.js')
 execSync(`node scripts/download_node_headers.js node ${process.version} ${targetOs} ${targetCpu}`)
 
-const commonConfig = [
-  'fatal_linker_warnings=false',
-  `target_cpu="${targetCpu}"`,
-  'node_runtime="node"',
+const commonConfig = config.concat([
   `node_version="${process.version}"`,
-]
+])
+if (process.env.CI === 'true') {
+  commonConfig.push('use_jumbo_build=true')
+}
+
 const componentConfig = [
   'is_component_build=true',
   'is_debug=true',
@@ -45,28 +48,11 @@ const releaseConfig = [
   'is_debug=false',
   'is_official_build=true',
 ]
-
-if (process.env.CI === 'true') {
-  commonConfig.push('use_jumbo_build=true')
-}
-
-if (targetOs == 'mac') {
-  commonConfig.push('mac_deployment_target="10.9.0"',
-                    'mac_sdk_min="10.12"',
-                    'use_xcode_clang=true')
-}
-
 if (targetOs == 'linux') {
-  // This flag prevents using dynamical loaded function pointers.
-  commonConfig.push('use_cfi_icall=false')
-  // Use our custom clang script.
-  commonConfig.push('is_clang=true',
-                    'clang_update_script="//building/tools/update-clang.py"')
-  // Use custom sysroot.
   const sysrootArgs = [
     'use_sysroot=true',
     'target_sysroot_dir="//third_party/"',
-    'debian_platform="stretch"',
+    'debian_platform="stretch"'
   ]
   debugConfig.push(...sysrootArgs)
   releaseConfig.push(...sysrootArgs)

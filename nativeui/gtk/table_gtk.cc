@@ -4,6 +4,7 @@
 
 #include "nativeui/table.h"
 
+#include "base/logging.h"
 #include "base/values.h"
 #include "nativeui/gtk/nu_custom_cell_renderer.h"
 #include "nativeui/gtk/nu_tree_model.h"

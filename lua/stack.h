@@ -10,7 +10,7 @@
 #include <functional>
 #include <tuple>
 
-#include "base/compiler_specific.h"
+#include "base/notreached.h"
 #include "lua/template_util.h"
 #include "lua/types.h"
 
@@ -108,7 +108,7 @@ inline void PushNil(State* state) {
 // Helpers for pushing strings.
 PRINTF_FORMAT(2, 3)
 inline void PushFormatedString(State* state,
-                               _Printf_format_string_ const char* format,
+                               const char* format,
                                ...)  {
   va_list ap;
   va_start(ap, format);

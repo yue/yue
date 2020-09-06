@@ -6,6 +6,7 @@
 
 #include <string.h>
 
+#include "base/logging.h"
 #include "nativeui/asar_archive.h"
 
 namespace nu {

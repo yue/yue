@@ -19,6 +19,8 @@ ScrollImpl::ScrollImpl(Scroll* delegate)
   SetScrollbarPolicy(Scroll::Policy::Automatic, Scroll::Policy::Automatic);
 }
 
+ScrollImpl::~ScrollImpl() {}
+
 void ScrollImpl::SetOrigin(const Vector2d& origin) {
   UpdateOrigin(origin);
   Layout();

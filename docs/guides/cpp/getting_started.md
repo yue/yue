@@ -135,7 +135,7 @@ of building apps with Yue from source code using CMake. To try it:
    __Windows__
 
    ```bash
-   cmake .. -G "Visual Studio 15 2017 Win64"
+   cmake .. -G "Visual Studio 16 2019" -A x64
    start Yue.sln
    ```
 

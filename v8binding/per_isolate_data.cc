@@ -4,7 +4,7 @@
 
 #include "v8binding/per_isolate_data.h"
 
-#include "base/logging.h"
+#include "base/check.h"
 
 // The slot 3 had been reserved for Node, but since it is not using the slot
 // after Node v7, we are free to take it.

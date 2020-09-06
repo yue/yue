@@ -51,7 +51,7 @@ std::unique_ptr<Gdiplus::Bitmap> DoubleBuffer::GetGdiplusBitmap() const {
   //
   // Copyright (c) Microsoft. All rights reserved.
   // Licensed under the MIT license.
-  DIBSECTION dib = {0};
+  DIBSECTION dib = {{0}};
   if (::GetObject(mem_bitmap_.get(), sizeof(dib), &dib) != sizeof(DIBSECTION) ||
       dib.dsBm.bmBitsPixel != 32) {
     // Fall back to Gdiplus conversion.

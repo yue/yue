@@ -32,7 +32,7 @@
 #include "nativeui/win/menu_base_win.h"
 #include "nativeui/win/subwin_view.h"
 #include "nativeui/win/util/hwnd_util.h"
-#include "third_party/yoga/yoga/Yoga.h"
+#include "third_party/yoga/Yoga.h"
 
 namespace nu {
 
@@ -257,7 +257,7 @@ int WindowImpl::DoDrag(std::vector<Clipboard::Data> data,
                                    IID_PPV_ARGS(&helper)))) {
       auto size = options.image->GetSize();
       // InitializeFromBitmap() takes ownership of |hbitmap|.
-      SHDRAGIMAGE sdi = {0};
+      SHDRAGIMAGE sdi = {{0}};
       sdi.sizeDragImage.cx = size.width();
       sdi.sizeDragImage.cy = size.height();
       sdi.crColorKey = 0x00FFFFFF;

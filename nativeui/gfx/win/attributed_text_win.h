@@ -13,11 +13,13 @@
 namespace nu {
 
 struct AttributedTextImpl {
+  AttributedTextImpl();
+  ~AttributedTextImpl();
+
   base::string16 text;
   scoped_refptr<Font> font;
   std::unique_ptr<Gdiplus::SolidBrush> brush;
-  // https://stackoverflow.com/questions/1203087/why-is-graphics-measurestring-returning-a-higher-than-expected-number
-  Gdiplus::StringFormat format = Gdiplus::StringFormat::GenericTypographic();
+  Gdiplus::StringFormat format;;
 };
 
 }  // namespace nu

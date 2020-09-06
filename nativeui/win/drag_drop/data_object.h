@@ -60,7 +60,7 @@ class DataObject : public IDataObject {
  private:
   friend class FormatEtcEnumerator;
 
-  ~DataObject();
+  virtual ~DataObject();
 
   // Removes from contents_ the first data that matches |format|.
   void RemoveData(const FORMATETC& format);

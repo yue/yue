@@ -29,17 +29,17 @@ base::Value NSValueToBaseValue(id value) {
     else
       return base::Value([value intValue]);
   } else if ([value isKindOfClass:[NSArray class]]) {
-    base::ListValue arr;
-    arr.GetList().reserve([value count]);
+    base::Value::ListStorage arr;
+    arr.reserve([value count]);
     for (id item in value)
-      arr.GetList().push_back(NSValueToBaseValue(item));
-    return std::move(arr);
+      arr.push_back(NSValueToBaseValue(item));
+    return base::Value(std::move(arr));
   } else if ([value isKindOfClass:[NSDictionary class]]) {
     base::DictionaryValue dict;
     for (id key in value) {
       std::string str_key = base::SysNSStringToUTF8(
           [key isKindOfClass:[NSString class]] ? key : [key description]);
-      auto vval = base::MakeUnique<base::Value>(
+      auto vval = std::make_unique<base::Value>(
           NSValueToBaseValue([value objectForKey:key]));
       dict.SetWithoutPathExpansion(str_key.c_str(), std::move(vval));
     }

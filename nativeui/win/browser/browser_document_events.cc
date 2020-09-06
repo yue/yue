@@ -15,11 +15,9 @@
 namespace nu {
 
 BrowserDocumentEvents::BrowserDocumentEvents(BrowserImplIE* browser)
-    : ref_(0), browser_(browser) {
-}
+    : ref_(0) {}
 
-BrowserDocumentEvents::~BrowserDocumentEvents() {
-}
+BrowserDocumentEvents::~BrowserDocumentEvents() {}
 
 STDMETHODIMP BrowserDocumentEvents::QueryInterface(REFIID riid,
                                                    void **ppvObject) {

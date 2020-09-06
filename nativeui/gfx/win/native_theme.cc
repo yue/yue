@@ -9,6 +9,10 @@
 #include <vsstyle.h>
 #include <vssym32.h>
 
+#include "base/check_op.h"
+#include "base/notreached.h"
+#include "base/stl_util.h"
+
 namespace nu {
 
 namespace {
@@ -152,6 +156,8 @@ void NativeTheme::Paint(Part part, HDC hdc, ControlState state,
     case Part::TabItem:
       PaintTabItem(part, hdc, state, rect);
       break;
+    default:
+      NOTREACHED();
   }
 }
 
@@ -247,7 +253,8 @@ HRESULT NativeTheme::PaintScrollbarArrow(
     ControlState state,
     const Rect& rect,
     const ScrollbarArrowExtraParams& extra) const {
-  static const int state_id_matrix[4][ControlState::Size] = {
+  static const int
+      state_id_matrix[4][static_cast<size_t>(ControlState::Size)] = {
       {ABS_UPDISABLED, ABS_UPHOT, ABS_UPNORMAL, ABS_UPPRESSED},
       {ABS_DOWNDISABLED, ABS_DOWNHOT, ABS_DOWNNORMAL, ABS_DOWNPRESSED},
       {ABS_LEFTDISABLED, ABS_LEFTHOT, ABS_LEFTNORMAL, ABS_LEFTPRESSED},
@@ -259,7 +266,7 @@ HRESULT NativeTheme::PaintScrollbarArrow(
     int index =
         static_cast<int>(part) - static_cast<int>(Part::ScrollbarUpArrow);
     DCHECK_GE(index, 0);
-    DCHECK_LT(static_cast<size_t>(index), arraysize(state_id_matrix));
+    DCHECK_LT(static_cast<size_t>(index), base::size(state_id_matrix));
     int state_id = state_id_matrix[index][static_cast<int>(state)];
 
     // Hovering means that the cursor is over the scrollbar, but not over the
@@ -440,7 +447,7 @@ HRESULT NativeTheme::PaintTabItem(Part part,
                                   HDC hdc,
                                   ControlState state,
                                   const Rect& rect) const {
-  static const int state_id_matrix[ControlState::Size] = {
+  static const int state_id_matrix[static_cast<size_t>(ControlState::Size)] = {
       TIS_DISABLED, TIS_HOT, TIS_NORMAL, TIS_SELECTED
   };
 

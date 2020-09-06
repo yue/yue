@@ -71,7 +71,7 @@ Clipboard::Data DraggingInfoWin::GetData(Data::Type type) const {
   }
 
   ReleaseStgMedium(&medium);
-  return std::move(ret);
+  return ret;
 }
 
 }  // namespace nu

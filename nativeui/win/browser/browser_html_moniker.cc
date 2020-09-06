@@ -52,7 +52,7 @@ STDMETHODIMP_(ULONG) BrowserHTMLMoniker::Release() {
 STDMETHODIMP BrowserHTMLMoniker::BindToStorage(
     IBindCtx *pbc, IMoniker *pmkToLeft, REFIID riid, void **ppvObj) {
   // Reset the stream cursor to the beginning of the stream.
-  LARGE_INTEGER seek = { 0 };
+  LARGE_INTEGER seek = {{0}};
   stream_->Seek(seek, STREAM_SEEK_SET, nullptr);
   return stream_->QueryInterface(riid, ppvObj);
 }

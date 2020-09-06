@@ -6,6 +6,8 @@
 
 #include <shellapi.h>
 
+#include "base/logging.h"
+#include "base/notreached.h"
 #include "base/strings/string_util.h"
 #include "base/win/win_util.h"
 #include "nativeui/gfx/geometry/point.h"
@@ -52,7 +54,9 @@ void AdjustWindowToFit(HWND hwnd, const RECT& bounds, bool fit_to_monitor) {
 }
 
 // Turn off optimizations for these functions so they show up in crash reports.
-MSVC_DISABLE_OPTIMIZE();
+#if defined(COMPILER_MSVC)
+__pragma(optimize("", off))
+#endif
 
 void CrashOutOfMemory() {
   PLOG(FATAL);
@@ -67,7 +71,9 @@ void CrashOther() {
   PLOG(FATAL);
 }
 
-MSVC_ENABLE_OPTIMIZE();
+#if defined(COMPILER_MSVC)
+__pragma(optimize("", on))
+#endif
 
 }  // namespace
 

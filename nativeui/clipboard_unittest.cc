@@ -17,7 +17,7 @@ class ClipboardTest : public testing::Test {
     clipboard_->Clear();
 
     base::FilePath exe_path;
-    PathService::Get(base::FILE_EXE, &exe_path);
+    base::PathService::Get(base::FILE_EXE, &exe_path);
     image_path_ = exe_path.DirName().DirName().DirName()
                           .Append(FILE_PATH_LITERAL("nativeui"))
                           .Append(FILE_PATH_LITERAL("test"))
@@ -103,7 +103,7 @@ TEST_F(ClipboardTest, Image) {
 
 TEST_F(ClipboardTest, FilePaths) {
   base::FilePath exe_path;
-  PathService::Get(base::FILE_EXE, &exe_path);
+  base::PathService::Get(base::FILE_EXE, &exe_path);
   base::FilePath root_dir = exe_path.DirName().DirName().DirName();
   std::vector<base::FilePath> paths = {
     exe_path,

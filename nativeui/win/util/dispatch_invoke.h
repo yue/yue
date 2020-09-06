@@ -18,7 +18,7 @@ inline bool Invoke(IDispatchEx* script,
                    base::win::ScopedVariant* result) {
   base::win::ScopedBstr name_str(name);
   DISPID name_id;
-  if (FAILED(script->GetDispID(name_str, 0, &name_id)))
+  if (FAILED(script->GetDispID(name_str.Get(), 0, &name_id)))
     return false;
   DISPPARAMS disp_params = { nullptr, nullptr, 0, 0 };
   if (FAILED(script->InvokeEx(name_id, LOCALE_USER_DEFAULT, flags, &disp_params,
@@ -35,7 +35,7 @@ bool Invoke(IDispatchEx* script,
             const ArgTypes&... args) {
   base::win::ScopedBstr name_str(name);
   DISPID name_id;
-  if (FAILED(script->GetDispID(name_str, 0, &name_id)))
+  if (FAILED(script->GetDispID(name_str.Get(), 0, &name_id)))
     return false;
   VARIANT vars[sizeof...(args)] = { args... };
   DISPPARAMS disp_params = { vars, nullptr, sizeof...(args), 0 };

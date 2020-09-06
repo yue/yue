@@ -16,7 +16,7 @@ class BrowserImplIE;
 class BrowserDocumentEvents : public IDispatch {
  public:
   explicit BrowserDocumentEvents(BrowserImplIE* browser);
-  ~BrowserDocumentEvents();
+  virtual ~BrowserDocumentEvents();
 
   // IUnknown
   STDMETHOD(QueryInterface)(REFIID riid, void **ppvObject);
@@ -45,7 +45,6 @@ class BrowserDocumentEvents : public IDispatch {
 
  private:
   ULONG ref_;
-  BrowserImplIE* browser_;
 
   DISALLOW_COPY_AND_ASSIGN(BrowserDocumentEvents);
 };

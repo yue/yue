@@ -4,6 +4,7 @@
 
 #include <node.h>
 
+#include "base/notreached.h"
 #include "nativeui/nativeui.h"
 #include "node_yue/binding_signal.h"
 #include "node_yue/binding_values.h"

@@ -36,7 +36,7 @@ enum class ControlType {
 // The common base for native window based view and directui view.
 class ViewImpl {
  public:
-  virtual ~ViewImpl() {}
+  virtual ~ViewImpl();
 
   /////////////////////////////////////////////////////////////////////////////
   // Core implementations, should be overriden for each kind of view
@@ -91,7 +91,7 @@ class ViewImpl {
   virtual void OnMouseMove(NativeEvent event);
   virtual void OnMouseEnter(NativeEvent event);
   virtual void OnMouseLeave(NativeEvent event);
-  virtual bool OnMouseWheel(NativeEvent event) { return false; }
+  virtual bool OnMouseWheel(NativeEvent event);
   virtual bool OnMouseClick(NativeEvent event);
   virtual bool OnSetCursor(NativeEvent event);
   virtual bool OnKeyEvent(NativeEvent event);

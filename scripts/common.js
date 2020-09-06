@@ -23,15 +23,6 @@ process.env.PATH = `${gnDir}${path.delimiter}${process.env.PATH}`
 // Get yue's version.
 const version = String(execSync('git describe --always --tags')).trim()
 
-// Get target_cpu from args.gn.
-let targetCpu = 'x64'
-if (fs.existsSync('out/Release/args.gn')) {
-  const content = String(fs.readFileSync('out/Release/args.gn'))
-  const match = content.match(/target_cpu = "(.*)"/)
-  if (match && match.length > 1)
-    targetCpu = match[1]
-}
-
 // Get target OS.
 const targetOs = {
   win32: 'win',
@@ -39,11 +30,31 @@ const targetOs = {
   darwin: 'mac',
 }[process.platform]
 
+// Get target_cpu from args.gn.
+let targetCpu = 'x64'
+let clang = targetOs != 'win'
+if (fs.existsSync('out/Release/args.gn')) {
+  const content = String(fs.readFileSync('out/Release/args.gn'))
+  const match = content.match(/target_cpu = "(.*)"/)
+  if (match && match.length > 1)
+    targetCpu = match[1]
+  if (content.includes('is_clang = true'))
+    clang = true
+  else
+    clang = false
+}
+
 // Parse args.
 let verbose = false
 const argv = process.argv.slice(2).filter((arg) => {
   if (arg == '-v' || arg == '--verbose') {
     verbose = true
+    return false
+  } else if (arg == '--clang') {
+    clang = true
+    return false
+  } else if (arg == '--no-clang') {
+    clang = false
     return false
   } else if (arg.startsWith('--target-cpu=')) {
     targetCpu = arg.substr(arg.indexOf('=') + 1)
@@ -52,6 +63,29 @@ const argv = process.argv.slice(2).filter((arg) => {
     return true
   }
 })
+
+// The common build configurations.
+const config = [
+  `target_cpu="${targetCpu}"`,
+  'use_allocator="none"',
+  'use_allocator_shim=false',
+  'use_partition_alloc=false',
+  'fatal_linker_warnings=false',
+]
+if (clang) {
+  config.push('is_clang=true',
+              'clang_update_script="//building/tools/update-clang.py"')
+} else {
+  config.push('is_clang=false')
+}
+if (targetOs == 'mac') {
+  config.push('mac_deployment_target="10.10.0"',
+              'mac_sdk_min="10.15"',
+              'use_xcode_clang=true')
+} else if (targetOs == 'linux') {
+  // Required for loading dynamic modules.
+  config.push('use_cfi_icall=false')
+}
 
 function strip(file) {
   // TODO(zcbenz): Use |file| command to determine type.
@@ -143,7 +177,7 @@ const spawnSyncWrapper = (exec, args, options = {}) => {
     options.env = Object.assign(options.env, process.env)
   const result = spawnSync(exec, args, options)
   if (result.error)
-    throw error
+    throw result.error
   return result
 }
 
@@ -159,6 +193,8 @@ if (!verbose) {
 module.exports = {
   verbose,
   version,
+  clang,
+  config,
   argv,
   targetCpu,
   targetOs,

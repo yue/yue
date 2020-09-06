@@ -4,6 +4,7 @@
 
 #include "lua_yue/binding_values.h"
 
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -34,6 +35,7 @@ bool IsTableArray(State* state, int index, size_t* size) {
 // static
 void Type<base::Value>::Push(State* state, const base::Value& value) {
   switch (value.type()) {
+    case base::Value::Type::DEAD:
     case base::Value::Type::NONE:
       lua::PushNil(state);
       return;
@@ -50,7 +52,9 @@ void Type<base::Value>::Push(State* state, const base::Value& value) {
       lua::Push(state, value.GetString());
       return;
     case base::Value::Type::BINARY:
-      lua_pushlstring(state, value.GetBlob().data(), value.GetBlob().size());
+      lua_pushlstring(state,
+                      reinterpret_cast<const char*>(value.GetBlob().data()),
+                      value.GetBlob().size());
       return;
     case base::Value::Type::DICTIONARY: {
       const auto* dict = static_cast<const base::DictionaryValue*>(&value);
@@ -108,7 +112,7 @@ bool Type<base::Value>::To(State* state, int index, base::Value* out) {
           if (!lua::To(state, -2, &key) || !lua::To(state, -1, &value))
             return false;
           lua_pop(state, 1);
-          auto vval = base::MakeUnique<base::Value>(std::move(value));
+          auto vval = std::make_unique<base::Value>(std::move(value));
           dict->SetWithoutPathExpansion(key.c_str(), std::move(vval));
         }
       }

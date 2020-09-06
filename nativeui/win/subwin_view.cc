@@ -127,6 +127,10 @@ void SubwinView::SetTransparentBackground() {
   UpdateTransparentBackgroundBrush();
 }
 
+LRESULT SubwinView::OnNotify(int code, LPNMHDR pnmh) {
+  return 0;
+}
+
 bool SubwinView::OnCtlColor(HDC dc, HBRUSH* brush) {
   ::SetTextColor(dc, color().ToCOLORREF());
   if (!bg_brush_.get())
