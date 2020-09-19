@@ -17,8 +17,8 @@ execSync('node ./scripts/cpplint.js')
 // Bootstrap.
 execSync(`node ./scripts/bootstrap.js --target-cpu=${targetCpu}`)
 
-// Run test except for cross compilation on Linux.
-if (targetOs != 'linux' || targetCpu == 'x64') {
+// Run test except for cross compilation.
+if ((targetCpu == 'x64') || (targetOs == 'win' && targetCpu == 'x86')) {
   const tests = [
     'nativeui_unittests',
     'lua_unittests',
@@ -35,13 +35,15 @@ execSync('node ./scripts/build.js out/Debug')
 execSync('node scripts/create_dist.js')
 
 // Test distributions.
-if (targetCpu == 'x64' || targetOs == 'win')
+if ((targetCpu == 'x64') || (targetOs == 'win' && targetCpu == 'x86'))
   execSync(`node ./scripts/test_libyue.js`)
 // Test typescript types.
 if (targetCpu == 'x64' && targetOs == 'linux')
   execSync(`node ./scripts/test_typescript_declarations.js`)
 
 // Build node extensions.
+if (targetOs == 'win' && targetCpu.startsWith('arm'))
+  process.exit(0)
 const runtimes = {
   node: [
     '12.16.3',

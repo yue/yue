@@ -28,12 +28,11 @@ execSync('git submodule update --init --recursive')
 execSync('node scripts/download_gn.js')
 execSync(`node scripts/download_node_headers.js node ${process.version} ${targetOs} ${targetCpu}`)
 
-const commonConfig = config.concat([
-  `node_version="${process.version}"`,
-])
-if (process.env.CI === 'true') {
+const commonConfig = config.slice()
+if (process.env.CI === 'true')
   commonConfig.push('use_jumbo_build=true')
-}
+if (!(targetOs == 'win' && targetCpu.startsWith('arm')))
+  commonConfig.push(`node_version="${process.version}"`)
 
 const componentConfig = [
   'is_component_build=true',

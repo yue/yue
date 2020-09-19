@@ -17,6 +17,11 @@ if (argv.length != 2) {
 const runtime = argv[0]
 const nodever = argv[1].startsWith('v') ? argv[1] : `v${argv[1]}`
 
+if (runtime == 'node' && targetOs == 'win' && targetCpu.startsWith('arm')) {
+  console.error('Node.js does not have official binary for Windows on ARM')
+  process.exit(1)
+}
+
 const args = config.concat([
   'use_jumbo_build=true',
   `node_version="${nodever}"`,
