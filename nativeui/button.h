@@ -30,7 +30,7 @@ class NATIVEUI_EXPORT Button : public View {
   std::string GetTitle() const;
   void SetChecked(bool checked);
   bool IsChecked() const;
-  void SetImage(Image* image);
+  void SetImage(scoped_refptr<Image> image);
   Image* GetImage() const { return image_.get(); }
 
 #if defined(OS_MACOSX)

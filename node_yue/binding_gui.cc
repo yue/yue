@@ -1404,7 +1404,7 @@ struct Type<nu::Tray> {
 #if defined(OS_MACOSX)
         "createWithTitle", &CreateOnHeap<nu::Tray, const std::string&>,
 #endif
-        "createWithImage", &CreateOnHeap<nu::Tray, nu::Image*>);
+        "createWithImage", &CreateOnHeap<nu::Tray, scoped_refptr<nu::Image>>);
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {

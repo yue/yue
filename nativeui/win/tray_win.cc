@@ -6,6 +6,7 @@
 #include "nativeui/win/tray_win.h"
 
 #include <string>
+#include <utility>
 
 #include "nativeui/gfx/canvas.h"
 #include "nativeui/gfx/image.h"
@@ -114,8 +115,8 @@ void TrayImpl::InitIconData(NOTIFYICONDATA* icon_data) {
 ///////////////////////////////////////////////////////////////////////////////
 // Public Tray API implementation.
 
-Tray::Tray(Image* icon) : tray_(new TrayImpl(this)) {
-  tray_->SetImage(icon);
+Tray::Tray(scoped_refptr<Image> icon) : tray_(new TrayImpl(this)) {
+  tray_->SetImage(icon.get());
 }
 
 Tray::~Tray() {
@@ -129,12 +130,12 @@ void Tray::Remove() {
 void Tray::SetTitle(const std::string& title) {
 }
 
-void Tray::SetImage(Image* icon) {
-  tray_->SetImage(icon);
+void Tray::SetImage(scoped_refptr<Image> icon) {
+  tray_->SetImage(icon.get());
 }
 
-void Tray::SetMenu(Menu* menu) {
-  menu_ = menu;
+void Tray::SetMenu(scoped_refptr<Menu> menu) {
+  menu_ = std::move(menu);
 }
 
 }  // namespace nu

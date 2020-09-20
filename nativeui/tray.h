@@ -19,7 +19,7 @@ class Menu;
 
 class NATIVEUI_EXPORT Tray : public base::RefCounted<Tray> {
  public:
-  explicit Tray(Image* icon);
+  explicit Tray(scoped_refptr<Image> icon);
 
 #if defined(OS_MACOSX)
   // Text only tray icon.
@@ -28,8 +28,8 @@ class NATIVEUI_EXPORT Tray : public base::RefCounted<Tray> {
 
   void Remove();
   void SetTitle(const std::string& title);
-  void SetImage(Image* icon);
-  void SetMenu(Menu* menu);
+  void SetImage(scoped_refptr<Image> icon);
+  void SetMenu(scoped_refptr<Menu> menu);
   Menu* GetMenu() const { return menu_.get(); }
 
   Signal<void(Tray*)> on_click;

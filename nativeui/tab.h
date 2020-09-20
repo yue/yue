@@ -19,7 +19,7 @@ class NATIVEUI_EXPORT Tab : public View {
   // View class name.
   static const char kClassName[];
 
-  void AddPage(const std::string& title, View* view);
+  void AddPage(const std::string& title, scoped_refptr<View> view);
   void RemovePage(View* view);
 
   int PageCount() const { return static_cast<int>(pages_.size()); }

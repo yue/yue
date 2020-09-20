@@ -102,10 +102,10 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
   void RegisterDraggedTypes(std::set<Clipboard::Data::Type> types);
 
   // Custom cursor when mouse hovers the view.
-  void SetCursor(Cursor* cursor);
+  void SetCursor(scoped_refptr<Cursor> cursor);
 
   // Display related styles.
-  virtual void SetFont(Font* font);
+  virtual void SetFont(scoped_refptr<Font> font);
   virtual void SetColor(Color color);
   void SetBackgroundColor(Color color);
 

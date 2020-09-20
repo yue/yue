@@ -5,6 +5,7 @@
 #include "nativeui/menu_base.h"
 
 #include <algorithm>
+#include <utility>
 
 #include "nativeui/menu_item.h"
 
@@ -18,26 +19,26 @@ MenuBase::~MenuBase() {
   PlatformDestroy();
 }
 
-void MenuBase::Append(MenuItem* item) {
-  Insert(item, ItemCount());
+void MenuBase::Append(scoped_refptr<MenuItem> item) {
+  Insert(std::move(item), ItemCount());
 }
 
-void MenuBase::Insert(MenuItem* item, int index) {
+void MenuBase::Insert(scoped_refptr<MenuItem> item, int index) {
   if (!item || item->GetMenu() || index < 0 || index > ItemCount())
     return;
-  items_.insert(items_.begin() + index, item);
   item->set_menu(this);
-  PlatformInsert(item, index);
   item->SetAcceleratorManager(accel_manager_);
+  PlatformInsert(item.get(), index);
+  items_.insert(items_.begin() + index, std::move(item));
 }
 
 void MenuBase::Remove(MenuItem* item) {
   const auto i(std::find(items_.begin(), items_.end(), item));
   if (i == items_.end())
     return;
+  item->set_menu(nullptr);
   item->SetAcceleratorManager(nullptr);
   PlatformRemove(item);
-  item->set_menu(nullptr);
   items_.erase(i);
 }
 

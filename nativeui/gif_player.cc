@@ -5,6 +5,7 @@
 #include "nativeui/gif_player.h"
 
 #include <algorithm>
+#include <utility>
 
 #include "nativeui/gfx/image.h"
 
@@ -13,9 +14,9 @@ namespace nu {
 // static
 const char GifPlayer::kClassName[] = "GifPlayer";
 
-void GifPlayer::SetImage(Image* image) {
-  image_ = image;
-  PlatformSetImage(image);
+void GifPlayer::SetImage(scoped_refptr<Image> image) {
+  image_ = std::move(image);
+  PlatformSetImage(image_.get());
   UpdateDefaultStyle();
 }
 

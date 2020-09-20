@@ -12,10 +12,10 @@
 
 namespace nu {
 
-Tray::Tray(Image* icon)
+Tray::Tray(scoped_refptr<Image> icon)
     : tray_([[[NSStatusBar systemStatusBar]
                 statusItemWithLength:NSSquareStatusItemLength] retain]) {
-  SetImage(icon);
+  SetImage(std::move(icon));
 }
 
 Tray::Tray(const std::string& title)
@@ -36,13 +36,13 @@ void Tray::SetTitle(const std::string& title) {
   [tray_ setTitle:base::SysUTF8ToNSString(title)];
 }
 
-void Tray::SetImage(Image* icon) {
+void Tray::SetImage(scoped_refptr<Image> icon) {
   [tray_ setImage:icon->GetNative()];
 }
 
-void Tray::SetMenu(Menu* menu) {
-  menu_ = menu;
+void Tray::SetMenu(scoped_refptr<Menu> menu) {
   [tray_ setMenu:menu->GetNative()];
+  menu_ = std::move(menu);
 }
 
 }  // namespace nu

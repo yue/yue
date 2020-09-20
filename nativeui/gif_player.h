@@ -24,7 +24,7 @@ class NATIVEUI_EXPORT GifPlayer : public View {
   // View class name.
   static const char kClassName[];
 
-  void SetImage(Image* image);
+  void SetImage(scoped_refptr<Image> image);
   Image* GetImage() const;
   void SetAnimating(bool animates);
   bool IsAnimating() const;

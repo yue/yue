@@ -16,21 +16,19 @@ namespace {
 GtkRadioMenuItem* SearchRadioInSameGroup(MenuBase* menu, MenuItem* radio,
                                          int index) {
   // First search backward.
-  for (int i = index; i >= 0; --i) {
+  for (int i = index - 1; i >= 0; --i) {
     nu::MenuItem* item = menu->ItemAt(i);
     if (item->GetType() == nu::MenuItem::Type::Separator)  // meet boundry
       break;
-    else if (item != radio &&
-             item->GetType() == nu::MenuItem::Type::Radio)  // found a radio
+    else if (item->GetType() == nu::MenuItem::Type::Radio)  // found a radio
       return GTK_RADIO_MENU_ITEM(item->GetNative());
   }
   // Then search forward.
-  for (int i = index + 1; i < menu->ItemCount(); ++i) {
+  for (int i = index; i < menu->ItemCount(); ++i) {
     nu::MenuItem* item = menu->ItemAt(i);
     if (item->GetType() == nu::MenuItem::Type::Separator)  // meet boundry
       break;
-    else if (item != radio &&
-             item->GetType() == nu::MenuItem::Type::Radio)  // found a radio
+    else if (item->GetType() == nu::MenuItem::Type::Radio)  // found a radio
       return GTK_RADIO_MENU_ITEM(item->GetNative());
   }
   return nullptr;

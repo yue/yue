@@ -4,6 +4,8 @@
 
 #include "nativeui/scroll.h"
 
+#include <utility>
+
 #include "nativeui/container.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
 
@@ -20,11 +22,11 @@ Scroll::Scroll() {
 Scroll::~Scroll() {
 }
 
-void Scroll::SetContentView(View* view) {
+void Scroll::SetContentView(scoped_refptr<View> view) {
   if (content_view_)
     content_view_->SetParent(nullptr);
-  PlatformSetContentView(view);
-  content_view_ = view;
+  PlatformSetContentView(view.get());
+  content_view_ = std::move(view);
   content_view_->SetParent(this);
 }
 

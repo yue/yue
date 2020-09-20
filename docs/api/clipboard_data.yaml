@@ -23,7 +23,7 @@ constructors:
     description: Create a data that contains an string.
     detail: The `type` can only be `Text` or `HTML`.
 
-  - signature: Data(Image* image)
+  - signature: Data(scoped_refptr<Image> image)
     lang: ['cpp']
     description: Create a data with type of `Image`.
 

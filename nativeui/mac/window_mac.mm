@@ -343,9 +343,9 @@ void Window::SetBackgroundColor(Color color) {
   [window_ setBackgroundColor:color.ToNSColor()];
 }
 
-void Window::SetToolbar(Toolbar* toolbar) {
-  toolbar_ = toolbar;
-  [window_ setToolbar:toolbar->GetNative()];
+void Window::SetToolbar(scoped_refptr<Toolbar> toolbar) {
+  toolbar_ = std::move(toolbar);
+  [window_ setToolbar:toolbar_->GetNative()];
 }
 
 void Window::SetTitleVisible(bool visible) {

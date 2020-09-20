@@ -4,6 +4,8 @@
 
 #include "nativeui/menu_item.h"
 
+#include <utility>
+
 #include "base/stl_util.h"
 #include "nativeui/accelerator_manager.h"
 #include "nativeui/menu.h"
@@ -72,11 +74,11 @@ MenuItem::~MenuItem() {
   PlatformDestroy();
 }
 
-void MenuItem::SetSubmenu(Menu* submenu) {
+void MenuItem::SetSubmenu(scoped_refptr<Menu> submenu) {
   if (submenu_)
     submenu_->SetParent(nullptr);
-  PlatformSetSubmenu(submenu);
-  submenu_ = submenu;
+  PlatformSetSubmenu(submenu.get());
+  submenu_ = std::move(submenu);
   if (submenu_)
     submenu_->SetParent(this);
 }

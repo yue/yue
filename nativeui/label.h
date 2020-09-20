@@ -32,7 +32,7 @@ class NATIVEUI_EXPORT Label : public View {
 
   // View:
   const char* GetClassName() const override;
-  void SetFont(Font* font) override;
+  void SetFont(scoped_refptr<Font> font) override;
   void SetColor(Color color) override;
 
  protected:

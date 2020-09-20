@@ -4,6 +4,8 @@
 
 #include "nativeui/group.h"
 
+#include <utility>
+
 #include "nativeui/container.h"
 #include "nativeui/gfx/geometry/insets.h"
 
@@ -30,12 +32,12 @@ SizeF Group::GetMinimumSize() const {
   return GetBorderSize();
 }
 
-void Group::SetContentView(View* view) {
+void Group::SetContentView(scoped_refptr<View> view) {
   if (content_view_)
     content_view_->SetParent(nullptr);
-  content_view_ = view;
+  content_view_ = std::move(view);
   content_view_->SetParent(this);
-  PlatformSetContentView(view);
+  PlatformSetContentView(content_view_.get());
 }
 
 View* Group::GetContentView() const {

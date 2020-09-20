@@ -24,8 +24,8 @@ class NATIVEUI_EXPORT MenuBase : public base::RefCounted<MenuBase> {
   // subclass.
   virtual const char* GetClassName() const = 0;
 
-  void Append(MenuItem* item);
-  void Insert(MenuItem* item, int index);
+  void Append(scoped_refptr<MenuItem> item);
+  void Insert(scoped_refptr<MenuItem> item, int index);
   void Remove(MenuItem* item);
 
   int ItemCount() const { return static_cast<int>(items_.size()); }

@@ -59,7 +59,7 @@ class NATIVEUI_EXPORT Clipboard {
     Data(Data&& that);
 
     Data(Type type, std::string str);
-    explicit Data(Image* image);
+    explicit Data(scoped_refptr<Image> image);
     explicit Data(std::vector<base::FilePath> file_paths);
 
     Data& operator=(Data&& that);

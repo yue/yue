@@ -22,7 +22,7 @@ class_properties:
     description: The class name of this view.
 
 methods:
-  - signature: void AddPage(const std::string& title, View* view)
+  - signature: void AddPage(const std::string& title, scoped_refptr<View> view)
     description: Add `view` as a new page with `title`.
 
   - signature: void RemovePage(View* view)

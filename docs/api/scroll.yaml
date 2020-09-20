@@ -29,7 +29,7 @@ class_properties:
     description: The class name of this view.
 
 methods:
-  - signature: void SetContentView(View* view)
+  - signature: void SetContentView(scoped_refptr<View> view)
     description: Set the content `view`.
 
   - signature: View* GetContentView() const

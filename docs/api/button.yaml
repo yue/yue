@@ -48,7 +48,7 @@ methods:
   - signature: bool IsChecked() const
     description: Return whether checkbox or radio is checked.
 
-  - signature: void SetImage(Image* image)
+  - signature: void SetImage(scoped_refptr<Image> image)
     description: Set the image of button.
 
   - signature: Image* GetImage() const

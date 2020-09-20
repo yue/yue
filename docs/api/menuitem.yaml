@@ -45,7 +45,7 @@ methods:
   - signature: std::string GetLabel() const
     description: Return the item's label.
 
-  - signature: void SetSubmenu(Menu* submenu)
+  - signature: void SetSubmenu(scoped_refptr<Menu> submenu)
     description: |
       Set the submenu attached to the item.
 

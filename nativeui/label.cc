@@ -87,9 +87,9 @@ const char* Label::GetClassName() const {
   return kClassName;
 }
 
-void Label::SetFont(Font* font) {
+void Label::SetFont(scoped_refptr<Font> font) {
   text_->SetFont(font);
-  View::SetFont(font);
+  View::SetFont(std::move(font));
   MarkDirty();  // layout has changed
 }
 

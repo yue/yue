@@ -29,7 +29,7 @@ class_properties:
     description: The class name of this view.
 
 methods:
-  - signature: void SetModel(TableModel* model)
+  - signature: void SetModel(scoped_refptr<TableModel> model)
     description: Set `model` as table's data source.
 
   - signature: TableModel* GetModel()

@@ -148,14 +148,14 @@ methods:
       types:
         description: An array of `<!type>Clipboard::Data::Type`.
 
-  - signature: void SetCursor(Cursor* cursor)
+  - signature: void SetCursor(scoped_refptr<Cursor> cursor)
     description: Set the cursor to show when hovering the view.
     detail: |
       On Linux, setting cursor would force the view to own its own GDK window.
       For certain views like `Label`, this may have remove the view's background
       color.
 
-  - signature: void SetFont(Font* font)
+  - signature: void SetFont(scoped_refptr<Font> font)
     description: Change the font used for drawing text in the view.
     detail: |
       This methods only works for `View`s that display text, like `Label` or

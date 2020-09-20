@@ -83,18 +83,18 @@ int View::DoDrag(std::vector<Clipboard::Data> data, int operations) {
   return DoDragWithOptions(std::move(data), operations, options);
 }
 
-void View::SetCursor(Cursor* cursor) {
-  if (cursor_.get() == cursor)
+void View::SetCursor(scoped_refptr<Cursor> cursor) {
+  if (cursor_ == cursor)
     return;
-  PlatformSetCursor(cursor);
-  cursor_ = cursor;
+  PlatformSetCursor(cursor.get());
+  cursor_ = std::move(cursor);
 }
 
-void View::SetFont(Font* font) {
-  if (font_.get() == font)
+void View::SetFont(scoped_refptr<Font> font) {
+  if (font_ == font)
     return;
-  PlatformSetFont(font);
-  font_ = font;
+  PlatformSetFont(font.get());
+  font_ = std::move(font);
   UpdateDefaultStyle();
 }
 

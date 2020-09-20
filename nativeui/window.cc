@@ -4,6 +4,8 @@
 
 #include "nativeui/window.h"
 
+#include <utility>
+
 #include "base/logging.h"
 #include "nativeui/container.h"
 #include "nativeui/menu_bar.h"
@@ -36,15 +38,15 @@ Window::~Window() {
   content_view_->BecomeContentView(nullptr);
 }
 
-void Window::SetContentView(View* view) {
+void Window::SetContentView(scoped_refptr<View> view) {
   if (!view) {
     LOG(ERROR) << "Content view can not be null";
     return;
   }
   if (content_view_)
     content_view_->BecomeContentView(nullptr);
-  PlatformSetContentView(view);
-  content_view_ = view;
+  PlatformSetContentView(view.get());
+  content_view_ = std::move(view);
   content_view_->BecomeContentView(this);
 }
 
@@ -57,23 +59,24 @@ SizeF Window::GetContentSize() const {
 }
 
 #if defined(OS_WIN) || defined(OS_LINUX)
-void Window::SetMenuBar(MenuBar* menu_bar) {
+void Window::SetMenuBar(scoped_refptr<MenuBar> menu_bar) {
   if (menu_bar_)
     menu_bar_->SetWindow(nullptr);
-  PlatformSetMenuBar(menu_bar);
-  menu_bar_ = menu_bar;
+  PlatformSetMenuBar(menu_bar.get());
+  menu_bar_ = std::move(menu_bar);
   menu_bar_->SetWindow(this);
 }
 #endif
 
-void Window::AddChildWindow(Window* child) {
+void Window::AddChildWindow(scoped_refptr<Window> child) {
   if (child->GetParentWindow())
     return;
-  auto it = std::find(child_windows_.begin(), child_windows_.end(), child);
+  auto it = std::find(child_windows_.begin(), child_windows_.end(),
+                      child.get());
   if (it == child_windows_.end()) {
     child->parent_ = this;
-    child_windows_.emplace_back(child);
-    PlatformAddChildWindow(child);
+    PlatformAddChildWindow(child.get());
+    child_windows_.emplace_back(std::move(child));
   }
 }
 

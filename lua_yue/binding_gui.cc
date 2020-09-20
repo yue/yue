@@ -1262,7 +1262,7 @@ struct Type<nu::Tray> {
 #if defined(OS_MACOSX)
            "createwithtitle", &CreateOnHeap<nu::Tray, const std::string&>,
 #endif
-           "createwithimage", &CreateOnHeap<nu::Tray, nu::Image*>,
+           "createwithimage", &CreateOnHeap<nu::Tray, scoped_refptr<nu::Image>>,
            "remove", &nu::Tray::Remove,
            "settitle", &nu::Tray::SetTitle,
            "setimage", &nu::Tray::SetImage,

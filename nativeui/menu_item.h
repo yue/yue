@@ -71,7 +71,7 @@ class NATIVEUI_EXPORT MenuItem : public base::RefCounted<MenuItem> {
   void SetLabel(const std::string& label);
   std::string GetLabel() const;
 
-  void SetSubmenu(Menu* submenu);
+  void SetSubmenu(scoped_refptr<Menu> submenu);
   Menu* GetSubmenu() const;
 
   void SetChecked(bool checked);

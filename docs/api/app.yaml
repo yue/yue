@@ -40,7 +40,7 @@ class_methods:
     description: Return current app.
 
 methods:
-  - signature: void SetApplicationMenu(MenuBar* menu)
+  - signature: void SetApplicationMenu(scoped_refptr<MenuBar> menu)
     platform: ['macOS']
     description: Set the application menu bar.
 

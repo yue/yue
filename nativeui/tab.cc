@@ -4,6 +4,8 @@
 
 #include "nativeui/tab.h"
 
+#include <utility>
+
 namespace nu {
 
 // static
@@ -17,12 +19,12 @@ Tab::Tab() {
 Tab::~Tab() {
 }
 
-void Tab::AddPage(const std::string& title, View* view) {
+void Tab::AddPage(const std::string& title, scoped_refptr<View> view) {
   if (!view || view->GetParent() == this)
     return;
-  pages_.push_back(view);
   view->SetParent(this);
-  PlatformAddPage(title, view);
+  pages_.emplace_back(view);
+  PlatformAddPage(title, view.get());
 }
 
 void Tab::RemovePage(View* view) {

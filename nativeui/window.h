@@ -56,7 +56,7 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
   void SetHasShadow(bool has);
   bool HasShadow() const;
 
-  void SetContentView(View* view);
+  void SetContentView(scoped_refptr<View> view);
   View* GetContentView() const;
 
   void Center();
@@ -100,7 +100,7 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
   void SetBackgroundColor(Color color);
 
 #if defined(OS_MACOSX)
-  void SetToolbar(Toolbar* toolbar);
+  void SetToolbar(scoped_refptr<Toolbar> toolbar);
   Toolbar* GetToolbar() const { return toolbar_.get(); }
   void SetTitleVisible(bool visible);
   bool IsTitleVisible() const;
@@ -110,12 +110,12 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
 
 #if defined(OS_WIN) || defined(OS_LINUX)
   void SetSkipTaskbar(bool skip);
-  void SetMenuBar(MenuBar* menu_bar);
+  void SetMenuBar(scoped_refptr<MenuBar> menu_bar);
   MenuBar* GetMenuBar() const { return menu_bar_.get(); }
 #endif
 
   Window* GetParentWindow() const { return parent_; }
-  void AddChildWindow(Window* child);
+  void AddChildWindow(scoped_refptr<Window> child);
   void RemoveChildWindow(Window* child);
   std::vector<Window*> GetChildWindows() const;
 

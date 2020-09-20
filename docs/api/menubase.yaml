@@ -10,10 +10,10 @@ lang_detail:
     Note that the `index` counts from `1`, following lua's convention.
 
 methods:
-  - signature: void Append(MenuItem* item)
+  - signature: void Append(scoped_refptr<MenuItem> item)
     description: Append the `item` to the menu.
 
-  - signature: void Insert(MenuItem* item, int index)
+  - signature: void Insert(scoped_refptr<MenuItem> item, int index)
     description: Insert the `item` at `index` to the menu.
 
   - signature: void Remove(MenuItem* item)

@@ -34,7 +34,7 @@ methods:
   - signature: bool HasShadow() const
     description: Return whether window has shadow.
 
-  - signature: void SetContentView(View* view)
+  - signature: void SetContentView(scoped_refptr<View> view)
     description: |
       Set the content view of the window.
 
@@ -164,7 +164,7 @@ methods:
   - signature: void SetBackgroundColor(Color color)
     description: Set the background color of the window.
 
-  - signature: void SetToolbar(Toolbar* toolbar)
+  - signature: void SetToolbar(scoped_refptr<Toolbar> toolbar)
     platform: ['macOS']
     description: Set the window toolbar.
 
@@ -196,7 +196,7 @@ methods:
     platform: ['Windows', 'Linux']
     description: Set whether to hide the window from taskbar.
 
-  - signature: void SetMenuBar(MenuBar* menubar)
+  - signature: void SetMenuBar(scoped_refptr<MenuBar> menubar)
     platform: ['Windows', 'Linux']
     description: Set the window menu bar.
 
@@ -207,7 +207,7 @@ methods:
   - signature: Window* GetParentWindow() const
     description: Return the parent window.
 
-  - signature: void AddChildWindow(Window* child)
+  - signature: void AddChildWindow(scoped_refptr<Window> child)
     description: Make `child` a child window of this window.
     detail: This method will do nothing if `child` already has a parent window.
 

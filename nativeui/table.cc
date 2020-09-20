@@ -4,6 +4,8 @@
 
 #include "nativeui/table.h"
 
+#include <utility>
+
 #include "nativeui/table_model.h"
 
 namespace nu {
@@ -27,11 +29,11 @@ Table::~Table() {
     model_->Unsubscribe(this);
 }
 
-void Table::SetModel(TableModel* model) {
+void Table::SetModel(scoped_refptr<TableModel> model) {
   if (model_)
     model_->Unsubscribe(this);
-  PlatformSetModel(model);
-  model_ = model;
+  PlatformSetModel(model.get());
+  model_ = std::move(model);
   if (model_)
     model_->Subscribe(this);
 }

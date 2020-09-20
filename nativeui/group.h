@@ -22,7 +22,7 @@ class NATIVEUI_EXPORT Group : public View {
   const char* GetClassName() const override;
   SizeF GetMinimumSize() const override;
 
-  void SetContentView(View* view);
+  void SetContentView(scoped_refptr<View> view);
   View* GetContentView() const;
 
   void SetTitle(const std::string& title);

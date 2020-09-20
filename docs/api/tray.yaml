@@ -15,7 +15,7 @@ detail: |
     a zombie icon would be left.
 
 constructors:
-  - signature: Tray(Image* icon)
+  - signature: Tray(scoped_refptr<Image> icon)
     lang: ['cpp']
     description: Create a tray item with `icon`.
 
@@ -42,10 +42,10 @@ methods:
     platform: ['macOS', 'linux']
     description: Set title to be displayed aside item's icon.
 
-  - signature: void SetImage(Image* icon)
+  - signature: void SetImage(scoped_refptr<Image> icon)
     description: Set the `icon` of tray item.
 
-  - signature: void SetMenu(Menu* menu)
+  - signature: void SetMenu(scoped_refptr<Menu> menu)
     description: Set the menu attached with the tray item.
     detail: |
       On most platforms the menu will show when clicking on the icon, while on

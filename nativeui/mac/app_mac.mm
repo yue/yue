@@ -10,9 +10,9 @@
 
 namespace nu {
 
-void App::SetApplicationMenu(MenuBar* menu) {
-  application_menu_ = menu;
-  [NSApp setMainMenu:menu->GetNative()];
+void App::SetApplicationMenu(scoped_refptr<MenuBar> menu) {
+  application_menu_ = std::move(menu);
+  [NSApp setMainMenu:application_menu_->GetNative()];
 }
 
 MenuBar* App::GetApplicationMenu() const {

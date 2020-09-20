@@ -23,7 +23,7 @@ class NATIVEUI_EXPORT App {
 
 #if defined(OS_MACOSX)
   // Set the application menu.
-  void SetApplicationMenu(MenuBar* menu);
+  void SetApplicationMenu(scoped_refptr<MenuBar> menu);
   MenuBar* GetApplicationMenu() const;
 
   // Dock functions.

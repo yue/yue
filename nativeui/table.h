@@ -45,7 +45,7 @@ class NATIVEUI_EXPORT Table : public View {
   // View class name.
   static const char kClassName[];
 
-  void SetModel(TableModel* model);
+  void SetModel(scoped_refptr<TableModel> model);
   TableModel* GetModel();
   void AddColumn(const std::string& title);
   void AddColumnWithOptions(const std::string& title,

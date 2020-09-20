@@ -144,7 +144,7 @@ std::string GenerateAppIndicatorId() {
 
 }  // namespace
 
-Tray::Tray(Image* icon)
+Tray::Tray(scoped_refptr<Image> icon)
     : id_(GenerateAppIndicatorId()) {
   EnsureMethodsLoaded();
   if (!g_opened) {
@@ -152,7 +152,7 @@ Tray::Tray(Image* icon)
     return;
   }
 
-  std::string name = WriteImage(icon);
+  std::string name = WriteImage(icon.get());
   if (name.empty()) {
     LOG(ERROR) << "Unable to save tray icon to temp dir";
     return;
@@ -182,11 +182,11 @@ void Tray::SetTitle(const std::string& title) {
   app_indicator_set_label(tray_, title.c_str(), title.c_str());
 }
 
-void Tray::SetImage(Image* icon) {
+void Tray::SetImage(scoped_refptr<Image> icon) {
   if (!tray_)
     return;
 
-  std::string name = WriteImage(icon);
+  std::string name = WriteImage(icon.get());
   if (name.empty()) {
     LOG(ERROR) << "Unable to save tray icon to temp dir";
     return;
@@ -196,11 +196,11 @@ void Tray::SetImage(Image* icon) {
   app_indicator_set_icon_full(tray_, name.c_str(), "icon");
 }
 
-void Tray::SetMenu(Menu* menu) {
+void Tray::SetMenu(scoped_refptr<Menu> menu) {
   if (!tray_)
     return;
-  menu_ = menu;
   app_indicator_set_menu(tray_, GTK_MENU(menu->GetNative()));
+  menu_ = std::move(menu);
 }
 
 std::string Tray::WriteImage(Image* icon) {

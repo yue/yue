@@ -32,13 +32,15 @@ class ClipboardTest : public testing::Test {
 };
 
 TEST_F(ClipboardTest, Types) {
-  EXPECT_TRUE(nu::Clipboard::FromType(nu::Clipboard::Type::CopyPaste)->GetNative());
+  EXPECT_TRUE(
+      nu::Clipboard::FromType(nu::Clipboard::Type::CopyPaste)->GetNative());
 #if defined(OS_MACOSX)
   EXPECT_TRUE(nu::Clipboard::FromType(nu::Clipboard::Type::Drag)->GetNative());
   EXPECT_TRUE(nu::Clipboard::FromType(nu::Clipboard::Type::Find)->GetNative());
   EXPECT_TRUE(nu::Clipboard::FromType(nu::Clipboard::Type::Font)->GetNative());
 #elif defined(OS_LINUX)
-  EXPECT_TRUE(nu::Clipboard::FromType(nu::Clipboard::Type::Selection)->GetNative());
+  EXPECT_TRUE(
+      nu::Clipboard::FromType(nu::Clipboard::Type::Selection)->GetNative());
 #endif
 }
 

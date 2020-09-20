@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <utility>
 
 #include "base/logging.h"
 #include "third_party/yoga/Yoga.h"
@@ -96,14 +97,14 @@ float Container::GetPreferredWidthForHeight(float height) const {
   return YGNodeLayoutGetWidth(node());
 }
 
-void Container::AddChildView(View* view) {
+void Container::AddChildView(scoped_refptr<View> view) {
   DCHECK(view);
   if (view->GetParent() == this)
     return;
-  AddChildViewAt(view, ChildCount());
+  AddChildViewAt(std::move(view), ChildCount());
 }
 
-void Container::AddChildViewAt(View* view, int index) {
+void Container::AddChildViewAt(scoped_refptr<View> view, int index) {
   DCHECK(view);
   if (view == this || index < 0 || index > ChildCount())
     return;
@@ -116,8 +117,8 @@ void Container::AddChildViewAt(View* view, int index) {
   YGNodeInsertChild(node(), view->node(), index);
   view->SetParent(this);
 
-  children_.insert(children_.begin() + index, view);
-  PlatformAddChildView(view);
+  PlatformAddChildView(view.get());
+  children_.insert(children_.begin() + index, std::move(view));
 
   DCHECK_EQ(static_cast<int>(YGNodeGetChildCount(node())), ChildCount());
 

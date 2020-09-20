@@ -34,8 +34,8 @@ class NATIVEUI_EXPORT Container : public View {
   float GetPreferredWidthForHeight(float height) const;
 
   // Add/Remove children.
-  void AddChildView(View* view);
-  void AddChildViewAt(View* view, int index);
+  void AddChildView(scoped_refptr<View> view);
+  void AddChildViewAt(scoped_refptr<View> view, int index);
   void RemoveChildView(View* view);
 
   // Get children.

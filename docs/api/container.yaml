@@ -47,13 +47,13 @@ methods:
     description: |
       Return the minimum width to show all child of the view for the `height`.
 
-  - signature: void AddChildView(View* view)
+  - signature: void AddChildView(scoped_refptr<View> view)
     description: |
       Append a child `view` to the container.
 
       This method will silently fail if the `view` already has a parent.
 
-  - signature: void AddChildViewAt(View* view, int index)
+  - signature: void AddChildViewAt(scoped_refptr<View> view, int index)
     description: |
       Add a child `view` to the container at `index`.
 

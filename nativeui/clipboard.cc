@@ -24,7 +24,8 @@ Clipboard::Data::Data(Type t, std::string s) : type_(t), str_(std::move(s)) {
   }
 }
 
-Clipboard::Data::Data(Image* i) : type_(Type::Image), image_(i) {
+Clipboard::Data::Data(scoped_refptr<Image> i)
+    : type_(Type::Image), image_(std::move(i)) {
   CHECK(image_) << "The image passed to Clipboard::Data can not be null";
 }
 
