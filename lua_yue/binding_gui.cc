@@ -19,7 +19,7 @@ namespace lua {
 
 template<>
 struct Type<base::FilePath> {
-  static constexpr const char* name = "yue.FilePath";
+  static constexpr const char* name = "FilePath";
   static inline void Push(State* state, const base::FilePath& value) {
     return lua::Push(state, value.value());;
   }
@@ -34,7 +34,7 @@ struct Type<base::FilePath> {
 
 template<>
 struct Type<nu::Buffer> {
-  static constexpr const char* name = "yue.Buffer";
+  static constexpr const char* name = "Buffer";
   static inline void Push(State* state, const nu::Buffer& value) {
     lua_pushlstring(state, static_cast<char*>(value.content()), value.size());
   }
@@ -53,7 +53,7 @@ struct Type<nu::Buffer> {
 
 template<>
 struct Type<nu::Size> {
-  static constexpr const char* name = "yue.Size";
+  static constexpr const char* name = "Size";
   static inline void Push(State* state, const nu::Size& size) {
     lua::NewTable(state);
     lua::RawSet(state, -1, "width", size.width(), "height", size.height());
@@ -74,7 +74,7 @@ struct Type<nu::Size> {
 
 template<>
 struct Type<nu::SizeF> {
-  static constexpr const char* name = "yue.SizeF";
+  static constexpr const char* name = "SizeF";
   static inline void Push(State* state, const nu::SizeF& size) {
     lua::NewTable(state);
     lua::RawSet(state, -1, "width", size.width(), "height", size.height());
@@ -95,7 +95,7 @@ struct Type<nu::SizeF> {
 
 template<>
 struct Type<nu::RectF> {
-  static constexpr const char* name = "yue.RectF";
+  static constexpr const char* name = "RectF";
   static inline void Push(State* state, const nu::RectF& rect) {
     lua::NewTable(state);
     lua::RawSet(state, -1,
@@ -120,7 +120,7 @@ struct Type<nu::RectF> {
 
 template<>
 struct Type<nu::Vector2dF> {
-  static constexpr const char* name = "yue.Vector2dF";
+  static constexpr const char* name = "Vector2dF";
   static inline void Push(State* state, const nu::Vector2dF& vec) {
     lua::NewTable(state);
     lua::RawSet(state, -1, "x", vec.x(), "y", vec.y());
@@ -141,7 +141,7 @@ struct Type<nu::Vector2dF> {
 
 template<>
 struct Type<nu::PointF> {
-  static constexpr const char* name = "yue.PointF";
+  static constexpr const char* name = "PointF";
   static inline void Push(State* state, const nu::PointF& p) {
     lua::NewTable(state);
     lua::RawSet(state, -1, "x", p.x(), "y", p.y());
@@ -230,7 +230,7 @@ struct Type<nu::Orientation> {
 
 template<>
 struct Type<nu::Accelerator> {
-  static constexpr const char* name = "yue.Accelerator";
+  static constexpr const char* name = "Accelerator";
   static inline bool To(State* state, int index, nu::Accelerator* out) {
     std::string description;
     if (!lua::To(state, index, &description))
@@ -245,7 +245,7 @@ struct Type<nu::Accelerator> {
 
 template<>
 struct Type<nu::Lifetime> {
-  static constexpr const char* name = "yue.Lifetime";
+  static constexpr const char* name = "Lifetime";
   static void BuildMetaTable(State* state, int index) {
 #if defined(OS_MACOSX)
     RawSetProperty(state, index,
@@ -257,7 +257,7 @@ struct Type<nu::Lifetime> {
 
 template<>
 struct Type<nu::MessageLoop> {
-  static constexpr const char* name = "yue.MessageLoop";
+  static constexpr const char* name = "MessageLoop";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
            "run", &nu::MessageLoop::Run,
@@ -270,7 +270,7 @@ struct Type<nu::MessageLoop> {
 #if defined(OS_MACOSX)
 template<>
 struct Type<nu::App::ActivationPolicy> {
-  static constexpr const char* name = "yue.AppActivationPolicy";
+  static constexpr const char* name = "AppActivationPolicy";
   static inline bool To(State* state, int index,
                         nu::App::ActivationPolicy* out) {
     std::string policy;
@@ -307,7 +307,7 @@ struct Type<nu::App::ActivationPolicy> {
 
 template<>
 struct Type<nu::App> {
-  static constexpr const char* name = "yue.App";
+  static constexpr const char* name = "App";
   static void BuildMetaTable(State* state, int metatable) {
 #if defined(OS_MACOSX)
     RawSet(state, metatable,
@@ -326,7 +326,7 @@ struct Type<nu::App> {
 
 template<>
 struct Type<nu::AttributedText> {
-  static constexpr const char* name = "yue.AttributedText";
+  static constexpr const char* name = "AttributedText";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::AttributedText,
@@ -359,7 +359,7 @@ struct Type<nu::AttributedText> {
 
 template<>
 struct Type<nu::Font::Weight> {
-  static constexpr const char* name = "yue.Font.Weight";
+  static constexpr const char* name = "FontWeight";
   static inline bool To(State* state, int index, nu::Font::Weight* out) {
     std::string weight;
     if (!lua::To(state, index, &weight))
@@ -430,7 +430,7 @@ struct Type<nu::Font::Weight> {
 
 template<>
 struct Type<nu::Font::Style> {
-  static constexpr const char* name = "yue.Font.Style";
+  static constexpr const char* name = "FontStyle";
   static inline bool To(State* state, int index, nu::Font::Style* out) {
     std::string style;
     if (!lua::To(state, index, &style))
@@ -459,7 +459,7 @@ struct Type<nu::Font::Style> {
 
 template<>
 struct Type<nu::Font> {
-  static constexpr const char* name = "yue.Font";
+  static constexpr const char* name = "Font";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
            "create", &CreateOnHeap<nu::Font, const std::string&, float,
@@ -477,7 +477,7 @@ struct Type<nu::Font> {
 
 template<>
 struct Type<nu::Canvas> {
-  static constexpr const char* name = "yue.Canvas";
+  static constexpr const char* name = "Canvas";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
            "create", &CreateOnHeap<nu::Canvas, const nu::SizeF&, float>,
@@ -490,7 +490,7 @@ struct Type<nu::Canvas> {
 
 template<>
 struct Type<nu::Clipboard::Data::Type> {
-  static constexpr const char* name = "yue.Clipboard.Data.Type";
+  static constexpr const char* name = "ClipboardDataType";
   static inline void Push(State* state, nu::Clipboard::Data::Type type) {
     switch (type) {
       case nu::Clipboard::Data::Type::Text:
@@ -530,7 +530,7 @@ struct Type<nu::Clipboard::Data::Type> {
 
 template<>
 struct Type<nu::Clipboard::Data> {
-  static constexpr const char* name = "yue.Clipboard.Data";
+  static constexpr const char* name = "ClipboardData";
   static inline void Push(State* state, const nu::Clipboard::Data& data) {
     NewTable(state);
     RawSet(state, -1, "type", data.type());
@@ -588,7 +588,7 @@ struct Type<nu::Clipboard::Data> {
 
 template<>
 struct Type<nu::Clipboard::Type> {
-  static constexpr const char* name = "yue.Clipboard.Type";
+  static constexpr const char* name = "ClipboardType";
   static inline bool To(State* state, int index, nu::Clipboard::Type* out) {
     std::string type;
     if (!lua::To(state, index, &type))
@@ -619,7 +619,7 @@ struct Type<nu::Clipboard::Type> {
 
 template<>
 struct Type<nu::Clipboard> {
-  static constexpr const char* name = "yue.Clipboard";
+  static constexpr const char* name = "Clipboard";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
            "get", &nu::Clipboard::Get,
@@ -639,7 +639,7 @@ struct Type<nu::Clipboard> {
 
 template<>
 struct Type<nu::Color::Name> {
-  static constexpr const char* name = "yue.ColorName";
+  static constexpr const char* name = "ColorName";
   static inline bool To(State* state, int index, nu::Color::Name* out) {
     std::string id;
     if (!lua::To(state, index, &id))
@@ -656,7 +656,7 @@ struct Type<nu::Color::Name> {
 
 template<>
 struct Type<nu::Color> {
-  static constexpr const char* name = "yue.Color";
+  static constexpr const char* name = "Color";
   static inline void Push(State* state, nu::Color color) {
     lua::Push(state, color.value());
   }
@@ -687,7 +687,7 @@ struct Type<nu::Color> {
 
 template<>
 struct Type<nu::Cursor::Type> {
-  static constexpr const char* name = "yue.Cursor.Type";
+  static constexpr const char* name = "CursorType";
   static inline bool To(State* state, int index, nu::Cursor::Type* out) {
     std::string type;
     if (!lua::To(state, index, &type))
@@ -736,7 +736,7 @@ struct Type<nu::Cursor::Type> {
 
 template<>
 struct Type<nu::Cursor> {
-  static constexpr const char* name = "yue.Cursor";
+  static constexpr const char* name = "Cursor";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
            "createwithtype", &CreateOnHeap<nu::Cursor, nu::Cursor::Type>);
@@ -745,7 +745,7 @@ struct Type<nu::Cursor> {
 
 template<>
 struct Type<nu::DraggingInfo> {
-  static constexpr const char* name = "yue.DraggingInfo";
+  static constexpr const char* name = "DraggingInfo";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
         "dragoperationnone", static_cast<int>(nu::DRAG_OPERATION_NONE),
@@ -760,7 +760,7 @@ struct Type<nu::DraggingInfo> {
 
 template<>
 struct Type<nu::DragOptions> {
-  static constexpr const char* name = "yue.DragOptions";
+  static constexpr const char* name = "DragOptions";
   static inline bool To(State* state, int index, nu::DragOptions* out) {
     if (GetType(state, index) != LuaType::Table)
       return false;
@@ -773,7 +773,7 @@ struct Type<nu::DragOptions> {
 
 template<>
 struct Type<nu::Image> {
-  static constexpr const char* name = "yue.Image";
+  static constexpr const char* name = "Image";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
            "createempty", &CreateOnHeap<nu::Image>,
@@ -789,7 +789,7 @@ struct Type<nu::Image> {
 
 template<>
 struct Type<nu::TextAlign> {
-  static constexpr const char* name = "yue.TextAlign";
+  static constexpr const char* name = "TextAlign";
   static inline bool To(State* state, int value, nu::TextAlign* out) {
     base::StringPiece align;
     if (!lua::To(state, value, &align))
@@ -821,7 +821,7 @@ struct Type<nu::TextAlign> {
 
 template<>
 struct Type<nu::TextFormat> {
-  static constexpr const char* name = "yue.TextFormat";
+  static constexpr const char* name = "TextFormat";
   static inline bool To(State* state, int index, nu::TextFormat* out) {
     if (GetType(state, index) != LuaType::Table)
       return false;
@@ -842,7 +842,7 @@ struct Type<nu::TextFormat> {
 
 template<>
 struct Type<nu::TextAttributes> {
-  static constexpr const char* name = "yue.TextAttributes";
+  static constexpr const char* name = "TextAttributes";
   static inline bool To(State* state, int index, nu::TextAttributes* out) {
     if (!Type<nu::TextFormat>::To(state, index, out))
       return false;
@@ -856,7 +856,7 @@ struct Type<nu::TextAttributes> {
 
 template<>
 struct Type<nu::Painter> {
-  static constexpr const char* name = "yue.Painter";
+  static constexpr const char* name = "Painter";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "save", &nu::Painter::Save,
@@ -893,7 +893,7 @@ struct Type<nu::Painter> {
 
 template<>
 struct Type<nu::EventType> {
-  static constexpr const char* name = "yue.EventType";
+  static constexpr const char* name = "EventType";
   static inline void Push(State* state, nu::EventType type) {
     switch (type) {
       case nu::EventType::MouseDown:
@@ -926,7 +926,7 @@ struct Type<nu::EventType> {
 
 template<>
 struct Type<nu::Event> {
-  static constexpr const char* name = "yue.Event";
+  static constexpr const char* name = "Event";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "maskshift", static_cast<int>(nu::MASK_SHIFT),
@@ -952,7 +952,7 @@ struct Type<nu::Event> {
 template<>
 struct Type<nu::MouseEvent> {
   using base = nu::Event;
-  static constexpr const char* name = "yue.MouseEvent";
+  static constexpr const char* name = "MouseEvent";
   static inline void Push(State* state, const nu::MouseEvent& event) {
     NewTable(state);
     Type<nu::Event>::SetEventProperties(state, -1, &event);
@@ -965,7 +965,7 @@ struct Type<nu::MouseEvent> {
 
 template<>
 struct Type<nu::KeyboardCode> {
-  static constexpr const char* name = "yue.KeyboardCode";
+  static constexpr const char* name = "KeyboardCode";
   static inline void Push(State* state, nu::KeyboardCode code) {
     lua::Push(state, nu::KeyboardCodeToStr(code));
   }
@@ -974,7 +974,7 @@ struct Type<nu::KeyboardCode> {
 template<>
 struct Type<nu::KeyEvent> {
   using base = nu::Event;
-  static constexpr const char* name = "yue.KeyEvent";
+  static constexpr const char* name = "KeyEvent";
   static inline void Push(State* state, const nu::KeyEvent& event) {
     NewTable(state);
     Type<nu::Event>::SetEventProperties(state, -1, &event);
@@ -985,7 +985,7 @@ struct Type<nu::KeyEvent> {
 
 template<>
 struct Type<nu::FileDialog::Filter> {
-  static constexpr const char* name = "yue.FileDialog.Filter";
+  static constexpr const char* name = "FileDialogFilter";
   static inline void Push(State* state,
                           const nu::FileDialog::Filter& filter) {
     NewTable(state, 0, 2);
@@ -1005,7 +1005,7 @@ struct Type<nu::FileDialog::Filter> {
 
 template<>
 struct Type<nu::FileDialog> {
-  static constexpr const char* name = "yue.FileDialog";
+  static constexpr const char* name = "FileDialog";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "optionpickfolders",
@@ -1029,7 +1029,7 @@ struct Type<nu::FileDialog> {
 template<>
 struct Type<nu::FileOpenDialog> {
   using base = nu::FileOpenDialog;
-  static constexpr const char* name = "yue.FileOpenDialog";
+  static constexpr const char* name = "FileOpenDialog";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::FileOpenDialog>,
@@ -1040,7 +1040,7 @@ struct Type<nu::FileOpenDialog> {
 template<>
 struct Type<nu::FileSaveDialog> {
   using base = nu::FileSaveDialog;
-  static constexpr const char* name = "yue.FileSaveDialog";
+  static constexpr const char* name = "FileSaveDialog";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::FileSaveDialog>);
@@ -1049,7 +1049,7 @@ struct Type<nu::FileSaveDialog> {
 
 template<>
 struct Type<nu::MenuBase> {
-  static constexpr const char* name = "yue.MenuBase";
+  static constexpr const char* name = "MenuBase";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "append", RefMethod(&nu::MenuBase::Append, RefType::Ref),
@@ -1071,7 +1071,7 @@ void ReadMenuItems(State* state, int metatable, nu::MenuBase* menu);
 template<>
 struct Type<nu::MenuBar> {
   using base = nu::MenuBase;
-  static constexpr const char* name = "yue.MenuBar";
+  static constexpr const char* name = "MenuBar";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &Create);
@@ -1086,7 +1086,7 @@ struct Type<nu::MenuBar> {
 template<>
 struct Type<nu::Menu> {
   using base = nu::MenuBase;
-  static constexpr const char* name = "yue.Menu";
+  static constexpr const char* name = "Menu";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &Create,
@@ -1101,7 +1101,7 @@ struct Type<nu::Menu> {
 
 template<>
 struct Type<nu::MenuItem::Type> {
-  static constexpr const char* name = "yue.MenuItem.Type";
+  static constexpr const char* name = "MenuItemType";
   static bool To(State* state, int index, nu::MenuItem::Type* out) {
     std::string type;
     if (!lua::To(state, index, &type))
@@ -1124,7 +1124,7 @@ struct Type<nu::MenuItem::Type> {
 
 template<>
 struct Type<nu::MenuItem::Role> {
-  static constexpr const char* name = "yue.MenuItem.Role";
+  static constexpr const char* name = "MenuItemRole";
   static bool To(State* state, int index, nu::MenuItem::Role* out) {
     std::string role;
     if (!lua::To(state, index, &role))
@@ -1165,7 +1165,7 @@ struct Type<nu::MenuItem::Role> {
 
 template<>
 struct Type<nu::MenuItem> {
-  static constexpr const char* name = "yue.MenuItem";
+  static constexpr const char* name = "MenuItem";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
            "create", &Create,
@@ -1256,7 +1256,7 @@ void ReadMenuItems(State* state, int options, nu::MenuBase* menu) {
 
 template<>
 struct Type<nu::Tray> {
-  static constexpr const char* name = "yue.Tray";
+  static constexpr const char* name = "Tray";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
 #if defined(OS_MACOSX)
@@ -1274,7 +1274,7 @@ struct Type<nu::Tray> {
 #if defined(OS_MACOSX)
 template<>
 struct Type<nu::Toolbar::Item> {
-  static constexpr const char* name = "yue.Toolbar::Item";
+  static constexpr const char* name = "Toolbar::Item";
   static inline bool To(State* state, int index, nu::Toolbar::Item* out) {
     if (GetType(state, index) != LuaType::Table)
       return false;
@@ -1295,7 +1295,7 @@ struct Type<nu::Toolbar::Item> {
 
 template<>
 struct Type<nu::Toolbar::DisplayMode> {
-  static constexpr const char* name = "yue.Toolbar.DisplayMode";
+  static constexpr const char* name = "ToolbarDisplayMode";
   static inline bool To(State* state, int index,
                         nu::Toolbar::DisplayMode* out) {
     std::string mode;
@@ -1321,7 +1321,7 @@ struct Type<nu::Toolbar::DisplayMode> {
 
 template<>
 struct Type<nu::Toolbar> {
-  static constexpr const char* name = "yue.Toolbar";
+  static constexpr const char* name = "Toolbar";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::Toolbar, const std::string&>,
@@ -1340,7 +1340,7 @@ struct Type<nu::Toolbar> {
 
 template<>
 struct Type<nu::Window::Options> {
-  static constexpr const char* name = "yue.Window.Options";
+  static constexpr const char* name = "WindowOptions";
   static inline bool To(State* state, int index, nu::Window::Options* out) {
     if (GetType(state, index) == LuaType::Table) {
       RawGetAndPop(state, index, "frame", &out->frame);
@@ -1356,7 +1356,7 @@ struct Type<nu::Window::Options> {
 
 template<>
 struct Type<nu::Window> {
-  static constexpr const char* name = "yue.Window";
+  static constexpr const char* name = "Window";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::Window, const nu::Window::Options&>,
@@ -1430,7 +1430,7 @@ struct Type<nu::Window> {
 
 template<>
 struct Type<nu::View> {
-  static constexpr const char* name = "yue.View";
+  static constexpr const char* name = "View";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "offsetfromview", &nu::View::OffsetFromView,
@@ -1496,7 +1496,7 @@ struct Type<nu::View> {
 template<>
 struct Type<nu::ComboBox> {
   using base = nu::Picker;
-  static constexpr const char* name = "yue.ComboBox";
+  static constexpr const char* name = "ComboBox";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
            "create", &CreateOnHeap<nu::ComboBox>,
@@ -1510,7 +1510,7 @@ struct Type<nu::ComboBox> {
 template<>
 struct Type<nu::Container> {
   using base = nu::View;
-  static constexpr const char* name = "yue.Container";
+  static constexpr const char* name = "Container";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
            "create", &CreateOnHeap<nu::Container>,
@@ -1540,7 +1540,7 @@ struct Type<nu::Container> {
 
 template<>
 struct Type<nu::Button::Type> {
-  static constexpr const char* name = "yue.Button.Type";
+  static constexpr const char* name = "ButtonType";
   static bool To(State* state, int index, nu::Button::Type* out) {
     std::string type;
     if (!lua::To(state, index, &type))
@@ -1563,7 +1563,7 @@ struct Type<nu::Button::Type> {
 #if defined(OS_MACOSX)
 template<>
 struct Type<nu::Button::Style> {
-  static constexpr const char* name = "yue.Button.Style";
+  static constexpr const char* name = "ButtonStyle";
   static bool To(State* state, int index, nu::Button::Style* out) {
     std::string style;
     if (!lua::To(state, index, &style))
@@ -1623,7 +1623,7 @@ struct Type<nu::Button::Style> {
 template<>
 struct Type<nu::Button> {
   using base = nu::View;
-  static constexpr const char* name = "yue.Button";
+  static constexpr const char* name = "Button";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &Create,
@@ -1660,7 +1660,7 @@ struct Type<nu::Button> {
 
 template<>
 struct Type<nu::ProtocolJob> {
-  static constexpr const char* name = "yue.ProtocolJob";
+  static constexpr const char* name = "ProtocolJob";
   static void BuildMetaTable(State* state, int metatable) {
   }
 };
@@ -1668,7 +1668,7 @@ struct Type<nu::ProtocolJob> {
 template<>
 struct Type<nu::ProtocolStringJob> {
   using base = nu::ProtocolJob;
-  static constexpr const char* name = "yue.ProtocolStringJob";
+  static constexpr const char* name = "ProtocolStringJob";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::ProtocolStringJob,
@@ -1680,7 +1680,7 @@ struct Type<nu::ProtocolStringJob> {
 template<>
 struct Type<nu::ProtocolFileJob> {
   using base = nu::ProtocolJob;
-  static constexpr const char* name = "yue.ProtocolFileJob";
+  static constexpr const char* name = "ProtocolFileJob";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::ProtocolFileJob,
@@ -1691,7 +1691,7 @@ struct Type<nu::ProtocolFileJob> {
 template<>
 struct Type<nu::ProtocolAsarJob> {
   using base = nu::ProtocolFileJob;
-  static constexpr const char* name = "yue.ProtocolAsarJob";
+  static constexpr const char* name = "ProtocolAsarJob";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::ProtocolAsarJob,
@@ -1703,7 +1703,7 @@ struct Type<nu::ProtocolAsarJob> {
 
 template<>
 struct Type<nu::Browser::Options> {
-  static constexpr const char* name = "yue.Browser.Options";
+  static constexpr const char* name = "BrowserOptions";
   static inline bool To(State* state, int index, nu::Browser::Options* out) {
     if (GetType(state, index) == LuaType::Table) {
       RawGetAndPop(
@@ -1727,7 +1727,7 @@ struct Type<nu::Browser::Options> {
 template<>
 struct Type<nu::Browser> {
   using base = nu::View;
-  static constexpr const char* name = "yue.Browser";
+  static constexpr const char* name = "Browser";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::Browser, nu::Browser::Options>,
@@ -1783,7 +1783,7 @@ struct Type<nu::Browser> {
 
 template<>
 struct Type<nu::Entry::Type> {
-  static constexpr const char* name = "yue.Entry.Type";
+  static constexpr const char* name = "EntryType";
   static bool To(State* state, int index, nu::Entry::Type* out) {
     std::string type;
     if (!lua::To(state, index, &type))
@@ -1801,7 +1801,7 @@ struct Type<nu::Entry::Type> {
 template<>
 struct Type<nu::Entry> {
   using base = nu::View;
-  static constexpr const char* name = "yue.Entry";
+  static constexpr const char* name = "Entry";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::Entry>,
@@ -1817,7 +1817,7 @@ struct Type<nu::Entry> {
 template<>
 struct Type<nu::Label> {
   using base = nu::View;
-  static constexpr const char* name = "yue.Label";
+  static constexpr const char* name = "Label";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::Label, const std::string&>,
@@ -1836,7 +1836,7 @@ struct Type<nu::Label> {
 template<>
 struct Type<nu::ProgressBar> {
   using base = nu::View;
-  static constexpr const char* name = "yue.ProgressBar";
+  static constexpr const char* name = "ProgressBar";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::ProgressBar>,
@@ -1850,7 +1850,7 @@ struct Type<nu::ProgressBar> {
 template<>
 struct Type<nu::Picker> {
   using base = nu::View;
-  static constexpr const char* name = "yue.Picker";
+  static constexpr const char* name = "Picker";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::Picker>,
@@ -1878,7 +1878,7 @@ struct Type<nu::Picker> {
 template<>
 struct Type<nu::GifPlayer> {
   using base = nu::View;
-  static constexpr const char* name = "yue.GifPlayer";
+  static constexpr const char* name = "GifPlayer";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::GifPlayer>,
@@ -1894,7 +1894,7 @@ struct Type<nu::GifPlayer> {
 template<>
 struct Type<nu::Group> {
   using base = nu::View;
-  static constexpr const char* name = "yue.Group";
+  static constexpr const char* name = "Group";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::Group, const std::string&>,
@@ -1908,7 +1908,7 @@ struct Type<nu::Group> {
 
 template<>
 struct Type<nu::Scroll::Policy> {
-  static constexpr const char* name = "yue.Scroll.Policy";
+  static constexpr const char* name = "ScrollPolicy";
   static inline bool To(State* state, int index, nu::Scroll::Policy* out) {
     std::string policy;
     if (!lua::To(state, index, &policy))
@@ -1939,7 +1939,7 @@ struct Type<nu::Scroll::Policy> {
 template<>
 struct Type<nu::Scroll> {
   using base = nu::View;
-  static constexpr const char* name = "yue.Scroll";
+  static constexpr const char* name = "Scroll";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::Scroll>,
@@ -1970,7 +1970,7 @@ struct Type<nu::Separator> {
 template<>
 struct Type<nu::Slider> {
   using base = nu::View;
-  static constexpr const char* name = "yue.Slider";
+  static constexpr const char* name = "Slider";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::Slider>,
@@ -1989,7 +1989,7 @@ struct Type<nu::Slider> {
 template<>
 struct Type<nu::Tab> {
   using base = nu::View;
-  static constexpr const char* name = "yue.Tab";
+  static constexpr const char* name = "Tab";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::Tab>,
@@ -2017,7 +2017,7 @@ struct Type<nu::Tab> {
 
 template<>
 struct Type<nu::TableModel> {
-  static constexpr const char* name = "yue.TableModel";
+  static constexpr const char* name = "TableModel";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "getrowcount", &nu::TableModel::GetRowCount,
@@ -2052,7 +2052,7 @@ struct Type<nu::TableModel> {
 template<>
 struct Type<nu::AbstractTableModel> {
   using base = nu::TableModel;
-  static constexpr const char* name = "yue.AbstractTableModel";
+  static constexpr const char* name = "AbstractTableModel";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable, "create", &Create);
     RawSetProperty(state, metatable,
@@ -2068,7 +2068,7 @@ struct Type<nu::AbstractTableModel> {
 template<>
 struct Type<nu::SimpleTableModel> {
   using base = nu::TableModel;
-  static constexpr const char* name = "yue.SimpleTableModel";
+  static constexpr const char* name = "SimpleTableModel";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::SimpleTableModel, uint32_t>,
@@ -2082,7 +2082,7 @@ struct Type<nu::SimpleTableModel> {
 
 template<>
 struct Type<nu::Table::ColumnType> {
-  static constexpr const char* name = "yue.Table.ColumnType";
+  static constexpr const char* name = "TableColumnType";
   static inline bool To(State* state, int index, nu::Table::ColumnType* out) {
     std::string type;
     if (!lua::To(state, index, &type))
@@ -2104,7 +2104,7 @@ struct Type<nu::Table::ColumnType> {
 
 template<>
 struct Type<nu::Table::ColumnOptions> {
-  static constexpr const char* name = "yue.Table.ColumnOptions";
+  static constexpr const char* name = "TableColumnOptions";
   static inline bool To(State* state, int index,
                         nu::Table::ColumnOptions* out) {
     if (GetType(state, index) == LuaType::Table) {
@@ -2122,7 +2122,7 @@ struct Type<nu::Table::ColumnOptions> {
 template<>
 struct Type<nu::Table> {
   using base = nu::View;
-  static constexpr const char* name = "yue.Table";
+  static constexpr const char* name = "Table";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::Table>,
@@ -2153,7 +2153,7 @@ struct Type<nu::Table> {
 template<>
 struct Type<nu::TextEdit> {
   using base = nu::View;
-  static constexpr const char* name = "yue.TextEdit";
+  static constexpr const char* name = "TextEdit";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::TextEdit>,
@@ -2189,7 +2189,7 @@ struct Type<nu::TextEdit> {
 #if defined(OS_MACOSX)
 template<>
 struct Type<nu::Vibrant::Material> {
-  static constexpr const char* name = "yue.Vibrant.Material";
+  static constexpr const char* name = "VibrantMaterial";
   static inline bool To(State* state, int index, nu::Vibrant::Material* out) {
     std::string material;
     if (!lua::To(state, index, &material))
@@ -2224,7 +2224,7 @@ struct Type<nu::Vibrant::Material> {
 
 template<>
 struct Type<nu::Vibrant::BlendingMode> {
-  static constexpr const char* name = "yue.Vibrant.BlendingMode";
+  static constexpr const char* name = "VibrantBlendingMode";
   static inline bool To(State* state, int index,
                         nu::Vibrant::BlendingMode* out) {
     std::string mode;
@@ -2251,7 +2251,7 @@ struct Type<nu::Vibrant::BlendingMode> {
 template<>
 struct Type<nu::Vibrant> {
   using base = nu::Container;
-  static constexpr const char* name = "yue.Vibrant";
+  static constexpr const char* name = "Vibrant";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::Vibrant>,

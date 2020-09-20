@@ -85,7 +85,7 @@ namespace vb {
 // Converter for Signal.
 template<typename Sig>
 struct Type<node_yue::SignalWrapper<Sig>> {
-  static constexpr const char* name = "yue.Signal";
+  static constexpr const char* name = "Signal";
   static void BuildConstructor(v8::Local<v8::Context>, v8::Local<v8::Object>) {
   }
   static void BuildPrototype(v8::Local<v8::Context> context,

@@ -27,7 +27,7 @@ namespace vb {
 
 template<>
 struct Type<base::FilePath> {
-  static constexpr const char* name = "yue.FilePath";
+  static constexpr const char* name = "FilePath";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    const base::FilePath& value) {
     return vb::ToV8(context, value.value());;
@@ -45,7 +45,7 @@ struct Type<base::FilePath> {
 
 template<>
 struct Type<nu::Buffer> {
-  static constexpr const char* name = "yue.Buffer";
+  static constexpr const char* name = "Buffer";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    const nu::Buffer& value) {
     return node::Buffer::Copy(context->GetIsolate(),
@@ -66,7 +66,7 @@ struct Type<nu::Buffer> {
 
 template<>
 struct Type<nu::Size> {
-  static constexpr const char* name = "yue.Size";
+  static constexpr const char* name = "Size";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    const nu::Size& value) {
     auto obj = v8::Object::New(context->GetIsolate());
@@ -87,7 +87,7 @@ struct Type<nu::Size> {
 
 template<>
 struct Type<nu::SizeF> {
-  static constexpr const char* name = "yue.SizeF";
+  static constexpr const char* name = "SizeF";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    const nu::SizeF& value) {
     auto obj = v8::Object::New(context->GetIsolate());
@@ -108,7 +108,7 @@ struct Type<nu::SizeF> {
 
 template<>
 struct Type<nu::RectF> {
-  static constexpr const char* name = "yue.RectF";
+  static constexpr const char* name = "RectF";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    const nu::RectF& value) {
     auto obj = v8::Object::New(context->GetIsolate());
@@ -131,7 +131,7 @@ struct Type<nu::RectF> {
 
 template<>
 struct Type<nu::Vector2dF> {
-  static constexpr const char* name = "yue.Vector2dF";
+  static constexpr const char* name = "Vector2dF";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    const nu::Vector2dF& value) {
     auto obj = v8::Object::New(context->GetIsolate());
@@ -152,7 +152,7 @@ struct Type<nu::Vector2dF> {
 
 template<>
 struct Type<nu::PointF> {
-  static constexpr const char* name = "yue.PointF";
+  static constexpr const char* name = "PointF";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    const nu::PointF& value) {
     auto obj = v8::Object::New(context->GetIsolate());
@@ -247,7 +247,7 @@ struct Type<nu::Orientation> {
 
 template<>
 struct Type<nu::Accelerator> {
-  static constexpr const char* name = "yue.Accelerator";
+  static constexpr const char* name = "Accelerator";
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::Accelerator* out) {
@@ -261,7 +261,7 @@ struct Type<nu::Accelerator> {
 
 template<>
 struct Type<nu::Lifetime> {
-  static constexpr const char* name = "yue.Lifetime";
+  static constexpr const char* name = "Lifetime";
   static void BuildConstructor(v8::Local<v8::Context>, v8::Local<v8::Object>) {
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
@@ -276,7 +276,7 @@ struct Type<nu::Lifetime> {
 
 template<>
 struct Type<nu::MessageLoop> {
-  static constexpr const char* name = "yue.MessageLoop";
+  static constexpr const char* name = "MessageLoop";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
@@ -296,7 +296,7 @@ struct Type<nu::MessageLoop> {
 #if defined(OS_MACOSX)
 template<>
 struct Type<nu::App::ActivationPolicy> {
-  static constexpr const char* name = "yue.AppActivationPolicy";
+  static constexpr const char* name = "AppActivationPolicy";
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::App::ActivationPolicy* out) {
@@ -334,7 +334,7 @@ struct Type<nu::App::ActivationPolicy> {
 
 template<>
 struct Type<nu::App> {
-  static constexpr const char* name = "yue.App";
+  static constexpr const char* name = "App";
   static void BuildConstructor(v8::Local<v8::Context>, v8::Local<v8::Object>) {
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
@@ -356,7 +356,7 @@ struct Type<nu::App> {
 
 template<>
 struct Type<nu::AttributedText> {
-  static constexpr const char* name = "yue.AttributedText";
+  static constexpr const char* name = "AttributedText";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
@@ -384,7 +384,7 @@ struct Type<nu::AttributedText> {
 
 template<>
 struct Type<nu::Font::Weight> {
-  static constexpr const char* name = "yue.Font.Weight";
+  static constexpr const char* name = "FontWeight";
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::Font::Weight* out) {
@@ -451,7 +451,7 @@ struct Type<nu::Font::Weight> {
 
 template<>
 struct Type<nu::Font::Style> {
-  static constexpr const char* name = "yue.Font.Style";
+  static constexpr const char* name = "FontStyle";
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::Font::Style* out) {
@@ -483,7 +483,7 @@ struct Type<nu::Font::Style> {
 
 template<>
 struct Type<nu::Font> {
-  static constexpr const char* name = "yue.Font";
+  static constexpr const char* name = "Font";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
@@ -505,7 +505,7 @@ struct Type<nu::Font> {
 
 template<>
 struct Type<nu::Canvas> {
-  static constexpr const char* name = "yue.Canvas";
+  static constexpr const char* name = "Canvas";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
@@ -523,7 +523,7 @@ struct Type<nu::Canvas> {
 
 template<>
 struct Type<nu::Clipboard::Data::Type> {
-  static constexpr const char* name = "yue.Clipboard.Data.Type";
+  static constexpr const char* name = "ClipboardDataType";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    nu::Clipboard::Data::Type type) {
     switch (type) {
@@ -565,7 +565,7 @@ struct Type<nu::Clipboard::Data::Type> {
 
 template<>
 struct Type<nu::Clipboard::Data> {
-  static constexpr const char* name = "yue.Clipboard.Data";
+  static constexpr const char* name = "ClipboardData";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    const nu::Clipboard::Data& data) {
     v8::Local<v8::Object> obj = v8::Object::New(context->GetIsolate());
@@ -628,7 +628,7 @@ struct Type<nu::Clipboard::Data> {
 
 template<>
 struct Type<nu::Clipboard::Type> {
-  static constexpr const char* name = "yue.Clipboard.Type";
+  static constexpr const char* name = "ClipboardType";
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::Clipboard::Type* out) {
@@ -661,7 +661,7 @@ struct Type<nu::Clipboard::Type> {
 
 template<>
 struct Type<nu::Clipboard> {
-  static constexpr const char* name = "yue.Clipboard";
+  static constexpr const char* name = "Clipboard";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
@@ -686,7 +686,7 @@ struct Type<nu::Clipboard> {
 
 template<>
 struct Type<nu::Color::Name> {
-  static constexpr const char* name = "yue.ColorName";
+  static constexpr const char* name = "ColorName";
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::Color::Name* out) {
@@ -705,7 +705,7 @@ struct Type<nu::Color::Name> {
 
 template<>
 struct Type<nu::Color> {
-  static constexpr const char* name = "yue.Color";
+  static constexpr const char* name = "Color";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    nu::Color color) {
     return vb::ToV8(context, color.value());
@@ -740,7 +740,7 @@ struct Type<nu::Color> {
 
 template<>
 struct Type<nu::Cursor::Type> {
-  static constexpr const char* name = "yue.Cursor.Type";
+  static constexpr const char* name = "CursorType";
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::Cursor::Type* out) {
@@ -791,7 +791,7 @@ struct Type<nu::Cursor::Type> {
 
 template<>
 struct Type<nu::Cursor> {
-  static constexpr const char* name = "yue.Cursor";
+  static constexpr const char* name = "Cursor";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
@@ -804,7 +804,7 @@ struct Type<nu::Cursor> {
 
 template<>
 struct Type<nu::DraggingInfo> {
-  static constexpr const char* name = "yue.DraggingInfo";
+  static constexpr const char* name = "DraggingInfo";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
@@ -824,7 +824,7 @@ struct Type<nu::DraggingInfo> {
 
 template<>
 struct Type<nu::DragOptions> {
-  static constexpr const char* name = "yue.DragOptions";
+  static constexpr const char* name = "DragOptions";
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::DragOptions* out) {
@@ -840,7 +840,7 @@ struct Type<nu::DragOptions> {
 
 template<>
 struct Type<nu::Image> {
-  static constexpr const char* name = "yue.Image";
+  static constexpr const char* name = "Image";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
@@ -859,7 +859,7 @@ struct Type<nu::Image> {
 
 template<>
 struct Type<nu::TextAlign> {
-  static constexpr const char* name = "yue.TextAlign";
+  static constexpr const char* name = "TextAlign";
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::TextAlign* out) {
@@ -891,7 +891,7 @@ struct Type<nu::TextAlign> {
 
 template<>
 struct Type<nu::TextFormat> {
-  static constexpr const char* name = "yue.TextFormat";
+  static constexpr const char* name = "TextFormat";
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::TextFormat* out) {
@@ -917,7 +917,7 @@ struct Type<nu::TextFormat> {
 
 template<>
 struct Type<nu::TextAttributes> {
-  static constexpr const char* name = "yue.TextAttributes";
+  static constexpr const char* name = "TextAttributes";
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::TextAttributes* out) {
@@ -934,7 +934,7 @@ struct Type<nu::TextAttributes> {
 
 template<>
 struct Type<nu::Painter> {
-  static constexpr const char* name = "yue.Painter";
+  static constexpr const char* name = "Painter";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
   }
@@ -975,7 +975,7 @@ struct Type<nu::Painter> {
 
 template<>
 struct Type<nu::EventType> {
-  static constexpr const char* name = "yue.EventType";
+  static constexpr const char* name = "EventType";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    nu::EventType type) {
     switch (type) {
@@ -1002,7 +1002,7 @@ struct Type<nu::EventType> {
 
 template<>
 struct Type<nu::Event> {
-  static constexpr const char* name = "yue.Event";
+  static constexpr const char* name = "Event";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
@@ -1032,7 +1032,7 @@ struct Type<nu::Event> {
 template<>
 struct Type<nu::MouseEvent> {
   using base = nu::Event;
-  static constexpr const char* name = "yue.MouseEvent";
+  static constexpr const char* name = "MouseEvent";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    const nu::MouseEvent& event) {
     v8::Local<v8::Object> obj = v8::Object::New(context->GetIsolate());
@@ -1047,7 +1047,7 @@ struct Type<nu::MouseEvent> {
 
 template<>
 struct Type<nu::KeyboardCode> {
-  static constexpr const char* name = "yue.KeyboardCode";
+  static constexpr const char* name = "KeyboardCode";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    nu::KeyboardCode code) {
     return vb::ToV8(context, nu::KeyboardCodeToStr(code));
@@ -1057,7 +1057,7 @@ struct Type<nu::KeyboardCode> {
 template<>
 struct Type<nu::KeyEvent> {
   using base = nu::Event;
-  static constexpr const char* name = "yue.KeyEvent";
+  static constexpr const char* name = "KeyEvent";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    const nu::KeyEvent& event) {
     v8::Local<v8::Object> obj = v8::Object::New(context->GetIsolate());
@@ -1070,7 +1070,7 @@ struct Type<nu::KeyEvent> {
 
 template<>
 struct Type<nu::FileDialog::Filter> {
-  static constexpr const char* name = "yue.FileDialog.Filter";
+  static constexpr const char* name = "FileDialogFilter";
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::FileDialog::Filter* out) {
@@ -1092,7 +1092,7 @@ struct Type<nu::FileDialog::Filter> {
 
 template<>
 struct Type<nu::FileDialog> {
-  static constexpr const char* name = "yue.FileDialog";
+  static constexpr const char* name = "FileDialog";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
@@ -1121,7 +1121,7 @@ struct Type<nu::FileDialog> {
 template<>
 struct Type<nu::FileOpenDialog> {
   using base = nu::FileDialog;
-  static constexpr const char* name = "yue.FileOpenDialog";
+  static constexpr const char* name = "FileOpenDialog";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor, "create", &CreateOnHeap<nu::FileOpenDialog>);
@@ -1136,7 +1136,7 @@ struct Type<nu::FileOpenDialog> {
 template<>
 struct Type<nu::FileSaveDialog> {
   using base = nu::FileDialog;
-  static constexpr const char* name = "yue.FileSaveDialog";
+  static constexpr const char* name = "FileSaveDialog";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor, "create", &CreateOnHeap<nu::FileSaveDialog>);
@@ -1148,7 +1148,7 @@ struct Type<nu::FileSaveDialog> {
 
 template<>
 struct Type<nu::MenuBase> {
-  static constexpr const char* name = "yue.MenuBase";
+  static constexpr const char* name = "MenuBase";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
   }
@@ -1170,7 +1170,7 @@ void ReadMenuItems(v8::Local<v8::Context> context,
 template<>
 struct Type<nu::MenuBar> {
   using base = nu::MenuBase;
-  static constexpr const char* name = "yue.MenuBar";
+  static constexpr const char* name = "MenuBar";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor, "create", &Create);
@@ -1199,7 +1199,7 @@ struct Type<nu::MenuBar> {
 template<>
 struct Type<nu::Menu> {
   using base = nu::MenuBase;
-  static constexpr const char* name = "yue.Menu";
+  static constexpr const char* name = "Menu";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor, "create", &Create);
@@ -1229,7 +1229,7 @@ struct Type<nu::Menu> {
 
 template<>
 struct Type<nu::MenuItem::Type> {
-  static constexpr const char* name = "yue.MenuItem.Type";
+  static constexpr const char* name = "MenuItemType";
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::MenuItem::Type* out) {
@@ -1254,7 +1254,7 @@ struct Type<nu::MenuItem::Type> {
 
 template<>
 struct Type<nu::MenuItem::Role> {
-  static constexpr const char* name = "yue.MenuItem.Role";
+  static constexpr const char* name = "MenuItemRole";
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::MenuItem::Role* out) {
@@ -1297,7 +1297,7 @@ struct Type<nu::MenuItem::Role> {
 
 template<>
 struct Type<nu::MenuItem> {
-  static constexpr const char* name = "yue.MenuItem";
+  static constexpr const char* name = "MenuItem";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor, "create", &Create);
@@ -1397,7 +1397,7 @@ void ReadMenuItems(v8::Local<v8::Context> context,
 
 template<>
 struct Type<nu::Tray> {
-  static constexpr const char* name = "yue.Tray";
+  static constexpr const char* name = "Tray";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
@@ -1420,7 +1420,7 @@ struct Type<nu::Tray> {
 #if defined(OS_MACOSX)
 template<>
 struct Type<nu::Toolbar::Item> {
-  static constexpr const char* name = "yue.Toolbar.Item";
+  static constexpr const char* name = "ToolbarItem";
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::Toolbar::Item* out) {
@@ -1444,7 +1444,7 @@ struct Type<nu::Toolbar::Item> {
 
 template<>
 struct Type<nu::Toolbar::DisplayMode> {
-  static constexpr const char* name = "yue.Toolbar.DisplayMode";
+  static constexpr const char* name = "ToolbarDisplayMode";
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::Toolbar::DisplayMode* out) {
@@ -1471,7 +1471,7 @@ struct Type<nu::Toolbar::DisplayMode> {
 
 template<>
 struct Type<nu::Toolbar> {
-  static constexpr const char* name = "yue.Toolbar";
+  static constexpr const char* name = "Toolbar";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
@@ -1495,7 +1495,7 @@ struct Type<nu::Toolbar> {
 
 template<>
 struct Type<nu::Window::Options> {
-  static constexpr const char* name = "yue.Window.Options";
+  static constexpr const char* name = "WindowOptions";
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::Window::Options* out) {
@@ -1513,7 +1513,7 @@ struct Type<nu::Window::Options> {
 
 template<>
 struct Type<nu::Window> {
-  static constexpr const char* name = "yue.Window";
+  static constexpr const char* name = "Window";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
@@ -1592,7 +1592,7 @@ struct Type<nu::Window> {
 
 template<>
 struct Type<nu::View> {
-  static constexpr const char* name = "yue.View";
+  static constexpr const char* name = "View";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
   }
@@ -1674,7 +1674,7 @@ struct Type<nu::View> {
 template<>
 struct Type<nu::ComboBox> {
   using base = nu::Picker;
-  static constexpr const char* name = "yue.ComboBox";
+  static constexpr const char* name = "ComboBox";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor, "create", &CreateOnHeap<nu::ComboBox>);
@@ -1692,7 +1692,7 @@ struct Type<nu::ComboBox> {
 template<>
 struct Type<nu::Container> {
   using base = nu::View;
-  static constexpr const char* name = "yue.Container";
+  static constexpr const char* name = "Container";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
@@ -1721,7 +1721,7 @@ struct Type<nu::Container> {
 
 template<>
 struct Type<nu::Button::Type> {
-  static constexpr const char* name = "yue.Button.Type";
+  static constexpr const char* name = "ButtonType";
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::Button::Type* out) {
@@ -1746,7 +1746,7 @@ struct Type<nu::Button::Type> {
 #if defined(OS_MACOSX)
 template<>
 struct Type<nu::Button::Style> {
-  static constexpr const char* name = "yue.Button.Style";
+  static constexpr const char* name = "ButtonStyle";
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::Button::Style* out) {
@@ -1808,7 +1808,7 @@ struct Type<nu::Button::Style> {
 template<>
 struct Type<nu::Button> {
   using base = nu::View;
-  static constexpr const char* name = "yue.Button";
+  static constexpr const char* name = "Button";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor, "create", &Create);
@@ -1851,7 +1851,7 @@ struct Type<nu::Button> {
 
 template<>
 struct Type<nu::ProtocolJob> {
-  static constexpr const char* name = "yue.ProtocolJob";
+  static constexpr const char* name = "ProtocolJob";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
   }
@@ -1863,7 +1863,7 @@ struct Type<nu::ProtocolJob> {
 template<>
 struct Type<nu::ProtocolStringJob> {
   using base = nu::ProtocolJob;
-  static constexpr const char* name = "yue.ProtocolStringJob";
+  static constexpr const char* name = "ProtocolStringJob";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
@@ -1879,7 +1879,7 @@ struct Type<nu::ProtocolStringJob> {
 template<>
 struct Type<nu::ProtocolFileJob> {
   using base = nu::ProtocolJob;
-  static constexpr const char* name = "yue.ProtocolFileJob";
+  static constexpr const char* name = "ProtocolFileJob";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
@@ -1894,7 +1894,7 @@ struct Type<nu::ProtocolFileJob> {
 template<>
 struct Type<nu::ProtocolAsarJob> {
   using base = nu::ProtocolFileJob;
-  static constexpr const char* name = "yue.ProtocolAsarJob";
+  static constexpr const char* name = "ProtocolAsarJob";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
@@ -1911,7 +1911,7 @@ struct Type<nu::ProtocolAsarJob> {
 
 template<>
 struct Type<nu::Browser::Options> {
-  static constexpr const char* name = "yue.Browser.Options";
+  static constexpr const char* name = "BrowserOptions";
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::Browser::Options* out) {
@@ -1937,7 +1937,7 @@ struct Type<nu::Browser::Options> {
 template<>
 struct Type<nu::Browser> {
   using base = nu::View;
-  static constexpr const char* name = "yue.Browser";
+  static constexpr const char* name = "Browser";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
@@ -2041,7 +2041,7 @@ struct Type<nu::Browser> {
 
 template<>
 struct Type<nu::Entry::Type> {
-  static constexpr const char* name = "yue.Entry.Type";
+  static constexpr const char* name = "EntryType";
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::Entry::Type* out) {
@@ -2061,7 +2061,7 @@ struct Type<nu::Entry::Type> {
 template<>
 struct Type<nu::Entry> {
   using base = nu::View;
-  static constexpr const char* name = "yue.Entry";
+  static constexpr const char* name = "Entry";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
@@ -2082,7 +2082,7 @@ struct Type<nu::Entry> {
 template<>
 struct Type<nu::Label> {
   using base = nu::View;
-  static constexpr const char* name = "yue.Label";
+  static constexpr const char* name = "Label";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
@@ -2106,7 +2106,7 @@ struct Type<nu::Label> {
 template<>
 struct Type<nu::ProgressBar> {
   using base = nu::View;
-  static constexpr const char* name = "yue.ProgressBar";
+  static constexpr const char* name = "ProgressBar";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor, "create", &CreateOnHeap<nu::ProgressBar>);
@@ -2124,7 +2124,7 @@ struct Type<nu::ProgressBar> {
 template<>
 struct Type<nu::Picker> {
   using base = nu::View;
-  static constexpr const char* name = "yue.Picker";
+  static constexpr const char* name = "Picker";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor, "create", &CreateOnHeap<nu::Picker>);
@@ -2146,7 +2146,7 @@ struct Type<nu::Picker> {
 template<>
 struct Type<nu::GifPlayer> {
   using base = nu::View;
-  static constexpr const char* name = "yue.GifPlayer";
+  static constexpr const char* name = "GifPlayer";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
@@ -2167,7 +2167,7 @@ struct Type<nu::GifPlayer> {
 template<>
 struct Type<nu::Group> {
   using base = nu::View;
-  static constexpr const char* name = "yue.Group";
+  static constexpr const char* name = "Group";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
@@ -2186,7 +2186,7 @@ struct Type<nu::Group> {
 
 template<>
 struct Type<nu::Scroll::Policy> {
-  static constexpr const char* name = "yue.Scroll.Policy";
+  static constexpr const char* name = "ScrollPolicy";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    nu::Scroll::Policy policy) {
     if (policy == nu::Scroll::Policy::Always)
@@ -2220,7 +2220,7 @@ struct Type<nu::Scroll::Policy> {
 template<>
 struct Type<nu::Scroll> {
   using base = nu::View;
-  static constexpr const char* name = "yue.Scroll";
+  static constexpr const char* name = "Scroll";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor, "create", &CreateOnHeap<nu::Scroll>);
@@ -2259,7 +2259,7 @@ struct Type<nu::Separator> {
 template<>
 struct Type<nu::Slider> {
   using base = nu::View;
-  static constexpr const char* name = "yue.Slider";
+  static constexpr const char* name = "Slider";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor, "create", &CreateOnHeap<nu::Slider>);
@@ -2282,7 +2282,7 @@ struct Type<nu::Slider> {
 template<>
 struct Type<nu::Tab> {
   using base = nu::View;
-  static constexpr const char* name = "yue.Tab";
+  static constexpr const char* name = "Tab";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor, "create", &CreateOnHeap<nu::Tab>);
@@ -2304,7 +2304,7 @@ struct Type<nu::Tab> {
 
 template<>
 struct Type<nu::TableModel> {
-  static constexpr const char* name = "yue.TableModel";
+  static constexpr const char* name = "TableModel";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
   }
@@ -2322,7 +2322,7 @@ struct Type<nu::TableModel> {
 template<>
 struct Type<nu::AbstractTableModel> {
   using base = nu::TableModel;
-  static constexpr const char* name = "yue.AbstractTableModel";
+  static constexpr const char* name = "AbstractTableModel";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor, "create", &CreateOnHeap<nu::AbstractTableModel>);
@@ -2339,7 +2339,7 @@ struct Type<nu::AbstractTableModel> {
 template<>
 struct Type<nu::SimpleTableModel> {
   using base = nu::TableModel;
-  static constexpr const char* name = "yue.SimpleTableModel";
+  static constexpr const char* name = "SimpleTableModel";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
@@ -2356,7 +2356,7 @@ struct Type<nu::SimpleTableModel> {
 
 template<>
 struct Type<nu::Table::ColumnType> {
-  static constexpr const char* name = "yue.Table.ColumnType";
+  static constexpr const char* name = "TableColumnType";
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::Table::ColumnType* out) {
@@ -2380,7 +2380,7 @@ struct Type<nu::Table::ColumnType> {
 
 template<>
 struct Type<nu::Table::ColumnOptions> {
-  static constexpr const char* name = "yue.Table.ColumnOptions";
+  static constexpr const char* name = "TableColumnOptions";
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::Table::ColumnOptions* out) {
@@ -2400,7 +2400,7 @@ struct Type<nu::Table::ColumnOptions> {
 template<>
 struct Type<nu::Table> {
   using base = nu::View;
-  static constexpr const char* name = "yue.Table";
+  static constexpr const char* name = "Table";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor, "create", &CreateOnHeap<nu::Table>);
@@ -2426,7 +2426,7 @@ struct Type<nu::Table> {
 template<>
 struct Type<nu::TextEdit> {
   using base = nu::View;
-  static constexpr const char* name = "yue.TextEdit";
+  static constexpr const char* name = "TextEdit";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor, "create", &CreateOnHeap<nu::TextEdit>);
@@ -2465,7 +2465,7 @@ struct Type<nu::TextEdit> {
 #if defined(OS_MACOSX)
 template<>
 struct Type<nu::Vibrant::Material> {
-  static constexpr const char* name = "yue.Vibrant.Material";
+  static constexpr const char* name = "VibrantMaterial";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    nu::Vibrant::Material material) {
     if (material == nu::Vibrant::Material::Light)
@@ -2503,7 +2503,7 @@ struct Type<nu::Vibrant::Material> {
 
 template<>
 struct Type<nu::Vibrant::BlendingMode> {
-  static constexpr const char* name = "yue.Vibrant.BlendingMode";
+  static constexpr const char* name = "VibrantBlendingMode";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    nu::Vibrant::BlendingMode mode) {
     if (mode == nu::Vibrant::BlendingMode::WithinWindow)
@@ -2532,7 +2532,7 @@ struct Type<nu::Vibrant::BlendingMode> {
 template<>
 struct Type<nu::Vibrant> {
   using base = nu::Container;
-  static constexpr const char* name = "yue.Vibrant";
+  static constexpr const char* name = "Vibrant";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor, "create", &CreateOnHeap<nu::Vibrant>);
@@ -2550,7 +2550,7 @@ struct Type<nu::Vibrant> {
 template<>
 struct Type<node_yue::ChromeView> {
   using base = nu::View;
-  static constexpr const char* name = "yue.ChromeView";
+  static constexpr const char* name = "ChromeView";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,

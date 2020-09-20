@@ -84,7 +84,7 @@ namespace lua {
 
 template<typename Sig>
 struct Type<yue::SignalWrapper<Sig>> {
-  static constexpr const char* name = "yue.Signal";
+  static constexpr const char* name = "Signal";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "connect", &yue::SignalWrapper<Sig>::Connect,
@@ -95,7 +95,7 @@ struct Type<yue::SignalWrapper<Sig>> {
 
 template<typename Sig>
 struct Type<nu::Signal<Sig>> {
-  static constexpr const char* name = "yue.Signal";
+  static constexpr const char* name = "Signal";
 };
 
 // Define how the Signal member is converted.
