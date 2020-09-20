@@ -223,20 +223,6 @@ void PainterMac::DrawCanvasFromRect(Canvas* canvas, const RectF& src,
               hints:nil];
 }
 
-TextMetrics PainterMac::MeasureText(const std::string& text, float width,
-                                    const TextAttributes& attributes) {
-  NSDictionary* attrs_dict = @{
-     NSFontAttributeName: attributes.font->GetNative(),
-  };
-  base::scoped_nsobject<NSAttributedString> attributed_str(
-      [[NSAttributedString alloc] initWithString:base::SysUTF8ToNSString(text)
-                                      attributes:attrs_dict]);
-  CGRect bounds = [attributed_str
-      boundingRectWithSize:CGSizeMake(width, -1)
-                   options:NSStringDrawingUsesLineFragmentOrigin];
-  return { SizeF(bounds.size) };
-}
-
 void PainterMac::DrawAttributedText(scoped_refptr<AttributedText> text,
                                     const RectF& rect) {
   // We still need the NSStringDrawingUsesLineFragmentOrigin flag even when

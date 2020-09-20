@@ -339,8 +339,8 @@ struct Type<nu::App> {
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
-    Set(context, templ,
 #if defined(OS_MACOSX)
+    Set(context, templ,
         "setApplicationMenu",
         RefMethod(&nu::App::SetApplicationMenu, RefType::Reset, "appMenu"),
         "setDockBadgeLabel", &nu::App::SetDockBadgeLabel,
@@ -349,11 +349,8 @@ struct Type<nu::App> {
         "deactivate", &nu::App::Deactivate,
         "isActive", &nu::App::IsActive,
         "setActivationPolicy", &nu::App::SetActivationPolicy,
-        "getActivationPolicy", &nu::App::GetActivationPolicy,
+        "getActivationPolicy", &nu::App::GetActivationPolicy);
 #endif
-        "getColor", &nu::App::GetColor,
-        "getDefaultFont", &nu::App::GetDefaultFont,
-        "getClipboard", &nu::App::GetClipboard);
   }
 };
 
@@ -936,17 +933,6 @@ struct Type<nu::TextAttributes> {
 };
 
 template<>
-struct Type<nu::TextMetrics> {
-  static constexpr const char* name = "yue.TextMetrics";
-  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
-                                   const nu::TextMetrics& metrics) {
-    v8::Local<v8::Object> obj = v8::Object::New(context->GetIsolate());
-    Set(context, obj, "size", metrics.size);
-    return obj;
-  }
-};
-
-template<>
 struct Type<nu::Painter> {
   static constexpr const char* name = "yue.Painter";
   static void BuildConstructor(v8::Local<v8::Context> context,
@@ -982,7 +968,6 @@ struct Type<nu::Painter> {
         "drawImageFromRect", &nu::Painter::DrawImageFromRect,
         "drawCanvas", &nu::Painter::DrawCanvas,
         "drawCanvasFromRect", &nu::Painter::DrawCanvasFromRect,
-        "measureText", &nu::Painter::MeasureText,
         "drawAttributedText", &nu::Painter::DrawAttributedText,
         "drawText", &nu::Painter::DrawText);
   }

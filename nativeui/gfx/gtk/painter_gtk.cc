@@ -202,19 +202,6 @@ void PainterGtk::DrawCanvasFromRect(Canvas* canvas, const RectF& src,
   cairo_restore(context_);
 }
 
-TextMetrics PainterGtk::MeasureText(const std::string& text, float width,
-                                    const TextAttributes& attributes) {
-  PangoLayout* layout = pango_cairo_create_layout(context_);
-  pango_layout_set_font_description(layout, attributes.font->GetNative());
-  pango_layout_set_text(layout, text.data(), text.length());
-  if (width >= 0)
-    pango_layout_set_width(layout, width * PANGO_SCALE);
-  int bwidth, bheight;
-  pango_layout_get_pixel_size(layout, &bwidth, &bheight);
-  g_object_unref(layout);
-  return { SizeF(bwidth, bheight) };
-}
-
 void PainterGtk::DrawAttributedText(scoped_refptr<AttributedText> text,
                                     const RectF& rect) {
   // Don't draw outside.

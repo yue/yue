@@ -309,8 +309,8 @@ template<>
 struct Type<nu::App> {
   static constexpr const char* name = "yue.App";
   static void BuildMetaTable(State* state, int metatable) {
-    RawSet(state, metatable,
 #if defined(OS_MACOSX)
+    RawSet(state, metatable,
            "setapplicationmenu",
            RefMethod(&nu::App::SetApplicationMenu, RefType::Reset, "appmenu"),
            "setdockbadgelabel", &nu::App::SetDockBadgeLabel,
@@ -319,11 +319,8 @@ struct Type<nu::App> {
            "deactivate", &nu::App::Deactivate,
            "isactive", &nu::App::IsActive,
            "setactivationpolicy", &nu::App::SetActivationPolicy,
-           "getactivationpolicy", &nu::App::GetActivationPolicy,
+           "getactivationpolicy", &nu::App::GetActivationPolicy);
 #endif
-           "getcolor", &nu::App::GetColor,
-           "getdefaultfont", &nu::App::GetDefaultFont,
-           "getclipboard", &nu::App::GetClipboard);
   }
 };
 
@@ -858,15 +855,6 @@ struct Type<nu::TextAttributes> {
 };
 
 template<>
-struct Type<nu::TextMetrics> {
-  static constexpr const char* name = "yue.TextMetrics";
-  static inline void Push(State* state, const nu::TextMetrics& metrics) {
-    NewTable(state, 0, 1);
-    RawSet(state, -1, "size", metrics.size);
-  }
-};
-
-template<>
 struct Type<nu::Painter> {
   static constexpr const char* name = "yue.Painter";
   static void BuildMetaTable(State* state, int metatable) {
@@ -898,7 +886,6 @@ struct Type<nu::Painter> {
            "drawimagefromrect", &nu::Painter::DrawImageFromRect,
            "drawcanvas", &nu::Painter::DrawCanvas,
            "drawcanvasfromrect", &nu::Painter::DrawCanvasFromRect,
-           "measuretext", &nu::Painter::MeasureText,
            "drawattributedtext", &nu::Painter::DrawAttributedText,
            "drawtext", &nu::Painter::DrawText);
   }

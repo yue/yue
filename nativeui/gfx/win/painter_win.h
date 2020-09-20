@@ -63,8 +63,6 @@ class PainterWin : public Painter {
   void DrawCanvas(Canvas* canvas, const RectF& rect) override;
   void DrawCanvasFromRect(Canvas* canvas, const RectF& src,
                           const RectF& dest) override;
-  TextMetrics MeasureText(const std::string& text, float width,
-                          const TextAttributes& attributes) override;
   void DrawAttributedText(scoped_refptr<AttributedText> text,
                           const RectF& rect) override;
 

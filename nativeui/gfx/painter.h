@@ -87,10 +87,6 @@ class NATIVEUI_EXPORT Painter {
   virtual void DrawCanvasFromRect(Canvas* canvas, const RectF& src,
                                   const RectF& dest) = 0;
 
-  // Return the space taken to paint the full string.
-  virtual TextMetrics MeasureText(const std::string& text, float width,
-                                  const TextAttributes& attributes) = 0;
-
   // Draw attributed |text|.
   virtual void DrawAttributedText(scoped_refptr<AttributedText> text,
                                   const RectF& rect) = 0;

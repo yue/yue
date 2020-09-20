@@ -21,16 +21,6 @@ class NATIVEUI_EXPORT App {
  public:
   static App* GetCurrent();
 
-  // Deprecated: Return color of a theme component.
-  using ThemeColor = Color::Name;
-  Color GetColor(ThemeColor name);
-
-  // Deprecated: Return the default GUI font.
-  Font* GetDefaultFont();
-
-  // Deprecated: Return clipboard instance.
-  Clipboard* GetClipboard(Clipboard::Type type = Clipboard::Type::CopyPaste);
-
 #if defined(OS_MACOSX)
   // Set the application menu.
   void SetApplicationMenu(MenuBar* menu);

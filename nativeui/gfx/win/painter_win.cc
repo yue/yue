@@ -195,22 +195,6 @@ void PainterWin::DrawCanvasFromRect(Canvas* canvas, const RectF& src,
                       Gdiplus::UnitPixel);
 }
 
-TextMetrics PainterWin::MeasureText(const std::string& text, float width,
-                                    const TextAttributes& attributes) {
-  if (width >= 0)
-    width = width * scale_factor_;
-  else
-    width = FLT_MAX;
-  base::string16 wtext(base::UTF8ToUTF16(text));
-  Gdiplus::RectF rect;
-  Gdiplus::StringFormat format;
-  graphics_.MeasureString(wtext.c_str(), static_cast<int>(wtext.length()),
-                          attributes.font->GetNative(),
-                          Gdiplus::RectF(0.f, 0.f, width, FLT_MAX),
-                          &format, &rect, nullptr, nullptr);
-  return { ScaleSize(SizeF(rect.Width, rect.Height), 1.0f / scale_factor_) };
-}
-
 void PainterWin::DrawAttributedText(scoped_refptr<AttributedText> text,
                                     const RectF& rect) {
   AttributedTextImpl* str = text->GetNative();
