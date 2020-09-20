@@ -19,6 +19,9 @@ nu::InsetsF GetButtonInsets(NSButton* button) {
   } else if ([button bezelStyle] == NSRoundedBezelStyle) {
     NSControlSize size = [[button cell] controlSize];
     switch (size) {
+#if defined(MAC_OS_VERSION_11_0)
+      case NSControlSizeLarge:
+#endif
       case NSRegularControlSize: return nu::InsetsF(4, 6, 7, 6);
       case NSSmallControlSize: return nu::InsetsF(4, 5, 6, 5);
       case NSMiniControlSize: return nu::InsetsF(0, 1, 1, 1);
