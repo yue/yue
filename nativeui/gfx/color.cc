@@ -8,7 +8,6 @@
 
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/stringprintf.h"
-#include "nativeui/state.h"
 
 namespace nu {
 
@@ -52,18 +51,6 @@ uint32_t ParseHexColor(const std::string& color_string) {
 }
 
 }  // namespace
-
-// static
-Color Color::Get(Name name) {
-  auto& theme_colors = State::GetCurrent()->theme_colors();
-  int key = static_cast<int>(name);
-  auto it = theme_colors.find(key);
-  if (it != theme_colors.end())
-    return it->second;
-  Color color = PlatformGet(name);
-  theme_colors[key] = color;
-  return color;
-}
 
 Color::Color(const std::string& hex) : value_(ParseHexColor(hex)) {}
 

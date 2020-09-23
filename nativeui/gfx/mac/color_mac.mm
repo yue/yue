@@ -11,7 +11,7 @@
 namespace nu {
 
 // static
-Color Color::PlatformGet(Name name) {
+Color Color::Get(Name name) {
   NSColor* color;
   if (name == Name::Text)
     color = [NSColor textColor];

@@ -82,8 +82,6 @@ class NATIVEUI_EXPORT Color {
   }
 
  private:
-  static Color PlatformGet(Name name);
-
   uint32_t value_;
 };
 

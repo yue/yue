@@ -7,7 +7,6 @@
 
 #include <array>
 #include <memory>
-#include <unordered_map>
 
 #include "base/memory/ref_counted.h"
 #include "nativeui/app.h"
@@ -34,6 +33,8 @@ class NativeTheme;
 class SubwinHolder;
 class ScopedOleInitializer;
 class TrayHost;
+#elif defined(OS_LINUX)
+class GtkTheme;
 #endif
 
 class NATIVEUI_EXPORT State {
@@ -55,6 +56,8 @@ class NATIVEUI_EXPORT State {
   NativeTheme* GetNativeTheme();
   TrayHost* GetTrayHost();
   UINT GetNextCommandID();
+#elif defined(OS_LINUX)
+  GtkTheme* GetGtkTheme();
 #endif
 
   // Internal: Return the clipboards.
@@ -62,9 +65,6 @@ class NATIVEUI_EXPORT State {
 
   // Internal: Return the default font.
   scoped_refptr<Font>& default_font() { return default_font_; }
-
-  // Internal: Return the colors cache.
-  std::unordered_map<int, Color>& theme_colors() { return theme_colors_; }
 
   // Internal: Return the default yoga config.
   YGConfigRef yoga_config() const { return yoga_config_; }
@@ -87,14 +87,15 @@ class NATIVEUI_EXPORT State {
   UINT next_command_id_ = 0x8000;
 #endif
 
+#if defined(OS_LINUX)
+  std::unique_ptr<GtkTheme> gtk_theme_;
+#endif
+
   // Array of available clipboards.
   std::array<std::unique_ptr<Clipboard>,
              static_cast<size_t>(Clipboard::Type::Count)> clipboards_;
 
   scoped_refptr<Font> default_font_;
-
-  // Cached colors.
-  std::unordered_map<int, Color> theme_colors_;
 
   // The app instance.
   App app_;
