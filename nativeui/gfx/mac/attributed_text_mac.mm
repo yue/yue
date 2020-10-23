@@ -39,12 +39,20 @@ void AttributedText::PlatformUpdateFormat() {
 
 void AttributedText::PlatformSetFontFor(scoped_refptr<Font> font,
                                         int start, int end) {
+  if (start == 0 && end == -1) {
+    [text_ removeAttribute:NSFontAttributeName
+                     range:NSMakeRange(0, [text_ length])];
+  }
   [text_ addAttribute:NSFontAttributeName
                 value:font->GetNative()
                 range:NSMakeRange(start, IndexToLength(text_, start, end))];
 }
 
 void AttributedText::PlatformSetColorFor(Color color, int start, int end) {
+  if (start == 0 && end == -1) {
+    [text_ removeAttribute:NSForegroundColorAttributeName
+                     range:NSMakeRange(0, [text_ length])];
+  }
   [text_ addAttribute:NSForegroundColorAttributeName
                 value:color.ToNSColor()
                 range:NSMakeRange(start, IndexToLength(text_, start, end))];

@@ -50,6 +50,9 @@ methods:
       Set the `color` of text between character range `[start, end)`. Passing
       `-1` as `end` means the rest of the text.
 
+  - signature: void Clear()
+    description: Reset font and color to system default.
+
   - signature: RectF GetBoundsFor(const SizeF& size) const
     description: Return the bounds required to draw the text within `size`.
 

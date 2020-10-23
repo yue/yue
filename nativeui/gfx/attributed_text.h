@@ -33,6 +33,7 @@ class NATIVEUI_EXPORT AttributedText : public base::RefCounted<AttributedText> {
   void SetFontFor(scoped_refptr<Font> font, int start, int end);
   void SetColor(Color color);
   void SetColorFor(Color color, int start, int end);
+  void Clear();
 
   RectF GetBoundsFor(const SizeF& size) const;
   std::string GetText() const;

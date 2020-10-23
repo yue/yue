@@ -375,6 +375,7 @@ struct Type<nu::AttributedText> {
 #if !defined(OS_WIN)
         "setColorFor", &nu::AttributedText::SetColorFor,
 #endif
+        "clear", &nu::AttributedText::Clear,
         "getBoundsFor", &nu::AttributedText::GetBoundsFor,
         "setFormat", &nu::AttributedText::SetFormat,
         "getFormat", &nu::AttributedText::GetFormat,

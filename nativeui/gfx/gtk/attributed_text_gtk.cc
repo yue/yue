@@ -9,6 +9,7 @@
 #include <gtk/gtk.h>
 #include <pango/pango.h>
 
+#include "base/logging.h"
 #include "base/strings/utf_string_conversions.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/gfx/geometry/rect_f.h"
@@ -33,6 +34,20 @@ void FillPangoAttributeIndex(PangoAttribute* attr, PangoLayout* layout,
   base::string16 text = base::UTF8ToUTF16(pango_layout_get_text(layout));
   attr->start_index = CharIndexToByteIndex(text, start);
   attr->end_index = CharIndexToByteIndex(text, end);
+}
+
+// Find and remove the attribute of type.
+gboolean FilterAttributeType(PangoAttribute* attr, PangoAttrType type) {
+  return attr->klass->type == type;
+}
+
+void RemoveFromAttributeList(PangoAttrList* attrs, PangoAttrType type) {
+  PangoAttrList* removed = pango_attr_list_filter(
+      attrs,
+      reinterpret_cast<PangoAttrFilterFunc>(FilterAttributeType),
+      reinterpret_cast<gpointer>(type));
+  if (removed)
+    pango_attr_list_unref(removed);
 }
 
 }  // namespace
@@ -82,21 +97,25 @@ void AttributedText::PlatformUpdateFormat() {
 
 void AttributedText::PlatformSetFontFor(scoped_refptr<Font> font,
                                         int start, int end) {
+  PangoAttrList* attrs = pango_layout_get_attributes(text_);
+  if (start == 0 && end == -1)
+    RemoveFromAttributeList(attrs, PANGO_ATTR_FONT_DESC);
+
   PangoAttribute* font_attr = pango_attr_font_desc_new(font->GetNative());
   FillPangoAttributeIndex(font_attr, text_, start, end);
-
-  PangoAttrList* attrs = pango_layout_get_attributes(text_);
   pango_attr_list_insert(attrs, font_attr);  // ownership taken
 }
 
 void AttributedText::PlatformSetColorFor(Color color, int start, int end) {
+  PangoAttrList* attrs = pango_layout_get_attributes(text_);
+  if (start == 0 && end == -1)
+    RemoveFromAttributeList(attrs, PANGO_ATTR_FOREGROUND);
+
   PangoAttribute* fg_attr = pango_attr_foreground_new(
       color.r() / 255. * 65535,
       color.g() / 255. * 65535,
       color.b() / 255. * 65535);
   FillPangoAttributeIndex(fg_attr, text_, start, end);
-
-  PangoAttrList* attrs = pango_layout_get_attributes(text_);
   pango_attr_list_insert(attrs, fg_attr);  // ownership taken
 }
 

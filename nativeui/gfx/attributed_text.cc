@@ -49,6 +49,12 @@ void AttributedText::SetColorFor(Color color, int start, int end) {
   PlatformSetColorFor(color, start, end);
 }
 
+void AttributedText::Clear() {
+  TextAttributes attrs;
+  SetFont(std::move(attrs.font));
+  SetColor(attrs.color);
+}
+
 SizeF AttributedText::GetOneLineSize() const {
   return GetBoundsFor(SizeF(FLT_MAX, FLT_MAX)).size();
 }
