@@ -4,7 +4,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {config, clang, targetCpu, targetOs, execSync, spawnSync} = require('./common')
+const {clang, targetCpu, targetOs, execSync, spawnSync} = require('./common')
+const {gnConfig, gnSysrootConfig} = require('./config')
 
 // Get the arch of sysroot.
 let sysrootArch = {
@@ -28,7 +29,7 @@ execSync('git submodule update --init --recursive')
 execSync('node scripts/download_gn.js')
 execSync(`node scripts/download_node_headers.js node ${process.version} ${targetOs} ${targetCpu}`)
 
-const commonConfig = config.slice()
+const commonConfig = gnConfig.slice()
 if (process.env.CI === 'true')
   commonConfig.push('use_jumbo_build=true')
 if (!(targetOs == 'win' && targetCpu.startsWith('arm')))
@@ -48,13 +49,8 @@ const releaseConfig = [
   'is_official_build=true',
 ]
 if (targetOs == 'linux') {
-  const sysrootArgs = [
-    'use_sysroot=true',
-    'target_sysroot_dir="//third_party/"',
-    'debian_platform="stretch"'
-  ]
-  debugConfig.push(...sysrootArgs)
-  releaseConfig.push(...sysrootArgs)
+  debugConfig.push(...gnSysrootConfig)
+  releaseConfig.push(...gnSysrootConfig)
 }
 
 gen('out/Component', componentConfig)

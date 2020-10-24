@@ -4,14 +4,15 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {version, config, targetOs, searchFiles, execSync, spawnSync} = require('./common')
+const {version, targetOs, searchFiles, execSync, spawnSync} = require('./common')
+const {gnConfig} = require('./config')
 const {createZip} = require('./zip_utils')
 
 const path = require('path')
 const fs = require('fs-extra')
 
 // Do a jumbo build to prepare for searching files.
-const args = config.concat([
+const args = gnConfig.concat([
   'use_jumbo_build=true',
   'is_component_build=false',
   'is_debug=false',

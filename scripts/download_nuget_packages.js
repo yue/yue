@@ -5,6 +5,7 @@
 // LICENSE file.
 
 const {spawnSync, streamPromise} = require('./common')
+const {webview2Version} = require('./config')
 
 const path  = require('path')
 const fs    = require('fs-extra')
@@ -12,7 +13,7 @@ const fetch = require('node-fetch')
 
 const nugetVersion = 'v5.5.1'
 const nugetPackages = {
-  'Microsoft.Web.WebView2': '0.9.488'
+  'Microsoft.Web.WebView2': webview2Version
 }
 
 const nuget = path.join('third_party', 'nuget.exe')

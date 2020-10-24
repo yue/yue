@@ -5,6 +5,7 @@
 // LICENSE file.
 
 const {targetCpu, targetOs, execSync} = require('./common')
+const {nodeVersions, electronVersions} = require('./config')
 
 const path = require('path')
 
@@ -45,12 +46,8 @@ if (targetCpu == 'x64' && targetOs == 'linux')
 if (targetOs == 'win' && targetCpu.startsWith('arm'))
   process.exit(0)
 const runtimes = {
-  node: [
-    '12.16.3',
-    '14.1.0',
-  ],
-  electron: [
-  ],
+  node: nodeVersions,
+  electron: electronVersions,
 }
 for (let runtime in runtimes) {
   for (let nodever of runtimes[runtime])

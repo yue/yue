@@ -4,7 +4,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {version, clang, argv, config, targetCpu, targetOs, strip, execSync, spawnSync} = require('./common')
+const {version, clang, argv, targetCpu, targetOs, strip, execSync, spawnSync} = require('./common')
+const {gnConfig, gnSysrootConfig} = require('./config')
 const {createZip} = require('./zip_utils')
 
 const fs = require('fs-extra')
@@ -22,7 +23,7 @@ if (runtime == 'node' && targetOs == 'win' && targetCpu.startsWith('arm')) {
   process.exit(1)
 }
 
-const args = config.concat([
+const args = gnConfig.concat([
   'use_jumbo_build=true',
   `node_version="${nodever}"`,
   `node_runtime="${runtime}"`,
@@ -31,11 +32,8 @@ const args = config.concat([
   'is_debug=false',
   'is_official_build=true',
 ])
-if (targetOs == 'linux') {
-  args.push('use_sysroot=true',
-            'target_sysroot_dir="//third_party/"',
-            'debian_platform="stretch"')
-}
+if (targetOs == 'linux')
+  args.push(...gnSysrootConfig)
 
 console.log(`Creating native extension for ${runtime} ${nodever} ${targetCpu}...`)
 

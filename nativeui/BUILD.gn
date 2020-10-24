@@ -7,6 +7,7 @@ import("//testing/test.gni")
 
 declare_args() {
   webview2_support = true
+  webview2_version = ""
 }
 
 jumbo_component("nativeui") {
@@ -534,7 +535,8 @@ if (is_linux) {
 }
 
 if (webview2_support && is_win) {
-  webview2 = "Microsoft.Web.WebView2.0.9.488"
+  assert(webview2_version != "")
+  webview2 = "Microsoft.Web.WebView2." + webview2_version
 
   config("webview2") {
     include_dirs = [ "//third_party/$webview2/build/native/include" ]

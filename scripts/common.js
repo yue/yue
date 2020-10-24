@@ -64,32 +64,6 @@ const argv = process.argv.slice(2).filter((arg) => {
   }
 })
 
-// The common build configurations.
-const config = [
-  `target_cpu="${targetCpu}"`,
-  'use_allocator="none"',
-  'use_allocator_shim=false',
-  'use_partition_alloc=false',
-  'fatal_linker_warnings=false',
-]
-if (clang) {
-  config.push('is_clang=true',
-              'clang_update_script="//building/tools/update-clang.py"')
-} else {
-  config.push('is_clang=false')
-}
-if (targetOs == 'mac') {
-  config.push('mac_deployment_target="10.10.0"',
-              'use_xcode_clang=true')
-  if (targetCpu == 'arm64')
-    config.push('mac_sdk_min="11.0"')
-  else
-    config.push('mac_sdk_min="10.15"')
-} else if (targetOs == 'linux') {
-  // Required for loading dynamic modules.
-  config.push('use_cfi_icall=false')
-}
-
 function strip(file) {
   // TODO(zcbenz): Use |file| command to determine type.
   if (!file.endsWith('.so') &&
@@ -197,7 +171,6 @@ module.exports = {
   verbose,
   version,
   clang,
-  config,
   argv,
   targetCpu,
   targetOs,
