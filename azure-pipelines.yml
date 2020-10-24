@@ -42,8 +42,8 @@ jobs:
         TARGET_CPU: arm64
   steps:
   - script: |
-      sudo xcode-select -switch /Applications/Xcode_12_beta.app/Contents/Developer
-    displayName: Select XCode 12
+      sudo xcode-select -switch /Applications/Xcode_12.2.app/Contents/Developer
+    displayName: Select XCode 12.2
     condition: eq(variables['TARGET_CPU'], 'arm64')
   - template: building/azure-pipelines-template.yml
 

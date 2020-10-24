@@ -80,8 +80,11 @@ if (clang) {
 }
 if (targetOs == 'mac') {
   config.push('mac_deployment_target="10.10.0"',
-              'mac_sdk_min="10.15"',
               'use_xcode_clang=true')
+  if (targetCpu == 'arm64')
+    config.push('mac_sdk_min="11.0"')
+  else
+    config.push('mac_sdk_min="10.15"')
 } else if (targetOs == 'linux') {
   // Required for loading dynamic modules.
   config.push('use_cfi_icall=false')
