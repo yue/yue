@@ -48,6 +48,9 @@ void Label::SetText(const std::string& text) {
       text_ ? text_->GetFormat()
             : TextFormat({TextAlign::Center, TextAlign::Center, true, false});
   SetAttributedText(new AttributedText(text, format));
+
+  use_system_color_ = true;
+  system_color_ = Color::Get(Color::Name::Text);
 }
 
 std::string Label::GetText() const {
@@ -69,8 +72,19 @@ void Label::SetVAlign(TextAlign align) {
 }
 
 void Label::SetAttributedText(scoped_refptr<AttributedText> text) {
+  use_system_color_ = false;
   text_ = std::move(text);
   MarkDirty();
+}
+
+void Label::UpdateColor() {
+  if (!use_system_color_)
+    return;
+  Color color = Color::Get(Color::Name::Text);
+  if (color == system_color_)
+    return;
+  text_->SetColor(color);
+  system_color_ = color;
 }
 
 void Label::Init() {
@@ -94,6 +108,7 @@ void Label::SetFont(scoped_refptr<Font> font) {
 }
 
 void Label::SetColor(Color color) {
+  use_system_color_ = false;
   text_->SetColor(color);
   View::SetColor(color);
 }

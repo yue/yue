@@ -24,6 +24,7 @@
   painter.FillRect(nu::RectF(dirtyRect));
 
   auto* label = static_cast<nu::Label*>([self shell]);
+  label->UpdateColor();
   painter.DrawAttributedText(label->GetAttributedText(),
                              nu::RectF(nu::SizeF([self frame].size)));
 }

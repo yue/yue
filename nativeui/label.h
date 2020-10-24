@@ -30,6 +30,9 @@ class NATIVEUI_EXPORT Label : public View {
   void SetAttributedText(scoped_refptr<AttributedText> text);
   AttributedText* GetAttributedText() const { return text_.get(); }
 
+  // Internal: Make sure the label is using system text color.
+  void UpdateColor();
+
   // View:
   const char* GetClassName() const override;
   void SetFont(scoped_refptr<Font> font) override;
@@ -47,6 +50,9 @@ class NATIVEUI_EXPORT Label : public View {
   NativeView PlatformCreate();
 
   scoped_refptr<AttributedText> text_;
+
+  bool use_system_color_ = false;
+  Color system_color_;
 };
 
 }  // namespace nu
