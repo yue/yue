@@ -1,7 +1,7 @@
 const {clang, targetCpu, targetOs} = require('./common')
 
 // The version of nuget WebView2 package.
-const webview2Version = '0.9.488'
+const webview2Version = '1.0.622.22'
 
 // The versions of Node.js to build against.
 const nodeVersions = [
