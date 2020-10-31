@@ -28,8 +28,14 @@ function runTests(error) {
     process.exit(1)
   }
   process.chdir(tmppath)
-  generateProject()
-  buildProject()
+  if (targetOs != 'win') {  // use make
+    generateProject('Release')
+    generateProject('Debug')
+  } else {  // use VS
+    generateProject()
+  }
+  buildProject('Release')
+  buildProject('Debug')
   // On CI, we have to remove the zip file on non-x64 platforms to avoid
   // uploading the source dist unnecessarily.
   if (process.env.CI == 'true' && targetCpu != 'x64')
@@ -37,7 +43,7 @@ function runTests(error) {
   console.log(tmppath)
 }
 
-function generateProject() {
+function generateProject(config) {
   if (targetOs == 'win') {
     const buildDir = `build_${targetCpu}`
     fs.ensureDirSync(buildDir)
@@ -47,16 +53,17 @@ function generateProject() {
       args.push('-T', 'ClangCL')
     spawnSync('cmake', args)
   } else {
-    fs.ensureDirSync('build')
-    execSync('cmake ..', {cwd: 'build'})
+    const buildDir = `build_${config}`
+    fs.ensureDirSync(buildDir)
+    execSync(`cmake -DCMAKE_BUILD_TYPE=${config} ..`, {cwd: buildDir})
   }
 }
 
-function buildProject() {
+function buildProject(config) {
   const cpus = os.cpus().length
   if (targetOs == 'win') {
     if (clang) {
-      execSync(`cmake --build build_${targetCpu} --config Debug --parallel ${cpus}`)
+      execSync(`cmake --build build_${targetCpu} --config ${config} --parallel ${cpus}`)
     } else {
       const vsPaths = [
         'C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\MSBuild\\Current\\Bin',
@@ -68,12 +75,12 @@ function buildProject() {
       spawnSync(
         'msbuild',
         ['Yue.sln',
-          '/maxcpucount:' + cpus,
-          '/p:Configuration=Release',
-          '/p:Platform=' + platform],
+          `/maxcpucount:${cpus}`,
+          `/p:Configuration=${config}`,
+          `/p:Platform=${platform}`],
         {cwd: `build_${targetCpu}`, env})
     }
   } else {
-    execSync(`make -j ${cpus}`, {cwd: 'build'})
+    execSync(`make -j ${cpus}`, {cwd: `build_${config}`})
   }
 }
