@@ -78,8 +78,8 @@ class NATIVEUI_EXPORT Painter {
   virtual void FillRect(const RectF& rect) = 0;
 
   // Draw image.
-  virtual void DrawImage(Image* image, const RectF& rect) = 0;
-  virtual void DrawImageFromRect(Image* image, const RectF& src,
+  virtual void DrawImage(const Image* image, const RectF& rect) = 0;
+  virtual void DrawImageFromRect(const Image* image, const RectF& src,
                                  const RectF& dest) = 0;
 
   // Copy content from a canvas.

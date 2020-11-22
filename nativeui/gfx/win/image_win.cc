@@ -7,7 +7,11 @@
 #include <shlwapi.h>
 #include <wrl.h>
 
+#include "base/logging.h"
 #include "base/win/scoped_hglobal.h"
+#include "nativeui/gfx/canvas.h"
+#include "nativeui/gfx/painter.h"
+#include "nativeui/gfx/win/double_buffer.h"
 #include "nativeui/gfx/win/gdiplus.h"
 
 namespace nu {
@@ -43,6 +47,16 @@ SizeF Image::GetSize() const {
   Gdiplus::Image* image = const_cast<Gdiplus::Image*>(image_);
   return ScaleSize(SizeF(image->GetWidth(), image->GetHeight()),
                    1.f / scale_factor_);
+}
+
+base::win::ScopedHICON Image::GetHICON(const SizeF& size) const {
+  scoped_refptr<Canvas> canvas = new Canvas(size);
+  canvas->GetPainter()->DrawImage(this, RectF(size));
+  base::win::ScopedHICON result;
+  if (canvas->GetBitmap()->GetGdiplusBitmap()->GetHICON(
+          base::win::ScopedHICON::Receiver(result).get()) != Gdiplus::Ok)
+    LOG(WARNING) << "Error converting image to HICON";
+  return result;
 }
 
 }  // namespace nu

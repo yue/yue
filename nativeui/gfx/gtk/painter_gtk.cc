@@ -151,11 +151,11 @@ void PainterGtk::FillRect(const RectF& rect) {
   cairo_fill(context_);
 }
 
-void PainterGtk::DrawImage(Image* image, const RectF& rect) {
+void PainterGtk::DrawImage(const Image* image, const RectF& rect) {
   DrawImageFromRect(image, RectF(image->GetSize()), rect);
 }
 
-void PainterGtk::DrawImageFromRect(Image* image, const RectF& src,
+void PainterGtk::DrawImageFromRect(const Image* image, const RectF& src,
                                    const RectF& dest) {
   RectF ps = ScaleRect(src, image->GetScaleFactor());
   cairo_save(context_);

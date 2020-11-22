@@ -1397,6 +1397,63 @@ void ReadMenuItems(v8::Local<v8::Context> context,
 }
 
 template<>
+struct Type<nu::MessageBox::Type> {
+  static constexpr const char* name = "MessageBoxType";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::MessageBox::Type* out) {
+    std::string type;
+    if (!vb::FromV8(context, value, &type))
+      return false;
+    if (type == "none")
+      *out = nu::MessageBox::Type::None;
+    else if (type == "information")
+      *out = nu::MessageBox::Type::Information;
+    else if (type == "warning")
+      *out = nu::MessageBox::Type::Warning;
+    else if (type == "error")
+      *out = nu::MessageBox::Type::Error;
+    else
+      return false;
+    return true;
+  }
+};
+
+template<>
+struct Type<nu::MessageBox> {
+  static constexpr const char* name = "MessageBox";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor, "create", &CreateOnHeap<nu::MessageBox>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "run", &nu::MessageBox::Run,
+        "runForWindow", &nu::MessageBox::RunForWindow,
+#if defined(OS_LINUX) || defined(OS_WIN)
+        "show", &nu::MessageBox::Show,
+#endif
+        "showForWindow", &nu::MessageBox::ShowForWindow,
+        "close", &nu::MessageBox::Close,
+        "setType", &nu::MessageBox::SetType,
+        "addButton", &nu::MessageBox::AddButton,
+        "setDefaultResponse", &nu::MessageBox::SetDefaultResponse,
+        "setCancelResponse", &nu::MessageBox::SetCancelResponse,
+        "setText", &nu::MessageBox::SetText,
+        "setInformativeText", &nu::MessageBox::SetInformativeText,
+#if defined(OS_LINUX) || defined(OS_MAC)
+        "setAccessoryView",
+        RefMethod(&nu::MessageBox::SetAccessoryView, RefType::Reset, "accv"),
+        "getAccessoryView", &nu::MessageBox::GetAccessoryView,
+#endif
+        "setImage", &nu::MessageBox::SetImage,
+        "getImage", &nu::MessageBox::GetImage);
+    SetProperty(context, templ, "onResponse", &nu::MessageBox::on_response);
+  }
+};
+
+template<>
 struct Type<nu::Tray> {
   static constexpr const char* name = "Tray";
   static void BuildConstructor(v8::Local<v8::Context> context,
@@ -2634,6 +2691,7 @@ void Initialize(v8::Local<v8::Object> exports,
           "MenuBar",           vb::Constructor<nu::MenuBar>(),
           "Menu",              vb::Constructor<nu::Menu>(),
           "MenuItem",          vb::Constructor<nu::MenuItem>(),
+          "MessageBox",        vb::Constructor<nu::MessageBox>(),
           "Window",            vb::Constructor<nu::Window>(),
           "View",              vb::Constructor<nu::View>(),
           "ComboBox",          vb::Constructor<nu::ComboBox>(),

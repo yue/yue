@@ -1256,6 +1256,58 @@ void ReadMenuItems(State* state, int options, nu::MenuBase* menu) {
 }
 
 template<>
+struct Type<nu::MessageBox::Type> {
+  static constexpr const char* name = "MessageBoxType";
+  static bool To(State* state, int index, nu::MessageBox::Type* out) {
+    std::string type;
+    if (!lua::To(state, index, &type))
+      return false;
+    if (type == "none")
+      *out = nu::MessageBox::Type::None;
+    else if (type == "information")
+      *out = nu::MessageBox::Type::Information;
+    else if (type == "warning")
+      *out = nu::MessageBox::Type::Warning;
+    else if (type == "error")
+      *out = nu::MessageBox::Type::Error;
+    else
+      return false;
+    return true;
+  }
+};
+
+template<>
+struct Type<nu::MessageBox> {
+  static constexpr const char* name = "MessageBox";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateOnHeap<nu::MessageBox>,
+           "run", &nu::MessageBox::Run,
+           "runforwindow", &nu::MessageBox::RunForWindow,
+#if defined(OS_LINUX) || defined(OS_WIN)
+           "show", &nu::MessageBox::Show,
+#endif
+           "showforwindow", &nu::MessageBox::ShowForWindow,
+           "close", &nu::MessageBox::Close,
+           "settype", &nu::MessageBox::SetType,
+           "addbutton", &nu::MessageBox::AddButton,
+           "setdefaultresponse", &nu::MessageBox::SetDefaultResponse,
+           "setcancelresponse", &nu::MessageBox::SetCancelResponse,
+           "settext", &nu::MessageBox::SetText,
+           "setinformativetext", &nu::MessageBox::SetInformativeText,
+#if defined(OS_LINUX) || defined(OS_MAC)
+           "setaccessoryview",
+           RefMethod(&nu::MessageBox::SetAccessoryView, RefType::Reset, "accv"),
+           "getaccessoryview", &nu::MessageBox::GetAccessoryView,
+#endif
+           "setimage", &nu::MessageBox::SetImage,
+           "getimage", &nu::MessageBox::GetImage);
+    RawSetProperty(state, metatable,
+                   "onresponse", &nu::MessageBox::on_response);
+  }
+};
+
+template<>
 struct Type<nu::Tray> {
   static constexpr const char* name = "Tray";
   static void BuildMetaTable(State* state, int metatable) {
@@ -2309,6 +2361,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::MenuBar>(state, "MenuBar");
   BindType<nu::Menu>(state, "Menu");
   BindType<nu::MenuItem>(state, "MenuItem");
+  BindType<nu::MessageBox>(state, "MessageBox");
   BindType<nu::Window>(state, "Window");
   BindType<nu::ComboBox>(state, "ComboBox");
   BindType<nu::Container>(state, "Container");

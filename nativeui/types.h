@@ -26,6 +26,7 @@ typedef struct _GtkClipboard GtkClipboard;
 typedef struct _GtkFileChooser GtkFileChooser;
 typedef struct _GtkMenuItem GtkMenuItem;
 typedef struct _GtkMenuShell GtkMenuShell;
+typedef struct _GtkMessageDialog GtkMessageDialog;
 typedef struct _GtkWidget GtkWidget;
 typedef struct _GtkWindow GtkWindow;
 typedef struct _PangoFontDescription PangoFontDescription;
@@ -39,6 +40,7 @@ typedef union _GdkEvent GdkEvent;
 typedef struct CGContext* CGContextRef;
 #ifdef __OBJC__
 @class NSMutableAttributedString;
+@class NSAlert;
 @class NSBitmapImageRep;
 @class NSCursor;
 @class NSEvent;
@@ -55,6 +57,7 @@ typedef struct CGContext* CGContextRef;
 @class NSWindow;
 #else
 class NSMutableAttributedString;
+class NSAlert;
 class NSBitmapImageRep;
 class NSCursor;
 class NSEvent;
@@ -92,6 +95,7 @@ class WindowImpl;
 struct AttributedTextImpl;
 struct Win32Message;
 struct MenuItemData;
+struct MessageBoxImpl;
 #endif
 
 #if defined(OS_MACOSX)
@@ -100,6 +104,7 @@ using NativeClipboard = NSPasteboard*;
 using NativeCursor = NSCursor*;
 using NativeEvent = NSEvent*;
 using NativeFileDialog = NSSavePanel*;
+using NativeMessageBox = NSAlert*;
 using NativeView = NSView*;
 using NativeWindow = NSWindow*;
 using NativeBitmap = CGContextRef;
@@ -116,6 +121,7 @@ using NativeClipboard = GtkClipboard*;
 using NativeCursor = GdkCursor*;
 using NativeEvent = GdkEvent*;
 using NativeFileDialog = GtkFileChooser*;
+using NativeMessageBox = GtkMessageDialog*;
 using NativeView = GtkWidget*;
 using NativeWindow = GtkWindow*;
 using NativeBitmap = cairo_surface_t*;
@@ -131,6 +137,7 @@ using NativeClipboard = ClipboardImpl*;
 using NativeCursor = HCURSOR;
 using NativeEvent = Win32Message*;
 using NativeFileDialog = FileDialogImpl*;
+using NativeMessageBox = MessageBoxImpl*;
 using NativeView = ViewImpl*;
 using NativeWindow = WindowImpl*;
 using NativeBitmap = DoubleBuffer*;

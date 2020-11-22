@@ -1,0 +1,101 @@
+name: MessageBox
+component: gui
+header: nativeui/message_box.h
+type: refcounted
+namespace: nu
+description: A window showing some text and buttons.
+
+constructors:
+  - signature: MessageBox()
+    lang: ['cpp']
+    description: Create a message box.
+
+class_methods:
+  - signature: MessageBox create()
+    lang: ['lua', 'js']
+    description: Create a message box.
+
+methods:
+  - signature: int Run()
+    description: |
+      Show the message box and wait for result. Response ID will be returned.
+
+  - signature: int RunForWindow(Window* window)
+    description: |
+      Show the message box as a child for `window` and wait for result.
+      Response ID will be returned.
+
+  - signature: void Show()
+    platform: ['Windows', 'Linux']
+    description: |
+      Show the message box. The `<!name>on_response` event will be emitted when
+      the message box is closed.
+
+  - signature: void ShowForWindow(Window* window)
+    description: |
+      Show the message box as a child of `window`. The `<!name>on_response`
+      event will be emitted when the message box is closed.
+
+  - signature: void Close()
+    description: |
+      Close the message box. The cancel response ID will be used as result.
+
+  - signature: void SetType(MessageBox::Type type)
+    description: |
+      Set the `type` of message box, system will show the corresponding icon in
+      the message box.
+    detail: |
+      On macOS there is no visual difference between `information` and `warning`
+      types.
+      On Linux this method has no effect if a custom icon has been set.
+
+  - signature: void AddButton(const std::string& title, int response)
+    description: |
+      Add a button with `title`. The `response` ID will be used as result when
+      the button is clicked.
+
+  - signature: void SetDefaultResponse(int response)
+    description: |
+      Set the default `response` ID, when user presses the <kbd>Enter</kbd> key
+      the button associated with the ID will be clicked.
+
+  - signature: void SetCancelResponse(int response)
+    description: |
+      Set the cancel `response` ID that will be used as result  when user
+      presses the <kbd>Esc</kbd> key or when the window is closed without
+      clicking any button.
+    detail: The default cancel response ID is -1.
+
+  - signature: void SetText(const std::string& text)
+    description: Set the message box's message text.
+
+  - signature: void SetInformativeText(const std::string& text)
+    description: Set informative text that will show bellow the message text.
+
+  - signature: void SetAccessoryView(scoped_refptr<View> view)
+    platform: ['macOS', 'Linux']
+    description: |
+      Set the accessory `view` that will be placed between the text and the
+      buttons. The `view` must be given a size before being used as accessory
+      view.
+
+  - signature: View* GetAccessoryView() const
+    platform: ['macOS', 'Linux']
+    description: Return the accessory view.
+
+  - signature: void SetImage(scoped_refptr<Image> image)
+    description: Set the custom icon displayed in the message box.
+    detail: |
+      On macOS the default icon is the app's icon, on Windows and Linux there
+      is no default icon.
+
+  - signature: Image* GetImage() const
+    description: Return the custom icon.
+
+  - signature: NativeMessageBox GetNative() const
+    lang: ['cpp']
+    description: Return the native instance wrapped by the class.
+
+events:
+  - callback: void on_response(MessageBox* self, int response)
+    description: Emitted when the message box is closed.

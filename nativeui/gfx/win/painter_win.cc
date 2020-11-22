@@ -164,12 +164,12 @@ void PainterWin::FillRect(const RectF& rect) {
   FillRectPixel(ToEnclosingRect(ScaleRect(rect, scale_factor_)));
 }
 
-void PainterWin::DrawImage(Image* image, const RectF& rect) {
+void PainterWin::DrawImage(const Image* image, const RectF& rect) {
   graphics_.DrawImage(image->GetNative(),
                       ToGdi(ScaleRect(rect, scale_factor_)));
 }
 
-void PainterWin::DrawImageFromRect(Image* image, const RectF& src,
+void PainterWin::DrawImageFromRect(const Image* image, const RectF& src,
                                    const RectF& dest) {
   RectF ps = ScaleRect(src, image->GetScaleFactor());
   graphics_.DrawImage(image->GetNative(),

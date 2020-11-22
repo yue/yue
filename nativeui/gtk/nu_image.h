@@ -12,6 +12,7 @@
 namespace nu {
 
 class Image;
+class Size;
 
 #define NU_TYPE_IMAGE (nu_image_get_type ())
 #define NU_IMAGE(obj) (G_TYPE_CHECK_INSTANCE_CAST((obj), \
@@ -32,6 +33,7 @@ struct _NUImageClass {
 
 GType nu_image_get_type();
 GtkWidget* nu_image_new(Image* image);
+void nu_image_set_size(NUImage* widget, const Size& size);
 
 }  // namespace nu
 

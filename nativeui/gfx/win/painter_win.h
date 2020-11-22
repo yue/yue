@@ -57,8 +57,8 @@ class PainterWin : public Painter {
   void Clear() override;
   void StrokeRect(const RectF& rect) override;
   void FillRect(const RectF& rect) override;
-  void DrawImage(Image* image, const RectF& rect) override;
-  void DrawImageFromRect(Image* image, const RectF& src,
+  void DrawImage(const Image* image, const RectF& rect) override;
+  void DrawImageFromRect(const Image* image, const RectF& src,
                          const RectF& dest) override;
   void DrawCanvas(Canvas* canvas, const RectF& rect) override;
   void DrawCanvasFromRect(Canvas* canvas, const RectF& src,

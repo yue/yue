@@ -1,0 +1,11 @@
+name: MessageBox::Type
+header: nativeui/message_box.h
+type: enum class
+namespace: nu
+description: Represent possible `MessageBox` types.
+
+enums:
+  - name: None
+  - name: Information
+  - name: Warning
+  - name: Error

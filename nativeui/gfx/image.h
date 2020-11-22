@@ -14,6 +14,10 @@
 #include "nativeui/gfx/geometry/size_f.h"
 #include "nativeui/types.h"
 
+#if defined(OS_WIN)
+#include "base/win/scoped_gdi_object.h"
+#endif
+
 #if defined(OS_MACOSX)
 #include <ImageIO/ImageIO.h>
 #endif
@@ -56,6 +60,10 @@ class NATIVEUI_EXPORT Image : public base::RefCounted<Image> {
 
   // Return the native instance of image object.
   NativeImage GetNative() const { return image_; }
+
+#if defined(OS_WIN)
+  base::win::ScopedHICON GetHICON(const SizeF& size) const;
+#endif
 
 #if defined(OS_MACOSX)
   // Internal: Return the image representaion that has animations.

@@ -175,7 +175,7 @@ void PainterMac::FillRect(const RectF& rect) {
   CGContextFillRect(context_, rect.ToCGRect());
 }
 
-void PainterMac::DrawImage(Image* image, const RectF& rect) {
+void PainterMac::DrawImage(const Image* image, const RectF& rect) {
   GraphicsContextScope scoped(target_context_);
   [image->GetNative() drawInRect:rect.ToCGRect()
                         fromRect:NSZeroRect
@@ -185,7 +185,7 @@ void PainterMac::DrawImage(Image* image, const RectF& rect) {
                            hints:nil];
 }
 
-void PainterMac::DrawImageFromRect(Image* image, const RectF& src,
+void PainterMac::DrawImageFromRect(const Image* image, const RectF& src,
                                    const RectF& dest) {
   // The src rect needs to be manually flipped.
   RectF flipped(src);

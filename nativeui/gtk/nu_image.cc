@@ -11,6 +11,7 @@ namespace nu {
 
 struct _NUImagePrivate {
   Image* image;
+  Size size;
 };
 
 static void nu_image_get_preferred_width(GtkWidget* widget,
@@ -36,7 +37,8 @@ static void nu_image_get_preferred_width(GtkWidget* widget,
                                          gint* minimum,
                                          gint* natural) {
   NUImagePrivate* priv = NU_IMAGE(widget)->priv;
-  int width = priv->image->GetSize().width();
+  int width = priv->size.IsEmpty() ? priv->image->GetSize().width()
+                                   : priv->size.width();
   *minimum = *natural = width;
 }
 
@@ -44,7 +46,8 @@ static void nu_image_get_preferred_height(GtkWidget* widget,
                                           gint* minimum,
                                           gint* natural) {
   NUImagePrivate* priv = NU_IMAGE(widget)->priv;
-  int height = priv->image->GetSize().height();
+  int height = priv->size.IsEmpty() ? priv->image->GetSize().height()
+                                    : priv->size.height();
   *minimum = *natural = height;
 }
 
@@ -68,6 +71,10 @@ GtkWidget* nu_image_new(Image* image) {
   void* widget = g_object_new(NU_TYPE_IMAGE, nullptr);
   NU_IMAGE(widget)->priv->image = image;
   return GTK_WIDGET(widget);
+}
+
+void nu_image_set_size(NUImage* widget, const Size& size) {
+  widget->priv->size = size;
 }
 
 }  // namespace nu
