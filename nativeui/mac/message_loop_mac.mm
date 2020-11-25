@@ -42,16 +42,16 @@ void MessageLoop::Quit() {
 }
 
 // static
-void MessageLoop::PostTask(const Task& task) {
-  __block auto callback = task;
+void MessageLoop::PostTask(Task task) {
+  __block Task callback = std::move(task);
   dispatch_async(dispatch_get_main_queue(), ^{
     callback();
   });
 }
 
 // static
-void MessageLoop::PostDelayedTask(int ms, const Task& task) {
-  __block std::function<void()> callback = task;
+void MessageLoop::PostDelayedTask(int ms, Task task) {
+  __block Task callback = std::move(task);
   dispatch_time_t t = dispatch_time(DISPATCH_TIME_NOW, ms * NSEC_PER_MSEC);
   dispatch_after(t, dispatch_get_main_queue(), ^{
     callback();
@@ -59,13 +59,13 @@ void MessageLoop::PostDelayedTask(int ms, const Task& task) {
 }
 
 // static
-MessageLoop::TimerId MessageLoop::SetTimeout(int ms, const Task& task) {
+MessageLoop::TimerId MessageLoop::SetTimeout(int ms, Task task) {
   // Store the callback.
   __block TimerId id;
   {
     base::AutoLock auto_lock(lock_);
     id = ++g_task_id;
-    tasks_[id] = task;
+    tasks_[id] = std::move(task);
   }
   // Schedule a task to run the callback.
   dispatch_time_t t = dispatch_time(DISPATCH_TIME_NOW, ms * NSEC_PER_MSEC);
@@ -76,7 +76,7 @@ MessageLoop::TimerId MessageLoop::SetTimeout(int ms, const Task& task) {
       auto it = tasks_.find(id);
       if (it == tasks_.end())  // cleared
         return;
-      task = it->second;
+      task = std::move(it->second);
       tasks_.erase(it);
     }
     task();

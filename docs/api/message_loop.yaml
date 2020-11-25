@@ -38,16 +38,17 @@ lang_detail:
 
 class_methods:
   - signature: void Run()
-    description: Enter message loop.
+    description: Enter GUI message loop.
 
   - signature: void Quit()
-    description: Quit message loop.
+    description: Quit current message loop.
 
-  - signature: void PostTask(const std::function<void()>& task)
-    description: Post a `task` to message loop.
+  - signature: void PostTask(std::function<void()> task)
+    description: Post a `task` to main thread's message loop.
 
-  - signature: void PostDelayedTask(int ms, const std::function<void()>& task);
-    description: Post a `task` to message loop and execute it after `ms`.
+  - signature: void PostDelayedTask(int ms, std::function<void()> task);
+    description: |
+      Post a `task` to main thread's message loop and execute it after `ms`.
     parameters:
       ms:
         description: The number of milliseconds to wait

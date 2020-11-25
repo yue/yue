@@ -12,7 +12,7 @@ namespace nu {
 
 namespace {
 
-gboolean OnSource(std::function<void()>* func) {
+gboolean OnSource(MessageLoop::Task* func) {
   (*func)();
   return G_SOURCE_REMOVE;
 }
@@ -30,21 +30,21 @@ void MessageLoop::Quit() {
 }
 
 // static
-void MessageLoop::PostTask(const std::function<void()>& task) {
+void MessageLoop::PostTask(Task task) {
   g_idle_add_full(G_PRIORITY_DEFAULT, reinterpret_cast<GSourceFunc>(OnSource),
-                  new Task(task), Delete<Task>);
+                  new Task(std::move(task)), Delete<Task>);
 }
 
 // static
-void MessageLoop::PostDelayedTask(int ms, const std::function<void()>& task) {
-  SetTimeout(ms, task);
+void MessageLoop::PostDelayedTask(int ms, Task task) {
+  SetTimeout(ms, std::move(task));
 }
 
 // static
-MessageLoop::TimerId MessageLoop::SetTimeout(int ms, const Task& task) {
+MessageLoop::TimerId MessageLoop::SetTimeout(int ms, Task task) {
   return g_timeout_add_full(G_PRIORITY_DEFAULT, ms,
                             reinterpret_cast<GSourceFunc>(OnSource),
-                            new Task(task), Delete<Task>);
+                            new Task(std::move(task)), Delete<Task>);
 }
 
 // static

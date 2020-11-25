@@ -21,8 +21,8 @@ class NATIVEUI_EXPORT MessageLoop {
   // Control message loop.
   static void Run();
   static void Quit();
-  static void PostTask(const Task& task);
-  static void PostDelayedTask(int ms, const Task& task);
+  static void PostTask(Task task);
+  static void PostDelayedTask(int ms, Task task);
 
   // Internal: Cancellable timers.
 #if defined(OS_WIN)
@@ -30,7 +30,7 @@ class NATIVEUI_EXPORT MessageLoop {
 #elif defined(OS_LINUX) || defined(OS_MACOSX)
   using TimerId = unsigned int;
 #endif
-  static TimerId SetTimeout(int ms, const Task& task);
+  static TimerId SetTimeout(int ms, Task task);
   static void ClearTimeout(TimerId id);
 
  private:

@@ -26,18 +26,18 @@ void MessageLoop::Quit() {
 }
 
 // static
-void MessageLoop::PostTask(const std::function<void()>& task) {
-  PostDelayedTask(USER_TIMER_MINIMUM, task);
+void MessageLoop::PostTask(Task task) {
+  PostDelayedTask(USER_TIMER_MINIMUM, std::move(task));
 }
 
 // static
-void MessageLoop::PostDelayedTask(int ms, const std::function<void()>& task) {
-  SetTimeout(ms, task);
+void MessageLoop::PostDelayedTask(int ms, Task task) {
+  SetTimeout(ms, std::move(task));
 }
 
 // static
-UINT_PTR MessageLoop::SetTimeout(int ms, const Task& task) {
-  return State::GetMain()->GetTimerHost()->SetTimeout(ms, task);
+UINT_PTR MessageLoop::SetTimeout(int ms, Task task) {
+  return State::GetMain()->GetTimerHost()->SetTimeout(ms, std::move(task));
 }
 
 // static
