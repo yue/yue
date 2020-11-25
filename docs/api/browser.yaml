@@ -23,16 +23,17 @@ detail: |
 
   1. Set the `<!name>webview2_support` option to `true`.
   2. Ship the `WebView2Loader.dll` file together with your program.
-  3. Have users install Chromium-based Microsoft Edge on their machines.
+  3. Have users install Edge Beta/Dev/Canary or
+  [WebView2 Runtime](https://docs.microsoft.com/en-us/microsoft-edge/webview2/concepts/distribution)
+  on their machines.
 
   There are also a few things to notice:
   1. When WebView2 failed to initialize for any reason, the browser will
   fallback to use IE as backend quietly.
   2. If you don't use WebView2, it is safe to remove the `WebView2Loader.dll`
   file.
-  3. As WebView2 is still being developed, stable versions of Edge may have
-  various problems with WebView2, it is usually suggested to install Edge Canary
-  to have best experience.
+  3. WebView2 can not use stable channels of Edge, it will search channels in
+  the order of WebView2 Runtime, Beta, Dev, and Canary.
   4. Some `Browser` APIs are not implemented with WebView2 backend, due to lack
   of APIs in WebView2.
 
