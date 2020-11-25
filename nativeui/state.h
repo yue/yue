@@ -33,6 +33,7 @@ class NativeTheme;
 class SubwinHolder;
 class ScopedOleInitializer;
 class TrayHost;
+class TimerHost;
 #elif defined(OS_LINUX)
 class GtkTheme;
 #endif
@@ -43,6 +44,9 @@ class NATIVEUI_EXPORT State {
   ~State();
 
   static State* GetCurrent();
+
+  // Internal: Get the state created for the main thread.
+  static State* GetMain();
 
   // Return the instance of App.
   App* GetApp() { return &app_; }
@@ -55,6 +59,7 @@ class NATIVEUI_EXPORT State {
   ClassRegistrar* GetClassRegistrar();
   NativeTheme* GetNativeTheme();
   TrayHost* GetTrayHost();
+  TimerHost* GetTimerHost();
   UINT GetNextCommandID();
 #elif defined(OS_LINUX)
   GtkTheme* GetGtkTheme();
@@ -81,6 +86,7 @@ class NATIVEUI_EXPORT State {
   std::unique_ptr<SubwinHolder> subwin_holder_;
   std::unique_ptr<NativeTheme> native_theme_;
   std::unique_ptr<TrayHost> tray_host_;
+  std::unique_ptr<TimerHost> timer_host_;
 
   // Next ID for custom WM_COMMAND items, the number came from:
   // https://msdn.microsoft.com/en-us/library/11861byt.aspx

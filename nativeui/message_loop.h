@@ -35,10 +35,10 @@ class NATIVEUI_EXPORT MessageLoop {
 
  private:
 #if defined(OS_WIN)
-  static void CALLBACK OnTimer(HWND, UINT, UINT_PTR event, DWORD);
+  friend class TimerHost;
 #endif
 
-#if defined(OS_WIN) || defined(OS_MACOSX)
+#if defined(OS_MACOSX)
   static base::Lock lock_;
   static std::unordered_map<TimerId, Task> tasks_;
 #endif

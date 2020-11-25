@@ -18,6 +18,7 @@
 #include "nativeui/win/util/gdiplus_holder.h"
 #include "nativeui/win/util/scoped_ole_initializer.h"
 #include "nativeui/win/util/subwin_holder.h"
+#include "nativeui/win/util/timer_host.h"
 #include "nativeui/win/util/tray_host.h"
 #include "third_party/yoga/Yoga.h"
 
@@ -33,6 +34,10 @@ void State::PlatformInit() {
   config.dwSize = sizeof(config);
   config.dwICC = ICC_WIN95_CLASSES;
   ::InitCommonControlsEx(&config);
+
+  // Make sure TimerHost is initialized for main thread.
+  if (GetMain() == this)
+    GetTimerHost();
 
   gdiplus_holder_.reset(new GdiplusHolder);
 }
@@ -83,6 +88,13 @@ TrayHost* State::GetTrayHost() {
   if (!tray_host_)
     tray_host_.reset(new TrayHost);
   return tray_host_.get();
+}
+
+TimerHost* State::GetTimerHost() {
+  CHECK_EQ(GetMain(), this);
+  if (!timer_host_)
+    timer_host_.reset(new TimerHost);
+  return timer_host_.get();
 }
 
 UINT State::GetNextCommandID() {

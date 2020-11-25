@@ -18,6 +18,7 @@
 #include "nativeui/win/util/gdiplus_holder.h"
 #include "nativeui/win/util/scoped_ole_initializer.h"
 #include "nativeui/win/util/subwin_holder.h"
+#include "nativeui/win/util/timer_host.h"
 #include "nativeui/win/util/tray_host.h"
 #elif defined(OS_LINUX)
 #include "nativeui/gfx/gtk/gtk_theme.h"
@@ -26,6 +27,8 @@
 namespace nu {
 
 namespace {
+
+State* g_main_state = nullptr;
 
 // A lazily created thread local storage for quick access to a thread's message
 // loop, if one exists. This should be safe and free of static constructors.
@@ -39,9 +42,16 @@ State* State::GetCurrent() {
   return lazy_tls_ptr.Pointer()->Get();
 }
 
+// static
+State* State::GetMain() {
+  return g_main_state;
+}
+
 State::State() : yoga_config_(YGConfigNew()) {
   DCHECK_EQ(GetCurrent(), nullptr) << "should only have one state per thread";
 
+  if (!g_main_state)
+    g_main_state = this;
   lazy_tls_ptr.Pointer()->Set(this);
   PlatformInit();
 
@@ -51,6 +61,9 @@ State::State() : yoga_config_(YGConfigNew()) {
 
 State::~State() {
   YGConfigFree(yoga_config_);
+
+  if (g_main_state == this)
+    g_main_state = nullptr;
 
   DCHECK_EQ(GetCurrent(), this);
   lazy_tls_ptr.Pointer()->Set(nullptr);

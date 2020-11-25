@@ -6,13 +6,10 @@
 
 #include <windows.h>
 
+#include "nativeui/state.h"
+#include "nativeui/win/util/timer_host.h"
+
 namespace nu {
-
-// static
-base::Lock MessageLoop::lock_;
-
-// static
-std::unordered_map<MessageLoop::TimerId, MessageLoop::Task> MessageLoop::tasks_;
 
 // static
 void MessageLoop::Run() {
@@ -40,32 +37,12 @@ void MessageLoop::PostDelayedTask(int ms, const std::function<void()>& task) {
 
 // static
 UINT_PTR MessageLoop::SetTimeout(int ms, const Task& task) {
-  UINT_PTR event = ::SetTimer(NULL, NULL, ms, OnTimer);
-  base::AutoLock auto_lock(lock_);
-  tasks_[event] = task;
-  return event;
+  return State::GetMain()->GetTimerHost()->SetTimeout(ms, task);
 }
 
 // static
 void MessageLoop::ClearTimeout(TimerId id) {
-  ::KillTimer(NULL, id);
-  base::AutoLock auto_lock(lock_);
-  tasks_.erase(id);
-}
-
-// static
-void CALLBACK MessageLoop::OnTimer(HWND, UINT, UINT_PTR event, DWORD) {
-  ::KillTimer(NULL, event);
-  std::function<void()> task;
-  {
-    base::AutoLock auto_lock(lock_);
-    auto it = tasks_.find(event);
-    if (it == tasks_.end())  // could it happen?
-      return;
-    task = it->second;
-    tasks_.erase(it);
-  }
-  task();
+  State::GetMain()->GetTimerHost()->ClearTimeout(id);
 }
 
 }  // namespace nu
