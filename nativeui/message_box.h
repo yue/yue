@@ -38,6 +38,9 @@ class NATIVEUI_EXPORT MessageBox : public base::RefCounted<MessageBox> {
   void Close();
 
   void SetType(Type type);
+#if defined(OS_LINUX) || defined(OS_WIN)
+  void SetTitle(const std::string& title);
+#endif
   void AddButton(const std::string& title, int response);
   void SetDefaultResponse(int response);
   void SetCancelResponse(int response);

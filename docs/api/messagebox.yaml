@@ -49,6 +49,10 @@ methods:
       types.
       On Linux this method has no effect if a custom icon has been set.
 
+  - signature: void SetTitle(const std::string& title)
+    platform: ['Windows', 'Linux']
+    description: Set the message box window's title.
+
   - signature: void AddButton(const std::string& title, int response)
     description: |
       Add a button with `title`. The `response` ID will be used as result when

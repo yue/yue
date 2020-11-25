@@ -1290,6 +1290,9 @@ struct Type<nu::MessageBox> {
            "showforwindow", &nu::MessageBox::ShowForWindow,
            "close", &nu::MessageBox::Close,
            "settype", &nu::MessageBox::SetType,
+#if defined(OS_LINUX) || defined(OS_WIN)
+           "settitle", &nu::MessageBox::SetTitle,
+#endif
            "addbutton", &nu::MessageBox::AddButton,
            "setdefaultresponse", &nu::MessageBox::SetDefaultResponse,
            "setcancelresponse", &nu::MessageBox::SetCancelResponse,

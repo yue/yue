@@ -91,6 +91,10 @@ void MessageBox::SetType(Type type) {
   g_value_unset(&val);
 }
 
+void MessageBox::SetTitle(const std::string& title) {
+  gtk_window_set_title(GTK_WINDOW(box_), title.c_str());
+}
+
 void MessageBox::AddButton(const std::string& title, int response) {
   gtk_dialog_add_button(GTK_DIALOG(box_), title.c_str(), response);
   if (default_response_ && *default_response_ == response)
