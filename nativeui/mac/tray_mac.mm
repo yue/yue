@@ -25,6 +25,7 @@ Tray::Tray(const std::string& title)
 }
 
 Tray::~Tray() {
+  Remove();  // macOS does not remove the icon when obj is destroyed
   [tray_ release];
 }
 
