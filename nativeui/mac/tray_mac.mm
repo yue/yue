@@ -7,7 +7,9 @@
 #import <Cocoa/Cocoa.h>
 
 #include "base/strings/sys_string_conversions.h"
+#include "nativeui/gfx/geometry/rect_f.h"
 #include "nativeui/gfx/image.h"
+#include "nativeui/gfx/mac/coordinate_conversion.h"
 #include "nativeui/menu.h"
 
 namespace nu {
@@ -31,6 +33,12 @@ Tray::~Tray() {
 
 void Tray::Remove() {
   [[NSStatusBar systemStatusBar] removeStatusItem:tray_];
+}
+
+RectF Tray::GetBounds() const {
+  NSStatusBarButton* button = [tray_ button];
+  NSRect rect = [button convertRect:[button bounds] toView:nil];
+  return ScreenRectFromNSRect([[button window] convertRectToScreen:rect]);
 }
 
 void Tray::SetTitle(const std::string& title) {

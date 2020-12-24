@@ -10,10 +10,11 @@
 
 #include "base/win/scoped_gdi_object.h"
 #include "nativeui/tray.h"
+#include "nativeui/win/util/tray_host.h"
 
 namespace nu {
 
-class TrayHost;
+class Rect;
 
 class TrayImpl {
  public:
@@ -23,9 +24,11 @@ class TrayImpl {
   void Remove();
   void HandleClickEvent(UINT message);
   void ResetIcon();
+  Rect GetBounds() const;
   void SetImage(Image* icon);
 
   UINT icon_id() const { return icon_id_; }
+  HWND hwnd() const { return host_->hwnd(); }
 
  private:
   void InitIconData(NOTIFYICONDATA* icon_data);

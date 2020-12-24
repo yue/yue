@@ -1320,7 +1320,12 @@ struct Type<nu::Tray> {
 #endif
            "createwithimage", &CreateOnHeap<nu::Tray, scoped_refptr<nu::Image>>,
            "remove", &nu::Tray::Remove,
+#if defined(OS_MACOSX) || defined(OS_WIN)
+           "getbounds", &nu::Tray::GetBounds,
+#endif
+#if defined(OS_MACOSX) || defined(OS_LINUX)
            "settitle", &nu::Tray::SetTitle,
+#endif
            "setimage", &nu::Tray::SetImage,
            "setmenu", RefMethod(&nu::Tray::SetMenu, RefType::Reset, "menu"));
     RawSetProperty(state, metatable, "onclick", &nu::Tray::on_click);

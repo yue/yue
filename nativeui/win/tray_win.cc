@@ -8,11 +8,12 @@
 #include <string>
 #include <utility>
 
+#include "nativeui/gfx/geometry/rect_f.h"
 #include "nativeui/gfx/image.h"
 #include "nativeui/gfx/win/gdiplus.h"
+#include "nativeui/gfx/win/screen_win.h"
 #include "nativeui/menu.h"
 #include "nativeui/state.h"
-#include "nativeui/win/util/tray_host.h"
 
 namespace nu {
 
@@ -81,6 +82,19 @@ void TrayImpl::ResetIcon() {
     LOG(WARNING) << "Unable to re-create status tray icon.";
 }
 
+Rect TrayImpl::GetBounds() const {
+  if (!host_)
+    return Rect();
+  NOTIFYICONIDENTIFIER identifier = {0};
+  identifier.cbSize = sizeof(NOTIFYICONIDENTIFIER);
+  identifier.hWnd = hwnd();
+  identifier.uID = icon_id_;
+
+  RECT rect = {0};
+  Shell_NotifyIconGetRect(&identifier, &rect);
+  return Rect(rect);
+}
+
 void TrayImpl::SetImage(Image* icon) {
   if (!host_)
     return;
@@ -101,7 +115,7 @@ void TrayImpl::SetImage(Image* icon) {
 void TrayImpl::InitIconData(NOTIFYICONDATA* icon_data) {
   memset(icon_data, 0, sizeof(NOTIFYICONDATA));
   icon_data->cbSize = sizeof(NOTIFYICONDATA);
-  icon_data->hWnd = host_->hwnd();
+  icon_data->hWnd = hwnd();
   icon_data->uID = icon_id_;
 }
 
@@ -120,7 +134,9 @@ void Tray::Remove() {
   tray_->Remove();
 }
 
-void Tray::SetTitle(const std::string& title) {
+RectF Tray::GetBounds() const {
+  return ScaleRect(RectF(tray_->GetBounds()),
+                         1.0f / GetScaleFactorForHWND(tray_->hwnd()));
 }
 
 void Tray::SetImage(scoped_refptr<Image> icon) {

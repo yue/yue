@@ -38,8 +38,12 @@ methods:
   - signature: void Remove()
     description: Remove the tray item.
 
+  - signature: RectF GetBounds() const
+    platform: ['macOS', 'Windows']
+    description: Return the position and size of the tray item.
+
   - signature: void SetTitle(const std::string& title)
-    platform: ['macOS', 'linux']
+    platform: ['macOS', 'Linux']
     description: Set title to be displayed aside item's icon.
 
   - signature: void SetImage(scoped_refptr<Image> icon)

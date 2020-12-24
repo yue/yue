@@ -16,6 +16,7 @@ namespace nu {
 
 class Image;
 class Menu;
+class RectF;
 
 class NATIVEUI_EXPORT Tray : public base::RefCounted<Tray> {
  public:
@@ -27,7 +28,12 @@ class NATIVEUI_EXPORT Tray : public base::RefCounted<Tray> {
 #endif
 
   void Remove();
+#if defined(OS_MACOSX) || defined(OS_WIN)
+  RectF GetBounds() const;
+#endif
+#if defined(OS_MACOSX) || defined(OS_LINUX)
   void SetTitle(const std::string& title);
+#endif
   void SetImage(scoped_refptr<Image> icon);
   void SetMenu(scoped_refptr<Menu> menu);
   Menu* GetMenu() const { return menu_.get(); }

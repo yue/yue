@@ -1471,7 +1471,12 @@ struct Type<nu::Tray> {
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
         "remove", &nu::Tray::Remove,
+#if defined(OS_MACOSX) || defined(OS_WIN)
+        "getBounds", &nu::Tray::GetBounds,
+#endif
+#if defined(OS_MACOSX) || defined(OS_LINUX)
         "setTitle", &nu::Tray::SetTitle,
+#endif
         "setImage", &nu::Tray::SetImage,
         "setMenu", RefMethod(&nu::Tray::SetMenu, RefType::Reset, "menu"));
     SetProperty(context, templ, "onClick", &nu::Tray::on_click);
