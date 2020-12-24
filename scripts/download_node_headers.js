@@ -44,13 +44,6 @@ const zipname = `node-headers-${version}`
 const cwd = path.join(os.tmpdir(), zipname)
 fs.emptyDirSync(cwd)
 
-// Print working dir when quit unexpected.
-process.on('unhandledRejection', (error) => {
-  console.error('Working dir:', cwd)
-  console.error(error)
-  process.exit(1)
-})
-
 main()
 
 async function main() {
