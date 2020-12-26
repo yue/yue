@@ -33,6 +33,7 @@
 #include "nativeui/message_loop.h"
 #include "nativeui/progress_bar.h"
 #include "nativeui/protocol_asar_job.h"
+#include "nativeui/screen.h"
 #include "nativeui/scroll.h"
 #include "nativeui/separator.h"
 #include "nativeui/slider.h"

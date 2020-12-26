@@ -11,7 +11,7 @@
 #include "base/win/scoped_hdc.h"
 #include "nativeui/gfx/attributed_text.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
-#include "nativeui/gfx/win/screen_win.h"
+#include "nativeui/win/screen_win.h"
 
 namespace nu {
 

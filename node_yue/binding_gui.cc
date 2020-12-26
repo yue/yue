@@ -65,6 +65,24 @@ struct Type<nu::Buffer> {
 };
 
 template<>
+struct Type<nu::Display> {
+  static constexpr const char* name = "Display";
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   const nu::Display& display) {
+    auto obj = v8::Object::New(context->GetIsolate());
+    Set(context, obj,
+        "id", display.id,
+        "scaleFactor", display.scale_factor,
+#if defined(OS_MAC)
+        "internal", display.internal,
+#endif
+        "bounds", display.bounds,
+        "workArea", display.work_area);
+    return obj;
+  }
+};
+
+template<>
 struct Type<nu::Size> {
   static constexpr const char* name = "Size";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
@@ -2251,6 +2269,27 @@ struct Type<nu::Group> {
 };
 
 template<>
+struct Type<nu::Screen> {
+  static constexpr const char* name = "Screen";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "getPrimaryDisplay", &nu::Screen::GetPrimaryDisplay,
+        "getAllDisplays", &nu::Screen::GetAllDisplays,
+        "getDisplayNearestWindow", &nu::Screen::GetDisplayNearestWindow,
+        "getDisplayNearestPoint", &nu::Screen::GetDisplayNearestPoint,
+        "getCursorScreenPoint", &nu::Screen::GetCursorScreenPoint);
+    SetProperty(context, templ,
+                "onAddDisplay", &nu::Screen::on_add_display,
+                "onRemoveDisplay", &nu::Screen::on_remove_display,
+                "onUpdateDisplay", &nu::Screen::on_update_display);
+  }
+};
+
+template<>
 struct Type<nu::Scroll::Policy> {
   static constexpr const char* name = "ScrollPolicy";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
@@ -2715,6 +2754,7 @@ void Initialize(v8::Local<v8::Object> exports,
           "ProgressBar",       vb::Constructor<nu::ProgressBar>(),
           "GifPlayer",         vb::Constructor<nu::GifPlayer>(),
           "Group",             vb::Constructor<nu::Group>(),
+          "Screen",            vb::Constructor<nu::Screen>(),
           "Scroll",            vb::Constructor<nu::Scroll>(),
           "Separator",         vb::Constructor<nu::Separator>(),
           "Slider",            vb::Constructor<nu::Slider>(),
@@ -2730,7 +2770,8 @@ void Initialize(v8::Local<v8::Object> exports,
           "Vibrant",           vb::Constructor<nu::Vibrant>(),
 #endif
           // Properties.
-          "app",      nu::State::GetCurrent()->GetApp(),
+          "app",    nu::App::GetCurrent(),
+          "screen", nu::Screen::GetCurrent(),
           // Functions.
           "memoryPressureNotification", &MemoryPressureNotification);
   if (is_electron) {

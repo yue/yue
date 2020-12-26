@@ -11,9 +11,9 @@
 #include "nativeui/gfx/geometry/rect_f.h"
 #include "nativeui/gfx/image.h"
 #include "nativeui/gfx/win/gdiplus.h"
-#include "nativeui/gfx/win/screen_win.h"
 #include "nativeui/menu.h"
 #include "nativeui/state.h"
+#include "nativeui/win/screen_win.h"
 
 namespace nu {
 

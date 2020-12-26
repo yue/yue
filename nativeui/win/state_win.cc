@@ -12,8 +12,8 @@
 #include "base/win/scoped_com_initializer.h"
 #include "base/win/win_util.h"
 #include "base/win/windows_version.h"
-#include "nativeui/gfx/screen.h"
 #include "nativeui/gfx/win/native_theme.h"
+#include "nativeui/screen.h"
 #include "nativeui/win/util/class_registrar.h"
 #include "nativeui/win/util/gdiplus_holder.h"
 #include "nativeui/win/util/scoped_ole_initializer.h"
@@ -27,7 +27,7 @@ namespace nu {
 void State::PlatformInit() {
   base::win::EnableHighDPISupport();
 
-  YGConfigSetPointScaleFactor(yoga_config(), GetScaleFactor());
+  YGConfigSetPointScaleFactor(yoga_config(), Screen::GetDefaultScaleFactor());
 
   // Initialize Common Controls.
   INITCOMMONCONTROLSEX config;

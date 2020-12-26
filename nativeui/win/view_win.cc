@@ -10,7 +10,7 @@
 #include "nativeui/events/event.h"
 #include "nativeui/events/win/event_win.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
-#include "nativeui/gfx/screen.h"
+#include "nativeui/screen.h"
 #include "nativeui/win/dragging_info_win.h"
 #include "nativeui/win/scroll_win.h"
 
@@ -20,7 +20,7 @@ ViewImpl::ViewImpl(ControlType type, View* delegate)
     : type_(type),
       font_(Font::Default()),
       color_(Color::Get(Color::Name::Text)),
-      scale_factor_(GetScaleFactor()),
+      scale_factor_(Screen::GetDefaultScaleFactor()),
       delegate_(delegate) {}
 
 ViewImpl::~ViewImpl() {}

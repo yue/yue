@@ -5,12 +5,12 @@
 #include "nativeui/gfx/canvas.h"
 
 #include "nativeui/gfx/painter.h"
-#include "nativeui/gfx/screen.h"
+#include "nativeui/screen.h"
 
 namespace nu {
 
 Canvas::Canvas(const SizeF& size)
-    : Canvas(size, nu::GetScaleFactor()) {
+    : Canvas(size, Screen::GetDefaultScaleFactor()) {
 }
 
 Canvas::Canvas(const SizeF& size, float scale_factor)

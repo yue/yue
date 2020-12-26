@@ -14,12 +14,25 @@
 
 namespace nu {
 
+class SignalDelegate {
+ public:
+  virtual ~SignalDelegate() {}
+  virtual void OnConnect(int identifier) {}
+};
+
 // A simple signal/slot implementation.
 template<typename Sig> class SignalBase {
  public:
   using Slot = std::function<Sig>;
 
+  void SetDelegate(SignalDelegate* delegate, int identifier = 0) {
+    delegate_ = delegate;
+    identifier_ = identifier;
+  }
+
   int Connect(const Slot& slot) {
+    if (delegate_)
+      delegate_->OnConnect(identifier_);
     slots_.push_back(std::make_pair(++next_id_, slot));
     return next_id_;
   }
@@ -47,6 +60,9 @@ template<typename Sig> class SignalBase {
 
   int next_id_ = 0;
   std::vector<std::pair<int, Slot>> slots_;
+
+  int identifier_ = 0;
+  SignalDelegate* delegate_ = nullptr;
 };
 
 template<typename Sig> class Signal;

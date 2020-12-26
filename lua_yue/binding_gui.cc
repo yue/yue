@@ -52,6 +52,22 @@ struct Type<nu::Buffer> {
 };
 
 template<>
+struct Type<nu::Display> {
+  static constexpr const char* name = "Display";
+  static inline void Push(State* state, const nu::Display& display) {
+    lua::NewTable(state);
+    lua::RawSet(state, -1,
+                "id", display.id,
+                "scalefactor", display.scale_factor,
+#if defined(OS_MAC)
+                "internal", display.internal,
+#endif
+                "bounds", display.bounds,
+                "workarea", display.work_area);
+  }
+};
+
+template<>
 struct Type<nu::Size> {
   static constexpr const char* name = "Size";
   static inline void Push(State* state, const nu::Size& size) {
@@ -1968,6 +1984,23 @@ struct Type<nu::Group> {
 };
 
 template<>
+struct Type<nu::Screen> {
+  static constexpr const char* name = "Screen";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "getprimarydisplay", &nu::Screen::GetPrimaryDisplay,
+           "getalldisplays", &nu::Screen::GetAllDisplays,
+           "getdisplaynearestwindow", &nu::Screen::GetDisplayNearestWindow,
+           "getdisplaynearestpoint", &nu::Screen::GetDisplayNearestPoint,
+           "getcursorscreenpoint", &nu::Screen::GetCursorScreenPoint);
+    RawSetProperty(state, metatable,
+                   "onadddisplay", &nu::Screen::on_add_display,
+                   "onremovedisplay", &nu::Screen::on_remove_display,
+                   "onupdatedisplay", &nu::Screen::on_update_display);
+  }
+};
+
+template<>
 struct Type<nu::Scroll::Policy> {
   static constexpr const char* name = "ScrollPolicy";
   static inline bool To(State* state, int index, nu::Scroll::Policy* out) {
@@ -2384,6 +2417,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::ProgressBar>(state, "ProgressBar");
   BindType<nu::GifPlayer>(state, "GifPlayer");
   BindType<nu::Group>(state, "Group");
+  BindType<nu::Screen>(state, "Screen");
   BindType<nu::Scroll>(state, "Scroll");
   BindType<nu::Separator>(state, "Separator");
   BindType<nu::Slider>(state, "Slider");
@@ -2401,6 +2435,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   // Properties.
   lua::RawSet(state, -1,
               "lifetime", nu::Lifetime::GetCurrent(),
-              "app",      nu::State::GetCurrent()->GetApp());
+              "app",      nu::App::GetCurrent(),
+              "screen",   nu::Screen::GetCurrent());
   return 1;
 }

@@ -3,8 +3,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE.chromium file.
 
-#ifndef NATIVEUI_GFX_WIN_SCREEN_WIN_H_
-#define NATIVEUI_GFX_WIN_SCREEN_WIN_H_
+#ifndef NATIVEUI_WIN_SCREEN_WIN_H_
+#define NATIVEUI_WIN_SCREEN_WIN_H_
 
 #include <windows.h>
 
@@ -35,4 +35,4 @@ int GetSystemMetricsForMonitor(HMONITOR monitor, int metric);
 
 }  // namespace nu
 
-#endif  // NATIVEUI_GFX_WIN_SCREEN_WIN_H_
+#endif  // NATIVEUI_WIN_SCREEN_WIN_H_

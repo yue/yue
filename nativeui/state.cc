@@ -8,6 +8,7 @@
 #include "base/threading/thread_local.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/protocol_job.h"
+#include "nativeui/screen.h"
 #include "third_party/yoga/Yoga.h"
 
 #if defined(OS_WIN)
@@ -75,6 +76,12 @@ State::~State() {
 
 Clipboard* State::GetClipboard(Clipboard::Type type) {
   return clipboards_[static_cast<size_t>(type)].get();
+}
+
+Screen* State::GetScreen() {
+  if (!screen_)
+    screen_.reset(new Screen);
+  return screen_.get();
 }
 
 }  // namespace nu

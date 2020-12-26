@@ -13,7 +13,7 @@
 #include "nativeui/gfx/geometry/point.h"
 #include "nativeui/gfx/geometry/rect.h"
 #include "nativeui/gfx/geometry/size.h"
-#include "nativeui/gfx/win/screen_win.h"
+#include "nativeui/win/screen_win.h"
 
 namespace nu {
 

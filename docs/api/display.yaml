@@ -1,0 +1,22 @@
+name: Display
+header: nativeui/screen.h
+type: struct
+namespace: nu
+description: Information of monitor.
+
+properties:
+  - property: uint32_t id
+    description: An unique ID of the monitor.
+
+  - property: float scale_factor
+    description: Output device's pixel scale factor.
+
+  - property: bool internal
+    platform: ['macOS', 'Windows']
+    description: Whether this is an internal display.
+
+  - property: RectF bounds
+    description: The display's bounds.
+
+  - property: RectF work_area
+    description: The work area's bounds.

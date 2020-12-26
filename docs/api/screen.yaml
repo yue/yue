@@ -1,0 +1,63 @@
+name: Screen
+component: gui
+header: nativeui/screen.h
+type: class
+namespace: nu
+description: Receive information about system’s monitor or screen.
+
+lang_detail:
+  cpp: |
+    This class can not be created by user, you must create `State` first and
+    then receive an instance of `Screen` via `Screen::GetCurrent`.
+
+    ```cpp
+    nu::State state;
+    nu::Screen* screen = nu::Screen::GetCurrent();
+    ```
+
+  lua: |
+    This class can not be created by user, you can only receive its global
+    instance from the `screen` property of the module:
+
+    ```lua
+    gui.screen:getprimarydisplay()
+    ```
+
+  js: |
+    This class can not be created by user, you can only receive its global
+    instance from the `screen` property of the module:
+
+    ```js
+    gui.screen.getPrimaryDisplay()
+    ```
+
+class_methods:
+  - signature: Screen* GetCurrent()
+    lang: ['cpp']
+    description: Return the screen instance.
+
+methods:
+  - signature: Display GetPrimaryDisplay()
+    description: Return the primary display.
+
+  - signature: const std::vector<Display>& GetAllDisplays()
+    description: Return the list of displays that are currently available.
+
+  - signature: Display GetDisplayNearestWindow(Window* window)
+    description: Return the display nearest the specified `window`.
+
+  - signature: Display GetDisplayNearestPoint(const PointF& point)
+    description: Return the display nearest the specified DIP `point`.
+
+  - signature: PointF GetCursorScreenPoint()
+    description: Return the current absolute position of the mouse pointer.
+
+events:
+  - callback: void on_add_display(const Display& display)
+    description: Emitted when a new `display` is available.
+
+  - callback: void on_remove_display(const Display& display)
+    description: Emitted when the `display` has been removed.
+
+  - callback: void on_update_display(const Display& display)
+    description: Emitted when there are changes happened to `display`.
