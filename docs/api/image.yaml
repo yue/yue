@@ -5,6 +5,22 @@ type: refcounted
 namespace: nu
 description: Native image.
 
+detail: |
+  ## High DPI Image
+
+  By appending `@{scaleFactor}x` to the image's base filename, you can mark
+  the image as a high DPI image. For example an image file with filename of
+  `icon@2x.png` will have scale factor of 2.
+
+  ## Template Image
+
+  On macOS you can mark an image as template image by putting `Template` to
+  its base filename, for example `iconTemplate.png` and `iconTemplate@2x.png`.
+
+  Template images should consist of only black and clear colors, and macOS will
+  mix with other content to create best appearance. This is useful for tray
+  icons and menu item icons that automatically adjust to light and dark themes.
+
 constructors:
   - signature: Image()
     lang: ['cpp']
