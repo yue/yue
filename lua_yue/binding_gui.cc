@@ -1343,6 +1343,9 @@ struct Type<nu::Tray> {
            "settitle", &nu::Tray::SetTitle,
 #endif
            "setimage", &nu::Tray::SetImage,
+#if defined(OS_MAC)
+           "setpressedimage", &nu::Tray::SetPressedImage,
+#endif
            "setmenu", RefMethod(&nu::Tray::SetMenu, RefType::Reset, "menu"));
     RawSetProperty(state, metatable, "onclick", &nu::Tray::on_click);
   }

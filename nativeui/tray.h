@@ -35,6 +35,9 @@ class NATIVEUI_EXPORT Tray : public base::RefCounted<Tray> {
   void SetTitle(const std::string& title);
 #endif
   void SetImage(scoped_refptr<Image> icon);
+#if defined(OS_MAC)
+  void SetPressedImage(scoped_refptr<Image> icon);
+#endif
   void SetMenu(scoped_refptr<Menu> menu);
   Menu* GetMenu() const { return menu_.get(); }
 

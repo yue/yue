@@ -49,6 +49,10 @@ methods:
   - signature: void SetImage(scoped_refptr<Image> icon)
     description: Set the `icon` of tray item.
 
+  - signature: void SetPressedImage(scoped_refptr<Image> image)
+    platform: ['macOS']
+    description: Set the `image` to show when tray item is pressed.
+
   - signature: void SetMenu(scoped_refptr<Menu> menu)
     description: Set the menu attached with the tray item.
     detail: |

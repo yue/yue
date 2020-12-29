@@ -83,7 +83,11 @@ void Tray::SetTitle(const std::string& title) {
 }
 
 void Tray::SetImage(scoped_refptr<Image> icon) {
-  [tray_ setImage:icon->GetNative()];
+  [[tray_ button] setImage:icon->GetNative()];
+}
+
+void Tray::SetPressedImage(scoped_refptr<Image> icon) {
+  [[tray_ button] setAlternateImage:icon->GetNative()];
 }
 
 void Tray::SetMenu(scoped_refptr<Menu> menu) {
