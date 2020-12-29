@@ -12,22 +12,59 @@
 #include "nativeui/gfx/mac/coordinate_conversion.h"
 #include "nativeui/menu.h"
 
+// The button delegate to catch click events.
+@interface NUStatusButtonDelegate : NSObject {
+ @private
+  nu::Tray* shell_;
+}
+- (id)initWithShell:(nu::Tray*)shell;
+- (IBAction)onClick:(id)sender;
+@end
+
+@implementation NUStatusButtonDelegate
+
+- (id)initWithShell:(nu::Tray*)shell {
+  if ((self = [super init]))
+    shell_ = shell;
+  return self;
+}
+
+- (IBAction)onClick:(id)sender {
+  shell_->on_click.Emit(shell_);
+}
+
+@end
+
 namespace nu {
+
+namespace {
+
+void InstallStatusButtonDelegate(Tray* tray) {
+  NSStatusBarButton* button = [tray->GetNative() button];
+  [button setTarget:[[NUStatusButtonDelegate alloc] initWithShell:tray]];
+  [button setAction:@selector(onClick:)];
+}
+
+}  // namespace
 
 Tray::Tray(scoped_refptr<Image> icon)
     : tray_([[[NSStatusBar systemStatusBar]
                 statusItemWithLength:NSSquareStatusItemLength] retain]) {
   SetImage(std::move(icon));
+  InstallStatusButtonDelegate(this);
 }
 
 Tray::Tray(const std::string& title)
     : tray_([[[NSStatusBar systemStatusBar]
                 statusItemWithLength:NSVariableStatusItemLength] retain]) {
   SetTitle(title);
+  InstallStatusButtonDelegate(this);
 }
 
 Tray::~Tray() {
   Remove();  // macOS does not remove the icon when obj is destroyed
+  NSStatusBarButton* button = [tray_ button];
+  [button.target release];
   [tray_ release];
 }
 

@@ -59,6 +59,6 @@ methods:
     description: Return the menu attached.
 
 events:
-  - callback: void on_click(Button* self)
-    platform: ['Windows']
+  - callback: void on_click(Tray* self)
+    platform: ['macOS', 'Windows']
     description: Emitted when the tray item is clicked.

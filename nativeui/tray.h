@@ -22,21 +22,23 @@ class NATIVEUI_EXPORT Tray : public base::RefCounted<Tray> {
  public:
   explicit Tray(scoped_refptr<Image> icon);
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
   // Text only tray icon.
   explicit Tray(const std::string& title);
 #endif
 
   void Remove();
-#if defined(OS_MACOSX) || defined(OS_WIN)
+#if defined(OS_MAC) || defined(OS_WIN)
   RectF GetBounds() const;
 #endif
-#if defined(OS_MACOSX) || defined(OS_LINUX)
+#if defined(OS_MAC) || defined(OS_LINUX)
   void SetTitle(const std::string& title);
 #endif
   void SetImage(scoped_refptr<Image> icon);
   void SetMenu(scoped_refptr<Menu> menu);
   Menu* GetMenu() const { return menu_.get(); }
+
+  NativeTray GetNative() const { return tray_; }
 
   Signal<void(Tray*)> on_click;
 
