@@ -2,6 +2,7 @@ name: Screen
 component: gui
 header: nativeui/screen.h
 type: class
+singleton: true
 namespace: nu
 description: Receive information about system’s monitor or screen.
 

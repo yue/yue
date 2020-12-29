@@ -2,6 +2,7 @@ name: Lifetime
 component: gui
 header: nativeui/lifetime.h
 type: class
+singleton: true
 namespace: nu
 description: Application lifetime.
 detail: |

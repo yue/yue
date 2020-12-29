@@ -131,6 +131,10 @@ function addClass(mod, isInterface = false) {
   }
   output += indent(sub)
   output += '}'
+  if (mod.singleton) {
+    output += '\n\n'
+    output += `const ${mod.name.toLowerCase()}: ${mod.name};`
+  }
   return output
 }
 

@@ -2,6 +2,7 @@ name: App
 component: gui
 header: nativeui/app.h
 type: class
+singleton: true
 namespace: nu
 description: Application class.
 
