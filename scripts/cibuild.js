@@ -41,6 +41,11 @@ if ((targetCpu == 'x64') || (targetOs == 'win' && targetCpu == 'x86'))
 // Test typescript types.
 if (targetCpu == 'x64' && targetOs == 'linux')
   execSync(`node ./scripts/test_typescript_declarations.js`)
+// Test node modules can load.
+if (targetCpu == 'x64') {
+  for (const config of ['Release', 'Debug'])
+    execSync(`node -e "require('./out/${config}/gui.node').MessageLoop.quit();process.exit()"`)
+}
 
 // Build node extensions.
 if (targetOs == 'win' && targetCpu.startsWith('arm'))

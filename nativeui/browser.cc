@@ -10,6 +10,7 @@
 #include "base/base64.h"
 #include "base/json/json_reader.h"
 #include "base/json/string_escape.h"
+#include "base/logging.h"
 #include "base/rand_util.h"
 #include "base/strings/stringprintf.h"
 

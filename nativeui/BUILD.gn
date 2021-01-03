@@ -478,7 +478,7 @@ jumbo_component("nativeui") {
     ldflags = [
       "/DELAYLOAD:dwmapi.dll",
     ]
-    deps += [
+    public_deps = [
       "//build/win:default_exe_manifest",
     ]
     configs -= [ "//build/config/win:lean_and_mean" ]
