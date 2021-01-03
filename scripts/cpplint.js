@@ -43,16 +43,20 @@ const sourceFiles = listFiles([
 })
 
 // Call cpplint.
+let hasError = false
 const cpplint = path.join('building', 'tools', 'cpplint.py')
 while (sourceFiles.length) {
   const chunck = sourceFiles.splice(0, 100)
-  const child = exec(`python ${cpplint} ${chunck.join(' ')}`)
+  const child = exec(`python ${cpplint} --quiet ${chunck.join(' ')}`)
   child.stderr.on('data', (chunck) => {
-    if (chunck.startsWith('Done processing'))
-      return
+    hasError = true
     process.stdout.write(chunck)
   })
 }
+
+process.on('beforeExit', (code) => {
+  process.exit(hasError ? 1 : 0)
+})
 
 // Util function to list files recursively
 function listFiles(dirs) {
