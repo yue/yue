@@ -33,7 +33,7 @@ MessageBox::MessageBox() {
                              static_cast<GtkDialogFlags>(0),  // flags
                              GTK_MESSAGE_OTHER,               // type
                              GTK_BUTTONS_NONE,                // buttons
-                             ""));
+                             nullptr));
   gtk_window_set_modal(GTK_WINDOW(box_), TRUE);
   g_signal_connect(box_, "delete-event", G_CALLBACK(gtk_widget_hide_on_delete),
                    nullptr);
