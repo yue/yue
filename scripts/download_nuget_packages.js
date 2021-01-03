@@ -4,7 +4,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {spawnSync, streamPromise} = require('./common')
+const {spawnSync, sleep, streamPromise} = require('./common')
 const {webview2Version} = require('./config')
 
 const path  = require('path')
@@ -21,8 +21,10 @@ const nuget = path.join('third_party', 'nuget.exe')
 main()
 
 async function main() {
-  if (!fs.existsSync(nuget))
+  if (!fs.existsSync(nuget)) {
     await downloadNuget()
+    await sleep(1000)
+  }
   downloadPackages()
 }
 

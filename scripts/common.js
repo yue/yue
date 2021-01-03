@@ -125,6 +125,13 @@ function searchFiles(dir, suffix, list = []) {
   }, list)
 }
 
+// Sleep for some time.
+function sleep(ms, value) {
+ return new Promise((resolve) => {
+   setTimeout(resolve.bind(null, value), ms)
+ })
+}
+
 // Turn stream into Promise.
 function streamPromise(stream) {
   return new Promise((resolve, reject) => {
@@ -183,6 +190,7 @@ module.exports = {
   strip,
   download,
   searchFiles,
+  sleep,
   streamPromise,
   execSync: execSyncWrapper,
   spawnSync: spawnSyncWrapper,
