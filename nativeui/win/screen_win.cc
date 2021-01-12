@@ -150,16 +150,12 @@ int GetSystemMetricsForMonitor(HMONITOR monitor, int metric) {
   return GetSystemMetricsForScaleFactor(scale_factor, metric);
 }
 
-class ScreenObserver : public Win32Window {
- public:
-  explicit ScreenObserver(Screen* delegate) : delegate_(delegate) {}
+namespace internal {
 
-  static BOOL CALLBACK EnumMonitorCallback(HMONITOR monitor, HDC, LPRECT,
-                                           LPARAM data) {
-    auto* displays = reinterpret_cast<Screen::DisplayList*>(data);
-    displays->emplace_back(Screen::CreateDisplayFromNative(monitor));
-    return TRUE;
-  }
+class ScreenObserverImpl : public ScreenObserver,
+                           public Win32Window {
+ public:
+  explicit ScreenObserverImpl(Screen* screen) : screen_(screen) {}
 
  private:
   // Win32Window:
@@ -170,26 +166,24 @@ class ScreenObserver : public Win32Window {
                             LRESULT* result) override {
     if ((message == WM_DISPLAYCHANGE) ||
         (message == WM_SETTINGCHANGE && w_param == SPI_SETWORKAREA)) {
-      delegate_->NotifyDisplaysChange();
+      screen_->NotifyDisplaysChange();
     }
     return false;
   }
 
-  Screen* delegate_;
+  Screen* screen_;
 };
+
+// static
+ScreenObserver* ScreenObserver::Create(Screen* screen) {
+  return new ScreenObserverImpl(screen);
+}
+
+}  // namespace internal
 
 // static
 float Screen::GetDefaultScaleFactor() {
   return GetScalingFactorFromDPI(GetDPI().width());
-}
-
-void Screen::PlatformInit() {
-  observer_ = new ScreenObserver(this);
-}
-
-void Screen::PlatformDestroy() {
-  if (observer_)
-    delete observer_;
 }
 
 Display Screen::GetDisplayNearestWindow(Window* window) {
@@ -238,6 +232,14 @@ Point Screen::DIPToScreenPoint(const PointF& point) {
 }
 
 // static
+BOOL CALLBACK Screen::EnumMonitorCallback(HMONITOR monitor, HDC, LPRECT,
+                                          LPARAM data) {
+  auto* displays = reinterpret_cast<Screen::DisplayList*>(data);
+  displays->emplace_back(Screen::CreateDisplayFromNative(monitor));
+  return TRUE;
+}
+
+// static
 uint32_t Screen::DisplayIdFromNative(HMONITOR monitor) {
   MONITORINFOEX monitor_info = {};
   monitor_info.cbSize = sizeof(monitor_info);
@@ -270,7 +272,7 @@ Display Screen::CreateDisplayFromNative(HMONITOR monitor) {
 Screen::DisplayList Screen::CreateAllDisplays() {
   DisplayList displays;
   ::EnumDisplayMonitors(NULL, NULL,
-                        &ScreenObserver::EnumMonitorCallback,
+                        &Screen::EnumMonitorCallback,
                         reinterpret_cast<LPARAM>(&displays));
   return displays;
 }

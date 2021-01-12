@@ -34,26 +34,28 @@ CGFloat GetMinimumDistanceToCorner(const NSPoint& point, NSScreen* screen) {
 
 }  // namespace
 
-class ScreenObserver {
+namespace internal {
+
+class ScreenObserverImpl : public ScreenObserver {
  public:
-  explicit ScreenObserver(Screen* delegate) : delegate_(delegate) {
+  explicit ScreenObserverImpl(Screen* screen) : screen_(screen) {
     CGDisplayRegisterReconfigurationCallback(DisplayReconfigurationCallBack,
-                                             delegate_);
+                                             screen_);
     NSNotificationCenter* center = [NSNotificationCenter defaultCenter];
     screen_params_change_observer_.reset([[center
         addObserverForName:NSApplicationDidChangeScreenParametersNotification
                     object:nil
                      queue:nil
                 usingBlock:^(NSNotification* notification) {
-                             delegate_->NotifyDisplaysChange();
+                             screen_->NotifyDisplaysChange();
                            }] retain]);
   }
 
-  ~ScreenObserver() {
+  ~ScreenObserverImpl() {
     NSNotificationCenter* center = [NSNotificationCenter defaultCenter];
     [center removeObserver:screen_params_change_observer_];
     CGDisplayRemoveReconfigurationCallback(DisplayReconfigurationCallBack,
-                                           delegate_);
+                                           screen_);
   }
 
  private:
@@ -63,23 +65,21 @@ class ScreenObserver {
     static_cast<Screen*>(userInfo)->NotifyDisplaysChange();
   }
 
-  Screen* delegate_;
+  Screen* screen_;
   base::scoped_nsobject<id> screen_params_change_observer_;
 };
+
+// static
+ScreenObserver* ScreenObserver::Create(Screen* screen) {
+  return new ScreenObserverImpl(screen);
+}
+
+}  // namespace internal
 
 // static
 float Screen::GetDefaultScaleFactor() {
   NSScreen* screen = GetNativePrimaryDisplay();
   return screen ? [screen backingScaleFactor] : 1.f;
-}
-
-void Screen::PlatformInit() {
-  observer_ = new ScreenObserver(this);
-}
-
-void Screen::PlatformDestroy() {
-  if (observer_)
-    delete observer_;
 }
 
 Display Screen::GetDisplayNearestWindow(Window* window) {

@@ -12,9 +12,11 @@
 
 namespace nu {
 
-class ScreenObserver {
+namespace internal {
+
+class ScreenObserverImpl : public ScreenObserver {
  public:
-  explicit ScreenObserver(Screen* delegate) : delegate_(delegate) {
+  explicit ScreenObserverImpl(Screen* screen) : screen_(screen) {
     GdkDisplay* display = gdk_display_get_default();
     if (!display)
       return;
@@ -29,7 +31,7 @@ class ScreenObserver {
       AddMonitorSignals(gdk_display_get_monitor(display, i));
   }
 
-  ~ScreenObserver() {
+  ~ScreenObserverImpl() override {
     GdkDisplay* display = gdk_display_get_default();
     if (display) {
       g_signal_handler_disconnect(display, signal_monitor_added_);
@@ -53,26 +55,26 @@ class ScreenObserver {
   void AddMonitorSignals(GdkMonitor* monitor) {
     MonitorSignal signal = {monitor};
     signal.geometry = g_signal_connect(
-        monitor, "notify::geometry", G_CALLBACK(OnNotify), delegate_);
+        monitor, "notify::geometry", G_CALLBACK(OnNotify), screen_);
     signal.scale_factor = g_signal_connect(
-        monitor, "notify::scale-factor", G_CALLBACK(OnNotify), delegate_);
+        monitor, "notify::scale-factor", G_CALLBACK(OnNotify), screen_);
     signal.work_area = g_signal_connect(
-        monitor, "notify::workarea", G_CALLBACK(OnNotify), delegate_);
+        monitor, "notify::workarea", G_CALLBACK(OnNotify), screen_);
     monitor_signals_.push_back(signal);
   }
 
   static void OnMonitorAdded(GdkDisplay*, GdkMonitor* monitor,
-                             ScreenObserver* self) {
+                             ScreenObserverImpl* self) {
     self->AddMonitorSignals(monitor);
-    self->delegate_->NotifyDisplaysChange();
+    self->screen_->NotifyDisplaysChange();
   }
 
   static void OnMonitorRemoved(GdkDisplay*, GdkMonitor* monitor,
-                               ScreenObserver* self) {
+                               ScreenObserverImpl* self) {
     self->monitor_signals_.remove_if([monitor](const MonitorSignal& signal) {
       return signal.monitor == monitor;
     });
-    self->delegate_->NotifyDisplaysChange();
+    self->screen_->NotifyDisplaysChange();
   }
 
   static void OnNotify(GdkDisplay*, GParamSpec*, Screen* screen) {
@@ -83,8 +85,15 @@ class ScreenObserver {
   ulong signal_monitor_removed_ = 0;
   std::list<MonitorSignal> monitor_signals_;
 
-  Screen* delegate_;
+  Screen* screen_;
 };
+
+// static
+ScreenObserver* ScreenObserver::Create(Screen* screen) {
+  return new ScreenObserverImpl(screen);
+}
+
+}  // namespace internal
 
 // static
 float Screen::GetDefaultScaleFactor() {
@@ -92,15 +101,6 @@ float Screen::GetDefaultScaleFactor() {
   if (!monitor)
     return 1.f;
   return gdk_monitor_get_scale_factor(monitor);
-}
-
-void Screen::PlatformInit() {
-  observer_ = new ScreenObserver(this);
-}
-
-void Screen::PlatformDestroy() {
-  if (observer_)
-    delete observer_;
 }
 
 Display Screen::GetDisplayNearestWindow(Window* window) {

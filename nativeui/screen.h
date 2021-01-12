@@ -15,8 +15,19 @@
 
 namespace nu {
 
-class ScreenObserver;
+class Screen;
 class Window;
+
+namespace internal {
+
+// Internal: Interface for platform observers.
+class ScreenObserver {
+ public:
+  static ScreenObserver* Create(Screen* screen);
+  virtual ~ScreenObserver() {}
+};
+
+}  // namespace internal
 
 struct NATIVEUI_EXPORT Display {
   uint32_t id = 0;
@@ -50,6 +61,9 @@ class NATIVEUI_EXPORT Screen : public SignalDelegate {
 
   PointF GetCursorScreenPoint();
 
+  // Internal: Used by observers to notify changes.
+  void NotifyDisplaysChange();
+
   base::WeakPtr<Screen> GetWeakPtr() { return weak_factory_.GetWeakPtr(); }
 
   // Events.
@@ -59,7 +73,7 @@ class NATIVEUI_EXPORT Screen : public SignalDelegate {
 
  private:
   friend class State;
-  friend class ScreenObserver;
+  friend class internal::ScreenObserver;
 
   Screen();
 
@@ -67,23 +81,21 @@ class NATIVEUI_EXPORT Screen : public SignalDelegate {
   void OnConnect(int) override;
 
   // Helpers used by platform implementations.
-  void NotifyDisplaysChange();
   Display FindDisplay(NativeDisplay native);
   static Display CreatePrimaryDisplay();
 
   // Platform implementations.
-  void PlatformInit();
-  void PlatformDestroy();
 #if defined(OS_WIN)
   Point DIPToScreenPoint(const PointF& point);
+  static BOOL CALLBACK EnumMonitorCallback(HMONITOR, HDC, LPRECT, LPARAM);
 #endif
   static uint32_t DisplayIdFromNative(NativeDisplay native);
   static NativeDisplay GetNativePrimaryDisplay();
   static Display CreateDisplayFromNative(NativeDisplay native);
   static DisplayList CreateAllDisplays();
 
+  std::unique_ptr<internal::ScreenObserver> observer_;
   DisplayList displays_;
-  ScreenObserver* observer_ = nullptr;
 
   base::WeakPtrFactory<Screen> weak_factory_;
 

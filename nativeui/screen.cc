@@ -36,9 +36,7 @@ Screen::Screen() : weak_factory_(this) {
   on_update_display.SetDelegate(this);
 }
 
-Screen::~Screen() {
-  PlatformDestroy();
-}
+Screen::~Screen() = default;
 
 Display Screen::GetPrimaryDisplay() {
   NativeDisplay native = GetNativePrimaryDisplay();
@@ -49,7 +47,7 @@ Display Screen::GetPrimaryDisplay() {
 
 const Screen::DisplayList& Screen::GetAllDisplays() {
   if (!observer_) {
-    PlatformInit();
+    observer_.reset(internal::ScreenObserver::Create(this));
     displays_ = CreateAllDisplays();
     // No more need to monitor signals after initialization.
     on_add_display.SetDelegate(nullptr);
@@ -57,11 +55,6 @@ const Screen::DisplayList& Screen::GetAllDisplays() {
     on_update_display.SetDelegate(nullptr);
   }
   return displays_;
-}
-
-void Screen::OnConnect(int) {
-  // Force initialization when user tries to listen to events.
-  GetAllDisplays();
 }
 
 void Screen::NotifyDisplaysChange() {
@@ -88,6 +81,11 @@ void Screen::NotifyDisplaysChange() {
     if (display != *old)
       on_update_display.Emit(display);
   }
+}
+
+void Screen::OnConnect(int) {
+  // Force initialization when user tries to listen to events.
+  GetAllDisplays();
 }
 
 Display Screen::FindDisplay(NativeDisplay native) {
