@@ -716,6 +716,10 @@ struct Type<nu::Color::Name> {
       *out = nu::Color::Name::Text;
     else if (id == "disabled-text")
       *out = nu::Color::Name::DisabledText;
+    else if (id == "control")
+      *out = nu::Color::Name::Control;
+    else if (id == "window-background")
+      *out = nu::Color::Name::WindowBackground;
     else
       return false;
     return true;

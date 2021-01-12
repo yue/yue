@@ -1,9 +1,11 @@
 // Copyright 2016 Cheng Zhao. All rights reserved.
+// Copyright 2012 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
 #include "nativeui/gfx/color.h"
 
+#include <cmath>
 #include <vector>
 
 #include "base/strings/string_number_conversions.h"
@@ -50,9 +52,25 @@ uint32_t ParseHexColor(const std::string& color_string) {
          (bytes[3] << 0);
 }
 
+// Assumes sRGB.
+inline float Linearize(float eight_bit_component) {
+  const float component = eight_bit_component / 255.0f;
+  // The W3C link in the header uses 0.03928 here.  See
+  // https://en.wikipedia.org/wiki/SRGB#Theory_of_the_transformation for
+  // discussion of why we use this value rather than that one.
+  return (component <= 0.04045f) ? (component / 12.92f)
+                                 : pow((component + 0.055f) / 1.055f, 2.4f);
+}
+
 }  // namespace
 
 Color::Color(const std::string& hex) : value_(ParseHexColor(hex)) {}
+
+float Color::GetRelativeLuminance() const {
+  return (0.2126f * Linearize(r())) +
+         (0.7152f * Linearize(g())) +
+         (0.0722f * Linearize(b()));
+}
 
 std::string Color::ToString() const {
   return base::StringPrintf("rgba(%d, %d, %d, %d)", r(), g(), b(), a());

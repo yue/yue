@@ -37,6 +37,8 @@ class NATIVEUI_EXPORT Color {
   enum class Name {
     Text,
     DisabledText,
+    Control,
+    WindowBackground,
   };
 
   static Color Get(Name name);
@@ -66,6 +68,7 @@ class NATIVEUI_EXPORT Color {
 
   bool transparent() const { return a() == 0; }
 
+  float GetRelativeLuminance() const;
   std::string ToString() const;
 
   bool operator==(Color other) const {

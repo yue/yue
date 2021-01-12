@@ -7,7 +7,6 @@
 
 #include <dlfcn.h>
 #include <gdk/gdk.h>
-#include <gtk/gtk.h>
 
 #include <string>
 
@@ -63,6 +62,63 @@ inline void ScopedStyleContext::Unref() {
 }
 
 namespace {
+
+class CairoSurface {
+ public:
+  // Creates a new cairo surface with the given size.  The memory for
+  // this surface is deallocated when this CairoSurface is destroyed.
+  explicit CairoSurface(const Size& size)
+      : surface_(cairo_image_surface_create(CAIRO_FORMAT_ARGB32,
+                                            size.width(),
+                                            size.height())),
+        cairo_(cairo_create(surface_)) {
+    DCHECK(cairo_surface_status(surface_) == CAIRO_STATUS_SUCCESS);
+    // Clear the surface.
+    cairo_save(cairo_);
+    cairo_set_source_rgba(cairo_, 0, 0, 0, 0);
+    cairo_set_operator(cairo_, CAIRO_OPERATOR_SOURCE);
+    cairo_paint(cairo_);
+    cairo_restore(cairo_);
+  }
+
+  ~CairoSurface() {
+    cairo_destroy(cairo_);
+    cairo_surface_destroy(surface_);
+  }
+
+  // Get the drawing context for GTK to use.
+  cairo_t* cairo() { return cairo_; }
+
+  // Returns the average of all pixels in the surface.  If |frame| is
+  // true, the resulting alpha will be the average alpha, otherwise it
+  // will be the max alpha across all pixels.
+  Color GetAveragePixelValue(bool frame) {
+    cairo_surface_flush(surface_);
+    Color* data =
+        reinterpret_cast<Color*>(cairo_image_surface_get_data(surface_));
+    int width = cairo_image_surface_get_width(surface_);
+    int height = cairo_image_surface_get_height(surface_);
+    DCHECK(4 * width == cairo_image_surface_get_stride(surface_));
+    long a = 0, r = 0, g = 0, b = 0;
+    unsigned int max_alpha = 0;
+    for (int i = 0; i < width * height; i++) {
+      Color color = data[i];
+      max_alpha = std::max(color.a(), max_alpha);
+      a += color.a();
+      r += color.r();
+      g += color.g();
+      b += color.b();
+    }
+    if (a == 0)
+      return Color();
+    return Color(frame ? max_alpha : a / (width * height),
+                 r * 255 / a, g * 255 / a, b * 255 / a);
+  }
+
+ private:
+  cairo_surface_t* surface_;
+  cairo_t* cairo_;
+};
 
 ScopedStyleContext AppendCssNodeToStyleContext(GtkStyleContext* context,
                                                const std::string& css_node) {
@@ -215,10 +271,79 @@ Color GetFgColor(const std::string& css_selector) {
   return GetFgColorFromStyleContext(GetStyleContextFromCss(css_selector));
 }
 
+void ApplyCssProviderToContext(GtkStyleContext* context,
+                               GtkCssProvider* provider) {
+  while (context) {
+    gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(provider),
+                                   G_MAXUINT);
+    context = gtk_style_context_get_parent(context);
+  }
+}
+
+ScopedCssProvider GetCssProvider(const std::string& css) {
+  GtkCssProvider* provider = gtk_css_provider_new();
+#if GTK_CHECK_VERSION(3, 90, 0)
+  gtk_css_provider_load_from_data(provider, css.c_str(), -1);
+#else
+  GError* error = nullptr;
+  gtk_css_provider_load_from_data(provider, css.c_str(), -1, &error);
+  DCHECK(!error);
+#endif
+  return ScopedCssProvider(provider);
+}
+
+void ApplyCssToContext(GtkStyleContext* context, const std::string& css) {
+  auto provider = GetCssProvider(css);
+  ApplyCssProviderToContext(context, provider);
+}
+
+void RenderBackground(const Size& size, cairo_t* cr, GtkStyleContext* context) {
+  if (!context)
+    return;
+  RenderBackground(size, cr, gtk_style_context_get_parent(context));
+  gtk_render_background(context, cr, 0, 0, size.width(), size.height());
+}
+
+Color GetBgColorFromStyleContext(GtkStyleContext* context) {
+  // Backgrounds are more general than solid colors (eg. gradients),
+  // but chromium requires us to boil this down to one color.  We
+  // cannot use the background-color here because some themes leave it
+  // set to a garbage color because a background-image will cover it
+  // anyway. So we instead render the background into a 24x24 bitmap,
+  // removing any borders, and hope that we get a good color.
+  ApplyCssToContext(context,
+                    "* {"
+                    "border-radius: 0px;"
+                    "border-style: none;"
+                    "box-shadow: none;"
+                    "}");
+  Size size(24, 24);
+  CairoSurface surface(size);
+  RenderBackground(size, surface.cairo(), context);
+  return surface.GetAveragePixelValue(false);
+}
+
+Color GetBgColor(const std::string& css_selector) {
+  return GetBgColorFromStyleContext(GetStyleContextFromCss(css_selector));
+}
+
 }  // namespace
 
-GtkTheme::GtkTheme() {}
-GtkTheme::~GtkTheme() {}
+GtkTheme::GtkTheme() {
+  GtkSettings* settings = gtk_settings_get_default();
+  signal_gtk_theme_name_ = g_signal_connect(
+      settings, "notify::gtk-theme-name",
+      G_CALLBACK(OnThemeChange), this);
+  signal_gtk_prefer_dark_theme_ = g_signal_connect(
+      settings, "notify::gtk-application-prefer-dark-theme",
+      G_CALLBACK(OnThemeChange), this);
+}
+
+GtkTheme::~GtkTheme() {
+  GtkSettings* settings = gtk_settings_get_default();
+  g_signal_handler_disconnect(settings, signal_gtk_theme_name_);
+  g_signal_handler_disconnect(settings, signal_gtk_prefer_dark_theme_);
+}
 
 Color GtkTheme::GetColor(Color::Name name) {
   int key = static_cast<int>(name);
@@ -233,12 +358,22 @@ Color GtkTheme::GetColor(Color::Name name) {
     case Color::Name::DisabledText:
       color = GetFgColor("GtkLabel:disabled");
       break;
+    case Color::Name::Control:
+    case Color::Name::WindowBackground:
+      color = GetBgColor("");
+      break;
     default:
       NOTREACHED();
       return Color();
   }
   colors_[key] = color;
   return color;
+}
+
+// static
+void GtkTheme::OnThemeChange(GtkSettings*, GParamSpec*, GtkTheme* self) {
+  self->colors_.clear();
+  self->on_theme_change.Emit();
 }
 
 }  // namespace nu

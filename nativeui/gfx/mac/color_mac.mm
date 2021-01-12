@@ -6,6 +6,7 @@
 
 #import <Cocoa/Cocoa.h>
 
+#include "base/notreached.h"
 #include "nativeui/gfx/geometry/safe_integer_conversions.h"
 
 namespace nu {
@@ -13,12 +14,23 @@ namespace nu {
 // static
 Color Color::Get(Name name) {
   NSColor* color;
-  if (name == Name::Text)
-    color = [NSColor textColor];
-  else if (name == Name::DisabledText)
-    color = [NSColor disabledControlTextColor];
-  else
-    color = [NSColor blackColor];
+  switch (name) {
+    case Color::Name::Text:
+      color = [NSColor textColor];
+      break;
+    case Color::Name::DisabledText:
+      color = [NSColor disabledControlTextColor];
+      break;
+    case Color::Name::Control:
+      color = [NSColor controlColor];
+      break;
+    case Color::Name::WindowBackground:
+      color = [NSColor windowBackgroundColor];
+      break;
+    default:
+      NOTREACHED();
+      color = [NSColor blackColor];
+  }
   CGFloat red, green, blue, alpha;
   color = [color colorUsingColorSpace:[NSColorSpace deviceRGBColorSpace]];
   [color getRed:&red green:&green blue:&blue alpha:&alpha];
