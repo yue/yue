@@ -6,6 +6,7 @@
 
 #include "base/lazy_instance.h"
 #include "base/threading/thread_local.h"
+#include "nativeui/appearance.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/protocol_job.h"
 #include "nativeui/screen.h"
@@ -82,6 +83,12 @@ Screen* State::GetScreen() {
   if (!screen_)
     screen_.reset(new Screen);
   return screen_.get();
+}
+
+Appearance* State::GetAppearance() {
+  if (!appearance_)
+    appearance_.reset(new Appearance);
+  return appearance_.get();
 }
 
 }  // namespace nu

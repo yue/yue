@@ -8,6 +8,7 @@
 #include <dlfcn.h>
 #include <gdk/gdk.h>
 
+#include <algorithm>
 #include <string>
 
 #include "base/notreached.h"
@@ -94,15 +95,15 @@ class CairoSurface {
   // will be the max alpha across all pixels.
   Color GetAveragePixelValue(bool frame) {
     cairo_surface_flush(surface_);
-    Color* data =
-        reinterpret_cast<Color*>(cairo_image_surface_get_data(surface_));
+    uint32_t* data =
+        reinterpret_cast<uint32_t*>(cairo_image_surface_get_data(surface_));
     int width = cairo_image_surface_get_width(surface_);
     int height = cairo_image_surface_get_height(surface_);
     DCHECK(4 * width == cairo_image_surface_get_stride(surface_));
-    long a = 0, r = 0, g = 0, b = 0;
+    int32_t a = 0, r = 0, g = 0, b = 0;
     unsigned int max_alpha = 0;
     for (int i = 0; i < width * height; i++) {
-      Color color = data[i];
+      Color color(data[i]);
       max_alpha = std::max(color.a(), max_alpha);
       a += color.a();
       r += color.r();

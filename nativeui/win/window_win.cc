@@ -24,8 +24,10 @@
 #include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/gfx/geometry/size_conversions.h"
 #include "nativeui/gfx/win/double_buffer.h"
+#include "nativeui/gfx/win/native_theme.h"
 #include "nativeui/gfx/win/painter_win.h"
 #include "nativeui/menu_bar.h"
+#include "nativeui/state.h"
 #include "nativeui/win/drag_drop/clipboard_util.h"
 #include "nativeui/win/drag_drop/data_object.h"
 #include "nativeui/win/menu_base_win.h"
@@ -92,6 +94,10 @@ WindowImpl::WindowImpl(const Window::Options& options, Window* delegate)
   if (options.transparent) {
     // Change default background color to transparent.
     background_color_ = Color(0, 0, 0, 0);
+  }
+  NativeTheme* theme = State::GetCurrent()->GetNativeTheme();
+  if (theme->IsAppDarkMode()) {
+    theme->EnableDarkModeForWindow(hwnd());
   }
 }
 

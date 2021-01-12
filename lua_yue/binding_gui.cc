@@ -341,6 +341,21 @@ struct Type<nu::App> {
 };
 
 template<>
+struct Type<nu::Appearance> {
+  static constexpr const char* name = "Appearance";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+#if defined(OS_WIN)
+           "setdarkmodeenabled", &nu::Appearance::SetDarkModeEnabled,
+#endif
+           "isdarkscheme", &nu::Appearance::IsDarkScheme);
+    RawSetProperty(
+        state, metatable,
+        "oncolorschemechange", &nu::Appearance::on_color_scheme_change);
+  }
+};
+
+template<>
 struct Type<nu::AttributedText> {
   static constexpr const char* name = "AttributedText";
   static void BuildMetaTable(State* state, int metatable) {
@@ -2393,6 +2408,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::Lifetime>(state, "Lifetime");
   BindType<nu::MessageLoop>(state, "MessageLoop");
   BindType<nu::App>(state, "App");
+  BindType<nu::Appearance>(state, "Appearance");
   BindType<nu::AttributedText>(state, "AttributedText");
   BindType<nu::Font>(state, "Font");
   BindType<nu::Canvas>(state, "Canvas");
@@ -2441,8 +2457,9 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
 #endif
   // Properties.
   lua::RawSet(state, -1,
-              "lifetime", nu::Lifetime::GetCurrent(),
-              "app",      nu::App::GetCurrent(),
-              "screen",   nu::Screen::GetCurrent());
+              "lifetime",   nu::Lifetime::GetCurrent(),
+              "app",        nu::App::GetCurrent(),
+              "appearance", nu::Appearance::GetCurrent(),
+              "screen",     nu::Screen::GetCurrent());
   return 1;
 }

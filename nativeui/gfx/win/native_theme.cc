@@ -6,12 +6,16 @@
 #include "nativeui/gfx/win/native_theme.h"
 
 #include <stddef.h>
+#include <uxtheme.h>
 #include <vsstyle.h>
 #include <vssym32.h>
 
 #include "base/check_op.h"
 #include "base/notreached.h"
 #include "base/stl_util.h"
+#include "base/win/registry.h"
+#include "base/win/win_util.h"
+#include "base/win/windows_version.h"
 
 namespace nu {
 
@@ -77,24 +81,17 @@ int GetWindowsState(NativeTheme::Part part, ControlState state) {
   }
 }
 
+bool IsHighContrast() {
+  HIGHCONTRASTW high_contrast = {sizeof(high_contrast)};
+  if (SystemParametersInfoW(SPI_GETHIGHCONTRAST, sizeof(high_contrast),
+                            &high_contrast, FALSE))
+    return high_contrast.dwFlags & HCF_HIGHCONTRASTON;
+  return false;
+}
+
 }  // namespace
 
-NativeTheme::NativeTheme()
-    : draw_theme_(nullptr),
-      get_theme_part_size_(nullptr),
-      open_theme_(nullptr),
-      close_theme_(nullptr),
-      theme_dll_(LoadLibrary(L"uxtheme.dll")) {
-  if (theme_dll_) {
-    draw_theme_ = reinterpret_cast<DrawThemeBackgroundPtr>(
-        GetProcAddress(theme_dll_, "DrawThemeBackground"));
-    get_theme_part_size_ = reinterpret_cast<GetThemePartSizePtr>(
-        GetProcAddress(theme_dll_, "GetThemePartSize"));
-    open_theme_ = reinterpret_cast<OpenThemeDataPtr>(
-        GetProcAddress(theme_dll_, "OpenThemeData"));
-    close_theme_ = reinterpret_cast<CloseThemeDataPtr>(
-        GetProcAddress(theme_dll_, "CloseThemeData"));
-  }
+NativeTheme::NativeTheme() {
   memset(theme_handles_, 0, sizeof(theme_handles_));
 }
 
@@ -105,16 +102,107 @@ NativeTheme::~NativeTheme() {
   }
 }
 
+bool NativeTheme::InitializeDarkMode() {
+  if (!dark_mode_supported_) {
+    theme_dll_ = LoadLibrary(L"uxtheme.dll");
+    DCHECK(theme_dll_);
+
+    const auto* os_info = base::win::OSInfo::GetInstance();
+    const auto version = os_info->version();
+    if ((version >= base::win::Version::WIN10_RS5) &&
+        (version <= base::win::Version::WIN10_20H1)) {
+      open_nc_theme_date_ = reinterpret_cast<OpenNcThemeDataPtr>(
+          GetProcAddress(theme_dll_, MAKEINTRESOURCEA(49)));
+      should_app_use_dark_mode_ = reinterpret_cast<ShouldAppsUseDarkModePtr>(
+          GetProcAddress(theme_dll_, MAKEINTRESOURCEA(132)));
+      allow_dark_mode_for_window_ = reinterpret_cast<AllowDarkModeForWindowPtr>(
+          GetProcAddress(theme_dll_, MAKEINTRESOURCEA(133)));
+      if (os_info->version_number().build < 18362)
+        allow_dark_mode_for_app_ = reinterpret_cast<AllowDarkModeForAppPtr>(
+            GetProcAddress(theme_dll_, MAKEINTRESOURCEA(135)));
+      else
+        set_preferred_app_mode_ = reinterpret_cast<SetPreferredAppModePtr>(
+            GetProcAddress(theme_dll_, MAKEINTRESOURCEA(135)));
+      refresh_color_policy_ =
+          reinterpret_cast<RefreshImmersiveColorPolicyStatePtr>(
+              GetProcAddress(theme_dll_, MAKEINTRESOURCEA(104)));
+      set_window_attribute_ =
+          reinterpret_cast<SetWindowCompositionAttributePtr>(
+              base::win::GetUser32FunctionPointer(
+                  "SetWindowCompositionAttribute"));
+
+      dark_mode_supported_ =
+          open_nc_theme_date_ &&
+          should_app_use_dark_mode_ &&
+          allow_dark_mode_for_window_ &&
+          (allow_dark_mode_for_app_ || set_preferred_app_mode_) &&
+          refresh_color_policy_;
+    }
+  }
+  return *dark_mode_supported_;
+}
+
+bool NativeTheme::IsDarkModeSupported() const {
+  return dark_mode_supported_.value_or(false);
+}
+
+void NativeTheme::SetAppDarkModeEnabled(bool enable) {
+  if (!IsDarkModeSupported())
+    return;
+  if (allow_dark_mode_for_app_)
+    allow_dark_mode_for_app_(enable);
+  else if (set_preferred_app_mode_)
+    set_preferred_app_mode_(enable ? AllowDark : Default);
+  refresh_color_policy_();
+}
+
+void NativeTheme::EnableDarkModeForWindow(HWND hwnd) {
+  if (!IsDarkModeSupported())
+    return;
+  allow_dark_mode_for_window_(hwnd, true);
+  const auto* os_info = base::win::OSInfo::GetInstance();
+  BOOL dark = TRUE;
+  if (os_info->version_number().build < 18362) {
+    ::SetPropW(hwnd, L"UseImmersiveDarkModeColors",
+               reinterpret_cast<HANDLE>(static_cast<INT_PTR>(dark)));
+  } else if (set_window_attribute_) {
+    WINDOWCOMPOSITIONATTRIBDATA data = {
+      WCA_USEDARKMODECOLORS, &dark, sizeof(dark)
+    };
+    set_window_attribute_(hwnd, &data);
+  }
+}
+
+bool NativeTheme::IsAppDarkMode() const {
+  if (!IsDarkModeSupported())
+    return false;
+  return should_app_use_dark_mode_() && !IsHighContrast();
+}
+
+bool NativeTheme::IsSystemDarkMode() const {
+  base::win::RegKey hkcu_themes_regkey;
+  hkcu_themes_regkey.Open(HKEY_CURRENT_USER,
+                          L"Software\\Microsoft\\Windows\\CurrentVersion\\"
+                          L"Themes\\Personalize",
+                          KEY_READ);
+  if (!hkcu_themes_regkey.Valid())
+    return false;
+  DWORD apps_use_light_theme = 1;
+  hkcu_themes_regkey.ReadValueDW(L"AppsUseLightTheme",
+                                 &apps_use_light_theme);
+  return apps_use_light_theme == 0;
+}
+
 Size NativeTheme::GetThemePartSize(HDC hdc,
                                    Part part,
                                    ControlState state) const {
   HANDLE handle = GetThemeHandle(part);
-  if (handle && get_theme_part_size_) {
+  if (handle) {
     SIZE size;
     int part_id = GetWindowsPart(part);
     int state_id = GetWindowsState(part, state);
-    if (SUCCEEDED(get_theme_part_size_(handle, hdc, part_id, state_id,
-                                       nullptr, TS_TRUE, &size)))
+    if (SUCCEEDED(::GetThemePartSize(handle, hdc, part_id, state_id,
+                                     nullptr, TS_TRUE, &size)))
       return Size(size.cx, size.cy);
   }
 
@@ -262,7 +350,7 @@ HRESULT NativeTheme::PaintScrollbarArrow(
   };
   HANDLE handle = GetThemeHandle(part);
   RECT rect_win = rect.ToRECT();
-  if (handle && draw_theme_) {
+  if (handle) {
     int index =
         static_cast<int>(part) - static_cast<int>(Part::ScrollbarUpArrow);
     DCHECK_GE(index, 0);
@@ -376,7 +464,7 @@ HRESULT NativeTheme::PaintScrollbarThumb(
       break;
   }
 
-  if (handle && draw_theme_)
+  if (handle)
     return PaintScaledTheme(handle, hdc, part_id, state_id, rect);
 
   // Draw it manually.
@@ -419,8 +507,8 @@ HRESULT NativeTheme::PaintScrollbarTrack(
       break;
   }
 
-  if (handle && draw_theme_)
-    return draw_theme_(handle, hdc, part_id, state_id, &rect_win, NULL);
+  if (handle)
+    return DrawThemeBackground(handle, hdc, part_id, state_id, &rect_win, NULL);
 
   // Draw it manually.
   FillRect(hdc, &rect_win, reinterpret_cast<HBRUSH>(COLOR_SCROLLBAR + 1));
@@ -436,8 +524,8 @@ HRESULT NativeTheme::PaintTabPanel(Part part,
   HANDLE handle = GetThemeHandle(part);
   RECT rect_win = rect.ToRECT();
 
-  if (handle && draw_theme_)
-    return draw_theme_(handle, hdc, TABP_PANE, 0, &rect_win, NULL);
+  if (handle)
+    return DrawThemeBackground(handle, hdc, TABP_PANE, 0, &rect_win, NULL);
 
   // TODO(zcbenz): Add fallback when visual theme is not enabled.
   return S_OK;
@@ -457,8 +545,8 @@ HRESULT NativeTheme::PaintTabItem(Part part,
   const int part_id = TABP_TABITEM;
   int state_id = state_id_matrix[static_cast<int>(state)];
 
-  if (handle && draw_theme_)
-    return draw_theme_(handle, hdc, part_id, state_id, &rect_win, NULL);
+  if (handle)
+    return DrawThemeBackground(handle, hdc, part_id, state_id, &rect_win, NULL);
 
   // TODO(zcbenz): Add fallback when visual theme is not enabled.
   return S_OK;
@@ -471,8 +559,8 @@ HRESULT NativeTheme::PaintButton(HDC hdc,
                                  int state_id,
                                  RECT* rect) const {
   HANDLE handle = GetThemeHandle(Part::Button);
-  if (handle && draw_theme_)
-    return draw_theme_(handle, hdc, part_id, state_id, rect, NULL);
+  if (handle)
+    return DrawThemeBackground(handle, hdc, part_id, state_id, rect, NULL);
 
   // Adjust classic_state based on part, state, and extras.
   int classic_state = 0;
@@ -555,20 +643,17 @@ HRESULT NativeTheme::PaintScaledTheme(HANDLE theme,
       Rect scaled_rect = ScaleToEnclosedRect(rect, scale);
       scaled_rect.Offset(save_transform.eDx, save_transform.eDy);
       RECT bounds = scaled_rect.ToRECT();
-      HRESULT result = draw_theme_(theme, hdc, part_id, state_id, &bounds,
-                                   NULL);
+      HRESULT result = ::DrawThemeBackground(
+          theme, hdc, part_id, state_id, &bounds, NULL);
       SetWorldTransform(hdc, &save_transform);
       return result;
     }
   }
   RECT bounds = rect.ToRECT();
-  return draw_theme_(theme, hdc, part_id, state_id, &bounds, NULL);
+  return ::DrawThemeBackground(theme, hdc, part_id, state_id, &bounds, NULL);
 }
 
 HANDLE NativeTheme::GetThemeHandle(Part part) const {
-  if (!open_theme_)
-    return 0;
-
   // Translate part to real theme names.
   switch (part) {
     case Part::Checkbox:
@@ -594,17 +679,22 @@ HANDLE NativeTheme::GetThemeHandle(Part part) const {
   if (theme_handles_[static_cast<int>(part)])
     return theme_handles_[static_cast<int>(part)];
 
+  // Dark mode is not ready for most controls.
+  const bool dark_mode = false;
+
   // Not found, try to load it.
   HANDLE handle = 0;
   switch (part) {
     case Part::Button:
-      handle = open_theme_(NULL, L"Button");
+      handle = dark_mode ? open_nc_theme_date_(NULL, L"Explorer::Button")
+                         : ::OpenThemeData(NULL, L"Button");
       break;
     case Part::ScrollbarDownArrow:
-      handle = open_theme_(NULL, L"Scrollbar");
+      handle = dark_mode ? open_nc_theme_date_(NULL, L"Explorer::Scrollbar")
+                         : ::OpenThemeData(NULL, L"Scrollbar");
       break;
     case Part::TabPanel:
-      handle = open_theme_(NULL, L"Tab");
+      handle = ::OpenThemeData(NULL, L"Tab");
       break;
     default:
       NOTREACHED();
@@ -615,12 +705,9 @@ HANDLE NativeTheme::GetThemeHandle(Part part) const {
 }
 
 void NativeTheme::CloseHandles() const {
-  if (!close_theme_)
-    return;
-
   for (int i = 0; i < static_cast<int>(Part::Count); ++i) {
     if (theme_handles_[i]) {
-      close_theme_(theme_handles_[i]);
+      ::CloseThemeData(theme_handles_[i]);
       theme_handles_[i] = nullptr;
     }
   }

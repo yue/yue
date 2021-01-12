@@ -6,6 +6,7 @@
 #define NATIVEUI_NATIVEUI_H_
 
 #include "nativeui/app.h"
+#include "nativeui/appearance.h"
 #include "nativeui/browser.h"
 #include "nativeui/button.h"
 #include "nativeui/combo_box.h"

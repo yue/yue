@@ -17,9 +17,19 @@
 #include <map>
 
 #include "base/macros.h"
+#include "base/optional.h"
 #include "nativeui/gfx/color.h"
 #include "nativeui/gfx/geometry/rect.h"
 #include "nativeui/gfx/geometry/size.h"
+
+// Structurs used by private win32 APIs.
+enum PreferredAppMode { Default, AllowDark, ForceDark, ForceLight, Max };
+enum WINDOWCOMPOSITIONATTRIB { WCA_USEDARKMODECOLORS = 26 };
+struct WINDOWCOMPOSITIONATTRIBDATA {
+  WINDOWCOMPOSITIONATTRIB Attrib;
+  PVOID pvData;
+  SIZE_T cbData;
+};
 
 namespace nu {
 
@@ -93,6 +103,24 @@ class NativeTheme {
     ScrollbarTrackExtraParams scrollbar_track;
   };
 
+  // Initialize dark mode related functions.
+  bool InitializeDarkMode();
+
+  // Return whether dark mode is supported.
+  bool IsDarkModeSupported() const;
+
+  // Set whether to allow dark mode for the app.
+  void SetAppDarkModeEnabled(bool enable);
+
+  // Enable dark mode for the window.
+  void EnableDarkModeForWindow(HWND hwnd);
+
+  // Return whether app is using dark mode.
+  bool IsAppDarkMode() const;
+
+  // Return whether system is using dark mode.
+  bool IsSystemDarkMode() const;
+
   // Return the size that a control takes.
   Size GetThemePartSize(HDC hdc, Part part, ControlState state) const;
 
@@ -162,56 +190,28 @@ class NativeTheme {
   // for a theme change.
   void CloseHandles() const;
 
-  typedef HRESULT (WINAPI* DrawThemeBackgroundPtr)(HANDLE theme,
-                                                   HDC hdc,
-                                                   int part_id,
-                                                   int state_id,
-                                                   const RECT* rect,
-                                                   const RECT* clip_rect);
-  typedef HRESULT (WINAPI* DrawThemeBackgroundExPtr)(HANDLE theme,
-                                                     HDC hdc,
-                                                     int part_id,
-                                                     int state_id,
-                                                     const RECT* rect,
-                                                     const DTBGOPTS* opts);
-  typedef HRESULT (WINAPI* GetThemeColorPtr)(HANDLE hTheme,
-                                             int part_id,
-                                             int state_id,
-                                             int prop_id,
-                                             COLORREF* color);
-  typedef HRESULT (WINAPI* GetThemeContentRectPtr)(HANDLE hTheme,
-                                                   HDC hdc,
-                                                   int part_id,
-                                                   int state_id,
-                                                   const RECT* rect,
-                                                   RECT* content_rect);
-  typedef HRESULT (WINAPI* GetThemePartSizePtr)(HANDLE hTheme,
-                                                HDC hdc,
-                                                int part_id,
-                                                int state_id,
-                                                RECT* rect,
-                                                int ts,
-                                                SIZE* size);
-  typedef HANDLE (WINAPI* OpenThemeDataPtr)(HWND window,
-                                            LPCWSTR class_list);
-  typedef HRESULT (WINAPI* CloseThemeDataPtr)(HANDLE theme);
-
-  typedef void (WINAPI* SetThemeAppPropertiesPtr) (DWORD flags);
-  typedef BOOL (WINAPI* IsThemeActivePtr)();
-  typedef HRESULT (WINAPI* GetThemeIntPtr)(HANDLE hTheme,
-                                           int part_id,
-                                           int state_id,
-                                           int prop_id,
-                                           int *value);
+  using OpenNcThemeDataPtr = HTHEME (WINAPI*)(HWND, LPCWSTR);    //NOLINT
+  using ShouldAppsUseDarkModePtr = bool (WINAPI*)();             //NOLINT
+  using AllowDarkModeForWindowPtr = bool (WINAPI*)(HWND, bool);  //NOLINT
+  using AllowDarkModeForAppPtr = bool (WINAPI*)(bool);           //NOLINT
+  using RefreshImmersiveColorPolicyStatePtr = void (WINAPI*)();  //NOLINT
+  using SetPreferredAppModePtr = PreferredAppMode (WINAPI*)(PreferredAppMode);                  //NOLINT
+  using SetWindowCompositionAttributePtr = BOOL (WINAPI*)(HWND, WINDOWCOMPOSITIONATTRIBDATA*);  //NOLINT
 
   // Function pointers into uxtheme.dll.
-  DrawThemeBackgroundPtr draw_theme_;
-  GetThemePartSizePtr get_theme_part_size_;
-  OpenThemeDataPtr open_theme_;
-  CloseThemeDataPtr close_theme_;
+  OpenNcThemeDataPtr open_nc_theme_date_ = nullptr;
+  ShouldAppsUseDarkModePtr should_app_use_dark_mode_ = nullptr;
+  AllowDarkModeForWindowPtr allow_dark_mode_for_window_ = nullptr;
+  AllowDarkModeForAppPtr allow_dark_mode_for_app_ = nullptr;
+  SetPreferredAppModePtr set_preferred_app_mode_ = nullptr;
+  RefreshImmersiveColorPolicyStatePtr refresh_color_policy_ = nullptr;
+  SetWindowCompositionAttributePtr set_window_attribute_ = nullptr;
+
+  // Whether dark mode is supported.
+  base::Optional<bool> dark_mode_supported_;
 
   // Handle to uxtheme.dll.
-  HMODULE theme_dll_;
+  HMODULE theme_dll_ = NULL;
 
   // A cache of open theme handles.
   mutable HANDLE theme_handles_[static_cast<size_t>(Part::Count)];

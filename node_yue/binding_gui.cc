@@ -373,6 +373,23 @@ struct Type<nu::App> {
 };
 
 template<>
+struct Type<nu::Appearance> {
+  static constexpr const char* name = "Appearance";
+  static void BuildConstructor(v8::Local<v8::Context>, v8::Local<v8::Object>) {
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+#if defined(OS_WIN)
+        "setDarkModeEnabled", &nu::Appearance::SetDarkModeEnabled,
+#endif
+        "isDarkScheme", &nu::Appearance::IsDarkScheme);
+    SetProperty(context, templ,
+                "onColorSchemeChange", &nu::Appearance::on_color_scheme_change);
+  }
+};
+
+template<>
 struct Type<nu::AttributedText> {
   static constexpr const char* name = "AttributedText";
   static void BuildConstructor(v8::Local<v8::Context> context,
@@ -2729,6 +2746,7 @@ void Initialize(v8::Local<v8::Object> exports,
   vb::Set(context, exports,
           // Classes.
           "App",               vb::Constructor<nu::App>(),
+          "Appearance",        vb::Constructor<nu::Appearance>(),
           "AttributedText",    vb::Constructor<nu::AttributedText>(),
           "Font",              vb::Constructor<nu::Font>(),
           "Canvas",            vb::Constructor<nu::Canvas>(),
@@ -2777,8 +2795,9 @@ void Initialize(v8::Local<v8::Object> exports,
           "Vibrant",           vb::Constructor<nu::Vibrant>(),
 #endif
           // Properties.
-          "app",    nu::App::GetCurrent(),
-          "screen", nu::Screen::GetCurrent(),
+          "app",        nu::App::GetCurrent(),
+          "appearance", nu::Appearance::GetCurrent(),
+          "screen",     nu::Screen::GetCurrent(),
           // Functions.
           "memoryPressureNotification", &MemoryPressureNotification);
   if (is_electron) {

@@ -24,6 +24,7 @@ class ScopedCOMInitializer;
 
 namespace nu {
 
+class Appearance;
 class Font;
 class Screen;
 
@@ -72,6 +73,9 @@ class NATIVEUI_EXPORT State {
   // Internal: Return the screen object
   Screen* GetScreen();
 
+  // Internal: Return the appearance object
+  Appearance* GetAppearance();
+
   // Internal: Return the default font.
   scoped_refptr<Font>& default_font() { return default_font_; }
 
@@ -106,6 +110,7 @@ class NATIVEUI_EXPORT State {
              static_cast<size_t>(Clipboard::Type::Count)> clipboards_;
 
   std::unique_ptr<Screen> screen_;
+  std::unique_ptr<Appearance> appearance_;
   scoped_refptr<Font> default_font_;
 
   // The app instance.
