@@ -10,7 +10,7 @@
 #include "node_yue/binding_values.h"
 #include "node_yue/node_integration.h"
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
 #include "node_yue/chrome_view_mac.h"
 #endif
 
@@ -284,7 +284,7 @@ struct Type<nu::Lifetime> {
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
     SetProperty(context, templ,
                 "onReady", &nu::Lifetime::on_ready,
                 "onActivate", &nu::Lifetime::on_activate);
@@ -311,7 +311,7 @@ struct Type<nu::MessageLoop> {
   }
 };
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
 template<>
 struct Type<nu::App::ActivationPolicy> {
   static constexpr const char* name = "AppActivationPolicy";
@@ -357,7 +357,7 @@ struct Type<nu::App> {
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
     Set(context, templ,
         "setApplicationMenu",
         RefMethod(&nu::App::SetApplicationMenu, RefType::Reset, "appMenu"),
@@ -674,7 +674,7 @@ struct Type<nu::Clipboard::Type> {
     if (type == "copy-paste") {
       *out = nu::Clipboard::Type::CopyPaste;
       return true;
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
     } else if (type == "drag") {
       *out = nu::Clipboard::Type::Drag;
       return true;
@@ -1313,7 +1313,7 @@ struct Type<nu::MenuItem::Role> {
       *out = nu::MenuItem::Role::Undo;
     else if (role == "redo")
       *out = nu::MenuItem::Role::Redo;
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
     else if (role == "about")
       *out = nu::MenuItem::Role::About;
     else if (role == "hide")
@@ -1356,6 +1356,10 @@ struct Type<nu::MenuItem> {
         "isVisible", &nu::MenuItem::IsVisible,
         "setSubmenu", &nu::MenuItem::SetSubmenu,
         "getSubmenu", &nu::MenuItem::GetSubmenu,
+#if defined(OS_MAC) || defined(OS_WIN)
+        "setImage", &nu::MenuItem::SetImage,
+        "getImage", &nu::MenuItem::GetImage,
+#endif
         "setAccelerator", &nu::MenuItem::SetAccelerator);
     SetProperty(context, templ,
                 "onClick", &nu::MenuItem::on_click);
@@ -1400,6 +1404,11 @@ struct Type<nu::MenuItem> {
     nu::Accelerator accelerator;
     if (Get(context, obj, "accelerator", &accelerator))
       item->SetAccelerator(accelerator);
+#if defined(OS_MAC) || defined(OS_WIN)
+    nu::Image* image;
+    if (Get(context, obj, "image", &image))
+      item->SetImage(image);
+#endif
     // The signal handler must not be referenced by C++.
     v8::Local<v8::Value> on_click_val;
     std::function<void(nu::MenuItem*)> on_click;
@@ -1501,7 +1510,7 @@ struct Type<nu::Tray> {
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
     Set(context, constructor,
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
         "createWithTitle", &CreateOnHeap<nu::Tray, const std::string&>,
 #endif
         "createWithImage", &CreateOnHeap<nu::Tray, scoped_refptr<nu::Image>>);
@@ -1510,10 +1519,10 @@ struct Type<nu::Tray> {
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
         "remove", &nu::Tray::Remove,
-#if defined(OS_MACOSX) || defined(OS_WIN)
+#if defined(OS_MAC) || defined(OS_WIN)
         "getBounds", &nu::Tray::GetBounds,
 #endif
-#if defined(OS_MACOSX) || defined(OS_LINUX)
+#if defined(OS_MAC) || defined(OS_LINUX)
         "setTitle", &nu::Tray::SetTitle,
 #endif
         "setImage", &nu::Tray::SetImage,
@@ -1525,7 +1534,7 @@ struct Type<nu::Tray> {
   }
 };
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
 template<>
 struct Type<nu::Toolbar::Item> {
   static constexpr const char* name = "ToolbarItem";
@@ -1612,7 +1621,7 @@ struct Type<nu::Window::Options> {
       return false;
     Get(context, obj, "frame", &out->frame);
     Get(context, obj, "transparent", &out->transparent);
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
     Get(context, obj, "showTrafficLights", &out->show_traffic_lights);
 #endif
     return true;
@@ -1671,7 +1680,7 @@ struct Type<nu::Window> {
         "setTitle", &nu::Window::SetTitle,
         "getTitle", &nu::Window::GetTitle,
         "setBackgroundColor", &nu::Window::SetBackgroundColor,
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
         "setToolbar", &nu::Window::SetToolbar,
         "getToolbar", &nu::Window::GetToolbar,
         "setTitleVisible", &nu::Window::SetTitleVisible,
@@ -1739,7 +1748,7 @@ struct Type<nu::View> {
         "setStyle", &SetStyle,
         "getComputedLayout", &nu::View::GetComputedLayout,
         "getMinimumSize", &nu::View::GetMinimumSize,
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
         "setWantsLayer", &nu::View::SetWantsLayer,
         "wantsLayer", &nu::View::WantsLayer,
 #endif
@@ -1851,7 +1860,7 @@ struct Type<nu::Button::Type> {
   }
 };
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
 template<>
 struct Type<nu::Button::Style> {
   static constexpr const char* name = "ButtonStyle";
@@ -1927,7 +1936,7 @@ struct Type<nu::Button> {
         "makeDefault", &nu::Button::MakeDefault,
         "setTitle", &nu::Button::SetTitle,
         "getTitle", &nu::Button::GetTitle,
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
         "setButtonStyle", &nu::Button::SetButtonStyle,
         "setHasBorder", &nu::Button::SetHasBorder,
         "hasBorder", &nu::Button::HasBorder,
@@ -2027,7 +2036,7 @@ struct Type<nu::Browser::Options> {
     if (obj.IsEmpty())
       return false;
     Get(context, obj,
-#if defined(OS_MACOSX) || defined(OS_LINUX)
+#if defined(OS_MAC) || defined(OS_LINUX)
         "allowFileAccessFromFiles", &out->allow_file_access_from_files,
 #endif
 #if defined(OS_LINUX)
@@ -2591,7 +2600,7 @@ struct Type<nu::TextEdit> {
   }
 };
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
 template<>
 struct Type<nu::Vibrant::Material> {
   static constexpr const char* name = "VibrantMaterial";
@@ -2790,7 +2799,7 @@ void Initialize(v8::Local<v8::Object> exports,
           "Table",             vb::Constructor<nu::Table>(),
           "TextEdit",          vb::Constructor<nu::TextEdit>(),
           "Tray",              vb::Constructor<nu::Tray>(),
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
           "Toolbar",           vb::Constructor<nu::Toolbar>(),
           "Vibrant",           vb::Constructor<nu::Vibrant>(),
 #endif
@@ -2801,7 +2810,7 @@ void Initialize(v8::Local<v8::Object> exports,
           // Functions.
           "memoryPressureNotification", &MemoryPressureNotification);
   if (is_electron) {
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
     vb::Set(context, exports,
             "ChromeView", vb::Constructor<node_yue::ChromeView>());
 #endif

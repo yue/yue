@@ -8,6 +8,7 @@
 
 #include "base/stl_util.h"
 #include "base/strings/sys_string_conversions.h"
+#include "nativeui/gfx/image.h"
 #include "nativeui/menu.h"
 
 @interface NUMenuItemDelegate : NSObject {
@@ -129,6 +130,10 @@ void MenuItem::PlatformSetSubmenu(Menu* submenu) {
     case Role::Services: [NSApp setServicesMenu:menu_item_.submenu]; break;
     default: break;
   }
+}
+
+void MenuItem::PlatformSetImage(Image* image) {
+  menu_item_.image = image->GetNative();
 }
 
 }  // namespace nu

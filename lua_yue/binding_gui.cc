@@ -263,7 +263,7 @@ template<>
 struct Type<nu::Lifetime> {
   static constexpr const char* name = "Lifetime";
   static void BuildMetaTable(State* state, int index) {
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
     RawSetProperty(state, index,
                    "onready", &nu::Lifetime::on_ready,
                    "onactivate", &nu::Lifetime::on_activate);
@@ -283,7 +283,7 @@ struct Type<nu::MessageLoop> {
   }
 };
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
 template<>
 struct Type<nu::App::ActivationPolicy> {
   static constexpr const char* name = "AppActivationPolicy";
@@ -325,7 +325,7 @@ template<>
 struct Type<nu::App> {
   static constexpr const char* name = "App";
   static void BuildMetaTable(State* state, int metatable) {
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
     RawSet(state, metatable,
            "setapplicationmenu",
            RefMethod(&nu::App::SetApplicationMenu, RefType::Reset, "appmenu"),
@@ -628,7 +628,7 @@ struct Type<nu::Clipboard::Type> {
     if (type == "copy-paste") {
       *out = nu::Clipboard::Type::CopyPaste;
       return true;
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
     } else if (type == "drag") {
       *out = nu::Clipboard::Type::Drag;
       return true;
@@ -1177,7 +1177,7 @@ struct Type<nu::MenuItem::Role> {
       *out = nu::MenuItem::Role::Undo;
     else if (role == "redo")
       *out = nu::MenuItem::Role::Redo;
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
     else if (role == "about")
       *out = nu::MenuItem::Role::About;
     else if (role == "hide")
@@ -1216,6 +1216,10 @@ struct Type<nu::MenuItem> {
            "isvisible", &nu::MenuItem::IsVisible,
            "setsubmenu", &nu::MenuItem::SetSubmenu,
            "getsubmenu", &nu::MenuItem::GetSubmenu,
+#if defined(OS_MAC) || defined(OS_WIN)
+           "setimage", &nu::MenuItem::SetImage,
+           "getimage", &nu::MenuItem::GetImage,
+#endif
            "setaccelerator", &nu::MenuItem::SetAccelerator);
     RawSetProperty(state, index,
                    "onclick", &nu::MenuItem::on_click);
@@ -1265,6 +1269,11 @@ struct Type<nu::MenuItem> {
     nu::Accelerator accelerator;
     if (RawGetAndPop(state, options, "accelerator", &accelerator))
       item->SetAccelerator(accelerator);
+#if defined(OS_MAC) || defined(OS_WIN)
+    nu::Image* image;
+    if (RawGetAndPop(state, options, "image", &image))
+      item->SetImage(image);
+#endif
     std::function<void(nu::MenuItem*)> onclick;
     if (RawGetAndPop(state, options, "onclick", &onclick))
       item->on_click.Connect(onclick);
@@ -1350,15 +1359,15 @@ struct Type<nu::Tray> {
   static constexpr const char* name = "Tray";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
            "createwithtitle", &CreateOnHeap<nu::Tray, const std::string&>,
 #endif
            "createwithimage", &CreateOnHeap<nu::Tray, scoped_refptr<nu::Image>>,
            "remove", &nu::Tray::Remove,
-#if defined(OS_MACOSX) || defined(OS_WIN)
+#if defined(OS_MAC) || defined(OS_WIN)
            "getbounds", &nu::Tray::GetBounds,
 #endif
-#if defined(OS_MACOSX) || defined(OS_LINUX)
+#if defined(OS_MAC) || defined(OS_LINUX)
            "settitle", &nu::Tray::SetTitle,
 #endif
            "setimage", &nu::Tray::SetImage,
@@ -1370,7 +1379,7 @@ struct Type<nu::Tray> {
   }
 };
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
 template<>
 struct Type<nu::Toolbar::Item> {
   static constexpr const char* name = "Toolbar::Item";
@@ -1444,7 +1453,7 @@ struct Type<nu::Window::Options> {
     if (GetType(state, index) == LuaType::Table) {
       RawGetAndPop(state, index, "frame", &out->frame);
       RawGetAndPop(state, index, "transparent", &out->transparent);
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
       RawGetAndPop(state, index,
                    "showtrafficlights", &out->show_traffic_lights);
 #endif
@@ -1500,7 +1509,7 @@ struct Type<nu::Window> {
            "settitle", &nu::Window::SetTitle,
            "gettitle", &nu::Window::GetTitle,
            "setbackgroundcolor", &nu::Window::SetBackgroundColor,
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
            "settoolbar", &nu::Window::SetToolbar,
            "gettoolbar", &nu::Window::GetToolbar,
            "settitlevisible", &nu::Window::SetTitleVisible,
@@ -1564,7 +1573,7 @@ struct Type<nu::View> {
            "setstyle", &SetStyle,
            "getcomputedlayout", &nu::View::GetComputedLayout,
            "getminimumsize", &nu::View::GetMinimumSize,
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
            "setwantslayer", &nu::View::SetWantsLayer,
            "wantslayer", &nu::View::WantsLayer,
 #endif
@@ -1659,7 +1668,7 @@ struct Type<nu::Button::Type> {
   }
 };
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
 template<>
 struct Type<nu::Button::Style> {
   static constexpr const char* name = "ButtonStyle";
@@ -1729,7 +1738,7 @@ struct Type<nu::Button> {
            "makedefault", &nu::Button::MakeDefault,
            "settitle", &nu::Button::SetTitle,
            "gettitle", &nu::Button::GetTitle,
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
            "setbuttonstyle", &nu::Button::SetButtonStyle,
            "sethasborder", &nu::Button::SetHasBorder,
            "hasborder", &nu::Button::HasBorder,
@@ -1807,7 +1816,7 @@ struct Type<nu::Browser::Options> {
     if (GetType(state, index) == LuaType::Table) {
       RawGetAndPop(
           state, index,
-#if defined(OS_MACOSX) || defined(OS_LINUX)
+#if defined(OS_MAC) || defined(OS_LINUX)
           "allowfileaccessfromfiles", &out->allow_file_access_from_files,
 #endif
 #if defined(OS_LINUX)
@@ -2302,7 +2311,7 @@ struct Type<nu::TextEdit> {
   }
 };
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
 template<>
 struct Type<nu::Vibrant::Material> {
   static constexpr const char* name = "VibrantMaterial";
@@ -2451,7 +2460,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::Table>(state, "Table");
   BindType<nu::TextEdit>(state, "TextEdit");
   BindType<nu::Tray>(state, "Tray");
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
   BindType<nu::Toolbar>(state, "Toolbar");
   BindType<nu::Vibrant>(state, "Vibrant");
 #endif

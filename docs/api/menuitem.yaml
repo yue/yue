@@ -33,6 +33,7 @@ class_methods:
           - property: bool enabled
           - property: std::string label
           - property: Accelerator accelerator
+          - property: Image image
           - property: Function on_click
 
 methods:
@@ -81,6 +82,14 @@ methods:
   - signature: Accelerator GetAccelerator() const
     lang: ['cpp']
     description: Return the accelerator of the item.
+
+  - signature: void SetImage(scoped_refptr<Image> image)
+    platform: ['macOS', 'Windows']
+    description: Set the item's image.
+
+  - signature: Image* GetImage() const
+    platform: ['macOS', 'Windows']
+    description: Return the item's image.
 
   - signature: MenuItem::Type GetType() const
     lang: ['cpp']

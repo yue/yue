@@ -46,6 +46,10 @@ void MenuBase::PlatformInsert(MenuItem* item, int index) {
       mii.fMask |= MIIM_SUBMENU;
       mii.hSubMenu = item->GetSubmenu()->GetNative();
     }
+    if (item->GetImage()) {
+      mii.fMask |= MIIM_BITMAP;
+      mii.hbmpItem = item->bitmap_image_.get();
+    }
     if (item->GetType() == MenuItem::Type::Radio)
       mii.fType = MFT_RADIOCHECK;
     else

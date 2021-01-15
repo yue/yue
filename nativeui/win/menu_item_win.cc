@@ -11,6 +11,7 @@
 #include "nativeui/menu_bar.h"
 #include "nativeui/menu_item.h"
 #include "nativeui/state.h"
+#include "nativeui/win/drag_drop/clipboard_util.h"
 #include "nativeui/win/subwin_view.h"
 #include "nativeui/win/view_win.h"
 #include "nativeui/win/window_win.h"
@@ -146,6 +147,17 @@ void MenuItem::PlatformSetSubmenu(Menu* submenu) {
     mii.cbSize = sizeof(mii);
     mii.fMask = MIIM_SUBMENU;
     mii.hSubMenu = submenu->GetNative();
+    SetMenuItemInfo(menu_->GetNative(), menu_item_->id, FALSE, &mii);
+  }
+}
+
+void MenuItem::PlatformSetImage(Image* image) {
+  bitmap_image_.reset(GetBitmapFromImage(image));
+  if (menu_) {
+    MENUITEMINFO mii = {0};
+    mii.cbSize = sizeof(mii);
+    mii.fMask = MIIM_BITMAP;
+    mii.hbmpItem = bitmap_image_.get();
     SetMenuItemInfo(menu_->GetNative(), menu_item_->id, FALSE, &mii);
   }
 }

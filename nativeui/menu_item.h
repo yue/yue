@@ -12,6 +12,10 @@
 #include "nativeui/signal.h"
 #include "nativeui/types.h"
 
+#if defined(OS_WIN)
+#include "base/win/scoped_gdi_object.h"
+#endif
+
 #if defined(OS_LINUX)
 // X11 headers define macros for these function names which screw with us.
 #if defined(None)
@@ -22,6 +26,7 @@
 namespace nu {
 
 class AcceleratorManager;
+class Image;
 class Menu;
 class MenuBase;
 
@@ -44,7 +49,7 @@ class NATIVEUI_EXPORT MenuItem : public base::RefCounted<MenuItem> {
     SelectAll,
     Undo,
     Redo,
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
     // macOS only roles.
     About,
     Hide,
@@ -53,7 +58,7 @@ class NATIVEUI_EXPORT MenuItem : public base::RefCounted<MenuItem> {
 #endif
     // Indicate number of item roles, should not be used.
     ItemCount,
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
     // Submenu roles.
     Help,
     Window,
@@ -82,6 +87,11 @@ class NATIVEUI_EXPORT MenuItem : public base::RefCounted<MenuItem> {
 
   void SetVisible(bool visible);
   bool IsVisible() const;
+
+#if defined(OS_MAC) || defined(OS_WIN)
+  void SetImage(scoped_refptr<Image> image);
+  Image* GetImage() const;
+#endif
 
   void SetAccelerator(const Accelerator& accelerator);
   Accelerator GetAccelerator() const;
@@ -116,8 +126,7 @@ class NATIVEUI_EXPORT MenuItem : public base::RefCounted<MenuItem> {
   void PlatformInit();
   void PlatformDestroy();
   void PlatformSetSubmenu(Menu* submenu);
-  void PlatformSetAccelerator(const Accelerator& accelerator);
-  void PlatformRemoveAccelerator();
+  void PlatformSetImage(Image* image);
 
   // Flip all radio items in the same group with |item|.
   void FlipRadioMenuItems(nu::MenuBase* menu, nu::MenuItem* sender);
@@ -133,6 +142,15 @@ class NATIVEUI_EXPORT MenuItem : public base::RefCounted<MenuItem> {
 
   // The submenu.
   scoped_refptr<Menu> submenu_;
+
+#if defined(OS_MAC) || defined(OS_WIN)
+  // Menu item icon.
+  scoped_refptr<Image> image_;
+#if defined(OS_WIN)
+  // The bitmap handle of the menu item icon.
+  base::win::ScopedBitmap bitmap_image_;
+#endif
+#endif
 
   // Stored accelerator instance.
   Accelerator accelerator_;

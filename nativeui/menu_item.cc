@@ -8,13 +8,14 @@
 
 #include "base/stl_util.h"
 #include "nativeui/accelerator_manager.h"
+#include "nativeui/gfx/image.h"
 #include "nativeui/menu.h"
 
 namespace nu {
 
 namespace {
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
 #define CONTROL_OR_COMMAND MASK_META
 #else
 #define CONTROL_OR_COMMAND MASK_CONTROL
@@ -32,7 +33,7 @@ struct {
   { "Select All", VKEY_A, CONTROL_OR_COMMAND },
   { "Undo",       VKEY_Z, CONTROL_OR_COMMAND },
   { "Redo",       VKEY_Z, CONTROL_OR_COMMAND | MASK_SHIFT },
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
   { "About",       VKEY_UNKNOWN, 0 },
   { "Hide",        VKEY_H, CONTROL_OR_COMMAND },
   { "Hide Others", VKEY_H, CONTROL_OR_COMMAND | MASK_ALT },
@@ -86,6 +87,17 @@ void MenuItem::SetSubmenu(scoped_refptr<Menu> submenu) {
 Menu* MenuItem::GetSubmenu() const {
   return submenu_.get();
 }
+
+#if defined(OS_MAC) || defined(OS_WIN)
+void MenuItem::SetImage(scoped_refptr<Image> image) {
+  PlatformSetImage(image.get());
+  image_ = std::move(image);
+}
+
+Image* MenuItem::GetImage() const {
+  return image_.get();
+}
+#endif
 
 void MenuItem::SetAccelerator(const Accelerator& accelerator) {
   if (accel_manager_) {
