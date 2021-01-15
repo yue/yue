@@ -1690,6 +1690,7 @@ struct Type<nu::Window> {
 #endif
 #if defined(OS_WIN) || defined(OS_LINUX)
         "setSkipTaskbar", &nu::Window::SetSkipTaskbar,
+        "setIcon", &nu::Window::SetIcon,
         "setMenuBar",
         RefMethod(&nu::Window::SetMenuBar, RefType::Reset, "menuBar"),
         "getMenuBar", &nu::Window::GetMenuBar,

@@ -59,6 +59,11 @@ SizeF Window::GetContentSize() const {
 }
 
 #if defined(OS_WIN) || defined(OS_LINUX)
+void Window::SetIcon(scoped_refptr<Image> icon) {
+  PlatformSetIcon(icon.get());
+  icon_ = std::move(icon);
+}
+
 void Window::SetMenuBar(scoped_refptr<MenuBar> menu_bar) {
   if (menu_bar_)
     menu_bar_->SetWindow(nullptr);

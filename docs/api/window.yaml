@@ -196,6 +196,10 @@ methods:
     platform: ['Windows', 'Linux']
     description: Set whether to hide the window from taskbar.
 
+  - signature: void SetIcon(scoped_refptr<Image> icon)
+    platform: ['Windows', 'Linux']
+    description: Set the window icon.
+
   - signature: void SetMenuBar(scoped_refptr<MenuBar> menubar)
     platform: ['Windows', 'Linux']
     description: Set the window menu bar.

@@ -1519,6 +1519,7 @@ struct Type<nu::Window> {
 #endif
 #if defined(OS_WIN) || defined(OS_LINUX)
            "setskiptaskbar", &nu::Window::SetSkipTaskbar,
+           "seticon", &nu::Window::SetIcon,
            "setmenubar",
            RefMethod(&nu::Window::SetMenuBar, RefType::Reset, "menubar"),
            "getmenubar", &nu::Window::GetMenuBar,

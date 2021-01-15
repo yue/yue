@@ -15,6 +15,10 @@
 #include "nativeui/gfx/geometry/rect_f.h"
 
 #if defined(OS_WIN)
+#include "base/win/scoped_gdi_object.h"
+#endif
+
+#if defined(OS_WIN)
 // Windows headers define macros for these function names which screw with us.
 #if defined(IsMaximized)
 #undef IsMaximized
@@ -110,6 +114,7 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
 
 #if defined(OS_WIN) || defined(OS_LINUX)
   void SetSkipTaskbar(bool skip);
+  void SetIcon(scoped_refptr<Image> icon);
   void SetMenuBar(scoped_refptr<MenuBar> menu_bar);
   MenuBar* GetMenuBar() const { return menu_bar_.get(); }
 #endif
@@ -147,6 +152,7 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
   void PlatformDestroy();
   void PlatformSetContentView(View* container);
 #if defined(OS_WIN) || defined(OS_LINUX)
+  void PlatformSetIcon(Image* icon);
   void PlatformSetMenuBar(MenuBar* menu_bar);
 #endif
   void PlatformAddChildWindow(Window* child);
@@ -169,6 +175,10 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
 #endif
 
 #if defined(OS_WIN) || defined(OS_LINUX)
+  scoped_refptr<Image> icon_;
+#if defined(OS_WIN)
+  base::win::ScopedHICON hicon_;
+#endif
   scoped_refptr<MenuBar> menu_bar_;
 #endif
 

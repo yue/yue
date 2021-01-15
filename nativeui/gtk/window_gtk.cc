@@ -556,6 +556,11 @@ void Window::SetSkipTaskbar(bool skip) {
   gtk_window_set_skip_taskbar_hint(window_, skip);
 }
 
+void Window::PlatformSetIcon(Image* icon) {
+  gtk_window_set_icon(window_,
+                      gdk_pixbuf_animation_get_static_image(icon->GetNative()));
+}
+
 void Window::PlatformSetMenuBar(MenuBar* menu_bar) {
   GtkContainer* vbox = GTK_CONTAINER(gtk_bin_get_child(GTK_BIN(window_)));
   if (menu_bar_)

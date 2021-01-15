@@ -1046,6 +1046,15 @@ void Window::SetSkipTaskbar(bool skip) {
     taskbar->AddTab(window_->hwnd());
 }
 
+void Window::PlatformSetIcon(Image* icon) {
+  SizeF big_size(::GetSystemMetrics(SM_CXICON),
+                 ::GetSystemMetrics(SM_CYICON));
+  hicon_ = icon->GetHICON(big_size);
+  LPARAM param = reinterpret_cast<LPARAM>(hicon_.get());
+  ::SendMessage(window_->hwnd(), WM_SETICON, ICON_BIG, param);
+  ::SendMessage(window_->hwnd(), WM_SETICON, ICON_SMALL, param);
+}
+
 void Window::PlatformSetMenuBar(MenuBar* menu_bar) {
   ::SetMenu(window_->hwnd(), menu_bar ? menu_bar->GetNative() : NULL);
 }
