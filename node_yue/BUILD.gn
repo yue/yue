@@ -14,21 +14,36 @@ loadable_module("node_yue") {
     "binding_signal.h",
     "binding_values.cc",
     "binding_values.h",
-    "chrome_view_mac.mm",
-    "chrome_view_mac.h",
-    "delay_load_hook_win.cc",
     "node_integration.cc",
     "node_integration.h",
-    "node_integration_linux.cc",
-    "node_integration_linux.h",
-    "node_integration_mac.cc",
-    "node_integration_mac.h",
-    "node_integration_win.cc",
-    "node_integration_win.h",
     "v8_value_converter.h",
     "v8_value_converter_impl.cc",
     "v8_value_converter_impl.h",
   ]
+
+  if (is_linux) {
+    sources += [
+      "node_integration_linux.cc",
+      "node_integration_linux.h",
+    ]
+  }
+
+  if (is_mac) {
+    sources += [
+      "chrome_view_mac.mm",
+      "chrome_view_mac.h",
+      "node_integration_mac.cc",
+      "node_integration_mac.h",
+    ]
+  }
+
+  if (is_win) {
+    sources += [
+      "delay_load_hook_win.cc",
+      "node_integration_win.cc",
+      "node_integration_win.h",
+    ]
+  }
 
   deps = [
     "//base",

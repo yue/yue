@@ -72,7 +72,7 @@ State::~State() {
 
   DCHECK_EQ(YGConfigGetInstanceCount(), 0) <<
       "There are instances of YGConfig leaked on exit";
-  base::debug::LeakTracker<ProtocolJob>::CheckForLeaks();
+  LeakTracker<ProtocolJob>::CheckForLeaks();
 }
 
 Clipboard* State::GetClipboard(Clipboard::Type type) {

@@ -437,8 +437,9 @@ std::unique_ptr<base::Value> V8ValueConverterImpl::FromV8ArrayBuffer(
     v8::Isolate* isolate) const {
   if (val->IsArrayBuffer()) {
     auto contents = val.As<v8::ArrayBuffer>()->GetContents();
-    return base::Value::CreateWithCopiedBuffer(
-        static_cast<const char*>(contents.Data()), contents.ByteLength());
+    const auto* data = static_cast<const uint8_t*>(contents.Data());
+    return base::Value::ToUniquePtrValue(
+        base::Value(base::make_span(data, contents.ByteLength())));
   } else if (val->IsArrayBufferView()) {
     v8::Local<v8::ArrayBufferView> view = val.As<v8::ArrayBufferView>();
     size_t byte_length = view->ByteLength();

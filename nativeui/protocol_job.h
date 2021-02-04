@@ -8,9 +8,9 @@
 #include <functional>
 #include <string>
 
-#include "base/debug/leak_tracker.h"
 #include "base/memory/ref_counted.h"
 #include "nativeui/nativeui_export.h"
+#include "nativeui/util/leak_tracker.h"
 
 namespace nu {
 
@@ -35,7 +35,7 @@ class NATIVEUI_EXPORT ProtocolJob : public base::RefCounted<ProtocolJob> {
   // Used by subclasses to notify the browser.
   std::function<void(int)> notify_content_length;
 
-  base::debug::LeakTracker<ProtocolJob> leak_tracker_;
+  LeakTracker<ProtocolJob> leak_tracker_;
 };
 
 // Use string as response.

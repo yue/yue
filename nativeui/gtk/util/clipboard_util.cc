@@ -37,8 +37,8 @@ std::string ReadMarkupFromSelectionData(GtkSelectionData* selection) {
   // UTF-16, otherwise assume UTF-8.
   std::string markup;
   if (size >= 2 &&
-      reinterpret_cast<const uint16_t*>(data)[0] == 0xFEFF) {
-    base::UTF16ToUTF8(reinterpret_cast<const uint16_t*>(data) + 1,
+      reinterpret_cast<const char16_t*>(data)[0] == 0xFEFF) {
+    base::UTF16ToUTF8(reinterpret_cast<const char16_t*>(data) + 1,
                       (size / 2) - 1, &markup);
   } else {
     markup.assign(reinterpret_cast<const char*>(data), size);
