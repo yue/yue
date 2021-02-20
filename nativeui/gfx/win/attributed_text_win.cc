@@ -83,6 +83,10 @@ RectF AttributedText::GetBoundsFor(const SizeF& size) const {
                rect.Width / scale_factor, rect.Height / scale_factor);
 }
 
+void AttributedText::SetText(const std::string& text) {
+  text_->text = base::UTF8ToUTF16(text);
+}
+
 std::string AttributedText::GetText() const {
   return base::UTF16ToUTF8(text_->text);
 }

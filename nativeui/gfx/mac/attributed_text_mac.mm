@@ -77,6 +77,10 @@ RectF AttributedText::GetBoundsFor(const SizeF& size) const {
   }
 }
 
+void AttributedText::SetText(const std::string& text) {
+  [[text_ mutableString] setString:base::SysUTF8ToNSString(text)];
+}
+
 std::string AttributedText::GetText() const {
   return base::SysNSStringToUTF8([text_ string]);
 }

@@ -133,6 +133,10 @@ RectF AttributedText::GetBoundsFor(const SizeF& size) const {
   return RectF(0, 0, width, height);
 }
 
+void AttributedText::SetText(const std::string& text) {
+  pango_layout_set_text(text_, text.c_str(), text.length());
+}
+
 std::string AttributedText::GetText() const {
   return pango_layout_get_text(text_);
 }

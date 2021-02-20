@@ -414,6 +414,7 @@ struct Type<nu::AttributedText> {
         "getBoundsFor", &nu::AttributedText::GetBoundsFor,
         "setFormat", &nu::AttributedText::SetFormat,
         "getFormat", &nu::AttributedText::GetFormat,
+        "setText", &nu::AttributedText::SetText,
         "getText", &nu::AttributedText::GetText);
   }
 };

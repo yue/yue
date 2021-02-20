@@ -36,6 +36,8 @@ class NATIVEUI_EXPORT AttributedText : public base::RefCounted<AttributedText> {
   void Clear();
 
   RectF GetBoundsFor(const SizeF& size) const;
+
+  void SetText(const std::string& text);
   std::string GetText() const;
 
   // Private: Get one line's size.

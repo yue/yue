@@ -375,6 +375,7 @@ struct Type<nu::AttributedText> {
 #endif
            "clear", &nu::AttributedText::Clear,
            "getboundsfor", &nu::AttributedText::GetBoundsFor,
+           "settext", &nu::AttributedText::SetText,
            "gettext", &nu::AttributedText::GetText);
   }
 #if !defined(OS_WIN)

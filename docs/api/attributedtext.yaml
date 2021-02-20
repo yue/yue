@@ -56,6 +56,9 @@ methods:
   - signature: RectF GetBoundsFor(const SizeF& size) const
     description: Return the bounds required to draw the text within `size`.
 
+  - signature: void SetText(const std::string& text)
+    description: Change the text content.
+
   - signature: std::string GetText() const
     description: Return the plain text.
 
