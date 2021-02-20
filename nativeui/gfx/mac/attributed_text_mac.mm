@@ -26,8 +26,10 @@ AttributedText::AttributedText(const std::string& text, TextAttributes att)
     : text_([[NSMutableAttributedString alloc]
                 initWithString:base::SysUTF8ToNSString(text)]),
       format_(att.ToTextFormat()) {
+  [text_ beginEditing];
   SetFont(att.font.get());
   SetColor(att.color);
+  [text_ endEditing];
 }
 
 AttributedText::~AttributedText() {
@@ -39,6 +41,7 @@ void AttributedText::PlatformUpdateFormat() {
 
 void AttributedText::PlatformSetFontFor(scoped_refptr<Font> font,
                                         int start, int end) {
+  [text_ beginEditing];
   if (start == 0 && end == -1) {
     [text_ removeAttribute:NSFontAttributeName
                      range:NSMakeRange(0, [text_ length])];
@@ -46,9 +49,11 @@ void AttributedText::PlatformSetFontFor(scoped_refptr<Font> font,
   [text_ addAttribute:NSFontAttributeName
                 value:font->GetNative()
                 range:NSMakeRange(start, IndexToLength(text_, start, end))];
+  [text_ endEditing];
 }
 
 void AttributedText::PlatformSetColorFor(Color color, int start, int end) {
+  [text_ beginEditing];
   if (start == 0 && end == -1) {
     [text_ removeAttribute:NSForegroundColorAttributeName
                      range:NSMakeRange(0, [text_ length])];
@@ -56,6 +61,7 @@ void AttributedText::PlatformSetColorFor(Color color, int start, int end) {
   [text_ addAttribute:NSForegroundColorAttributeName
                 value:color.ToNSColor()
                 range:NSMakeRange(start, IndexToLength(text_, start, end))];
+  [text_ endEditing];
 }
 
 RectF AttributedText::GetBoundsFor(const SizeF& size) const {

@@ -30,27 +30,26 @@ YGSize MeasureLabel(YGNodeRef node,
 // static
 const char Label::kClassName[] = "Label";
 
-Label::Label(const std::string& text) {
+Label::Label(const std::string& text)
+    : text_(new AttributedText(text, TextFormat({TextAlign::Center,
+                                                 TextAlign::Center,
+                                                 true, false}))),
+      use_system_color_(true),
+      system_color_(Color::Get(Color::Name::Text)) {
   Init();
-  SetText(text);
 }
 
-Label::Label(scoped_refptr<AttributedText> text) {
+Label::Label(scoped_refptr<AttributedText> text)
+    : text_(std::move(text)),
+      use_system_color_(false) {
   Init();
-  SetAttributedText(std::move(text));
 }
 
 Label::~Label() {}
 
 void Label::SetText(const std::string& text) {
-  // Inherit settings from old text.
-  const TextFormat format =
-      text_ ? text_->GetFormat()
-            : TextFormat({TextAlign::Center, TextAlign::Center, true, false});
-  SetAttributedText(new AttributedText(text, format));
-
-  use_system_color_ = true;
-  system_color_ = Color::Get(Color::Name::Text);
+  text_->SetText(text);
+  MarkDirty();
 }
 
 std::string Label::GetText() const {

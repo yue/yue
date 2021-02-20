@@ -51,7 +51,7 @@ class NATIVEUI_EXPORT Label : public View {
 
   scoped_refptr<AttributedText> text_;
 
-  bool use_system_color_ = false;
+  bool use_system_color_;
   Color system_color_;
 };
 
