@@ -147,11 +147,11 @@ TEST_P(BrowserTest, FailNavigation) {
                                           int code) {
     nu::MessageLoop::Quit();
     EXPECT_NE(code, 0);
-    EXPECT_EQ(url, "http://0.0.0.123/");
+    EXPECT_EQ(url, "http://host.invalid/");
   });
   nu::MessageLoop::PostTask([&]() {
     // Load an invalid IP to fail quickly.
-    browser_->LoadURL("http://0.0.0.123/");
+    browser_->LoadURL("http://host.invalid/");
   });
   nu::MessageLoop::Run();
 }
@@ -199,7 +199,12 @@ TEST_P(BrowserTest, LoadHTMLBaseURL) {
 }
 
 TEST_P(BrowserTest, Title) {
+  bool loaded = false;
   std::string next_title = "t1";
+  browser_->on_finish_navigation.Connect([&loaded](nu::Browser*,
+                                                   const std::string&) {
+    loaded = true;
+  });
   browser_->on_update_title.Connect([&](nu::Browser* browser,
                                         const std::string& title) {
     if (title.empty() || title == "about:blank")
@@ -208,10 +213,14 @@ TEST_P(BrowserTest, Title) {
     EXPECT_EQ(title, next_title);
     if (next_title == "t1") {
       next_title = "t2";
-      browser->on_finish_navigation.Connect([](nu::Browser* browser,
-                                               const std::string& url) {
+      if (loaded) {
         browser->ExecuteJavaScript("document.title = 't2'", nullptr);
-      });
+      } else {
+        browser->on_finish_navigation.Connect([](nu::Browser* browser,
+                                                 const std::string& url) {
+          browser->ExecuteJavaScript("document.title = 't2'", nullptr);
+        });
+      }
     } else {
       nu::MessageLoop::Quit();
     }
