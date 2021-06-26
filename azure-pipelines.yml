@@ -33,7 +33,7 @@ jobs:
 - job: macos_build
   displayName: 'Build for macOS'
   pool:
-    vmImage: 'macOS-latest'
+    vmImage: 'macOS-10.15'
   strategy:
     matrix:
       x64:
@@ -41,10 +41,6 @@ jobs:
       arm64:
         TARGET_CPU: arm64
   steps:
-  - script: |
-      sudo xcode-select -switch /Applications/Xcode_12.2.app/Contents/Developer
-    displayName: Select XCode 12.2
-    condition: eq(variables['TARGET_CPU'], 'arm64')
   - template: building/azure-pipelines-template.yml
 
 - job: linux_build

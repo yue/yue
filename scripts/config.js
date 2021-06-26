@@ -12,6 +12,9 @@ const nodeVersions = [
 const electronVersions = [
 ]
 
+// The version of gn.
+const gnVersion = '0.6.1'
+
 // The common build configurations.
 const gnConfig = [
   `target_cpu="${targetCpu}"`,
@@ -51,6 +54,7 @@ module.exports = {
   webview2Version,
   nodeVersions,
   electronVersions,
+  gnVersion,
   gnConfig,
   gnSysrootConfig,
 }

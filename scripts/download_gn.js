@@ -5,12 +5,13 @@
 // LICENSE file.
 
 const {targetOs, download} = require('./common')
+const {gnVersion} = require('./config')
 
 const fs = require('fs')
 const path = require('path')
 const extract = require('extract-zip')
 
-const version = 'v0.6.0'
+const version = 'v' + gnVersion
 const url = `https://github.com/yue/build-gn/releases/download/${version}/gn_${version}_${targetOs}_x64.zip`
 
 const gnDir = path.resolve('building', 'tools', 'gn')
