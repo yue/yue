@@ -62,6 +62,7 @@ State::State() : yoga_config_(YGConfigNew()) {
 }
 
 State::~State() {
+  PlatformDestroy();
   YGConfigFree(yoga_config_);
 
   if (g_main_state == this)

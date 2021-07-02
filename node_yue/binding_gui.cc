@@ -1505,6 +1505,59 @@ struct Type<nu::MessageBox> {
   }
 };
 
+#if defined(OS_MAC)
+template<>
+struct Type<nu::Notification::Action> {
+  static constexpr const char* name = "NotificationAction";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::Notification::Action* out) {
+    if (!value->IsObject())
+      return false;
+    return Get(context, value.As<v8::Object>(),
+               "title", &out->title,
+               "info", &out->info);
+  }
+};
+#endif
+
+template<>
+struct Type<nu::Notification> {
+  static constexpr const char* name = "Notification";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor, "create", &CreateOnHeap<nu::Notification>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "show", &nu::Notification::Show,
+        "close", &nu::Notification::Close,
+        "setTitle", &nu::Notification::SetTitle,
+        "setBody", &nu::Notification::SetBody,
+        "setInfo", &nu::Notification::SetInfo,
+        "getInfo", &nu::Notification::GetInfo,
+        "setSilent", &nu::Notification::SetSilent,
+        "setImage", &nu::Notification::SetImage,
+#if defined(OS_MAC)
+        "setHasReplyButton", &nu::Notification::SetHasReplyButton,
+        "setResponsePlaceholder", &nu::Notification::SetResponsePlaceholder,
+        "setIdentifier", &nu::Notification::SetIdentifier,
+        "getIdentifier", &nu::Notification::GetIdentifier,
+#endif
+        "setActions", &nu::Notification::SetActions);
+    SetProperty(context, templ,
+                "onShow", &nu::Notification::on_show,
+                "onClose", &nu::Notification::on_close,
+                "onClick", &nu::Notification::on_click,
+                "onAction", &nu::Notification::on_action);
+#if defined(OS_MAC)
+    SetProperty(context, templ,
+                "onReply", &nu::Notification::on_reply);
+#endif
+  }
+};
+
 template<>
 struct Type<nu::Tray> {
   static constexpr const char* name = "Tray";
@@ -2775,6 +2828,7 @@ void Initialize(v8::Local<v8::Object> exports,
           "Menu",              vb::Constructor<nu::Menu>(),
           "MenuItem",          vb::Constructor<nu::MenuItem>(),
           "MessageBox",        vb::Constructor<nu::MessageBox>(),
+          "Notification",      vb::Constructor<nu::Notification>(),
           "Window",            vb::Constructor<nu::Window>(),
           "View",              vb::Constructor<nu::View>(),
           "ComboBox",          vb::Constructor<nu::ComboBox>(),

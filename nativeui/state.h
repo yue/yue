@@ -22,6 +22,14 @@ class ScopedCOMInitializer;
 }
 #endif
 
+#if defined(OS_MAC)
+#ifdef __OBJC__
+@class NUNotificationCenterDelegate;
+#else
+class NUNotificationCenterDelegate;
+#endif
+#endif
+
 namespace nu {
 
 class Appearance;
@@ -65,6 +73,8 @@ class NATIVEUI_EXPORT State {
   UINT GetNextCommandID();
 #elif defined(OS_LINUX)
   GtkTheme* GetGtkTheme();
+#elif defined(OS_MAC)
+  NUNotificationCenterDelegate* GetNotificationCenterDelegate();
 #endif
 
   // Internal: Return the clipboards.
@@ -84,6 +94,7 @@ class NATIVEUI_EXPORT State {
 
  private:
   void PlatformInit();
+  void PlatformDestroy();
 
 #if defined(OS_WIN)
   std::unique_ptr<base::win::ScopedCOMInitializer> com_initializer_;
@@ -103,6 +114,10 @@ class NATIVEUI_EXPORT State {
 
 #if defined(OS_LINUX)
   std::unique_ptr<GtkTheme> gtk_theme_;
+#endif
+
+#if defined(OS_MAC)
+  NUNotificationCenterDelegate* notification_center_delegate_;
 #endif
 
   // Array of available clipboards.

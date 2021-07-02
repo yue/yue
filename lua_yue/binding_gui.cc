@@ -1355,6 +1355,54 @@ struct Type<nu::MessageBox> {
   }
 };
 
+#if defined(OS_MAC)
+template<>
+struct Type<nu::Notification::Action> {
+  static constexpr const char* name = "NotificationAction";
+  static inline bool To(State* state, int index,
+                        nu::Notification::Action* out) {
+    if (GetType(state, index) == LuaType::Table)
+      return false;
+    return RawGetAndPop(state, index,
+                        "info", &out->info,
+                        "title", &out->title);
+  }
+};
+#endif
+
+template<>
+struct Type<nu::Notification> {
+  static constexpr const char* name = "Notification";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateOnHeap<nu::Notification>,
+           "show", &nu::Notification::Show,
+           "close", &nu::Notification::Close,
+           "settitle", &nu::Notification::SetTitle,
+           "setbody", &nu::Notification::SetBody,
+           "setinfo", &nu::Notification::SetInfo,
+           "getinfo", &nu::Notification::GetInfo,
+           "setsilent", &nu::Notification::SetSilent,
+           "setimage", &nu::Notification::SetImage,
+#if defined(OS_MAC)
+           "sethasreplybutton", &nu::Notification::SetHasReplyButton,
+           "setresponseplaceholder", &nu::Notification::SetResponsePlaceholder,
+           "setidentifier", &nu::Notification::SetIdentifier,
+           "getidentifier", &nu::Notification::GetIdentifier,
+#endif
+           "setactions", &nu::Notification::SetActions);
+    RawSetProperty(state, metatable,
+                   "onshow", &nu::Notification::on_show,
+                   "onclose", &nu::Notification::on_close,
+                   "onclick", &nu::Notification::on_click,
+                   "onaction", &nu::Notification::on_action);
+#if defined(OS_MAC)
+    RawSetProperty(state, metatable,
+                   "onreply", &nu::Notification::on_reply);
+#endif
+  }
+};
+
 template<>
 struct Type<nu::Tray> {
   static constexpr const char* name = "Tray";
@@ -2437,6 +2485,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::Menu>(state, "Menu");
   BindType<nu::MenuItem>(state, "MenuItem");
   BindType<nu::MessageBox>(state, "MessageBox");
+  BindType<nu::Notification>(state, "Notification");
   BindType<nu::Window>(state, "Window");
   BindType<nu::ComboBox>(state, "ComboBox");
   BindType<nu::Container>(state, "Container");
