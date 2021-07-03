@@ -22,18 +22,11 @@ class ScopedCOMInitializer;
 }
 #endif
 
-#if defined(OS_MAC)
-#ifdef __OBJC__
-@class NUNotificationCenterDelegate;
-#else
-class NUNotificationCenterDelegate;
-#endif
-#endif
-
 namespace nu {
 
 class Appearance;
 class Font;
+class NotificationCenter;
 class Screen;
 
 #if defined(OS_WIN)
@@ -73,8 +66,6 @@ class NATIVEUI_EXPORT State {
   UINT GetNextCommandID();
 #elif defined(OS_LINUX)
   GtkTheme* GetGtkTheme();
-#elif defined(OS_MAC)
-  NUNotificationCenterDelegate* GetNotificationCenterDelegate();
 #endif
 
   // Internal: Return the clipboards.
@@ -86,6 +77,9 @@ class NATIVEUI_EXPORT State {
   // Internal: Return the appearance object
   Appearance* GetAppearance();
 
+  // Internal: Return the notificationCenter object
+  NotificationCenter* GetNotificationCenter();
+
   // Internal: Return the default font.
   scoped_refptr<Font>& default_font() { return default_font_; }
 
@@ -94,7 +88,6 @@ class NATIVEUI_EXPORT State {
 
  private:
   void PlatformInit();
-  void PlatformDestroy();
 
 #if defined(OS_WIN)
   std::unique_ptr<base::win::ScopedCOMInitializer> com_initializer_;
@@ -116,16 +109,13 @@ class NATIVEUI_EXPORT State {
   std::unique_ptr<GtkTheme> gtk_theme_;
 #endif
 
-#if defined(OS_MAC)
-  NUNotificationCenterDelegate* notification_center_delegate_;
-#endif
-
   // Array of available clipboards.
   std::array<std::unique_ptr<Clipboard>,
              static_cast<size_t>(Clipboard::Type::Count)> clipboards_;
 
   std::unique_ptr<Screen> screen_;
   std::unique_ptr<Appearance> appearance_;
+  std::unique_ptr<NotificationCenter> notification_center_;
   scoped_refptr<Font> default_font_;
 
   // The app instance.

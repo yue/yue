@@ -9,18 +9,8 @@
 #include "base/logging.h"
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/gfx/image.h"
-#include "nativeui/mac/nu_notification_center_delegate.h"
-#include "nativeui/state.h"
 
 namespace nu {
-
-namespace {
-
-inline NUNotificationCenterDelegate* GetDelegate() {
-  return State::GetCurrent()->GetNotificationCenterDelegate();
-}
-
-}  // namespace
 
 void Notification::Show() {
   [NSUserNotificationCenter.defaultUserNotificationCenter
@@ -113,7 +103,6 @@ void Notification::PlatformInit() {
   notification_ = [[NSUserNotification alloc] init];
   [notification_ setHasActionButton:NO];
   [notification_ setUserInfo:@{@"info": @"", @"actionInfo": @""}];
-  [GetDelegate() addNotification:this];
 
   NSString* identifier =
       [NSString stringWithFormat:@"%@.notification.%@",
@@ -124,7 +113,6 @@ void Notification::PlatformInit() {
 
 void Notification::PlatformDestroy() {
   [notification_ release];
-  [GetDelegate() removeNotification:this];
 }
 
 void Notification::PlatformSetImage(Image* image) {

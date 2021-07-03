@@ -44,15 +44,6 @@ class NATIVEUI_EXPORT Notification : public base::RefCounted<Notification> {
   // Return the native Notification object.
   NativeNotification GetNative() const { return notification_; }
 
-  // Events.
-  Signal<void(Notification*)> on_show;
-  Signal<void(Notification*)> on_close;
-  Signal<void(Notification*)> on_click;
-  Signal<void(Notification*, const std::string&)> on_action;
-#if defined(OS_MAC)
-  Signal<void(Notification*, const std::string&)> on_reply;
-#endif
-
  private:
   friend class base::RefCounted<Notification>;
 

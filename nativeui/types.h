@@ -58,6 +58,7 @@ typedef struct CGContext* CGContextRef;
 @class NSToolbar;
 @class NSView;
 @class NSWindow;
+@class NUNotificationCenterDelegate;
 #else
 class NSMutableAttributedString;
 class NSAlert;
@@ -77,6 +78,7 @@ class NSStatusItem;
 class NSToolbar;
 struct NSView;
 class NSWindow;
+class NUNotificationCenterDelegate;
 #endif  // __OBJC__
 #endif  // defined(OS_MACOSX)
 
@@ -120,6 +122,7 @@ using NativeFont = NSFont*;
 using NativeMenu = NSMenu*;
 using NativeMenuItem = NSMenuItem*;
 using NativeNotification = NSUserNotification*;
+using NativeNotificationCenter = NUNotificationCenterDelegate*;
 using NativeToolbar = NSToolbar*;
 using NativeTray = NSStatusItem*;
 #elif defined(OS_LINUX)

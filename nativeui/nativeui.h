@@ -33,6 +33,7 @@
 #include "nativeui/message_box.h"
 #include "nativeui/message_loop.h"
 #include "nativeui/notification.h"
+#include "nativeui/notification_center.h"
 #include "nativeui/progress_bar.h"
 #include "nativeui/protocol_asar_job.h"
 #include "nativeui/screen.h"

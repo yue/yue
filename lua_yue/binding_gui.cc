@@ -1391,14 +1391,28 @@ struct Type<nu::Notification> {
            "getidentifier", &nu::Notification::GetIdentifier,
 #endif
            "setactions", &nu::Notification::SetActions);
+  }
+};
+
+template<>
+struct Type<nu::NotificationCenter> {
+  static constexpr const char* name = "NotificationCenter";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "clear", &nu::NotificationCenter::Clear);
     RawSetProperty(state, metatable,
-                   "onshow", &nu::Notification::on_show,
-                   "onclose", &nu::Notification::on_close,
-                   "onclick", &nu::Notification::on_click,
-                   "onaction", &nu::Notification::on_action);
+                   "onnotificationshow",
+                   &nu::NotificationCenter::on_notification_show,
+                   "onnotificationclose",
+                   &nu::NotificationCenter::on_notification_close,
+                   "onnotificationclick",
+                   &nu::NotificationCenter::on_notification_click,
+                   "onnotificationaction",
+                   &nu::NotificationCenter::on_notification_action);
 #if defined(OS_MAC)
     RawSetProperty(state, metatable,
-                   "onreply", &nu::Notification::on_reply);
+                   "onnotificationreply",
+                   &nu::NotificationCenter::on_notification_reply);
 #endif
   }
 };
@@ -2486,6 +2500,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::MenuItem>(state, "MenuItem");
   BindType<nu::MessageBox>(state, "MessageBox");
   BindType<nu::Notification>(state, "Notification");
+  BindType<nu::NotificationCenter>(state, "NotificationCenter");
   BindType<nu::Window>(state, "Window");
   BindType<nu::ComboBox>(state, "ComboBox");
   BindType<nu::Container>(state, "Container");
@@ -2517,9 +2532,10 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
 #endif
   // Properties.
   lua::RawSet(state, -1,
-              "lifetime",   nu::Lifetime::GetCurrent(),
-              "app",        nu::App::GetCurrent(),
-              "appearance", nu::Appearance::GetCurrent(),
-              "screen",     nu::Screen::GetCurrent());
+              "lifetime",           nu::Lifetime::GetCurrent(),
+              "app",                nu::App::GetCurrent(),
+              "appearance",         nu::Appearance::GetCurrent(),
+              "notificationCenter", nu::NotificationCenter::GetCurrent(),
+              "screen",             nu::Screen::GetCurrent());
   return 1;
 }

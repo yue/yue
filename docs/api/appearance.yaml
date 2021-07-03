@@ -6,6 +6,33 @@ singleton: true
 namespace: nu
 description: Information about user's appearance preferences.
 
+lang_detail:
+  cpp: |
+    This class can not be created by user, you must create `State` first and
+    then receive an instance of `Appearance` via `Appearance::GetCurrent`.
+
+    ```cpp
+    nu::State state;
+    nu::Appearance* appearance = nu::Appearance::GetCurrent();
+    ```
+
+  lua: |
+    This class can not be created by user, you can only receive its global
+    instance from the `appearance` property of the module:
+
+    ```lua
+    gui.appearance:isdarkscheme()
+    ```
+
+  js: |
+    This class can not be created by user, you can only receive its global
+    instance from the `appearance` property of the module:
+
+    ```js
+    gui.appearance.isDarkScheme()
+    ```
+
+
 class_methods:
   - signature: Appearance* GetCurrent()
     lang: ['cpp']

@@ -5,19 +5,9 @@
 #include "nativeui/state.h"
 
 #include "nativeui/mac/events_handler.h"
-#include "nativeui/mac/nu_notification_center_delegate.h"
 #include "third_party/yoga/Yoga.h"
 
 namespace nu {
-
-NUNotificationCenterDelegate* State::GetNotificationCenterDelegate() {
-  if (!notification_center_delegate_) {
-    notification_center_delegate_ = [[NUNotificationCenterDelegate alloc] init];
-    [NSUserNotificationCenter.defaultUserNotificationCenter
-        setDelegate:notification_center_delegate_];
-  }
-  return notification_center_delegate_;
-}
 
 void State::PlatformInit() {
   [NSApplication sharedApplication];
@@ -34,11 +24,6 @@ void State::PlatformInit() {
 
   YGConfigSetPointScaleFactor(yoga_config(),
                               [NSScreen mainScreen].backingScaleFactor);
-}
-
-void State::PlatformDestroy() {
-  [NSUserNotificationCenter.defaultUserNotificationCenter setDelegate:nil];
-  [notification_center_delegate_ release];
 }
 
 }  // namespace nu
