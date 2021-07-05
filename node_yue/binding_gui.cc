@@ -350,6 +350,25 @@ struct Type<nu::App::ActivationPolicy> {
 };
 #endif
 
+#if defined(OS_WIN)
+template<>
+struct Type<nu::App::ShortcutOptions> {
+  static constexpr const char* name = "AppShortcutOptions";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::App::ShortcutOptions* out) {
+    auto obj = value.As<v8::Object>();
+    if (obj.IsEmpty())
+      return false;
+    Get(context, obj,
+        "arguments", &out->arguments,
+        "description", &out->description,
+        "workingDir", &out->working_dir);
+    return true;
+  }
+};
+#endif
+
 template<>
 struct Type<nu::App> {
   static constexpr const char* name = "App";
@@ -368,6 +387,12 @@ struct Type<nu::App> {
         "isActive", &nu::App::IsActive,
         "setActivationPolicy", &nu::App::SetActivationPolicy,
         "getActivationPolicy", &nu::App::GetActivationPolicy);
+#elif defined(OS_WIN)
+    Set(context, templ,
+        "setAppUserModelID", &nu::App::SetAppUserModelID,
+        "getAppUserModelID", &nu::App::GetAppUserModelID,
+        "createStartMenuShortcut", &nu::App::CreateStartMenuShortcut,
+        "getStartMenuShortcutPath", &nu::App::GetStartMenuShortcutPath);
 #endif
   }
 };
@@ -1505,7 +1530,6 @@ struct Type<nu::MessageBox> {
   }
 };
 
-#if defined(OS_MAC)
 template<>
 struct Type<nu::Notification::Action> {
   static constexpr const char* name = "NotificationAction";
@@ -1519,7 +1543,6 @@ struct Type<nu::Notification::Action> {
                "info", &out->info);
   }
 };
-#endif
 
 template<>
 struct Type<nu::Notification> {
@@ -1539,15 +1562,52 @@ struct Type<nu::Notification> {
         "getInfo", &nu::Notification::GetInfo,
         "setSilent", &nu::Notification::SetSilent,
         "setImage", &nu::Notification::SetImage,
-#if defined(OS_MAC)
+#if defined(OS_MAC) || defined(OS_WIN)
         "setHasReplyButton", &nu::Notification::SetHasReplyButton,
         "setResponsePlaceholder", &nu::Notification::SetResponsePlaceholder,
+#endif
+#if defined(OS_MAC)
         "setIdentifier", &nu::Notification::SetIdentifier,
         "getIdentifier", &nu::Notification::GetIdentifier,
+#elif defined(OS_WIN)
+        "setImagePlacement", &nu::Notification::SetImagePlacement,
+        "setXML", &nu::Notification::SetXML,
+        "getXML", &nu::Notification::GetXML,
 #endif
         "setActions", &nu::Notification::SetActions);
   }
 };
+
+#if defined(OS_WIN)
+template<>
+struct Type<nu::NotificationCenter::COMServerOptions> {
+  static constexpr const char* name = "NotificationCenterCOMServerOptions";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::NotificationCenter::COMServerOptions* out) {
+    auto obj = value.As<v8::Object>();
+    if (obj.IsEmpty())
+      return false;
+    Get(context, obj,
+        "writeRegistry", &out->write_registry,
+        "arguments", &out->arguments,
+        "toastActivatorClsid", &out->toast_activator_clsid);
+    return true;
+  }
+};
+
+template<>
+struct Type<nu::NotificationCenter::InputData> {
+  static constexpr const char* name = "NotificationCenterInputData";
+  static v8::Local<v8::Value> ToV8(
+      v8::Local<v8::Context> context,
+      const nu::NotificationCenter::InputData& data) {
+    auto obj = v8::Object::New(context->GetIsolate());
+    Set(context, obj, "key", data.key, "value", data.value);
+    return obj;
+  }
+};
+#endif
 
 template<>
 struct Type<nu::NotificationCenter> {
@@ -1558,6 +1618,17 @@ struct Type<nu::NotificationCenter> {
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
         "clear", &nu::NotificationCenter::Clear);
+#if defined(OS_WIN)
+    Set(context, templ,
+        "setCOMServerOptions",
+        &nu::NotificationCenter::SetCOMServerOptions,
+        "registerCOMServer",
+        &nu::NotificationCenter::RegisterCOMServer,
+        "removeCOMServerFromRegistry",
+        &nu::NotificationCenter::RemoveCOMServerFromRegistry,
+        "getToastActivatorCLSID",
+        &nu::NotificationCenter::GetToastActivatorCLSID);
+#endif
     SetProperty(context, templ,
                 "onNotificationShow",
                 &nu::NotificationCenter::on_notification_show,
@@ -1567,10 +1638,14 @@ struct Type<nu::NotificationCenter> {
                 &nu::NotificationCenter::on_notification_click,
                 "onNotificationAction",
                 &nu::NotificationCenter::on_notification_action);
-#if defined(OS_MAC)
+#if defined(OS_MAC) || defined(OS_WIN)
     SetProperty(context, templ,
                 "onNotificationReply",
                 &nu::NotificationCenter::on_notification_reply);
+#endif
+#if defined(OS_WIN)
+    SetProperty(context, templ,
+                "toastActivate", &nu::NotificationCenter::toast_activate);
 #endif
   }
 };

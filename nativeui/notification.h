@@ -5,12 +5,18 @@
 #ifndef NATIVEUI_NOTIFICATION_H_
 #define NATIVEUI_NOTIFICATION_H_
 
+#include <memory>
 #include <string>
 #include <vector>
 
 #include "base/memory/ref_counted.h"
-#include "nativeui/signal.h"
+#include "nativeui/nativeui_export.h"
 #include "nativeui/types.h"
+
+#if defined(OS_WIN)
+#include "base/files/scoped_temp_dir.h"
+#include "base/optional.h"
+#endif
 
 namespace nu {
 
@@ -28,11 +34,17 @@ class NATIVEUI_EXPORT Notification : public base::RefCounted<Notification> {
   std::string GetInfo() const;
   void SetSilent(bool silent);
   void SetImage(scoped_refptr<Image> image);
-#if defined(OS_MAC)
+#if defined(OS_MAC) || defined(OS_WIN)
   void SetHasReplyButton(bool has);
   void SetResponsePlaceholder(const std::string& placeholder);
+#endif
+#if defined(OS_MAC)
   void SetIdentifier(const std::string& identifier);
   std::string GetIdentifier() const;
+#elif defined(OS_WIN)
+  void SetImagePlacement(base::Optional<std::wstring> placement);
+  void SetXML(base::Optional<std::wstring> xml);
+  std::wstring GetXML() const;
 #endif
 
   struct Action {
@@ -54,6 +66,9 @@ class NATIVEUI_EXPORT Notification : public base::RefCounted<Notification> {
   void PlatformSetImage(Image* image);
 
   scoped_refptr<Image> image_;
+#if defined(OS_WIN)
+  base::ScopedTempDir image_dir_;
+#endif
 
   NativeNotification notification_;
 };

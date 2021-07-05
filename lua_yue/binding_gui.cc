@@ -321,6 +321,23 @@ struct Type<nu::App::ActivationPolicy> {
 };
 #endif
 
+#if defined(OS_WIN)
+template<>
+struct Type<nu::App::ShortcutOptions> {
+  static constexpr const char* name = "AppShortcutOptions";
+  static inline bool To(State* state, int index,
+                        nu::App::ShortcutOptions* out) {
+    if (GetType(state, index) == LuaType::Table) {
+      RawGetAndPop(state, index,
+                   "arguments", &out->arguments,
+                   "description", &out->description,
+                   "workingdir", &out->working_dir);
+    }
+    return true;
+  }
+};
+#endif
+
 template<>
 struct Type<nu::App> {
   static constexpr const char* name = "App";
@@ -336,6 +353,12 @@ struct Type<nu::App> {
            "isactive", &nu::App::IsActive,
            "setactivationpolicy", &nu::App::SetActivationPolicy,
            "getactivationpolicy", &nu::App::GetActivationPolicy);
+#elif defined(OS_WIN)
+    RawSet(state, metatable,
+           "setappusermodelid", &nu::App::SetAppUserModelID,
+           "getappusermodelid", &nu::App::GetAppUserModelID,
+           "createstartmenushortcut", &nu::App::CreateStartMenuShortcut,
+           "getstartmenushortcutpath", &nu::App::GetStartMenuShortcutPath);
 #endif
   }
 };
@@ -1355,7 +1378,6 @@ struct Type<nu::MessageBox> {
   }
 };
 
-#if defined(OS_MAC)
 template<>
 struct Type<nu::Notification::Action> {
   static constexpr const char* name = "NotificationAction";
@@ -1368,7 +1390,6 @@ struct Type<nu::Notification::Action> {
                         "title", &out->title);
   }
 };
-#endif
 
 template<>
 struct Type<nu::Notification> {
@@ -1384,15 +1405,48 @@ struct Type<nu::Notification> {
            "getinfo", &nu::Notification::GetInfo,
            "setsilent", &nu::Notification::SetSilent,
            "setimage", &nu::Notification::SetImage,
-#if defined(OS_MAC)
+#if defined(OS_MAC) || defined(OS_WIN)
            "sethasreplybutton", &nu::Notification::SetHasReplyButton,
            "setresponseplaceholder", &nu::Notification::SetResponsePlaceholder,
+#endif
+#if defined(OS_MAC)
            "setidentifier", &nu::Notification::SetIdentifier,
            "getidentifier", &nu::Notification::GetIdentifier,
+#elif defined(OS_WIN)
+           "setimageplacement", &nu::Notification::SetImagePlacement,
+           "setxml", &nu::Notification::SetXML,
+           "getxml", &nu::Notification::GetXML,
 #endif
            "setactions", &nu::Notification::SetActions);
   }
 };
+
+#if defined(OS_WIN)
+template<>
+struct Type<nu::NotificationCenter::COMServerOptions> {
+  static constexpr const char* name = "NotificationCenterCOMServerOptions";
+  static inline bool To(State* state, int index,
+                        nu::NotificationCenter::COMServerOptions* out) {
+    if (GetType(state, index) == LuaType::Table) {
+      RawGetAndPop(state, index,
+                   "writeregistry", &out->write_registry,
+                   "arguments", &out->arguments,
+                   "toastactivatorclsid", &out->toast_activator_clsid);
+    }
+    return true;
+  }
+};
+
+template<>
+struct Type<nu::NotificationCenter::InputData> {
+  static constexpr const char* name = "NotificationCenterInputData";
+  static inline void Push(State* state,
+                          const nu::NotificationCenter::InputData& data) {
+    lua::NewTable(state);
+    lua::RawSet(state, -1, "key", data.key, "value", data.value);
+  }
+};
+#endif
 
 template<>
 struct Type<nu::NotificationCenter> {
@@ -1400,6 +1454,17 @@ struct Type<nu::NotificationCenter> {
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "clear", &nu::NotificationCenter::Clear);
+#if defined(OS_WIN)
+    RawSet(state, metatable,
+           "setcomserveroptions",
+           &nu::NotificationCenter::SetCOMServerOptions,
+           "registercomserver",
+           &nu::NotificationCenter::RegisterCOMServer,
+           "removecomserverfromregistry",
+           &nu::NotificationCenter::RemoveCOMServerFromRegistry,
+           "gettoastactivatorclsid",
+           &nu::NotificationCenter::GetToastActivatorCLSID);
+#endif
     RawSetProperty(state, metatable,
                    "onnotificationshow",
                    &nu::NotificationCenter::on_notification_show,
@@ -1409,10 +1474,14 @@ struct Type<nu::NotificationCenter> {
                    &nu::NotificationCenter::on_notification_click,
                    "onnotificationaction",
                    &nu::NotificationCenter::on_notification_action);
-#if defined(OS_MAC)
+#if defined(OS_MAC) || defined(OS_WIN)
     RawSetProperty(state, metatable,
                    "onnotificationreply",
                    &nu::NotificationCenter::on_notification_reply);
+#endif
+#if defined(OS_WIN)
+    RawSetProperty(state, metatable,
+                   "toastactivate", &nu::NotificationCenter::toast_activate);
 #endif
   }
 };

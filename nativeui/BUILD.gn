@@ -358,6 +358,7 @@ jumbo_component("nativeui") {
       "win/clickable.h",
       "win/lifetime_win.cc",
       "win/accelerator_manager_win.cc",
+      "win/app_win.cc",
       "win/appearance_win.cc",
       "win/browser/browser_impl_ie.cc",
       "win/browser/browser_impl_ie.h",
@@ -414,6 +415,16 @@ jumbo_component("nativeui") {
       "win/menu_item_win.h",
       "win/message_box_win.cc",
       "win/message_loop_win.cc",
+      "win/notification_win.cc",
+      "win/notification_win.h",
+      "win/notification_center_win.cc",
+      "win/notifications/com_server_module.cc",
+      "win/notifications/com_server_module.h",
+      "win/notifications/notification_builder.cc",
+      "win/notifications/notification_builder.h",
+      "win/notifications/notification_activator.cc",
+      "win/notifications/notification_activator.h",
+      "win/notifications/winrt_util.h",
       "win/picker_win.cc",
       "win/picker_win.h",
       "win/progress_bar_win.cc",
@@ -502,6 +513,7 @@ jumbo_component("nativeui") {
       "gdiplus.lib",
       "urlmon.lib",
       "uxtheme.lib",
+      "runtimeobject.lib",  # used by ComServerModule
     ]
     ldflags = [
       "/DELAYLOAD:dwmapi.dll",

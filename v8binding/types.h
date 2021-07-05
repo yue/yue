@@ -12,6 +12,7 @@
 #include <utility>
 #include <vector>
 
+#include "base/optional.h"
 #include "base/strings/string_piece.h"
 #include "base/strings/string_util.h"
 #include "v8.h"  // NOLINT(build/include)
@@ -207,6 +208,31 @@ struct Type<base::string16> {
     str->Write(context->GetIsolate(),
                reinterpret_cast<uint16_t*>(base::WriteInto(out, length + 1)), 0,
                length);
+    return true;
+  }
+};
+
+template<typename T>
+struct Type<base::Optional<T>> {
+  static constexpr const char* name = Type<T>::name;
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   const base::Optional<T>& value) {
+    if (value)
+      return Type<T>::ToV8(context, *value);
+    else
+      return v8::Null(context->GetIsolate());
+  }
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     base::Optional<T>* out) {
+    if (value->IsUndefined() || value->IsNull()) {
+      out->reset();
+      return true;
+    }
+    T copy;
+    if (!Type<T>::FromV8(context, value, &copy))
+      return false;
+    out->emplace(std::move(copy));
     return true;
   }
 };

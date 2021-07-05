@@ -12,39 +12,22 @@
 
 #include "base/base_paths.h"
 #include "base/base_paths_win.h"
-#include "base/file_version_info.h"
 #include "base/json/json_reader.h"
 #include "base/path_service.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/win/scoped_co_mem.h"
+#include "nativeui/app.h"
 
 namespace nu {
 
 namespace {
-
-// Get the application name with order:
-// 1. The product name specified in exe file.
-// 2. The name of the exe file.
-// 3. "Yue.WebView2"
-base::string16 GetApplicationName() {
-  base::string16 name;
-  base::FilePath path;
-  if (base::PathService::Get(base::FILE_EXE, &path)) {
-    auto info = FileVersionInfo::CreateFileVersionInfo(path);
-    if (info && !info->product_name().empty())
-      name = info->product_name();
-    else
-      name = path.BaseName().RemoveExtension().value();
-  }
-  return name.empty() ? L"Yue.WebView2" : name;
-}
 
 // C:\Users\USER_NAME\AppData\Local\APPLICATION_NAME
 base::FilePath GetUserDataDir() {
   base::FilePath path;
   if (!base::PathService::Get(base::DIR_LOCAL_APP_DATA, &path))
     base::PathService::Get(base::DIR_TEMP, &path);
-  return path.Append(GetApplicationName());
+  return path.Append(App::GetCurrent()->GetNameW());
 }
 
 }  // namespace

@@ -18,15 +18,19 @@ NotificationCenter::NotificationCenter() : weak_factory_(this) {
   on_notification_close.SetDelegate(this);
   on_notification_click.SetDelegate(this);
   on_notification_action.SetDelegate(this);
+#if defined(OS_MAC)
   on_notification_reply.SetDelegate(this);
+#endif
 }
 
 NotificationCenter::~NotificationCenter() {
-  PlatformDestroy();
+  if (center_)
+    PlatformDestroy();
 }
 
 void NotificationCenter::OnConnect(int) {
-  PlatformInit();
+  if (!center_)
+    PlatformInit();
 }
 
 }  // namespace nu

@@ -56,18 +56,18 @@
     case NSUserNotificationActivationTypeActionButtonClicked: {
       NSDictionary* userInfo = [nsnotification userInfo];
       shell_->on_notification_action.Emit(
-          [self infoForNotification:nsnotification],
           base::SysNSStringToUTF8(userInfo[@"actionInfo"]));
       break;
     }
     case NSUserNotificationActivationTypeAdditionalActionClicked: {
       auto action = [nsnotification additionalActivationAction];
       shell_->on_notification_action.Emit(
-          [self infoForNotification:nsnotification],
           base::SysNSStringToUTF8([action identifier]));
       break;
     }
   }
+  [NSUserNotificationCenter.defaultUserNotificationCenter
+      removeDeliveredNotification:nsnotification];
 }
 
 - (void)userNotificationCenter:(NSUserNotificationCenter*)center
@@ -91,8 +91,6 @@ void NotificationCenter::Clear() {
 }
 
 void NotificationCenter::PlatformInit() {
-  if (center_)
-    return;
   center_ = [[NUNotificationCenterDelegate alloc] initWithShell:this];
   [NSUserNotificationCenter.defaultUserNotificationCenter setDelegate:center_];
 }

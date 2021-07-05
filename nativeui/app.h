@@ -8,6 +8,7 @@
 #include <string>
 
 #include "base/memory/weak_ptr.h"
+#include "base/optional.h"
 #include "nativeui/clipboard.h"
 #include "nativeui/gfx/color.h"
 
@@ -43,6 +44,21 @@ class NATIVEUI_EXPORT App {
   };
   void SetActivationPolicy(ActivationPolicy policy);
   ActivationPolicy GetActivationPolicy() const;
+#endif
+
+#if defined(OS_WIN)
+  bool IsRunningAsUWP() const;
+  void SetAppUserModelID(const std::string& id);
+  std::wstring GetAppUserModelID() const;
+  std::wstring GetNameW() const;
+
+  struct ShortcutOptions {
+    base::Optional<std::wstring> arguments;
+    base::Optional<std::wstring> description;
+    base::Optional<base::FilePath> working_dir;
+  };
+  bool CreateStartMenuShortcut(const ShortcutOptions& options);
+  base::FilePath GetStartMenuShortcutPath() const;
 #endif
 
   base::WeakPtr<App> GetWeakPtr() { return weak_factory_.GetWeakPtr(); }

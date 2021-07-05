@@ -9,7 +9,9 @@
 #include "base/base_paths.h"
 #include "base/path_service.h"
 #include "base/scoped_native_library.h"
+#include "base/win/core_winrt_util.h"
 #include "base/win/scoped_com_initializer.h"
+#include "base/win/scoped_hstring.h"
 #include "base/win/win_util.h"
 #include "base/win/windows_version.h"
 #include "nativeui/gfx/win/native_theme.h"
@@ -47,6 +49,11 @@ void State::InitializeCOM() {
     com_initializer_.reset(new base::win::ScopedCOMInitializer);
     ole_initializer_.reset(new ScopedOleInitializer);
   }
+}
+
+void State::InitializeWinRT() {
+  base::win::ResolveCoreWinRTDelayload();
+  base::win::ScopedHString::ResolveCoreWinRTStringDelayload();
 }
 
 bool State::InitWebView2Loader() {

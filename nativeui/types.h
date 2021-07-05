@@ -94,6 +94,7 @@ namespace nu {
 
 #if defined(OS_WIN)
 class ClipboardImpl;
+class ComServerModule;
 class DoubleBuffer;
 class FileDialogImpl;
 class TrayImpl;
@@ -103,6 +104,7 @@ struct AttributedTextImpl;
 struct Win32Message;
 struct MenuItemData;
 struct MessageBoxImpl;
+struct NotificationImpl;
 #endif
 
 #if defined(OS_MACOSX)
@@ -158,6 +160,8 @@ using nativeGraphicsContext = Gdiplus::Graphics*;
 using NativeImage = Gdiplus::Image*;
 using NativeMenu = HMENU;
 using NativeMenuItem = MenuItemData*;
+using NativeNotification = NotificationImpl*;
+using NativeNotificationCenter = ComServerModule*;
 using NativeTray = TrayImpl*;
 #elif defined(OS_IOS)
 using NativeView = UIView*;

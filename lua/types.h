@@ -14,6 +14,7 @@
 #include <utility>
 #include <vector>
 
+#include "base/optional.h"
 #include "base/strings/string_piece.h"
 #include "base/strings/utf_string_conversions.h"
 #include "lua/stack_auto_reset.h"
@@ -218,6 +219,28 @@ struct Type<const char[n]> {
   static constexpr const char* name = "string";
   static inline void Push(State* state, const char* str) {
     lua_pushlstring(state, str, n - 1);
+  }
+};
+
+template<typename T>
+struct Type<base::Optional<T>> {
+  static constexpr const char* name = Type<T>::name;
+  static inline void Push(State* state, const base::Optional<T>& value) {
+    if (value)
+      Type<T>::Push(state, *value);
+    else
+      lua_pushnil(state);
+  }
+  static inline bool To(State* state, int index, base::Optional<T>* out) {
+    if (GetType(state, index) == LuaType::Nil) {
+      out->reset();
+      return true;
+    }
+    T copy;
+    if (!Type<T>::To(state, index, &copy))
+      return false;
+    out->emplace(std::move(copy));
+    return true;
   }
 };
 
