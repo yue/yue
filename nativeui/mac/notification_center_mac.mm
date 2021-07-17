@@ -2,20 +2,9 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/notification_center.h"
-
-#import <Cocoa/Cocoa.h>
+#include "nativeui/mac/notification_center_mac.h"
 
 #include "base/strings/sys_string_conversions.h"
-
-@interface NUNotificationCenterDelegate
-    : NSObject<NSUserNotificationCenterDelegate> {
- @private
-  nu::NotificationCenter* shell_;
-}
-- (id)initWithShell:(nu::NotificationCenter*)shell;
-- (std::string)infoForNotification:(NSUserNotification*)nsnotification;
-@end
 
 @implementation NUNotificationCenterDelegate
 

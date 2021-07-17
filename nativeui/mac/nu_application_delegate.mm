@@ -5,6 +5,7 @@
 #include "nativeui/mac/nu_application_delegate.h"
 
 #include "nativeui/lifetime.h"
+#include "nativeui/mac/notification_center_mac.h"
 
 @implementation NUApplicationDelegate
 
@@ -21,6 +22,18 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification*)notify {
   shell_->on_ready.Emit();
+
+  // Dispatch the notification to NotificationCenter. This can happen when the
+  // app is started by clicking the notification.
+  NSObject* obj = [notify userInfo][NSApplicationLaunchUserNotificationKey];
+  if (obj && [obj isKindOfClass:[NSUserNotification class]]) {
+    auto* notification = static_cast<NSUserNotification*>(obj);
+    auto* center = nu::NotificationCenter::GetCurrent()->GetNative();
+    if (center) {
+      auto* unc = NSUserNotificationCenter.defaultUserNotificationCenter;
+      [center userNotificationCenter:unc didActivateNotification:notification];
+    }
+  }
 }
 
 - (BOOL)applicationShouldHandleReopen:(NSApplication*)sender

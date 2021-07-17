@@ -310,6 +310,7 @@ jumbo_component("nativeui") {
       "mac/message_box_mac.mm",
       "mac/message_loop_mac.mm",
       "mac/notification_mac.mm",
+      "mac/notification_center_mac.h",
       "mac/notification_center_mac.mm",
       "mac/picker_mac.mm",
       "mac/progress_bar_mac.mm",
