@@ -22,7 +22,12 @@ class NATIVEUI_EXPORT App {
  public:
   static App* GetCurrent();
 
+  void SetName(base::Optional<std::string> name);
+  std::string GetName() const;
+
 #if defined(OS_MACOSX)
+  bool IsBundled() const;
+
   // Set the application menu.
   void SetApplicationMenu(scoped_refptr<MenuBar> menu);
   MenuBar* GetApplicationMenu() const;
@@ -70,6 +75,9 @@ class NATIVEUI_EXPORT App {
  private:
   friend class State;
 
+  std::string PlatformGetName() const;
+
+  base::Optional<std::string> name_override_;
 #if defined(OS_MACOSX)
   scoped_refptr<MenuBar> application_menu_;
 #endif

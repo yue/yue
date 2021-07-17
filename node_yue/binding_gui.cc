@@ -376,8 +376,12 @@ struct Type<nu::App> {
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "setName", &nu::App::SetName,
+        "getName", &nu::App::GetName);
 #if defined(OS_MAC)
     Set(context, templ,
+        "isBundled", &nu::App::IsBundled,
         "setApplicationMenu",
         RefMethod(&nu::App::SetApplicationMenu, RefType::Reset, "appMenu"),
         "setDockBadgeLabel", &nu::App::SetDockBadgeLabel,

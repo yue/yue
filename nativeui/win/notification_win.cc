@@ -24,6 +24,9 @@ using ToastDismissedHandler = ABI::Windows::Foundation::ITypedEventHandler<
 namespace {
 
 winui::Notifications::IToastNotifier* GetNotifier() {
+  if (!State::GetCurrent()->InitializeWinRT())
+    return nullptr;
+
   static base::NoDestructor<mswr::ComPtr<winui::Notifications::IToastNotifier>>
       notifier;
   if (!(*notifier)) {
@@ -155,7 +158,6 @@ std::wstring Notification::GetXML() const {
 }
 
 void Notification::PlatformInit() {
-  State::GetCurrent()->InitializeWinRT();
   notification_ = new NotificationImpl();
 }
 

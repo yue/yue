@@ -342,8 +342,12 @@ template<>
 struct Type<nu::App> {
   static constexpr const char* name = "App";
   static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "setname", &nu::App::SetName,
+           "getname", &nu::App::GetName);
 #if defined(OS_MAC)
     RawSet(state, metatable,
+           "isbundled", &nu::App::IsBundled,
            "setapplicationmenu",
            RefMethod(&nu::App::SetApplicationMenu, RefType::Reset, "appmenu"),
            "setdockbadgelabel", &nu::App::SetDockBadgeLabel,

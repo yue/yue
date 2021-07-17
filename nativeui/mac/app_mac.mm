@@ -4,11 +4,17 @@
 
 #include "nativeui/app.h"
 
+#include "base/base_paths.h"
+#include "base/path_service.h"
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/mac/nu_application_delegate.h"
 #include "nativeui/menu_bar.h"
 
 namespace nu {
+
+bool App::IsBundled() const {
+  return [[NSBundle mainBundle] bundleIdentifier];
+}
 
 void App::SetApplicationMenu(scoped_refptr<MenuBar> menu) {
   application_menu_ = std::move(menu);
@@ -64,6 +70,17 @@ App::ActivationPolicy App::GetActivationPolicy() const {
     case NSApplicationActivationPolicyProhibited:
       return ActivationPolicy::Prohibited;
   }
+}
+
+std::string App::PlatformGetName() const {
+  NSString* key = static_cast<NSString*>(kCFBundleNameKey);
+  NSString* name = [NSBundle mainBundle].infoDictionary[key];
+  if (name)
+    return base::SysNSStringToUTF8(name);
+  base::FilePath path;
+  if (base::PathService::Get(base::FILE_EXE, &path))
+    return path.BaseName().RemoveExtension().value();
+  return "Yue";
 }
 
 }  // namespace nu

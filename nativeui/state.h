@@ -57,7 +57,7 @@ class NATIVEUI_EXPORT State {
   // Internal classes.
 #if defined(OS_WIN)
   void InitializeCOM();
-  void InitializeWinRT();
+  bool InitializeWinRT();
   bool InitWebView2Loader();
   HWND GetSubwinHolder();
   ClassRegistrar* GetClassRegistrar();

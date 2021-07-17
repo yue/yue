@@ -18,6 +18,7 @@ const blacklist = [
   path.join('nativeui', 'mac', 'browser', 'nu_custom_protocol.h'),
   path.join('nativeui', 'mac', 'container_mac.h'),
   path.join('nativeui', 'mac', 'drag_drop', 'data_provider.h'),
+  path.join('nativeui', 'mac', 'notification_center_mac.h'),
   path.join('nativeui', 'mac', 'nu_application_delegate.h'),
   path.join('nativeui', 'mac', 'nu_table_cell.h'),
   path.join('nativeui', 'mac', 'nu_table_column.h'),

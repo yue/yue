@@ -111,4 +111,8 @@ base::FilePath App::GetStartMenuShortcutPath() const {
   return start_menu_path.Append(name);
 }
 
+std::string App::PlatformGetName() const {
+  return base::WideToUTF8(GetNameW());
+}
+
 }  // namespace nu

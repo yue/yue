@@ -51,9 +51,9 @@ void State::InitializeCOM() {
   }
 }
 
-void State::InitializeWinRT() {
-  base::win::ResolveCoreWinRTDelayload();
-  base::win::ScopedHString::ResolveCoreWinRTStringDelayload();
+bool State::InitializeWinRT() {
+  return base::win::ResolveCoreWinRTDelayload() &&
+         base::win::ScopedHString::ResolveCoreWinRTStringDelayload();
 }
 
 bool State::InitWebView2Loader() {

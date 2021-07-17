@@ -21,7 +21,8 @@
 namespace nu {
 
 void NotificationCenter::Clear() {
-  State::GetCurrent()->InitializeWinRT();
+  if (!State::GetCurrent()->InitializeWinRT())
+    return;
 
   mswr::ComPtr<winui::Notifications::IToastNotificationManagerStatics>
       toast_manager;
@@ -146,6 +147,9 @@ const std::wstring& NotificationCenter::GetToastActivatorCLSID() {
 }
 
 void NotificationCenter::PlatformInit() {
+  if (!State::GetCurrent()->InitializeWinRT())
+    return;
+
   State::GetCurrent()->InitializeCOM();
   if (options_.write_registry)
     RegisterCOMServer();
