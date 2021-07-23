@@ -8,12 +8,11 @@
 #include <dlfcn.h>
 #include <gtk/gtk.h>
 
-#include "base/base_paths.h"
 #include "base/check.h"
 #include "base/files/file_path.h"
 #include "base/logging.h"
-#include "base/path_service.h"
 #include "base/strings/stringprintf.h"
+#include "nativeui/app.h"
 #include "nativeui/gfx/image.h"
 #include "nativeui/menu.h"
 
@@ -130,16 +129,10 @@ void EnsureMethodsLoaded() {
 
 // Generate ID based on the exe name.
 std::string GenerateAppIndicatorId() {
-  static std::string exe_name;
-  if (exe_name.empty()) {
-    base::FilePath exe_path;
-    if (base::PathService::Get(base::FILE_EXE, &exe_path))
-      exe_name = exe_path.BaseName().value();
-    else
-      exe_name = "yue";
-  }
   static int count = 0;
-  return base::StringPrintf("%s-appindicator-%d", exe_name.c_str(), count++);
+  return base::StringPrintf("%s-appindicator-%d",
+                            App::GetCurrent()->GetName().c_str(),
+                            count++);
 }
 
 }  // namespace

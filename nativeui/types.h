@@ -30,6 +30,7 @@ typedef struct _GtkMenuShell GtkMenuShell;
 typedef struct _GtkMessageDialog GtkMessageDialog;
 typedef struct _GtkWidget GtkWidget;
 typedef struct _GtkWindow GtkWindow;
+typedef struct _GDBusProxy GDBusProxy;
 typedef struct _PangoFontDescription PangoFontDescription;
 typedef struct _PangoLayout PangoLayout;
 typedef struct _cairo_surface cairo_surface_t;
@@ -105,6 +106,8 @@ struct Win32Message;
 struct MenuItemData;
 struct MessageBoxImpl;
 struct NotificationImpl;
+#elif defined(OS_LINUX)
+struct NotificationData;
 #endif
 
 #if defined(OS_MACOSX)
@@ -143,6 +146,8 @@ using nativeGraphicsContext = cairo_t*;
 using NativeFont = PangoFontDescription*;
 using NativeMenu = GtkMenuShell*;
 using NativeMenuItem = GtkMenuItem*;
+using NativeNotification = NotificationData*;
+using NativeNotificationCenter = GDBusProxy*;
 using NativeTray = AppIndicator*;
 #elif defined(OS_WIN)
 using NativeAttributedText = AttributedTextImpl*;

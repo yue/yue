@@ -4,6 +4,8 @@
 
 #include "nativeui/notification_center.h"
 
+#include "base/logging.h"
+#include "nativeui/notification.h"
 #include "nativeui/state.h"
 
 namespace nu {
@@ -26,6 +28,12 @@ NotificationCenter::NotificationCenter() : weak_factory_(this) {
 NotificationCenter::~NotificationCenter() {
   if (center_)
     PlatformDestroy();
+}
+
+NativeNotificationCenter NotificationCenter::GetNative() {
+  if (!center_)
+    PlatformInit();
+  return center_;
 }
 
 void NotificationCenter::OnConnect(int) {

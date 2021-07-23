@@ -5,6 +5,7 @@
 #ifndef NATIVEUI_NOTIFICATION_CENTER_H_
 #define NATIVEUI_NOTIFICATION_CENTER_H_
 
+#include <set>
 #include <string>
 #include <vector>
 
@@ -18,6 +19,8 @@ class FilePath;
 }
 
 namespace nu {
+
+class Notification;
 
 class NATIVEUI_EXPORT NotificationCenter : SignalDelegate {
  public:
@@ -41,7 +44,14 @@ class NATIVEUI_EXPORT NotificationCenter : SignalDelegate {
   ::GUID GetRawToastActivatorCLSID();
 #endif
 
-  NativeNotificationCenter GetNative() const { return center_; }
+#if defined(OS_LINUX)
+  // Internal: Notification managements.
+  void AddNotification(Notification* notification);
+  void RemoveNotification(Notification* notification);
+  Notification* FindNotification(uint32_t dbus_id) const;
+#endif
+
+  NativeNotificationCenter GetNative();
 
   base::WeakPtr<NotificationCenter> GetWeakPtr() {
     return weak_factory_.GetWeakPtr();
@@ -84,6 +94,14 @@ class NATIVEUI_EXPORT NotificationCenter : SignalDelegate {
 
   base::Optional<::GUID> toast_activator_clsid_;
   std::wstring toast_activator_clsid_string_;
+#endif
+
+#if defined(OS_LINUX)
+  // Stores the notifications that have been shown.
+  std::set<scoped_refptr<Notification>> notifications_;
+
+  // Used to disconnect from "g-signal" during destruction.
+  unsigned long proxy_signal_handler_ = 0;  // NOLINT
 #endif
 
   NativeNotificationCenter center_ = nullptr;

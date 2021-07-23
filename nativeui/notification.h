@@ -13,7 +13,7 @@
 #include "nativeui/nativeui_export.h"
 #include "nativeui/types.h"
 
-#if defined(OS_WIN)
+#if defined(OS_LINUX) || defined(OS_WIN)
 #include "base/files/scoped_temp_dir.h"
 #include "base/optional.h"
 #endif
@@ -61,16 +61,20 @@ class NATIVEUI_EXPORT Notification : public base::RefCounted<Notification> {
 
   ~Notification();
 
+#if defined(OS_LINUX) || defined(OS_WIN)
+  bool WriteImageToTempDir(Image* image, base::FilePath* out);
+#endif
+
   void PlatformInit();
   void PlatformDestroy();
   void PlatformSetImage(Image* image);
 
   scoped_refptr<Image> image_;
-#if defined(OS_WIN)
+#if defined(OS_LINUX) || defined(OS_WIN)
   base::ScopedTempDir image_dir_;
 #endif
 
-  NativeNotification notification_;
+  NativeNotification notification_ = nullptr;
 };
 
 }  // namespace nu

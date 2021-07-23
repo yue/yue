@@ -166,15 +166,9 @@ void Notification::PlatformDestroy() {
 }
 
 void Notification::PlatformSetImage(Image* image) {
-  if (!image_dir_.CreateUniqueTempDir()) {
-    LOG(ERROR) << "Failed for create temporary dir";
+  base::FilePath path;
+  if (!WriteImageToTempDir(image, &path))
     return;
-  }
-  base::FilePath path = image_dir_.GetPath().Append(L"image.png");
-  if (!image->WriteToFile("png", path)) {
-    LOG(ERROR) << "Failed to write image to disk";
-    return;
-  }
   notification_->image.emplace(path.value());
 }
 
