@@ -27,7 +27,7 @@ base::FilePath GetUserDataDir() {
   base::FilePath path;
   if (!base::PathService::Get(base::DIR_LOCAL_APP_DATA, &path))
     base::PathService::Get(base::DIR_TEMP, &path);
-  return path.Append(App::GetCurrent()->GetNameW());
+  return path.Append(base::UTF8ToWide(App::GetCurrent()->GetName()));
 }
 
 }  // namespace

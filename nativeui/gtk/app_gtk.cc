@@ -4,16 +4,27 @@
 
 #include "nativeui/app.h"
 
-#include "base/base_paths.h"
-#include "base/path_service.h"
+#include "base/environment.h"
+#include "nativeui/gtk/util/desktop_file.h"
 
 namespace nu {
 
-std::string App::PlatformGetName() const {
-  base::FilePath path;
-  if (base::PathService::Get(base::FILE_EXE, &path))
-    return path.BaseName().RemoveExtension().value();
-  return "Yue";
+void App::SetID(const std::string& name) {
+  desktop_name_ = name;
+}
+
+std::string App::GetID() const {
+  return desktop_name_;
+}
+
+bool App::PlatformGetName(std::string* name) const {
+  if (desktop_name_.empty())
+    return false;
+  std::unique_ptr<base::Environment> env = base::Environment::Create();
+  std::string contents;
+  if (!GetDesktopFileContents(env.get(), desktop_name_ + ".desktop", &contents))
+    return false;
+  return GetNameFromDesktopFile(contents, name);
 }
 
 }  // namespace nu

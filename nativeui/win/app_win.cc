@@ -20,6 +20,14 @@
 
 namespace nu {
 
+void App::SetID(const std::string& id) {
+  ::SetCurrentProcessExplicitAppUserModelID(base::UTF8ToWide(id).c_str());
+}
+
+std::string App::GetID() const {
+  return base::WideToUTF8(GetAppUserModelID());
+}
+
 bool App::IsRunningAsUWP() const {
   static base::Optional<bool> result;
   if (!result) {
@@ -38,10 +46,6 @@ bool App::IsRunningAsUWP() const {
   return *result;
 }
 
-void App::SetAppUserModelID(const std::string& id) {
-  ::SetCurrentProcessExplicitAppUserModelID(base::UTF8ToUTF16(id).c_str());
-}
-
 std::wstring App::GetAppUserModelID() const {
   PWSTR id;
   if (FAILED(::GetCurrentProcessExplicitAppUserModelID(&id)))
@@ -49,23 +53,6 @@ std::wstring App::GetAppUserModelID() const {
   std::wstring result(id);
   ::CoTaskMemFree(id);
   return result;
-}
-
-std::wstring App::GetNameW() const {
-  // Get the application name with order:
-  // 1. The product name specified in exe file.
-  // 2. The name of the exe file.
-  // 3. "Yue"
-  std::wstring name;
-  base::FilePath path;
-  if (base::PathService::Get(base::FILE_EXE, &path)) {
-    auto info = FileVersionInfo::CreateFileVersionInfo(path);
-    if (info && !info->product_name().empty())
-      name = info->product_name();
-    else
-      name = path.BaseName().RemoveExtension().value();
-  }
-  return name.empty() ? L"Yue" : name;
 }
 
 bool App::CreateStartMenuShortcut(
@@ -102,7 +89,7 @@ bool App::CreateStartMenuShortcut(
 }
 
 base::FilePath App::GetStartMenuShortcutPath() const {
-  std::wstring name = GetNameW() + L".LNK";
+  std::wstring name = base::UTF8ToWide(GetName()) + L".LNK";
   base::FilePath start_menu_path;
   if (!base::PathService::Get(base::DIR_START_MENU, &start_menu_path)) {
     DLOG(ERROR) << "Failed to get DIR_START_MENU path";
@@ -111,8 +98,16 @@ base::FilePath App::GetStartMenuShortcutPath() const {
   return start_menu_path.Append(name);
 }
 
-std::string App::PlatformGetName() const {
-  return base::WideToUTF8(GetNameW());
+bool App::PlatformGetName(std::string* name) const {
+  // Get the product name specified in exe file.
+  base::FilePath path;
+  if (!base::PathService::Get(base::FILE_EXE, &path))
+    return false;
+  auto info = FileVersionInfo::CreateFileVersionInfo(path);
+  if (!info || info->product_name().empty())
+    return false;
+  *name = base::WideToUTF8(info->product_name());
+  return true;
 }
 
 }  // namespace nu

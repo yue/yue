@@ -6,6 +6,8 @@
 
 #include <utility>
 
+#include "base/base_paths.h"
+#include "base/path_service.h"
 #include "nativeui/menu_bar.h"
 #include "nativeui/state.h"
 
@@ -28,7 +30,18 @@ void App::SetName(base::Optional<std::string> name) {
 std::string App::GetName() const {
   if (name_override_)
     return *name_override_;
-  return PlatformGetName();
+  if (!cached_name_) {
+    std::string name;
+    if (!PlatformGetName(&name)) {
+      base::FilePath path;
+      if (base::PathService::Get(base::FILE_EXE, &path))
+        name = path.BaseName().RemoveExtension().AsUTF8Unsafe();
+      else
+        name = "Yue";
+    }
+    cached_name_.emplace(std::move(name));
+  }
+  return *cached_name_;
 }
 
 }  // namespace nu

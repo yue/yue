@@ -24,10 +24,12 @@ class NATIVEUI_EXPORT App {
 
   void SetName(base::Optional<std::string> name);
   std::string GetName() const;
+#if defined(OS_LINUX) || defined(OS_WIN)
+  void SetID(const std::string& id);
+#endif
+  std::string GetID() const;
 
 #if defined(OS_MACOSX)
-  bool IsBundled() const;
-
   // Set the application menu.
   void SetApplicationMenu(scoped_refptr<MenuBar> menu);
   MenuBar* GetApplicationMenu() const;
@@ -53,9 +55,7 @@ class NATIVEUI_EXPORT App {
 
 #if defined(OS_WIN)
   bool IsRunningAsUWP() const;
-  void SetAppUserModelID(const std::string& id);
   std::wstring GetAppUserModelID() const;
-  std::wstring GetNameW() const;
 
   struct ShortcutOptions {
     base::Optional<std::wstring> arguments;
@@ -75,11 +75,14 @@ class NATIVEUI_EXPORT App {
  private:
   friend class State;
 
-  std::string PlatformGetName() const;
+  bool PlatformGetName(std::string* name) const;
 
   base::Optional<std::string> name_override_;
+  mutable base::Optional<std::string> cached_name_;
 #if defined(OS_MACOSX)
   scoped_refptr<MenuBar> application_menu_;
+#elif defined(OS_LINUX)
+  std::string desktop_name_;
 #endif
 
   base::WeakPtrFactory<App> weak_factory_;

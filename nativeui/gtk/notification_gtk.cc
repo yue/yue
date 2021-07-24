@@ -5,6 +5,8 @@
 
 #include "nativeui/gtk/notification_gtk.h"
 
+#include "base/logging.h"
+#include "base/strings/string_util.h"
 #include "nativeui/app.h"
 #include "nativeui/notification_center.h"
 
@@ -70,10 +72,10 @@ void Notification::Show() {
   notification_->cancellable.reset(g_cancellable_new());
 
   GVariant* parameters = g_variant_new(
-      "(susssasa{sv}i)", "" /* app_name */, notification_->dbus_id,
-      "" /* app_icon */, notification_->title.c_str(),
-      notification_->body.c_str(), notification_->actions_builder,
-      notification_->hints_builder, -1);
+      "(susssasa{sv}i)", App::GetCurrent()->GetName().c_str(),
+      notification_->dbus_id, "" /* app_icon */,
+      notification_->title.c_str(), notification_->body.c_str(),
+      notification_->actions_builder, notification_->hints_builder, -1);
   g_dbus_proxy_call(
       proxy, "Notify", parameters, G_DBUS_CALL_FLAGS_NONE, -1,
       notification_->cancellable,
@@ -127,6 +129,12 @@ void Notification::SetActions(const std::vector<Action>& actions) {
 
 void Notification::PlatformInit() {
   notification_ = new NotificationData;
+
+  std::string desktop_name = App::GetCurrent()->GetID();
+  if (!desktop_name.empty()) {
+    g_variant_builder_add(notification_->hints_builder, "{sv}", "desktop-entry",
+                          g_variant_new_string(desktop_name.c_str()));
+  }
 }
 
 void Notification::PlatformDestroy() {

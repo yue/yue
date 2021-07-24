@@ -4,16 +4,15 @@
 
 #include "nativeui/app.h"
 
-#include "base/base_paths.h"
-#include "base/path_service.h"
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/mac/nu_application_delegate.h"
 #include "nativeui/menu_bar.h"
 
 namespace nu {
 
-bool App::IsBundled() const {
-  return [[NSBundle mainBundle] bundleIdentifier];
+std::string App::GetID() const {
+  NSString* ns_id = [[NSBundle mainBundle] bundleIdentifier];
+  return ns_id ? base::SysNSStringToUTF8(ns_id) : std::string();
 }
 
 void App::SetApplicationMenu(scoped_refptr<MenuBar> menu) {
@@ -72,15 +71,13 @@ App::ActivationPolicy App::GetActivationPolicy() const {
   }
 }
 
-std::string App::PlatformGetName() const {
+bool App::PlatformGetName(std::string* name) const {
   NSString* key = static_cast<NSString*>(kCFBundleNameKey);
-  NSString* name = [NSBundle mainBundle].infoDictionary[key];
-  if (name)
-    return base::SysNSStringToUTF8(name);
-  base::FilePath path;
-  if (base::PathService::Get(base::FILE_EXE, &path))
-    return path.BaseName().RemoveExtension().value();
-  return "Yue";
+  NSString* ns_name = [NSBundle mainBundle].infoDictionary[key];
+  if (!ns_name)
+    return false;
+  *name = base::SysNSStringToUTF8(ns_name);
+  return true;
 }
 
 }  // namespace nu

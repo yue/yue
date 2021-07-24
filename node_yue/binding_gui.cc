@@ -378,10 +378,13 @@ struct Type<nu::App> {
                              v8::Local<v8::ObjectTemplate> templ) {
     Set(context, templ,
         "setName", &nu::App::SetName,
-        "getName", &nu::App::GetName);
+        "getName", &nu::App::GetName,
+#if defined(OS_LINUX) || defined(OS_WIN)
+        "setID", &nu::App::SetID,
+#endif
+        "getID", &nu::App::GetID);
 #if defined(OS_MAC)
     Set(context, templ,
-        "isBundled", &nu::App::IsBundled,
         "setApplicationMenu",
         RefMethod(&nu::App::SetApplicationMenu, RefType::Reset, "appMenu"),
         "setDockBadgeLabel", &nu::App::SetDockBadgeLabel,
@@ -393,8 +396,6 @@ struct Type<nu::App> {
         "getActivationPolicy", &nu::App::GetActivationPolicy);
 #elif defined(OS_WIN)
     Set(context, templ,
-        "setAppUserModelID", &nu::App::SetAppUserModelID,
-        "getAppUserModelID", &nu::App::GetAppUserModelID,
         "createStartMenuShortcut", &nu::App::CreateStartMenuShortcut,
         "getStartMenuShortcutPath", &nu::App::GetStartMenuShortcutPath);
 #endif

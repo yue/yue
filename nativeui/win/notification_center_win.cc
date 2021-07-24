@@ -11,6 +11,7 @@
 #include "base/logging.h"
 #include "base/notreached.h"
 #include "base/path_service.h"
+#include "base/strings/utf_string_conversions.h"
 #include "base/win/registry.h"
 #include "base/win/scoped_co_mem.h"
 #include "nativeui/app.h"
@@ -92,7 +93,7 @@ bool NotificationCenter::RegisterCOMServer() {
   }
 
   std::wstring key = L"SOFTWARE\\Classes\\CLSID\\" + GetToastActivatorCLSID();
-  std::wstring class_name = App::GetCurrent()->GetNameW() +
+  std::wstring class_name = base::UTF8ToWide(App::GetCurrent()->GetName()) +
                             L" ToastActivator Class";
   LONG result =
       base::win::RegKey(HKEY_CURRENT_USER, key.c_str(), KEY_ALL_ACCESS)

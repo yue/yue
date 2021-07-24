@@ -344,10 +344,13 @@ struct Type<nu::App> {
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "setname", &nu::App::SetName,
-           "getname", &nu::App::GetName);
+           "getname", &nu::App::GetName,
+#if defined(OS_LINUX) || defined(OS_WIN)
+           "setid", &nu::App::SetID,
+#endif
+           "getid", &nu::App::GetID);
 #if defined(OS_MAC)
     RawSet(state, metatable,
-           "isbundled", &nu::App::IsBundled,
            "setapplicationmenu",
            RefMethod(&nu::App::SetApplicationMenu, RefType::Reset, "appmenu"),
            "setdockbadgelabel", &nu::App::SetDockBadgeLabel,
@@ -359,8 +362,6 @@ struct Type<nu::App> {
            "getactivationpolicy", &nu::App::GetActivationPolicy);
 #elif defined(OS_WIN)
     RawSet(state, metatable,
-           "setappusermodelid", &nu::App::SetAppUserModelID,
-           "getappusermodelid", &nu::App::GetAppUserModelID,
            "createstartmenushortcut", &nu::App::CreateStartMenuShortcut,
            "getstartmenushortcutpath", &nu::App::GetStartMenuShortcutPath);
 #endif
