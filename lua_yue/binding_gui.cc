@@ -1414,11 +1414,10 @@ struct Type<nu::Notification> {
 #if defined(OS_MAC) || defined(OS_WIN)
            "sethasreplybutton", &nu::Notification::SetHasReplyButton,
            "setresponseplaceholder", &nu::Notification::SetResponsePlaceholder,
-#endif
-#if defined(OS_MAC)
            "setidentifier", &nu::Notification::SetIdentifier,
            "getidentifier", &nu::Notification::GetIdentifier,
-#elif defined(OS_WIN)
+#endif
+#if defined(OS_WIN)
            "setimageplacement", &nu::Notification::SetImagePlacement,
            "setxml", &nu::Notification::SetXML,
            "getxml", &nu::Notification::GetXML,

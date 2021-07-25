@@ -23,8 +23,9 @@ struct NotificationData {
   std::string title;
   std::string body;
   std::string info;
-  GVariantBuilder* actions_builder;
-  GVariantBuilder* hints_builder;
+  std::string image_path;
+  bool silent = false;
+  std::vector<Notification::Action> actions;
 
   // The ID used by the notification server. Will be 0 until the
   // first "Notify" message completes.
@@ -36,6 +37,10 @@ struct NotificationData {
   // If true, indicates the notification should be closed once
   // |dbus_id| becomes available.
   bool should_close = false;
+
+  // If true, indicates the notification should be updated once
+  // |dbus_id| becomes available.
+  bool should_update = false;
 
   NotificationData();
   ~NotificationData();

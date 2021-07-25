@@ -17,8 +17,8 @@ const wchar_t kEmptyTemplate[] =
     L"<toast>\n"
     L"  <visual>\n"
     L"    <binding template=\"ToastGeneric\">\n"
-    L"      <text></text>\n"
-    L"      <text></text>\n"
+    L"      <text>{title}</text>\n"
+    L"      <text>{body}</text>\n"
     L"    </binding>\n"
     L"  </visual>\n"
     L"  <actions></actions>\n"
@@ -98,26 +98,6 @@ mswr::ComPtr<winxml::Dom::IXmlNode> GetNthElementByTagName(
   return node;
 }
 
-HRESULT SetNthTextNodeValue(winxml::Dom::IXmlDocument* document,
-                            winxml::Dom::IXmlNodeList* node_list,
-                            UINT32 index,
-                            base::WStringPiece text) {
-  mswr::ComPtr<winxml::Dom::IXmlNode> node;
-  HRESULT hr = node_list->Item(index, &node);
-  if (FAILED(hr))
-    return hr;
-  mswr::ComPtr<winxml::Dom::IXmlText> xml_text;
-  hr = document->CreateTextNode(ScopedHString::Create(text).get(), &xml_text);
-  if (FAILED(hr))
-    return hr;
-  mswr::ComPtr<winxml::Dom::IXmlNode> text_node;
-  hr = xml_text.As(&text_node);
-  if (FAILED(hr))
-    return hr;
-  mswr::ComPtr<winxml::Dom::IXmlNode> append_node;
-  return node->AppendChild(text_node.Get(), &append_node);
-}
-
 HRESULT SetAttribute(winxml::Dom::IXmlDocument* document,
                      winxml::Dom::IXmlNode* node,
                      base::WStringPiece name,
@@ -181,26 +161,21 @@ HRESULT AppendActionNode(winxml::Dom::IXmlDocument* document,
 
 mswr::ComPtr<IToastNotification> CreateToastNotification(
     winxml::Dom::IXmlDocument* document) {
-  mswr::ComPtr<winui::Notifications::IToastNotificationFactory>
-      toast_notification_factory;
+  mswr::ComPtr<winui::Notifications::IToastNotificationFactory> factory;
   HRESULT hr = CreateActivationFactory(
       RuntimeClass_Windows_UI_Notifications_ToastNotification,
-      IID_PPV_ARGS(&toast_notification_factory));
+      IID_PPV_ARGS(&factory));
   if (FAILED(hr)) {
-    DLOG(ERROR) << "Unable to create the IToastNotificationFactory "
+    DLOG(ERROR) << "Unable to create IToastNotificationFactory "
                 << std::hex << hr;
     return nullptr;
   }
-
   mswr::ComPtr<IToastNotification> toast_notification;
-  hr = toast_notification_factory->CreateToastNotification(
-      document, &toast_notification);
+  hr = factory->CreateToastNotification(document, &toast_notification);
   if (FAILED(hr)) {
-    DLOG(ERROR) << "Unable to create the IToastNotification " << std::hex
-                << hr;
+    DLOG(ERROR) << "Unable to create IToastNotification " << std::hex << hr;
     return nullptr;
   }
-
   return toast_notification;
 }
 
@@ -217,13 +192,6 @@ mswr::ComPtr<winxml::Dom::IXmlDocument> BuildNotificationXMLDocument(
     return nullptr;
   SetAttribute(document.Get(), toast.Get(), L"launch",
                kNotificationTypeClick + notification->info);
-
-  mswr::ComPtr<winxml::Dom::IXmlNodeList> texts =
-      GetElementsByTagName(document.Get(), L"text", 2);
-  if (!texts)
-    return nullptr;
-  SetNthTextNodeValue(document.Get(), texts.Get(), 0, notification->title);
-  SetNthTextNodeValue(document.Get(), texts.Get(), 1, notification->body);
 
   mswr::ComPtr<winxml::Dom::IXmlNode> actions =
       GetNthElementByTagName(document.Get(), L"actions", 0);
@@ -261,7 +229,7 @@ mswr::ComPtr<winxml::Dom::IXmlDocument> BuildNotificationXMLDocument(
     SetAttribute(document.Get(), node.Get(), L"silent", L"true");
   }
 
-  if (notification->image) {
+  if (notification->image_path) {
     mswr::ComPtr<winxml::Dom::IXmlNode> binding =
         GetNthElementByTagName(document.Get(), L"binding", 0);
     if (!binding)
@@ -270,7 +238,7 @@ mswr::ComPtr<winxml::Dom::IXmlDocument> BuildNotificationXMLDocument(
     if (FAILED(AppendNode(document.Get(), binding.Get(), L"image", &node)))
       return nullptr;
     SetAttribute(document.Get(), node.Get(), L"src",
-                 notification->image->c_str());
+                 notification->image_path->c_str());
     if (notification->image_placement) {
       SetAttribute(document.Get(), node.Get(), L"placement",
                    notification->image_placement->c_str());
@@ -311,6 +279,38 @@ mswr::ComPtr<IToastNotification> BuildNotification(
   if (!document)
     return nullptr;
   return CreateToastNotification(document.Get());
+}
+
+mswr::ComPtr<INotificationData> CreateNotificationData() {
+  mswr::ComPtr<winui::Notifications::INotificationDataFactory> factory;
+  HRESULT hr = CreateActivationFactory(
+      RuntimeClass_Windows_UI_Notifications_NotificationData,
+      IID_PPV_ARGS(&factory));
+  if (FAILED(hr)) {
+    DLOG(ERROR) << "Unable to create INotificationDataFactory "
+                << std::hex << hr;
+    return nullptr;
+  }
+  mswr::ComPtr<INotificationData> notification_data;
+  hr = factory->CreateNotificationDataWithValues(nullptr, &notification_data);
+  if (FAILED(hr)) {
+    DLOG(ERROR) << "Unable to create INotificationData " << std::hex << hr;
+    return nullptr;
+  }
+  return notification_data;
+}
+
+HRESULT NotificationDataInsert(INotificationData* data,
+                               base::WStringPiece key,
+                               base::WStringPiece value) {
+  mswr::ComPtr<winfoundtn::Collections::IMap<HSTRING, HSTRING>> values;
+  HRESULT hr = data->get_Values(&values);
+  if (FAILED(hr))
+    return hr;
+  ScopedHString hkey = ScopedHString::Create(key);
+  ScopedHString hvalue = ScopedHString::Create(value);
+  boolean replaced;
+  return values->Insert(hkey.get(), hvalue.get(), &replaced);
 }
 
 }  // namespace nu

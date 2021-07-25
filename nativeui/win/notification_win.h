@@ -18,20 +18,20 @@ namespace nu {
 class ToastEventHandler;
 
 struct NotificationImpl {
-  base::Optional<std::wstring> xml;
-
-  std::wstring title;
-  std::wstring body;
+  std::wstring id;
   std::wstring info;
   bool has_reply_button = false;
   std::wstring reply_placeholder;
-  base::Optional<std::wstring> image;
+  base::Optional<std::wstring> image_path;
   base::Optional<std::wstring> image_placement;
   bool silent = false;
   std::vector<Notification::Action> actions;
 
+  base::Optional<std::wstring> xml;
+  bool first_time = true;
+
   mswr::ComPtr<IToastNotification> toast;
-  std::unique_ptr<ToastEventHandler> event_handler;
+  mswr::ComPtr<INotificationData> data;
 };
 
 }  // namespace nu

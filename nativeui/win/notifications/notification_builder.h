@@ -19,8 +19,14 @@ extern const wchar_t kNotificationTypeReply[];
 extern const wchar_t kReplyInputId[];
 
 std::wstring GetNotificationXMLRepresentation(NotificationImpl* notification);
+
 mswr::ComPtr<IToastNotification> BuildNotification(
     NotificationImpl* notification);
+
+mswr::ComPtr<INotificationData> CreateNotificationData();
+HRESULT NotificationDataInsert(INotificationData* data,
+                               base::WStringPiece key,
+                               base::WStringPiece value);
 
 }  // namespace nu
 

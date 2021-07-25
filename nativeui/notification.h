@@ -18,6 +18,10 @@
 #include "base/optional.h"
 #endif
 
+namespace base {
+class FilePath;
+}
+
 namespace nu {
 
 class Image;
@@ -38,11 +42,10 @@ class NATIVEUI_EXPORT Notification : public base::RefCounted<Notification> {
 #if defined(OS_MAC) || defined(OS_WIN)
   void SetHasReplyButton(bool has);
   void SetResponsePlaceholder(const std::string& placeholder);
-#endif
-#if defined(OS_MAC)
   void SetIdentifier(const std::string& identifier);
   std::string GetIdentifier() const;
-#elif defined(OS_WIN)
+#endif
+#if defined(OS_WIN)
   void SetImagePlacement(base::Optional<std::wstring> placement);
   void SetXML(base::Optional<std::wstring> xml);
   std::wstring GetXML() const;

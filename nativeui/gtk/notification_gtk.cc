@@ -39,9 +39,17 @@ void NotifyCompleteReceiver(GObject* source_object,
   if (value && g_variant_is_of_type(value, G_VARIANT_TYPE("(u)")))
     g_variant_get(value, "(u)", &data->dbus_id);
 
-  if (data->dbus_id && data->should_close) {
-    notification->Close();
-    return;
+  if (data->dbus_id) {
+    if (data->should_close) {
+      data->should_close = false;
+      notification->Close();
+      return;
+    }
+    if (data->should_update) {
+      data->should_update = false;
+      notification->Show();
+      return;
+    }
   }
 
   NotificationCenter::GetCurrent()->on_notification_show.Emit(
@@ -52,30 +60,53 @@ void NotifyCompleteReceiver(GObject* source_object,
 
 const char kNotificationActionPrefix[] = "action-";
 
-NotificationData::NotificationData()
-    : actions_builder(g_variant_builder_new(G_VARIANT_TYPE("as"))),
-      hints_builder(g_variant_builder_new(G_VARIANT_TYPE("a{sv}"))) {
-}
+NotificationData::NotificationData() = default;
 
-NotificationData::~NotificationData() {
-  g_variant_builder_unref(actions_builder);
-  g_variant_builder_unref(hints_builder);
-}
+NotificationData::~NotificationData() = default;
 
 void Notification::Show() {
   GDBusProxy* proxy = NotificationCenter::GetCurrent()->GetNative();
   if (!proxy)
     return;
 
-  if (notification_->cancellable)  // previous |Show| is still pending.
+  // Previous |Show| is still pending.
+  if (notification_->cancellable) {
+    notification_->should_update = true;
     return;
+  }
   notification_->cancellable.reset(g_cancellable_new());
+
+  GVariantBuilder actions_builder;
+  g_variant_builder_init(&actions_builder, G_VARIANT_TYPE("as"));
+  for (const auto& a : notification_->actions)
+    AddActionToNotification(&actions_builder,
+                            kNotificationActionPrefix + a.info, a.title);
+  // Special case: the pair ("default", "") will not add a button,
+  // but instead makes the entire notification clickable.
+  AddActionToNotification(&actions_builder, "default", "");
+
+  GVariantBuilder hints_builder;
+  g_variant_builder_init(&hints_builder, G_VARIANT_TYPE("a{sv}"));
+  if (notification_->silent) {
+    g_variant_builder_add(&hints_builder, "{sv}", "suppress-sound",
+                          g_variant_new_boolean(true));
+  }
+  if (!notification_->image_path.empty()) {
+    g_variant_builder_add(
+        &hints_builder, "{sv}", "image-path",
+        g_variant_new_string(notification_->image_path.c_str()));
+  }
+  std::string desktop_name = App::GetCurrent()->GetID();
+  if (!desktop_name.empty()) {
+    g_variant_builder_add(&hints_builder, "{sv}", "desktop-entry",
+                          g_variant_new_string(desktop_name.c_str()));
+  }
 
   GVariant* parameters = g_variant_new(
       "(susssasa{sv}i)", App::GetCurrent()->GetName().c_str(),
       notification_->dbus_id, "" /* app_icon */,
       notification_->title.c_str(), notification_->body.c_str(),
-      notification_->actions_builder, notification_->hints_builder, -1);
+      &actions_builder, &hints_builder, -1);
   g_dbus_proxy_call(
       proxy, "Notify", parameters, G_DBUS_CALL_FLAGS_NONE, -1,
       notification_->cancellable,
@@ -95,6 +126,7 @@ void Notification::Close() {
   g_dbus_proxy_call(proxy, "CloseNotification",
                     g_variant_new("(u)", notification_->dbus_id),
                     G_DBUS_CALL_FLAGS_NONE, -1, nullptr, nullptr, nullptr);
+  notification_->dbus_id = 0;
 }
 
 void Notification::SetTitle(const std::string& title) {
@@ -114,33 +146,19 @@ std::string Notification::GetInfo() const {
 }
 
 void Notification::SetSilent(bool silent) {
-  g_variant_builder_add(notification_->hints_builder, "{sv}",
-                        "suppress-sound", g_variant_new_boolean(silent));
+  notification_->silent = silent;
 }
 
 void Notification::SetImagePath(const base::FilePath& path) {
-  g_variant_builder_add(
-      notification_->hints_builder, "{sv}", "image-path",
-      g_variant_new_string(path.value().c_str()));
+  notification_->image_path = path.value();
 }
 
 void Notification::SetActions(const std::vector<Action>& actions) {
-  for (const auto& a : actions)
-    AddActionToNotification(notification_->actions_builder,
-                            kNotificationActionPrefix + a.info, a.title);
-  // Special case: the pair ("default", "") will not add a button,
-  // but instead makes the entire notification clickable.
-  AddActionToNotification(notification_->actions_builder, "default", "");
+  notification_->actions = actions;
 }
 
 void Notification::PlatformInit() {
   notification_ = new NotificationData;
-
-  std::string desktop_name = App::GetCurrent()->GetID();
-  if (!desktop_name.empty()) {
-    g_variant_builder_add(notification_->hints_builder, "{sv}", "desktop-entry",
-                          g_variant_new_string(desktop_name.c_str()));
-  }
 }
 
 void Notification::PlatformDestroy() {

@@ -13,11 +13,13 @@
 #include "base/win/scoped_hstring.h"
 
 namespace mswr = Microsoft::WRL;
+namespace winfoundtn = ABI::Windows::Foundation;
 namespace winui = ABI::Windows::UI;
 namespace winxml = ABI::Windows::Data::Xml;
 
 using base::win::ScopedHString;
 using winui::Notifications::IToastNotification;
+using winui::Notifications::INotificationData;
 
 namespace nu {
 
