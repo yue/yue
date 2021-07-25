@@ -7,6 +7,7 @@
 #import <Cocoa/Cocoa.h>
 
 #include "base/logging.h"
+#include "base/mac/scoped_nsobject.h"
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/gfx/image.h"
 
@@ -44,6 +45,13 @@ std::string Notification::GetInfo() const {
 void Notification::SetSilent(bool silent) {
   [notification_ setSoundName:(silent ? nil
                                       : NSUserNotificationDefaultSoundName)];
+}
+
+void Notification::SetImagePath(const base::FilePath& path) {
+  NSString* imagePath = base::SysUTF8ToNSString(path.value());
+  base::scoped_nsobject<NSImage> image(
+      [[NSImage alloc] initByReferencingFile:imagePath]);
+  [notification_ setContentImage:image.get()];
 }
 
 void Notification::SetHasReplyButton(bool has) {

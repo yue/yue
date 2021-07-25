@@ -118,6 +118,12 @@ void Notification::SetSilent(bool silent) {
                         "suppress-sound", g_variant_new_boolean(silent));
 }
 
+void Notification::SetImagePath(const base::FilePath& path) {
+  g_variant_builder_add(
+      notification_->hints_builder, "{sv}", "image-path",
+      g_variant_new_string(path.value().c_str()));
+}
+
 void Notification::SetActions(const std::vector<Action>& actions) {
   for (const auto& a : actions)
     AddActionToNotification(notification_->actions_builder,
@@ -141,15 +147,6 @@ void Notification::PlatformDestroy() {
   if (notification_->cancellable)
     g_cancellable_cancel(notification_->cancellable);
   delete notification_;
-}
-
-void Notification::PlatformSetImage(Image* image) {
-  base::FilePath path;
-  if (!WriteImageToTempDir(image, &path))
-    return;
-  g_variant_builder_add(
-      notification_->hints_builder, "{sv}", "image-path",
-      g_variant_new_string(path.value().c_str()));
 }
 
 }  // namespace nu

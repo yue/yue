@@ -1567,6 +1567,7 @@ struct Type<nu::Notification> {
         "getInfo", &nu::Notification::GetInfo,
         "setSilent", &nu::Notification::SetSilent,
         "setImage", &nu::Notification::SetImage,
+        "setImagePath", &nu::Notification::SetImagePath,
 #if defined(OS_MAC) || defined(OS_WIN)
         "setHasReplyButton", &nu::Notification::SetHasReplyButton,
         "setResponsePlaceholder", &nu::Notification::SetResponsePlaceholder,

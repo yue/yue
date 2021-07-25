@@ -39,6 +39,13 @@ bool Notification::WriteImageToTempDir(Image* image, base::FilePath* out) {
   *out = std::move(path);
   return true;
 }
+
+void Notification::PlatformSetImage(Image* image) {
+  base::FilePath path;
+  if (!WriteImageToTempDir(image, &path))
+    return;
+  SetImagePath(path);
+}
 #endif
 
 }  // namespace nu

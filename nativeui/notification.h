@@ -34,6 +34,7 @@ class NATIVEUI_EXPORT Notification : public base::RefCounted<Notification> {
   std::string GetInfo() const;
   void SetSilent(bool silent);
   void SetImage(scoped_refptr<Image> image);
+  void SetImagePath(const base::FilePath& path);
 #if defined(OS_MAC) || defined(OS_WIN)
   void SetHasReplyButton(bool has);
   void SetResponsePlaceholder(const std::string& placeholder);

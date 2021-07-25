@@ -133,6 +133,10 @@ void Notification::SetSilent(bool silent) {
   notification_->silent = silent;
 }
 
+void Notification::SetImagePath(const base::FilePath& path) {
+  notification_->image.emplace(path.value());
+}
+
 void Notification::SetActions(const std::vector<Action>& actions) {
   notification_->actions = actions;
 }
@@ -163,13 +167,6 @@ void Notification::PlatformInit() {
 
 void Notification::PlatformDestroy() {
   delete notification_;
-}
-
-void Notification::PlatformSetImage(Image* image) {
-  base::FilePath path;
-  if (!WriteImageToTempDir(image, &path))
-    return;
-  notification_->image.emplace(path.value());
 }
 
 }  // namespace nu
