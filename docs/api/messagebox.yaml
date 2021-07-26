@@ -101,5 +101,5 @@ methods:
     description: Return the native instance wrapped by the class.
 
 events:
-  - callback: void on_response(MessageBox* self, int response)
+  - signature: void on_response(MessageBox* self, int response)
     description: Emitted when the message box is closed.

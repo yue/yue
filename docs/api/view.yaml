@@ -215,37 +215,37 @@ methods:
     description: Return the native type wrapped by the view.
 
 events:
-  - callback: bool on_mouse_down(View* self, const MouseEvent& event)
+  - signature: bool on_mouse_down(View* self, const MouseEvent& event)
     description: Emitted when pressing mouse buttons.
 
-  - callback: bool on_mouse_up(View* self, const MouseEvent& event)
+  - signature: bool on_mouse_up(View* self, const MouseEvent& event)
     description: Emitted when releasing mouse buttons.
 
-  - callback: void on_mouse_move(View* self, const MouseEvent& event)
+  - signature: void on_mouse_move(View* self, const MouseEvent& event)
     description: Emitted when user moves mouse in the view.
 
-  - callback: void on_mouse_enter(View* self, const MouseEvent& event)
+  - signature: void on_mouse_enter(View* self, const MouseEvent& event)
     description: Emitted when mouse enters the view.
 
-  - callback: void on_mouse_leave(View* self, const MouseEvent& event)
+  - signature: void on_mouse_leave(View* self, const MouseEvent& event)
     description: Emitted when mouse leaves the view.
 
-  - callback: bool on_key_down(View* self, const KeyEvent& event)
+  - signature: bool on_key_down(View* self, const KeyEvent& event)
     description: Emitted when pressing keyboard.
 
-  - callback: bool on_key_up(View* self, const KeyEvent& event)
+  - signature: bool on_key_up(View* self, const KeyEvent& event)
     description: Emitted when releasing keyboard.
 
-  - callback: void on_drag_leave(View* self, DraggingInfo* info)>
+  - signature: void on_drag_leave(View* self, DraggingInfo* info)>
     description: Emitted when cursor leaves the view while dragging.
     detail: |
       This event will also be emitted before the `handle_drop` event when user
       drops the data on the view.
 
-  - callback: void on_size_changed(View* self)
+  - signature: void on_size_changed(View* self)
     description: Emitted when the view's size has been changed.
 
-  - callback: void on_capture_lost(View* self)
+  - signature: void on_capture_lost(View* self)
     description: Emitted when the mouse capture on view has been released.
 
 delegates:

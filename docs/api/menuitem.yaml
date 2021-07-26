@@ -104,5 +104,5 @@ methods:
     description: Return the native instance wrapped by the item.
 
 events:
-  - callback: void on_click(MenuItem* self)
+  - signature: void on_click(MenuItem* self)
     description: Emitted when item is clicked.

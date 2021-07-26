@@ -94,6 +94,19 @@ mixin switch(text, href, chosen, enabled)
   else
     a(href=href) #{text}
 
+//- Display TOC items.
+mixin toc_methods(methods)
+  ul
+    each node in methods
+      li
+        +switch(node.signature.shortStr, `${doc.id}.html#${node.id}`, false, true)
+
+mixin toc_properties(properties)
+  ul
+    each node in properties
+      li
+        +switch(node.name, `${doc.id}.html#${node.id}`, false, true)
+
 //- Main page starts from here.
 block content
   h1 #{doc.name}
@@ -209,13 +222,13 @@ block content
   if doc.events
     +title('h2', 'events', 'Events')
     each node in doc.events
-      +title_with_label(node, node.callback.str)
+      +title_with_label(node, node.signature.str)
       +description(node)
-      if node.callback.parameters.length > 0
+      if node.signature.parameters.length > 0
         h4 Parameters
-        +parameters(node.callback.parameters)
+        +parameters(node.signature.parameters)
       h4 Preventable
-      if node.callback.returnType
+      if node.signature.returnType
         | Yes.
       else
         | No.
@@ -244,9 +257,41 @@ block sidebar
   h4 Formats:
   a(href=`${doc.id}.json`) JSON
 
+  if doc.global_functions
+    h4 Global functions:
+    +toc_methods(doc.global_functions)
+
+  if doc.constructors
+    h4 Constructors:
+    +toc_methods(doc.constructors)
+
+  if doc.class_methods
+    h4 Class methods:
+    +toc_methods(doc.class_methods)
+
+  if doc.class_properties
+    h4 Class properties:
+    +toc_properties(doc.class_properties)
+
+  if doc.properties
+    h4 Properties:
+    +toc_properties(doc.properties)
+
+  if doc.methods
+    h4 Methods:
+    +toc_methods(doc.methods)
+
+  if doc.events
+    h4 Events:
+    +toc_methods(doc.events)
+
+  if doc.delegates
+    h4 Delegates:
+    +toc_methods(doc.delegates)
+
   h4 Components:
   ul
     each type in types
       if type.component == 'gui'
         li
-        +switch(type.name, `${type.id}.html`, doc.name == type.name, true)
+          +switch(type.name, `${type.id}.html`, doc.name == type.name, true)

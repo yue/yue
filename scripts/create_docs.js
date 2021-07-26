@@ -243,13 +243,6 @@ function pruneNode(lang, node) {
     node.id = parseParam('lua', node.property).name
     Object.assign(node, parseParam(lang, node.property))
     delete node.property
-  } else if (node.callback) {
-    node.id = generateIdForSignature(node.callback)
-    node.callback = parseSignature(lang, node.callback)
-    if (node.parameters) {
-      mergePrameters(node.callback, node.parameters)
-      delete node.parameters
-    }
   }
 
   return node
@@ -278,7 +271,7 @@ function convertModuleAndType(lang, node) {
 
 // Parse the C++ signature string.
 function parseSignature(lang, str) {
-  let signature = {}
+  const signature = {}
   let match = str.match(/^(\w+)\((.*)\)$/)
   if (match) {
     // Constructor type.
@@ -295,12 +288,12 @@ function parseSignature(lang, str) {
   }
   signature.name = parseName(lang, signature.name)
   signature.parameters = parseParameters(lang, signature.parameters)
-  if (lang == 'cpp') {
+  const parameters = signature.parameters.map((param) => param.name)
+  signature.shortStr = `${signature.name}(${parameters.join(', ')})`
+  if (lang == 'cpp')
     signature.str = str
-  } else {
-    let parameters = signature.parameters.map((param) => param.name)
-    signature.str = `${signature.name}(${parameters.join(', ')})`
-  }
+  else
+    signature.str = signature.shortStr
   return signature
 }
 
@@ -370,6 +363,9 @@ function parseType(lang, str) {
       type.args = match[2].split(',').map((t) => parseType(lang, t.trim()))
     } else if (type.name == 'scoped_refptr') {
       type.name = match[2]
+    } else if (type.name == 'base::Optional' || type.name == 'absl::optional') {
+      type.name = match[2]
+      type.nullable = true
     }
     // For js we want to pass some more information for TypeScript.
     if (lang == 'js') {
@@ -443,6 +439,20 @@ function parseInlineCode(lang, type, code) {
   switch (type) {
     case 'name':
       return parseName(lang, code)
+    case 'method':
+      let parts
+      let separator
+      for (separator of ['.', '::']) {
+        if (code.includes(separator)) {
+          parts = code.split(separator)
+          break
+        }
+      }
+      if (lang != 'cpp')
+        separator = '.'
+      const typeInfo = parseType(lang, parseName(lang, parts[0]))
+      const signature = parseShortSignature(lang, parts[1])
+      return `<code><a class="type" href="${typeInfo.id}.html#${signature.id}">${typeInfo.name}${separator}${signature.str}</a></code>`
     case 'type':
       const info = parseType(lang, code)
       return `<code><a class="type" href="${info.id}.html">${info.name}</a></code>`
@@ -453,6 +463,25 @@ function parseInlineCode(lang, type, code) {
     default:
       throw Error(`Unknown type ${type} in inline code`)
   }
+}
+
+// Parse simplified signature string.
+function parseShortSignature(lang, raw) {
+  const match = raw.match(/^(\w+)\((.*)\)$/)
+  if (!match)
+    throw new Error(`Invalid simplified signature: ${raw}`)
+  const name = parseName(lang, match[1])
+  const parameters = []
+  for (const p of match[2].split(',')) {
+    const name = parseName(lang, p.trim())
+    if (name != '')
+      parameters.push(name)
+  }
+  const str = `${name}(${parameters.length > 0 ? parameters.join(', ') : ''})`
+  let id = parseName('lua', name)
+  for (let param of parameters)
+    id += '-' + parseName('lua', param)
+  return {id, str}
 }
 
 // Convert enum class values.
@@ -487,7 +516,7 @@ function mergePrameters(signature, parameters) {
 // Generate a readable ID from signature string.
 function generateIdForSignature(str) {
   // Convert to all lowercase names.
-  let signature = parseSignature('lua', str)
+  const signature = parseSignature('lua', str)
   let id = signature.name
   for (let param of signature.parameters)
     id += `-${param.name}`

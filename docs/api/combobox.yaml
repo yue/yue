@@ -34,5 +34,5 @@ methods:
     description: Return currently displayed text.
 
 events:
-  - callback: void on_text_change(Entry* self)
+  - signature: void on_text_change(Entry* self)
     description: Emitted when user has changed text.

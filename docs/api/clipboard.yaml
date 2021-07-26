@@ -124,7 +124,7 @@ methods:
     description: Return the native handle of clipboard.
 
 events:
-  - callback: void on_change(Clipboard* self)
+  - signature: void on_change(Clipboard* self)
     description: Emitted when clipboard's content has been changed.
     detail: |
       The `<!name>StartWatching` method must be called first to make this event

@@ -226,13 +226,13 @@ methods:
     description: Return the native instance wrapped the window.
 
 events:
-  - callback: void on_close(Window* self)
+  - signature: void on_close(Window* self)
     description: Emitted when the window is closed.
 
-  - callback: void on_focus(Window* self)
+  - signature: void on_focus(Window* self)
     description: Emitted when the window is focused.
 
-  - callback: void on_blur(Window* self)
+  - signature: void on_blur(Window* self)
     description: Emitted when the window lost focus.
 
 delegates:

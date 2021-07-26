@@ -43,10 +43,10 @@ methods:
     description: Return the range of the slider.
 
 events:
-  - callback: void on_value_change(Slider* self)
+  - signature: void on_value_change(Slider* self)
     description: Emitted when user is changing the slider.
 
-  - callback: void on_sliding_complete(Slider* self)
+  - signature: void on_sliding_complete(Slider* self)
     description: Emitted when user releases the slider.
     detail: |
       Note that this event only emits when user was dragging the slider with

@@ -76,7 +76,7 @@ methods:
       This method will silently fail if the `index` is out of range.
 
 events:
-  - callback: void on_draw(Container* self, Painter* painter, const RectF& dirty)
+  - signature: void on_draw(Container* self, Painter* painter, const RectF& dirty)
     description: |
       Emitted when button the operating system or application requests to draw
       a portion of the view.

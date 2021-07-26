@@ -105,7 +105,7 @@ methods:
     description: Return the text extend.
 
 events:
-  - callback: void on_text_change(TextEdit* self)
+  - signature: void on_text_change(TextEdit* self)
     description: Emitted when user has changed text.
 
 delegates:

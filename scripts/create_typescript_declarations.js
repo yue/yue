@@ -179,7 +179,7 @@ function addSignal() {
 }
 
 // Convert JavaScript type name to TypeScript type name.
-function toTSType(type, isReturnType = false) {
+function toTSTypeBase(type, isReturnType) {
   switch (type.name) {
     case 'Boolean':
       return 'boolean'
@@ -204,6 +204,11 @@ function toTSType(type, isReturnType = false) {
     default:
       return type.name.replace(/::/g, '')
   }
+}
+
+function toTSType(type, isReturnType = false) {
+  const name = toTSTypeBase(type, isReturnType)
+  return type.nullable ? name + ' | null' : name
 }
 
 // Convert to function signature.

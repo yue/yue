@@ -34,8 +34,8 @@ methods:
     description: Return currently displayed text.
 
 events:
-  - callback: void on_text_change(Entry* self)
+  - signature: void on_text_change(Entry* self)
     description: Emitted when user has changed text.
 
-  - callback: void on_activate(Entry* self)
+  - signature: void on_activate(Entry* self)
     description: Emitted when user has pressed <kbd>Enter</kbd> in the view.

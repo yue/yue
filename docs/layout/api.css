@@ -38,6 +38,9 @@
 
 #sidebar {
   padding-left: 0;
+  flex-basis: 200px;
+	flex-grow: 0;
+	flex-shrink: 0;
 }
 
 #sidebar ul {

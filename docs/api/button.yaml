@@ -67,5 +67,5 @@ methods:
     description: Return whether the button has a border.
 
 events:
-  - callback: void on_click(Button* self)
+  - signature: void on_click(Button* self)
     description: Emitted when button is clicked.

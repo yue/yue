@@ -19,12 +19,12 @@ constructor:
       Create a `Lifetime` instance, you can only have one instance per thread.
 
 events:
-  - callback: void on_ready()
+  - signature: void on_ready()
     platform: ['macOS']
     description: |
       Emitted when received `applicationDidFinishLaunching` notification.
 
-  - callback: void on_activate()
+  - signature: void on_activate()
     platform: ['macOS']
     description: |
       Emitted when received `applicationShouldHandleReopen` notification and

@@ -44,7 +44,7 @@ methods:
     description: Return the view of selected page.
 
 events:
-  - callback: void on_selected_page_change(Tab* self)
+  - signature: void on_selected_page_change(Tab* self)
     description: Emitted when user has changed the selected page.
     detail: |
       Programmatically changing the selected page will also emit the event.

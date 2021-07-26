@@ -54,11 +54,11 @@ methods:
     description: Return the current absolute position of the mouse pointer.
 
 events:
-  - callback: void on_add_display(const Display& display)
+  - signature: void on_add_display(const Display& display)
     description: Emitted when a new `display` is available.
 
-  - callback: void on_remove_display(const Display& display)
+  - signature: void on_remove_display(const Display& display)
     description: Emitted when the `display` has been removed.
 
-  - callback: void on_update_display(const Display& display)
+  - signature: void on_update_display(const Display& display)
     description: Emitted when there are changes happened to `display`.

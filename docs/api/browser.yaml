@@ -191,26 +191,26 @@ methods:
     description: Remove the native binding with `name`.
 
 events:
-  - callback: void on_close(Browser* self)
+  - signature: void on_close(Browser* self)
     description: Emitted when the web page requests to close.
 
-  - callback: void on_update_command(Browser* self)
+  - signature: void on_update_command(Browser* self)
     description: Emitted when the back-forward list has changed.
 
-  - callback: void on_change_loading(Browser* self)
+  - signature: void on_change_loading(Browser* self)
     description: Emitted when the browser starts or stops loading content.
 
-  - callback: void on_update_title(Browser* self, const std::string& title)
+  - signature: void on_update_title(Browser* self, const std::string& title)
     description: Emitted when document's title is changed.
 
-  - callback: void on_start_navigation(Browser* self, const std::string& url)
+  - signature: void on_start_navigation(Browser* self, const std::string& url)
     description: Emitted when the browser begins provisional navigation.
 
-  - callback: void on_commit_navigation(Browser* self, const std::string& url)
+  - signature: void on_commit_navigation(Browser* self, const std::string& url)
     description: Emitted when the browser begins to receive web content.
 
-  - callback: void on_finish_navigation(Browser* self, const std::string& url)
+  - signature: void on_finish_navigation(Browser* self, const std::string& url)
     description: Emitted when the navigation is complete.
 
-  - callback: void on_fail_navigation(Browser* self, const std::string& url, int code)
+  - signature: void on_fail_navigation(Browser* self, const std::string& url, int code)
     description: Emitted when the navigation fails.
