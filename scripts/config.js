@@ -5,9 +5,9 @@ const webview2Version = '1.0.622.22'
 
 // The versions of Node.js to build against.
 const nodeVersions = [
-  '12.19.0',
-  '14.15.0',
-  '15.0.1',
+  '12.22.4',
+  '14.17.4',
+  '16.6.0',
 ]
 const electronVersions = [
 ]
