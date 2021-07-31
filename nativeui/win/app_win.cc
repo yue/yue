@@ -20,7 +20,7 @@
 
 namespace nu {
 
-void App::SetID(const std::string& id) {
+void App::SetID(std::string id) {
   ::SetCurrentProcessExplicitAppUserModelID(base::UTF8ToWide(id).c_str());
 }
 

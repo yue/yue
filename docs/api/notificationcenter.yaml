@@ -1,0 +1,167 @@
+name: NotificationCenter
+component: gui
+header: nativeui/notification_center.h
+type: class
+singleton: true
+namespace: nu
+description: Handle events of notifications.
+
+detail: |
+  The `NotificationCenter` API is responsible for handling events of
+  notifications, for sending notifications, the `<!type>Notification` API should
+  be used.
+
+  For most platforms, the notifications will persist after the app is quit, so
+  the source notification of the received event may be sent by other instances
+  of the app. For this reason, you do not get the source `Notification` instance
+  when handling events, and you should not do bookkeeping to try to do so.
+
+  To pass information in notifications, you should use
+  `<!method>Notification::SetInfo(info)` to store a custom string, which will
+  be passed to the event handlers of `NotificationCenter`.
+
+  ```cpp
+  auto* notification_center = nu::NotificationCenter::GetCurrent();
+  notification_center->on_notification_click.Connect([=](const std::string& info) {
+    LOG(ERROR) << "Clicked: " << info;
+  });
+  ```
+
+  ```lua
+  function app.notificationcenter.onnotificationclick(info)
+    print(info)
+  end
+  ```
+
+  ```js
+  gui.notificationCenter.onNotificationClick = (info) => {
+    console.log('Clicked', info)
+  }
+  ```
+
+  ## Linux notices
+
+  On Windows and macOS, clicking a notification will start the app that sent
+  the notification, but this feature has not been implemented on Linux yet.
+
+  On Linux due to the limitation of
+  [Desktop Notifications Specification](https://developer.gnome.org/notification-spec/),
+  the custom information attached to the notification is not persisted after
+  the app is quit, so if a notification is sent by other instances of the app,
+  the `info` parameter will be empty in its events.
+
+  ## Windows notices
+
+  On Windows receiving notification events is implemented by starting a COM
+  server, which is started automatcially when any event is subscribed.
+
+  The COM server must has a `ToastActivatorCLSID`, which will be automatcially
+  generated from the app's `AppUserModelID` if non is specified. It is
+  recommended to use `uuidgen.exe` to generate one and set it explicitly
+  with `<!method>NotificationCenter::SetCOMServerOptions(options)`.
+
+  For the COM server to receive events from Action Center, there must be a start
+  menu shortcut, with `AppUserModelID` and `ToastActivatorCLSID` properties
+  assigned to it. The `<!method>App::CreateStartMenuShortcut(options)` API can be
+  used to create one for testing.
+
+  It is also possible to start the app by clicking the notification, after the
+  app has quit, but it requires registering the COM server in registry, which
+  is done automatcially when any event is subscribed. This behavior can be
+  turned off with `<!method>NotificationCenter::SetCOMServerOptions(options)`,
+  and the item in registry can be removed with
+  `<!method>NotificationCenter::RemoveCOMServerFromRegistry()`.
+
+class_methods:
+  - signature: NotificationCenter* GetCurrent()
+    lang: ['cpp']
+    description: Return current NotificationCenter instance.
+
+methods:
+  - signature: void Clear()
+    description: Remove all notifications sent by this app.
+    detail: |
+      Due to the limitations of system APIs, on Linux only notifications created
+      by current process can be cleared, and on Windows clearing notifications
+      won't emit the `<!name>on_notification_close` event.
+
+  - signature: bool SetCOMServerOptions(NotificationCenter::COMServerOptions options)
+    platform: ['Windows']
+    description: |
+      Set COM server related options, `false` will be returned if the passed
+      `ToastActivatorCLSID` is invalid.
+    detail: This API should be only called before subscribing to any event.
+
+  - signature: bool RegisterCOMServer()
+    platform: ['Windows']
+    description: Register the COM server.
+    detail: |
+      Usually the COM server is automatcially registered when any event is
+      subscribed, but this API can be used to register COM server manully if
+      `<!name>write_registry` is set to `false` in `<!name>SetCOMServerOptions`.
+
+  - signature: void RemoveCOMServerFromRegistry()
+    platform: ['Windows']
+    description: Remove the app's COM server from registry.
+
+  - signature: const std::wstring& GetToastActivatorCLSID()
+    platform: ['Windows']
+    description: Return current `ToastActivatorCLSID`.
+
+events:
+  - signature: void on_notification_show(const std::string& info)
+    description: |
+      Emitted when a notification has been displayed, the custom `info` of the
+      notification is passed.
+
+  - signature: void on_notification_close(const std::string& info)
+    description: |
+      Emitted when a notification has been closed without activation, the custom
+      `info` of the notification is passed.
+    detail: |
+      Note that this event is not guarenteed to emit for notifications, the
+      system may choose to not notify the app when a notification is closed.
+      So you should not do bookkeeping of notifications and count on this API
+      to clear closed notifications.
+
+  - signature: void on_notification_click(const std::string& info)
+    description: |
+      Emitted when user clicks on the body of a notification, the custom
+      `info` of the notification is passed.
+    detail: |
+      On Linux due to the limitation of
+      [Desktop Notifications Specification](https://developer.gnome.org/notification-spec/),
+      only the custom `info` of notifications sent by current app will be
+      passed, i.e. if the app received a notification sent by other instances
+      of the app, the `info` will be empty.
+
+  - signature: void on_notification_action(const std::string& action_info)
+    description: |
+      Emitted when user clicks on an action button of a notification, the custom
+      `<!name>action_info` string of the action button is passed.
+
+  - signature: void on_notification_reply(const std::string& info, const std::string& reply)
+    platform: ['macOS', 'Windows']
+    description: |
+      Emitted when user sends a text using inline reply in a notification, the
+      custom `info` of the notification, and the `reply` string will be passed.
+    detail: |
+      On Linux due to the limitation of
+      [Desktop Notifications Specification](https://developer.gnome.org/notification-spec/),
+      only the custom `info` of notifications sent by current app will be
+      passed, i.e. if the app received a notification sent by other instances
+      of the app, the `info` will be empty.
+
+  - signature: bool on_toast_activate(const std::wstring& app_user_model_id, const std::wstring& invoked_args, const std::vector<NotificationCenter::InputData>& data)
+    platform: ['Windows']
+    description: |
+      Emitted when the notification activator COM server receives the Activate
+      message.
+    detail: |
+      This event is useful if you are using custom XML in the notification and
+      want to handle the events yourself.
+
+      Returning `true` will prevent normal notifications event from emitting.
+    parameters:
+      data:
+        description: An array of `<!type>NotificationCenter::InputData`.

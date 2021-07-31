@@ -1,0 +1,19 @@
+name: App::ShortcutOptions
+platform: ['Windows']
+header: nativeui/app.h
+type: struct
+namespace: nu
+description: Options for creating start menu shortcut.
+
+properties:
+  - property: base::Optional<std::wstring> arguments
+    optional: true
+    description: The arguments passed to the executable, default is empty string.
+
+  - property: base::Optional<std::wstring> description
+    optional: true
+    description: The description of the shortcut, default is the executable's description.
+
+  - property: base::Optional<base::FilePath> working_dir
+    optional: true
+    description: The working directory that the executable will run under.

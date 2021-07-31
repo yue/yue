@@ -22,10 +22,10 @@ class NATIVEUI_EXPORT App {
  public:
   static App* GetCurrent();
 
-  void SetName(base::Optional<std::string> name);
+  void SetName(std::string name);
   std::string GetName() const;
 #if defined(OS_LINUX) || defined(OS_WIN)
-  void SetID(const std::string& id);
+  void SetID(std::string id);
 #endif
   std::string GetID() const;
 

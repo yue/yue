@@ -9,8 +9,8 @@
 
 namespace nu {
 
-void App::SetID(const std::string& name) {
-  desktop_name_ = name;
+void App::SetID(std::string name) {
+  desktop_name_ = std::move(name);
 }
 
 std::string App::GetID() const {

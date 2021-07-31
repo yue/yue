@@ -1,0 +1,206 @@
+name: Notification
+component: gui
+header: nativeui/notification.h
+type: refcounted
+namespace: nu
+description: Send native notifications.
+
+detail: |
+  The `Notification` API is responsible for sending notifications, for handling
+  events of notifications, the `<!type>NotificationCenter` API should be used.
+
+  Before sending notifications, you should set app's ID and name otherwise the
+  notifications may not be displayed.
+
+  ```cpp
+  auto* app = nu::App::GetCurrent();
+  app->SetName("MyApp");
+  #if defined(OS_LINUX) || defined(OS_WIN)
+  app->SetID("org.yue.myapp");
+  #else
+  if (app->GetID().empty())
+    LOG(ERROR) << "Unable to send notifications due to app not being bundled";
+  #endif
+
+  #if defined(OS_WIN)
+  // Create start menu shortcut for testing.
+  app->CreateStartMenuShortcut(nu::App::ShortcutOptions());
+  #endif
+
+  scoped_refptr<nu::Notification> notification = new nu::Notification;
+  notification->SetTitle("Title");
+  notification->SetBody("Message");
+  notification->SetInfo("first-notification");
+  notification->Show();
+  ```
+
+  ```lua
+  gui.app:setname("MyApp")
+  if (sys.platform ~= "macos")
+    gui.app:setid("org.yue.myapp")
+  else if (gui.app:getid() == '')
+    print("Unable to send notifications due to app not being bundled")
+
+  -- Create start menu shortcut for testing.
+  if (sys.platform == "win32")
+    gui.app:createstartmenushortcut{}
+
+  local notification = gui.Notification.create()
+  notification:settitle("Title")
+  notification:setbody("Message")
+  notification:setinfo("first-notification")
+  notification:show()
+  ```
+
+  ```js
+  gui.app.setName("MyApp")
+  if (process.platform !== 'darwin')
+    gui.app.setID("org.yue.myapp")
+  else if (gui.app.getID().length === 0)
+    console.error("Unable to send notifications due to app not being bundled")
+
+  // Create start menu shortcut for testing.
+  if (process.platform === "win32")
+    gui.app.createStartMenuShortcut({})
+
+  const notification = gui.Notification.create()
+  notification.setTitle("Title")
+  notification.setBody("Message")
+  notification.setInfo("first-notification")
+  notification.show()
+  ```
+
+  ## Platform requirements
+
+  On macOS, only bundled apps can send notifications. To check if the app is
+  bundled, you can check whether `<!method>App::GetID()` returns a non-empty
+  string.
+
+  On Linux, `Notification` is implemented by sending DBus messages following the
+  [Desktop Notifications Specification](https://developer.gnome.org/notification-spec/),
+  the desktop environment must has a desktop notifications service running to
+  show the notifications.
+
+  On Windows, to display the notifications the app must has an AppUserModelID,
+  and a shortcut on the start menu. For testing purpose, you can use the
+  `<!method>App::CreateStartMenuShortcut(options)` API to create a start menu
+  shortcut file.
+
+  Also on Windows `Notification` uses toast notifications under the hood, and
+  currently only Windows 10 and above are supported.
+
+class_methods:
+  - signature: Notification* Create()
+    lang: ['lua', 'js']
+    description: Create a new Notification instance.
+
+methods:
+  - signature: void Show()
+    description: Display the notification.
+    detail: |
+      If the notification has already been displayed, calling this method again
+      will update the contents of the notification. If the notification has been
+      closed, calling this method will show the notification again.
+
+      On Windows due to platform limitation, only the title and body of the
+      notification can be updated after it has been displayed.
+
+  - signature: void Close()
+    description: Close the notification.
+
+  - signature: void SetTitle(const std::string& title)
+    description: Set the title of the notification.
+
+  - signature: void SetBody(const std::string& body)
+    description: Set the body text of the notification.
+
+  - signature: void SetInfo(const std::string& info)
+    description: Set the user info to be attached to the notification.
+    detail: |
+      When handling notification events with `<!type>NotificationCenter`, only
+      the user info will be passed to the event handler.
+
+  - signature: std::string GetInfo() const
+    description: Return the attached user info.
+
+  - signature: void SetActions(const std::vector<Notification::Action>& actions)
+    description: Set the buttons to be displayed in the notification.
+    detail: |
+      The `<!name>on_notification_action` event of `<!type>NotificationCenter`
+      will be emitted when user clicks one of the buttons.
+    parameters:
+      actions:
+        description: An array of `<!type>Notification::Action`.
+
+  - signature: void SetSilent(bool silent)
+    description: Set whether to play sound when the notification is displayed.
+
+  - signature: void SetImage(scoped_refptr<Image> image)
+    description: Set the image shown in the content of the notification.
+    detail: |
+      Different platforms may choose to put the image in different places, there
+      is no guarentee on where the image is placed.
+
+  - signature: void SetImagePath(const base::FilePath& path)
+    description: |
+      Set the file path of the image shown in the content of the notification.
+    detail: |
+      This method is usually faster than reading a file from disk and passing
+      its content to `<!name>SetImage`, so it is recommended to use this
+      method over `<!name>SetImage` if the image is stored on disk.
+
+      Different platforms may choose to put the image in different places, there
+      is no guarentee on where the image is placed.
+
+  - signature: void SetImagePlacement(base::Optional<std::wstring> placement)
+    platform: ['Windows']
+    description: Set the `placement` attribute of the image.
+    detail: |
+      The most common used `placement`s are `"appLogoOverride"` and `"hero"`.
+
+  - signature: void SetHasReplyButton(bool has)
+    platform: ['macOS', 'Windows']
+    description: |
+      Set whether to display an input field and a reply button in the
+      notification.
+    detail: |
+      The `<!name>on_notification_reply` event of `<!type>NotificationCenter`
+      will be emitted when user sends a reply in the notification.
+
+  - signature: void SetResponsePlaceholder(const std::string& placeholder)
+    platform: ['macOS', 'Windows']
+    description: The the placeholder of the input field.
+
+  - signature: void SetIdentifier(const std::string& identifier)
+    platform: ['macOS', 'Windows']
+    description: Set an unique `identifier` that can identifies a notification.
+    detail: |
+      When there is already a displayed notification with the same identifier,
+      showing this notification will update its contents.
+
+      On Windows due to platform limitation, only the title and body of the
+      notification can be updated after it has been displayed.
+
+      Note that there is no equivalent API on Linux, to update an existing
+      notification's contents you have to keep the instance of the notification
+      and call its `<!name>Show` method.
+
+  - signature: std::string GetIdentifier() const
+    platform: ['macOS', 'Windows']
+    description: Return the unique identifier of the notification.
+
+  - signature: void SetXML(base::Optional<std::wstring> xml)
+    platform: ['Windows']
+    description: Set custom XML of the toast notification.
+    detail: |
+      On Windows the notification can have rich contents and the Notification
+      APIs do not cover all the possible features. In case you want to show
+      some rich contents, you can use this API to set raw XML of the
+      notification.
+
+      You can find documentation on the XML schema and tools to generate XML
+      at [here](https://docs.microsoft.com/en-us/windows/apps/design/shell/tiles-and-notifications/adaptive-interactive-toasts?tabs=xml).
+
+  - signature: std::wstring GetXML() const
+    platform: ['Windows']
+    description: Return the XML representation of the toast notification.

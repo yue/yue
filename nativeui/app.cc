@@ -23,8 +23,8 @@ App::App() : weak_factory_(this) {
 
 App::~App() = default;
 
-void App::SetName(base::Optional<std::string> name) {
-  name_override_ = std::move(name);
+void App::SetName(std::string name) {
+  name_override_.emplace(std::move(name));
 }
 
 std::string App::GetName() const {

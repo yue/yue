@@ -161,12 +161,12 @@ function addDelegate(delegate) {
 function addEvent(event) {
   // TypeScript does not allow different types for get/set, so we have to use
   // any as type to allow event handler assignment.
-  return event.callback.name + ': any;'
+  return event.signature.name + ': any;'
   // The ideal declaration should be:
-  //   const func = toTSFunction(event.callback, true)
+  //   const func = toTSFunction(event.signature, true)
   //   const setType = `Signal<(${func})> | (${func}) | null`
-  //   return `set ${event.callback.name}(handler: ${setType});\n` +
-  //          `get ${event.callback.name}() : Signal<(${func})>`
+  //   return `set ${event.signature.name}(handler: ${setType});\n` +
+  //          `get ${event.signature.name}() : Signal<(${func})>`
 }
 
 // The declaration for signals.

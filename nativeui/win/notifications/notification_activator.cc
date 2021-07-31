@@ -32,12 +32,12 @@ HRESULT NotificationActivator::Activate(
   }
 
   auto* center = NotificationCenter::GetCurrent();
-  if (center->toast_activate) {
+  if (!center->on_toast_activate.IsEmpty()) {
     std::vector<NotificationCenter::InputData> inputs;
     inputs.reserve(count);
     for (ULONG i = 0; i < count; ++i)
       inputs.push_back({data[i].Key, data[i].Value});
-    if (center->toast_activate(app_user_model_id, invoked_args, inputs))
+    if (center->on_toast_activate.Emit(app_user_model_id, invoked_args, inputs))
       return S_OK;
   }
 

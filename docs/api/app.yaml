@@ -41,6 +41,56 @@ class_methods:
     description: Return current app.
 
 methods:
+  - signature: void SetName(std::string name)
+    description: Set the name of current app.
+    detail: |
+      The app name should be something like "My App", it will be used in vairous
+      places, such as folder name when storing user data, or key name when
+      writing registry.
+
+      You should always call this API at the beginning of your app.
+
+      On macOS it is strong recommended to use the same name with the
+      `CFBundleName` field of app bundle's `Info.plist` file.
+
+  - signature: std::string GetName() const
+    description: Return current app's name.
+    detail: |
+      If `<!method>App::SetName(name)` has never been called, this API will try to guess a
+      name from existing information, for example the executable's version info,
+      or the app bundle information, or the executable file's base name.
+
+  - signature: void SetID(std::string id)
+    platform: ['Windows', 'Linux']
+    description: Set the application ID.
+    detail: |
+      The application ID must be globally unique, and it is recommended to use
+      something like "org.myself.myapp".
+
+      On macOS the application ID is the app bundle ID, and there is no way to
+      change it at runtime.
+
+      On Linux the application ID will be used in various places, such as the
+      name of the [`.desktop` file](https://developer.gnome.org/integration-guide/stable/desktop-files.html),
+      or the base name of GSettings schemas.
+
+      On Windows the application ID is [`AppUserModelID`](https://docs.microsoft.com/en-us/windows/win32/shell/appids),
+      it is mainly used to recognize which app a process belongs to. For
+      UWP/Desktop Bridge apps, Windows will assign an AppUserModelID to the app
+      and this API should not be used.
+
+  - signature: std::string GetID() const
+    description: Return the application ID.
+    detail: |
+      On macOS if the app is bundled, the app bundle ID will be returned,
+      otherwise empty string will be returned.
+
+      On Linux the ID set by `<!name>SetID` will be returned.
+
+      On Windows the [`AppUserModelID`](https://docs.microsoft.com/en-us/windows/win32/shell/appids)
+      will be returned. If neither you or Windows ever assigned an ID to the
+      app, empty string will be returned.
+
   - signature: void SetApplicationMenu(scoped_refptr<MenuBar> menu)
     platform: ['macOS']
     description: Set the application menu bar.
@@ -57,6 +107,34 @@ methods:
     platform: ['macOS']
     description: Get the label displayed in dock’s badging area.
 
+  - signature: bool IsRunningAsUWP() const
+    platform: ['Windows']
+    description: Return whether app is running as UWP/Desktop Bridge.
+    detail: |
+      On Windows the Win32 apps can run as UWP apps by using
+      [Desktop Bridge](https://techcommunity.microsoft.com/t5/windows-dev-appconsult/desktop-bridge-8211-the-bridge-between-desktop-apps-and-the/ba-p/316488),
+      which is required for submitting Win32 apps to Microsoft Store.
+
+      There are a few runtime differences when running apps as UWP, and this
+      API can be used to detect the environment.
+
+  - signature: bool CreateStartMenuShortcut(const App::ShortcutOptions& options)
+    platform: ['Windows']
+    description: Create a start menu shortcut for current user linking to current process.
+    detail: |
+      This API will write the `AppUserModelID` and `ToastActivatorCLSID` to the
+      shortcut file, and the shortcut file's name will be the app's name, so it
+      is recommended to call `<!method>App::SetID(id)` and
+      `<!method>App::SetName(name)` before using this API.
+
+      Note that on Windows you should generally not write start menu shortcut
+      automatically, by convention the file is commonly created by installers
+      or users themselves. This API is usually used for testing purpose.
+
+  - signature: base::FilePath GetStartMenuShortcutPath() const
+    platform: ['Windows']
+    description: Return file path to the shortcut created by the `<!method>App::CreateStartMenuShortcut(options)` API.
+
   - signature: void Activate(bool force)
     platform: ['macOS']
     description: Make current app the active app.
@@ -72,7 +150,7 @@ methods:
     platform: ['macOS']
     description: Deactivate current app.
 
-  - signature: bool IsActive()
+  - signature: bool IsActive() const
     platform: ['macOS']
     description: Return whether current app is the active app.
 

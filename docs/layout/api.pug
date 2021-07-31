@@ -13,7 +13,8 @@ mixin title(level, id, str)
 
 //- Block description of a method or properties.
 mixin description(node)
-  != markdown(node.description)
+  if node.description
+    != markdown(node.description)
   if node.detail
     != markdown(node.detail)
 
@@ -27,7 +28,7 @@ mixin type(node)
         | [
       each arg, i in node.args
         if arg.id
-          a.type(href=`${arg.id}.html}`) #{arg.name}
+          a.type(href=`${arg.id}.html`) #{arg.name}
         else
           | #{arg.name}
         if i != node.args.length - 1
@@ -208,6 +209,9 @@ block content
         code
           +type(node.type)
         |  #{node.name}
+        if node.optional
+          |  
+          span.optional (optional)
         if node.platform
           each platform in node.platform
             |  

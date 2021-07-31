@@ -1,0 +1,17 @@
+name: Notification::Action
+header: nativeui/notification.h
+type: struct
+namespace: nu
+description: Describes the action button of `Notification`.
+
+properties:
+  - property: std::string title
+    optional: false
+    description: The title of the action button.
+
+  - property: std::string info
+    optional: false
+    description: The user info attached to the action.
+    detail: |
+      The user info will be passed to the handler of the
+      `<!name>on_notification_action` event.

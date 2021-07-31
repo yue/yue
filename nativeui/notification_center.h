@@ -65,16 +65,14 @@ class NATIVEUI_EXPORT NotificationCenter : SignalDelegate {
 #if defined(OS_MAC) || defined(OS_WIN)
   Signal<void(const std::string&, const std::string&)> on_notification_reply;
 #endif
-
-  // Delegate methods.
 #if defined(OS_WIN)
   struct InputData {
     std::wstring key;
     std::wstring value;
   };
-  std::function<bool(const std::wstring&,
-                     const std::wstring&,
-                     const std::vector<InputData>&)> toast_activate;
+  Signal<bool(const std::wstring&,
+              const std::wstring&,
+              const std::vector<InputData>&)> on_toast_activate;
 #endif
 
  protected:

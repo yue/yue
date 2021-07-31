@@ -1486,7 +1486,8 @@ struct Type<nu::NotificationCenter> {
 #endif
 #if defined(OS_WIN)
     RawSetProperty(state, metatable,
-                   "toastactivate", &nu::NotificationCenter::toast_activate);
+                   "ontoastactivate",
+                   &nu::NotificationCenter::on_toast_activate);
 #endif
   }
 };
@@ -2609,7 +2610,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
               "lifetime",           nu::Lifetime::GetCurrent(),
               "app",                nu::App::GetCurrent(),
               "appearance",         nu::Appearance::GetCurrent(),
-              "notificationCenter", nu::NotificationCenter::GetCurrent(),
+              "notificationcenter", nu::NotificationCenter::GetCurrent(),
               "screen",             nu::Screen::GetCurrent());
   return 1;
 }

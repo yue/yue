@@ -378,7 +378,9 @@ function parseType(lang, str) {
   if (lang == 'cpp') {
     let builtins = [ 'bool', 'float', 'char', 'uint32_t', 'unsigned', 'int',
                      'size_t', 'void' ]
-    builtin = type.name.startsWith('std::') || type.name.endsWith('...') ||
+    builtin = type.name.startsWith('std::') ||
+              type.name.startsWith('base::') ||
+              type.name.endsWith('...') ||
               builtins.includes(type.name)
   }
   // Convertbuilt-in types for differnt languages.
@@ -387,6 +389,7 @@ function parseType(lang, str) {
       case 'bool': type.name = 'boolean'; break
       case 'float': type.name = 'number'; break
       case 'std::string': type.name = 'string'; break
+      case 'std::wstring': type.name = 'string'; break
       case 'char': type.name = 'string'; break
       case 'uint32_t': type.name = 'integer'; break
       case 'unsigned': type.name = 'integer'; break
@@ -408,6 +411,7 @@ function parseType(lang, str) {
       case 'bool': type.name = 'Boolean'; break
       case 'float': type.name = 'Number'; break
       case 'std::string': type.name = 'String'; break
+      case 'std::wstring': type.name = 'String'; break
       case 'char': type.name = 'String'; break
       case 'uint32_t': type.name = 'Integer'; break
       case 'unsigned': type.name = 'Integer'; break
@@ -473,7 +477,9 @@ function parseShortSignature(lang, raw) {
   const name = parseName(lang, match[1])
   const parameters = []
   for (const p of match[2].split(',')) {
-    const name = parseName(lang, p.trim())
+    if (p == '')
+      continue
+    const name = parseName(lang, p)
     if (name != '')
       parameters.push(name)
   }

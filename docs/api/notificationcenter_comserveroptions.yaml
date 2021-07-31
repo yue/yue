@@ -1,0 +1,26 @@
+name: NotificationCenter::COMServerOptions
+platform: ['Windows']
+header: nativeui/notification_center.h
+type: struct
+namespace: nu
+description: Options for creating COM server.
+
+properties:
+  - property: bool write_registry
+    optional: true
+    description: |
+      Whether to register COM server in registry automatically when any event
+      of `NotificationCenter` is subscribed. Default is `true`.
+
+  - property: std::wstring arguments
+    optional: true
+    description: |
+      The arguments to pass to the executable when system starts the app after
+      a notification is activated. Default is empty string.
+
+  - property: base::Optional<std::wstring> toast_activator_clsid;
+    optional: true
+    description: |
+      The `ToastActivatorCLSID`, which can be generated with `uuidgen.exe`. It
+      must include a pair of curly braces. If not specified, one will be
+      automatically generated from the app's `AppUserModelID`.

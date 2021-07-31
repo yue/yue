@@ -1,0 +1,10 @@
+name: NotificationCenter::InputData
+platform: ['Windows']
+header: nativeui/notification_center.h
+type: struct
+namespace: nu
+description: The data passed in `<!name>on_toast_activate` event.
+
+properties:
+  - property: std::wstring key
+  - property: std::wstring value

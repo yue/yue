@@ -1650,7 +1650,7 @@ struct Type<nu::NotificationCenter> {
 #endif
 #if defined(OS_WIN)
     SetProperty(context, templ,
-                "toastActivate", &nu::NotificationCenter::toast_activate);
+                "onToastActivate", &nu::NotificationCenter::on_toast_activate);
 #endif
   }
 };

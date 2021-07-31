@@ -149,7 +149,7 @@ methods:
     description: Add a native binding to web page with `name`.
     detail: |
       You can pass an arbitrary function as long as the parameters can be
-      converted from `base::Value`, othewise compilation error would happen.
+      converted from `base::Value`, otherwise compilation error would happen.
 
       For example, following native binding:
 
