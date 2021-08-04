@@ -63,6 +63,7 @@ createZip({withLicense: true})
   .addFile('out/Dist/source', 'out/Dist/source')
   .addFile('sample_app/CMakeLists.txt', 'sample_app')
   .addFile('sample_app/main.cc')
+  .addFile('sample_app/exe.manifest')
   .writeToFile(`libyue_${version}_${targetOs}`)
 
 function DescribeAll(target, sources, headers) {
