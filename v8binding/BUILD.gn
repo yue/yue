@@ -11,7 +11,16 @@ config("node_config") {
     "BUILDING_NODE_EXTENSION",
   ]
 
-  node_dir = "//third_party/node-" + node_version
+  # v8_enable_pointer_compression is enabled on Electron.
+  if (node_runtime == "electron" &&
+      (target_cpu == "arm64" || target_cpu == "x64")) {
+    defines += [
+      "V8_COMPRESS_POINTERS",
+      "V8_31BIT_SMIS_ON_64BIT_ARCH",
+    ]
+  }
+
+  node_dir = "//third_party/" + node_runtime + "-" + node_version
 
   include_dirs = [
     node_dir + "/include/node",

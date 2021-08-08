@@ -3,6 +3,7 @@
 // LICENSE file.
 
 #include <node.h>
+#include <node_buffer.h>
 
 #include "base/notreached.h"
 #include "nativeui/nativeui.h"
@@ -13,8 +14,6 @@
 #if defined(OS_MAC)
 #include "node_yue/chrome_view_mac.h"
 #endif
-
-#include "node_buffer.h"  // NOLINT(build/include)
 
 namespace {
 

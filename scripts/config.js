@@ -10,6 +10,10 @@ const nodeVersions = [
   '16.6.0',
 ]
 const electronVersions = [
+  '12.0.16',
+  '13.1.8',
+  '14.0.0-beta.19',
+  '15.0.0-alpha.4',
 ]
 
 // The version of gn.
@@ -31,7 +35,7 @@ if (clang) {
 }
 if (targetOs == 'mac') {
   gnConfig.push('mac_deployment_target="10.10.0"',
-              'use_xcode_clang=true')
+                'use_xcode_clang=true')
   if (targetCpu == 'arm64')
     gnConfig.push('mac_sdk_min="11.0"')
   else

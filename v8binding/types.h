@@ -125,16 +125,6 @@ struct Type<std::string> {
         out->clear();
       }
       return true;
-    } else if (value->IsArrayBuffer()) {
-      v8::ArrayBuffer::Contents contents =
-          v8::Local<v8::ArrayBuffer>::Cast(value)->GetContents();
-      if (contents.ByteLength() > 0) {
-        out->resize(contents.ByteLength());
-        memcpy(&out->front(), contents.Data(), contents.ByteLength());
-      } else {
-        out->clear();
-      }
-      return true;
     } else if (value->IsArrayBufferView()) {
       v8::Local<v8::ArrayBufferView> buffer =
           v8::Local<v8::ArrayBufferView>::Cast(value);

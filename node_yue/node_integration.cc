@@ -31,13 +31,13 @@ NodeIntegration::~NodeIntegration() {
 
   // Clear uv.
   uv_sem_destroy(&embed_sem_);
-  uv_close(reinterpret_cast<uv_handle_t*>(&dummy_uv_handle_), nullptr);
+  uv_close(reinterpret_cast<uv_handle_t*>(&awake_handle_), nullptr);
 }
 
 void NodeIntegration::PrepareMessageLoop() {
-  // Add dummy handle for libuv, otherwise libuv would quit when there is
-  // nothing to do.
-  uv_async_init(uv_loop_, &dummy_uv_handle_, nullptr);
+  // Unref the handle otherwise libuv loop won't quit.
+  uv_async_init(uv_loop_, &awake_handle_, nullptr);
+  uv_unref(reinterpret_cast<uv_handle_t*>(&awake_handle_));
 
   // Start worker that will interrupt main loop when having uv events.
   uv_sem_init(&embed_sem_, 0);
@@ -66,7 +66,7 @@ void NodeIntegration::WakeupMainThread() {
 }
 
 void NodeIntegration::WakeupEmbedThread() {
-  uv_async_send(&dummy_uv_handle_);
+  uv_async_send(&awake_handle_);
 }
 
 // static

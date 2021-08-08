@@ -8,6 +8,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <node_buffer.h>
+
 #include <cmath>
 #include <memory>
 #include <string>
@@ -301,11 +303,16 @@ v8::Local<v8::Value> V8ValueConverterImpl::ToArrayBuffer(
     v8::Local<v8::Object> creation_context,
     const base::Value* value) const {
   DCHECK(creation_context->CreationContext() == isolate->GetCurrentContext());
-  v8::Local<v8::ArrayBuffer> buffer =
-      v8::ArrayBuffer::New(isolate, value->GetBlob().size());
-  memcpy(buffer->GetContents().Data(), value->GetBlob().data(),
-         value->GetBlob().size());
-  return buffer;
+  v8::MaybeLocal<v8::Object> buffer = node::Buffer::Copy(
+      isolate,
+      reinterpret_cast<const char *>(value->GetBlob().data()),
+      value->GetBlob().size());
+  v8::Local<v8::Object> local;
+  if (!buffer.ToLocal(&local)) {
+    LOG(ERROR) << "Failed to create Buffer";
+    return v8::Null(isolate);
+  }
+  return local;
 }
 
 std::unique_ptr<base::Value> V8ValueConverterImpl::FromV8ValueImpl(
@@ -376,7 +383,7 @@ std::unique_ptr<base::Value> V8ValueConverterImpl::FromV8ValueImpl(
     return FromV8Object(val.As<v8::Object>(), state, isolate);
   }
 
-  if (val->IsArrayBuffer() || val->IsArrayBufferView())
+  if (val->IsArrayBufferView())
     return FromV8ArrayBuffer(val.As<v8::Object>(), isolate);
 
   if (val->IsObject())
@@ -435,19 +442,14 @@ std::unique_ptr<base::Value> V8ValueConverterImpl::FromV8Array(
 std::unique_ptr<base::Value> V8ValueConverterImpl::FromV8ArrayBuffer(
     v8::Local<v8::Object> val,
     v8::Isolate* isolate) const {
-  if (val->IsArrayBuffer()) {
-    auto contents = val.As<v8::ArrayBuffer>()->GetContents();
-    const auto* data = static_cast<const uint8_t*>(contents.Data());
-    return base::Value::ToUniquePtrValue(
-        base::Value(base::make_span(data, contents.ByteLength())));
-  } else if (val->IsArrayBufferView()) {
+  if (val->IsArrayBufferView()) {
     v8::Local<v8::ArrayBufferView> view = val.As<v8::ArrayBufferView>();
     size_t byte_length = view->ByteLength();
     std::vector<char> buffer(byte_length);
     view->CopyContents(buffer.data(), buffer.size());
     return std::make_unique<base::Value>(std::move(buffer));
   } else {
-    NOTREACHED() << "Only ArrayBuffer and ArrayBufferView should get here.";
+    NOTREACHED() << "Only ArrayBufferView should get here.";
     return nullptr;
   }
 }

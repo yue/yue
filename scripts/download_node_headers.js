@@ -32,7 +32,7 @@ if (!(runtime in prefix)) {
   process.exit(2)
 }
 
-const nodeDir = path.join('third_party', `node-${version}`)
+const nodeDir = path.join('third_party', `${runtime}-${version}`)
 const libDir = path.join(nodeDir, targetCpu)
 if (fs.existsSync(targetOs == 'win' ? libDir : nodeDir)) {
   process.exit(0)

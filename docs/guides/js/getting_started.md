@@ -20,7 +20,23 @@ npm i gui
 But note that `gui` is a native module, you have to reinstall it whenever you
 change Node.js versions or platforms.
 
-Only Node.js v7 and above are supported.
+Only Node.js v12 and above are supported.
+
+### Electron
+
+For Electron you must follow the [Using Native Node Modules][native-module]
+guide on installing the `gui` module:
+
+```bash
+# Runtime is electron.
+export npm_config_runtime=electron
+# Electron's version.
+export npm_config_target=13.1.8
+# The architecture of Electron, can be ia32, arm or x64.
+export npm_config_arch=x64
+# Install the module, and store cache to ~/.electron-gyp.
+HOME=~/.electron-gyp npm i gui
+```
 
 ## Using Yue
 
@@ -40,7 +56,7 @@ while still handling libuv events:
 ```js
 const gui = require('gui')
 
-if (!process.versions.yode) {
+if (!process.versions.yode && !process.versions.electron) {
   gui.MessageLoop.run()  // block until gui.MessageLoop.quit() is called
   process.exit(0)
 }
@@ -354,3 +370,4 @@ function drawHeart(painter) {
 [win-editor]: https://cdn.rawgit.com/yue/yue-app-samples/10cc39d9/editor/screenshots/win_editor.png
 [linux-heart]: https://cdn.rawgit.com/yue/yue-app-samples/196cfee8/floating_heart/screenshots/linux_heart.png
 [win-heart]: https://cdn.rawgit.com/yue/yue-app-samples/196cfee8/floating_heart/screenshots/win_heart.png
+[native-module]: https://github.com/electron/electron/blob/master/docs/tutorial/using-native-node-modules.md

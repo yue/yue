@@ -43,9 +43,7 @@ spawnSync('gn', ['gen', 'out/Node', `--args=${args.join(' ')}`])
 execSync('ninja -C out/Node node_yue')
 
 // Generate a name conforming node's convention.
-let shortver = nodever.substring(1, nodever.lastIndexOf('.'))
-if (runtime == "node")
-  shortver = shortver.substring(0, shortver.lastIndexOf('.'))
+const shortver = nodever.substring(1, nodever.indexOf('.'))
 
 // Strip the binaries on Linux.
 if (targetOs == 'linux')
