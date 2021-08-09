@@ -6,11 +6,11 @@
 
 const {argv, streamPromise} = require('./common')
 
-const path  = require('path')
-const os    = require('os')
-const tar   = require('tar')
-const fs    = require('fs-extra')
+const path = require('path')
+const tar = require('tar')
+const fs = require('fs-extra')
 const fetch = require('node-fetch')
+const useTmpDir = require('use-tmp-dir')
 
 if (argv.length != 4) {
   console.error('Usage: download_node_headers runtime version os cpu')
@@ -39,14 +39,7 @@ if (fs.existsSync(targetOs == 'win' ? libDir : nodeDir)) {
 }
 fs.emptyDirSync(nodeDir)
 
-// Our work dir.
-const zipname = `node-headers-${version}`
-const cwd = path.join(os.tmpdir(), zipname)
-fs.emptyDirSync(cwd)
-
-main()
-
-async function main() {
+useTmpDir(async (cwd) => {
   const url = `${prefix[runtime]}/${version}/node-${version}-headers.tar.gz`
   const file = path.join(cwd, 'node_headers.tar.gz')
   const res = await fetch(url)
@@ -68,9 +61,7 @@ async function main() {
     else
       throw new Error(`Unsupported targetCpu: ${targetCpu}`)
   }
-
-  await fs.remove(cwd)
-}
+})
 
 async function downloadNodeLib(arch) {
   await fs.emptyDir(libDir)

@@ -6,28 +6,14 @@
 
 const {version, execSync} = require('./common')
 
-const os = require('os')
 const path = require('path')
 const fs = require('fs-extra')
+const useTmpDir = require('use-tmp-dir')
 
-// Our work dir.
-const zipname = `node_yue_types_${version}`
-const cwd = path.join(os.tmpdir(), zipname)
-fs.emptyDirSync(cwd)
-
-// Print working dir when quit unexpected.
-process.removeAllListeners('uncaughtException')
-process.on('uncaughtException', (error) => {
-  console.error('Working dir:', cwd)
-  console.error(error)
-  process.exit(1)
+useTmpDir((cwd) => {
+  execSync('node scripts/create_typescript_declarations.js')
+  execSync(`git clone https://github.com/yue/node-gui "${cwd}"`)
+  execSync('npm install', {cwd})
+  fs.copySync('out/Dist/index.d.ts', path.join(cwd, 'index.d.ts'))
+  execSync('npm pack', {cwd})
 })
-
-execSync('node scripts/create_typescript_declarations.js')
-execSync(`git clone https://github.com/yue/node-gui "${cwd}"`)
-execSync('npm install', {cwd})
-fs.copySync('out/Dist/index.d.ts', path.join(cwd, 'index.d.ts'))
-execSync('npm pack', {cwd})
-
-// Cleanup.
-fs.removeSync(cwd)

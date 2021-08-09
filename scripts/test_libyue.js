@@ -10,24 +10,21 @@ const os = require('os')
 const path = require('path')
 const fs = require('fs-extra')
 const extract = require('extract-zip')
+const useTmpDir = require('use-tmp-dir')
 
-// Our work dir.
 const zipname = `libyue_${version}_${targetOs}`
-const tmppath = path.join(os.tmpdir(), zipname)
 
-// Bulid and package.
 console.log('Building libyue...')
 execSync('node scripts/create_source_dist.js')
-console.log('Unzipping libyue...')
-fs.removeSync(tmppath)
-extract(`out/Dist/${zipname}.zip`, {dir: tmppath}, runTests)
 
-function runTests(error) {
-  if (error) {
-    console.error(error)
-    process.exit(1)
-  }
-  process.chdir(tmppath)
+useTmpDir(async (tmpDir) => {
+  console.log('Unzipping libyue...')
+  await extract(`out/Dist/${zipname}.zip`, {dir: tmpDir})
+  process.chdir(tmpDir)
+  runTests()
+})
+
+function runTests() {
   if (targetOs != 'win') {  // use make
     generateProject('Release')
     generateProject('Debug')
@@ -40,7 +37,6 @@ function runTests(error) {
   // uploading the source dist unnecessarily.
   if (process.env.CI == 'true' && targetCpu != 'x64')
     fs.removeSync(`out/Dist/${zipname}.zip`)
-  console.log(tmppath)
 }
 
 function generateProject(config) {

@@ -20,11 +20,13 @@ if (fs.existsSync(verFile) && fs.readFileSync(verFile) == version)
   return
 
 download(url, (response) => {
-  response.on('end', () => {
-    extract('gn.zip', {dir: gnDir}, () => {
+  response.on('end', async () => {
+    try {
+      await extract('gn.zip', {dir: gnDir})
       fs.writeFileSync(verFile, version)
+    } finally {
       fs.unlinkSync('gn.zip')
-    })
+    }
   })
   response.pipe(fs.createWriteStream('gn.zip'))
 })
