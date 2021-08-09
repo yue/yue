@@ -22,6 +22,7 @@ useTmpDir(async (tmpDir) => {
   await extract(`out/Dist/${zipname}.zip`, {dir: tmpDir})
   process.chdir(tmpDir)
   runTests()
+  process.chdir(path.dirname(__dirname))
 })
 
 function runTests() {

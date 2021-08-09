@@ -168,6 +168,8 @@ const spawnSyncWrapper = (exec, args, options = {}) => {
   const result = spawnSync(exec, args, options)
   if (result.error)
     throw result.error
+  if (result.signal)
+    throw new Error(`Process aborted with ${result.signal}`)
   return result
 }
 

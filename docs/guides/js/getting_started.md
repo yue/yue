@@ -86,7 +86,16 @@ the process will exit when all pending Node.js requests have finished.
 The code example above also showed how to make the script run under both Yode
 and Node.js.
 
-#### Garbage collection when using Yode
+#### Electron
+
+When using Yue in Electron, there is no need to worry about message loop in
+the main process, as Electron uses GUI message loop there. But it is not
+recommended to use Yue in renderer process.
+
+Also on Linux, due to GTK+ only getting initialized after the `ready` event
+of `app` gets emitted, you should only use Yue by then.
+
+#### Garbage collection in the main script
 
 When using Node.js to run code, the whole program will block at the
 `gui.MessageLoop.run()` call, and the local variables defined in the main script
@@ -116,7 +125,7 @@ high CPU usage. While the trick used by Yue's `MessageLoop` API to replace the
 event loop, has various problems with the events queue of Node.js.
 
 Luckily with Yode the problem with message loop has been solved cleanly, even if
-you are not intersted in Yue, it is still possible to use Win32 and Cocoa
+you are not interested in Yue, it is still possible to use Win32 and Cocoa
 bindings in Yode.
 
 ## Example: Text editor

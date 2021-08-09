@@ -44,7 +44,7 @@ if (targetCpu == 'x64' && targetOs == 'linux')
 // Test node modules can load.
 if (targetCpu == 'x64') {
   for (const config of ['Release', 'Debug'])
-    execSync(`node -e "require('./out/${config}/gui.node').MessageLoop.quit();process.exit()"`)
+    execSync(`node node_yue/smoke_test.js out/${config}`)
 }
 
 // Build node extensions.
@@ -55,6 +55,9 @@ const runtimes = {
   electron: electronVersions,
 }
 for (let runtime in runtimes) {
-  for (let nodever of runtimes[runtime])
+  for (let nodever of runtimes[runtime]) {
     execSync(`node ./scripts/create_node_extension.js --target-cpu=${targetCpu} ${runtime} ${nodever}`)
+    if (targetCpu == 'x64')
+      execSync(`node ./scripts/test_node_extension.js ${runtime} ${nodever}`)
+  }
 }
