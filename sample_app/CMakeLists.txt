@@ -40,7 +40,6 @@ target_compile_features(${LIBYUE} PUBLIC cxx_std_17)
 
 # macOS configuration.
 if(APPLE)
-  target_include_directories(${LIBYUE} PRIVATE src/mac)
   find_library(APPKIT AppKit)
   find_library(IOKIT IOKit)
   find_library(SECURITY Security)
@@ -57,7 +56,6 @@ endif()
 
 # win32 configuration
 if(WIN32)
-  target_include_directories(${LIBYUE} PRIVATE src/win)
   target_compile_definitions(${LIBYUE} PUBLIC
                              _WINDOWS WIN32 WIN32_LEAN_AND_MEAN NOMINMAX
                              _UNICODE UNICODE)
@@ -75,7 +73,6 @@ endif()
 
 # Linux configuration
 if(UNIX AND NOT APPLE)
-  target_include_directories(${LIBYUE} PRIVATE src/linux)
   find_package(PkgConfig)
   pkg_search_module(FONTCONFIG REQUIRED fontconfig)
   pkg_search_module(PANGO REQUIRED pangoft2)

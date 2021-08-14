@@ -59,6 +59,8 @@ for (const parent in EXTRA_HEADERS) {
   }
 }
 
+execSync('node scripts/modify_base_includes.js')
+
 createZip({withLicense: true})
   .addFile('out/Dist/source', 'out/Dist/source')
   .addFile('sample_app/CMakeLists.txt', 'sample_app')
@@ -111,28 +113,17 @@ function Descibe(target, sources, deps) {
 }
 
 function MergeSources(sources, headers, from) {
-  let isThirdParty = false
   let isHeaderOnly = true
   for (const f of from) {
     if (IsSourceFile(f)) {
       isHeaderOnly = false
-      if (path.normalize(f).split(path.sep).includes('third_party'))
-        isThirdParty = true
     }
   }
   for (const f of from) {
-    if (isThirdParty) {
-      // When the target is from third party, we have to put sources and headers
-      // together since it may search for headers from the source dir.
-      if (!isHeaderOnly)
-        sources.add(f)
-    } else {
-      // Otherwise we can safely separate headers from sources.
-      if (IsSourceFile(f))
-        sources.add(f)
-      else
-        headers.add(f)
-    }
+    if (IsSourceFile(f))
+      sources.add(f)
+    else
+      headers.add(f)
   }
 }
 
