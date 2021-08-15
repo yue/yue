@@ -77,7 +77,7 @@ __pragma(optimize("", on))
 
 }  // namespace
 
-base::string16 GetClassName(HWND window) {
+std::wstring GetClassName(HWND window) {
   // GetClassNameW will return a truncated result (properly null terminated) if
   // the given buffer is not large enough.  So, it is not possible to determine
   // that we got the entire class name if the result is exactly equal to the
@@ -215,8 +215,8 @@ HWND GetWindowToParentTo(bool get_real_hwnd) {
   return get_real_hwnd ? ::GetDesktopWindow() : HWND_DESKTOP;
 }
 
-base::string16 GetWindowString(HWND hwnd) {
-  base::string16 title;
+std::wstring GetWindowString(HWND hwnd) {
+  std::wstring title;
   int len = ::GetWindowTextLengthW(hwnd) + 1;
   if (len > 1)
     ::GetWindowTextW(hwnd, base::WriteInto(&title, len), len);

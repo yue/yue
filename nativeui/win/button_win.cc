@@ -40,7 +40,7 @@ class ButtonImpl : public Clickable {
     SetFocus(true);
   }
 
-  void SetTitle(base::string16 title) {
+  void SetTitle(std::wstring title) {
     text_ = new AttributedText(
         std::move(title),
         TextAttributes(font(), color(), TextAlign::Center, TextAlign::Center,
@@ -251,7 +251,7 @@ void Button::MakeDefault() {
 
 void Button::PlatformSetTitle(const std::string& title) {
   auto* button = static_cast<ButtonImpl*>(GetNative());
-  button->SetTitle(base::UTF8ToUTF16(title));
+  button->SetTitle(base::UTF8ToWide(title));
 }
 
 std::string Button::GetTitle() const {

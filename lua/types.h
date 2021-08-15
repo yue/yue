@@ -14,10 +14,10 @@
 #include <utility>
 #include <vector>
 
-#include "base/optional.h"
 #include "base/strings/string_piece.h"
 #include "base/strings/utf_string_conversions.h"
 #include "lua/stack_auto_reset.h"
+#include "third_party/abseil-cpp/absl/types/optional.h"
 
 namespace lua {
 
@@ -185,16 +185,16 @@ struct Type<std::string> {
 };
 
 template<>
-struct Type<base::string16> {
+struct Type<std::wstring> {
   static constexpr const char* name = "string";
-  static inline void Push(State* state, const base::string16& str) {
-    Type<std::string>::Push(state, base::UTF16ToUTF8(str));
+  static inline void Push(State* state, const std::wstring& str) {
+    Type<std::string>::Push(state, base::WideToUTF8(str));
   }
-  static inline bool To(State* state, int index, base::string16* out) {
+  static inline bool To(State* state, int index, std::wstring* out) {
     const char* str = lua_tostring(state, index);
     if (!str)
       return false;
-    *out = base::UTF8ToUTF16(str);
+    *out = base::UTF8ToWide(str);
     return true;  // ignore memory errors.
   }
 };
@@ -223,15 +223,15 @@ struct Type<const char[n]> {
 };
 
 template<typename T>
-struct Type<base::Optional<T>> {
+struct Type<absl::optional<T>> {
   static constexpr const char* name = Type<T>::name;
-  static inline void Push(State* state, const base::Optional<T>& value) {
+  static inline void Push(State* state, const absl::optional<T>& value) {
     if (value)
       Type<T>::Push(state, *value);
     else
       lua_pushnil(state);
   }
-  static inline bool To(State* state, int index, base::Optional<T>* out) {
+  static inline bool To(State* state, int index, absl::optional<T>* out) {
     if (GetType(state, index) == LuaType::Nil) {
       out->reset();
       return true;

@@ -27,7 +27,7 @@ void EditView::SetPlainText() {
 
 void EditView::SetText(const std::string& text) {
   is_editing_ = true;
-  base::string16 text16 = base::UTF8ToUTF16(text);
+  std::wstring text16 = base::UTF8ToWide(text);
   ::SetWindowTextW(hwnd(), text16.c_str());
   is_editing_ = false;
   // Scroll to end after setting text, this follows the behavior on other
@@ -36,7 +36,7 @@ void EditView::SetText(const std::string& text) {
 }
 
 std::string EditView::GetText() const {
-  return base::UTF16ToUTF8(GetWindowString(hwnd()));
+  return base::WideToUTF8(GetWindowString(hwnd()));
 }
 
 void EditView::Redo() {

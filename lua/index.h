@@ -5,6 +5,7 @@
 #ifndef LUA_INDEX_H_
 #define LUA_INDEX_H_
 
+#include "base/notreached.h"
 #include "lua/table.h"
 #include "lua/user_data.h"
 

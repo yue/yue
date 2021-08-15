@@ -11,6 +11,7 @@
 #include "base/logging.h"
 #include "base/notreached.h"
 #include "base/path_service.h"
+#include "base/strings/string_util_win.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/win/registry.h"
 #include "base/win/scoped_co_mem.h"
@@ -134,10 +135,10 @@ const std::wstring& NotificationCenter::GetToastActivatorCLSID() {
   if (!toast_activator_clsid_) {
     // Generate one from AppUserModelID if not set.
     ::GUID clsid;
-    uint32_t h = base::Hash(App::GetCurrent()->GetAppUserModelID());
-    for (size_t i = 0; i < sizeof(GUID); i += sizeof(uint32_t)) {
+    uint32_t h = base::Hash(
+        base::as_u16cstr(App::GetCurrent()->GetAppUserModelID()));
+    for (size_t i = 0; i < sizeof(GUID); i += sizeof(uint32_t))
       memcpy(reinterpret_cast<char*>(&clsid) + i, &h, sizeof(uint32_t));
-    }
     base::win::ScopedCoMem<OLECHAR> clsid_string;
     if (FAILED(::StringFromCLSID(clsid, &clsid_string)))
       NOTREACHED() << "StringFromCLSID failed";

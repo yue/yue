@@ -119,7 +119,7 @@ std::string TextEdit::GetTextInRange(int start, int end) const {
 void TextEdit::InsertText(const std::string& text) {
   HWND hwnd = static_cast<SubwinView*>(GetNative())->hwnd();
   ::SendMessageW(hwnd, EM_REPLACESEL, TRUE,
-                 reinterpret_cast<LPARAM>(base::UTF8ToUTF16(text).c_str()));
+                 reinterpret_cast<LPARAM>(base::UTF8ToWide(text).c_str()));
 }
 
 void TextEdit::InsertTextAt(const std::string& text, int pos) {

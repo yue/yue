@@ -63,13 +63,13 @@ class BrowserImpl {
 
   virtual bool IsWebView2() const;
 
-  virtual void LoadURL(base::string16 str) = 0;
-  virtual void LoadHTML(base::string16 str, base::string16 base_url) = 0;
-  virtual base::string16 GetURL() = 0;
-  virtual base::string16 GetTitle() = 0;
+  virtual void LoadURL(std::wstring str) = 0;
+  virtual void LoadHTML(std::wstring str, std::wstring base_url) = 0;
+  virtual std::wstring GetURL() = 0;
+  virtual std::wstring GetTitle() = 0;
   virtual void SetUserAgent(const std::string& user_agent) = 0;
   virtual void ExecuteJavaScript(
-      base::string16 code,
+      std::wstring code,
       const Browser::ExecutionCallback& callback) = 0;
 
   virtual void GoBack() = 0;

@@ -31,7 +31,7 @@ class GroupImpl : public ContainerImpl,
   explicit GroupImpl(Group* delegate)
       : ContainerImpl(delegate, this), delegate_(delegate) {}
 
-  void SetTitle(base::string16 title) {
+  void SetTitle(std::wstring title) {
     text_ = new AttributedText(
         std::move(title),
         TextAttributes(font(), color(), TextAlign::Center, TextAlign::Center,
@@ -140,7 +140,7 @@ void Group::PlatformSetContentView(View* view) {
 }
 
 void Group::SetTitle(const std::string& title) {
-  static_cast<GroupImpl*>(GetNative())->SetTitle(base::UTF8ToUTF16(title));
+  static_cast<GroupImpl*>(GetNative())->SetTitle(base::UTF8ToWide(title));
   GetNative()->Invalidate();
 }
 

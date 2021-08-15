@@ -6,6 +6,7 @@
 
 #import <Cocoa/Cocoa.h>
 
+#include "base/cxx17_backports.h"
 #include "base/notreached.h"
 #include "base/mac/foundation_util.h"
 #include "base/mac/scoped_nsobject.h"

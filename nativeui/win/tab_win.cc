@@ -27,7 +27,7 @@ class TabItem : public ViewImpl {
 
   ~TabItem() final {}
 
-  void SetTitle(base::string16 title) {
+  void SetTitle(std::wstring title) {
     text_ = new AttributedText(
         std::move(title),
         TextAttributes(font(), color(), TextAlign::Center, TextAlign::Center,
@@ -117,7 +117,7 @@ class TabImpl : public ContainerImpl,
 
   explicit TabImpl(Tab* delegate) : ContainerImpl(delegate, this) {}
 
-  void AddPage(base::string16 title) {
+  void AddPage(std::wstring title) {
     std::unique_ptr<TabItem> item(new TabItem);
     item->SetTitle(std::move(title));
     item->on_select = [this](TabItem* item) { this->SetSelectedItem(item); };
@@ -315,7 +315,7 @@ void Tab::PlatformAddPage(const std::string& title, View* view) {
   view->GetNative()->SetParent(tab);
   if (PageCount() > 0)  // later added pages are hidden by default
     view->SetVisible(false);
-  tab->AddPage(base::UTF8ToUTF16(title));
+  tab->AddPage(base::UTF8ToWide(title));
 }
 
 void Tab::PlatformRemovePage(int index, View* view) {

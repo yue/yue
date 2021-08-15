@@ -8,9 +8,10 @@
 #define LUA_STACK_H_
 
 #include <functional>
+#include <ostream>
 #include <tuple>
 
-#include "base/notreached.h"
+#include "base/check_op.h"
 #include "lua/template_util.h"
 #include "lua/types.h"
 

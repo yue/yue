@@ -198,26 +198,19 @@ v8::Local<v8::Value> V8ValueConverterImpl::ToV8ValueImpl(
       return v8::Null(isolate);
 
     case base::Value::Type::BOOLEAN: {
-      bool val = false;
-      CHECK(value->GetAsBoolean(&val));
-      return v8::Boolean::New(isolate, val);
+      return v8::Boolean::New(isolate, value->GetBool());
     }
 
     case base::Value::Type::INTEGER: {
-      int val = 0;
-      CHECK(value->GetAsInteger(&val));
-      return v8::Integer::New(isolate, val);
+      return v8::Integer::New(isolate, value->GetInt());
     }
 
     case base::Value::Type::DOUBLE: {
-      double val = 0.0;
-      CHECK(value->GetAsDouble(&val));
-      return v8::Number::New(isolate, val);
+      return v8::Number::New(isolate, value->GetDouble());
     }
 
     case base::Value::Type::STRING: {
-      std::string val;
-      CHECK(value->GetAsString(&val));
+      std::string val = value->GetString();
       return v8::String::NewFromUtf8(
           isolate, val.c_str(), v8::NewStringType::kNormal,
           static_cast<int>(val.length())).ToLocalChecked();

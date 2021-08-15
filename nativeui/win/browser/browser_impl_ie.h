@@ -25,20 +25,20 @@ namespace nu {
 // Implementation of Browser based on IE.
 class BrowserImplIE : public BrowserImpl {
  public:
-  static bool RegisterProtocol(base::string16 scheme,
+  static bool RegisterProtocol(std::wstring scheme,
                                const Browser::ProtocolHandler& handler);
-  static void UnregisterProtocol(base::string16 scheme);
+  static void UnregisterProtocol(std::wstring scheme);
 
   BrowserImplIE(Browser::Options options, BrowserHolder* holder);
   ~BrowserImplIE() override;
 
-  void LoadURL(base::string16 str) override;
-  void LoadHTML(base::string16 str, base::string16 base_url) override;
-  base::string16 GetURL() override;
-  base::string16 GetTitle() override;
+  void LoadURL(std::wstring str) override;
+  void LoadHTML(std::wstring str, std::wstring base_url) override;
+  std::wstring GetURL() override;
+  std::wstring GetTitle() override;
   void SetUserAgent(const std::string& user_agent) override;
   void ExecuteJavaScript(
-      base::string16 code,
+      std::wstring code,
       const Browser::ExecutionCallback& callback) override;
 
   void GoBack() override;
@@ -75,7 +75,7 @@ class BrowserImplIE : public BrowserImpl {
   void OnDestroy();
   LRESULT OnParentNotify(UINT msg, WPARAM w_param, LPARAM l_param);
 
-  bool Eval(base::string16 code, base::Value* result);
+  bool Eval(std::wstring code, base::Value* result);
 
   // Get the HWND of the IE control and add hooks.
   void ReceiveBrowserHWND();

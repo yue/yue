@@ -16,7 +16,7 @@ struct AttributedTextImpl {
   AttributedTextImpl();
   ~AttributedTextImpl();
 
-  base::string16 text;
+  std::wstring text;
   scoped_refptr<Font> font;
   std::unique_ptr<Gdiplus::SolidBrush> brush;
   Gdiplus::StringFormat format;;

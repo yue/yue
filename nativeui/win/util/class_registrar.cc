@@ -5,7 +5,7 @@
 
 #include "nativeui/win/util/class_registrar.h"
 
-#include "base/strings/string_number_conversions.h"
+#include "base/strings/string_number_conversions_win.h"
 #include "base/win/win_util.h"
 #include "base/win/wrapped_window_proc.h"
 #include "nativeui/win/util/win32_window.h"
@@ -44,8 +44,8 @@ ATOM ClassRegistrar::RetrieveClassAtom(const ClassInfo& class_info) {
   }
 
   // No class found, need to register one.
-  base::string16 name = base::string16(kBaseClassName) +
-      base::NumberToString16(registered_count_++);
+  std::wstring name = std::wstring(kBaseClassName) +
+      base::NumberToWString(registered_count_++);
 
   WNDCLASSEX window_class;
   base::win::InitializeWindowClass(
@@ -64,7 +64,7 @@ ATOM ClassRegistrar::RetrieveClassAtom(const ClassInfo& class_info) {
 }
 
 ClassRegistrar::RegisteredClass::RegisteredClass(const ClassInfo& info,
-                                                 const base::string16& name,
+                                                 const std::wstring& name,
                                                  ATOM atom,
                                                  HMODULE instance)
     : info(info),

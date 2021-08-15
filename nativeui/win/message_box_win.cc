@@ -144,12 +144,12 @@ void MessageBox::SetType(Type type) {
 }
 
 void MessageBox::SetTitle(const std::string& title) {
-  box_->title = base::UTF8ToUTF16(title);
+  box_->title = base::UTF8ToWide(title);
   box_->config.pszWindowTitle = box_->title.c_str();
 }
 
 void MessageBox::AddButton(const std::string& title, int response) {
-  box_->button_titles.push_back(base::UTF8ToUTF16(title));
+  box_->button_titles.push_back(base::UTF8ToWide(title));
   box_->buttons.push_back({static_cast<int>(kIDStart + response)});
   // Must update all pointers in |buttons| since |titles| are changed.
   for (size_t i = 0; i < box_->button_titles.size(); ++i)
@@ -166,12 +166,12 @@ void MessageBox::PlatformSetCancelResponse() {
 }
 
 void MessageBox::SetText(const std::string& text) {
-  box_->text = base::UTF8ToUTF16(text);
+  box_->text = base::UTF8ToWide(text);
   box_->config.pszMainInstruction = box_->text.c_str();
 }
 
 void MessageBox::SetInformativeText(const std::string& text) {
-  box_->informative_text = base::UTF8ToUTF16(text);
+  box_->informative_text = base::UTF8ToWide(text);
   box_->config.pszContent = box_->informative_text.c_str();
 }
 

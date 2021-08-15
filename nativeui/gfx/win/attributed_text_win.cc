@@ -22,9 +22,9 @@ AttributedTextImpl::AttributedTextImpl()
 AttributedTextImpl::~AttributedTextImpl() {}
 
 AttributedText::AttributedText(const std::string& text, TextAttributes att)
-    : AttributedText(base::UTF8ToUTF16(text), std::move(att)) {}
+    : AttributedText(base::UTF8ToWide(text), std::move(att)) {}
 
-AttributedText::AttributedText(base::string16 text, TextAttributes att) {
+AttributedText::AttributedText(std::wstring text, TextAttributes att) {
   text_ = new AttributedTextImpl;
   text_->text = std::move(text);
   SetFormat(att.ToTextFormat());
@@ -65,7 +65,7 @@ RectF AttributedText::GetBoundsFor(const SizeF& size) const {
   // to make it behave the same with other platforms.
   bool ends_with_newline = text_->text.size() > 0 &&
                            text_->text[text_->text.size() - 1] == L'\n';
-  const base::string16& text = ends_with_newline ? text_->text + L"a"
+  const std::wstring& text = ends_with_newline ? text_->text + L"a"
                                                  : text_->text;
 
   base::win::ScopedGetDC dc(NULL);
@@ -84,11 +84,11 @@ RectF AttributedText::GetBoundsFor(const SizeF& size) const {
 }
 
 void AttributedText::SetText(const std::string& text) {
-  text_->text = base::UTF8ToUTF16(text);
+  text_->text = base::UTF8ToWide(text);
 }
 
 std::string AttributedText::GetText() const {
-  return base::UTF16ToUTF8(text_->text);
+  return base::WideToUTF8(text_->text);
 }
 
 }  // namespace nu

@@ -8,6 +8,10 @@
 #include "base/strings/pattern.h"
 #include "base/strings/string_util.h"
 
+#if defined(OS_WIN)
+#include "base/strings/string_util_win.h"
+#endif
+
 namespace nu {
 
 namespace {
@@ -39,7 +43,11 @@ Image::Image(NativeImage image) : image_(image) {}
 // static
 float Image::GetScaleFactorFromFilePath(const base::FilePath& path) {
   base::FilePath::StringType name(path.BaseName().RemoveExtension().value());
-  if (!base::MatchPattern(name, FILE_PATH_LITERAL("*@*x")))
+#if defined(OS_WIN)
+  if (!base::MatchPattern(base::as_u16cstr(name), u"*@*x"))
+#else
+  if (!base::MatchPattern(name, "*@*x"))
+#endif
     return 1.0f;
 
   // We don't try to convert string to float here because it is very very

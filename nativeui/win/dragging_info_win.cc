@@ -40,8 +40,8 @@ Clipboard::Data DraggingInfoWin::GetData(Data::Type type) const {
   switch (type) {
     case Data::Type::Text: {
       base::win::ScopedHGlobal<wchar_t*> data(medium.hGlobal);
-      base::string16 result(data.get());
-      ret = Data(Data::Type::Text, base::UTF16ToUTF8(result));
+      std::wstring result(data.get());
+      ret = Data(Data::Type::Text, base::WideToUTF8(result));
       break;
     }
     case Data::Type::HTML: {

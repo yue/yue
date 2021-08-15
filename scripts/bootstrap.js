@@ -15,10 +15,8 @@ let sysrootArch = {
   arm64: 'arm64',
 }[targetCpu]
 
-if (clang) {
-  execSync('python building/tools/update-clang.py')
-}
 if (process.platform == 'linux') {
+  execSync('python building/tools/update-clang.py')
   execSync(`python building/tools/install-sysroot.py --arch ${sysrootArch}`)
 } else if (process.platform == 'win32') {
   execSync('node scripts/download_nuget_packages.js')

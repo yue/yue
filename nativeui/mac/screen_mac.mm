@@ -7,8 +7,10 @@
 
 #import <Cocoa/Cocoa.h>
 
+#include <map>
+
+#include "base/cxx17_backports.h"
 #include "base/mac/scoped_nsobject.h"
-#include "base/stl_util.h"
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/gfx/mac/coordinate_conversion.h"
 #include "nativeui/window.h"

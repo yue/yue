@@ -8,9 +8,9 @@
 #include <string>
 
 #include "base/memory/weak_ptr.h"
-#include "base/optional.h"
 #include "nativeui/clipboard.h"
 #include "nativeui/gfx/color.h"
+#include "third_party/abseil-cpp/absl/types/optional.h"
 
 namespace nu {
 
@@ -58,9 +58,9 @@ class NATIVEUI_EXPORT App {
   std::wstring GetAppUserModelID() const;
 
   struct ShortcutOptions {
-    base::Optional<std::wstring> arguments;
-    base::Optional<std::wstring> description;
-    base::Optional<base::FilePath> working_dir;
+    absl::optional<std::wstring> arguments;
+    absl::optional<std::wstring> description;
+    absl::optional<base::FilePath> working_dir;
   };
   bool CreateStartMenuShortcut(const ShortcutOptions& options);
   base::FilePath GetStartMenuShortcutPath() const;
@@ -77,8 +77,8 @@ class NATIVEUI_EXPORT App {
 
   bool PlatformGetName(std::string* name) const;
 
-  base::Optional<std::string> name_override_;
-  mutable base::Optional<std::string> cached_name_;
+  absl::optional<std::string> name_override_;
+  mutable absl::optional<std::string> cached_name_;
 #if defined(OS_MAC)
   scoped_refptr<MenuBar> application_menu_;
 #elif defined(OS_LINUX)

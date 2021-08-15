@@ -201,7 +201,7 @@ void Browser::LoadURL(const std::string& url) {
     return;
   }
 #endif
-  browser->LoadURL(base::UTF8ToUTF16(url));
+  browser->LoadURL(base::UTF8ToWide(url));
 }
 
 void Browser::LoadHTML(const std::string& html, const std::string& base_url) {
@@ -214,17 +214,17 @@ void Browser::LoadHTML(const std::string& html, const std::string& base_url) {
     return;
   }
 #endif
-  browser->LoadHTML(base::UTF8ToUTF16(html), base::UTF8ToUTF16(base_url));
+  browser->LoadHTML(base::UTF8ToWide(html), base::UTF8ToWide(base_url));
 }
 
 std::string Browser::GetURL() {
   auto* browser = static_cast<BrowserHolder*>(GetNative())->impl();
-  return base::UTF16ToUTF8(browser->GetURL());
+  return base::WideToUTF8(browser->GetURL());
 }
 
 std::string Browser::GetTitle() {
   auto* browser = static_cast<BrowserHolder*>(GetNative())->impl();
-  return base::UTF16ToUTF8(browser->GetTitle());
+  return base::WideToUTF8(browser->GetTitle());
 }
 
 void Browser::SetUserAgent(const std::string& ua) {
@@ -235,7 +235,7 @@ void Browser::SetUserAgent(const std::string& ua) {
 void Browser::ExecuteJavaScript(const std::string& code,
                                 const ExecutionCallback& callback) {
   auto* browser = static_cast<BrowserHolder*>(GetNative())->impl();
-  browser->ExecuteJavaScript(base::UTF8ToUTF16(code), callback);
+  browser->ExecuteJavaScript(base::UTF8ToWide(code), callback);
 }
 
 void Browser::GoBack() {
@@ -282,17 +282,17 @@ void Browser::PlatformUpdateBindings() {
 bool Browser::RegisterProtocol(const std::string& scheme,
                                const ProtocolHandler& handler) {
 #if defined(WEBVIEW2_SUPPORT)
-  BrowserImplWebview2::RegisterProtocol(base::UTF8ToUTF16(scheme), handler);
+  BrowserImplWebview2::RegisterProtocol(base::UTF8ToWide(scheme), handler);
 #endif
-  return BrowserImplIE::RegisterProtocol(base::UTF8ToUTF16(scheme), handler);
+  return BrowserImplIE::RegisterProtocol(base::UTF8ToWide(scheme), handler);
 }
 
 // static
 void Browser::UnregisterProtocol(const std::string& scheme) {
 #if defined(WEBVIEW2_SUPPORT)
-  BrowserImplWebview2::UnregisterProtocol(base::UTF8ToUTF16(scheme));
+  BrowserImplWebview2::UnregisterProtocol(base::UTF8ToWide(scheme));
 #endif
-  return BrowserImplIE::UnregisterProtocol(base::UTF8ToUTF16(scheme));
+  return BrowserImplIE::UnregisterProtocol(base::UTF8ToWide(scheme));
 }
 
 }  // namespace nu

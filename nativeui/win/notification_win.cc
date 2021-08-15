@@ -299,13 +299,13 @@ std::string Notification::GetIdentifier() const {
   return base::WideToUTF8(notification_->id);
 }
 
-void Notification::SetImagePlacement(base::Optional<std::wstring> placement) {
+void Notification::SetImagePlacement(absl::optional<std::wstring> placement) {
   if (!notification_)
     return;
   notification_->image_placement = std::move(placement);
 }
 
-void Notification::SetXML(base::Optional<std::wstring> xml) {
+void Notification::SetXML(absl::optional<std::wstring> xml) {
   if (!notification_)
     return;
   notification_->xml = std::move(xml);

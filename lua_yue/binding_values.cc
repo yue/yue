@@ -35,7 +35,6 @@ bool IsTableArray(State* state, int index, size_t* size) {
 // static
 void Type<base::Value>::Push(State* state, const base::Value& value) {
   switch (value.type()) {
-    case base::Value::Type::DEAD:
     case base::Value::Type::NONE:
       lua::PushNil(state);
       return;
@@ -57,11 +56,10 @@ void Type<base::Value>::Push(State* state, const base::Value& value) {
                       value.GetBlob().size());
       return;
     case base::Value::Type::DICTIONARY: {
-      const auto* dict = static_cast<const base::DictionaryValue*>(&value);
-      NewTable(state, 0, static_cast<int>(dict->size()));
-      for (const auto& it : *dict) {
+      NewTable(state, 0, static_cast<int>(value.DictSize()));
+      for (const auto it : value.DictItems()) {
         lua::Push(state, it.first);
-        Type<base::Value>::Push(state, *it.second);
+        Type<base::Value>::Push(state, it.second);
         lua_rawset(state, -3);
       }
       return;

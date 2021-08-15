@@ -195,10 +195,10 @@ class ClipboardImpl {
 
     switch (type) {
       case Data::Type::Text: {
-        base::string16 result;
+        std::wstring result;
         if (!ReadText(&result))
           return Data();
-        return Data(Data::Type::Text, base::UTF16ToUTF8(result));
+        return Data(Data::Type::Text, base::WideToUTF8(result));
       }
       case Data::Type::HTML: {
         std::string result;
@@ -234,7 +234,7 @@ class ClipboardImpl {
       switch (data.type()) {
         case Data::Type::Text:
           WriteToClipboard(CF_UNICODETEXT,
-                           CreateGlobalData(base::UTF8ToUTF16(data.str())));
+                           CreateGlobalData(base::UTF8ToWide(data.str())));
           break;
         case Data::Type::HTML:
           WriteToClipboard(GetHTMLFormat(),
@@ -276,13 +276,13 @@ class ClipboardImpl {
     }
   }
 
-  bool ReadText(base::string16* result) const {
+  bool ReadText(std::wstring* result) const {
     HANDLE data = ::GetClipboardData(CF_UNICODETEXT);
     if (!data)
       return false;
 
-    result->assign(static_cast<const base::char16*>(::GlobalLock(data)),
-                   ::GlobalSize(data) / sizeof(base::char16));
+    result->assign(static_cast<const wchar_t*>(::GlobalLock(data)),
+                   ::GlobalSize(data) / sizeof(wchar_t));
     ::GlobalUnlock(data);
     TrimAfterNull(result);
     return true;

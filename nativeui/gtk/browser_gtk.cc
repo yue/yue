@@ -35,7 +35,7 @@ base::Value JSResultToBaseValue(WebKitJavascriptResult* js_result) {
     return base::Value();
   std::string json_str = JSStringToString(json);
   JSStringRelease(json);
-  base::Optional<base::Value> result = base::JSONReader::Read(json_str);
+  absl::optional<base::Value> result = base::JSONReader::Read(json_str);
   if (!result)
     return base::Value();
   return std::move(*result);

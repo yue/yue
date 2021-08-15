@@ -10,8 +10,9 @@ const path = require('path')
 const fs = require('fs-extra')
 
 const targets = [
-  'third_party/modp_b64',
+  'third_party/abseil-cpp',
   'third_party/apple_apsl',
+  'third_party/modp_b64',
   'third_party/yoga',
   'base/third_party/double_conversion/double-conversion',
   'base/third_party/libevent',
@@ -50,23 +51,17 @@ function modifyIncludesForFile(sourceFile, rootDir, newBaseDir) {
   let hasModification = false
   const lines = fs.readFileSync(sourceFile).toString().split('\n')
   for (const i in lines) {
-    const line = lines[i]
-    if (!line.startsWith('#include "'))
+    const result = parseHeader(lines[i])
+    if (!result)
       continue
-    const header = line.match(/#include "(.+)"/)[1]
-    if (!header)
-      throw new Error(`Unable to parse: ${line}`)
+    const [header, prefix, suffix] = result
     if (header.startsWith(newBaseDir) || buildHeaders.includes(header))
       continue
     const newHeader = rebaseHeader(header, sourceFile, rootDir, newBaseDir)
-    if (!fs.existsSync(`include/${newHeader}`)) {
-      if (verbose)
-        console.log('Unexisting file:', header)
-    }
     if (verbose)
       console.log('Replacing', header, 'with', newHeader)
     hasModification = true
-    lines[i] = `#include "${newHeader}"`
+    lines[i] = prefix + newHeader + suffix
   }
   if (hasModification) {
     if (verbose)
@@ -76,7 +71,28 @@ function modifyIncludesForFile(sourceFile, rootDir, newBaseDir) {
   }
 }
 
+function parseHeader(line) {
+  let match = line.match(/^#include "(.+)"/)
+  if (match)
+    return [match[1], '#include "', '"']
+  // A special case for abseil.
+  match = line.match(/^ +"(.+.inc)"/)
+  if (match)
+    return [match[1], '    "', '"']
+  return null
+}
+
 function rebaseHeader(header, sourceFile, rootDir, newBaseDir) {
-  const fullPath = path.resolve(rootDir, path.dirname(sourceFile), header)
-  return `${newBaseDir}/${header}`
+  const newHeader = `${newBaseDir}/${header}`
+  if (fs.existsSync(`include/${newHeader}`))
+    return newHeader
+  const relativeSourceFile =
+      path.relative(path.join(rootDir, newBaseDir), sourceFile)
+  const relativeHeader =
+      path.join(newBaseDir, path.dirname(relativeSourceFile), header)
+  if (fs.existsSync(`include/${relativeHeader}`))
+    return relativeHeader.replace(/\\/g, '/')
+  if (verbose)
+    console.log('Unexisting header:', header, 'from', sourceFile)
+  return newHeader
 }

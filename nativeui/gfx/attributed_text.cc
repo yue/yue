@@ -4,6 +4,8 @@
 
 #include "nativeui/gfx/attributed_text.h"
 
+#include <float.h>  // needed for FLT_MAX on arm64 macOS
+
 #include <utility>
 
 #include "nativeui/gfx/font.h"

@@ -11,12 +11,12 @@
 #include "base/base_paths_win.h"
 #include "base/file_version_info.h"
 #include "base/logging.h"
-#include "base/optional.h"
 #include "base/path_service.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/win/shortcut.h"
 #include "nativeui/notification_center.h"
 #include "nativeui/state.h"
+#include "third_party/abseil-cpp/absl/types/optional.h"
 
 namespace nu {
 
@@ -29,7 +29,7 @@ std::string App::GetID() const {
 }
 
 bool App::IsRunningAsUWP() const {
-  static base::Optional<bool> result;
+  static absl::optional<bool> result;
   if (!result) {
     result.emplace(false);
     auto get_package_family_name =
@@ -106,7 +106,7 @@ bool App::PlatformGetName(std::string* name) const {
   auto info = FileVersionInfo::CreateFileVersionInfo(path);
   if (!info || info->product_name().empty())
     return false;
-  *name = base::WideToUTF8(info->product_name());
+  *name = base::UTF16ToUTF8(info->product_name());
   return true;
 }
 

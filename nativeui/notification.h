@@ -15,7 +15,7 @@
 
 #if defined(OS_LINUX) || defined(OS_WIN)
 #include "base/files/scoped_temp_dir.h"
-#include "base/optional.h"
+#include "third_party/abseil-cpp/absl/types/optional.h"
 #endif
 
 namespace base {
@@ -46,8 +46,8 @@ class NATIVEUI_EXPORT Notification : public base::RefCounted<Notification> {
   std::string GetIdentifier() const;
 #endif
 #if defined(OS_WIN)
-  void SetImagePlacement(base::Optional<std::wstring> placement);
-  void SetXML(base::Optional<std::wstring> xml);
+  void SetImagePlacement(absl::optional<std::wstring> placement);
+  void SetXML(absl::optional<std::wstring> xml);
   std::wstring GetXML() const;
 #endif
 

@@ -51,7 +51,7 @@ AsarArchive::AsarArchive(base::File file, bool extended_format)
     return;
 
   // Parse header.
-  base::Optional<base::Value> value = base::JSONReader::Read(header);
+  absl::optional<base::Value> value = base::JSONReader::Read(header);
   if (!value || !value->is_dict())
     return;
   content_offset_ += 8 + size;

@@ -36,13 +36,13 @@ base::FilePath GetUserDataDir() {
 
 // static
 bool BrowserImplWebview2::RegisterProtocol(
-    base::string16 scheme,
+    std::wstring scheme,
     const Browser::ProtocolHandler& handler) {
   return false;
 }
 
 // static
-void BrowserImplWebview2::UnregisterProtocol(base::string16 scheme) {
+void BrowserImplWebview2::UnregisterProtocol(std::wstring scheme) {
 }
 
 BrowserImplWebview2::BrowserImplWebview2(Browser::Options options,
@@ -92,7 +92,7 @@ bool BrowserImplWebview2::IsWebView2() const {
   return true;
 }
 
-void BrowserImplWebview2::LoadURL(base::string16 str) {
+void BrowserImplWebview2::LoadURL(std::wstring str) {
   if (!webview_)
     return;
   bool should_update_bindings = delegate()->HasBindings() && is_first_load_;
@@ -112,8 +112,8 @@ void BrowserImplWebview2::LoadURL(base::string16 str) {
   ReceiveBrowserHWND();
 }
 
-void BrowserImplWebview2::LoadHTML(base::string16 str,
-                                   base::string16 base_url) {
+void BrowserImplWebview2::LoadHTML(std::wstring str,
+                                   std::wstring base_url) {
   if (!webview_)
     return;
   bool should_update_bindings = delegate()->HasBindings() && is_first_load_;
@@ -134,18 +134,18 @@ void BrowserImplWebview2::LoadHTML(base::string16 str,
   ReceiveBrowserHWND();
 }
 
-base::string16 BrowserImplWebview2::GetURL() {
+std::wstring BrowserImplWebview2::GetURL() {
   base::win::ScopedCoMem<wchar_t> url;
   if (webview_)
     webview_->get_Source(&url);
-  return url.get() ? url.get() : base::string16();
+  return url.get() ? url.get() : std::wstring();
 }
 
-base::string16 BrowserImplWebview2::GetTitle() {
+std::wstring BrowserImplWebview2::GetTitle() {
   base::win::ScopedCoMem<wchar_t> title;
   if (webview_)
     webview_->get_DocumentTitle(&title);
-  return title.get() ? title.get() : base::string16();
+  return title.get() ? title.get() : std::wstring();
 }
 
 void BrowserImplWebview2::SetUserAgent(const std::string& ua) {
@@ -153,7 +153,7 @@ void BrowserImplWebview2::SetUserAgent(const std::string& ua) {
 }
 
 void BrowserImplWebview2::ExecuteJavaScript(
-    base::string16 code,
+    std::wstring code,
     const Browser::ExecutionCallback& callback) {
   if (webview_) {
     auto handler =
@@ -163,7 +163,7 @@ void BrowserImplWebview2::ExecuteJavaScript(
                 return S_OK;
               base::Value result;
               if (SUCCEEDED(res)) {
-                auto pv = base::JSONReader::Read(base::UTF16ToUTF8(json));
+                auto pv = base::JSONReader::Read(base::WideToUTF8(json));
                 if (pv)
                   result = std::move(*pv);
               }
@@ -249,7 +249,7 @@ void BrowserImplWebview2::UpdateBindings() {
                 return S_OK;
               });
   webview_->AddScriptToExecuteOnDocumentCreated(
-      base::UTF8ToUTF16(delegate()->GetBindingScript()).c_str(),
+      base::UTF8ToWide(delegate()->GetBindingScript()).c_str(),
       callback.Get());
 }
 
@@ -462,7 +462,7 @@ HRESULT BrowserImplWebview2::OnNavigationStarting(
   base::win::ScopedCoMem<wchar_t> url;
   args->get_Uri(&url);
   delegate()->on_start_navigation.Emit(
-      delegate(), url.get() ? base::UTF16ToUTF8(url.get()) : std::string());
+      delegate(), url.get() ? base::WideToUTF8(url.get()) : std::string());
   return S_OK;
 }
 
@@ -504,7 +504,7 @@ HRESULT BrowserImplWebview2::OnWebMessageReceived(
   if (FAILED(args->TryGetWebMessageAsString(&message)) || !message.get())
     return E_INVALIDARG;
   return delegate()->InvokeBindings(
-     base::UTF16ToUTF8(message.get())) ? S_OK : E_INVALIDARG;
+     base::WideToUTF8(message.get())) ? S_OK : E_INVALIDARG;
 }
 
 }  // namespace nu

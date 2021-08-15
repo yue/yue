@@ -20,7 +20,7 @@ namespace {
 std::string URLToString(BSTR str) {
   if (::SysStringLen(str) == 0)
     return "about:blank";
-  return base::UTF16ToUTF8(str);
+  return base::WideToUTF8(str);
 }
 
 }  // namespace
@@ -130,7 +130,7 @@ STDMETHODIMP BrowserEventSink::Invoke(_In_  DISPID dispIdMember,
       if (!is_load_html_) {
         delegate->on_update_title.Emit(
             delegate,
-            base::UTF16ToUTF8(pDispParams->rgvarg[0].bstrVal));
+            base::WideToUTF8(pDispParams->rgvarg[0].bstrVal));
       }
       break;
     case DISPID_COMMANDSTATECHANGE:

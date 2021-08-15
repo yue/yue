@@ -23,7 +23,7 @@ class NATIVEUI_EXPORT AttributedText : public base::RefCounted<AttributedText> {
   AttributedText(const std::string& text, TextFormat format);
   AttributedText(const std::string& text, TextAttributes att);
 #if defined(OS_WIN)
-  AttributedText(base::string16 text, TextAttributes att);
+  AttributedText(std::wstring text, TextAttributes att);
 #endif
 
   void SetFormat(TextFormat format);

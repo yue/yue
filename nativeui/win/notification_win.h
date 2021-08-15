@@ -22,12 +22,12 @@ struct NotificationImpl {
   std::wstring info;
   bool has_reply_button = false;
   std::wstring reply_placeholder;
-  base::Optional<std::wstring> image_path;
-  base::Optional<std::wstring> image_placement;
+  absl::optional<std::wstring> image_path;
+  absl::optional<std::wstring> image_placement;
   bool silent = false;
   std::vector<Notification::Action> actions;
 
-  base::Optional<std::wstring> xml;
+  absl::optional<std::wstring> xml;
   bool first_time = true;
 
   mswr::ComPtr<IToastNotification> toast;

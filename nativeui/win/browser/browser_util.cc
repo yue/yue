@@ -35,7 +35,7 @@ void FixIECompatibleMode() {
   base::FilePath exe_path;
   if (!base::PathService::Get(base::FILE_EXE, &exe_path))
     return;
-  base::string16 exe_name = exe_path.BaseName().value();
+  std::wstring exe_name = exe_path.BaseName().value();
 
   // Windows Internet Explorer 8 and later. The FEATURE_BROWSER_EMULATION
   // feature defines the default emulation mode for Internet Explorer and
@@ -90,7 +90,7 @@ base::Value VARIANTToValue(IDispatchEx* script,
   if (!Invoke(json_obj.Get(), L"stringify", DISPATCH_METHOD, &str, value))
     return base::Value();
   // Parse from JSON.
-  auto pv = base::JSONReader::Read(base::UTF16ToUTF8(str.ptr()->bstrVal));
+  auto pv = base::JSONReader::Read(base::WideToUTF8(str.ptr()->bstrVal));
   if (!pv)
     return base::Value();
   return std::move(*pv);

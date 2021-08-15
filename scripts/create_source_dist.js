@@ -95,7 +95,7 @@ function Descibe(target, sources, deps) {
   }
   if (desc.public) {
     for (const p of desc.public) {
-      if (p.endsWith('.h'))
+      if (IsHeaderFile(p))
         sources.add(p)
     }
   }
@@ -105,7 +105,7 @@ function Descibe(target, sources, deps) {
   }
   if (desc.type === 'action') {
     for (const o of desc.outputs) {
-      if (o.endsWith('.h'))
+      if (IsHeaderFile(o))
         sources.add(o)
     }
   }
@@ -113,12 +113,6 @@ function Descibe(target, sources, deps) {
 }
 
 function MergeSources(sources, headers, from) {
-  let isHeaderOnly = true
-  for (const f of from) {
-    if (IsSourceFile(f)) {
-      isHeaderOnly = false
-    }
-  }
   for (const f of from) {
     if (IsSourceFile(f))
       sources.add(f)
@@ -158,6 +152,10 @@ function CopySource(file, targetDir, baseDir = '') {
   } catch (e) {
     throw new Error(`Unable to copy file ${originalName}: ${e.message}`)
   }
+}
+
+function IsHeaderFile(f) {
+  return ['.h', '.inc'].includes(path.extname(f))
 }
 
 function IsSourceFile(f) {

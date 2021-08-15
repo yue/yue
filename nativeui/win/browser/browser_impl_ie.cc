@@ -20,13 +20,13 @@ namespace nu {
 namespace {
 
 // Stores the protocol factories.
-std::map<base::string16,
+std::map<std::wstring,
          Microsoft::WRL::ComPtr<BrowserProtocolFactory>> g_protocol_factories;
 
 }  // namespace
 
 // static
-bool BrowserImplIE::RegisterProtocol(base::string16 scheme,
+bool BrowserImplIE::RegisterProtocol(std::wstring scheme,
                                      const Browser::ProtocolHandler& handler) {
   Microsoft::WRL::ComPtr<IInternetSession> session;
   if (FAILED(::CoInternetGetSession(0, &session, 0)))
@@ -42,7 +42,7 @@ bool BrowserImplIE::RegisterProtocol(base::string16 scheme,
 }
 
 // static
-void BrowserImplIE::UnregisterProtocol(base::string16 scheme) {
+void BrowserImplIE::UnregisterProtocol(std::wstring scheme) {
   Microsoft::WRL::ComPtr<IInternetSession> session;
   if (FAILED(::CoInternetGetSession(0, &session, 0)))
     return;
@@ -106,7 +106,7 @@ BrowserImplIE::~BrowserImplIE() {
   ole_object->SetClientSite(nullptr);
 }
 
-void BrowserImplIE::LoadURL(base::string16 str) {
+void BrowserImplIE::LoadURL(std::wstring str) {
   if (!browser_)
     return;
   html_moniker_.Reset();
@@ -115,8 +115,8 @@ void BrowserImplIE::LoadURL(base::string16 str) {
   browser_->Navigate(url.Get(), nullptr, nullptr, nullptr, nullptr);
 }
 
-void BrowserImplIE::LoadHTML(base::string16 str,
-                             base::string16 base_url) {
+void BrowserImplIE::LoadHTML(std::wstring str,
+                             std::wstring base_url) {
   if (!browser_)
     return;
   html_moniker_ = new BrowserHTMLMoniker;
@@ -127,19 +127,19 @@ void BrowserImplIE::LoadHTML(base::string16 str,
   browser_->Navigate(url.Get(), nullptr, nullptr, nullptr, nullptr);
 }
 
-base::string16 BrowserImplIE::GetURL() {
+std::wstring BrowserImplIE::GetURL() {
   base::win::ScopedBstr url;
   browser_->get_LocationURL(url.Receive());
   return url.Length() == 0 ? L"about:blank" : url.Get();
 }
 
-base::string16 BrowserImplIE::GetTitle() {
+std::wstring BrowserImplIE::GetTitle() {
   base::win::ScopedBstr title;
   if (document_)
     document_->get_title(title.Receive());
   if (!title.Get())
-    return base::string16();
-  return base::string16(title.Get());
+    return std::wstring();
+  return std::wstring(title.Get());
 }
 
 void BrowserImplIE::SetUserAgent(const std::string& ua) {
@@ -150,7 +150,7 @@ void BrowserImplIE::SetUserAgent(const std::string& ua) {
 }
 
 void BrowserImplIE::ExecuteJavaScript(
-    base::string16 code,
+    std::wstring code,
     const Browser::ExecutionCallback& callback) {
   // IE executes the script syncronously but we need async behavior to keep
   // consistency with other platforms, so delay the task to next tick.
@@ -247,7 +247,7 @@ LRESULT BrowserImplIE::OnParentNotify(UINT msg, WPARAM w_param, LPARAM) {
   return 0;
 }
 
-bool BrowserImplIE::Eval(base::string16 code, base::Value* result) {
+bool BrowserImplIE::Eval(std::wstring code, base::Value* result) {
   Microsoft::WRL::ComPtr<IDispatchEx> script;
   if (!GetScript(&script))
     return false;
@@ -325,7 +325,7 @@ void BrowserImplIE::OnDocumentReady() {
   }
   // Add bindings to the document.
   auto* browser = static_cast<Browser*>(delegate());
-  Eval(base::UTF8ToUTF16(browser->GetBindingScript()), nullptr);
+  Eval(base::UTF8ToWide(browser->GetBindingScript()), nullptr);
 }
 
 // static

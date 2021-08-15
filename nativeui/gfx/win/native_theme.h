@@ -17,10 +17,10 @@
 #include <map>
 
 #include "base/macros.h"
-#include "base/optional.h"
 #include "nativeui/gfx/color.h"
 #include "nativeui/gfx/geometry/rect.h"
 #include "nativeui/gfx/geometry/size.h"
+#include "third_party/abseil-cpp/absl/types/optional.h"
 
 // Structurs used by private win32 APIs.
 enum PreferredAppMode { Default, AllowDark, ForceDark, ForceLight, Max };
@@ -208,7 +208,7 @@ class NativeTheme {
   SetWindowCompositionAttributePtr set_window_attribute_ = nullptr;
 
   // Whether dark mode is supported.
-  base::Optional<bool> dark_mode_supported_;
+  absl::optional<bool> dark_mode_supported_;
 
   // Handle to uxtheme.dll.
   HMODULE theme_dll_ = NULL;

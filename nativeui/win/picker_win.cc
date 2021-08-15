@@ -27,10 +27,10 @@ std::string PickerImpl::GetItemAt(int i) {
   int len = ::SendMessage(hwnd(), CB_GETLBTEXTLEN, i, 0L);
   if (len == CB_ERR)
     return std::string();
-  base::string16 text16(len, 0L);
+  std::wstring text16(len, 0L);
   ::SendMessage(hwnd(), CB_GETLBTEXT, i,
                 reinterpret_cast<LPARAM>(text16.data()));
-  return base::UTF16ToUTF8(text16);
+  return base::WideToUTF8(text16);
 }
 
 void PickerImpl::SelectItemAt(int index) {
@@ -63,7 +63,7 @@ Picker::~Picker() {
 
 void Picker::AddItem(const std::string& text) {
   auto* picker = static_cast<PickerImpl*>(GetNative());
-  base::string16 text16 = base::UTF8ToUTF16(text);
+  std::wstring text16 = base::UTF8ToWide(text);
   // Guard against duplicate items.
   int r = ::SendMessage(picker->hwnd(), CB_FINDSTRINGEXACT, 0,
                         reinterpret_cast<LPARAM>(text16.c_str()));

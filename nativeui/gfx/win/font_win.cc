@@ -46,7 +46,7 @@ Font::Font(const std::string& name, float size, Weight weight, Style style) {
     font_style |= Gdiplus::FontStyleBold;
   if (style == Font::Style::Italic)
     font_style |= Gdiplus::FontStyleItalic;
-  font_ = new Gdiplus::Font(base::UTF8ToUTF16(name).c_str(),
+  font_ = new Gdiplus::Font(base::UTF8ToWide(name).c_str(),
                             // Converting DPI-aware pixel size to point.
                             size * 72.f / 96.f,
                             font_style,
@@ -85,7 +85,7 @@ Font::~Font() {
 }
 
 std::string Font::GetName() const {
-  return base::UTF16ToUTF8(GetName16());
+  return base::WideToUTF8(GetName16());
 }
 
 float Font::GetSize() const {

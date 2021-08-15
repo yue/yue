@@ -154,9 +154,9 @@ HRESULT AppendActionNode(winxml::Dom::IXmlDocument* document,
   if (FAILED(hr))
     return hr;
   SetAttribute(document, action_node.Get(), L"content",
-               base::UTF8ToUTF16(action.title));
+               base::UTF8ToWide(action.title));
   return SetAttribute(document, action_node.Get(), L"arguments",
-                      kNotificationTypeAction + base::UTF8ToUTF16(action.info));
+                      kNotificationTypeAction + base::UTF8ToWide(action.info));
 }
 
 mswr::ComPtr<IToastNotification> CreateToastNotification(

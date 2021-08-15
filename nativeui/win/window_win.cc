@@ -1022,11 +1022,11 @@ bool Window::IsMovable() const {
 }
 
 void Window::SetTitle(const std::string& title) {
-  ::SetWindowTextW(window_->hwnd(), base::UTF8ToUTF16(title).c_str());
+  ::SetWindowTextW(window_->hwnd(), base::UTF8ToWide(title).c_str());
 }
 
 std::string Window::GetTitle() const {
-  return base::UTF16ToUTF8(GetWindowString(window_->hwnd()));
+  return base::WideToUTF8(GetWindowString(window_->hwnd()));
 }
 
 void Window::SetBackgroundColor(Color color) {

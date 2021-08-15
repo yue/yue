@@ -561,7 +561,6 @@ test("nativeui_unittests") {
     "tab_unittests.cc",
     "table_unittests.cc",
     "text_edit_unittests.cc",
-    "values_unittest.cc",
     "view_unittest.cc",
     "window_unittest.cc",
     "test/gfx_util.cc",

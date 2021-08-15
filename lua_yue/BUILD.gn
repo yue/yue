@@ -62,9 +62,12 @@ source_set("lua_yue_gui") {
   ]
 
   deps = [
+    "//nativeui",
+  ]
+
+  public_deps = [
     "//base",
     "//lua",
-    "//nativeui",
   ]
 }
 

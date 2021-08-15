@@ -10,9 +10,9 @@
 #include <vector>
 
 #include "base/memory/weak_ptr.h"
-#include "base/optional.h"
 #include "nativeui/signal.h"
 #include "nativeui/types.h"
+#include "third_party/abseil-cpp/absl/types/optional.h"
 
 namespace base {
 class FilePath;
@@ -34,7 +34,7 @@ class NATIVEUI_EXPORT NotificationCenter : SignalDelegate {
   struct COMServerOptions {
     bool write_registry = true;
     std::wstring arguments;
-    base::Optional<std::wstring> toast_activator_clsid;
+    absl::optional<std::wstring> toast_activator_clsid;
   };
   bool SetCOMServerOptions(COMServerOptions options);
   bool RegisterCOMServer();
@@ -90,7 +90,7 @@ class NATIVEUI_EXPORT NotificationCenter : SignalDelegate {
 #if defined(OS_WIN)
   COMServerOptions options_;
 
-  base::Optional<::GUID> toast_activator_clsid_;
+  absl::optional<::GUID> toast_activator_clsid_;
   std::wstring toast_activator_clsid_string_;
 #endif
 

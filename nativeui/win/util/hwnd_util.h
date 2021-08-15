@@ -7,7 +7,8 @@
 
 #include <windows.h>
 
-#include "base/strings/string16.h"
+#include <string>
+
 #include "nativeui/nativeui_export.h"
 
 namespace nu {
@@ -16,8 +17,8 @@ class Point;
 class Size;
 
 // A version of the GetClassNameW API that returns the class name in an
-// base::string16. An empty result indicates a failure to get the class name.
-base::string16 GetClassName(HWND hwnd);
+// std::wstring. An empty result indicates a failure to get the class name.
+std::wstring GetClassName(HWND hwnd);
 
 // Useful for subclassing a HWND.  Returns the previous window procedure.
 WNDPROC SetWindowProc(HWND hwnd, WNDPROC wndproc);
@@ -47,7 +48,7 @@ void CheckWindowCreated(HWND hwnd);
 HWND GetWindowToParentTo(bool get_real_hwnd);
 
 // Get the window text.
-base::string16 GetWindowString(HWND hwnd);
+std::wstring GetWindowString(HWND hwnd);
 
 // The size, in pixels, of the non-client frame around a window.
 int GetFrameThickness(float scale_factor);

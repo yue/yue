@@ -10,3 +10,6 @@
 [submodule "third_party/lua"]
 	path = third_party/lua
 	url = https://github.com/ejoy/lua.git
+[submodule "third_party/abseil-cpp"]
+	path = third_party/abseil-cpp
+	url = https://github.com/yue/abseil-cpp

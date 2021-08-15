@@ -8,9 +8,9 @@
 #include <string>
 
 #include "base/memory/ref_counted.h"
-#include "base/optional.h"
 #include "nativeui/signal.h"
 #include "nativeui/types.h"
+#include "third_party/abseil-cpp/absl/types/optional.h"
 
 namespace nu {
 
@@ -59,7 +59,7 @@ class NATIVEUI_EXPORT MessageBox : public base::RefCounted<MessageBox> {
   Signal<void(MessageBox*, int response)> on_response;
 
   // Private: Called by native implementations to notify response.
-  void OnClose(base::Optional<int> response = base::Optional<int>());
+  void OnClose(absl::optional<int> response = absl::optional<int>());
 
  private:
   friend class base::RefCounted<MessageBox>;
@@ -75,7 +75,7 @@ class NATIVEUI_EXPORT MessageBox : public base::RefCounted<MessageBox> {
   void PlatformSetCancelResponse();
   void PlatformSetImage(Image* image);
 
-  base::Optional<int> default_response_;
+  absl::optional<int> default_response_;
   int cancel_response_ = -1;
 #if defined(OS_LINUX) || defined(OS_MAC)
   scoped_refptr<View> accessory_view_;

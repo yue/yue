@@ -11,8 +11,9 @@
 #include <ole2.h>
 #include <wrl.h>
 
+#include <string>
+
 #include "base/macros.h"
-#include "base/strings/string16.h"
 
 namespace nu {
 
@@ -21,7 +22,7 @@ class BrowserHTMLMoniker : public IMoniker {
   BrowserHTMLMoniker();
   virtual ~BrowserHTMLMoniker();
 
-  void LoadHTML(const base::string16& str, const base::string16& base_url);
+  void LoadHTML(const std::wstring& str, const std::wstring& base_url);
 
   // IUnknown
   STDMETHOD(QueryInterface)(REFIID riid, void **ppvObject);
@@ -66,7 +67,7 @@ class BrowserHTMLMoniker : public IMoniker {
  private:
   ULONG ref_;
 
-  base::string16 base_url_;
+  std::wstring base_url_;
   Microsoft::WRL::ComPtr<IStream> stream_;
 
   DISALLOW_COPY_AND_ASSIGN(BrowserHTMLMoniker);

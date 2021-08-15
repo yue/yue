@@ -17,8 +17,8 @@ BrowserHTMLMoniker::BrowserHTMLMoniker()
 BrowserHTMLMoniker::~BrowserHTMLMoniker() {
 }
 
-void BrowserHTMLMoniker::LoadHTML(const base::string16& str,
-                                  const base::string16& base_url) {
+void BrowserHTMLMoniker::LoadHTML(const std::wstring& str,
+                                  const std::wstring& base_url) {
   base_url_ = base_url;
   HGLOBAL glob = ::GlobalAlloc(GPTR, sizeof(wchar_t) * (str.size() + 1));
   {

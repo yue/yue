@@ -14,7 +14,7 @@
 namespace nu {
 
 SubwinView::SubwinView(View* delegate,
-                       base::StringPiece16 class_name,
+                       base::WStringPiece class_name,
                        DWORD window_style, DWORD window_ex_style)
     : Win32Window(class_name, State::GetCurrent()->GetSubwinHolder(),
                   window_style, window_ex_style),

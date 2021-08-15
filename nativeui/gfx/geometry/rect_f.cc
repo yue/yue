@@ -7,17 +7,17 @@
 #include <algorithm>
 #include <limits>
 
+#include "base/check.h"
+#include "base/numerics/safe_conversions.h"
+#include "base/strings/stringprintf.h"
+#include "build/build_config.h"
+#include "nativeui/gfx/geometry/insets_f.h"
+
 #if defined(OS_IOS)
 #include <CoreGraphics/CoreGraphics.h>
 #elif defined(OS_MAC)
 #include <ApplicationServices/ApplicationServices.h>
 #endif
-
-#include "base/logging.h"
-#include "base/strings/stringprintf.h"
-#include "build/build_config.h"
-#include "nativeui/gfx/geometry/insets_f.h"
-#include "nativeui/gfx/geometry/safe_integer_conversions.h"
 
 namespace nu {
 
@@ -224,9 +224,12 @@ float RectF::ManhattanInternalDistance(const RectF& rect) const {
 }
 
 bool RectF::IsExpressibleAsRect() const {
-  return IsExpressibleAsInt(x()) && IsExpressibleAsInt(y()) &&
-      IsExpressibleAsInt(width()) && IsExpressibleAsInt(height()) &&
-      IsExpressibleAsInt(right()) && IsExpressibleAsInt(bottom());
+  return base::IsValueInRangeForNumericType<int>(x()) &&
+         base::IsValueInRangeForNumericType<int>(y()) &&
+         base::IsValueInRangeForNumericType<int>(width()) &&
+         base::IsValueInRangeForNumericType<int>(height()) &&
+         base::IsValueInRangeForNumericType<int>(right()) &&
+         base::IsValueInRangeForNumericType<int>(bottom());
 }
 
 std::string RectF::ToString() const {

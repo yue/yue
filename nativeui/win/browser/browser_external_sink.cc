@@ -69,7 +69,7 @@ IFACEMETHODIMP BrowserExternalSink::GetIDsOfNames(
     __RPC__out_ecount_full(cNames) DISPID *rgDispId) {
   if (browser_->delegate()->stop_serving())
     return DISP_E_UNKNOWNNAME;
-  if (cNames == 1 && base::StringPiece16(rgszNames[0]) == L"postMessage") {
+  if (cNames == 1 && base::WStringPiece(rgszNames[0]) == L"postMessage") {
     rgDispId[0] = kInvokeId;
     return S_OK;
   }
@@ -93,7 +93,7 @@ IFACEMETHODIMP BrowserExternalSink::Invoke(
       pDispParams->rgvarg[0].vt != VT_BSTR)
     return E_INVALIDARG;
   return browser_->delegate()->InvokeBindings(
-     base::UTF16ToUTF8(pDispParams->rgvarg[0].bstrVal)) ? S_OK : E_INVALIDARG;
+     base::WideToUTF8(pDispParams->rgvarg[0].bstrVal)) ? S_OK : E_INVALIDARG;
 }
 
 }  // namespace nu

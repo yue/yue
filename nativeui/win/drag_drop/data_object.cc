@@ -324,7 +324,7 @@ DataObject::DataObject(std::vector<Clipboard::Data> objects) {
     switch (data.type()) {
       case Data::Type::Text:
         contents_.emplace_back(
-            format, GetStorageForString(base::UTF8ToUTF16(data.str())));
+            format, GetStorageForString(base::UTF8ToWide(data.str())));
         break;
       case Data::Type::HTML: {
         std::string cf_html = HtmlToCFHtml(data.str(), "about:blank");

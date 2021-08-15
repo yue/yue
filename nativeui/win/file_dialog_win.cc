@@ -154,15 +154,15 @@ bool FileDialog::RunForWindow(Window* window) {
 }
 
 void FileDialog::SetTitle(const std::string& title) {
-  dialog_->SetTitle(base::UTF8ToUTF16(title));
+  dialog_->SetTitle(base::UTF8ToWide(title));
 }
 
 void FileDialog::SetButtonLabel(const std::string& label) {
-  dialog_->SetButtonLabel(base::UTF8ToUTF16(label));
+  dialog_->SetButtonLabel(base::UTF8ToWide(label));
 }
 
 void FileDialog::SetFilename(const std::string& filename) {
-  dialog_->SetFilename(base::UTF8ToUTF16(filename));
+  dialog_->SetFilename(base::UTF8ToWide(filename));
 }
 
 void FileDialog::SetFolder(const base::FilePath& folder) {

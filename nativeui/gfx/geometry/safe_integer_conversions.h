@@ -6,7 +6,6 @@
 #define NATIVEUI_GFX_GEOMETRY_SAFE_INTEGER_CONVERSIONS_H_
 
 #include <cmath>
-#include <limits>
 
 #include "base/numerics/safe_conversions.h"
 #include "nativeui/nativeui_export.h"
@@ -45,16 +44,6 @@ inline int ToRoundedInt(double value) {
   else
     rounded = std::ceil(value - 0.5);
   return base::saturated_cast<int>(rounded);
-}
-
-inline bool IsExpressibleAsInt(float value) {
-  if (value != value)
-    return false;  // no int NaN.
-  if (value > std::numeric_limits<int>::max())
-    return false;
-  if (value < std::numeric_limits<int>::min())
-    return false;
-  return true;
 }
 
 }  // namespace nu

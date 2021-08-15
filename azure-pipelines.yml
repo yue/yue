@@ -20,6 +20,7 @@ jobs:
         TARGET_CPU: x86
       arm64:
         TARGET_CPU: arm64
+  timeoutInMinutes: 120
   steps:
   - powershell: |
       Start-BitsTransfer -Source 'https://go.microsoft.com/fwlink/?linkid=2084649&Channel=Canary&language=en-us' -Destination EdgeSetup.exe

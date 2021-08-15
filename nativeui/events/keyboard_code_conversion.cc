@@ -6,6 +6,7 @@
 #include "nativeui/events/keyboard_code_conversion.h"
 
 #include <algorithm>
+#include <ostream>
 
 #include "base/stl_util.h"
 #include "base/strings/string_number_conversions.h"
@@ -137,7 +138,7 @@ const KeyCodeMap kKeyCodesMap[] = {
 
 // Return key code of the char, and also determine whether the SHIFT key is
 // pressed.
-KeyboardCode KeyboardCodeFromCharCode(base::char16 c, bool* shifted) {
+KeyboardCode KeyboardCodeFromCharCode(char c, bool* shifted) {
   c = base::ToLowerASCII(c);
   *shifted = false;
   switch (c) {

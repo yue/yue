@@ -12,9 +12,9 @@
 #include <utility>
 #include <vector>
 
-#include "base/optional.h"
 #include "base/strings/string_piece.h"
 #include "base/strings/string_util.h"
+#include "third_party/abseil-cpp/absl/types/optional.h"
 #include "v8.h"  // NOLINT(build/include)
 #include "v8binding/template_util.h"
 
@@ -176,10 +176,10 @@ struct Type<base::StringPiece> {
 };
 
 template<>
-struct Type<base::string16> {
+struct Type<std::wstring> {
   static constexpr const char* name = "String";
   static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
-                                          const base::string16& value) {
+                                          const std::wstring& value) {
     return v8::String::NewFromTwoByte(
         context->GetIsolate(),
         reinterpret_cast<const uint16_t*>(value.data()),
@@ -188,25 +188,24 @@ struct Type<base::string16> {
   }
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
-                     base::string16* out) {
+                     std::wstring* out) {
     if (!value->IsString())
       return false;
     v8::Local<v8::String> str = v8::Local<v8::String>::Cast(value);
     int length = str->Length();
-    // Note that the reinterpret cast is because on Windows string16 is an alias
-    // to wstring, and hence has character type wchar_t not uint16_t.
+    out->reserve(length + 1);
+    out->resize(length);
     str->Write(context->GetIsolate(),
-               reinterpret_cast<uint16_t*>(base::WriteInto(out, length + 1)), 0,
-               length);
+               reinterpret_cast<uint16_t*>(&((*str)[0])), 0, length);
     return true;
   }
 };
 
 template<typename T>
-struct Type<base::Optional<T>> {
+struct Type<absl::optional<T>> {
   static constexpr const char* name = Type<T>::name;
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
-                                   const base::Optional<T>& value) {
+                                   const absl::optional<T>& value) {
     if (value)
       return Type<T>::ToV8(context, *value);
     else
@@ -214,7 +213,7 @@ struct Type<base::Optional<T>> {
   }
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
-                     base::Optional<T>* out) {
+                     absl::optional<T>* out) {
     if (value->IsUndefined() || value->IsNull()) {
       out->reset();
       return true;

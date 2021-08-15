@@ -66,7 +66,7 @@ if(WIN32)
                         gdi32.lib gdiplus.lib urlmon.lib userenv.lib
                         uxtheme.lib delayimp.lib runtimeobject.lib)
   set_target_properties(${LIBYUE} PROPERTIES COMPILE_FLAGS
-                        "/wd4244")
+                        "/wd4244 /wd4267 /wd4996")
   target_link_options(${LIBYUE} PUBLIC
                       "/DELAYLOAD:setupapi.dll;/DELAYLOAD:powrprof.dll;/DELAYLOAD:dwmapi.dll;/SUBSYSTEM:WINDOWS")
 endif()

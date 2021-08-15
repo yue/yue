@@ -21,7 +21,7 @@ namespace nu {
 namespace {
 
 // Convert the character index to byte index.
-guint CharIndexToByteIndex(const base::string16& text, int index) {
+guint CharIndexToByteIndex(const std::u16string& text, int index) {
   if (index < 0)
     return G_MAXUINT;
   return base::UTF16ToUTF8(text.substr(0, index)).size();
@@ -31,7 +31,7 @@ void FillPangoAttributeIndex(PangoAttribute* attr, PangoLayout* layout,
                              int start, int end) {
   if (start == 0 && end < 0)  // this is the most common case
     return;
-  base::string16 text = base::UTF8ToUTF16(pango_layout_get_text(layout));
+  std::u16string text = base::UTF8ToUTF16(pango_layout_get_text(layout));
   attr->start_index = CharIndexToByteIndex(text, start);
   attr->end_index = CharIndexToByteIndex(text, end);
 }

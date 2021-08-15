@@ -17,7 +17,7 @@ const electronVersions = [
 ]
 
 // The version of gn.
-const gnVersion = '0.6.1'
+const gnVersion = '0.7.0'
 
 // The common build configurations.
 const gnConfig = [
@@ -29,7 +29,7 @@ const gnConfig = [
 ]
 if (clang) {
   gnConfig.push('is_clang=true',
-              'clang_update_script="//building/tools/update-clang.py"')
+                'clang_update_script="//building/tools/update-clang.py"')
 } else {
   gnConfig.push('is_clang=false')
 }
@@ -40,9 +40,6 @@ if (targetOs == 'mac') {
     gnConfig.push('mac_sdk_min="11.0"')
   else
     gnConfig.push('mac_sdk_min="10.15"')
-} else if (targetOs == 'linux') {
-  // Required for loading dynamic modules.
-  gnConfig.push('use_cfi_icall=false')
 } else if (targetOs == 'win') {
   gnConfig.push(`webview2_version="${webview2Version}"`)
 }

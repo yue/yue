@@ -6,8 +6,8 @@
 #define NATIVEUI_WIN_UTIL_CLASS_REGISTRAR_H_
 
 #include <list>
+#include <string>
 
-#include "base/strings/string16.h"
 #include "base/synchronization/lock.h"
 
 namespace nu {
@@ -44,7 +44,7 @@ class ClassRegistrar {
   // Represents a registered window class.
   struct RegisteredClass {
     RegisteredClass(const ClassInfo& info,
-                    const base::string16& name,
+                    const std::wstring& name,
                     ATOM atom,
                     HINSTANCE instance);
 
@@ -52,7 +52,7 @@ class ClassRegistrar {
     ClassInfo info;
 
     // The name given to the window class
-    base::string16 name;
+    std::wstring name;
 
     // The atom identifying the window class.
     ATOM atom;

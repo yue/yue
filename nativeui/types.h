@@ -9,13 +9,9 @@
 #include <windows.h>
 #endif
 
-#include "build/build_config.h"
-
-#if defined(OS_WIN)
-#include "base/strings/string16.h"
-#else
 #include <string>
-#endif
+
+#include "build/build_config.h"
 
 #if defined(OS_LINUX)
 typedef struct _AppIndicator AppIndicator;

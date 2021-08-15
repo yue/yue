@@ -17,7 +17,7 @@ const DWORD Win32Window::kWindowDefaultChildStyle =
 const DWORD Win32Window::kWindowDefaultStyle =
     WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN;
 
-Win32Window::Win32Window(base::StringPiece16 class_name, HWND parent,
+Win32Window::Win32Window(base::WStringPiece class_name, HWND parent,
                          DWORD window_style, DWORD window_ex_style)
     : window_style_(window_style),
       window_ex_style_(window_ex_style) {

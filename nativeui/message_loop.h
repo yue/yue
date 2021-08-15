@@ -5,6 +5,7 @@
 #ifndef NATIVEUI_MESSAGE_LOOP_H_
 #define NATIVEUI_MESSAGE_LOOP_H_
 
+#include <functional>
 #include <unordered_map>
 
 #include "base/synchronization/lock.h"

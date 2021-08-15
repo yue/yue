@@ -33,7 +33,7 @@ class Win32Window {
   static const DWORD kWindowDefaultChildStyle;
   static const DWORD kWindowDefaultStyle;
 
-  Win32Window(base::StringPiece16 class_name = L"",
+  Win32Window(base::WStringPiece class_name = L"",
               HWND parent = NULL,
               DWORD window_style = kWindowDefaultStyle,
               DWORD window_ex_style = 0);

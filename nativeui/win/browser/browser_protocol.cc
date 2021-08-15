@@ -53,7 +53,7 @@ IFACEMETHODIMP BrowserProtocol::Start(LPCWSTR szUrl,
     return E_INVALIDARG;
   if (!handler_)
     return E_FAIL;
-  protocol_job_ = handler_(base::UTF16ToUTF8(szUrl));
+  protocol_job_ = handler_(base::WideToUTF8(szUrl));
   if (!protocol_job_)
     return E_FAIL;
 
@@ -68,7 +68,7 @@ IFACEMETHODIMP BrowserProtocol::Start(LPCWSTR szUrl,
   std::string mime_type;
   if (protocol_job_->GetMimeType(&mime_type)) {
     sink_->ReportProgress(BINDSTATUS_VERIFIEDMIMETYPEAVAILABLE,
-                          base::UTF8ToUTF16(mime_type).c_str());
+                          base::UTF8ToWide(mime_type).c_str());
   }
   return protocol_job_->Start() ? S_OK : E_FAIL;
 }

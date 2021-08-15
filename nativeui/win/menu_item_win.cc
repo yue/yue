@@ -75,7 +75,7 @@ void MenuItem::Click() {
 
 void MenuItem::SetLabel(const std::string& label) {
   menu_item_->label = label;
-  menu_item_->actual_label = base::UTF8ToUTF16(label);
+  menu_item_->actual_label = base::UTF8ToWide(label);
   if (!menu_item_->accelerator.empty()) {
     menu_item_->actual_label += L'\t';
     menu_item_->actual_label += menu_item_->accelerator;

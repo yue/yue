@@ -31,7 +31,7 @@ TableImpl::~TableImpl() {
     ImageList_Destroy(image_list_);
 }
 
-void TableImpl::AddColumnWithOptions(const base::string16& title,
+void TableImpl::AddColumnWithOptions(const std::wstring& title,
                                      Table::ColumnOptions options) {
   LVCOLUMNA col = {0};
   col.mask = LVCF_TEXT;
@@ -69,7 +69,7 @@ void TableImpl::UpdateColumnsWidth(TableModel* model) {
       if (model && model->GetRowCount() > 0) {
         const base::Value* value = model->GetValue(i, 0);
         if (value && value->is_string()) {
-          base::string16 text = base::UTF8ToUTF16(value->GetString());
+          std::wstring text = base::UTF8ToWide(value->GetString());
           int text_width = ListView_GetStringWidth(hwnd(), text.c_str());
           // Add some padding.
           text_width += (i == 0 ? 7 : 14) * scale_factor();
@@ -169,7 +169,7 @@ LRESULT TableImpl::OnGetDispInfo(NMLVDISPINFO* nm, int column, int row) {
     return 0;
   // Always set text regardless of cell type, for increased accessbility.
   if ((nm->item.mask & LVIF_TEXT) && value->is_string()) {
-    text_cache_ = base::UTF8ToUTF16(value->GetString());
+    text_cache_ = base::UTF8ToWide(value->GetString());
     nm->item.pszText = const_cast<wchar_t*>(text_cache_.c_str());
     return TRUE;
   }
@@ -251,7 +251,7 @@ LRESULT TableImpl::OnBeginEdit(NMLVDISPINFO* nm, int row) {
     if (model) {
       const base::Value* value = model->GetValue(column, row);
       if (value && value->is_string()) {
-        base::string16 text16 = base::UTF8ToUTF16(value->GetString());
+        std::wstring text16 = base::UTF8ToWide(value->GetString());
         ::SetWindowTextW(edit_hwnd_, text16.c_str());
       }
     }
@@ -266,7 +266,7 @@ LRESULT TableImpl::OnEndEdit(NMLVDISPINFO* nm, int row) {
     auto* model = static_cast<Table*>(delegate())->GetModel();
     if (model)
       model->SetValue(edit_column_, edit_row_,
-                      base::Value(base::UTF16ToUTF8(nm->item.pszText)));
+                      base::Value(base::WideToUTF8(nm->item.pszText)));
   }
 
   edit_row_ = -1;
@@ -330,7 +330,7 @@ void Table::PlatformSetModel(TableModel* model) {
 void Table::AddColumnWithOptions(const std::string& title,
                                  const ColumnOptions& options) {
   auto* table = static_cast<TableImpl*>(GetNative());
-  table->AddColumnWithOptions(base::UTF8ToUTF16(title), options);
+  table->AddColumnWithOptions(base::UTF8ToWide(title), options);
 }
 
 int Table::GetColumnCount() const {

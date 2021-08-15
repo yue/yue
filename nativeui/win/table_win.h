@@ -19,7 +19,7 @@ class TableImpl : public SubwinView {
 
   static const int kDefaultColumnWidth = 50;
 
-  void AddColumnWithOptions(const base::string16& title,
+  void AddColumnWithOptions(const std::wstring& title,
                             Table::ColumnOptions options);
   int GetColumnCount() const;
   void UpdateColumnsWidth(TableModel* model);
@@ -68,7 +68,7 @@ class TableImpl : public SubwinView {
 
   // The pszText must be valid when the message is sent, so we have to keep
   // a cache to avoid returning a pointer to temporary memory.
-  base::string16 text_cache_;
+  std::wstring text_cache_;
 };
 
 }  // namespace nu
