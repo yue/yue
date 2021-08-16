@@ -27,7 +27,7 @@ class NATIVEUI_EXPORT MessageLoop {
   // Internal: Cancellable timers.
 #if defined(OS_WIN)
   using TimerId = UINT_PTR;
-#elif defined(OS_LINUX) || defined(OS_MACOSX)
+#elif defined(OS_LINUX) || defined(OS_MAC)
   using TimerId = unsigned int;
 #endif
   static TimerId SetTimeout(int ms, Task task);
@@ -38,7 +38,7 @@ class NATIVEUI_EXPORT MessageLoop {
   friend class TimerHost;
 #endif
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
   static base::Lock lock_;
   static std::unordered_map<TimerId, Task> tasks_;
 #endif

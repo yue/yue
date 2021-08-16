@@ -13,7 +13,7 @@ namespace {
 #define PLATFORM "win32"
 #elif defined(OS_LINUX)
 #define PLATFORM "linux"
-#elif defined(OS_MACOSX)
+#elif defined(OS_MAC)
 #define PLATFORM "macos"
 #else
 #define PLATFORM "other"

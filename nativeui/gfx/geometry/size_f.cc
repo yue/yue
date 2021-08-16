@@ -4,7 +4,7 @@
 
 #include "nativeui/gfx/geometry/size_f.h"
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
 #include <ApplicationServices/ApplicationServices.h>
 #endif
 
@@ -12,7 +12,7 @@
 
 namespace nu {
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
 SizeF::SizeF(const CGSize& s)
     : width_(s.width < 0 ? 0 : s.width),
       height_(s.height < 0 ? 0 : s.height) {

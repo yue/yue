@@ -34,7 +34,7 @@ class ClipboardTest : public testing::Test {
 TEST_F(ClipboardTest, Types) {
   EXPECT_TRUE(
       nu::Clipboard::FromType(nu::Clipboard::Type::CopyPaste)->GetNative());
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
   EXPECT_TRUE(nu::Clipboard::FromType(nu::Clipboard::Type::Drag)->GetNative());
   EXPECT_TRUE(nu::Clipboard::FromType(nu::Clipboard::Type::Find)->GetNative());
   EXPECT_TRUE(nu::Clipboard::FromType(nu::Clipboard::Type::Font)->GetNative());

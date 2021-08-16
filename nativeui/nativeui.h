@@ -48,7 +48,7 @@
 #include "nativeui/tray.h"
 #include "nativeui/window.h"
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
 #include "nativeui/toolbar.h"
 #include "nativeui/vibrant.h"
 #endif

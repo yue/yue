@@ -13,7 +13,7 @@
 #include "nativeui/gfx/geometry/vector2d_f.h"
 #include "nativeui/nativeui_export.h"
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
 typedef struct CGPoint CGPoint;
 #endif
 
@@ -29,7 +29,7 @@ class NATIVEUI_EXPORT PointF {
   explicit PointF(const Point& p)
       : PointF(static_cast<float>(p.x()), static_cast<float>(p.y())) {}
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
   explicit PointF(const CGPoint& r);
   // Construct an equivalent CoreGraphics object.
   CGPoint ToCGPoint() const;

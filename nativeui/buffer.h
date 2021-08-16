@@ -12,7 +12,7 @@
 #include "build/build_config.h"
 #include "nativeui/nativeui_export.h"
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
 #ifdef __OBJC__
 @class NSData;
 #else
@@ -46,7 +46,7 @@ class NATIVEUI_EXPORT Buffer {
   void* content() const { return content_; }
   size_t size() const { return size_; }
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
   // Return an autoreleased NSData which does not manage the memory.
   NSData* ToNSData() const;
 #endif

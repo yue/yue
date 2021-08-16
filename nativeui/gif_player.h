@@ -56,7 +56,7 @@ class NATIVEUI_EXPORT GifPlayer : public View {
  private:
   void PlatformSetImage(Image* image);
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
   unsigned int frames_count_ = 0;
   unsigned int frame_ = 0;
   NSBitmapImageRep* animation_rep_ = nullptr;

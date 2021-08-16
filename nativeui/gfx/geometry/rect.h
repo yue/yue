@@ -25,7 +25,7 @@
 
 #if defined(OS_WIN)
 typedef struct tagRECT RECT;
-#elif defined(OS_MACOSX)
+#elif defined(OS_MAC)
 typedef struct CGRect CGRect;
 #elif defined(OS_LINUX)
 #include <gdk/gdk.h>
@@ -46,7 +46,7 @@ class NATIVEUI_EXPORT Rect {
 
 #if defined(OS_WIN)
   explicit Rect(const RECT& r);
-#elif defined(OS_MACOSX)
+#elif defined(OS_MAC)
   explicit Rect(const CGRect& r);
 #elif defined(OS_LINUX)
   explicit Rect(const GdkRectangle& r);
@@ -57,7 +57,7 @@ class NATIVEUI_EXPORT Rect {
 #if defined(OS_WIN)
   // Construct an equivalent Win32 RECT object.
   RECT ToRECT() const;
-#elif defined(OS_MACOSX)
+#elif defined(OS_MAC)
   // Construct an equivalent CoreGraphics object.
   CGRect ToCGRect() const;
 #elif defined(OS_LINUX)

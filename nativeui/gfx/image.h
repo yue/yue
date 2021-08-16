@@ -18,7 +18,7 @@
 #include "base/win/scoped_gdi_object.h"
 #endif
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
 #include <ImageIO/ImageIO.h>
 #endif
 
@@ -65,7 +65,7 @@ class NATIVEUI_EXPORT Image : public base::RefCounted<Image> {
   base::win::ScopedHICON GetHICON(const SizeF& size) const;
 #endif
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
   // Internal: Return the image representaion that has animations.
   NSBitmapImageRep* GetAnimationRep() const;
 
@@ -97,7 +97,7 @@ class NATIVEUI_EXPORT Image : public base::RefCounted<Image> {
   bool is_empty_ = false;
   // The animation frame.
   GdkPixbufAnimationIter* iter_ = nullptr;
-#elif defined(OS_MACOSX)
+#elif defined(OS_MAC)
   // The frame durations.
   std::vector<float> durations_;
 #endif

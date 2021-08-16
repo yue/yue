@@ -85,7 +85,7 @@ TEST_F(TextEditTest, Undo) {
   EXPECT_EQ(edit_->CanRedo(), false);
   edit_->InsertTextAt("b", 0);
   edit_->Undo();
-#if !defined(OS_MACOSX)
+#if !defined(OS_MAC)
   // On macOS an undo operation would undo all.
   EXPECT_EQ(edit_->GetText(), "a");
   EXPECT_EQ(edit_->CanUndo(), true);

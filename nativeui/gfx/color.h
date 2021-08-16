@@ -20,7 +20,7 @@
 typedef struct _GdkRGBA GdkRGBA;
 #endif
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
 #ifdef __OBJC__
 @class NSColor;
 #else
@@ -51,7 +51,7 @@ class NATIVEUI_EXPORT Color {
       : Color(0xFF, r, g, b) {}
   Color() : value_(0) {}
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
   NSColor* ToNSColor() const;
 #elif defined(OS_WIN)
   COLORREF ToCOLORREF() const;

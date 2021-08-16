@@ -7,7 +7,7 @@
 
 #include "build/build_config.h"
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
 #include "nativeui/events/mac/keyboard_codes_mac.h"
 #elif defined(OS_LINUX)
 #include "nativeui/events/gtk/keyboard_codes_gtk.h"

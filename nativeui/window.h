@@ -32,7 +32,7 @@ namespace nu {
 
 class MenuBar;
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
 class Toolbar;
 #endif
 
@@ -45,7 +45,7 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
     // Whether the window is transparent.
     bool transparent = false;
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
     // Show window buttons for the frameless window.
     bool show_traffic_lights = false;
 #endif
@@ -103,7 +103,7 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
   std::string GetTitle() const;
   void SetBackgroundColor(Color color);
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
   void SetToolbar(scoped_refptr<Toolbar> toolbar);
   Toolbar* GetToolbar() const { return toolbar_.get(); }
   void SetTitleVisible(bool visible);
@@ -170,7 +170,7 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
   // Whehter window has been closed.
   bool is_closed_ = false;
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
   scoped_refptr<Toolbar> toolbar_;
 #endif
 

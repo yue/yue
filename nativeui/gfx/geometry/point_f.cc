@@ -6,7 +6,7 @@
 
 #if defined(OS_IOS)
 #include <CoreGraphics/CoreGraphics.h>
-#elif defined(OS_MACOSX)
+#elif defined(OS_MAC)
 #include <ApplicationServices/ApplicationServices.h>
 #endif
 
@@ -14,7 +14,7 @@
 
 namespace nu {
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
 PointF::PointF(const CGPoint& r) : x_(r.x), y_(r.y) {
 }
 

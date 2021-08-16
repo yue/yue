@@ -25,7 +25,7 @@ class NATIVEUI_EXPORT Browser : public View {
   struct Options {
     bool devtools = false;
     bool context_menu = false;
-#if defined(OS_MACOSX) || defined(OS_LINUX)
+#if defined(OS_MAC) || defined(OS_LINUX)
     bool allow_file_access_from_files = false;
 #endif
 #if defined(OS_LINUX)

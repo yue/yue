@@ -16,7 +16,7 @@
 #if defined(OS_WIN)
 typedef unsigned long DWORD;  // NOLINT
 typedef struct tagPOINT POINT;
-#elif defined(OS_MACOSX)
+#elif defined(OS_MAC)
 typedef struct CGPoint CGPoint;
 #endif
 
@@ -34,7 +34,7 @@ class NATIVEUI_EXPORT Point {
   explicit Point(DWORD point);
   explicit Point(const POINT& point);
   Point& operator=(const POINT& point);
-#elif defined(OS_MACOSX)
+#elif defined(OS_MAC)
   explicit Point(const CGPoint& point);
 #endif
 
@@ -42,7 +42,7 @@ class NATIVEUI_EXPORT Point {
 
 #if defined(OS_WIN)
   POINT ToPOINT() const;
-#elif defined(OS_MACOSX)
+#elif defined(OS_MAC)
   CGPoint ToCGPoint() const;
 #endif
 

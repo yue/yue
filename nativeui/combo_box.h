@@ -24,7 +24,7 @@ class NATIVEUI_EXPORT ComboBox : public Picker {
 
   // Picker:
   void AddItem(const std::string& text) override;
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
   // On macOS the ComboBox does not have any relationship with Picker, we have
   // to reimplement every method.
   void RemoveItemAt(int index) override;

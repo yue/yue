@@ -21,7 +21,7 @@ class NATIVEUI_EXPORT SizeF {
   SizeF() : width_(0.f), height_(0.f) {}
   SizeF(float width, float height)
       : width_(fmaxf(0, width)), height_(fmaxf(0, height)) {}
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
   explicit SizeF(const CGSize& s);
 #endif
   ~SizeF() {}
@@ -30,11 +30,11 @@ class NATIVEUI_EXPORT SizeF {
       : SizeF(static_cast<float>(size.width()),
               static_cast<float>(size.height())) {}
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
   SizeF& operator=(const CGSize& s);
 #endif
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
   CGSize ToCGSize() const;
 #endif
 

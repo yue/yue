@@ -13,7 +13,7 @@
 #include <windows.h>
 #elif defined(OS_IOS)
 #include <CoreGraphics/CoreGraphics.h>
-#elif defined(OS_MACOSX)
+#elif defined(OS_MAC)
 #include <ApplicationServices/ApplicationServices.h>
 #endif
 
@@ -34,7 +34,7 @@ Point& Point::operator=(const POINT& point) {
   y_ = point.y;
   return *this;
 }
-#elif defined(OS_MACOSX)
+#elif defined(OS_MAC)
 Point::Point(const CGPoint& point) : x_(point.x), y_(point.y) {
 }
 #endif
@@ -46,7 +46,7 @@ POINT Point::ToPOINT() const {
   p.y = y();
   return p;
 }
-#elif defined(OS_MACOSX)
+#elif defined(OS_MAC)
 CGPoint Point::ToCGPoint() const {
   return CGPointMake(x(), y());
 }

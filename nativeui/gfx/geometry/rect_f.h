@@ -14,7 +14,7 @@
 #include "nativeui/gfx/geometry/size_f.h"
 #include "nativeui/gfx/geometry/vector2d_f.h"
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
 typedef struct CGRect CGRect;
 #endif
 
@@ -39,7 +39,7 @@ class NATIVEUI_EXPORT RectF {
               static_cast<float>(r.width()),
               static_cast<float>(r.height())) {}
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
   explicit RectF(const CGRect& r);
   // Construct an equivalent CoreGraphics object.
   CGRect ToCGRect() const;

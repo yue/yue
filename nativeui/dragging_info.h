@@ -9,7 +9,7 @@
 #include "base/memory/weak_ptr.h"
 #include "nativeui/clipboard.h"
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
 #include "nativeui/mac/drag_operation_mac.h"
 #elif defined(OS_LINUX)
 #include "nativeui/gtk/drag_operation_gtk.h"

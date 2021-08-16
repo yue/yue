@@ -30,7 +30,7 @@ class NATIVEUI_EXPORT Clipboard {
   // Types of clipboard.
   enum class Type {
     CopyPaste,
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
     Drag,
     Find,
     Font,
@@ -104,7 +104,7 @@ class NATIVEUI_EXPORT Clipboard {
     };
   };
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
   // Initializing from existing draggingPasteboard.
   explicit Clipboard(NativeClipboard clipboard);
 #endif
@@ -137,7 +137,7 @@ class NATIVEUI_EXPORT Clipboard {
   void PlatformStartWatching();
   void PlatformStopWatching();
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
   void OnTimer();
 #endif
 
@@ -145,7 +145,7 @@ class NATIVEUI_EXPORT Clipboard {
   NativeClipboard clipboard_;
 
   bool is_watching_ = false;
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
   // Timer-based clipboard watching.
   MessageLoop::TimerId timer_ = 0;
   int change_count_ = 0;

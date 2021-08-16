@@ -38,7 +38,7 @@ typedef struct _cairo cairo_t;
 typedef union _GdkEvent GdkEvent;
 #endif
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
 typedef struct CGContext* CGContextRef;
 #ifdef __OBJC__
 @class NSMutableAttributedString;
@@ -81,7 +81,7 @@ struct NSView;
 class NSWindow;
 class NUNotificationCenterDelegate;
 #endif  // __OBJC__
-#endif  // defined(OS_MACOSX)
+#endif  // defined(OS_MAC)
 
 #if defined(OS_WIN)
 namespace Gdiplus {
@@ -110,7 +110,7 @@ struct NotificationImpl;
 struct NotificationData;
 #endif
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
 using NativeAttributedText = NSMutableAttributedString*;
 using NativeClipboard = NSPasteboard*;
 using NativeCursor = NSCursor*;

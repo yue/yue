@@ -33,7 +33,7 @@ class NATIVEUI_EXPORT Button : public View {
   void SetImage(scoped_refptr<Image> image);
   Image* GetImage() const { return image_.get(); }
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
   // Values here should match NSBezelStyle.
   enum class Style {
     Rounded = 1,

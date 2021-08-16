@@ -11,7 +11,7 @@
 #include "nativeui/menu_bar.h"
 #include "third_party/yoga/Yoga.h"
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
 #include "nativeui/toolbar.h"
 #endif
 

@@ -50,13 +50,13 @@ const KeyCodeMap kKeyCodesMap[] = {
   { "capslock", VKEY_CAPITAL },
   { "clear", VKEY_CLEAR },
   { "cmd", VKEY_COMMAND },
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
   { "cmdorctrl", VKEY_COMMAND },
 #else
   { "cmdorctrl", VKEY_CONTROL },
 #endif
   { "command", VKEY_COMMAND },
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
   { "commandorcontrol", VKEY_COMMAND },
 #else
   { "commandorcontrol", VKEY_CONTROL },

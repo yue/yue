@@ -29,7 +29,7 @@ class NATIVEUI_EXPORT App {
 #endif
   std::string GetID() const;
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
   // Set the application menu.
   void SetApplicationMenu(scoped_refptr<MenuBar> menu);
   MenuBar* GetApplicationMenu() const;
@@ -79,7 +79,7 @@ class NATIVEUI_EXPORT App {
 
   base::Optional<std::string> name_override_;
   mutable base::Optional<std::string> cached_name_;
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
   scoped_refptr<MenuBar> application_menu_;
 #elif defined(OS_LINUX)
   std::string desktop_name_;

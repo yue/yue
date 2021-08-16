@@ -9,7 +9,7 @@
 #include "base/memory/weak_ptr.h"
 #include "nativeui/signal.h"
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
 #include "base/mac/scoped_nsautorelease_pool.h"
 #ifdef __OBJC__
 @class NUApplicationDelegate;
@@ -30,7 +30,7 @@ class NATIVEUI_EXPORT Lifetime {
   static Lifetime* GetCurrent();
 
   // Events.
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
   Signal<void()> on_ready;
   Signal<void()> on_activate;
 #endif
@@ -41,7 +41,7 @@ class NATIVEUI_EXPORT Lifetime {
   void PlatformInit();
   void PlatformDestroy();
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
   base::mac::ScopedNSAutoreleasePool autorelease_pool_;
   NUApplicationDelegate* app_delegate_;
 #endif

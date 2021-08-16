@@ -8,7 +8,7 @@
 #include <windows.h>
 #elif defined(OS_IOS)
 #include <CoreGraphics/CoreGraphics.h>
-#elif defined(OS_MACOSX)
+#elif defined(OS_MAC)
 #include <ApplicationServices/ApplicationServices.h>
 #endif
 
@@ -19,7 +19,7 @@
 
 namespace nu {
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
 Size::Size(const CGSize& s)
     : width_(s.width < 0 ? 0 : s.width),
       height_(s.height < 0 ? 0 : s.height) {
@@ -39,7 +39,7 @@ SIZE Size::ToSIZE() const {
   s.cy = height();
   return s;
 }
-#elif defined(OS_MACOSX)
+#elif defined(OS_MAC)
 CGSize Size::ToCGSize() const {
   return CGSizeMake(width(), height());
 }
