@@ -17,7 +17,7 @@ const electronVersions = [
 ]
 
 // The version of gn.
-const gnVersion = '0.7.0'
+const gnVersion = '0.7.1'
 
 // The common build configurations.
 const gnConfig = [

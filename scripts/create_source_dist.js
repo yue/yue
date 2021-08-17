@@ -9,116 +9,120 @@ const {gnConfig} = require('./config')
 const {createZip} = require('./zip_utils')
 
 const path = require('path')
+const cp = require('child_process')
+const readline = require('readline')
 const fs = require('fs-extra')
 
-// Do a jumbo build to prepare for searching files.
-const args = gnConfig.concat([
-  'use_jumbo_build=true',
-  'is_component_build=false',
-  'is_debug=false',
-])
-fs.emptyDirSync('out/Source')
-process.env.JUMBO_INCLUDE_FILE_CONTENTS = 'true'
-spawnSync('gn', ['gen', 'out/Source', `--args=${args.join(' ')}`])
-spawnSync('ninja', ['-C', 'out/Source', 'nativeui'])
+main()
 
-// Search files.
-const sources = new Set()
-const headers = new Set()
-DescribeAll('nativeui', sources, headers)
+async function main() {
+  GenerateProject()
 
-// Copy source files out.
-const targetDir = 'out/Dist/source'
-fs.emptyDirSync(targetDir)
-for (const file of sources)
-  CopySource(file, path.join(targetDir, 'src', targetOs))
-for (const file of headers)
-  CopySource(file, path.join(targetDir, 'include'))
+  const target = 'nativeui'
+  const deps = await GetAllDeps(target)
 
-// Copy some extra files.
-const EXTRA_HEADERS = {
-  'building/tools/gn': [
-    'build',
-    'testing/gtest',
-    'third_party/googletest/src/googletest/include'
-  ],
-}
-if (targetOs === 'mac') {
-  EXTRA_HEADERS[''] = [ 'third_party/apple_apsl' ]
-} else if (targetOs === 'win') {
-  CopySource('//base/win/windows_defines.inc', path.join(targetDir, 'include'))
-  CopySource('//base/win/windows_undefines.inc', path.join(targetDir, 'include'))
-  // This file is needed by Windows, but marked as posix.
-  CopySource('//base/posix/eintr_wrapper.h', path.join(targetDir, 'include'))
-}
-for (const parent in EXTRA_HEADERS) {
-  for (const dir of EXTRA_HEADERS[parent]) {
-    const headers = searchFiles(path.join(parent, dir), '.h')
-    for (const h of headers)
-      CopySource('//' + h, path.join(targetDir, 'include'), parent)
-  }
+  const sources = new Set()
+  const headers = new Set()
+  Describe(Array.from(deps).concat(target), sources, headers)
+
+  CopySources(sources, headers)
 }
 
-execSync('node scripts/modify_base_includes.js')
-
-createZip({withLicense: true})
-  .addFile('out/Dist/source', 'out/Dist/source')
-  .addFile('sample_app/CMakeLists.txt', 'sample_app')
-  .addFile('sample_app/main.cc')
-  .addFile('sample_app/exe.manifest')
-  .writeToFile(`libyue_${version}_${targetOs}`)
-
-function DescribeAll(target, sources, headers) {
-  const deps = new Set()
-  const described = new Set()
-  deps.add(target)
-  while (deps.size > 0) {
-    const target = Array.from(deps)[0]
-    deps.delete(target)
-    if (described.has(target))
-      continue
-    else
-      described.add(target)
-
-    const subsources = new Set()
-    Descibe(target, subsources, deps)
-    MergeSources(sources, headers, subsources)
-  }
+function GenerateProject() {
+  // Do a jumbo build to prepare for searching files.
+  const args = gnConfig.concat([
+    'use_jumbo_build=true',
+    'is_component_build=false',
+    'is_debug=false',
+  ])
+  fs.emptyDirSync('out/Source')
+  process.env.JUMBO_INCLUDE_FILE_CONTENTS = 'true'
+  spawnSync('gn', ['gen', 'out/Source', `--args=${args.join(' ')}`])
+  spawnSync('ninja', ['-C', 'out/Source', 'nativeui'])
 }
 
-function Descibe(target, sources, deps) {
-  const ret = execSync(`gn desc --format=json out/Source ${target}`, {stdio: 'pipe'})
-  const desc = Object.values(JSON.parse(String(ret)))[0]
-  if (desc.sources) {
-    for (const s of desc.sources)
-      sources.add(s)
-  }
-  if (desc.public) {
-    for (const p of desc.public) {
-      if (IsHeaderFile(p))
-        sources.add(p)
+async function GetAllDeps(target) {
+  return new Promise((resolve, reject) => {
+    const deps = new Set()
+    const child = cp.spawn(
+        'gn',
+        ['desc', '--tree', '--all', 'out/Source', target, 'deps'],
+        {stdio: 'pipe'})
+    child.once('close', (code) => {
+      if (code !== 0)
+        reject(`GN exited with ${code}`)
+      else
+        resolve(deps)
+    })
+    const rl = readline.createInterface({input: child.stdout, terminal: false})
+    rl.on('line', (line) => deps.add(line.trim()))
+  })
+}
+
+function Describe(targets, sources, headers) {
+  const ret = execSync(`gn desc --multiple-targets --format=json out/Source ${targets.join(' ')}`, {stdio: 'pipe'})
+  const result = JSON.parse(String(ret))
+  for (const target in result) {
+    const desc = result[target]
+    if (desc.sources) {
+      for (const s of desc.sources)
+        CategorizeFile(s, sources, headers)
+    }
+    if (desc.public) {
+      for (const p of desc.public) {
+        if (IsHeaderFile(p))
+          CategorizeFile(p, sources, headers)
+      }
+    }
+    if (desc.type === 'action') {
+      for (const o of desc.outputs) {
+        if (IsHeaderFile(o))
+          CategorizeFile(o, sources, headers)
+      }
     }
   }
-  if (desc.deps) {
-    for (const d of desc.deps)
-      deps.add(d)
-  }
-  if (desc.type === 'action') {
-    for (const o of desc.outputs) {
-      if (IsHeaderFile(o))
-        sources.add(o)
-    }
-  }
-  return sources
 }
 
-function MergeSources(sources, headers, from) {
-  for (const f of from) {
-    if (IsSourceFile(f))
-      sources.add(f)
-    else
-      headers.add(f)
+function CopySources(sources, headers) {
+  const targetDir = 'out/Dist/source'
+  fs.emptyDirSync(targetDir)
+  for (const file of sources)
+    CopySource(file, path.join(targetDir, 'src', targetOs))
+  for (const file of headers)
+    CopySource(file, path.join(targetDir, 'include'))
+
+  // Copy some extra files.
+  const EXTRA_HEADERS = {
+    'building/tools/gn': [
+      'build',
+      'testing/gtest',
+      'third_party/googletest/src/googletest/include'
+    ],
   }
+  if (targetOs === 'mac') {
+    EXTRA_HEADERS[''] = [ 'third_party/apple_apsl' ]
+  } else if (targetOs === 'win') {
+    CopySource('//base/win/windows_defines.inc', path.join(targetDir, 'include'))
+    CopySource('//base/win/windows_undefines.inc', path.join(targetDir, 'include'))
+    // This file is needed by Windows, but marked as posix.
+    CopySource('//base/posix/eintr_wrapper.h', path.join(targetDir, 'include'))
+  }
+  for (const parent in EXTRA_HEADERS) {
+    for (const dir of EXTRA_HEADERS[parent]) {
+      const headers = searchFiles(path.join(parent, dir), '.h')
+      for (const h of headers)
+        CopySource('//' + h, path.join(targetDir, 'include'), parent)
+    }
+  }
+
+  execSync('node scripts/modify_base_includes.js')
+
+  createZip({withLicense: true})
+    .addFile('out/Dist/source', 'out/Dist/source')
+    .addFile('sample_app/CMakeLists.txt', 'sample_app')
+    .addFile('sample_app/main.cc')
+    .addFile('sample_app/exe.manifest')
+    .writeToFile(`libyue_${version}_${targetOs}`)
 }
 
 function CopySource(file, targetDir, baseDir = '') {
@@ -152,6 +156,13 @@ function CopySource(file, targetDir, baseDir = '') {
   } catch (e) {
     throw new Error(`Unable to copy file ${originalName}: ${e.message}`)
   }
+}
+
+function CategorizeFile(f, sources, headers) {
+  if (IsSourceFile(f))
+    sources.add(f)
+  else
+    headers.add(f)
 }
 
 function IsHeaderFile(f) {

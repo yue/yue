@@ -114,10 +114,16 @@ const download = (url, callback, log=true) => {
 
 // Return all the files recursivley.
 function searchFiles(dir, suffix, list = []) {
+  let shouldInclude
+  if (typeof suffix == 'string') {
+    shouldInclude = (f) => f.endsWith(suffix)
+  } else if (Array.isArray(suffix)) {
+    shouldInclude = (f) => suffix.includes(path.extname(f))
+  }
   return fs.readdirSync(dir).reduce((list, filename) => {
-    const p = path.join(dir, filename)
+    const p = dir + '/' + filename
     const stat = fs.statSync(p)
-    if (stat.isFile() && filename.endsWith(suffix))
+    if (stat.isFile() && shouldInclude(filename))
       list.push(p)
     else if (stat.isDirectory())
       searchFiles(p, suffix, list)
