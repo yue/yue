@@ -1,6 +1,3 @@
-[submodule "third_party/modp_b64"]
-	path = third_party/modp_b64
-	url = https://chromium.googlesource.com/chromium/src/third_party/modp_b64
 [submodule "base"]
 	path = base
 	url = https://github.com/yue/base
