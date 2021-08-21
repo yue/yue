@@ -53,8 +53,8 @@ struct Type<std::function<ReturnType(ArgTypes...)>> {
   static constexpr const char* name = "function";
   static inline void Push(
       State* state,
-      const std::function<ReturnType(ArgTypes...)>& callback) {
-    internal::PushCFunction(state, callback);
+      std::function<ReturnType(ArgTypes...)> callback) {
+    internal::PushCFunction(state, std::move(callback));
   }
   static inline bool To(State* state, int index,
                         std::function<ReturnType(ArgTypes...)>* out) {

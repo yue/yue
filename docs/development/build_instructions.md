@@ -86,16 +86,5 @@ versions for different languages are automatically generated under `out/Dist`.
 node scripts/create_docs.js
 ```
 
-## Creating distribution
-
-After building the `out/Debug` and `out/Release` configurations, distributions
-in ZIP archives can be created.
-
-```
-node scripts/create_dist.js
-```
-
-The distribution files are generated under the `out/Dist` directory.
-
 [gn]: https://chromium.googlesource.com/chromium/src/+/master/tools/gn/README.md
 [ninja]: https://ninja-build.org

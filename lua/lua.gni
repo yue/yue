@@ -1,0 +1,31 @@
+# Copyright 2021 Cheng Zhao. All rights reserved.
+# Use of this source code is governed by the license that can be found in the
+# LICENSE file.
+
+declare_args() {
+  # The version of Lua to build against to.
+  lua_version = "v5.3.6"
+  # Lua or LuaJIT.
+  lua_runtime = "lua"
+}
+
+template("lua_module") {
+  loadable_module(target_name) {
+    forward_variables_from(invoker, [ "output_name", "sources", "deps" ])
+    forward_variables_from(invoker, TESTONLY_AND_VISIBILITY)
+
+    output_prefix_override = true  # do not add "lib" prefix
+
+    if (is_mac) {
+      ldflags = [
+        "-undefined", "dynamic_lookup",
+      ]
+    } else if (is_linux && is_component_build) {
+      configs += [ "//build/config/gcc:rpath_for_built_shared_libraries" ]
+    } else if (is_win) {
+      deps += [
+        "//third_party/$lua_runtime-$lua_version:lua_shared",
+      ]
+    }
+  }
+}

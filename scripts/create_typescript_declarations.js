@@ -14,9 +14,15 @@ const fs = require('fs-extra')
 const docsDir = 'out/Dist/docs/js/api'
 if (!fs.existsSync(docsDir))
   execSync('node ./scripts/create_docs.js')
+
 // Generate declarations.
 const target = 'out/Dist/index.d.ts'
 fs.writeFileSync(target, generateDocs(docsDir))
+
+// Write zip.
+createZip()
+  .addFile('out/Dist/index.d.ts', 'out/Dist')
+  .writeToFile(`node_yue_types_${version}`)
 
 // Scan |docsDir| and generate types declarations from JSON files.
 function generateDocs(docsDir) {

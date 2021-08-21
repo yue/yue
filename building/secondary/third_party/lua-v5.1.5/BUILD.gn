@@ -2,38 +2,41 @@
 # Use of this source code is governed by the license that can be found in the
 # LICENSE file.
 
-config("lua_config") {
-  include_dirs = [ "." ]
-}
-
-executable("luac") {
-  sources = [ "src/luac.c" ]
-  deps = [ ":lua" ]
-}
-
-executable("lua53") {
+executable("lua") {
   sources = [ "src/lua.c" ]
-  deps = [ ":lua" ]
+  deps = [ ":lua_shared" ]
+
+  if (is_win) {
+    deps += [ "//build/win:default_exe_manifest" ]
+    configs -= [ "//build/config/win:lean_and_mean" ]
+  }
+  if (is_linux && !is_component_build) {
+    configs += [ "//build/config/gcc:rpath_for_built_shared_libraries" ]
+  }
 }
 
 shared_library("lua_shared") {
-  output_name = "lua53"
-  deps = [ ":lua" ]
+  output_name = "lua51"
+  output_prefix_override = true  # do not add "lib" prefix
+  deps = [ ":lua_src" ]
+
+  if (is_mac && !is_component_build) {
+    ldflags = [
+      "-install_name",
+      "@executable_path/$output_name.dylib",
+    ]
+  }
 }
 
-source_set("lua") {
+source_set("lua_src") {
   sources = [
     "src/lapi.c",
     "src/lapi.h",
     "src/lauxlib.c",
     "src/lauxlib.h",
     "src/lbaselib.c",
-    "src/lbitlib.c",
     "src/lcode.c",
     "src/lcode.h",
-    "src/lcorolib.c",
-    "src/lctype.c",
-    "src/lctype.h",
     "src/ldblib.c",
     "src/ldebug.c",
     "src/ldebug.h",
@@ -60,7 +63,6 @@ source_set("lua") {
     "src/loslib.c",
     "src/lparser.c",
     "src/lparser.h",
-    "src/lprefix.h",
     "src/lstate.c",
     "src/lstate.h",
     "src/lstring.c",
@@ -76,11 +78,11 @@ source_set("lua") {
     "src/lualib.h",
     "src/lundump.c",
     "src/lundump.h",
-    "src/lutf8lib.c",
     "src/lvm.c",
     "src/lvm.h",
     "src/lzio.c",
     "src/lzio.h",
+    "src/print.c",
   ]
 
   if (is_win) {
@@ -89,17 +91,25 @@ source_set("lua") {
       cflags = [
         "/wd4310",  # cast truncates constant value
         "/wd4324",  # structure was padded due to alignment specifier
+        "/wd4334",  # result of 32-bit shift implicitly converted to 64 bits
       ]
     }
   }
   if (is_posix) {
-    defines = [ "LUA_USE_POSIX" ]
     configs -= [ "//build/config/gcc:symbol_visibility_hidden" ]
     configs += [ "//build/config/gcc:symbol_visibility_default" ]
   }
-  if (is_clang) {
-    cflags_c = [ "-Wno-string-plus-int" ]
+  if (is_linux) {
+    defines = [ "LUA_USE_LINUX" ]
   }
-
-  public_configs = [ ":lua_config" ]
+  if (is_mac) {
+    defines = [ "LUA_USE_MACOSX" ]
+  }
+  if (is_clang) {
+    cflags_c = [
+      "-Wno-empty-body",
+      "-Wno-misleading-indentation",
+      "-Wno-deprecated-declarations",
+    ]
+  }
 }

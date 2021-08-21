@@ -56,9 +56,9 @@ struct Type<HostClass> {
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
            "new", &CreateOnHeap<HostClass>,
-           "add", RefMethod(&HostClass::Add, RefType::Ref),
-           "remove", RefMethod(&HostClass::Remove, RefType::Deref),
-           "set", RefMethod(&HostClass::Set, RefType::Reset, "key"));
+           "add", RefMethod(state, &HostClass::Add, RefType::Ref),
+           "remove", RefMethod(state, &HostClass::Remove, RefType::Deref),
+           "set", RefMethod(state, &HostClass::Set, RefType::Reset, "key"));
   }
 };
 
@@ -110,6 +110,9 @@ TEST_F(RefMethodTest, Set) {
   ASSERT_EQ(new_result, 0);
 
   lua::SetTop(state_, 0);
+  lua::CollectGarbage(state_);
+  // On lua5.1 it takes a few cycles to collect the refs table.
+  lua::CollectGarbage(state_);
   lua::CollectGarbage(state_);
   ASSERT_EQ(new_result, 88);
 }

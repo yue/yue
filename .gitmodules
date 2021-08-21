@@ -4,9 +4,9 @@
 [submodule "third_party/yoga"]
 	path = third_party/yoga
 	url = https://github.com/yue/yoga
-[submodule "third_party/lua"]
-	path = third_party/lua
-	url = https://github.com/ejoy/lua.git
 [submodule "third_party/abseil-cpp"]
 	path = third_party/abseil-cpp
 	url = https://github.com/yue/abseil-cpp
+[submodule "third_party/lua-compat-5.3"]
+	path = third_party/lua-compat-5.3
+	url = https://github.com/keplerproject/lua-compat-5.3

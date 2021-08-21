@@ -10,6 +10,12 @@
 #include "lua_yue/binding_values.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
+#if LUA_VERSION_NUM >= 503
+# define ONE "1.0"
+#else
+# define ONE "1"
+#endif
+
 class YueValuesTest : public testing::Test {
  protected:
   void SetUp() override {
@@ -21,11 +27,11 @@ class YueValuesTest : public testing::Test {
 
 TEST_F(YueValuesTest, ValueConversions) {
   absl::optional<base::Value> in = base::JSONReader::Read(
-      "{ \"a\": 1.0, \"b\": { \"c\": [\"t\", \"e\"], \"d\": \"st\" } }");
+      "{ \"a\": " ONE ",\"b\": { \"c\": [\"t\", \"e\"], \"d\": \"st\" } }");
   lua::Push(state_, *in);
   base::Value out;
   ASSERT_TRUE(lua::To(state_, 1, &out));
   std::string json;
   ASSERT_TRUE(base::JSONWriter::Write(out, &json));
-  ASSERT_EQ(json, "{\"a\":1.0,\"b\":{\"c\":[\"t\",\"e\"],\"d\":\"st\"}}");
+  ASSERT_EQ(json, "{\"a\":" ONE ",\"b\":{\"c\":[\"t\",\"e\"],\"d\":\"st\"}}");
 }

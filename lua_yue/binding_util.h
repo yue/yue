@@ -6,7 +6,8 @@
 #define LUA_YUE_BINDING_UTIL_H_
 
 #include "lua/lua.h"
+#include "lua/lua_module_export.h"
 
-extern "C" int luaopen_yue_util(lua::State* state);
+extern "C" LUA_MODULE_EXPORT int luaopen_yue_util(lua::State* state);
 
 #endif  // LUA_YUE_BINDING_UTIL_H_

@@ -6,12 +6,7 @@
 #define LUA_YUE_BINDING_GUI_H_
 
 #include "lua/lua.h"
-
-#ifdef _WIN32
-# define LUA_MODULE_EXPORT __declspec(dllexport)
-#else
-# define LUA_MODULE_EXPORT __attribute__((visibility("default")))
-#endif
+#include "lua/lua_module_export.h"
 
 extern "C" LUA_MODULE_EXPORT int luaopen_yue_gui(lua::State* state);
 

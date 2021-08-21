@@ -2,11 +2,18 @@
 # Use of this source code is governed by the license that can be found in the
 # LICENSE file.
 
+import("//lua/lua.gni")
 import("//testing/test.gni")
+
+config("lua_config") {
+  include_dirs = [ "//third_party/$lua_runtime-$lua_version/src" ]
+  defines = [ "COMPAT53_PREFIX=compat53" ]
+}
 
 source_set("lua") {
   sources = [
     "lua.h",
+    "lua_module_export.h",
     "call_context.h",
     "callback.h",
     "callback_internal.h",
@@ -28,6 +35,8 @@ source_set("lua") {
     "types.h",
     "user_data.h",
     "util.h",
+    "//third_party/lua-compat-5.3/c-api/compat-5.3.c",
+    "//third_party/lua-compat-5.3/c-api/compat-5.3.h",
   ]
 
   if (is_win) {
@@ -41,12 +50,13 @@ source_set("lua") {
     libs = [ "atomic" ]
   }
 
-  deps = [
-    "//base",
-  ]
+  deps = [ "//base" ]
+  public_configs = [ ":lua_config" ]
 }
 
-test("lua_unittests") {
+source_set("lua_unittests_source_set") {
+  testonly = true
+
   sources = [
     "callback_unittest.cc",
     "ref_method_unittest.cc",
@@ -54,13 +64,29 @@ test("lua_unittests") {
     "index_unittest.cc",
     "lua_unittest.cc",
     "metatable_unittest.cc",
-    "test/run_all_unittests.cc",
   ]
 
-  deps = [
+  public_deps = [
     ":lua",
     "//base",
     "//testing/gtest",
-    "//third_party/lua",
+  ]
+}
+
+test("lua_unittests") {
+  sources = [ "test/run_all_unittests.cc" ]
+  deps = [
+    ":lua_unittests_source_set",
+    "//third_party/$lua_runtime-$lua_version:lua_src",
+  ]
+}
+
+lua_module("lua_unittests_module") {
+  testonly = true
+  output_name = "lua_unittests"
+  sources = [ "test/unittests_module.cc" ]
+  deps = [
+    ":lua_unittests_source_set",
+    "//third_party/$lua_runtime-$lua_version:lua",
   ]
 }

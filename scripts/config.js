@@ -3,7 +3,7 @@ const {clang, targetCpu, targetOs} = require('./common')
 // The version of nuget WebView2 package.
 const webview2Version = '1.0.622.22'
 
-// The versions of Node.js to build against.
+// The versions of language bindings to build against.
 const nodeVersions = [
   '12.22.4',
   '14.17.4',
@@ -15,6 +15,11 @@ const electronVersions = [
   '14.0.0-beta.19',
   '15.0.0-alpha.4',
 ]
+const luaVersions = [
+  '5.3.6',
+  '5.4.3',
+  '5.1.5',
+]
 
 // The version of gn.
 const gnVersion = '0.7.1'
@@ -22,6 +27,7 @@ const gnVersion = '0.7.1'
 // The common build configurations.
 const gnConfig = [
   `target_cpu="${targetCpu}"`,
+  `lua_version="v${luaVersions[0]}"`,
   'use_allocator="none"',
   'use_allocator_shim=false',
   'use_partition_alloc=false',
@@ -55,6 +61,7 @@ module.exports = {
   webview2Version,
   nodeVersions,
   electronVersions,
+  luaVersions,
   gnVersion,
   gnConfig,
   gnSysrootConfig,

@@ -12,6 +12,12 @@
 #include "lua_yue/binding_sys.h"
 #include "lua_yue/binding_util.h"
 
+#if LUA_VERSION_NUM >= 502
+# define PACKAGE_SEARCHERS "searchers"
+#else
+# define PACKAGE_SEARCHERS "loaders"
+#endif
+
 namespace yue {
 
 namespace {
@@ -57,15 +63,14 @@ int SearchBuiltin(lua::State* state) {
 void InsertBuiltinModuleLoader(lua::State* state) {
   lua::StackAutoReset reset(state);
   lua_getglobal(state, "package");
-  DCHECK_EQ(lua::GetType(state, -1), lua::LuaType::Table)
+  CHECK_EQ(lua::GetType(state, -1), lua::LuaType::Table)
       << "package should be a table";
-  lua::RawGet(state, -1, "searchers");
-  DCHECK_EQ(lua::GetType(state, -1), lua::LuaType::Table)
-      << "package.searchers should be a table";
+  lua::RawGet(state, -1, PACKAGE_SEARCHERS);
+  CHECK_EQ(lua::GetType(state, -1), lua::LuaType::Table)
+      << "package." PACKAGE_SEARCHERS " should be a table";
 
   // table.insert(pacakge.searchers, 2, search_builtin)
   int len = static_cast<int>(lua::RawLen(state, -1));
-  DCHECK_EQ(len, 4);
   for (int i = len; i >= 2; --i) {
     lua::RawGet(state, -1, i);
     lua_rawseti(state, -2, i + 1);

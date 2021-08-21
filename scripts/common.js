@@ -50,6 +50,10 @@ if (fs.existsSync('out/Release/args.gn')) {
     clang = false
 }
 
+let hostCpu = process.arch
+if (hostCpu == 'ia32')
+  hostCpu = 'x86'
+
 // Parse args.
 let verbose = false
 const argv = process.argv.slice(2).filter((arg) => {
@@ -195,6 +199,7 @@ module.exports = {
   argv,
   targetCpu,
   targetOs,
+  hostCpu,
   strip,
   download,
   searchFiles,

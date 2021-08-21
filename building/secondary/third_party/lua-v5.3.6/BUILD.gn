@@ -1,0 +1,115 @@
+# Copyright 2017 Cheng Zhao. All rights reserved.
+# Use of this source code is governed by the license that can be found in the
+# LICENSE file.
+
+executable("lua") {
+  sources = [ "src/lua.c" ]
+  deps = [ ":lua_shared" ]
+
+  if (is_win) {
+    deps += [ "//build/win:default_exe_manifest" ]
+    configs -= [ "//build/config/win:lean_and_mean" ]
+  }
+  if (is_linux && !is_component_build) {
+    configs += [ "//build/config/gcc:rpath_for_built_shared_libraries" ]
+  }
+}
+
+shared_library("lua_shared") {
+  output_name = "lua53"
+  output_prefix_override = true  # do not add "lib" prefix
+  deps = [ ":lua_src" ]
+
+  if (is_mac && !is_component_build) {
+    ldflags = [
+      "-install_name",
+      "@executable_path/$output_name.dylib",
+    ]
+  }
+}
+
+source_set("lua_src") {
+  sources = [
+    "src/lapi.c",
+    "src/lapi.h",
+    "src/lauxlib.c",
+    "src/lauxlib.h",
+    "src/lbaselib.c",
+    "src/lbitlib.c",
+    "src/lcode.c",
+    "src/lcode.h",
+    "src/lcorolib.c",
+    "src/lctype.c",
+    "src/lctype.h",
+    "src/ldblib.c",
+    "src/ldebug.c",
+    "src/ldebug.h",
+    "src/ldo.c",
+    "src/ldo.h",
+    "src/ldump.c",
+    "src/lfunc.c",
+    "src/lfunc.h",
+    "src/lgc.c",
+    "src/lgc.h",
+    "src/linit.c",
+    "src/liolib.c",
+    "src/llex.c",
+    "src/llex.h",
+    "src/llimits.h",
+    "src/lmathlib.c",
+    "src/lmem.c",
+    "src/lmem.h",
+    "src/loadlib.c",
+    "src/lobject.c",
+    "src/lobject.h",
+    "src/lopcodes.c",
+    "src/lopcodes.h",
+    "src/loslib.c",
+    "src/lparser.c",
+    "src/lparser.h",
+    "src/lprefix.h",
+    "src/lstate.c",
+    "src/lstate.h",
+    "src/lstring.c",
+    "src/lstring.h",
+    "src/lstrlib.c",
+    "src/ltable.c",
+    "src/ltable.h",
+    "src/ltablib.c",
+    "src/ltm.c",
+    "src/ltm.h",
+    "src/lua.h",
+    "src/luaconf.h",
+    "src/lualib.h",
+    "src/lundump.c",
+    "src/lundump.h",
+    "src/lutf8lib.c",
+    "src/lvm.c",
+    "src/lvm.h",
+    "src/lzio.c",
+    "src/lzio.h",
+  ]
+
+  if (is_win) {
+    defines = [ "LUA_BUILD_AS_DLL" ]
+    if (!is_clang) {
+      cflags = [
+        "/wd4310",  # cast truncates constant value
+        "/wd4324",  # structure was padded due to alignment specifier
+      ]
+    }
+  }
+  if (is_posix) {
+    configs -= [ "//build/config/gcc:symbol_visibility_hidden" ]
+    configs += [ "//build/config/gcc:symbol_visibility_default" ]
+  }
+  if (is_linux) {
+    defines = [ "LUA_USE_LINUX" ]
+  }
+  if (is_mac) {
+    defines = [ "LUA_USE_MACOSX" ]
+  }
+  if (is_clang) {
+    cflags_c = [ "-Wno-string-plus-int" ]
+  }
+}

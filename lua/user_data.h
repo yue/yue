@@ -5,6 +5,8 @@
 #ifndef LUA_USER_DATA_H_
 #define LUA_USER_DATA_H_
 
+#include <utility>
+
 #include "lua/state.h"
 #include "lua/types.h"
 
@@ -44,9 +46,9 @@ int DestructOnGC(lua::State* state) {
 // Construct a new UserData with |T|, and assign it with a default metatable.
 // T must be type that can be destructed by calling destructor.
 template<typename T, typename... ArgTypes>
-void NewUserData(State* state, const ArgTypes... args) {
+void NewUserData(State* state, ArgTypes... args) {
   T* memory = static_cast<T*>(lua_newuserdata(state, sizeof(T)));
-  new(memory) T(args...);
+  new(memory) T(std::move(args)...);
   NewTable(state, 0, 1);
   RawSet(state, -1, "__gc", CFunction(&DestructOnGC<T>));
   SetMetaTable(state, -2);

@@ -352,7 +352,8 @@ struct Type<nu::App> {
 #if defined(OS_MAC)
     RawSet(state, metatable,
            "setapplicationmenu",
-           RefMethod(&nu::App::SetApplicationMenu, RefType::Reset, "appmenu"),
+           RefMethod(state, &nu::App::SetApplicationMenu,
+                     RefType::Reset, "appmenu"),
            "setdockbadgelabel", &nu::App::SetDockBadgeLabel,
            "getdockbadgelabel", &nu::App::GetDockBadgeLabel,
            "activate", &nu::App::Activate,
@@ -1117,9 +1118,9 @@ struct Type<nu::MenuBase> {
   static constexpr const char* name = "MenuBase";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
-           "append", RefMethod(&nu::MenuBase::Append, RefType::Ref),
-           "insert", RefMethod(&Insert, RefType::Ref),
-           "remove", RefMethod(&nu::MenuBase::Remove, RefType::Deref),
+           "append", RefMethod(state, &nu::MenuBase::Append, RefType::Ref),
+           "insert", RefMethod(state, &Insert, RefType::Ref),
+           "remove", RefMethod(state, &nu::MenuBase::Remove, RefType::Deref),
            "itemcount", &nu::MenuBase::ItemCount,
            "itemat", &ItemAt);
   }
@@ -1373,7 +1374,8 @@ struct Type<nu::MessageBox> {
            "setinformativetext", &nu::MessageBox::SetInformativeText,
 #if defined(OS_LINUX) || defined(OS_MAC)
            "setaccessoryview",
-           RefMethod(&nu::MessageBox::SetAccessoryView, RefType::Reset, "accv"),
+           RefMethod(state, &nu::MessageBox::SetAccessoryView,
+                     RefType::Reset, "accv"),
            "getaccessoryview", &nu::MessageBox::GetAccessoryView,
 #endif
            "setimage", &nu::MessageBox::SetImage,
@@ -1512,7 +1514,8 @@ struct Type<nu::Tray> {
 #if defined(OS_MAC)
            "setpressedimage", &nu::Tray::SetPressedImage,
 #endif
-           "setmenu", RefMethod(&nu::Tray::SetMenu, RefType::Reset, "menu"));
+           "setmenu",
+           RefMethod(state, &nu::Tray::SetMenu, RefType::Reset, "menu"));
     RawSetProperty(state, metatable, "onclick", &nu::Tray::on_click);
   }
 };
@@ -1611,7 +1614,8 @@ struct Type<nu::Window> {
            "hasshadow", &nu::Window::HasShadow,
            "center", &nu::Window::Center,
            "setcontentview",
-           RefMethod(&nu::Window::SetContentView, RefType::Reset, "content"),
+           RefMethod(state, &nu::Window::SetContentView,
+                     RefType::Reset, "content"),
            "getcontentview", &nu::Window::GetContentView,
            "setcontentsize", &nu::Window::SetContentSize,
            "getcontentsize", &nu::Window::GetContentSize,
@@ -1659,13 +1663,13 @@ struct Type<nu::Window> {
            "setskiptaskbar", &nu::Window::SetSkipTaskbar,
            "seticon", &nu::Window::SetIcon,
            "setmenubar",
-           RefMethod(&nu::Window::SetMenuBar, RefType::Reset, "menubar"),
+           RefMethod(state, &nu::Window::SetMenuBar, RefType::Reset, "menubar"),
            "getmenubar", &nu::Window::GetMenuBar,
 #endif
            "addchildwindow",
-           RefMethod(&nu::Window::AddChildWindow, RefType::Ref),
+           RefMethod(state, &nu::Window::AddChildWindow, RefType::Ref),
            "removechildview",
-           RefMethod(&nu::Window::RemoveChildWindow, RefType::Deref),
+           RefMethod(state, &nu::Window::RemoveChildWindow, RefType::Deref),
            "getchildwindows", &nu::Window::GetChildWindows);
     RawSetProperty(state, metatable,
                    "onclose", &nu::Window::on_close,
@@ -1767,11 +1771,11 @@ struct Type<nu::Container> {
            "getpreferredheightforwidth",
            &nu::Container::GetPreferredHeightForWidth,
            "addchildview",
-           RefMethod(&nu::Container::AddChildView, RefType::Ref),
+           RefMethod(state, &nu::Container::AddChildView, RefType::Ref),
            "addchildviewat",
-           RefMethod(&AddChildViewAt, RefType::Ref),
+           RefMethod(state, &AddChildViewAt, RefType::Ref),
            "removechildview",
-           RefMethod(&nu::Container::RemoveChildView, RefType::Deref),
+           RefMethod(state, &nu::Container::RemoveChildView, RefType::Deref),
            "childcount", &nu::Container::ChildCount,
            "childat", &ChildAt);
     RawSetProperty(state, index, "ondraw", &nu::Container::on_draw);
@@ -2075,7 +2079,8 @@ struct Type<nu::Label> {
            "setalign", &nu::Label::SetAlign,
            "setvalign", &nu::Label::SetVAlign,
            "setattributedtext",
-           RefMethod(&nu::Label::SetAttributedText, RefType::Reset, "atext"),
+           RefMethod(state, &nu::Label::SetAttributedText,
+                     RefType::Reset, "atext"),
            "getattributedtext", &nu::Label::GetAttributedText);
   }
 };
@@ -2146,7 +2151,8 @@ struct Type<nu::Group> {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::Group, const std::string&>,
            "setcontentview",
-           RefMethod(&nu::Group::SetContentView, RefType::Reset, "content"),
+           RefMethod(state, &nu::Group::SetContentView,
+                     RefType::Reset, "content"),
            "getcontentview", &nu::Group::GetContentView,
            "settitle", &nu::Group::SetTitle,
            "gettitle", &nu::Group::GetTitle);
@@ -2242,7 +2248,8 @@ struct Type<nu::Scroll> {
            "setcontentsize", &nu::Scroll::SetContentSize,
            "getcontentsize", &nu::Scroll::GetContentSize,
            "setcontentview",
-           RefMethod(&nu::Scroll::SetContentView, RefType::Reset, "content"),
+           RefMethod(state, &nu::Scroll::SetContentView,
+                     RefType::Reset, "content"),
            "getcontentview", &nu::Scroll::GetContentView,
 #if !defined(OS_WIN)
            "setoverlayscrollbar", &nu::Scroll::SetOverlayScrollbar,
@@ -2293,8 +2300,8 @@ struct Type<nu::Tab> {
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::Tab>,
-           "addpage", RefMethod(&nu::Tab::AddPage, RefType::Ref),
-           "removePage", RefMethod(&nu::Tab::RemovePage, RefType::Deref),
+           "addpage", RefMethod(state, &nu::Tab::AddPage, RefType::Ref),
+           "removePage", RefMethod(state, &nu::Tab::RemovePage, RefType::Deref),
            "pagecount", &nu::Tab::PageCount,
            "pageat", &PageAt,
            "selectpageat", &SelectPageAt,
@@ -2427,11 +2434,11 @@ struct Type<nu::Table> {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::Table>,
            "setmodel",
-           RefMethod(&nu::Table::SetModel, RefType::Reset, "model"),
+           RefMethod(state, &nu::Table::SetModel, RefType::Reset, "model"),
            "getmodel", &nu::Table::GetModel,
            "addcolumn", &nu::Table::AddColumn,
            "addcolumnwithoptions",
-           RefMethod(&nu::Table::AddColumnWithOptions,
+           RefMethod(state, &nu::Table::AddColumnWithOptions,
                      RefType::Ref, nullptr, 2),
            "getcolumncount", &nu::Table::GetColumnCount,
            "setcolumnsvisible", &nu::Table::SetColumnsVisible,

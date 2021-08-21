@@ -28,12 +28,25 @@ namespace internal {
 template<typename Sig>
 class CallbackHolder {
  public:
-  explicit CallbackHolder(const std::function<Sig>& callback)
-      : callback(callback) {}
+  CallbackHolder(State* state, std::function<Sig> callback)
+      : callback(std::move(callback)), state_(state) {
+    // For Lua 5.1 on Windows, it is possible for an upvalue to be garbage
+    // collected before the callback is called.
+    lua_pushvalue(state, -1);
+    ref_ = luaL_ref(state, LUA_REGISTRYINDEX);
+  }
+
+  ~CallbackHolder() {
+    // Unref the upvalue.
+    luaL_unref(state_, LUA_REGISTRYINDEX, ref_);
+  }
 
   std::function<Sig> callback;
 
  private:
+  State* state_;
+  int ref_;
+
   DISALLOW_COPY_AND_ASSIGN(CallbackHolder);
 };
 
@@ -186,8 +199,8 @@ struct Dispatcher<ReturnType(ArgTypes...)> {
 
 // Push the function on stack without wrapping it with pcall.
 template<typename Sig>
-inline void PushCFunction(State* state, const std::function<Sig>& callback) {
-  NewUserData<CallbackHolder<Sig>>(state, callback);
+inline void PushCFunction(State* state, std::function<Sig> callback) {
+  NewUserData<CallbackHolder<Sig>>(state, state, std::move(callback));
   lua_pushcclosure(state, &internal::Dispatcher<Sig>::DispatchToCallback, 1);
 }
 

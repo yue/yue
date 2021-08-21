@@ -2,22 +2,50 @@
 # Use of this source code is governed by the license that can be found in the
 # LICENSE file.
 
-declare_args() {
-  # Enable 64-bit GC references.
-  luajit_enable_gc64 = false
-  if (target_cpu == "arm64") {
-    luajit_enable_gc64 = true
+import("//build/compiled_action.gni")
+import("//build/config/arm.gni")
+
+config("luajit_config") {
+  defines = []
+
+  if (target_cpu == "x64") {
+    defines += [ "LUAJIT_TARGET=LUAJIT_ARCH_X64" ]
+  } else if (target_cpu == "x86") {
+    defines += [ "LUAJIT_TARGET=LUAJIT_ARCH_X86" ]
+  } else if (target_cpu == "arm") {
+    defines += [ "LUAJIT_TARGET=LUAJIT_ARCH_ARM" ]
+  } else if (target_cpu == "arm64") {
+    defines += [ "LUAJIT_TARGET=LUAJIT_ARCH_ARM64" ]
+  }
+
+  if (current_os == target_os) {
+    if (current_os == "win") {
+      defines += [ "LUAJIT_OS=LUAJIT_OS_WINDOWS" ]
+    } else if (current_os == "linux") {
+      defines += [ "LUAJIT_OS=LUAJIT_OS_LINUX" ]
+    } else if (current_os == "mac") {
+      defines += [ "LUAJIT_OS=LUAJIT_OS_OSX" ]
+    } else {
+      defines += [ "LUAJIT_OS=LUAJIT_OS_OTHER" ]
+    }
+  }
+
+  if (current_cpu == "arm") {
+    if (arm_float_abi == "soft" || arm_float_abi == "softfp") {
+      defines += [
+        "LJ_ABI_SOFTFP=1",
+        "LJ_ARCH_HASFPU=0",
+      ]
+    } else {
+      defines += [
+        "LJ_ABI_SOFTFP=0",
+        "LJ_ARCH_HASFPU=1",
+      ]
+    }
   }
 }
 
-# Translated from lj_arch.h.
-luajit_enable_jit = !luajit_enable_gc64
-if (luajit_enable_gc64) {
-  luajit_defines += [ "LUAJIT_ENABLE_GC64" ]
-}
-
 # Translated from src/Makefile, do not change the seqeunce.
-luajit_defines = []
 dasm_flags = []
 if (target_cpu != "mips" && target_cpu != "ppc") {
   dasm_flags += ["-D", "ENDIAN_LE"]
@@ -25,29 +53,15 @@ if (target_cpu != "mips" && target_cpu != "ppc") {
   assert(false, "Unsupported cpu: " + target_cpu)
 }
 if (target_cpu == "x64" || target_cpu == "arm64") {
-  luajit_defines += ["LUAJIT_TARGET=LUAJIT_ARCH_x64"]
   dasm_flags += ["-D", "P64"]
-} else {
-  luajit_defines += ["LUAJIT_TARGET=LUAJIT_ARCH_$target_cpu"]
 }
-if (luajit_enable_jit) {
-  dasm_flags += ["-D", "JIT"]
-}
+dasm_flags += ["-D", "JIT"]
 if (target_os != "console") {
   dasm_flags += ["-D", "FFI"]
 }
 if (target_cpu == "arm" || target_cpu == "arm64") {
   dasm_flags += ["-D", "DUALNUM"]
-  if (arm_float_abi == "soft" || arm_float_abi == "softfp") {
-    luajit_defines += [
-      "LJ_ABI_SOFTFP=1",
-      "LJ_ARCH_HASFPU=0",
-    ]
-  } else {
-    luajit_defines += [
-      "LJ_ABI_SOFTFP=0",
-      "LJ_ARCH_HASFPU=1",
-    ]
+  if (!(arm_float_abi == "soft" || arm_float_abi == "softfp")) {
     dasm_flags += ["-D", "FPU"]
     dasm_flags += ["-D", "HFABI"]
   }
@@ -102,8 +116,29 @@ config("luajit_excutable_config") {
   }
 }
 
-static_library("luajit") {
-  defines = luajit_defines
+executable("lua51") {
+  sources = [ "src/luajit.c" ]
+  configs += [ ":luajit_config" ]
+  deps = [ ":lua" ]
+}
+
+if (is_win) {
+  executable("wlua51") {
+    deps = [
+      ":lua_shared",
+      "//build/win:default_exe_manifest",
+    ]
+    configs += [ ":luajit_config" ]
+    configs -= [ "//build/config/win:lean_and_mean" ]
+  }
+}
+
+shared_library("lua_shared") {
+  output_name = "lua51"
+  deps = [ ":lua" ]
+}
+
+static_library("lua") {
   include_dirs = [ "$target_gen_dir" ]
   sources = ljlib_files + [
     ljvm_bout,
@@ -239,6 +274,7 @@ static_library("luajit") {
   ]
   cflags = [ "-Wno-varargs" ]
 
+  configs += [ ":luajit_config" ]
   public_configs = [ ":luajit_excutable_config" ]
   if (!is_win) {
     configs -= [ "//build/config/gcc:symbol_visibility_hidden" ]
@@ -255,43 +291,25 @@ static_library("luajit") {
   ]
 }
 
-executable("luajit_interpreter") {
-  defines = luajit_defines
-  sources = [ "src/luajit.c" ]
-  configs -= [ "//build/config/compiler:default_optimization" ]
-  deps = [ ":luajit" ]
-}
-
 executable("minilua") {
-  defines = luajit_defines
-  sources = [
-    "src/host/minilua.c",
-  ]
+  sources = [ "src/host/minilua.c" ]
+  configs += [ ":luajit_config" ]
 }
 
-action("generate_buildvm_arch_h") {
-  if (target_cpu == "x64" && !luajit_enable_gc64) {
-    dasm_arch = "x86"
-  } else {
-    dasm_arch = target_cpu
-  }
-
-  hostlua = "$root_out_dir/minilua"
+compiled_action("generate_buildvm_arch_h") {
+  dasm_arch = target_cpu
   dasm_lua = "dynasm/dynasm.lua"
   dasm_asc = "src/vm_$dasm_arch.dasc"
   buildvm_arch_h = "$target_gen_dir/buildvm_arch.h"
 
-  script = "//build/run.py"
-  inputs = [ hostlua, dasm_lua ]
+  tool = ":minilua"
+  inputs = [ dasm_lua ]
   outputs = [ buildvm_arch_h ]
-  args = [ rebase_path(hostlua), rebase_path(dasm_lua) ] + dasm_flags +
+  args = [ rebase_path(dasm_lua) ] + dasm_flags +
          ["-o", rebase_path(buildvm_arch_h), rebase_path(dasm_asc) ]
-
-  deps = [ ":minilua($host_toolchain)" ]
 }
 
 executable("buildvm") {
-  defines = luajit_defines
   include_dirs = [
     "src",
     "$target_gen_dir",
@@ -307,77 +325,61 @@ executable("buildvm") {
   ]
   cflags = [ "-Wno-shift-overflow" ]
 
+  configs += [ ":luajit_config" ]
   deps = [ ":generate_buildvm_arch_h" ]
 }
 
-action("generate_ljvm_s") {
-  script = "//build/run.py"
-  inputs = [ buildvm ]
-  outputs = [ ljvm_bout ]
-  args = [ rebase_path(buildvm), "-m", ljvm_mode, "-o", rebase_path(ljvm_bout) ]
+template("buildvm_action") {
+  compiled_action("${target_name}") {
+    forward_variables_from(invoker, [ "deps", "inputs" ])
+    if (!defined(inputs)) {
+      inputs = []
+    }
 
-  deps = [ ":buildvm($host_toolchain)" ]
+    tool = ":buildvm"
+    outputs = [ invoker.output_file ]
+    args = [ "-m", invoker.mode,
+             "-o", rebase_path(invoker.output_file) ] + rebase_path(inputs)
+  }
 }
 
-action("generate_lj_bcdef_h") {
-  script = "//build/run.py"
-  inputs = [ buildvm ] + ljlib_files
-  outputs = [ lj_bcdef_h ]
-  args = [ rebase_path(buildvm), "-m", "bcdef", "-o",
-           rebase_path(lj_bcdef_h) ] + rebase_path(ljlib_files)
-
-  deps = [ ":buildvm($host_toolchain)" ]
+buildvm_action("generate_ljvm_s") {
+  output_file = ljvm_bout
+  mode = ljvm_mode
 }
 
-action("generate_lj_ffdef_h") {
-  script = "//build/run.py"
-  inputs = [ buildvm ] + ljlib_files
-  outputs = [ lj_ffdef_h ]
-  args = [ rebase_path(buildvm), "-m", "ffdef", "-o",
-           rebase_path(lj_ffdef_h) ] + rebase_path(ljlib_files)
-
-  deps = [ ":buildvm($host_toolchain)" ]
+buildvm_action("generate_lj_bcdef_h") {
+  inputs = ljlib_files
+  output_file = lj_bcdef_h
+  mode = "bcdef"
 }
 
-action("generate_lj_libdef_h") {
-  script = "//build/run.py"
-  inputs = [ buildvm ] + ljlib_files
-  outputs = [ lj_libdef_h ]
-  args = [ rebase_path(buildvm), "-m", "libdef", "-o",
-           rebase_path(lj_libdef_h) ] + rebase_path(ljlib_files)
-
-  deps = [ ":buildvm($host_toolchain)" ]
+buildvm_action("generate_lj_ffdef_h") {
+  inputs = ljlib_files
+  output_file = lj_ffdef_h
+  mode = "ffdef"
 }
 
-action("generate_lj_recdef_h") {
-  script = "//build/run.py"
-  inputs = [ buildvm ] + ljlib_files
-  outputs = [ lj_recdef_h ]
-  args = [ rebase_path(buildvm), "-m", "recdef", "-o",
-           rebase_path(lj_recdef_h) ] + rebase_path(ljlib_files)
-
-  deps = [ ":buildvm($host_toolchain)" ]
+buildvm_action("generate_lj_libdef_h") {
+  inputs = ljlib_files
+  output_file = lj_libdef_h
+  mode = "libdef"
 }
 
-action("generate_lj_folddef_h") {
-  script = "//build/run.py"
-  inputs = [
-    buildvm,
-    "src/lj_opt_fold.c",
-  ]
-  outputs = [ lj_folddef_h ]
-  args = [ rebase_path(buildvm), "-m", "folddef", "-o",
-           rebase_path(lj_folddef_h), rebase_path("src/lj_opt_fold.c") ]
-
-  deps = [ ":buildvm($host_toolchain)" ]
+buildvm_action("generate_lj_recdef_h") {
+  inputs = ljlib_files
+  output_file = lj_recdef_h
+  mode = "recdef"
 }
 
-action("generate_vmdef_lua") {
-  script = "//build/run.py"
-  inputs = [ buildvm ] + ljlib_files
-  outputs = [ "$root_out_dir/vmdef.lua" ]
-  args = [ rebase_path(buildvm), "-m", "vmdef", "-o",
-           rebase_path("$root_out_dir/vmdef.lua") ] + rebase_path(ljlib_files)
+buildvm_action("generate_lj_folddef_h") {
+  inputs = [ "src/lj_opt_fold.c" ]
+  output_file = lj_folddef_h
+  mode = "folddef"
+}
 
-  deps = [ ":buildvm($host_toolchain)" ]
+buildvm_action("generate_vmdef_lua") {
+  inputs = ljlib_files
+  output_file = "$root_out_dir/vmdef.lua"
+  mode = "vmdef"
 }

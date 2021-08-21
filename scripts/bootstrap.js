@@ -5,7 +5,7 @@
 // LICENSE file.
 
 const {clang, targetCpu, targetOs, execSync, spawnSync} = require('./common')
-const {gnConfig, gnSysrootConfig} = require('./config')
+const {gnConfig, gnSysrootConfig, luaVersions} = require('./config')
 
 // Get the arch of sysroot.
 let sysrootArch = {
@@ -15,17 +15,18 @@ let sysrootArch = {
   arm64: 'arm64',
 }[targetCpu]
 
-if (process.platform == 'linux') {
+if (clang)
   execSync('python building/tools/update-clang.py')
+if (process.platform == 'linux')
   execSync(`python building/tools/install-sysroot.py --arch ${sysrootArch}`)
-} else if (process.platform == 'win32') {
+else if (process.platform == 'win32')
   execSync('node scripts/download_nuget_packages.js')
-}
 
 execSync('git submodule sync --recursive')
 execSync('git submodule update --init --recursive')
 execSync('node scripts/download_gn.js')
 execSync(`node scripts/download_node_headers.js node ${process.version} ${targetOs} ${targetCpu}`)
+execSync(`node scripts/download_lua_sources.js lua ${luaVersions[0]}`)
 
 const commonConfig = gnConfig.slice()
 if (process.env.CI === 'true')

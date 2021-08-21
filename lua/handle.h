@@ -23,7 +23,9 @@ enum class GCOp {
   Step       = LUA_GCSTEP,
   SetPause   = LUA_GCSETPAUSE,
   SetStepMul = LUA_GCSETSTEPMUL,
+#if LUA_VERSION_NUM >= 503
   IsRunning  = LUA_GCISRUNNING,
+#endif
 };
 inline int CollectGarbage(State* state, GCOp op = GCOp::Collect, int arg = 0) {
   return lua_gc(state, static_cast<int>(op), arg);

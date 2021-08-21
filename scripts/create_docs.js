@@ -5,6 +5,7 @@
 // LICENSE file.
 
 const {version} = require('./common')
+const {createZip} = require('./zip_utils')
 
 const path   = require('path')
 const fs     = require('fs-extra')
@@ -43,7 +44,7 @@ for (let lang of langs) {
   renderer.lang = lang
 
   const langdir = path.join(gendir, lang)
-  fs.ensureDirSync(langdir)
+  fs.emptyDirSync(langdir)
 
   // Parse all API docs.
   const docs = fs.readdirSync('docs/api').reduce((docs, file) => {
@@ -117,6 +118,11 @@ for (let lang of langs) {
     fs.writeFileSync(path.join(apidir, `${doc.id}.html`), html)
   }
 }
+
+// Create zip.
+createZip()
+  .addFile('out/Dist/docs', 'out/Dist/docs')
+  .writeToFile(`yue_docs_${version}`)
 
 // Load js-yaml from its browserify pack.
 function loadYaml() {

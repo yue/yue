@@ -4,7 +4,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {version, clang, argv, targetCpu, targetOs, strip, execSync, spawnSync} = require('./common')
+const {version, clang, argv, targetCpu, targetOs, hostCpu, strip, execSync, spawnSync} = require('./common')
 const {gnConfig, gnSysrootConfig} = require('./config')
 const {createZip} = require('./zip_utils')
 
@@ -42,12 +42,16 @@ execSync(`node ./scripts/download_node_headers.js ${runtime} ${nodever} ${target
 spawnSync('gn', ['gen', 'out/Node', `--args=${args.join(' ')}`])
 execSync('ninja -C out/Node node_yue')
 
-// Generate a name conforming node's convention.
-const shortver = nodever.substring(1, nodever.indexOf('.'))
-
 // Strip the binaries on Linux.
 if (targetOs == 'linux')
   strip('out/Node/gui.node')
+
+// Run tests.
+if (hostCpu == targetCpu)
+  execSync(`node ./scripts/test_node_extension.js ${runtime} ${nodever}`)
+
+// Generate a name conforming node's convention.
+const shortver = nodever.substring(1, nodever.indexOf('.'))
 
 // Create zip archive of the node module.
 fs.ensureDirSync('out/Dist')

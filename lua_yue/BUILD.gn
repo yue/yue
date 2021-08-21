@@ -2,6 +2,7 @@
 # Use of this source code is governed by the license that can be found in the
 # LICENSE file.
 
+import("//lua/lua.gni")
 import("//testing/test.gni")
 
 # Independent lua executable with yue runtime.
@@ -21,34 +22,20 @@ source_set("lua_yue_lib") {
     "builtin_loader.h",
   ]
 
-  deps = [
+  public_deps = [
     ":lua_yue_gui",
     ":lua_yue_util",
-    "//third_party/lua",
+    "//third_party/$lua_runtime-$lua_version:lua_src",
   ]
 }
 
 # Loadable module of core yue libraries to be used with other lua distributions,
 # currently we only build bindings to GUI part of yue.
-loadable_module("lua_yue") {
+lua_module("lua_yue") {
   output_name = "yue"
-  output_prefix_override = true  # do not add "lib" prefix
-
   deps = [
     ":lua_yue_gui",
   ]
-
-  if (is_mac) {
-    ldflags = [
-      "-undefined", "dynamic_lookup",
-    ]
-  } else if (is_linux && is_component_build) {
-    configs += [ "//build/config/gcc:rpath_for_built_shared_libraries" ]
-  } else if (is_win) {
-    deps += [
-      "//third_party/lua:lua_shared",
-    ]
-  }
 }
 
 # Lua bindings of yue's GUI part.
@@ -80,7 +67,7 @@ source_set("lua_yue_util") {
     "binding_util.h",
   ]
 
-  deps = [
+  public_deps = [
     "//base",
     "//lua",
   ]
