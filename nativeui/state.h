@@ -59,6 +59,7 @@ class NATIVEUI_EXPORT State {
   void InitializeCOM();
   bool InitializeWinRT();
   bool InitWebView2Loader();
+  base::ScopedNativeLibrary* GetWebView2Loader();
   HWND GetSubwinHolder();
   ClassRegistrar* GetClassRegistrar();
   NativeTheme* GetNativeTheme();

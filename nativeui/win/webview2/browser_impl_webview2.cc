@@ -14,9 +14,11 @@
 #include "base/base_paths_win.h"
 #include "base/json/json_reader.h"
 #include "base/path_service.h"
+#include "base/scoped_native_library.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/win/scoped_co_mem.h"
 #include "nativeui/app.h"
+#include "nativeui/state.h"
 
 namespace nu {
 
@@ -56,9 +58,13 @@ BrowserImplWebview2::BrowserImplWebview2(Browser::Options options,
                   return E_FAIL;
                 return self->OnEnvCreated(res, env);
               });
-  if (FAILED(::CreateCoreWebView2EnvironmentWithOptions(
-                 nullptr, GetUserDataDir().value().c_str(), nullptr,
-                 callback.Get()))) {
+  auto* create =
+      reinterpret_cast<decltype(&::CreateCoreWebView2EnvironmentWithOptions)>(
+          State::GetCurrent()->GetWebView2Loader()->GetFunctionPointer(
+              "CreateCoreWebView2EnvironmentWithOptions"));
+  if (!create ||
+      FAILED(create(nullptr, GetUserDataDir().value().c_str(), nullptr,
+                    callback.Get()))) {
     CreationFailed();
     return;
   }

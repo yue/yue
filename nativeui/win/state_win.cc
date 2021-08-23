@@ -73,6 +73,11 @@ bool State::InitWebView2Loader() {
   return webview2_loader_->is_valid();
 }
 
+base::ScopedNativeLibrary* State::GetWebView2Loader() {
+  DCHECK(webview2_loader_ && webview2_loader_->is_valid());
+  return webview2_loader_.get();
+}
+
 HWND State::GetSubwinHolder() {
   if (!subwin_holder_)
     subwin_holder_.reset(new SubwinHolder);
