@@ -29,23 +29,14 @@ template<typename Sig>
 class CallbackHolder {
  public:
   CallbackHolder(State* state, std::function<Sig> callback)
-      : callback(std::move(callback)), state_(state) {
-    // For Lua 5.1 on Windows, it is possible for an upvalue to be garbage
-    // collected before the callback is called.
-    lua_pushvalue(state, -1);
-    ref_ = luaL_ref(state, LUA_REGISTRYINDEX);
-  }
-
-  ~CallbackHolder() {
-    // Unref the upvalue.
-    luaL_unref(state_, LUA_REGISTRYINDEX, ref_);
-  }
+      : callback(std::move(callback)), ref_(state, -1) {}
 
   std::function<Sig> callback;
 
  private:
-  State* state_;
-  int ref_;
+  // For Lua 5.1 on Windows, it is possible for an upvalue to be garbage
+  // collected before the callback is called.
+  Persistent ref_;
 
   DISALLOW_COPY_AND_ASSIGN(CallbackHolder);
 };
@@ -207,13 +198,13 @@ inline void PushCFunction(State* state, std::function<Sig> callback) {
 // Call PCall for the gloal handle.
 template<typename ReturnType, typename...ArgTypes>
 struct PCallHelper {
-  static ReturnType Run(State* state, const std::shared_ptr<Handle>& handle,
-                        ArgTypes... args) {
+  static ReturnType Run(State* state, std::shared_ptr<Handle> handle,
+                        ArgTypes&&... args) {
     ReturnType result = ReturnType();
     int top = GetTop(state);
     DCHECK_EQ(state, handle->state());
     handle->Push();
-    if (!PCall(state, &result, args...)) {
+    if (!PCall(state, &result, std::forward<ArgTypes>(args)...)) {
       std::string error;
       lua::Pop(state, &error);
       LOG(ERROR) << "Error when calling lua function: " << error;
@@ -226,12 +217,12 @@ struct PCallHelper {
 // The void return type version for PCallHelper.
 template<typename...ArgTypes>
 struct PCallHelper<void, ArgTypes...> {
-  static void Run(State* state, const std::shared_ptr<Handle>& handle,
-                  ArgTypes... args) {
+  static void Run(State* state, std::shared_ptr<Handle> handle,
+                  ArgTypes&&... args) {
     int top = GetTop(state);
     DCHECK_EQ(state, handle->state());
     handle->Push();
-    if (!PCall(state, nullptr, args...)) {
+    if (!PCall(state, nullptr, std::forward<ArgTypes>(args)...)) {
       std::string error;
       lua::Pop(state, &error);
       LOG(ERROR) << "Error when calling lua function: " << error;

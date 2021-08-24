@@ -14,8 +14,10 @@ const char* kWeakTableName = "yue.internal.weaktable";
 
 }  // namespace
 
-Persistent::Persistent(State* state)
-    : Handle(state), ref_(luaL_ref(state, LUA_REGISTRYINDEX)) {
+Persistent::Persistent(State* state, int index)
+    : Handle(state) {
+  lua::Push(state, ValueOnStack(state, index));
+  ref_ = luaL_ref(state, LUA_REGISTRYINDEX);
 }
 
 Persistent::~Persistent() {
@@ -31,13 +33,13 @@ Weak::Weak(State* state, int index)
   index = AbsIndex(state, index);
   StackAutoReset reset(state);
   PushWeakTable(state, kWeakTableName, "v");
-  RawSet(state, -1, static_cast<const void*>(this), ValueOnStack(state, index));
+  RawSet(state, -1, static_cast<void*>(this), ValueOnStack(state, index));
 }
 
 Weak::~Weak() {
   StackAutoReset reset(state());
   luaL_getmetatable(state(), kWeakTableName);
-  RawSet(state(), -1, static_cast<const void*>(this), nullptr);
+  RawSet(state(), -1, static_cast<void*>(this), nullptr);
 }
 
 void Weak::Push() const {

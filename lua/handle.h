@@ -7,8 +7,6 @@
 #ifndef LUA_HANDLE_H_
 #define LUA_HANDLE_H_
 
-#include <memory>
-
 #include "lua/stack.h"
 
 namespace lua {
@@ -51,12 +49,7 @@ class Handle {
 // The strong reference to a value.
 class Persistent : public Handle {
  public:
-  static std::shared_ptr<Persistent> New(State* state, int index) {
-    lua::Push(state, ValueOnStack(state, index));
-    return std::make_shared<Persistent>(state);
-  }
-
-  explicit Persistent(State* state);
+  Persistent(State* state, int index);
   ~Persistent() override;
 
   void Push() const override;
@@ -68,10 +61,6 @@ class Persistent : public Handle {
 // The weak reference.
 class Weak : public Handle {
  public:
-  static std::shared_ptr<Weak> New(State* state, int index) {
-    return std::make_shared<Weak>(state, index);
-  }
-
   Weak(State* state, int index);
   ~Weak() override;
 

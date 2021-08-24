@@ -8,6 +8,7 @@
 #define LUA_TABLE_H_
 
 #include <tuple>
+#include <utility>
 
 #include "lua/table_internal.h"
 
@@ -33,42 +34,41 @@ inline bool GetMetaTable(State* state, int index) {
 
 // The generic version of lua_rawset.
 template<typename Key, typename Value>
-inline void RawSet(State* state, int index, const Key& key,
-                   const Value& value) {
+inline void RawSet(State* state, int index, Key&& key, Value&& value) {
   index = AbsIndex(state, index);
-  Push(state, key, value);
+  Push(state, std::forward<Key>(key), std::forward<Value>(value));
   lua_rawset(state, index);
 }
 
 // Optimize for lua_rawseti.
 template<typename Value>
-inline void RawSet(State* state, int index, int key, const Value& value) {
+inline void RawSet(State* state, int index, int key, Value&& value) {
   index = AbsIndex(state, index);
-  Push(state, value);
+  Push(state, std::forward<Value>(value));
   lua_rawseti(state, index, key);
 }
 
 // Optimize for lua_rawsetp.
 template<typename Value>
-inline void RawSet(State* state, int index, void* key, const Value& value) {
+inline void RawSet(State* state, int index, void* key, Value&& value) {
   index = AbsIndex(state, index);
-  Push(state, value);
+  Push(state, std::forward<Value>(value));
   lua_rawsetp(state, index, key);
 }
 
 // Allow setting arbitrary key/value pairs.
 template<typename Key, typename Value, typename... ArgTypes>
-inline void RawSet(State* state, int index, const Key& key, const Value& value,
-                   const ArgTypes&... args) {
-  RawSet(state, index, key, value);
-  RawSet(state, index, args...);
+inline void RawSet(State* state, int index, Key&& key, Value&& value,
+                   ArgTypes&&... args) {
+  RawSet(state, index, std::forward<Key>(key), std::forward<Value>(value));
+  RawSet(state, index, std::forward<ArgTypes>(args)...);
 }
 
 // Generic version of lua_rawget.
 template<typename Key>
-inline void RawGet(State* state, int index, const Key& key) {
+inline void RawGet(State* state, int index, Key&& key) {
   index = AbsIndex(state, index);
-  Push(state, key);
+  Push(state, std::forward<Key>(key));
   lua_rawget(state, index);
 }
 
@@ -86,38 +86,37 @@ inline void RawGet(State* state, int index, void* key) {
 
 // Allow getting arbitrary values.
 template<typename Key, typename... ArgTypes>
-inline void RawGet(State* state, int index, const Key& key,
-                   const ArgTypes&... args) {
+inline void RawGet(State* state, int index, Key&& key,
+                   ArgTypes&&... args) {
   index = AbsIndex(state, index);
-  RawGet(state, index, key);
-  RawGet(state, index, args...);
+  RawGet(state, index, std::forward<Key>(key));
+  RawGet(state, index, std::forward<ArgTypes>(args)...);
 }
 
 // Helper function: Call RawGet for all keys and ignore the out.
 template<typename Key, typename Value, typename... ArgTypes>
-inline void RawGetKeyPairHelper(State* state, int index, const Key& key,
+inline void RawGetKeyPairHelper(State* state, int index, Key&& key,
                                 Value* out) {
-  RawGet(state, index, key);
+  RawGet(state, index, std::forward<Key>(key));
 }
 template<typename Key, typename Value, typename... ArgTypes>
-inline void RawGetKeyPairHelper(State* state, int index, const Key& key,
-                                Value* out, const ArgTypes&... args) {
+inline void RawGetKeyPairHelper(State* state, int index, Key&& key,
+                                Value* out, ArgTypes&&... args) {
   index = AbsIndex(state, index);
-  RawGetKeyPairHelper(state, index, key, out);
-  RawGetKeyPairHelper(state, index, args...);
+  RawGetKeyPairHelper(state, index, std::forward<Key>(key), out);
+  RawGetKeyPairHelper(state, index, std::forward<ArgTypes>(args)...);
 }
 
 // Helper function: Call To for all values and ignore the key.
 template<typename Key, typename Value>
-inline bool ToKeyPairHelper(State* state, int index, const Key& key,
-                            Value* out) {
+inline bool ToKeyPairHelper(State* state, int index, Key&& key, Value* out) {
   return To(state, index, out);
 }
 template<typename Key, typename Value, typename... ArgTypes>
-inline bool ToKeyPairHelper(State* state, int index, const Key& key, Value* out,
-                            const ArgTypes&... args) {
-  return ToKeyPairHelper(state, index, key, out) &&
-         ToKeyPairHelper(state, index + 1, args...);
+inline bool ToKeyPairHelper(State* state, int index, Key&& key, Value* out,
+                            ArgTypes&&... args) {
+  return ToKeyPairHelper(state, index, std::forward<Key>(key), out) &&
+         ToKeyPairHelper(state, index + 1, std::forward<ArgTypes>(args)...);
 }
 
 // Allow getting and poping arbitrary values.

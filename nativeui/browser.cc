@@ -39,12 +39,12 @@ void Browser::SetBindingName(const std::string& name) {
     PlatformUpdateBindings();
 }
 
-void Browser::AddRawBinding(const std::string& name, const BindingFunc& func) {
+void Browser::AddRawBinding(const std::string& name, BindingFunc func) {
   if (name.empty())
     return;
   std::string escaped;
   base::EscapeJSONString(name, false, &escaped);
-  bindings_[escaped] = func;
+  bindings_[escaped] = std::move(func);
   if (!stop_serving_)
     PlatformUpdateBindings();
 }

@@ -30,10 +30,10 @@ template<typename Sig> class SignalBase {
     identifier_ = identifier;
   }
 
-  int Connect(const Slot& slot) {
+  int Connect(Slot slot) {
     if (delegate_)
       delegate_->OnConnect(identifier_);
-    slots_.push_back(std::make_pair(++next_id_, slot));
+    slots_.push_back(std::make_pair(++next_id_, std::move(slot)));
     return next_id_;
   }
 
@@ -71,12 +71,13 @@ template<typename Sig> class Signal;
 template<typename... Args>
 class Signal<void(Args...)> : public SignalBase<void(Args...)> {
  public:
-  void Emit(Args... args) {
+  template<typename... EmitArgs>
+  void Emit(EmitArgs&&... args) {
     // Copy the list before iterating, since it is possible that user removes
     // elements from the list when iterating.
     auto slots = this->slots_;
     for (auto& slot : slots)
-      slot.second(std::forward<Args>(args)...);
+      slot.second(std::forward<EmitArgs>(args)...);
   }
 };
 
@@ -84,12 +85,13 @@ class Signal<void(Args...)> : public SignalBase<void(Args...)> {
 template<typename... Args>
 class Signal<bool(Args...)> : public SignalBase<bool(Args...)> {
  public:
-  bool Emit(Args... args) {
+  template<typename... EmitArgs>
+  bool Emit(EmitArgs&&... args) {
     // Copy the list before iterating, since it is possible that user removes
     // elements from the list when iterating.
     auto slots = this->slots_;
     for (auto& slot : slots) {
-      if (slot.second(std::forward<Args>(args)...))
+      if (slot.second(std::forward<EmitArgs>(args)...))
         return true;
     }
     return false;

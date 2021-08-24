@@ -23,14 +23,14 @@ namespace vb {
 // will create substantial memory leaks. See http://crbug.com/463487.
 template<typename Sig>
 v8::Local<v8::FunctionTemplate> CreateFunctionTemplate(
-    v8::Local<v8::Context> context, const std::function<Sig>& callback,
+    v8::Local<v8::Context> context, std::function<Sig> callback,
     int callback_flags = 0) {
 #ifndef NDEBUG
   internal::FunctionTemplateCreated();
 #endif
   v8::Isolate* isolate = context->GetIsolate();
   typedef internal::CallbackHolder<Sig> HolderT;
-  HolderT* holder = new HolderT(isolate, callback, callback_flags);
+  HolderT* holder = new HolderT(isolate, std::move(callback), callback_flags);
 
   v8::Local<v8::FunctionTemplate> tmpl = v8::FunctionTemplate::New(
       isolate, &internal::Dispatcher<Sig>::DispatchToCallback,
@@ -54,9 +54,9 @@ bool WeakFunctionFromV8(v8::Local<v8::Context> context,
   auto wrapper = std::make_shared<internal::V8FunctionWrapper>(
       isolate, val.As<v8::Function>());
   wrapper->SetWeak();
-  *out = [isolate, wrapper](ArgTypes... args) -> ReturnType {
+  *out = [isolate, wrapper](ArgTypes&&... args) -> ReturnType {
     return internal::V8FunctionInvoker<ReturnType(ArgTypes...)>::Go(
-        isolate, wrapper, std::move(args)...);
+        isolate, wrapper, std::forward<ArgTypes>(args)...);
   };
   return true;
 }
@@ -77,9 +77,9 @@ struct Type<std::function<ReturnType(ArgTypes...)>> {
     v8::Isolate* isolate = context->GetIsolate();
     auto wrapper = std::make_shared<internal::V8FunctionWrapper>(
         isolate, val.As<v8::Function>());
-    *out = [isolate, wrapper](ArgTypes... args) -> ReturnType {
+    *out = [isolate, wrapper](ArgTypes&&... args) -> ReturnType {
       return internal::V8FunctionInvoker<ReturnType(ArgTypes...)>::Go(
-          isolate, wrapper, std::move(args)...);
+          isolate, wrapper, std::forward<ArgTypes>(args)...);
     };
     return true;
   }

@@ -5,6 +5,7 @@
 #ifndef V8BINDING_REF_METHOD_H_
 #define V8BINDING_REF_METHOD_H_
 
+#include <utility>
 #include <vector>
 
 #include "v8binding/callback.h"
@@ -35,8 +36,8 @@ struct RefMethodRef {
 template<typename T>
 class RefMethodRefHolder : public CallbackHolderBase {
  public:
-  RefMethodRefHolder(v8::Isolate* isolate, const RefMethodRef<T>& ref)
-      : CallbackHolderBase(isolate), ref(ref) {}
+  RefMethodRefHolder(v8::Isolate* isolate, RefMethodRef<T> ref)
+      : CallbackHolderBase(isolate), ref(std::move(ref)) {}
 
   RefMethodRef<T> ref;
   v8::Global<v8::Function> v8_func;

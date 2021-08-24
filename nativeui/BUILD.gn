@@ -557,6 +557,7 @@ test("nativeui_unittests") {
     "message_loop_unittests.cc",
     "picker_unittests.cc",
     "screen_unittests.cc",
+    "signal_unittests.cc",
     "slider_unittests.cc",
     "tab_unittests.cc",
     "table_unittests.cc",

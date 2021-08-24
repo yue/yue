@@ -34,6 +34,7 @@ class TestClass : public base::RefCounted<TestClass> {
 
  protected:
   friend class base::RefCounted<TestClass>;
+
   virtual ~TestClass() {
     if (ptr_)
       *ptr_ = 456;

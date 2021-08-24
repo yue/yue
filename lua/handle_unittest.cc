@@ -19,7 +19,7 @@ class HandleTest : public testing::Test {
 TEST_F(HandleTest, Persistent) {
   size_t original_registry_len = lua::RawLen(state_, LUA_REGISTRYINDEX);
   lua::NewTable(state_);
-  std::shared_ptr<lua::Persistent> handle(lua::Persistent::New(state_, -1));
+  auto handle = std::make_unique<lua::Persistent>(state_, -1);
   ASSERT_GT(lua::RawLen(state_, LUA_REGISTRYINDEX), original_registry_len);
 
   lua::PopAndIgnore(state_, 1);

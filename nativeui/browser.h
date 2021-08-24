@@ -71,17 +71,19 @@ class NATIVEUI_EXPORT Browser : public View {
   bool IsLoading() const;
 
   void SetBindingName(const std::string& name);
-  void AddRawBinding(const std::string& name, const BindingFunc& func);
+  void AddRawBinding(const std::string& name, BindingFunc func);
   void RemoveBinding(const std::string& name);
   bool HasBindings() const;
 
   // Automatically deduce argument types.
   template<typename Sig>
-  void AddBinding(const std::string& name, const std::function<Sig>& func) {
-    AddRawBinding(name, [func](nu::Browser* browser, base::Value args) {
+  void AddBinding(const std::string& name, std::function<Sig> func) {
+    auto binding = [func = std::move(func)](nu::Browser* browser,
+                                            base::Value args) mutable{
       internal::Dispatcher<Sig>::DispatchToCallback(
           func, browser, std::move(args));
-    });
+    };
+    AddRawBinding(name, binding);
   }
   // Automatically convert function pointer to std::function.
   template<typename T>

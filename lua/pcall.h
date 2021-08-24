@@ -14,8 +14,8 @@ namespace lua {
 // Safely call the function on top of stack.
 // When error happens, this API returns false and leaves the error on stack.
 template<typename ReturnType, typename... ArgTypes>
-inline bool PCall(State* state, ReturnType* result, const ArgTypes&... args) {
-  Push(state, args...);
+inline bool PCall(State* state, ReturnType* result, ArgTypes&&... args) {
+  Push(state, std::forward<ArgTypes>(args)...);
 
   if (lua_pcall(state, sizeof...(ArgTypes), Values<ReturnType>::count,
                 0 /* no message handler */) != LUA_OK)
@@ -42,8 +42,8 @@ inline bool PCall(State* state, ReturnType* result, const ArgTypes&... args) {
 
 // Passing nullptr means there is no result expected.
 template<typename... ArgTypes>
-inline bool PCall(State* state, std::nullptr_t, const ArgTypes&... args) {
-  Push(state, args...);
+inline bool PCall(State* state, std::nullptr_t, ArgTypes&&... args) {
+  Push(state, std::forward<ArgTypes>(args)...);
   return lua_pcall(state, sizeof...(ArgTypes), 0, 0) == LUA_OK;
 }
 

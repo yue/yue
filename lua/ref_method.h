@@ -34,23 +34,14 @@ struct RefMethodArgs {
 template<typename T>
 struct RefMethodRef {
   RefMethodRef(State* state, RefMethodArgs<T> args)
-      : args(std::move(args)), state_(state) {
-    // For Lua 5.1 on Windows, it is possible for an upvalue to be garbage
-    // collected before the callback is called.
-    lua_pushvalue(state, -1);
-    ref_ = luaL_ref(state, LUA_REGISTRYINDEX);
-  }
-
-  ~RefMethodRef() {
-    // Unref the upvalue.
-    luaL_unref(state_, LUA_REGISTRYINDEX, ref_);
-  }
+      : args(std::move(args)), ref_(state, -1) {}
 
   RefMethodArgs<T> args;
 
  private:
-  State* state_;
-  int ref_;
+  // For Lua 5.1 on Windows, it is possible for an upvalue to be garbage
+  // collected before the callback is called.
+  Persistent ref_;
 
   DISALLOW_COPY_AND_ASSIGN(RefMethodRef);
 };

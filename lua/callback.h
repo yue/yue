@@ -25,10 +25,10 @@ bool ToWeakFunction(State* state, int index,
   }
   if (GetType(state, index) != LuaType::Function)
     return false;
-  std::shared_ptr<Handle> handle = Weak::New(state, index);
+  std::shared_ptr<Handle> handle = std::make_shared<Weak>(state, index);
   *out = [state, handle](ArgTypes... args) -> ReturnType {
     return internal::PCallHelper<ReturnType, ArgTypes...>::Run(
-        state, handle, std::move(args)...);
+        state, std::move(handle), std::move(args)...);
   };
   return true;
 }
@@ -64,10 +64,10 @@ struct Type<std::function<ReturnType(ArgTypes...)>> {
     }
     if (GetType(state, index) != LuaType::Function)
       return false;
-    std::shared_ptr<Handle> handle = Persistent::New(state, index);
+    std::shared_ptr<Handle> handle = std::make_shared<Persistent>(state, index);
     *out = [state, handle](ArgTypes... args) -> ReturnType {
       return internal::PCallHelper<ReturnType, ArgTypes...>::Run(
-          state, handle, std::move(args)...);
+          state, std::move(handle), std::move(args)...);
     };
     return true;
   }

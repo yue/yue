@@ -28,27 +28,19 @@ using void_t = typename make_void<Ts...>::type;
 // Deduce the proper type for callback parameters.
 template<typename T>
 struct CallbackParamTraits {
-  typedef T LocalType;
-};
-template<typename T>
-struct CallbackParamTraits<const T&> {
-  typedef T LocalType;
-};
-template<typename T>
-struct CallbackParamTraits<T&&> {
-  typedef T LocalType;
-};
-template<typename T>
-struct CallbackParamTraits<T*> {
-  typedef T* LocalType;
+  using LocalType = typename std::decay<T>::type;
 };
 template<typename T>
 struct CallbackParamTraits<const T*> {
-  typedef T* LocalType;
+  using LocalType = T*;
 };
 template<>
 struct CallbackParamTraits<const char*> {
-  typedef const char* LocalType;
+  using LocalType = const char*;
+};
+template<>
+struct CallbackParamTraits<const char*&> {
+  using LocalType = const char*;
 };
 
 // Classes for generating and storing an argument pack of integer indices

@@ -5,6 +5,8 @@
 #ifndef NODE_YUE_BINDING_SIGNAL_H_
 #define NODE_YUE_BINDING_SIGNAL_H_
 
+#include <utility>
+
 #include "nativeui/nativeui.h"
 #include "v8binding/v8binding.h"
 
@@ -33,7 +35,7 @@ class SignalWrapper : public base::RefCounted<SignalWrapper<Sig>> {
       args->ThrowError("Function");
       return -1;
     }
-    int id = signal_->Connect(slot);
+    int id = signal_->Connect(std::move(slot));
     // owner[signal][id] = slot.
     v8::Local<v8::Map> refs = vb::GetAttachedTable(
         context, v8::Local<v8::Object>::New(isolate, owner_), signal_);
@@ -118,7 +120,7 @@ struct MemberTraits<nu::Signal<Sig>> {
     std::function<Sig> slot;
     if (!vb::WeakFunctionFromV8(context, value, &slot))
       return false;
-    int id = out->Connect(slot);
+    int id = out->Connect(std::move(slot));
     // owner[signal][id] = slot
     v8::Local<v8::Map> refs = vb::GetAttachedTable(context, owner, out);
     refs->Set(context,

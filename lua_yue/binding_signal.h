@@ -6,6 +6,7 @@
 #define LUA_YUE_BINDING_SIGNAL_H_
 
 #include <string>
+#include <utility>
 
 #include "lua/lua.h"
 #include "nativeui/signal.h"
@@ -32,7 +33,7 @@ class SignalWrapper : public base::RefCounted<SignalWrapper<Sig>> {
           2, lua::GetTypeName(context->state, 2), "function");
       return -1;
     }
-    int id = signal_->Connect(slot);
+    int id = signal_->Connect(std::move(slot));
     // self.__yuesignals[signal][id] = slot
     lua::PushRefsTable(context->state, "__yuesignals", -1);
     lua::RawGetOrCreateTable(context->state, -1, static_cast<void*>(signal_));
@@ -117,7 +118,7 @@ struct MemberTraits<nu::Signal<Sig>> {
     std::function<Sig> slot;
     if (!lua::ToWeakFunction(state, value, &slot))
       return false;
-    int id = out->Connect(slot);
+    int id = out->Connect(std::move(slot));
     // self.__yuesignals[signal][id] = slot
     lua::PushRefsTable(state, "__yuesignals", owner);
     lua::RawGetOrCreateTable(state, -1, static_cast<void*>(out));

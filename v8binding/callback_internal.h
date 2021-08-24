@@ -7,6 +7,7 @@
 
 #include <functional>
 #include <memory>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -34,21 +35,22 @@ struct Type<Arguments*> {
 
 namespace internal {
 
+// Deduce the proper type for callback parameters.
 template<typename T>
 struct CallbackParamTraits {
-  typedef T LocalType;
-};
-template<typename T>
-struct CallbackParamTraits<const T&> {
-  typedef T LocalType;
-};
-template<typename T>
-struct CallbackParamTraits<T&&> {
-  typedef T LocalType;
+  using LocalType = typename std::decay<T>::type;
 };
 template<typename T>
 struct CallbackParamTraits<const T*> {
-  typedef T* LocalType;
+  using LocalType = T*;
+};
+template<>
+struct CallbackParamTraits<const char*> {
+  using LocalType = const char*;
+};
+template<>
+struct CallbackParamTraits<const char*&> {
+  using LocalType = const char*;
 };
 
 #ifndef NDEBUG
@@ -85,9 +87,11 @@ template<typename Sig>
 class CallbackHolder : public CallbackHolderBase {
  public:
   CallbackHolder(v8::Isolate* isolate,
-                 const std::function<Sig>& callback,
+                 std::function<Sig> callback,
                  int flags)
-      : CallbackHolderBase(isolate), callback(callback), flags(flags) {}
+      : CallbackHolderBase(isolate),
+        callback(std::move(callback)),
+        flags(flags) {}
 
   std::function<Sig> callback;
   int flags;
@@ -253,7 +257,7 @@ struct V8FunctionInvoker<v8::Local<v8::Value>(ArgTypes...)> {
   static v8::Local<v8::Value> Go(
       v8::Isolate* isolate,
       const std::shared_ptr<V8FunctionWrapper>& wrapper,
-      ArgTypes... raw) {
+      ArgTypes&&... raw) {
     Locker locker(isolate);
     v8::EscapableHandleScope handle_scope(isolate);
     v8::MicrotasksScope script_scope(isolate,
@@ -264,7 +268,9 @@ struct V8FunctionInvoker<v8::Local<v8::Value>(ArgTypes...)> {
       return v8::Null(isolate);
     }
     auto context = func->CreationContext();
-    std::vector<v8::Local<v8::Value>> args = { ToV8(context, raw)... };
+    std::vector<v8::Local<v8::Value>> args = {
+        ToV8(context, std::forward<ArgTypes>(raw))...
+    };
     v8::MaybeLocal<v8::Value> val = node::MakeCallback(
         isolate, func, func,
         static_cast<int>(args.size()),
@@ -281,7 +287,7 @@ template<typename... ArgTypes>
 struct V8FunctionInvoker<void(ArgTypes...)> {
   static void Go(v8::Isolate* isolate,
                  const std::shared_ptr<V8FunctionWrapper>& wrapper,
-                 ArgTypes... raw) {
+                 ArgTypes&&... raw) {
     Locker locker(isolate);
     v8::HandleScope handle_scope(isolate);
     v8::MicrotasksScope script_scope(isolate,
@@ -292,7 +298,9 @@ struct V8FunctionInvoker<void(ArgTypes...)> {
       return;
     }
     auto context = func->CreationContext();
-    std::vector<v8::Local<v8::Value>> args = { ToV8(context, raw)... };
+    std::vector<v8::Local<v8::Value>> args = {
+        ToV8(context, std::forward<ArgTypes>(raw))...
+    };
     node::MakeCallback(isolate, func, func,
                        static_cast<int>(args.size()),
                        args.empty() ? nullptr: &args.front(),
@@ -304,7 +312,7 @@ template<typename ReturnType, typename... ArgTypes>
 struct V8FunctionInvoker<ReturnType(ArgTypes...)> {
   static ReturnType Go(v8::Isolate* isolate,
                        const std::shared_ptr<V8FunctionWrapper>& wrapper,
-                       ArgTypes... raw) {
+                       ArgTypes&&... raw) {
     Locker locker(isolate);
     v8::HandleScope handle_scope(isolate);
     v8::MicrotasksScope script_scope(isolate,
@@ -316,7 +324,9 @@ struct V8FunctionInvoker<ReturnType(ArgTypes...)> {
       return ret;
     }
     auto context = func->CreationContext();
-    std::vector<v8::Local<v8::Value>> args = { ToV8(context, raw)... };
+    std::vector<v8::Local<v8::Value>> args = {
+        ToV8(context, std::forward<ArgTypes>(raw))...
+    };
     v8::MaybeLocal<v8::Value> val = node::MakeCallback(
         isolate, func, func,
         static_cast<int>(args.size()),

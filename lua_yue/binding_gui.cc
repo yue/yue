@@ -2021,10 +2021,10 @@ struct Type<nu::Browser> {
       return;
     }
     // Persistent the function and pass it to lambda.
-    std::shared_ptr<Persistent> func_ref = Persistent::New(state, 3);
-    browser->AddRawBinding(name, [state, func_ref](nu::Browser* browser,
-                                                   ::base::Value value) {
-      func_ref->Push();
+    auto ref = std::make_shared<Persistent>(state, 3);
+    browser->AddRawBinding(name, [state, ref](nu::Browser* browser,
+                                              ::base::Value value) {
+      ref->Push();
       for (const auto& it : value.GetList())
         Push(state, it);
       lua_pcall(state, static_cast<int>(value.GetList().size()), 0, 0);

@@ -2,6 +2,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
+#include "lua_yue/binding_signal.h"
+
 #include "lua_yue/builtin_loader.h"
 #include "nativeui/nativeui.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -159,4 +161,83 @@ TEST_F(YueSignalTest, SignalCyclicReference) {
       "win = nil\n"
       "collectgarbage()\n"
       "assert(t.w == nil)\n"));
+}
+
+struct Copiable {
+  explicit Copiable(int ref = 1) : ref(ref) {}
+  Copiable(const Copiable& other) : ref(other.ref + 1) {}
+  Copiable(Copiable&& other) : ref(other.ref) {
+    other.ref = 0;
+  }
+  Copiable& operator=(Copiable&& other) {
+    ref = other.ref;
+    other.ref = 0;
+    return *this;
+  }
+  int ref;
+};
+
+class TestClass : public base::RefCounted<TestClass> {
+ public:
+  TestClass() {}
+
+  void Emit() {
+    signal.Emit(Copiable());
+  }
+
+  nu::Signal<void(Copiable)> signal;
+
+ protected:
+  friend class base::RefCounted<TestClass>;
+
+  virtual ~TestClass() {}
+};
+
+namespace lua {
+
+template<>
+struct Type<Copiable> {
+  static constexpr const char* name = "Arg";
+  static inline void Push(State* state, Copiable arg) {
+    lua_pushinteger(state, arg.ref);
+  }
+  static inline bool To(State* state, int index, Copiable* out) {
+    int success = 0;
+    int ret = lua_tointegerx(state, index, &success);
+    if (success)
+      *out = Copiable(ret);
+    return success != 0;
+  }
+};
+
+template<>
+struct Type<TestClass> {
+  static constexpr const char* name = "TestClass";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "new", &CreateOnHeap<TestClass>,
+           "emit", &TestClass::Emit);
+    RawSetProperty(state, index, "signal", &TestClass::signal);
+  }
+};
+
+}  // namespace lua
+
+TEST_F(YueSignalTest, FunctionCallZeroCopyArg) {
+  scoped_refptr<TestClass> instance = new TestClass;
+  lua::Push(state_, instance.get());  // 1
+
+  bool called = false;
+  std::function<void(Copiable)> handler = [&called](Copiable arg) {
+    ASSERT_EQ(arg.ref, 1);
+    called = true;
+  };
+  lua::Push(state_, handler);  // 2
+
+  ASSERT_TRUE(lua::PSet(state_, 1,
+                        "signal", lua::ValueOnStack(state_, 2)));  // 3
+
+  ASSERT_TRUE(lua::PGet(state_, 1, "emit"));
+  ASSERT_TRUE(lua::PCall(state_, nullptr, lua::ValueOnStack(state_, 1)));
+  ASSERT_TRUE(called);
 }

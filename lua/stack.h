@@ -10,6 +10,7 @@
 #include <functional>
 #include <ostream>
 #include <tuple>
+#include <utility>
 
 #include "base/check_op.h"
 #include "lua/template_util.h"
@@ -24,9 +25,9 @@ inline int AbsIndex(State* state, int index) {
 
 // Function template for Type<ArgType>::Push.
 template<typename ArgType>
-inline void Push(State* state, const ArgType& arg) {
+inline void Push(State* state, ArgType&& arg) {
   Type<typename internal::CallbackParamTraits<ArgType>::LocalType>::Push(
-      state, arg);
+      state, std::forward<ArgType>(arg));
 }
 
 // Optimized version for string iterals.
@@ -82,22 +83,22 @@ inline void Push(State* state) {
 
 // Enable push arbitrary args at the same time.
 template<typename ArgType, typename... ArgTypes>
-inline void Push(State* state, const ArgType& arg, const ArgTypes&... args) {
-  Push(state, arg);
-  Push(state, args...);
+inline void Push(State* state, ArgType&& arg, ArgTypes&&... args) {
+  Push(state, std::forward<ArgType>(arg));
+  Push(state, std::forward<ArgTypes>(args)...);
 }
 
 // The helper function for the tuple version of Push.
 template<typename Tuple, size_t... Indices>
-inline void Push(State* state, const Tuple& packed,
+inline void Push(State* state, Tuple&& packed,
                  internal::IndicesHolder<Indices...>) {
-  Push(state, std::get<Indices>(packed)...);
+  Push(state, std::get<Indices>(std::forward<Tuple>(packed))...);
 }
 
 // Treat std::tuple as unpacked args.
 template<typename... ArgTypes>
-inline void Push(State* state, const std::tuple<ArgTypes...>& packed) {
-  Push(state, packed,
+inline void Push(State* state, std::tuple<ArgTypes...>&& packed) {
+  Push(state, std::forward<std::tuple<ArgTypes...>>(packed),
        typename internal::IndicesGenerator<sizeof...(ArgTypes)>::type());
 }
 
@@ -124,8 +125,9 @@ inline bool To(State* state, int index) {
 
 // Enable getting arbitrary args at the same time.
 template<typename ArgType, typename... ArgTypes>
-inline bool To(State* state, int index, ArgType* arg, const ArgTypes&... args) {
-  return Type<ArgType>::To(state, index, arg) && To(state, index + 1, args...);
+inline bool To(State* state, int index, ArgType* arg, ArgTypes&&... args) {
+  return Type<ArgType>::To(state, index, arg) &&
+         To(state, index + 1, std::forward<ArgTypes>(args)...);
 }
 
 // The helper function for the tuple version of To.

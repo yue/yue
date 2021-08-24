@@ -5,6 +5,8 @@
 #ifndef V8BINDING_PROPERTY_H_
 #define V8BINDING_PROPERTY_H_
 
+#include <utility>
+
 #include "v8binding/prototype.h"
 
 namespace vb {
@@ -195,9 +197,9 @@ template<typename T, typename... ArgTypes>
 inline void SetProperty(v8::Local<v8::Context> context,
                         v8::Local<v8::ObjectTemplate> templ,
                         base::StringPiece key, T ptr,
-                        const ArgTypes&... args) {
+                        ArgTypes&&... args) {
   SetProperty(context, templ, key, ptr);
-  SetProperty(context, templ, args...);
+  SetProperty(context, templ, std::forward<ArgTypes>(args)...);
 }
 
 }  // namespace vb
