@@ -44,6 +44,16 @@ class NATIVEUI_EXPORT Scroll : public View {
   void SetScrollbarPolicy(Policy h_policy, Policy v_policy);
   std::tuple<Policy, Policy> GetScrollbarPolicy() const;
 
+#if defined(OS_MACOSX)
+  enum class Elasticity {
+    Automatic = 0,  // NSScrollElasticityAutomatic = 0
+    None = 1,       // NSScrollElasticityNone = 1
+    Allowed = 2,    // NSScrollElasticityAllowed = 2
+  };
+  void SetScrollElasticity(Elasticity h, Elasticity v);
+  std::tuple<Elasticity, Elasticity> GetScrollElasticity() const;
+#endif
+
   // View:
   const char* GetClassName() const override;
 

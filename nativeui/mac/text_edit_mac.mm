@@ -53,6 +53,7 @@
 
 - (id)initWithShell:(nu::TextEdit*)shell {
   if ((self = [super init])) {
+    self.drawsBackground = NO; // disable super NSScrollView background
     delegate_.reset([[NUTextViewDelegate alloc] initWithShell:shell]);
     textView_.reset([[NSTextView alloc] init]);
     [textView_ setDelegate:delegate_.get()];
@@ -226,6 +227,19 @@ void TextEdit::SetScrollbarPolicy(Scroll::Policy h_policy,
   auto* scroll = static_cast<NSScrollView*>(GetNative());
   scroll.hasHorizontalScroller = h_policy != Scroll::Policy::Never;
   scroll.hasVerticalScroller = v_policy != Scroll::Policy::Never;
+}
+
+void TextEdit::SetScrollElasticity(Scroll::Elasticity h, Scroll::Elasticity v) {
+  auto* scroll = static_cast<NSScrollView*>(GetNative());
+  scroll.horizontalScrollElasticity = static_cast<NSScrollElasticity>(h);
+  scroll.verticalScrollElasticity = static_cast<NSScrollElasticity>(v);
+}
+
+std::tuple<Scroll::Elasticity, Scroll::Elasticity> TextEdit::GetScrollElasticity() const {
+  auto* scroll = static_cast<NSScrollView*>(GetNative());
+  Scroll::Elasticity h = static_cast<Scroll::Elasticity>(scroll.horizontalScrollElasticity);
+  Scroll::Elasticity v = static_cast<Scroll::Elasticity>(scroll.verticalScrollElasticity);
+  return std::make_tuple(h, v);
 }
 
 RectF TextEdit::GetTextBounds() const {
