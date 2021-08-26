@@ -6,6 +6,7 @@
 #include "nativeui/win/notifications/notification_activator.h"
 
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "base/logging.h"
@@ -37,7 +38,8 @@ HRESULT NotificationActivator::Activate(
     inputs.reserve(count);
     for (ULONG i = 0; i < count; ++i)
       inputs.push_back({data[i].Key, data[i].Value});
-    if (center->on_toast_activate.Emit(app_user_model_id, invoked_args, inputs))
+    if (center->on_toast_activate.Emit(app_user_model_id, invoked_args,
+                                       std::move(inputs)))
       return S_OK;
   }
 
@@ -57,7 +59,7 @@ HRESULT NotificationActivator::Activate(
     }
     center->on_notification_reply.Emit(
         base::WideToUTF8(invoked_args).substr(wcslen(kNotificationTypeReply)),
-        reply);
+        std::move(reply));
   }
   return S_OK;
 }

@@ -26,7 +26,7 @@ namespace nu {
 class BrowserImplIE : public BrowserImpl {
  public:
   static bool RegisterProtocol(std::wstring scheme,
-                               const Browser::ProtocolHandler& handler);
+                               Browser::ProtocolHandler handler);
   static void UnregisterProtocol(std::wstring scheme);
 
   BrowserImplIE(Browser::Options options, BrowserHolder* holder);

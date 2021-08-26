@@ -140,7 +140,7 @@ events:
       Emitted when user clicks on an action button of a notification, the custom
       `<!name>action_info` string of the action button is passed.
 
-  - signature: void on_notification_reply(const std::string& info, const std::string& reply)
+  - signature: void on_notification_reply(const std::string& info, std::string reply)
     platform: ['macOS', 'Windows']
     description: |
       Emitted when user sends a text using inline reply in a notification, the
@@ -152,7 +152,7 @@ events:
       passed, i.e. if the app received a notification sent by other instances
       of the app, the `info` will be empty.
 
-  - signature: bool on_toast_activate(const std::wstring& app_user_model_id, const std::wstring& invoked_args, const std::vector<NotificationCenter::InputData>& data)
+  - signature: bool on_toast_activate(std::wstring app_user_model_id, std::wstring invoked_args, std::vector<NotificationCenter::InputData> data)
     platform: ['Windows']
     description: |
       Emitted when the notification activator COM server receives the Activate

@@ -27,12 +27,12 @@ std::map<std::wstring,
 
 // static
 bool BrowserImplIE::RegisterProtocol(std::wstring scheme,
-                                     const Browser::ProtocolHandler& handler) {
+                                     Browser::ProtocolHandler handler) {
   Microsoft::WRL::ComPtr<IInternetSession> session;
   if (FAILED(::CoInternetGetSession(0, &session, 0)))
     return false;
   Microsoft::WRL::ComPtr<BrowserProtocolFactory> factory =
-      new BrowserProtocolFactory(handler);
+      new BrowserProtocolFactory(std::move(handler));
   g_protocol_factories[scheme] = factory;
   session->RegisterNameSpace(factory.Get(),
                              BrowserProtocolFactory::CLSID_BROWSER_PROTOCOL,

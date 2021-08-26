@@ -15,7 +15,7 @@ class BrowserProtocolFactory : public IClassFactory {
  public:
   static const GUID CLSID_BROWSER_PROTOCOL;
 
-  explicit BrowserProtocolFactory(const Browser::ProtocolHandler& handler);
+  explicit BrowserProtocolFactory(Browser::ProtocolHandler handler);
   virtual ~BrowserProtocolFactory();
 
   // IUnknown

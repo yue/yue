@@ -47,7 +47,7 @@ class_methods:
     lang: ['lua', 'js']
     description: Create a new browser view.
 
-  - signature: bool RegisterProtocol(const std::string& scheme, const std::function<ProtocolJob*(const std::string&)>& handler)
+  - signature: bool RegisterProtocol(const std::string& scheme, std::function<ProtocolJob*(std::string)> handler)
     description: Register a custom protocol with `scheme` and `handler`.
     detail: |
       When the browser sends a request with `scheme`, the `handler` will be
@@ -138,13 +138,13 @@ methods:
       By default native bindings are added to the `window` object, by calling
       this API, native bindings will be added to the `window[name]` object.
 
-  - signature: void AddBinding(const std::string& name, const Function& func)
+  - signature: void AddBinding(const std::string& name, Function func)
     lang: ['lua', 'js']
     description: Add a native binding to web page with `name`.
     detail: |
       The `func` will be called with automatically converted arguments.
 
-  - signature: void AddBinding(const std::string& name, const std::function<void(...)>& func)
+  - signature: void AddBinding(const std::string& name, std::function<void(...)> func)
     lang: ['cpp']
     description: Add a native binding to web page with `name`.
     detail: |
@@ -154,7 +154,7 @@ methods:
       For example, following native binding:
 
       ```cpp
-      browser->AddBinding("AddRecord", [](const std::string&key, int value) {
+      browser->AddBinding("AddRecord", [](std::string key, int value) {
       });
       ```
 
@@ -168,7 +168,7 @@ methods:
       You can also use `base::Value` directly to accept arbitrary argument:
 
       ```cpp
-      browser->AddBinding("AddRecord2", [](const std::string&key, base::Value value) {
+      browser->AddBinding("AddRecord2", [](std::string key, base::Value value) {
       })
       ```
 
@@ -182,7 +182,7 @@ methods:
       functions with captures can not have their types deduced automatically, so
       you have to convert them to `std::function` first .
 
-  - signature: void AddRawBinding(const std::string& name, const std::function<void(Browser*, base::Value)>& func)
+  - signature: void AddRawBinding(const std::string& name, std::function<void(Browser*, base::Value)> func)
     description: Add a raw handler to web page with `name`.
     detail: |
       The `func` will be called with a list of arguments passed from JavaScript.
@@ -200,17 +200,17 @@ events:
   - signature: void on_change_loading(Browser* self)
     description: Emitted when the browser starts or stops loading content.
 
-  - signature: void on_update_title(Browser* self, const std::string& title)
+  - signature: void on_update_title(Browser* self, std::string title)
     description: Emitted when document's title is changed.
 
-  - signature: void on_start_navigation(Browser* self, const std::string& url)
+  - signature: void on_start_navigation(Browser* self, std::string url)
     description: Emitted when the browser begins provisional navigation.
 
-  - signature: void on_commit_navigation(Browser* self, const std::string& url)
+  - signature: void on_commit_navigation(Browser* self, std::string url)
     description: Emitted when the browser begins to receive web content.
 
-  - signature: void on_finish_navigation(Browser* self, const std::string& url)
+  - signature: void on_finish_navigation(Browser* self, std::string url)
     description: Emitted when the navigation is complete.
 
-  - signature: void on_fail_navigation(Browser* self, const std::string& url, int code)
+  - signature: void on_fail_navigation(Browser* self, std::string url, int code)
     description: Emitted when the navigation fails.

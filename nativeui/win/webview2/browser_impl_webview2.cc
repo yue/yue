@@ -34,17 +34,6 @@ base::FilePath GetUserDataDir() {
 
 }  // namespace
 
-// static
-bool BrowserImplWebview2::RegisterProtocol(
-    std::wstring scheme,
-    const Browser::ProtocolHandler& handler) {
-  return false;
-}
-
-// static
-void BrowserImplWebview2::UnregisterProtocol(std::wstring scheme) {
-}
-
 BrowserImplWebview2::BrowserImplWebview2(Browser::Options options,
                                          BrowserHolder* holder)
     : BrowserImpl(std::move(options), holder),

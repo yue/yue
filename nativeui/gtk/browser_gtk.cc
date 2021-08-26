@@ -317,13 +317,13 @@ void Browser::PlatformUpdateBindings() {
 
 // static
 bool Browser::RegisterProtocol(const std::string& scheme,
-                               const ProtocolHandler& handler) {
+                               ProtocolHandler handler) {
   WebKitWebContext* context = webkit_web_context_get_default();
   webkit_web_context_register_uri_scheme(
       context,
       scheme.c_str(),
       reinterpret_cast<WebKitURISchemeRequestCallback>(&OnProtocolRequest),
-      new ProtocolHandler(handler),
+      new ProtocolHandler(std::move(handler)),
       Delete<ProtocolHandler>);
   return true;
 }

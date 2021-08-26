@@ -50,7 +50,7 @@ class NATIVEUI_EXPORT Container : public View {
   void SetChildBoundsFromCSS();
 
   // Events.
-  Signal<void(Container*, Painter*, const RectF&)> on_draw;
+  Signal<void(Container*, Painter*, RectF)> on_draw;
 
  protected:
   ~Container() override;

@@ -18,7 +18,7 @@ namespace nu {
 
 class NATIVEUI_EXPORT Browser : public View {
  public:
-  using ProtocolHandler = std::function<ProtocolJob*(const std::string&)>;
+  using ProtocolHandler = std::function<ProtocolJob*(std::string)>;
   using ExecutionCallback = std::function<void(bool, base::Value)>;
   using BindingFunc = std::function<void(Browser*, base::Value)>;
 
@@ -45,7 +45,7 @@ class NATIVEUI_EXPORT Browser : public View {
 
   // Protocol APIs.
   static bool RegisterProtocol(const std::string& scheme,
-                               const ProtocolHandler& handler);
+                               ProtocolHandler handler);
   static void UnregisterProtocol(const std::string& scheme);
 
   // View:
@@ -78,12 +78,11 @@ class NATIVEUI_EXPORT Browser : public View {
   // Automatically deduce argument types.
   template<typename Sig>
   void AddBinding(const std::string& name, std::function<Sig> func) {
-    auto binding = [func = std::move(func)](nu::Browser* browser,
-                                            base::Value args) mutable{
+    AddRawBinding(name, [func = std::move(func)](nu::Browser* browser,
+                                                 base::Value args) {
       internal::Dispatcher<Sig>::DispatchToCallback(
           func, browser, std::move(args));
-    };
-    AddRawBinding(name, binding);
+    });
   }
   // Automatically convert function pointer to std::function.
   template<typename T>
@@ -96,11 +95,11 @@ class NATIVEUI_EXPORT Browser : public View {
   Signal<void(Browser*)> on_close;
   Signal<void(Browser*)> on_update_command;
   Signal<void(Browser*)> on_change_loading;
-  Signal<void(Browser*, const std::string&)> on_update_title;
-  Signal<void(Browser*, const std::string&)> on_start_navigation;
-  Signal<void(Browser*, const std::string&)> on_commit_navigation;
-  Signal<void(Browser*, const std::string&, int)> on_fail_navigation;
-  Signal<void(Browser*, const std::string&)> on_finish_navigation;
+  Signal<void(Browser*, std::string)> on_update_title;
+  Signal<void(Browser*, std::string)> on_start_navigation;
+  Signal<void(Browser*, std::string)> on_commit_navigation;
+  Signal<void(Browser*, std::string, int)> on_fail_navigation;
+  Signal<void(Browser*, std::string)> on_finish_navigation;
 
   // Internal: Called from web pages to invoke native bindings.
   bool InvokeBindings(const std::string& json_arg);

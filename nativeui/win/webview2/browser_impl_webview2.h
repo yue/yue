@@ -19,10 +19,6 @@ namespace nu {
 
 class BrowserImplWebview2 : public BrowserImpl {
  public:
-  static bool RegisterProtocol(std::wstring scheme,
-                               const Browser::ProtocolHandler& handler);
-  static void UnregisterProtocol(std::wstring scheme);
-
   BrowserImplWebview2(Browser::Options options, BrowserHolder* holder);
   ~BrowserImplWebview2() override;
 

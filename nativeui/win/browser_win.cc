@@ -280,18 +280,13 @@ void Browser::PlatformUpdateBindings() {
 
 // static
 bool Browser::RegisterProtocol(const std::string& scheme,
-                               const ProtocolHandler& handler) {
-#if defined(WEBVIEW2_SUPPORT)
-  BrowserImplWebview2::RegisterProtocol(base::UTF8ToWide(scheme), handler);
-#endif
-  return BrowserImplIE::RegisterProtocol(base::UTF8ToWide(scheme), handler);
+                               ProtocolHandler handler) {
+  return BrowserImplIE::RegisterProtocol(base::UTF8ToWide(scheme),
+                                         std::move(handler));
 }
 
 // static
 void Browser::UnregisterProtocol(const std::string& scheme) {
-#if defined(WEBVIEW2_SUPPORT)
-  BrowserImplWebview2::UnregisterProtocol(base::UTF8ToWide(scheme));
-#endif
   return BrowserImplIE::UnregisterProtocol(base::UTF8ToWide(scheme));
 }
 

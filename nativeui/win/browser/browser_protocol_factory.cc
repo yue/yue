@@ -7,6 +7,8 @@
 #include <shlwapi.h>
 #include <wrl.h>
 
+#include <utility>
+
 #include "nativeui/win/browser/browser_protocol.h"
 
 namespace nu {
@@ -23,9 +25,9 @@ const GUID BrowserProtocolFactory::CLSID_BROWSER_PROTOCOL =
       { 0x85, 0x35, 0x23, 0x32, 0xfb, 0x91, 0x73, 0x96 } };
 
 BrowserProtocolFactory::BrowserProtocolFactory(
-    const Browser::ProtocolHandler& handler)
+    Browser::ProtocolHandler handler)
     : ref_(0),
-      handler_(handler) {
+      handler_(std::move(handler)) {
 }
 
 BrowserProtocolFactory::~BrowserProtocolFactory() {

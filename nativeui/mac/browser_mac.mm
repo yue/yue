@@ -316,9 +316,9 @@ void Browser::PlatformUpdateBindings() {
 
 // static
 bool Browser::RegisterProtocol(const std::string& scheme,
-                               const ProtocolHandler& handler) {
+                               ProtocolHandler handler) {
   return [NUCustomProtocol registerProtocol:base::SysUTF8ToNSString(scheme)
-                                withHandler:handler];
+                                withHandler:std::move(handler)];
 }
 
 // static
