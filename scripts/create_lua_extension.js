@@ -58,7 +58,7 @@ if (hostCpu == targetCpu) {
 // Generate a name conforming lua's convention.
 let luaName = 'luajit'
 if (runtime == 'lua')
-  luaName = 'lua_ ' + luaver.substring(1, luaver.lastIndexOf('.'))
+  luaName = 'lua_' + luaver.substring(1, luaver.lastIndexOf('.'))
 
 // Create zip archive of the module.
 fs.ensureDirSync('out/Dist')
