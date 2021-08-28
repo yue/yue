@@ -48,6 +48,12 @@ class NATIVEUI_EXPORT TextEdit : public View {
 #endif
   void SetScrollbarPolicy(Scroll::Policy h_policy, Scroll::Policy v_policy);
 
+#if defined(OS_MACOSX)
+  void SetScrollElasticity(Scroll::Elasticity h, Scroll::Elasticity v);
+  std::tuple<Scroll::Elasticity, Scroll::Elasticity> GetScrollElasticity()
+      const;
+#endif
+
   RectF GetTextBounds() const;
 
   // Events.

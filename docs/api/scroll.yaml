@@ -61,3 +61,18 @@ methods:
   - signature: std::tuple<Scroll::Policy, Scroll::Policy> GetScrollbarPolicy() const
     description: |
       Return the display policy of horizontal and vertical scrollbars.
+
+  - signature: void SetScrollElasticity(Scroll::Elasticity helasticity, Scroll::Elasticity velasticity)
+    platform: ['macOS']
+    description: |
+      Set horizontal and vertical scroll elasticity (bounce).
+    parameters:
+      helasticity:
+        description: Horizontal scroll elasticity.
+      velasticity:
+        description: Vertical scroll elasticity.
+
+  - signature: std::tuple<Scroll::Elasticity, Scroll::Elasticity> GetScrollElasticity() const
+    platform: ['macOS']
+    description: |
+      Return the horizontal and vertical scroll elasticity.

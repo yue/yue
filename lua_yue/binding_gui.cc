@@ -2200,6 +2200,38 @@ struct Type<nu::Scroll::Policy> {
   }
 };
 
+#if defined(OS_MAC)
+template<>
+struct Type<nu::Scroll::Elasticity> {
+  static constexpr const char* name = "ScrollElasticity";
+  static inline bool To(State* state, int index, nu::Scroll::Elasticity* out) {
+    std::string elasticity;
+    if (!lua::To(state, index, &elasticity))
+      return false;
+    if (elasticity == "automatic") {
+      *out = nu::Scroll::Elasticity::Automatic;
+      return true;
+    } else if (elasticity == "none") {
+      *out = nu::Scroll::Elasticity::None;
+      return true;
+    } else if (elasticity == "allowed") {
+      *out = nu::Scroll::Elasticity::Allowed;
+      return true;
+    } else {
+      return false;
+    }
+  }
+  static inline void Push(State* state, nu::Scroll::Elasticity elasticity) {
+    if (elasticity == nu::Scroll::Elasticity::Automatic)
+      lua::Push(state, "automatic");
+    else if (elasticity == nu::Scroll::Elasticity::None)
+      lua::Push(state, "none");
+    else
+      lua::Push(state, "allowed");
+  }
+};
+#endif
+
 template<>
 struct Type<nu::Scroll> {
   using base = nu::View;
@@ -2213,8 +2245,12 @@ struct Type<nu::Scroll> {
            RefMethod(&nu::Scroll::SetContentView, RefType::Reset, "content"),
            "getcontentview", &nu::Scroll::GetContentView,
 #if !defined(OS_WIN)
-           "setOverlayScrollbar", &nu::Scroll::SetOverlayScrollbar,
-           "isOverlayScrollbar", &nu::Scroll::IsOverlayScrollbar,
+           "setoverlayscrollbar", &nu::Scroll::SetOverlayScrollbar,
+           "isoverlayscrollbar", &nu::Scroll::IsOverlayScrollbar,
+#endif
+#if defined(OS_MAC)
+           "setscrollelasticity", &nu::Scroll::SetScrollElasticity,
+           "getscrollelasticity", &nu::Scroll::GetScrollElasticity,
 #endif
            "setscrollbarpolicy", &nu::Scroll::SetScrollbarPolicy,
            "getscrollbarpolicy", &nu::Scroll::GetScrollbarPolicy);
@@ -2442,6 +2478,10 @@ struct Type<nu::TextEdit> {
            "setoverlayscrollbar", &nu::TextEdit::SetOverlayScrollbar,
 #endif
            "setscrollbarpolicy", &nu::TextEdit::SetScrollbarPolicy,
+#if defined(OS_MAC)
+           "setscrollelasticity", &nu::TextEdit::SetScrollElasticity,
+           "getscrollelasticity", &nu::TextEdit::GetScrollElasticity,
+#endif
            "gettextbounds", &nu::TextEdit::GetTextBounds);
     RawSetProperty(state, metatable,
                    "ontextchange", &nu::TextEdit::on_text_change,

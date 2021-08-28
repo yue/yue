@@ -2506,6 +2506,41 @@ struct Type<nu::Scroll::Policy> {
   }
 };
 
+#if defined(OS_MAC)
+template<>
+struct Type<nu::Scroll::Elasticity> {
+  static constexpr const char* name = "ScrollElasticity";
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   nu::Scroll::Elasticity elasticity) {
+    if (elasticity == nu::Scroll::Elasticity::Automatic)
+      return vb::ToV8(context, "automatic");
+    else if (elasticity == nu::Scroll::Elasticity::None)
+      return vb::ToV8(context, "none");
+    else
+      return vb::ToV8(context, "allowed");
+  }
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::Scroll::Elasticity* out) {
+    std::string elasticity;
+    if (!vb::FromV8(context, value, &elasticity))
+      return false;
+    if (elasticity == "automatic") {
+      *out = nu::Scroll::Elasticity::Automatic;
+      return true;
+    } else if (elasticity == "none") {
+      *out = nu::Scroll::Elasticity::None;
+      return true;
+    } else if (elasticity == "allowed") {
+      *out = nu::Scroll::Elasticity::Allowed;
+      return true;
+    } else {
+      return false;
+    }
+  }
+};
+#endif
+
 template<>
 struct Type<nu::Scroll> {
   using base = nu::View;
@@ -2525,6 +2560,10 @@ struct Type<nu::Scroll> {
 #if !defined(OS_WIN)
         "setOverlayScrollbar", &nu::Scroll::SetOverlayScrollbar,
         "isOverlayScrollbar", &nu::Scroll::IsOverlayScrollbar,
+#endif
+#if defined(OS_MAC)
+        "setScrollElasticity", &nu::Scroll::SetScrollElasticity,
+        "getScrollElasticity", &nu::Scroll::GetScrollElasticity,
 #endif
         "setScrollbarPolicy", &nu::Scroll::SetScrollbarPolicy,
         "getScrollbarPolicy", &nu::Scroll::GetScrollbarPolicy);
@@ -2744,6 +2783,10 @@ struct Type<nu::TextEdit> {
         "setOverlayScrollbar", &nu::TextEdit::SetOverlayScrollbar,
 #endif
         "setScrollbarPolicy", &nu::TextEdit::SetScrollbarPolicy,
+#if defined(OS_MAC)
+        "setScrollElasticity", &nu::TextEdit::SetScrollElasticity,
+        "getScrollElasticity", &nu::TextEdit::GetScrollElasticity,
+#endif
         "getTextBounds", &nu::TextEdit::GetTextBounds);
     SetProperty(context, templ,
                 "onTextChange", &nu::TextEdit::on_text_change,

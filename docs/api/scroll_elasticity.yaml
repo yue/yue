@@ -1,0 +1,11 @@
+name: Scroll::Elasticity
+platform: ['macOS']
+header: nativeui/scroll.h
+type: enum class
+namespace: nu
+description: Scroll elasticity.
+
+enums:
+  - name: Automatic
+  - name: None
+  - name: Allowed

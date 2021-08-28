@@ -107,4 +107,17 @@ std::tuple<Scroll::Policy, Scroll::Policy> Scroll::GetScrollbarPolicy() const {
   return std::make_tuple(h_policy, v_policy);
 }
 
+void Scroll::SetScrollElasticity(Elasticity h, Elasticity v) {
+  auto* scroll = static_cast<NUScroll*>(GetNative());
+  scroll.horizontalScrollElasticity = static_cast<NSScrollElasticity>(h);
+  scroll.verticalScrollElasticity = static_cast<NSScrollElasticity>(v);
+}
+
+std::tuple<Scroll::Elasticity, Scroll::Elasticity> Scroll::GetScrollElasticity() const {
+  auto* scroll = static_cast<NUScroll*>(GetNative());
+  Elasticity h = static_cast<Elasticity>(scroll.horizontalScrollElasticity);
+  Elasticity v = static_cast<Elasticity>(scroll.verticalScrollElasticity);
+  return std::make_tuple(h, v);
+}
+
 }  // namespace nu
