@@ -43,7 +43,9 @@
 
 #sidebar {
   padding-left: 0;
+  padding-right: 45px;
   flex: 0 0 200px;
+  overflow: hidden;
 }
 
 #sidebar ul {
@@ -65,19 +67,38 @@
 
 #index {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
 }
 
 #index .column {
   flex: 1;
-  padding-right: 45px;
 }
 
-#index>.column:last-child {
-  padding-right: 0;
+#index .column.guide ul {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+#index .column.guide ul li {
+  display: inline-block;
+  width: calc(100% / 3);
+}
+
+#index .column.api {
+  display: flex;
+  flex-direction: row;
+}
+
+#index .column.api .column:first-child {
+  padding-right: 45px;
 }
 
 #index ul {
   padding: 0;
   list-style-type: none;
+}
+
+#index li h3 {
+  margin: 16px 0 8px 0;
 }

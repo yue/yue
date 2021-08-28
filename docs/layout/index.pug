@@ -23,19 +23,20 @@ mixin items(filter)
 block content
   h1 Docs Index
   #index
-    .column
+    .column.guide
       h2 Guides
       ul
         each guide in guides
           +item('guides', guide)
 
-    .column
-      h2 Components
-      +items('gui')
+    .column.api
+      .column
+        h2 Components
+        +items('gui')
 
-    .column
-      h2 Structures
-      +items()
+      .column
+        h2 Structures
+        +items()
 
 block sidebar
   h4 Langauge:

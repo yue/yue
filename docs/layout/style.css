@@ -42,12 +42,13 @@ a:hover {
 
 #header .nav {
   position: absolute;
-  right: 45px;
   top: 0;
+  right: 45px;
+  width: 200px;
 }
 
 #header .nav a {
-  margin-left: 30px;
+  margin-right: 30px;
   color: white;
 }
 
