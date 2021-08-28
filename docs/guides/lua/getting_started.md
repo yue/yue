@@ -5,10 +5,10 @@ description: How to use Yue with Lua.
 
 # Getting started
 
-Currently Lua support in Yue is experimental, and a loadable module built
-for Lua 5.3 is provided which can be downloaded from the
+Currently Lua support in Yue is experimental, and loadable modules built
+for Lua 5.1/5.3/5.4 can be downloaded from the
 [Releases](https://github.com/yue/yue/releases) page. The filename is
-`lua_yue_LUA-VERSION_VERSION_PLATFORM_ARCH.zip`.
+`lua_yue_lua_$LUAVERSION_$YUEVERSION_$PLATFORM_$ARCH.zip`.
 
 There are plans on making Yue available in LuaRocks.
 
@@ -18,6 +18,9 @@ Currently only the GUI part of Yue has been provided with Lua bindings, which
 can be loaded via `require('yue.gui')`.
 
 ```lua
+-- Specify where to find yue.gui module.
+package.cpath = '/Path/To/Yue/?.dll;/Path/To/Yue/?.so'
+
 local gui = require('yue.gui')
 
 -- Create window and show it.
@@ -31,3 +34,9 @@ win:activate()
 -- Enter message loop.
 gui.MessageLoop.run()
 ```
+
+### Notes on Windows
+
+Due to using GUI related Win32 APIs in Yue, it is recommended to use the
+`wlua.exe` binaries to load Yue. The normal `lua.exe` binaries are built with
+Console subsystem and may throw DLL errors when using Yue.
