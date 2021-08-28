@@ -2200,7 +2200,7 @@ struct Type<nu::Scroll::Policy> {
   }
 };
 
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
 template<>
 struct Type<nu::Scroll::Elasticity> {
   static constexpr const char* name = "ScrollElasticity";
@@ -2225,7 +2225,7 @@ struct Type<nu::Scroll::Elasticity> {
     if (elasticity == nu::Scroll::Elasticity::Automatic)
       lua::Push(state, "automatic");
     else if (elasticity == nu::Scroll::Elasticity::None)
-      lua::Push(state, "never");
+      lua::Push(state, "none");
     else
       lua::Push(state, "allowed");
   }
@@ -2245,10 +2245,10 @@ struct Type<nu::Scroll> {
            RefMethod(&nu::Scroll::SetContentView, RefType::Reset, "content"),
            "getcontentview", &nu::Scroll::GetContentView,
 #if !defined(OS_WIN)
-           "setOverlayScrollbar", &nu::Scroll::SetOverlayScrollbar,
-           "isOverlayScrollbar", &nu::Scroll::IsOverlayScrollbar,
+           "setoverlayscrollbar", &nu::Scroll::SetOverlayScrollbar,
+           "isoverlayscrollbar", &nu::Scroll::IsOverlayScrollbar,
 #endif
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
            "setscrollelasticity", &nu::Scroll::SetScrollElasticity,
            "getscrollelasticity", &nu::Scroll::GetScrollElasticity,
 #endif
@@ -2478,7 +2478,7 @@ struct Type<nu::TextEdit> {
            "setoverlayscrollbar", &nu::TextEdit::SetOverlayScrollbar,
 #endif
            "setscrollbarpolicy", &nu::TextEdit::SetScrollbarPolicy,
-#if defined(OS_MACOSX)
+#if defined(OS_MAC)
            "setscrollelasticity", &nu::TextEdit::SetScrollElasticity,
            "getscrollelasticity", &nu::TextEdit::GetScrollElasticity,
 #endif
