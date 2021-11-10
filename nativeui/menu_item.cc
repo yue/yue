@@ -27,17 +27,24 @@ struct {
   KeyboardCode key;
   int mask;
 } g_roles_map[] = {
-  { "Copy",       VKEY_C, CONTROL_OR_COMMAND },
-  { "Cut",        VKEY_X, CONTROL_OR_COMMAND },
-  { "Paste",      VKEY_V, CONTROL_OR_COMMAND },
-  { "Select All", VKEY_A, CONTROL_OR_COMMAND },
-  { "Undo",       VKEY_Z, CONTROL_OR_COMMAND },
-  { "Redo",       VKEY_Z, CONTROL_OR_COMMAND | MASK_SHIFT },
+  { "Copy",         VKEY_C, CONTROL_OR_COMMAND },
+  { "Cut",          VKEY_X, CONTROL_OR_COMMAND },
+  { "Paste",        VKEY_V, CONTROL_OR_COMMAND },
+  { "Select All",   VKEY_A, CONTROL_OR_COMMAND },
+  { "Undo",         VKEY_Z, CONTROL_OR_COMMAND },
+  { "Redo",         VKEY_Z, CONTROL_OR_COMMAND | MASK_SHIFT },
+  { "Minimize",     VKEY_M, CONTROL_OR_COMMAND },
 #if defined(OS_MAC)
-  { "About",       VKEY_UNKNOWN, 0 },
-  { "Hide",        VKEY_H, CONTROL_OR_COMMAND },
-  { "Hide Others", VKEY_H, CONTROL_OR_COMMAND | MASK_ALT },
-  { "Unhide",      VKEY_UNKNOWN, 0 },
+  { "Zoom",         VKEY_UNKNOWN, 0 },
+#else
+  { "Maximize",     VKEY_UNKNOWN, 0 },
+#endif
+  { "Close Window", VKEY_W, CONTROL_OR_COMMAND },
+#if defined(OS_MAC)
+  { "About",        VKEY_UNKNOWN, 0 },
+  { "Hide",         VKEY_H, CONTROL_OR_COMMAND },
+  { "Hide Others",  VKEY_H, CONTROL_OR_COMMAND | MASK_ALT },
+  { "Unhide",       VKEY_UNKNOWN, 0 },
 #endif
 };
 

@@ -21,7 +21,7 @@ namespace {
 struct {
   const gchar* stock_id;
   const char* webkit_command;
-} g_stock_map[] = {
+} g_edit_map[] = {
   { GTK_STOCK_COPY, WEBKIT_EDITING_COMMAND_COPY },
   { GTK_STOCK_CUT, WEBKIT_EDITING_COMMAND_CUT },
   { GTK_STOCK_PASTE, WEBKIT_EDITING_COMMAND_PASTE },
@@ -31,11 +31,11 @@ struct {
 };
 
 static_assert(
-    base::size(g_stock_map) == static_cast<size_t>(MenuItem::Role::ItemCount),
-    "Stock items should map the roles");
+    base::size(g_edit_map) == static_cast<size_t>(MenuItem::Role::Redo) + 1,
+    "Stock edit items should map the roles");
 
-// Handling stock item clicking.
-void OnStockClick(GtkWidget*, MenuItem* item) {
+// Handling role item clicking.
+void OnRoleClick(GtkWidget*, MenuItem* item) {
   if (item->GetRole() >= MenuItem::Role::ItemCount)
     return;
   // Get the window.
@@ -45,15 +45,29 @@ void OnStockClick(GtkWidget*, MenuItem* item) {
   Window* window = static_cast<MenuBar*>(menu)->GetWindow();
   if (!window)
     return;
+  // Window roles.
+  switch (item->GetRole()) {
+    case MenuItem::Role::Minimize:
+      window->Minimize();
+      return;
+    case MenuItem::Role::Maximize:
+      window->Maximize();
+      return;
+    case MenuItem::Role::CloseWindow:
+      window->Close();
+      return;
+    default:
+      break;
+  }
   // Get the focused widget.
   GtkWidget* widget = gtk_window_get_focus(window->GetNative());
   if (!widget)
     return;
-
+  // Edit roles.
   if (WEBKIT_IS_WEB_VIEW(widget)) {
     webkit_web_view_execute_editing_command(
         WEBKIT_WEB_VIEW(widget),
-        g_stock_map[static_cast<int>(item->GetRole())].webkit_command);
+        g_edit_map[static_cast<int>(item->GetRole())].webkit_command);
   } else {
     switch (item->GetRole()) {
       case MenuItem::Role::Copy:
@@ -143,11 +157,10 @@ bool MenuItem::IsVisible() const {
 void MenuItem::PlatformInit() {
   GtkWidget* item;
   GtkStockItem stock;
-  if (role_ < Role::ItemCount &&
-      gtk_stock_lookup(g_stock_map[static_cast<int>(role_)].stock_id, &stock)) {
+  if (role_ <= Role::Redo &&
+      gtk_stock_lookup(g_edit_map[static_cast<int>(role_)].stock_id, &stock)) {
     // Create item from the stock.
     item = gtk_image_menu_item_new_from_stock(stock.stock_id, nullptr);
-    g_signal_connect(item, "activate", G_CALLBACK(OnStockClick), this);
     SetAccelerator(Accelerator(static_cast<KeyboardCode>(stock.keyval),
                                stock.modifier));
   } else {
@@ -158,8 +171,12 @@ void MenuItem::PlatformInit() {
       case Type::Checkbox: item = gtk_check_menu_item_new(); break;
       case Type::Separator: item = gtk_separator_menu_item_new(); break;
     }
-    g_signal_connect(item, "activate", G_CALLBACK(OnItemClick), this);
   }
+
+  if (role_ < Role::ItemCount)
+    g_signal_connect(item, "activate", G_CALLBACK(OnRoleClick), this);
+  else
+    g_signal_connect(item, "activate", G_CALLBACK(OnItemClick), this);
 
   gtk_widget_show(item);
   g_object_ref_sink(item);

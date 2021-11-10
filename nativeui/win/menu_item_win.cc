@@ -28,11 +28,25 @@ void OnRoleClick(MenuItem* self) {
   Window* window = static_cast<MenuBar*>(menu)->GetWindow();
   if (!window)
     return;
+  // Window roles.
+  switch (self->GetRole()) {
+    case MenuItem::Role::Minimize:
+      window->Minimize();
+      return;
+    case MenuItem::Role::Maximize:
+      window->Maximize();
+      return;
+    case MenuItem::Role::CloseWindow:
+      window->Close();
+      return;
+    default:
+      break;
+  }
   // Get the focused widget.
   ViewImpl* view = window->GetNative()->focus_manager()->focused_view();
   if (!view)
     return;
-  // Only supports Edit widgets.
+  // Edit roles.
   if (view->type() != ControlType::Subwin)
     return;
   HWND hwnd = static_cast<SubwinView*>(view)->hwnd();

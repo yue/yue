@@ -41,7 +41,7 @@ class NATIVEUI_EXPORT MenuItem : public base::RefCounted<MenuItem> {
   };
 
   enum class Role {
-    // Item roles.
+    // Edit roles.
     // menu_item_gtk.cc should be updated when new roles are added.
     Copy,
     Cut,
@@ -49,6 +49,10 @@ class NATIVEUI_EXPORT MenuItem : public base::RefCounted<MenuItem> {
     SelectAll,
     Undo,
     Redo,
+    // Window roles.
+    Minimize,
+    Maximize,
+    CloseWindow,
 #if defined(OS_MAC)
     // macOS only roles.
     About,

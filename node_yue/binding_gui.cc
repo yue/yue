@@ -1370,6 +1370,12 @@ struct Type<nu::MenuItem::Role> {
       *out = nu::MenuItem::Role::Undo;
     else if (role == "redo")
       *out = nu::MenuItem::Role::Redo;
+    else if (role == "minimize")
+      *out = nu::MenuItem::Role::Minimize;
+    else if (role == "maximize")
+      *out = nu::MenuItem::Role::Maximize;
+    else if (role == "close-window")
+      *out = nu::MenuItem::Role::CloseWindow;
 #if defined(OS_MAC)
     else if (role == "about")
       *out = nu::MenuItem::Role::About;

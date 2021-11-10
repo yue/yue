@@ -17,6 +17,9 @@ enums:
   - name: SelectAll
   - name: Undo
   - name: Redo
+  - name: Minimize
+  - name: Maximize
+  - name: CloseWindow
   - name: About
     description: Only available on macOS.
   - name: Hide
