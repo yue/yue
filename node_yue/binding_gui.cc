@@ -2221,6 +2221,10 @@ struct Type<nu::Browser> {
         "getURL", &nu::Browser::GetURL,
         "getTitle", &nu::Browser::GetTitle,
         "setUserAgent", &nu::Browser::SetUserAgent,
+#if defined(OS_MAC)
+        "isMagnifiable", &nu::Browser::IsMagnifiable,
+        "setMagnifiable", &nu::Browser::SetMagnifiable,
+#endif
         "executeJavaScript", &nu::Browser::ExecuteJavaScript,
         "goBack", &nu::Browser::GoBack,
         "canGoBack", &nu::Browser::CanGoBack,

@@ -59,6 +59,10 @@ class NATIVEUI_EXPORT Browser : public View {
   std::string GetURL();
   std::string GetTitle();
   void SetUserAgent(const std::string& user_agent);
+#if defined(OS_MAC)
+  bool IsMagnifiable() const;
+  void SetMagnifiable(bool magnifiable);
+#endif
   void ExecuteJavaScript(const std::string& code,
                          const ExecutionCallback& callback);
 

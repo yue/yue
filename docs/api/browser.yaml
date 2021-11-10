@@ -94,6 +94,14 @@ methods:
 
       This API is not supported on Windows with WebView2 backend.
 
+  - signature: bool IsMagnifiable() const
+    platform: ['macOS']
+    description: Return whether page's magnification can be changed with gestures.
+
+  - signature: void SetMagnifiable(bool magnifiable)
+    platform: ['macOS']
+    description: Set whether page's magnification can be changed with gestures.
+
   - signature: void ExecuteJavaScript(const std::string& code, const std::function<void(bool, base::Value)>& callback);
     description: Evaluate `code` in browser and get the evaluated result.
     detail: |

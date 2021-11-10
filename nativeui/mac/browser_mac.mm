@@ -264,6 +264,16 @@ void Browser::SetUserAgent(const std::string& user_agent) {
   [webview setCustomUserAgent:base::SysUTF8ToNSString(user_agent)];
 }
 
+bool Browser::IsMagnifiable() const {
+  auto* webview = static_cast<NUWebView*>(GetNative());
+  return [webview allowsMagnification];
+}
+
+void Browser::SetMagnifiable(bool magnifiable) {
+  auto* webview = static_cast<NUWebView*>(GetNative());
+  [webview setAllowsMagnification:magnifiable];
+}
+
 void Browser::ExecuteJavaScript(const std::string& code,
                                 const ExecutionCallback& callback) {
   auto* webview = static_cast<NUWebView*>(GetNative());
