@@ -259,6 +259,30 @@ struct Type<nu::Accelerator> {
   }
 };
 
+#if defined(OS_MAC)
+template<>
+struct Type<nu::Lifetime::Reply> {
+  static constexpr const char* name = "Lifetime::Reply";
+  static inline bool To(State* state, int index, nu::Lifetime::Reply* out) {
+    std::string reply;
+    if (!lua::To(state, index, &reply))
+      return false;
+    if (reply == "success") {
+      *out = nu::Lifetime::Reply::Success;
+      return true;
+    } else if (reply == "cancel") {
+      *out = nu::Lifetime::Reply::Cancel;
+      return true;
+    } else if (reply == "failure") {
+      *out = nu::Lifetime::Reply::Failure;
+      return true;
+    } else {
+      return false;
+    }
+  }
+};
+#endif
+
 template<>
 struct Type<nu::Lifetime> {
   static constexpr const char* name = "Lifetime";
@@ -266,7 +290,8 @@ struct Type<nu::Lifetime> {
 #if defined(OS_MAC)
     RawSetProperty(state, index,
                    "onready", &nu::Lifetime::on_ready,
-                   "onactivate", &nu::Lifetime::on_activate);
+                   "onactivate", &nu::Lifetime::on_activate,
+                   "openfiles", &nu::Lifetime::open_files);
 #endif
   }
 };

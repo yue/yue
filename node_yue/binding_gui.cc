@@ -276,6 +276,32 @@ struct Type<nu::Accelerator> {
   }
 };
 
+#if defined(OS_MAC)
+template<>
+struct Type<nu::Lifetime::Reply> {
+  static constexpr const char* name = "LifetimeReply";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::Lifetime::Reply* out) {
+    std::string reply;
+    if (!vb::FromV8(context, value, &reply))
+      return false;
+    if (reply == "success") {
+      *out = nu::Lifetime::Reply::Success;
+      return true;
+    } else if (reply == "cancel") {
+      *out = nu::Lifetime::Reply::Cancel;
+      return true;
+    } else if (reply == "failure") {
+      *out = nu::Lifetime::Reply::Failure;
+      return true;
+    } else {
+      return false;
+    }
+  }
+};
+#endif
+
 template<>
 struct Type<nu::Lifetime> {
   static constexpr const char* name = "Lifetime";
@@ -286,7 +312,8 @@ struct Type<nu::Lifetime> {
 #if defined(OS_MAC)
     SetProperty(context, templ,
                 "onReady", &nu::Lifetime::on_ready,
-                "onActivate", &nu::Lifetime::on_activate);
+                "onActivate", &nu::Lifetime::on_activate,
+                "openFiles", &nu::Lifetime::open_files);
 #endif
   }
 };

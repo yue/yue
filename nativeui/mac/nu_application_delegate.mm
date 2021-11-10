@@ -44,4 +44,18 @@
   return NO;
 }
 
+- (void)application:(NSApplication*)sender openFiles:(NSArray*)filenames {
+  if (!shell_->open_files) {
+    [sender replyToOpenOrPrint:NSApplicationDelegateReplyCancel];
+    return;
+  }
+
+  std::vector<base::FilePath> paths;
+  paths.reserve([filenames count]);
+  for (NSString* file in filenames)
+    paths.push_back(base::FilePath([file fileSystemRepresentation]));
+  auto reply = shell_->open_files(std::move(paths));
+  [sender replyToOpenOrPrint:static_cast<NSApplicationDelegateReply>(reply)];
+}
+
 @end

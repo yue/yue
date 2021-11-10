@@ -30,3 +30,11 @@ events:
       Emitted when received `applicationShouldHandleReopen` notification and
       there is no visible windows. This usually happens when the app is
       activated by Finder, or user clicks on the dock icon.
+
+delegates:
+  - signature: Lifetime::Reply open_files(std::vector<base::FilePath> files)
+    platform: ['macOS']
+    description: Called when received message to open files.
+    detail: |
+      This delegate method is usually called when the app is used to open files
+      with double clicking, or when files are dropped onto the app's dock icon.

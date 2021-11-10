@@ -1,0 +1,10 @@
+name: Lifetime::Reply
+header: nativeui/lifetime.h
+type: enum class
+namespace: nu
+description: Return type of `<!name>open_files`.
+
+enums:
+  - name: Success
+  - name: Cancel
+  - name: Failure
