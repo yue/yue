@@ -11,7 +11,7 @@
 
 @interface NUCustomProtocol : NSURLProtocol {
  @private
-  scoped_refptr<nu::ProtocolJob> protocol_job_;
+  nu::ProtocolJob* protocol_job_;
 }
 + (bool)registerProtocol:(NSString*)scheme
              withHandler:(nu::Browser::ProtocolHandler)handler;

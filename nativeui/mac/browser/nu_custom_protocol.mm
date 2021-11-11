@@ -69,6 +69,17 @@ base::Lock g_lock;
   return request;
 }
 
+- (void)dealloc {
+  if (protocol_job_) {
+    // Release the job in main thread.
+    __block nu::ProtocolJob* job = protocol_job_;
+    dispatch_async(dispatch_get_main_queue(), ^{
+      job->Release();
+    });
+  }
+  [super dealloc];
+}
+
 - (void)startLoading {
   // Create job in main thread.
   __block nu::ProtocolJob* job = nullptr;
@@ -83,8 +94,10 @@ base::Lock g_lock;
       if (it != g_handlers.end())
         handler = it->second;
     }
-    if (handler)
+    if (handler) {
       job = handler(url);
+      job->AddRef();
+    }
     // Wake up the thread that waits for the job.
     dispatch_semaphore_signal(semaphore);
   });
