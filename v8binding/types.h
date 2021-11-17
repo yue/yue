@@ -18,6 +18,10 @@
 #include "v8.h"  // NOLINT(build/include)
 #include "v8binding/template_util.h"
 
+#if defined(OS_WIN)
+#include "base/strings/string_util_win.h"
+#endif
+
 namespace vb {
 
 template<typename T, typename Enable = void>
@@ -141,6 +145,33 @@ struct Type<std::string> {
 };
 
 template<>
+struct Type<std::u16string> {
+  static constexpr const char* name = "String";
+  static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                          const std::u16string& value) {
+    return v8::String::NewFromTwoByte(
+        context->GetIsolate(),
+        reinterpret_cast<const uint16_t*>(value.data()),
+        v8::NewStringType::kNormal,
+        value.size()).ToLocalChecked();
+  }
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     std::u16string* out) {
+    if (!value->IsString())
+      return false;
+    v8::Local<v8::String> str = v8::Local<v8::String>::Cast(value);
+    int length = str->Length();
+    // Note that the reinterpret cast is because on Windows string16 is an alias
+    // to wstring, and hence has character type wchar_t not uint16_t.
+    str->Write(context->GetIsolate(),
+               reinterpret_cast<uint16_t*>(base::WriteInto(out, length + 1)), 0,
+               length);
+    return true;
+  }
+};
+
+template<>
 struct Type<const char*> {
   static constexpr const char* name = "String";
   static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
@@ -175,31 +206,41 @@ struct Type<base::StringPiece> {
   }
 };
 
+#if defined(OS_WIN)
+template<>
+struct Type<base::StringPiece16> {
+  static constexpr const char* name = "String";
+  static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                          base::StringPiece16 value) {
+    return v8::String::NewFromTwoByte(
+        context->GetIsolate(),
+        reinterpret_cast<const uint16_t*>(value.data()),
+        v8::NewStringType::kNormal,
+        value.size()).ToLocalChecked();
+  }
+};
+
 template<>
 struct Type<std::wstring> {
   static constexpr const char* name = "String";
   static inline v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                           const std::wstring& value) {
-    return v8::String::NewFromTwoByte(
-        context->GetIsolate(),
-        reinterpret_cast<const uint16_t*>(value.data()),
-        v8::NewStringType::kNormal,
-        static_cast<uint32_t>(value.length())).ToLocalChecked();
+    return Type<base::StringPiece16>::ToV8(context,
+                                           base::AsStringPiece16(value));
   }
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      std::wstring* out) {
     if (!value->IsString())
       return false;
-    v8::Local<v8::String> str = v8::Local<v8::String>::Cast(value);
-    int length = str->Length();
-    out->reserve(length + 1);
-    out->resize(length);
-    str->Write(context->GetIsolate(),
-               reinterpret_cast<uint16_t*>(&((*str)[0])), 0, length);
+    std::u16string str;
+    if (!Type<std::u16string>::FromV8(context, value, &str))
+      return false;
+    *out = base::AsWString(str);
     return true;
   }
 };
+#endif
 
 template<typename T>
 struct Type<absl::optional<T>> {
@@ -411,13 +452,13 @@ inline v8::Local<v8::String> ToV8Symbol(v8::Local<v8::Context> context,
 
 // Helper to throw errors.
 inline void ThrowTypeError(v8::Local<v8::Context> context,
-                           const base::StringPiece& message) {
+                           base::StringPiece message) {
   context->GetIsolate()->ThrowException(v8::Exception::TypeError(
       ToV8(context, message).As<v8::String>()));
 }
 
 inline void ThrowError(v8::Isolate* isolate,
-                       const base::StringPiece& message) {
+                       base::StringPiece message) {
   isolate->ThrowException(v8::Exception::Error(
       v8::String::NewFromUtf8(
           isolate,
