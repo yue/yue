@@ -265,30 +265,6 @@ void Window::PlatformSetContentView(View* view) {
   }
 }
 
-void Window::Center() {
-  // gtk_window_set_position can not be used together with gtk_window_move,
-  // the latter always takes priority no mater which one is called later.
-  GdkScreen* screen = gtk_window_get_screen(window_);
-  if (!screen)
-    screen = gdk_screen_get_default();
-  if (!screen)
-    return;
-
-  int monitor = gdk_screen_get_primary_monitor(screen);
-  GdkRectangle area;
-  gdk_screen_get_monitor_geometry(screen, monitor, &area);
-
-  RectF bounds(GetBounds());
-  bounds.set_x((area.width - bounds.width()) / 2 + area.x);
-  bounds.set_y((area.height - bounds.height()) / 2 + area.y);
-  if (bounds.x() < area.x)
-    bounds.set_x(area.x);
-  if (bounds.y() < area.y)
-    bounds.set_y(area.y);
-
-  SetBounds(bounds);
-}
-
 void Window::SetContentSize(const SizeF& size) {
   // Menubar is part of client area in GTK.
   ResizeWindow(window_, IsResizable(),

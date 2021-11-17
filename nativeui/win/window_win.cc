@@ -843,14 +843,6 @@ void Window::PlatformSetContentView(View* view) {
   view->SetPixelBounds(Rect(window_->GetContentPixelBounds().size()));
 }
 
-void Window::Center() {
-  Rect bounds = window_->GetPixelBounds();
-  int x = (::GetSystemMetrics(SM_CXSCREEN) - bounds.width()) / 2;
-  int y = (::GetSystemMetrics(SM_CYSCREEN) - bounds.height()) / 2;
-  ::SetWindowPos(window_->hwnd(), NULL, x, y, 0, 0,
-                 SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOREDRAW);
-}
-
 void Window::SetContentSize(const SizeF& size) {
   Size psize = ToRoundedSize(ScaleSize(size, window_->scale_factor()));
   if (HasFrame())
