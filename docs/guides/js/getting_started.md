@@ -95,19 +95,6 @@ recommended to use Yue in renderer process.
 Also on Linux, due to GTK+ only getting initialized after the `ready` event
 of `app` gets emitted, you should only use Yue by then.
 
-#### Garbage collection in the main script
-
-When using Node.js to run code, the whole program will block at the
-`gui.MessageLoop.run()` call, and the local variables defined in the main script
-will not be garbage collected.
-
-When using Yode to run code, the execution of the main script will finish
-immediately, and the local variables will be garbage collected as usual.
-
-So you might notice some windows disappearing after running for some time when
-using Yode, this is because the JavaScript objects of the windows got garbage
-collected.
-
 #### Why other GUI toolkit bindings do not work
 
 Having read so far, you might have understood why people were not using Node.js

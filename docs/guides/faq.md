@@ -27,6 +27,40 @@ There were lots of good GUI toolkits, but I could not find one that meets all ab
 
 Unless you have modified Yue's source code and linked your project with Yue statically, there is no requirements on which license your project should use.
 
+### Window disappears after some time when using Yode.
+
+You might notice `Window` or `Tray` instances disappearing after running for some time when using Yode, this is usually because the JavaScript objects of those instances got garbage collected.
+
+```js
+const win = gui.Window.create({})
+win.activate()
+if (!process.versions.yode && !process.versions.electron) {
+  gui.MessageLoop.run()
+  process.exit(0)
+}
+```
+
+When using Node.js to run code, the whole program will block at the `gui.MessageLoop.run()` call, and the local variables defined in the main script will not be garbage collected, i.e. the `win` object will live until the program quits.
+
+However when switching to Yode, the execution of the main script will finish immediately, and the local variables will be garbage collected as usual, i.e. the `win` object will be garbage collected after some time and the window will disappear.
+
+For simple apps you can fix it by declaring the main window as a global variable.
+
+```js
+global.mainWindow = gui.Window.create({})
+mainWindow.activate()
+```
+
+For multi-window apps it is recommended to manage the windows with a global map.
+
+```js
+global.windowManager = new Set()
+const win = gui.Window.create({})
+windowManager.add(win)
+win.onClose = () => windowManager.delete(win)
+mainWindow.activate()
+```
+
 ### What's the minimum version of Windows supported?
 
 By using Win32 API and GDI+, Yue can work on Windows >= 7. It is also possible to make Yue work on Windows XP with some efforts, but this is not on my roadmap.
