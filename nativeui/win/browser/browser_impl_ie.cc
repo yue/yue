@@ -336,7 +336,8 @@ LRESULT BrowserImplIE::BrowserWndProc(HWND hwnd,
   // Get the nu::Browser HWND.
   HWND nu_hwnd = ::GetParent(::GetParent(::GetParent(hwnd)));
   auto* holder = static_cast<BrowserHolder*>(GetWindowUserData(nu_hwnd));
-  DCHECK(holder);
+  if (!holder)  // could happen when dragging from Explorer to browser
+    return false;
   auto* self = static_cast<BrowserImplIE*>(holder->impl());
   // Interpret key shortcuts.
   switch (message) {
