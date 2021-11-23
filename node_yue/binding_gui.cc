@@ -15,6 +15,11 @@
 #include "node_yue/chrome_view_mac.h"
 #endif
 
+#if defined(OS_LINUX) || defined(OS_MAC)
+#include "base/environment.h"
+#include "base/strings/string_number_conversions.h"
+#endif
+
 namespace {
 
 bool is_electron = false;
@@ -2962,6 +2967,13 @@ void Initialize(v8::Local<v8::Object> exports,
                 v8::Local<v8::Context> context,
                 void* priv) {
   CHECK(GetRuntime(context, &is_electron, &is_yode));
+
+#if defined(OS_LINUX) || defined(OS_MAC)
+  // Both node and WebKit are using SIGUSR1, avoid conflict.
+  std::unique_ptr<base::Environment> env = base::Environment::Create();
+  if (!env->HasVar("JSC_SIGNAL_FOR_GC"))
+    env->SetVar("JSC_SIGNAL_FOR_GC", base::NumberToString(SIGUSR2));
+#endif
 
 #if defined(OS_WIN)
   if (!is_electron) {
