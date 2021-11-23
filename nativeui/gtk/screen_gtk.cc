@@ -105,10 +105,12 @@ float Screen::GetDefaultScaleFactor() {
 
 Display Screen::GetDisplayNearestWindow(Window* window) {
   GdkWindow* gdkwindow = gtk_widget_get_window(GTK_WIDGET(window->GetNative()));
+  if (!GDK_IS_WINDOW(gdkwindow))
+    return GetPrimaryDisplay();
   GdkDisplay* display = gdk_display_get_default();
   GdkMonitor* monitor = gdk_display_get_monitor_at_window(display, gdkwindow);
   if (!monitor)
-    return Display();
+    return GetPrimaryDisplay();
   return FindDisplay(monitor);
 }
 
@@ -117,7 +119,7 @@ Display Screen::GetDisplayNearestPoint(const PointF& point) {
   GdkMonitor* monitor = gdk_display_get_monitor_at_point(display,
                                                          point.x(), point.y());
   if (!monitor)
-    return Display();
+    return GetPrimaryDisplay();
   return FindDisplay(monitor);
 }
 
