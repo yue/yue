@@ -69,9 +69,11 @@ void Window::Center() {
 }
 #endif
 
+#if defined(OS_WIN) || defined(OS_MAC)
 SizeF Window::GetContentSize() const {
   return content_view_->GetBounds().size();
 }
+#endif
 
 #if defined(OS_WIN) || defined(OS_LINUX)
 void Window::SetIcon(scoped_refptr<Image> icon) {

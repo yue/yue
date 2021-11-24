@@ -18,7 +18,8 @@ namespace {
 // Window private data.
 struct NUWindowPrivate {
   Window* delegate = nullptr;
-  // Window state.
+  // Window states.
+  RectF bounds;
   int window_state = 0;
   // Insets of native window frame.
   InsetsF native_frame;
@@ -131,6 +132,15 @@ gboolean OnMap(GtkWidget* widget, GdkEvent* event, NUWindowPrivate* priv) {
   return FALSE;
 }
 
+// Window position/size has changed.
+gboolean OnConfigure(GtkWidget* widget, GdkEventConfigure* event,
+                     NUWindowPrivate* priv) {
+  priv->bounds = RectF(event->x, event->y, event->width, event->height);
+  if (!IsUsingCSD(GTK_WINDOW(widget)))
+    priv->bounds.Inset(-priv->native_frame);
+  return FALSE;
+}
+
 // Window state has changed.
 gboolean OnWindowState(GtkWidget* widget, GdkEvent* event,
                        NUWindowPrivate* priv) {
@@ -193,6 +203,8 @@ void Window::PlatformInit(const Options& options) {
   // Window events.
   g_signal_connect(window_, "delete-event", G_CALLBACK(OnDelete), this);
   g_signal_connect(window_, "map-event", G_CALLBACK(OnMap), priv);
+  g_signal_connect(window_, "configure-event",
+                   G_CALLBACK(OnConfigure), priv);
   g_signal_connect(window_, "window-state-event",
                    G_CALLBACK(OnWindowState), priv);
   g_signal_connect(window_, "notify::is-active",
@@ -267,25 +279,38 @@ void Window::PlatformSetContentView(View* view) {
 
 void Window::SetContentSize(const SizeF& size) {
   // Menubar is part of client area in GTK.
-  ResizeWindow(window_, IsResizable(),
-               size.width(), size.height() + GetMenuBarHeight(this));
+  float height = size.height() + GetMenuBarHeight(this);
+  ResizeWindow(window_, IsResizable(), size.width(), height);
+  // Save the size request.
+  NUWindowPrivate* priv = GetPrivate(this);
+  priv->bounds.Inset(priv->native_frame);
+  priv->bounds.set_width(size.width());
+  priv->bounds.set_height(height);
+  priv->bounds.Inset(-priv->native_frame);
+}
+
+SizeF Window::GetContentSize() const {
+  NUWindowPrivate* priv = GetPrivate(this);
+  RectF cbounds = priv->bounds;
+  cbounds.Inset(priv->native_frame);
+  cbounds.set_height(cbounds.height() - GetMenuBarHeight(this));
+  return cbounds.size();
 }
 
 void Window::SetBounds(const RectF& bounds) {
+  // Save the size request.
+  NUWindowPrivate* priv = GetPrivate(this);
+  priv->bounds = bounds;
+  // GTK does not count frame when resizing window.
   RectF cbounds(bounds);
-  cbounds.Inset(GetPrivate(this)->native_frame);
+  cbounds.Inset(priv->native_frame);
   ResizeWindow(window_, IsResizable(), cbounds.width(), cbounds.height());
   gtk_window_move(window_, cbounds.x(), cbounds.y());
 }
 
 RectF Window::GetBounds() const {
-  int x, y, width, height;
-  gtk_window_get_position(window_, &x, &y);
-  gtk_window_get_size(window_, &width, &height);
-  RectF bounds(x, y, width, height);
-  if (!IsUsingCSD(window_))
-    bounds.Inset(-GetPrivate(this)->native_frame);
-  return bounds;
+  NUWindowPrivate* priv = GetPrivate(this);
+  return priv->bounds;
 }
 
 void Window::SetSizeConstraints(const SizeF& min_size, const SizeF& max_size) {
