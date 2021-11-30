@@ -33,7 +33,7 @@ int main(int argc, const char *argv[]) {
   // Lua only accepts UTF-8 strings.
   // FIXME(zcbenz): Write our own luaL_loadfile.
 #if defined(OS_WIN)
-  std::string filename = base::UTF16ToUTF8(cmd->GetArgs()[0]);
+  std::string filename = base::WideToUTF8(cmd->GetArgs()[0]);
 #else
   std::string filename = cmd->GetArgs()[0];
 #endif

@@ -2282,6 +2282,9 @@ struct Type<nu::Scroll> {
            "create", &CreateOnHeap<nu::Scroll>,
            "setcontentsize", &nu::Scroll::SetContentSize,
            "getcontentsize", &nu::Scroll::GetContentSize,
+           "setscrollposition", &nu::Scroll::SetScrollPosition,
+           "getscrollposition", &nu::Scroll::GetScrollPosition,
+           "getmaximumscrollposition", &nu::Scroll::GetMaximumScrollPosition,
            "setcontentview",
            RefMethod(state, &nu::Scroll::SetContentView,
                      RefType::Reset, "content"),
@@ -2296,6 +2299,8 @@ struct Type<nu::Scroll> {
 #endif
            "setscrollbarpolicy", &nu::Scroll::SetScrollbarPolicy,
            "getscrollbarpolicy", &nu::Scroll::GetScrollbarPolicy);
+    RawSetProperty(state, metatable,
+                   "onscroll", &nu::Scroll::on_scroll);
   }
 };
 

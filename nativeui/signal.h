@@ -31,7 +31,7 @@ template<typename Sig> class SignalBase {
   }
 
   int Connect(Slot slot) {
-    if (delegate_)
+    if (delegate_ && slots_.empty())
       delegate_->OnConnect(identifier_);
     slots_.push_back(std::make_pair(++next_id_, std::move(slot)));
     return next_id_;

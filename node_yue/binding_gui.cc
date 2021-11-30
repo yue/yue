@@ -2596,6 +2596,9 @@ struct Type<nu::Scroll> {
     Set(context, templ,
         "setContentSize", &nu::Scroll::SetContentSize,
         "getContentSize", &nu::Scroll::GetContentSize,
+        "setScrollPosition", &nu::Scroll::SetScrollPosition,
+        "getScrollPosition", &nu::Scroll::GetScrollPosition,
+        "getMaximumScrollPosition", &nu::Scroll::GetMaximumScrollPosition,
         "setContentView",
         RefMethod(&nu::Scroll::SetContentView, RefType::Reset, "contentView"),
         "getContentView", &nu::Scroll::GetContentView,
@@ -2609,6 +2612,8 @@ struct Type<nu::Scroll> {
 #endif
         "setScrollbarPolicy", &nu::Scroll::SetScrollbarPolicy,
         "getScrollbarPolicy", &nu::Scroll::GetScrollbarPolicy);
+    SetProperty(context, templ,
+                "onScroll", &nu::Scroll::on_scroll);
   }
 };
 

@@ -166,6 +166,7 @@ bool ScrollImpl::UpdateOrigin(Vector2d new_origin) {
   if (new_origin == origin_)
     return false;
   origin_ = new_origin;
+  delegate_->on_scroll.Emit(delegate_);
   return true;
 }
 
@@ -202,6 +203,27 @@ void Scroll::SetContentSize(const SizeF& size) {
   scroll->SetContentSize(ToCeiledSize(ScaleSize(size, scroll->scale_factor())));
 }
 
+void Scroll::SetScrollPosition(float horizon, float vertical) {
+  auto* scroll = static_cast<ScrollImpl*>(GetNative());
+  scroll->SetOrigin(Vector2d(-horizon * scroll->scale_factor(),
+                             -vertical * scroll->scale_factor()));
+}
+
+std::tuple<float, float> Scroll::GetScrollPosition() const {
+  auto* scroll = static_cast<ScrollImpl*>(GetNative());
+  return std::make_tuple(-scroll->origin().x() / scroll->scale_factor(),
+                         -scroll->origin().y() / scroll->scale_factor());
+}
+
+std::tuple<float, float> Scroll::GetMaximumScrollPosition() const {
+  auto* scroll = static_cast<ScrollImpl*>(GetNative());
+  Size content = scroll->content_size();
+  Size viewport = scroll->GetViewportRect().size();
+  return std::make_tuple(
+      (content.width() - viewport.width()) / scroll->scale_factor(),
+      (content.height() - viewport.height()) / scroll->scale_factor());
+}
+
 void Scroll::SetScrollbarPolicy(Policy h_policy, Policy v_policy) {
   auto* scroll = static_cast<ScrollImpl*>(GetNative());
   scroll->SetScrollbarPolicy(h_policy, v_policy);
@@ -210,6 +232,9 @@ void Scroll::SetScrollbarPolicy(Policy h_policy, Policy v_policy) {
 std::tuple<Scroll::Policy, Scroll::Policy> Scroll::GetScrollbarPolicy() const {
   auto* scroll = static_cast<ScrollImpl*>(GetNative());
   return std::make_tuple(scroll->h_policy(), scroll->v_policy());
+}
+
+void Scroll::OnConnect(int identifier) {
 }
 
 }  // namespace nu

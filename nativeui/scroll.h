@@ -18,7 +18,8 @@
 
 namespace nu {
 
-class NATIVEUI_EXPORT Scroll : public View {
+class NATIVEUI_EXPORT Scroll : public View,
+                               public SignalDelegate {
  public:
   Scroll();
 
@@ -30,6 +31,9 @@ class NATIVEUI_EXPORT Scroll : public View {
 
   void SetContentSize(const SizeF& size);
   SizeF GetContentSize() const;
+  void SetScrollPosition(float horizon, float vertical);
+  std::tuple<float, float> GetScrollPosition() const;
+  std::tuple<float, float> GetMaximumScrollPosition() const;
 
 #if !defined(OS_WIN)
   void SetOverlayScrollbar(bool overlay);
@@ -57,6 +61,9 @@ class NATIVEUI_EXPORT Scroll : public View {
   // View:
   const char* GetClassName() const override;
 
+  // Events.
+  Signal<bool(Scroll*)> on_scroll;
+
  protected:
   ~Scroll() override;
 
@@ -64,7 +71,17 @@ class NATIVEUI_EXPORT Scroll : public View {
   void PlatformInit();
   void PlatformSetContentView(View* container);
 
+  enum { kOnScroll };
+
+  // SignalDelegate:
+  void OnConnect(int identifier) override;
+
  private:
+#if defined(OS_LINUX)
+  ulong h_signal_ = 0;
+  ulong v_signal_ = 0;
+#endif
+
   scoped_refptr<View> content_view_;
 };
 

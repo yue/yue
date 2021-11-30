@@ -30,13 +30,19 @@ Scroll::Policy PolicyFromGTK(GtkPolicyType policy) {
     return Scroll::Policy::Automatic;
 }
 
+void OnScrollValueChanged(GtkAdjustment* adjust, Scroll* scroll) {
+  scroll->on_scroll.Emit(scroll);
+}
+
 }  // namespace
 
 void Scroll::PlatformInit() {
-  TakeOverView(gtk_scrolled_window_new(nullptr, nullptr));
-  GtkWidget* viewport = gtk_viewport_new(
-      gtk_scrolled_window_get_hadjustment(GTK_SCROLLED_WINDOW(GetNative())),
-      gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(GetNative())));
+  auto* window = GTK_SCROLLED_WINDOW(gtk_scrolled_window_new(nullptr, nullptr));
+  auto* h_adjust = gtk_scrolled_window_get_hadjustment(window);
+  auto* v_adjust = gtk_scrolled_window_get_vadjustment(window);
+  TakeOverView(GTK_WIDGET(window));
+
+  GtkWidget* viewport = gtk_viewport_new(h_adjust, v_adjust);
   gtk_widget_show(viewport);
   gtk_container_add(GTK_CONTAINER(GetNative()), viewport);
 }
@@ -68,12 +74,38 @@ void Scroll::SetContentSize(const SizeF& size) {
                               size.width(), size.height());
   GetContentView()->Layout();
   // Scroll to top-left after setting content size.
-  auto* h_adjust = gtk_scrolled_window_get_hadjustment(
-      GTK_SCROLLED_WINDOW(GetNative()));
+  auto* window = GTK_SCROLLED_WINDOW(GetNative());
+  auto* h_adjust = gtk_scrolled_window_get_hadjustment(window);
+  auto* v_adjust = gtk_scrolled_window_get_vadjustment(window);
   gtk_adjustment_set_value(h_adjust, gtk_adjustment_get_lower(h_adjust));
-  auto* v_adjust = gtk_scrolled_window_get_vadjustment(
-      GTK_SCROLLED_WINDOW(GetNative()));
   gtk_adjustment_set_value(v_adjust, gtk_adjustment_get_lower(v_adjust));
+}
+
+void Scroll::SetScrollPosition(float horizon, float vertical) {
+  auto* window = GTK_SCROLLED_WINDOW(GetNative());
+  auto* h_adjust = gtk_scrolled_window_get_hadjustment(window);
+  auto* v_adjust = gtk_scrolled_window_get_vadjustment(window);
+  gtk_adjustment_set_value(h_adjust, horizon);
+  gtk_adjustment_set_value(v_adjust, vertical);
+}
+
+std::tuple<float, float> Scroll::GetScrollPosition() const {
+  auto* window = GTK_SCROLLED_WINDOW(GetNative());
+  auto* h_adjust = gtk_scrolled_window_get_hadjustment(window);
+  auto* v_adjust = gtk_scrolled_window_get_vadjustment(window);
+  return std::make_tuple(gtk_adjustment_get_value(h_adjust),
+                         gtk_adjustment_get_value(v_adjust));
+}
+
+std::tuple<float, float> Scroll::GetMaximumScrollPosition() const {
+  auto* window = GTK_SCROLLED_WINDOW(GetNative());
+  auto* h_adjust = gtk_scrolled_window_get_hadjustment(window);
+  auto* v_adjust = gtk_scrolled_window_get_vadjustment(window);
+  return std::make_tuple(
+      gtk_adjustment_get_upper(h_adjust) -
+          gtk_adjustment_get_page_size(h_adjust),
+      gtk_adjustment_get_upper(v_adjust) -
+          gtk_adjustment_get_page_size(h_adjust));
 }
 
 void Scroll::SetOverlayScrollbar(bool overlay) {
@@ -100,6 +132,18 @@ std::tuple<Scroll::Policy, Scroll::Policy> Scroll::GetScrollbarPolicy() const {
   GtkPolicyType hp, vp;
   gtk_scrolled_window_get_policy(GTK_SCROLLED_WINDOW(GetNative()), &hp, &vp);
   return std::make_tuple(PolicyFromGTK(hp), PolicyFromGTK(vp));
+}
+
+void Scroll::OnConnect(int identifier) {
+  if (identifier == kOnScroll && h_signal_ == 0) {
+    auto* window = GTK_SCROLLED_WINDOW(GetNative());
+    auto* h_adjust = gtk_scrolled_window_get_hadjustment(window);
+    auto* v_adjust = gtk_scrolled_window_get_vadjustment(window);
+    h_signal_ = g_signal_connect(h_adjust, "value-changed",
+                                 G_CALLBACK(OnScrollValueChanged), this);
+    v_signal_ = g_signal_connect(v_adjust, "value-changed",
+                                 G_CALLBACK(OnScrollValueChanged), this);
+  }
 }
 
 }  // namespace nu

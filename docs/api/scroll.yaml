@@ -41,6 +41,15 @@ methods:
   - signature: SizeF GetContentSize() const
     description: Return the size of content view.
 
+  - signature: void SetScrollPosition(float horizon, float vertical)
+    description: Scroll to the `horizon` and `vertical` position.
+
+  - signature: std::tuple<float, float> GetScrollPosition() const
+    description: Return the horizon and vertical scroll position.
+
+  - signature: std::tuple<float, float> GetMaximumScrollPosition() const
+    description: Return the maximum horizon and vertical scroll position.
+
   - signature: void SetOverlayScrollbar(bool overlay)
     platform: ['macOS', 'linux']
     description: Set whether to use overlay scrolling.
@@ -76,3 +85,7 @@ methods:
     platform: ['macOS']
     description: |
       Return the horizontal and vertical scroll elasticity.
+
+events:
+  - signature: void on_scroll(Scroll* self)
+    description: Emitted when the content view is being scrolled.

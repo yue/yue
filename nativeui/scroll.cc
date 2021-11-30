@@ -17,6 +17,7 @@ const char Scroll::kClassName[] = "Scroll";
 Scroll::Scroll() {
   PlatformInit();
   SetContentView(new Container);
+  on_scroll.SetDelegate(this, kOnScroll);
 }
 
 Scroll::~Scroll() {
