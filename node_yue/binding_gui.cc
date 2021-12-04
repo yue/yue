@@ -2973,7 +2973,7 @@ void Initialize(v8::Local<v8::Object> exports,
                 void* priv) {
   CHECK(GetRuntime(context, &is_electron, &is_yode));
 
-#if defined(OS_LINUX) || defined(OS_MAC)
+#if defined(OS_LINUX)
   // Both node and WebKit are using SIGUSR1, avoid conflict.
   std::unique_ptr<base::Environment> env = base::Environment::Create();
   if (!env->HasVar("JSC_SIGNAL_FOR_GC"))
