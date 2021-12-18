@@ -80,11 +80,7 @@ MenuItemData::MenuItemData() {}
 MenuItemData::~MenuItemData() {}
 
 void MenuItem::Click() {
-  if (type_ == Type::Checkbox)
-    SetChecked(!IsChecked());
-  else if (type_ == Type::Radio)
-    SetChecked(true);
-  on_click.Emit(this);
+  EmitClick();
 }
 
 void MenuItem::SetLabel(const std::string& label) {

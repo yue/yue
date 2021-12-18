@@ -17,10 +17,12 @@ Menu::Menu() : MenuBase(CreatePopupMenu()) {
 void Menu::Popup() {
   POINT p;
   GetCursorPos(&p);
+  OnMenuShow();
   UINT id = TrackPopupMenuEx(GetNative(),
                              TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD,
                              p.x, p.y, State::GetCurrent()->GetSubwinHolder(),
                              nullptr);
+  OnMenuHide();
   if (id > 0)
     DispatchCommandToItem(this, id);
 }

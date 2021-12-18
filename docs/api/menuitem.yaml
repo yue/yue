@@ -106,3 +106,9 @@ methods:
 events:
   - signature: void on_click(MenuItem* self)
     description: Emitted when item is clicked.
+
+delegates:
+  - signature: bool validate(MenuItem* self)
+    description: |
+      Called before the item shows or activates, should return whether the item
+      is enabled.

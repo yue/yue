@@ -328,6 +328,16 @@ void WindowImpl::OnCommand(UINT code, int command, HWND window) {
   control->OnCommand(code, command);
 }
 
+void WindowImpl::OnMenuShow(BOOL is_popup) {
+  if (!is_popup && delegate_->GetMenuBar())
+    delegate_->GetMenuBar()->OnMenuShow();
+}
+
+void WindowImpl::OnMenuHide(BOOL is_popup) {
+  if (!is_popup && delegate_->GetMenuBar())
+    delegate_->GetMenuBar()->OnMenuHide();
+}
+
 LRESULT WindowImpl::OnNotify(int id, LPNMHDR pnmh) {
   HWND window = pnmh->hwndFrom;
   if (::GetParent(window) != hwnd())

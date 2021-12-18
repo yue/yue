@@ -1430,7 +1430,8 @@ struct Type<nu::MenuItem> {
 #endif
         "setAccelerator", &nu::MenuItem::SetAccelerator);
     SetProperty(context, templ,
-                "onClick", &nu::MenuItem::on_click);
+                "onClick", &nu::MenuItem::on_click,
+                "validate", &nu::MenuItem::validate);
   }
   static nu::MenuItem* CreateRaw(v8::Local<v8::Context> context,
                                  v8::Local<v8::Value> value) {
@@ -1483,6 +1484,11 @@ struct Type<nu::MenuItem> {
     if (Get(context, obj, "onClick", &on_click_val) &&
         WeakFunctionFromV8(context, on_click_val, &on_click))
       item->on_click.Connect(on_click);
+    v8::Local<v8::Value> validate_val;
+    std::function<bool(nu::MenuItem*)> validate;
+    if (Get(context, obj, "validate", &validate_val) &&
+        WeakFunctionFromV8(context, validate_val, &validate))
+      item->validate = validate;
     return item;
   }
   static v8::Local<v8::Value> Create(v8::Local<v8::Context> context,

@@ -45,6 +45,12 @@ class NATIVEUI_EXPORT MenuBase : public base::RefCounted<MenuBase> {
   // Internal: Notify the change of AcceleratorManager.
   void SetAcceleratorManager(AcceleratorManager* accel_manager);
 
+#if defined(OS_LINUX) || defined(OS_WIN)
+  // Internal: Update items on menu show/hide.
+  void OnMenuShow();
+  void OnMenuHide();
+#endif
+
  protected:
   explicit MenuBase(NativeMenu menu);
   virtual ~MenuBase();

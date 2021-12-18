@@ -1283,7 +1283,8 @@ struct Type<nu::MenuItem> {
 #endif
            "setaccelerator", &nu::MenuItem::SetAccelerator);
     RawSetProperty(state, index,
-                   "onclick", &nu::MenuItem::on_click);
+                   "onclick", &nu::MenuItem::on_click,
+                   "validate", &nu::MenuItem::validate);
   }
   static nu::MenuItem* Create(CallContext* context) {
     State* state = context->state;
@@ -1338,6 +1339,9 @@ struct Type<nu::MenuItem> {
     std::function<void(nu::MenuItem*)> onclick;
     if (RawGetAndPop(state, options, "onclick", &onclick))
       item->on_click.Connect(onclick);
+    std::function<bool(nu::MenuItem*)> validate;
+    if (RawGetAndPop(state, options, "validate", &validate))
+      item->validate = validate;
     return item;
   }
 };

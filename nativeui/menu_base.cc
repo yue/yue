@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <utility>
 
+#include "nativeui/menu.h"
 #include "nativeui/menu_item.h"
 
 namespace nu {
@@ -47,5 +48,33 @@ void MenuBase::SetAcceleratorManager(AcceleratorManager* accel_manager) {
   for (int i = 0; i < ItemCount(); ++i)
     ItemAt(i)->SetAcceleratorManager(accel_manager);
 }
+
+#if defined(OS_LINUX) || defined(OS_WIN)
+void MenuBase::OnMenuShow() {
+  for (auto& item : items_) {
+    if (item->validate)
+      item->SetEnabled(item->validate(item.get()));
+#if defined(OS_WIN)
+    // On Windows only the top menu receives event.
+    if (item->GetSubmenu())
+      item->GetSubmenu()->OnMenuShow();
+#endif
+  }
+}
+
+void MenuBase::OnMenuHide() {
+  // When menu is closed, make validated items enabled so they can still respond
+  // to keyboard shortcuts.
+  for (auto& item : items_) {
+    if (item->validate)
+      item->SetEnabled(true);
+#if defined(OS_WIN)
+    // On Windows only the top menu receives event.
+    if (item->GetSubmenu())
+      item->GetSubmenu()->OnMenuHide();
+#endif
+  }
+}
+#endif
 
 }  // namespace nu

@@ -12,23 +12,31 @@ namespace nu {
 
 namespace {
 
+void OnGtkMenuShow(GtkWidget*, MenuBase* menu) {
+  menu->OnMenuShow();
+}
+
+void OnGtkMenuHide(GtkWidget*, MenuBase* menu) {
+  menu->OnMenuHide();
+}
+
 // Find out the radio items that in the same group with |radio|.
 GtkRadioMenuItem* SearchRadioInSameGroup(MenuBase* menu, MenuItem* radio,
                                          int index) {
   // First search backward.
   for (int i = index - 1; i >= 0; --i) {
-    nu::MenuItem* item = menu->ItemAt(i);
-    if (item->GetType() == nu::MenuItem::Type::Separator)  // meet boundry
+    MenuItem* item = menu->ItemAt(i);
+    if (item->GetType() == MenuItem::Type::Separator)  // meet boundry
       break;
-    else if (item->GetType() == nu::MenuItem::Type::Radio)  // found a radio
+    else if (item->GetType() == MenuItem::Type::Radio)  // found a radio
       return GTK_RADIO_MENU_ITEM(item->GetNative());
   }
   // Then search forward.
   for (int i = index; i < menu->ItemCount(); ++i) {
-    nu::MenuItem* item = menu->ItemAt(i);
-    if (item->GetType() == nu::MenuItem::Type::Separator)  // meet boundry
+    MenuItem* item = menu->ItemAt(i);
+    if (item->GetType() == MenuItem::Type::Separator)  // meet boundry
       break;
-    else if (item->GetType() == nu::MenuItem::Type::Radio)  // found a radio
+    else if (item->GetType() == MenuItem::Type::Radio)  // found a radio
       return GTK_RADIO_MENU_ITEM(item->GetNative());
   }
   return nullptr;
@@ -39,6 +47,8 @@ GtkRadioMenuItem* SearchRadioInSameGroup(MenuBase* menu, MenuItem* radio,
 void MenuBase::PlatformInit() {
   gtk_widget_show(GTK_WIDGET(menu_));
   g_object_ref_sink(menu_);
+  g_signal_connect(menu_, "map", G_CALLBACK(OnGtkMenuShow), this);
+  g_signal_connect(menu_, "hide", G_CALLBACK(OnGtkMenuHide), this);
 }
 
 void MenuBase::PlatformDestroy() {

@@ -108,7 +108,7 @@ void OnRoleClick(GtkWidget*, MenuItem* item) {
 
 // Normal handling of the clicking.
 void OnItemClick(GtkMenuItem*, MenuItem* item) {
-  item->on_click.Emit(item);
+  item->EmitClick();
 }
 
 }  // namespace

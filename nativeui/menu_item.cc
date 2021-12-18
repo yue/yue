@@ -134,6 +134,20 @@ MenuBase* MenuItem::FindTopLevelMenu() const {
   return menu;
 }
 
+void MenuItem::EmitClick() {
+#if !defined(OS_MAC)
+  if (validate && !validate(this))
+    return;
+#endif
+#if !defined(OS_LINUX)
+  if (type_ == Type::Checkbox)
+    SetChecked(!IsChecked());
+  else if (type_ == Type::Radio)
+    SetChecked(true);
+#endif
+  on_click.Emit(this);
+}
+
 // Flip all radio items in the same group with |item|.
 void MenuItem::FlipRadioMenuItems(nu::MenuBase* menu, nu::MenuItem* sender) {
   // Find out from where the group starts.

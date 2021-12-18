@@ -28,11 +28,13 @@
 }
 
 - (IBAction)onClick:(id)sender {
-  if (shell_->GetType() == nu::MenuItem::Type::Checkbox)
-    shell_->SetChecked(!shell_->IsChecked());
-  else if (shell_->GetType() == nu::MenuItem::Type::Radio)
-    shell_->SetChecked(true);
-  shell_->on_click.Emit(shell_);
+  shell_->EmitClick();
+}
+
+- (BOOL)validateUserInterfaceItem:(id<NSValidatedUserInterfaceItem>)item {
+  if (!shell_->validate)
+    return YES;
+  return shell_->validate(shell_);
 }
 
 @end

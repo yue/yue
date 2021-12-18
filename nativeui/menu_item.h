@@ -115,11 +115,17 @@ class NATIVEUI_EXPORT MenuItem : public base::RefCounted<MenuItem> {
   // Events.
   Signal<void(MenuItem*)> on_click;
 
-  // Internal: Set the owner of menu item.
-  void set_menu(MenuBase* menu) { menu_ = menu; }
+  // Delegate methods.
+  std::function<bool(MenuItem*)> validate;
 
   // Internal: Search for the top-level menu.
   MenuBase* FindTopLevelMenu() const;
+
+  // Internal: Emit the on_click event.
+  void EmitClick();
+
+  // Internal: Set the owner of menu item.
+  void set_menu(MenuBase* menu) { menu_ = menu; }
 
  private:
   friend class MenuBase;
