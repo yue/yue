@@ -10,6 +10,7 @@
 #include <utility>
 #include <vector>
 
+#include "base/check.h"
 #include "nativeui/nativeui_export.h"
 
 namespace nu {
@@ -31,6 +32,7 @@ template<typename Sig> class SignalBase {
   }
 
   int Connect(Slot slot) {
+    CHECK(slot);
     if (delegate_ && slots_.empty())
       delegate_->OnConnect(identifier_);
     slots_.push_back(std::make_pair(++next_id_, std::move(slot)));

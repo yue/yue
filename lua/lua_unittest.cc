@@ -109,6 +109,12 @@ TEST_F(LuaTest, RawGetWithPop) {
   ASSERT_EQ(lua::GetTop(state_), 1);
 }
 
+TEST_F(LuaTest, RawGetWithPopNonExistKey) {
+  lua::NewTable(state_);
+  std::function<void()> f;
+  ASSERT_FALSE(lua::RawGetAndPop(state_, 1, "key", &f));
+}
+
 TEST_F(LuaTest, PSetGet) {
   lua::NewTable(state_);
   ASSERT_EQ(lua::GetTop(state_), 1);

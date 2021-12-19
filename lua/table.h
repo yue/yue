@@ -95,16 +95,17 @@ inline void RawGet(State* state, int index, Key&& key,
 
 // Helper function: Call RawGet for all keys and ignore the out.
 template<typename Key, typename Value, typename... ArgTypes>
-inline void RawGetKeyPairHelper(State* state, int index, Key&& key,
+inline bool RawGetKeyPairHelper(State* state, int index, Key&& key,
                                 Value* out) {
   RawGet(state, index, std::forward<Key>(key));
+  return GetType(state, -1) != LuaType::Nil;
 }
 template<typename Key, typename Value, typename... ArgTypes>
-inline void RawGetKeyPairHelper(State* state, int index, Key&& key,
+inline bool RawGetKeyPairHelper(State* state, int index, Key&& key,
                                 Value* out, ArgTypes&&... args) {
   index = AbsIndex(state, index);
-  RawGetKeyPairHelper(state, index, std::forward<Key>(key), out);
-  RawGetKeyPairHelper(state, index, std::forward<ArgTypes>(args)...);
+  return RawGetKeyPairHelper(state, index, std::forward<Key>(key), out) &&
+         RawGetKeyPairHelper(state, index, std::forward<ArgTypes>(args)...);
 }
 
 // Helper function: Call To for all values and ignore the key.
@@ -123,11 +124,9 @@ inline bool ToKeyPairHelper(State* state, int index, Key&& key, Value* out,
 template<typename Key, typename Value, typename... ArgTypes>
 inline bool RawGetAndPop(State* state, int index, const Key& key, Value* out,
                          const ArgTypes&... args) {
-  int current_top = GetTop(state);
-  RawGetKeyPairHelper(state, index, key, out, args...);
-  bool success = ToKeyPairHelper(state, current_top + 1, key, out, args...);
-  SetTop(state, current_top);
-  return success;
+  StackAutoReset reset(state);
+  return RawGetKeyPairHelper(state, index, key, out, args...) &&
+         ToKeyPairHelper(state, reset.top() + 1, key, out, args...);
 }
 
 // The safe wrapper for the unsafe lua_settable.
