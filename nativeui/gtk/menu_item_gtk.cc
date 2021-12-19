@@ -36,8 +36,6 @@ static_assert(
 
 // Handling role item clicking.
 void OnRoleClick(GtkWidget*, MenuItem* item) {
-  if (item->GetRole() >= MenuItem::Role::ItemCount)
-    return;
   // Get the window.
   MenuBase* menu = item->FindTopLevelMenu();
   if (!menu || menu->GetClassName() != MenuBar::kClassName)

@@ -149,17 +149,21 @@ IFACEMETHODIMP BrowserOleSite::Exec(const GUID *pguidCmdGroup,
                                     DWORD nCmdexecopt,
                                     VARIANT *pvaIn,
                                     VARIANT *pvaOut) {
-  if (pguidCmdGroup &&
-      ::IsEqualGUID(*pguidCmdGroup, CGID_DocHostCommandHandler)) {
-    if (nCmdID == OLECMDID_SHOWSCRIPTERROR) {
-      // Continue running scripts on the page.
-      // http://support.microsoft.com/default.aspx?scid=kb;en-us;261003
+  if (!pguidCmdGroup)
+    return OLECMDERR_E_NOTSUPPORTED;
+  if (!::IsEqualGUID(*pguidCmdGroup, CGID_DocHostCommandHandler))
+    return OLECMDERR_E_UNKNOWNGROUP;
+  // Disable builtin dialogs.
+  switch (nCmdID) {
+    case OLECMDID_SHOWSCRIPTERROR:
+    case OLECMDID_SHOWFIND:
+    case OLECMDID_SHOWPRINT:
       (*pvaOut).vt = VT_BOOL;
       (*pvaOut).boolVal = VARIANT_TRUE;
       return S_OK;
-    }
+    default:
+      return OLECMDERR_E_NOTSUPPORTED;
   }
-  return pguidCmdGroup ? OLECMDERR_E_UNKNOWNGROUP : OLECMDERR_E_NOTSUPPORTED;
 }
 
 IFACEMETHODIMP BrowserOleSite::ShowContextMenu(
