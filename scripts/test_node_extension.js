@@ -23,6 +23,12 @@ useTmpDir((tmpDir) => {
     testNode(tmpDir)
   else
     throw new Error(`Unrecognized runtime ${runtime}`)
+}).catch((error) => {
+  // On Windows it may fail to remove dir due to Electron's process not exiting.
+  if (error.code == 'ENOTEMPTY')
+    console.error(error)
+  else
+    throw error
 })
 
 function testElectron(cwd) {
