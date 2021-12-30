@@ -24,13 +24,14 @@ class StackAutoReset {
   explicit StackAutoReset(State* state) : state_(state), top_(GetTop(state)) {}
   ~StackAutoReset() { SetTop(state_, top_); }
 
+  StackAutoReset& operator=(const StackAutoReset&) = delete;
+  StackAutoReset(const StackAutoReset&) = delete;
+
   int top() const { return top_; }
 
  private:
   State* state_;
   int top_;
-
-  DISALLOW_COPY_AND_ASSIGN(StackAutoReset);
 };
 
 }  // namespace lua

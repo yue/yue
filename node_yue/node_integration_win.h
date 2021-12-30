@@ -17,8 +17,6 @@ class NodeIntegrationWin : public NodeIntegration {
 
  private:
   void PollEvents() override;
-
-  DISALLOW_COPY_AND_ASSIGN(NodeIntegrationWin);
 };
 
 }  // namespace node_yue

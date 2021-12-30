@@ -10,7 +10,6 @@
 
 #include <string>
 
-#include "base/macros.h"
 #include "base/win/windows_types.h"
 
 namespace nu {
@@ -21,6 +20,9 @@ class ComServerModule {
  public:
   explicit ComServerModule(::GUID clsid);
   ~ComServerModule();
+
+  ComServerModule& operator=(const ComServerModule&) = delete;
+  ComServerModule(const ComServerModule&) = delete;
 
   // Registers the NotificationActivator COM object so other applications can
   // connect to it. Returns the registration status.
@@ -38,8 +40,6 @@ class ComServerModule {
 
   // Identifiers of registered class objects. Used for unregistration.
   DWORD cookies_[1] = {0};
-
-  DISALLOW_COPY_AND_ASSIGN(ComServerModule);
 };
 
 }  // namespace nu

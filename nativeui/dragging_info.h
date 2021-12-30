@@ -51,8 +51,6 @@ class NATIVEUI_EXPORT DraggingInfo {
   int drag_operations_ = DRAG_OPERATION_NONE;
 
   base::WeakPtrFactory<DraggingInfo> weak_factory_;
-
-  DISALLOW_COPY_AND_ASSIGN(DraggingInfo);
 };
 
 }  // namespace nu

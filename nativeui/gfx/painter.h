@@ -102,8 +102,6 @@ class NATIVEUI_EXPORT Painter {
 
  private:
   base::WeakPtrFactory<Painter> weak_factory_;
-
-  DISALLOW_COPY_AND_ASSIGN(Painter);
 };
 
 }  // namespace nu

@@ -13,8 +13,6 @@
 
 #include <string>
 
-#include "base/macros.h"
-
 namespace nu {
 
 class BrowserHTMLMoniker : public IMoniker {
@@ -69,8 +67,6 @@ class BrowserHTMLMoniker : public IMoniker {
 
   std::wstring base_url_;
   Microsoft::WRL::ComPtr<IStream> stream_;
-
-  DISALLOW_COPY_AND_ASSIGN(BrowserHTMLMoniker);
 };
 
 }  // namespace nu

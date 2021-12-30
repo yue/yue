@@ -20,8 +20,6 @@ class NodeIntegrationLinux : public NodeIntegration {
 
   // Epoll to poll for uv's backend fd.
   int epoll_;
-
-  DISALLOW_COPY_AND_ASSIGN(NodeIntegrationLinux);
 };
 
 }  // namespace node_yue

@@ -38,6 +38,9 @@ class ViewImpl {
  public:
   virtual ~ViewImpl();
 
+  ViewImpl& operator=(const ViewImpl&) = delete;
+  ViewImpl(const ViewImpl&) = delete;
+
   /////////////////////////////////////////////////////////////////////////////
   // Core implementations, should be overriden for each kind of view
 
@@ -227,8 +230,6 @@ class ViewImpl {
 
   // The absolute bounds relative to the origin of window.
   Rect size_allocation_;
-
-  DISALLOW_COPY_AND_ASSIGN(ViewImpl);
 };
 
 }  // namespace nu

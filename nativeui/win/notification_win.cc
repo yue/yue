@@ -135,6 +135,9 @@ class ToastEventHandler {
       MessageLoop::ClearTimeout(timer_);
   }
 
+  ToastEventHandler& operator=(const ToastEventHandler&) = delete;
+  ToastEventHandler(const ToastEventHandler&) = delete;
+
   HRESULT OnActivated(winui::Notifications::IToastNotification*,
                       IInspectable*) {
     DeleteThis();
@@ -172,8 +175,6 @@ class ToastEventHandler {
   EventRegistrationToken fail_token_;
 
   MessageLoop::TimerId timer_;
-
-  DISALLOW_COPY_AND_ASSIGN(ToastEventHandler);
 };
 
 void Notification::Show() {

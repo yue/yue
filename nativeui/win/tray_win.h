@@ -43,8 +43,6 @@ class TrayImpl {
 
   // The currently-displayed icon for the window.
   base::win::ScopedHICON icon_;
-
-  DISALLOW_COPY_AND_ASSIGN(TrayImpl);
 };
 
 }  // namespace nu

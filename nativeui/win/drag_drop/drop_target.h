@@ -8,7 +8,6 @@
 
 #include <objidl.h>
 
-#include "base/macros.h"
 #include "base/memory/ref_counted.h"
 
 // Windows interface.
@@ -58,6 +57,9 @@ class DropTarget : public IDropTarget {
 
   DropTarget(HWND hwnd, Delegate* delegate);
   virtual ~DropTarget();
+
+  DropTarget& operator=(const DropTarget&) = delete;
+  DropTarget(const DropTarget&) = delete;
 
   // Returns the hosting HWND.
   HWND hwnd() { return hwnd_; }
@@ -115,8 +117,6 @@ class DropTarget : public IDropTarget {
   HWND hwnd_;
 
   Delegate* delegate_;  // weak ref
-
-  DISALLOW_COPY_AND_ASSIGN(DropTarget);
 };
 
 }  // namespace nu

@@ -51,8 +51,6 @@ class FileDialogImpl {
 
   std::vector<std::wstring> buffer_;
   std::vector<COMDLG_FILTERSPEC> filterspec_;
-
-  DISALLOW_COPY_AND_ASSIGN(FileDialogImpl);
 };
 
 }  // namespace nu

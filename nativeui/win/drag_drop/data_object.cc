@@ -148,6 +148,9 @@ class FormatEtcEnumerator final : public IEnumFORMATETC {
   explicit FormatEtcEnumerator(std::vector<StoredDataInfo>* contents);
   ~FormatEtcEnumerator();
 
+  FormatEtcEnumerator& operator=(const FormatEtcEnumerator&) = delete;
+  FormatEtcEnumerator(const FormatEtcEnumerator&) = delete;
+
   // IEnumFORMATETC implementation:
   HRESULT __stdcall Next(ULONG count,
                          FORMATETC* elements_array,
@@ -181,8 +184,6 @@ class FormatEtcEnumerator final : public IEnumFORMATETC {
   size_t cursor_;
 
   LONG ref_count_;
-
-  DISALLOW_COPY_AND_ASSIGN(FormatEtcEnumerator);
 };
 
 FormatEtcEnumerator::FormatEtcEnumerator(std::vector<StoredDataInfo>* contents)

@@ -46,11 +46,12 @@ class GraphicsContextScope {
       [NSGraphicsContext setCurrentContext:previous_context_];
   }
 
+  GraphicsContextScope& operator=(const GraphicsContextScope&) = delete;
+  GraphicsContextScope(const GraphicsContextScope&) = delete;
+
  private:
   bool needs_switch_;
   NSGraphicsContext* previous_context_;
-
-  DISALLOW_COPY_AND_ASSIGN(GraphicsContextScope);
 };
 
 }  // namespace

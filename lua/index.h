@@ -70,6 +70,9 @@ class MemberHolder : public MemberHolderBase {
   explicit MemberHolder(T ptr) : ptr_(ptr) {}
   ~MemberHolder() override {}
 
+  MemberHolder& operator=(const MemberHolder&) = delete;
+  MemberHolder(const MemberHolder&) = delete;
+
   int Index(State* state) override;
   int NewIndex(State* state) override;
 
@@ -78,8 +81,6 @@ class MemberHolder : public MemberHolderBase {
   using MemberType = typename ExtractMemberPointer<T>::MemberType;
 
   T ptr_;
-
-  DISALLOW_COPY_AND_ASSIGN(MemberHolder);
 };
 
 template<typename T>

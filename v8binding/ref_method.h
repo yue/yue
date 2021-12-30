@@ -44,8 +44,6 @@ class RefMethodRefHolder : public CallbackHolderBase {
 
  private:
   virtual ~RefMethodRefHolder() {}
-
-  DISALLOW_COPY_AND_ASSIGN(RefMethodRefHolder);
 };
 
 // Store the |arg| into the |object|.

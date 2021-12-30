@@ -7,8 +7,6 @@
 
 #include <ole2.h>
 
-#include "base/macros.h"
-
 namespace nu {
 
 class BrowserImplIE;
@@ -17,6 +15,9 @@ class BrowserExternalSink : public IDispatch {
  public:
   explicit BrowserExternalSink(BrowserImplIE* browser);
   virtual ~BrowserExternalSink();
+
+  BrowserExternalSink& operator=(const BrowserExternalSink&) = delete;
+  BrowserExternalSink(const BrowserExternalSink&) = delete;
 
   // IUnknown
   STDMETHOD(QueryInterface)(REFIID riid, void **ppvObject);
@@ -46,8 +47,6 @@ class BrowserExternalSink : public IDispatch {
  private:
   ULONG ref_;
   BrowserImplIE* browser_;
-
-  DISALLOW_COPY_AND_ASSIGN(BrowserExternalSink);
 };
 
 }  // namespace nu

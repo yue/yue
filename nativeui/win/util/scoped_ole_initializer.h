@@ -7,14 +7,15 @@
 
 #include <ole2.h>
 
-#include "base/macros.h"
-
 namespace nu {
 
 class ScopedOleInitializer {
  public:
   ScopedOleInitializer();
   ~ScopedOleInitializer();
+
+  ScopedOleInitializer& operator=(const ScopedOleInitializer&) = delete;
+  ScopedOleInitializer(const ScopedOleInitializer&) = delete;
 
  private:
 #ifndef NDEBUG
@@ -25,8 +26,6 @@ class ScopedOleInitializer {
   DWORD thread_id_;
 #endif
   HRESULT hr_;
-
-  DISALLOW_COPY_AND_ASSIGN(ScopedOleInitializer);
 };
 
 }  // namespace nu

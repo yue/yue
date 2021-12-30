@@ -28,9 +28,11 @@ class AnonymousImpersonator {
       ::RevertToSelf();
   }
 
+  AnonymousImpersonator& operator=(const AnonymousImpersonator&) = delete;
+  AnonymousImpersonator(const AnonymousImpersonator&) = delete;
+
  private:
   BOOL must_revert_;
-  DISALLOW_COPY_AND_ASSIGN(AnonymousImpersonator);
 };
 
 // A scoper to manage acquiring and automatically releasing the clipboard.
@@ -350,8 +352,6 @@ class ClipboardImpl {
   }
 
   ClipboardWindow clipboard_owner_;
-
-  DISALLOW_COPY_AND_ASSIGN(ClipboardImpl);
 };
 
 ///////////////////////////////////////////////////////////////////////////////

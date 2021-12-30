@@ -28,8 +28,6 @@ class ObjectTracker {
 
   v8::Isolate* isolate_;
   v8::Global<v8::Object> v8_ref_;
-
-  DISALLOW_COPY_AND_ASSIGN(ObjectTracker);
 };
 
 // Tracks the lifetime of v8::Object that wraps RefPtr.

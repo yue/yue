@@ -8,7 +8,6 @@
 #include <windows.h>
 
 #include "base/logging.h"
-#include "base/macros.h"
 
 namespace nu {
 
@@ -28,11 +27,12 @@ class ScopedSetMapMode {
     DCHECK_NE(mode, 0);
   }
 
+  ScopedSetMapMode& operator=(const ScopedSetMapMode&) = delete;
+  ScopedSetMapMode(const ScopedSetMapMode&) = delete;
+
  private:
   HDC hdc_;
   int old_map_mode_;
-
-  DISALLOW_COPY_AND_ASSIGN(ScopedSetMapMode);
 };
 
 }  // namespace nu

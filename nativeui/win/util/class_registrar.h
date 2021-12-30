@@ -68,8 +68,6 @@ class ClassRegistrar {
   int registered_count_;
 
   base::Lock lock_;
-
-  DISALLOW_COPY_AND_ASSIGN(ClassRegistrar);
 };
 
 }  // namespace nu

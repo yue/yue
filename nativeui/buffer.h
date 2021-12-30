@@ -8,7 +8,6 @@
 #include <functional>
 #include <memory>
 
-#include "base/macros.h"
 #include "build/build_config.h"
 #include "nativeui/nativeui_export.h"
 
@@ -42,6 +41,8 @@ class NATIVEUI_EXPORT Buffer {
   ~Buffer();
 
   Buffer& operator=(Buffer&& other) noexcept;
+  Buffer& operator=(const Buffer&) = delete;
+  Buffer(const Buffer&) = delete;
 
   void* content() const { return content_; }
   size_t size() const { return size_; }
@@ -57,8 +58,6 @@ class NATIVEUI_EXPORT Buffer {
   void* content_ = nullptr;
   size_t size_ = 0;
   FreeFunc free_;
-
-  DISALLOW_COPY_AND_ASSIGN(Buffer);
 };
 
 }  // namespace nu

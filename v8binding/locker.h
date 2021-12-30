@@ -7,8 +7,6 @@
 
 #include <memory>
 
-#include "base/macros.h"
-
 namespace v8 {
 class Isolate;
 class Locker;
@@ -27,8 +25,6 @@ class Locker {
   void operator delete(void*, size_t);
 
   std::unique_ptr<v8::Locker> locker_;
-
-  DISALLOW_COPY_AND_ASSIGN(Locker);
 };
 
 }  // namespace vb

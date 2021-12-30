@@ -32,7 +32,7 @@ class ColorSchemeObserverImpl : public ColorSchemeObserver,
       // The ImmersiveColorSet is emitted multiple times for one change, try to
       // reduce the event numbers to minimum.
       base::Time now = base::Time::Now();
-      if (now - last_event > base::TimeDelta::FromMilliseconds(500)) {
+      if (now - last_event > base::Milliseconds(500)) {
         appearance_->on_color_scheme_change.Emit();
         last_event = now;
       }

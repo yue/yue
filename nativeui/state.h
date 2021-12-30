@@ -124,8 +124,6 @@ class NATIVEUI_EXPORT State {
   App app_;
 
   YGConfigRef yoga_config_;
-
-  DISALLOW_COPY_AND_ASSIGN(State);
 };
 
 }  // namespace nu

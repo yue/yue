@@ -102,6 +102,7 @@ function CopySources(sources, headers) {
   if (targetOs === 'mac') {
     EXTRA_HEADERS[''] = [ 'third_party/apple_apsl' ]
   } else if (targetOs === 'win') {
+    CopySource('//base/win/win_handle_types_list.inc', path.join(targetDir, 'include'))
     CopySource('//base/win/windows_defines.inc', path.join(targetDir, 'include'))
     CopySource('//base/win/windows_undefines.inc', path.join(targetDir, 'include'))
     // This file is needed by Windows, but marked as posix.

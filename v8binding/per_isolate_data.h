@@ -7,7 +7,6 @@
 
 #include <unordered_map>
 
-#include "base/macros.h"
 #include "v8.h"  // NOLINT(build/include)
 
 namespace vb {
@@ -18,6 +17,9 @@ class ObjectTracker;
 
 class PerIsolateData {
  public:
+  PerIsolateData& operator=(const PerIsolateData&) = delete;
+  PerIsolateData(const PerIsolateData&) = delete;
+
   static PerIsolateData* Get(v8::Isolate* isolate);
 
   // Cache template objects.
@@ -42,8 +44,6 @@ class PerIsolateData {
   v8::Isolate* isolate_;
   FunctionTemplateMap function_templates_;
   ObjectTrackerMap object_trackers_;
-
-  DISALLOW_COPY_AND_ASSIGN(PerIsolateData);
 };
 
 }  // namespace vb

@@ -11,7 +11,6 @@
 #include <ole2.h>
 #include <wrl.h>
 
-#include "base/macros.h"
 #include "nativeui/win/browser/browser_external_sink.h"
 
 namespace nu {
@@ -113,8 +112,6 @@ class BrowserOleSite : public IOleClientSite,
   BrowserImplIE* browser_;
 
   Microsoft::WRL::ComPtr<BrowserExternalSink> external_sink_;
-
-  DISALLOW_COPY_AND_ASSIGN(BrowserOleSite);
 };
 
 }  // namespace nu

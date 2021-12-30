@@ -9,7 +9,6 @@
 #include <map>
 #include <memory>
 
-#include "base/macros.h"
 #include "node_yue/v8_value_converter.h"
 
 namespace base {
@@ -23,6 +22,9 @@ namespace node_yue {
 class V8ValueConverterImpl : public V8ValueConverter {
  public:
   V8ValueConverterImpl();
+
+  V8ValueConverterImpl& operator=(const V8ValueConverterImpl&) = delete;
+  V8ValueConverterImpl(const V8ValueConverterImpl&) = delete;
 
   // V8ValueConverter implementation.
   void SetDateAllowed(bool val) override;
@@ -88,8 +90,6 @@ class V8ValueConverterImpl : public V8ValueConverter {
   bool convert_negative_zero_to_int_;
 
   bool avoid_identity_hash_for_testing_;
-
-  DISALLOW_COPY_AND_ASSIGN(V8ValueConverterImpl);
 };
 
 }  // namespace node_yue

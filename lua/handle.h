@@ -35,6 +35,9 @@ class Handle {
   explicit Handle(State* state) : state_(state) {}
   virtual ~Handle() {}
 
+  Handle& operator=(const Handle&) = delete;
+  Handle(const Handle&) = delete;
+
   // Puts the value back to stack.
   virtual void Push() const = 0;
 
@@ -42,8 +45,6 @@ class Handle {
 
  private:
   State* state_;
-
-  DISALLOW_COPY_AND_ASSIGN(Handle);
 };
 
 // The strong reference to a value.

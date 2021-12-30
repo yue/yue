@@ -8,8 +8,6 @@
 
 #include <CoreFoundation/CoreFoundation.h>
 
-#include "base/macros.h"
-
 namespace nu {
 
 // Enter a nested run loop.
@@ -17,6 +15,9 @@ class NestedRunLoop {
  public:
   NestedRunLoop();
   ~NestedRunLoop();
+
+  NestedRunLoop& operator=(const NestedRunLoop&) = delete;
+  NestedRunLoop(const NestedRunLoop&) = delete;
 
   void Run();
   void Quit();
@@ -32,8 +33,6 @@ class NestedRunLoop {
 
   // False after Quit is called.
   bool keep_running_ = false;
-
-  DISALLOW_COPY_AND_ASSIGN(NestedRunLoop);
 };
 
 }  // namespace nu

@@ -18,6 +18,9 @@ class BrowserProtocolFactory : public IClassFactory {
   explicit BrowserProtocolFactory(Browser::ProtocolHandler handler);
   virtual ~BrowserProtocolFactory();
 
+  BrowserProtocolFactory& operator=(const BrowserProtocolFactory&) = delete;
+  BrowserProtocolFactory(const BrowserProtocolFactory&) = delete;
+
   // IUnknown
   STDMETHOD(QueryInterface)(REFIID riid, void **ppvObject);
   STDMETHOD_(ULONG, AddRef)();
@@ -32,8 +35,6 @@ class BrowserProtocolFactory : public IClassFactory {
  private:
   ULONG ref_;
   Browser::ProtocolHandler handler_;
-
-  DISALLOW_COPY_AND_ASSIGN(BrowserProtocolFactory);
 };
 
 }  // namespace nu

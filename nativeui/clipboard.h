@@ -155,8 +155,6 @@ class NATIVEUI_EXPORT Clipboard {
 #endif
 
   base::WeakPtrFactory<Clipboard> weak_factory_;
-
-  DISALLOW_COPY_AND_ASSIGN(Clipboard);
 };
 
 }  // namespace nu

@@ -5,7 +5,6 @@
 #ifndef NATIVEUI_WIN_FOCUS_MANAGER_H_
 #define NATIVEUI_WIN_FOCUS_MANAGER_H_
 
-#include "base/macros.h"
 #include "nativeui/nativeui_export.h"
 
 namespace nu {
@@ -18,6 +17,9 @@ class FocusManager {
  public:
   FocusManager();
   ~FocusManager();
+
+  FocusManager& operator=(const FocusManager&) = delete;
+  FocusManager(const FocusManager&) = delete;
 
   // Reset current focus tracking if the view is focused.
   void RemoveFocus(ViewImpl* view);
@@ -40,8 +42,6 @@ class FocusManager {
 
   bool show_focus_ring_ = false;
   ViewImpl* focused_view_ = nullptr;
-
-  DISALLOW_COPY_AND_ASSIGN(FocusManager);
 };
 
 }  // namespace nu

@@ -55,8 +55,6 @@ class NATIVEUI_EXPORT Appearance : public SignalDelegate {
   std::unique_ptr<internal::ColorSchemeObserver> color_scheme_observer_;
 
   base::WeakPtrFactory<Appearance> weak_factory_;
-
-  DISALLOW_COPY_AND_ASSIGN(Appearance);
 };
 
 }  // namespace nu

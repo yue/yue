@@ -16,6 +16,10 @@ namespace nu {
 // Communicate with the GUI message loop. All methods are thread-safe.
 class NATIVEUI_EXPORT MessageLoop {
  public:
+  MessageLoop() = delete;
+  MessageLoop(const MessageLoop&) = delete;
+  MessageLoop& operator=(const MessageLoop&) = delete;
+
   // Function type for tasks.
   using Task = std::function<void()>;
 
@@ -43,8 +47,6 @@ class NATIVEUI_EXPORT MessageLoop {
   static base::Lock lock_;
   static std::unordered_map<TimerId, Task> tasks_;
 #endif
-
-  DISALLOW_IMPLICIT_CONSTRUCTORS(MessageLoop);
 };
 
 }  // namespace nu

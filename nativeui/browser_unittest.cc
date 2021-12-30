@@ -479,11 +479,13 @@ TEST_P(BrowserTest, LargeFileProtocol) {
 using ::testing::Values;
 
 #if defined(OS_WIN)
-INSTANTIATE_TEST_CASE_P(IE, BrowserTest, Values(DEFAULT));
+INSTANTIATE_TEST_SUITE_P(IE, BrowserTest, Values(DEFAULT));
 #if defined(WEBVIEW2_SUPPORT)
-INSTANTIATE_TEST_CASE_P(WebView2, BrowserTest, Values(WEBVIEW2));
-INSTANTIATE_TEST_CASE_P(WebView2FallbackIE, BrowserTest, Values(WEBVIEW2_IE));
+INSTANTIATE_TEST_SUITE_P(WebView2, BrowserTest,
+                         Values(WEBVIEW2));
+INSTANTIATE_TEST_SUITE_P(WebView2FallbackIE, BrowserTest,
+                         Values(WEBVIEW2_IE));
 #endif  // defined(WEBVIEW2_SUPPORT)
 #else
-INSTANTIATE_TEST_CASE_P(WebKit, BrowserTest, Values(DEFAULT));
+INSTANTIATE_TEST_SUITE_P(WebKit, BrowserTest, Values(DEFAULT));
 #endif

@@ -4,7 +4,6 @@
 
 #include "nativeui/gtk/util/fontconfig.h"
 
-#include "base/macros.h"
 #include "base/no_destructor.h"
 
 namespace nu {
@@ -41,6 +40,9 @@ class GlobalFontConfig {
 
   ~GlobalFontConfig() { FcConfigDestroy(fc_config_); }
 
+  GlobalFontConfig& operator=(const GlobalFontConfig&) = delete;
+  GlobalFontConfig(const GlobalFontConfig&) = delete;
+
   // Retrieve the native font-config FcConfig pointer.
   FcConfig* Get() const {
     DCHECK_EQ(fc_config_, FcConfigGetCurrent());
@@ -55,8 +57,6 @@ class GlobalFontConfig {
 
  private:
   FcConfig* fc_config_ = nullptr;
-
-  DISALLOW_COPY_AND_ASSIGN(GlobalFontConfig);
 };
 
 // Extracts a string property from a font-config pattern (e.g. FcPattern).

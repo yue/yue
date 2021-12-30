@@ -5,6 +5,7 @@
 #include <node.h>
 #include <node_buffer.h>
 
+#include "base/ignore_result.h"
 #include "base/notreached.h"
 #include "nativeui/nativeui.h"
 #include "node_yue/binding_signal.h"

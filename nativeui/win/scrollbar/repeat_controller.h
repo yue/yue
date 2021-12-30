@@ -7,7 +7,6 @@
 
 #include <functional>
 
-#include "base/macros.h"
 #include "base/memory/weak_ptr.h"
 
 namespace nu {
@@ -35,8 +34,6 @@ class RepeatController {
   std::function<void()> callback_;
 
   base::WeakPtrFactory<RepeatController> weak_factory_;
-
-  DISALLOW_COPY_AND_ASSIGN(RepeatController);
 };
 
 }  // namespace nu

@@ -7,7 +7,6 @@
 
 #include <map>
 
-#include "base/macros.h"
 #include "build/build_config.h"
 #include "nativeui/nativeui_export.h"
 
@@ -25,6 +24,9 @@ class NATIVEUI_EXPORT AcceleratorManager {
  public:
   AcceleratorManager();
   ~AcceleratorManager();
+
+  AcceleratorManager(const AcceleratorManager&) = delete;
+  AcceleratorManager& operator=(const AcceleratorManager&) = delete;
 
   void RegisterAccelerator(MenuItem* item, const Accelerator& accelerator);
   void RemoveAccelerator(MenuItem* item, const Accelerator& accelerator);
@@ -48,8 +50,6 @@ class NATIVEUI_EXPORT AcceleratorManager {
   using AcceleratorMap = std::map<Accelerator, int>;
   AcceleratorMap accelerators_;
 #endif
-
-  DISALLOW_COPY_AND_ASSIGN(AcceleratorManager);
 };
 
 }  // namespace nu

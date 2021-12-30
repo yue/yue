@@ -5,8 +5,6 @@
 #ifndef LUA_STATE_H_
 #define LUA_STATE_H_
 
-#include "base/macros.h"
-
 extern "C" {
 #include "third_party/lua-compat-5.3/c-api/compat-5.3.h"
 }
@@ -26,12 +24,13 @@ class ManagedState {
     lua_close(state_);
   }
 
+  ManagedState& operator=(const ManagedState&) = delete;
+  ManagedState(const ManagedState&) = delete;
+
   operator State*() { return state_; }
 
  private:
   State* state_;
-
-  DISALLOW_COPY_AND_ASSIGN(ManagedState);
 };
 
 }  // namespace lua

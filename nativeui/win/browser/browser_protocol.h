@@ -77,8 +77,6 @@ class BrowserProtocol : public IInternetProtocol,
 
   Microsoft::WRL::ComPtr<IInternetProtocolSink> sink_;
   scoped_refptr<ProtocolJob> protocol_job_;
-
-  DISALLOW_COPY_AND_ASSIGN(BrowserProtocol);
 };
 
 }  // namespace nu

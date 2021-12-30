@@ -7,8 +7,6 @@
 
 #include <ole2.h>
 
-#include "base/macros.h"
-
 namespace nu {
 
 class BrowserImplIE;
@@ -17,6 +15,9 @@ class BrowserDocumentEvents : public IDispatch {
  public:
   explicit BrowserDocumentEvents(BrowserImplIE* browser);
   virtual ~BrowserDocumentEvents();
+
+  BrowserDocumentEvents& operator=(const BrowserDocumentEvents&) = delete;
+  BrowserDocumentEvents(const BrowserDocumentEvents&) = delete;
 
   // IUnknown
   STDMETHOD(QueryInterface)(REFIID riid, void **ppvObject);
@@ -45,8 +46,6 @@ class BrowserDocumentEvents : public IDispatch {
 
  private:
   ULONG ref_;
-
-  DISALLOW_COPY_AND_ASSIGN(BrowserDocumentEvents);
 };
 
 }  // namespace nu

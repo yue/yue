@@ -10,7 +10,6 @@
 
 #include <unordered_map>
 
-#include "base/macros.h"
 #include "nativeui/gfx/color.h"
 #include "nativeui/signal.h"
 
@@ -20,6 +19,9 @@ class GtkTheme {
  public:
   GtkTheme();
   ~GtkTheme();
+
+  GtkTheme& operator=(const GtkTheme&) = delete;
+  GtkTheme(const GtkTheme&) = delete;
 
   Color GetColor(Color::Name name);
 
@@ -33,8 +35,6 @@ class GtkTheme {
 
   gulong signal_gtk_theme_name_;
   gulong signal_gtk_prefer_dark_theme_;
-
-  DISALLOW_COPY_AND_ASSIGN(GtkTheme);
 };
 
 }  // namespace nu

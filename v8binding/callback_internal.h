@@ -79,8 +79,6 @@ class CallbackHolderBase {
       const v8::WeakCallbackInfo<CallbackHolderBase>& data);
 
   v8::Global<v8::External> v8_ref_;
-
-  DISALLOW_COPY_AND_ASSIGN(CallbackHolderBase);
 };
 
 template<typename Sig>
@@ -98,8 +96,6 @@ class CallbackHolder : public CallbackHolderBase {
 
  private:
   virtual ~CallbackHolder() {}
-
-  DISALLOW_COPY_AND_ASSIGN(CallbackHolder);
 };
 
 template<typename T>

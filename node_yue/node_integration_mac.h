@@ -17,8 +17,6 @@ class NodeIntegrationMac : public NodeIntegration {
 
  private:
   void PollEvents() override;
-
-  DISALLOW_COPY_AND_ASSIGN(NodeIntegrationMac);
 };
 
 }  // namespace node_yue

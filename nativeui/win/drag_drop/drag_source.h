@@ -10,7 +10,6 @@
 #include <wrl/client.h>
 #include <wrl/implements.h>
 
-#include "base/macros.h"
 #include "base/memory/ref_counted.h"
 
 namespace nu {
@@ -40,6 +39,9 @@ class DragSource
   explicit DragSource(Delegate* delegate);
   ~DragSource() override {}
 
+  DragSource& operator=(const DragSource&) = delete;
+  DragSource(const DragSource&) = delete;
+
   // Stop the drag operation at the next chance we get.  This doesn't
   // synchronously stop the drag (since Windows is controlling that),
   // but lets us tell Windows to cancel the drag the next chance we get.
@@ -57,8 +59,6 @@ class DragSource
   bool cancel_drag_ = false;
 
   Delegate* delegate_;
-
-  DISALLOW_COPY_AND_ASSIGN(DragSource);
 };
 
 }  // namespace nu

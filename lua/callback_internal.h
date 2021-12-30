@@ -31,14 +31,15 @@ class CallbackHolder {
   CallbackHolder(State* state, std::function<Sig> callback)
       : callback(std::move(callback)), ref_(state, -1) {}
 
+  CallbackHolder& operator=(const CallbackHolder&) = delete;
+  CallbackHolder(const CallbackHolder&) = delete;
+
   std::function<Sig> callback;
 
  private:
   // For Lua 5.1 on Windows, it is possible for an upvalue to be garbage
   // collected before the callback is called.
   Persistent ref_;
-
-  DISALLOW_COPY_AND_ASSIGN(CallbackHolder);
 };
 
 // Class template for extracting and storing single argument for callback

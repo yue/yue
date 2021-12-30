@@ -36,14 +36,15 @@ struct RefMethodRef {
   RefMethodRef(State* state, RefMethodArgs<T> args)
       : args(std::move(args)), ref_(state, -1) {}
 
+  RefMethodRef& operator=(const RefMethodRef&) = delete;
+  RefMethodRef(const RefMethodRef&) = delete;
+
   RefMethodArgs<T> args;
 
  private:
   // For Lua 5.1 on Windows, it is possible for an upvalue to be garbage
   // collected before the callback is called.
   Persistent ref_;
-
-  DISALLOW_COPY_AND_ASSIGN(RefMethodRef);
 };
 
 // Store the |arg| into the object at index |1|.

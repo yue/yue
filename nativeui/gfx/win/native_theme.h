@@ -16,7 +16,6 @@
 
 #include <map>
 
-#include "base/macros.h"
 #include "nativeui/gfx/color.h"
 #include "nativeui/gfx/geometry/rect.h"
 #include "nativeui/gfx/geometry/size.h"
@@ -47,6 +46,9 @@ class NativeTheme {
  public:
   NativeTheme();
   ~NativeTheme();
+
+  NativeTheme& operator=(const NativeTheme&) = delete;
+  NativeTheme(const NativeTheme&) = delete;
 
   enum class Part {
     Checkbox,
@@ -215,8 +217,6 @@ class NativeTheme {
 
   // A cache of open theme handles.
   mutable HANDLE theme_handles_[static_cast<size_t>(Part::Count)];
-
-  DISALLOW_COPY_AND_ASSIGN(NativeTheme);
 };
 
 }  // namespace nu

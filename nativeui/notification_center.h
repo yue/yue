@@ -105,8 +105,6 @@ class NATIVEUI_EXPORT NotificationCenter : SignalDelegate {
   NativeNotificationCenter center_ = nullptr;
 
   base::WeakPtrFactory<NotificationCenter> weak_factory_;
-
-  DISALLOW_COPY_AND_ASSIGN(NotificationCenter);
 };
 
 }  // namespace nu

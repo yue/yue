@@ -20,6 +20,9 @@ class Window;
 
 class NATIVEUI_EXPORT FileDialog : public base::RefCounted<FileDialog> {
  public:
+  FileDialog& operator=(const FileDialog&) = delete;
+  FileDialog(const FileDialog&) = delete;
+
   // Possible options that can be OR-ed.
   enum Option {
     OPTION_PICK_FOLDERS = 1 << 0,
@@ -57,8 +60,6 @@ class NATIVEUI_EXPORT FileDialog : public base::RefCounted<FileDialog> {
 
   std::vector<Filter> filters_;
   NativeFileDialog dialog_;
-
-  DISALLOW_COPY_AND_ASSIGN(FileDialog);
 };
 
 }  // namespace nu

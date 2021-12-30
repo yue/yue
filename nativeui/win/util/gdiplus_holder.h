@@ -20,10 +20,11 @@ class GdiplusHolder {
     Gdiplus::GdiplusShutdown(token_);
   }
 
+  GdiplusHolder& operator=(const GdiplusHolder&) = delete;
+  GdiplusHolder(const GdiplusHolder&) = delete;
+
  private:
   ULONG_PTR token_;
-
-  DISALLOW_COPY_AND_ASSIGN(GdiplusHolder);
 };
 
 

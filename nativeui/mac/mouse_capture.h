@@ -7,8 +7,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-#include "base/macros.h"
-
 namespace nu {
 
 class View;
@@ -19,14 +17,15 @@ class MouseCapture {
   explicit MouseCapture(View* view);
   ~MouseCapture();
 
+  MouseCapture& operator=(const MouseCapture&) = delete;
+  MouseCapture(const MouseCapture&) = delete;
+
  private:
   void ProcessCapturedMouseEvent(NSEvent* event);
 
   View* view_;
   id local_monitor_;
   id global_monitor_;
-
-  DISALLOW_COPY_AND_ASSIGN(MouseCapture);
 };
 
 }  // namespace nu

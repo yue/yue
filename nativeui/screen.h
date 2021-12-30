@@ -98,8 +98,6 @@ class NATIVEUI_EXPORT Screen : public SignalDelegate {
   DisplayList displays_;
 
   base::WeakPtrFactory<Screen> weak_factory_;
-
-  DISALLOW_COPY_AND_ASSIGN(Screen);
 };
 
 }  // namespace nu

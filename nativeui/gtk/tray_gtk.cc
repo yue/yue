@@ -10,6 +10,7 @@
 
 #include "base/check.h"
 #include "base/files/file_path.h"
+#include "base/ignore_result.h"
 #include "base/logging.h"
 #include "base/strings/stringprintf.h"
 #include "nativeui/app.h"

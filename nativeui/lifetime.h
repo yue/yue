@@ -8,7 +8,6 @@
 #include <vector>
 
 #include "base/files/file_path.h"
-#include "base/macros.h"
 #include "base/memory/weak_ptr.h"
 #include "nativeui/signal.h"
 
@@ -63,8 +62,6 @@ class NATIVEUI_EXPORT Lifetime {
 #endif
 
   base::WeakPtrFactory<Lifetime> weak_factory_;
-
-  DISALLOW_COPY_AND_ASSIGN(Lifetime);
 };
 
 }  // namespace nu

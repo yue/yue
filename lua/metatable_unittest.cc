@@ -40,10 +40,11 @@ class TestClass : public base::RefCounted<TestClass> {
       *ptr_ = 456;
   }
 
+  TestClass& operator=(const TestClass&) = delete;
+  TestClass(const TestClass&) = delete;
+
  private:
   int* ptr_;
-
-  DISALLOW_COPY_AND_ASSIGN(TestClass);
 };
 
 namespace lua {

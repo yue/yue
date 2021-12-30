@@ -63,8 +63,6 @@ class NodeIntegration {
   uv_sem_t embed_sem_;
 
   base::WeakPtrFactory<NodeIntegration> weak_factory_;
-
-  DISALLOW_COPY_AND_ASSIGN(NodeIntegration);
 };
 
 }  // namespace node_yue

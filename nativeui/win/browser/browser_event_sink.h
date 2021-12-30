@@ -9,8 +9,6 @@
 #include <exdisp.h>  // NOLINT
 #include <ole2.h>
 
-#include "base/macros.h"
-
 namespace nu {
 
 class BrowserImplIE;
@@ -19,6 +17,9 @@ class BrowserEventSink : public IDispatch {
  public:
   explicit BrowserEventSink(BrowserImplIE* browser);
   virtual ~BrowserEventSink();
+
+  BrowserEventSink& operator=(const BrowserEventSink&) = delete;
+  BrowserEventSink(const BrowserEventSink&) = delete;
 
   // Mark we are loading html string.
   void set_load_html(bool is) { is_load_html_ = is; }
@@ -55,8 +56,6 @@ class BrowserEventSink : public IDispatch {
   BrowserImplIE* browser_;
 
   bool is_load_html_ = false;
-
-  DISALLOW_COPY_AND_ASSIGN(BrowserEventSink);
 };
 
 }  // namespace nu

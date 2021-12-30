@@ -86,8 +86,6 @@ class NATIVEUI_EXPORT App {
 #endif
 
   base::WeakPtrFactory<App> weak_factory_;
-
-  DISALLOW_COPY_AND_ASSIGN(App);
 };
 
 }  // namespace nu
