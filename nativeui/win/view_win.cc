@@ -348,6 +348,9 @@ void View::PlatformDestroy() {
   delete view_;
 }
 
+void View::OnConnect(int identifier) {
+}
+
 void View::TakeOverView(NativeView view) {
   view_ = view;
 }

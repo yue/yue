@@ -37,9 +37,6 @@ namespace nu {
 // Return whether a class is part of nativeui system.
 bool IsNUView(id view);
 
-// Return whether a class has been installed with custom methods.
-bool NUViewMethodsInstalled(Class cl);
-
 // Add custom view methods to class.
 void InstallNUViewMethods(Class cl);
 

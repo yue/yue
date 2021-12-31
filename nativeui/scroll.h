@@ -18,8 +18,7 @@
 
 namespace nu {
 
-class NATIVEUI_EXPORT Scroll : public View,
-                               public SignalDelegate {
+class NATIVEUI_EXPORT Scroll : public View {
  public:
   Scroll();
 
@@ -77,6 +76,8 @@ class NATIVEUI_EXPORT Scroll : public View,
   void OnConnect(int identifier) override;
 
  private:
+  void SubscribeOnScroll();
+
 #if defined(OS_LINUX)
   ulong h_signal_ = 0;
   ulong v_signal_ = 0;

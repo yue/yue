@@ -55,6 +55,21 @@ void View::PlatformDestroy() {
   [view_ release];
 }
 
+void View::OnConnect(int identifier) {
+  switch (identifier) {
+    case kOnMouseMove:
+      // Install event tracking area.
+      [view_ enableTracking];
+      FALLTHROUGH;
+    case kOnMouseClick:
+      AddMouseEventHandlerToClass([view_ class]);
+      break;
+    case kOnKey:
+      AddKeyEventHandlerToClass([view_ class]);
+      break;
+  }
+}
+
 void View::TakeOverView(NativeView view) {
   view_ = view;
 
@@ -62,17 +77,7 @@ void View::TakeOverView(NativeView view) {
     return;
 
   // Install events handle for the view's class.
-  Class cl = [view class];
-  if (!NUViewMethodsInstalled(cl)) {
-    InstallNUViewMethods(cl);
-    // TODO(zcbenz): Lazily install the event hooks.
-    if (GetClassName() != Browser::kClassName) {
-      // WKWebView does not like having mouse event handlers installed.
-      AddMouseEventHandlerToClass(cl);
-    }
-    AddKeyEventHandlerToClass(cl);
-    AddDragDropHandlerToClass(cl);
-  }
+  InstallNUViewMethods([view class]);
 
   // Initialize private bits of the view.
   NUPrivate* priv = [view nuPrivate];
@@ -90,9 +95,17 @@ void View::TakeOverView(NativeView view) {
       [[view superclass] instanceMethodForSelector:cmd]);
   priv->draggable = super_impl(view, cmd);
 
-  // Install event tracking area.
-  // TODO(zcbenz): Lazily install the event hooks.
-  [view enableTracking];
+  // Lazy install event handlers.
+  on_key_down.SetDelegate(this, kOnKey);
+  on_key_up.SetDelegate(this, kOnKey);
+  // WKWebView does not like having mouse event handlers installed.
+  if (GetClassName() != Browser::kClassName) {
+    on_mouse_down.SetDelegate(this, kOnMouseClick);
+    on_mouse_up.SetDelegate(this, kOnMouseClick);
+    on_mouse_move.SetDelegate(this, kOnMouseMove);
+    on_mouse_enter.SetDelegate(this, kOnMouseMove);
+    on_mouse_leave.SetDelegate(this, kOnMouseMove);
+  }
 }
 
 void View::SetBounds(const RectF& bounds) {
@@ -311,6 +324,7 @@ void View::RegisterDraggedTypes(std::set<Clipboard::Data::Type> types) {
     }
   }
   [view_ registerForDraggedTypes:newTypes];
+  AddDragDropHandlerToClass([view_ class]);
 }
 
 void View::PlatformSetCursor(Cursor* cursor) {

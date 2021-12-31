@@ -43,4 +43,10 @@ const char* Scroll::GetClassName() const {
   return kClassName;
 }
 
+void Scroll::OnConnect(int identifier) {
+  View::OnConnect(identifier);
+  if (identifier == kOnScroll)
+    SubscribeOnScroll();
+}
+
 }  // namespace nu

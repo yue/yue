@@ -70,6 +70,8 @@ void ResetCursorRects(NSView* self, SEL _cmd) {
 
 void EnableTracking(NSView* self, SEL _cmd) {
   NUPrivate* priv = [self nuPrivate];
+  if (priv->tracking_area)
+    return;
   NSTrackingAreaOptions trackingOptions = NSTrackingMouseEnteredAndExited |
                                           NSTrackingMouseMoved |
                                           NSTrackingActiveAlways |
@@ -156,12 +158,11 @@ bool IsNUView(id view) {
   return [view respondsToSelector:@selector(nuPrivate)];
 }
 
-bool NUViewMethodsInstalled(Class cl) {
-  return class_getClassMethod(cl, @selector(nuInjected)) != nullptr;
-}
-
 void InstallNUViewMethods(Class cl) {
+  if ([cl instancesRespondToSelector:@selector(nuInjected)])
+    return;
   class_addMethod(cl, @selector(nuInjected), (IMP)NUInjected, "B@:");
+
   class_addMethod(cl, @selector(shell), (IMP)GetShell, "^v@:");
   class_addMethod(cl, @selector(acceptsFirstResponder),
                   (IMP)AcceptsFirstResponder, "B@:");

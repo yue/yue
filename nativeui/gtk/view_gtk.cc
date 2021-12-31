@@ -240,6 +240,38 @@ void View::PlatformDestroy() {
   }
 }
 
+void View::OnConnect(int identifier) {
+  switch (identifier) {
+    case kOnMouseMove:
+      if (!on_mouse_move_installed_) {
+        g_signal_connect(view_, "motion-notify-event",
+                         G_CALLBACK(OnMouseMove), this);
+        g_signal_connect(view_, "enter-notify-event",
+                         G_CALLBACK(OnMouseEvent), this);
+        g_signal_connect(view_, "leave-notify-event",
+                         G_CALLBACK(OnMouseEvent), this);
+        on_mouse_move_installed_ = true;
+      }
+      break;
+    case kOnMouseClick:
+      if (!on_mouse_click_installed_) {
+        g_signal_connect(view_, "button-press-event",
+                         G_CALLBACK(OnMouseEvent), this);
+        g_signal_connect(view_, "button-release-event",
+                         G_CALLBACK(OnMouseEvent), this);
+        on_mouse_click_installed_ = true;
+      }
+      break;
+    case kOnKey:
+      if (!on_key_installed_) {
+        g_signal_connect(view_, "key-press-event", G_CALLBACK(OnKeyDown), this);
+        g_signal_connect(view_, "key-release-event", G_CALLBACK(OnKeyUp), this);
+        on_key_installed_ = true;
+      }
+      break;
+  }
+}
+
 void View::TakeOverView(NativeView view) {
   view_ = view;
   g_object_ref_sink(view);
@@ -254,23 +286,18 @@ void View::TakeOverView(NativeView view) {
   gtk_widget_add_events(view, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
                               GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK);
 
+  // Lazy install event handlers.
+  on_mouse_down.SetDelegate(this, kOnMouseClick);
+  on_mouse_up.SetDelegate(this, kOnMouseClick);
+  on_mouse_move.SetDelegate(this, kOnMouseMove);
+  on_mouse_enter.SetDelegate(this, kOnMouseMove);
+  on_mouse_leave.SetDelegate(this, kOnMouseMove);
+  on_key_down.SetDelegate(this, kOnKey);
+  on_key_up.SetDelegate(this, kOnKey);
+
   // Install event hooks.
   g_signal_connect(view, "size-allocate", G_CALLBACK(OnSizeAllocate), priv);
   g_signal_connect(view, "realize", G_CALLBACK(OnRealize), this);
-  g_signal_connect(view, "motion-notify-event", G_CALLBACK(OnMouseMove), this);
-  // TODO(zcbenz): Lazily install the event hooks.
-  g_signal_connect(view, "button-press-event", G_CALLBACK(OnMouseEvent), this);
-  g_signal_connect(view, "button-release-event", G_CALLBACK(OnMouseEvent), this);  // NOLINT
-  g_signal_connect(view, "enter-notify-event", G_CALLBACK(OnMouseEvent), this);
-  g_signal_connect(view, "leave-notify-event", G_CALLBACK(OnMouseEvent), this);
-  g_signal_connect(view, "key-press-event", G_CALLBACK(OnKeyDown), this);
-  g_signal_connect(view, "key-release-event", G_CALLBACK(OnKeyUp), this);
-  g_signal_connect(view, "drag-end", G_CALLBACK(OnDragEnd), priv);
-  g_signal_connect(view, "drag-data-get", G_CALLBACK(OnDragDataGet), priv);
-  g_signal_connect(view, "drag-motion", G_CALLBACK(OnDragMotion), priv);
-  g_signal_connect(view, "drag-leave", G_CALLBACK(OnDragLeave), priv);
-  g_signal_connect(view, "drag-drop", G_CALLBACK(OnDragDrop), priv);
-  g_signal_connect(view, "drag-data-received", G_CALLBACK(OnDragDataReceived), priv);  // NOLINT
 }
 
 Vector2dF View::OffsetFromView(const View* from) const {
@@ -491,6 +518,18 @@ void View::RegisterDraggedTypes(std::set<Clipboard::Data::Type> types) {
     gtk_target_table_free(table, size);
   }
   gtk_target_list_unref(targets);
+
+  // Install drag drop event handlers.
+  if (!on_drop_installed_) {
+    g_signal_connect(view_, "drag-end", G_CALLBACK(OnDragEnd), priv);
+    g_signal_connect(view_, "drag-data-get", G_CALLBACK(OnDragDataGet), priv);
+    g_signal_connect(view_, "drag-motion", G_CALLBACK(OnDragMotion), priv);
+    g_signal_connect(view_, "drag-leave", G_CALLBACK(OnDragLeave), priv);
+    g_signal_connect(view_, "drag-drop", G_CALLBACK(OnDragDrop), priv);
+    g_signal_connect(view_, "drag-data-received",
+                     G_CALLBACK(OnDragDataReceived), priv);
+    on_drop_installed_ = true;
+  }
 }
 
 void View::PlatformSetCursor(Cursor* cursor) {

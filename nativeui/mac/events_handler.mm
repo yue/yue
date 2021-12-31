@@ -25,6 +25,10 @@ View* CheckAndGetView(NSView* self) {
   return view;
 }
 
+bool NUDummy(NSView* self, SEL _cmd) {
+  return true;
+}
+
 void OnMouseEvent(NSView* self, SEL _cmd, NSEvent* event) {
   View* view = CheckAndGetView(self);
   if (!view)
@@ -122,6 +126,10 @@ void DraggingSessionEnded(NSView* self, SEL _cmd, NSDraggingSession*,
 }  // namespace
 
 void AddMouseEventHandlerToClass(Class cl) {
+  if ([cl instancesRespondToSelector:@selector(nuMouseHandlerInjected)])
+    return;
+  class_addMethod(cl, @selector(nuMouseHandlerInjected), (IMP)NUDummy, "B@:");
+
   class_addMethod(cl, @selector(mouseDown:), (IMP)OnMouseEvent, "v@:@");
   class_addMethod(cl, @selector(rightMouseDown:), (IMP)OnMouseEvent, "v@:@");
   class_addMethod(cl, @selector(otherMouseDown:), (IMP)OnMouseEvent, "v@:@");
@@ -137,12 +145,20 @@ void AddMouseEventHandlerToClass(Class cl) {
 }
 
 void AddKeyEventHandlerToClass(Class cl) {
+  if ([cl instancesRespondToSelector:@selector(nuKeyHandlerInjected)])
+    return;
+  class_addMethod(cl, @selector(nuKeyHandlerInjected), (IMP)NUDummy, "B@:");
+
   class_addMethod(cl, @selector(keyDown:), (IMP)OnKeyEvent, "v@:@");
   class_addMethod(cl, @selector(keyUp:), (IMP)OnKeyEvent, "v@:@");
   class_addMethod(cl, @selector(flagsChanged:), (IMP)OnKeyEvent, "v@:@");
 }
 
 void AddDragDropHandlerToClass(Class cl) {
+  if ([cl instancesRespondToSelector:@selector(nuDropHandlerInjected)])
+    return;
+  class_addMethod(cl, @selector(nuDropHandlerInjected), (IMP)NUDummy, "B@:");
+
   class_addMethod(cl, @selector(draggingEntered:),
                   (IMP)DraggingEntered, "L@:@");
   class_addMethod(cl, @selector(draggingUpdated:),

@@ -134,8 +134,8 @@ std::tuple<Scroll::Policy, Scroll::Policy> Scroll::GetScrollbarPolicy() const {
   return std::make_tuple(PolicyFromGTK(hp), PolicyFromGTK(vp));
 }
 
-void Scroll::OnConnect(int identifier) {
-  if (identifier == kOnScroll && h_signal_ == 0) {
+void Scroll::SubscribeOnScroll() {
+  if (h_signal_ == 0) {
     auto* window = GTK_SCROLLED_WINDOW(GetNative());
     auto* h_adjust = gtk_scrolled_window_get_hadjustment(window);
     auto* v_adjust = gtk_scrolled_window_get_vadjustment(window);

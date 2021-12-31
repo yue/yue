@@ -29,7 +29,8 @@ struct MouseEvent;
 struct KeyEvent;
 
 // The base class for all kinds of views.
-class NATIVEUI_EXPORT View : public base::RefCounted<View> {
+class NATIVEUI_EXPORT View : public base::RefCounted<View>,
+                             public SignalDelegate {
  public:
   // The view class name.
   static const char kClassName[];
@@ -189,15 +190,20 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
 
  protected:
   View();
-  virtual ~View();
+  ~View() override;
 
   // Update the default style.
   void UpdateDefaultStyle();
 
+  // Event types.
+  enum { kOnMouseClick, kOnMouseMove, kOnKey };
+
+  // SignalDelegate:
+  void OnConnect(int identifier) override;
+
   // Called by subclasses to take the ownership of |view|.
   void TakeOverView(NativeView view);
 
-  void PlatformInit();
   void PlatformDestroy();
   void PlatformSetVisible(bool visible);
   void PlatformSetCursor(Cursor* cursor);
@@ -205,6 +211,14 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View> {
 
  private:
   friend class base::RefCounted<View>;
+
+#if defined(OS_LINUX)
+  // Whether events have been installed.
+  bool on_mouse_move_installed_ = false;
+  bool on_mouse_click_installed_ = false;
+  bool on_key_installed_ = false;
+  bool on_drop_installed_ = false;
+#endif
 
   // Relationships.
   View* parent_ = nullptr;

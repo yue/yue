@@ -185,11 +185,9 @@ std::tuple<Scroll::Elasticity, Scroll::Elasticity> Scroll::GetScrollElasticity()
   return std::make_tuple(h, v);
 }
 
-void Scroll::OnConnect(int identifier) {
-  if (identifier == kOnScroll) {
-    auto* scroll = static_cast<NUScroll*>(GetNative());
-    [scroll setEventEnabled:YES];
-  }
+void Scroll::SubscribeOnScroll() {
+  auto* scroll = static_cast<NUScroll*>(GetNative());
+  [scroll setEventEnabled:YES];
 }
 
 }  // namespace nu
