@@ -44,6 +44,10 @@ NSString* UTIFromPboardType(NSString* type) {
 
 void View::PlatformDestroy() {
   if (IsNUView(view_)) {
+    // Release all hooks before destroying the view.
+    [view_ disableTracking];
+    CancelDrag();
+    ReleaseCapture();
     // The view may be referenced after this class gets destroyed.
     NUPrivate* priv = [view_ nuPrivate];
     priv->shell = nullptr;

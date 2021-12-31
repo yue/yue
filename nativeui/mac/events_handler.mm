@@ -17,11 +17,18 @@ namespace nu {
 
 namespace {
 
-void OnMouseEvent(NSView* self, SEL _cmd, NSEvent* event) {
-  DCHECK([self respondsToSelector:@selector(shell)])
+View* CheckAndGetView(NSView* self) {
+  CHECK([self respondsToSelector:@selector(shell)])
       << "Handler called for view other than NUView";
   View* view = [self shell];
-  DCHECK(view);
+  DCHECK(view) << "Handler called after view is destroyed";
+  return view;
+}
+
+void OnMouseEvent(NSView* self, SEL _cmd, NSEvent* event) {
+  View* view = CheckAndGetView(self);
+  if (!view)
+    return;
 
   // Emit the event to View.
   if (!DispatchMouseEvent(view, event)) {
@@ -33,10 +40,9 @@ void OnMouseEvent(NSView* self, SEL _cmd, NSEvent* event) {
 }
 
 void OnKeyEvent(NSView* self, SEL _cmd, NSEvent* event) {
-  DCHECK([self respondsToSelector:@selector(shell)])
-      << "Handler called for view other than NUView";
-  View* view = [self shell];
-  DCHECK(view);
+  View* view = CheckAndGetView(self);
+  if (!view)
+    return;
 
   // Emit the event to View.
   bool prevent_default = false;
@@ -57,8 +63,8 @@ void OnKeyEvent(NSView* self, SEL _cmd, NSEvent* event) {
 }
 
 NSDragOperation DraggingEntered(NSView* self, SEL _cmd, id<NSDraggingInfo> info) {
-  View* view = [self shell];
-  if (!view->handle_drag_enter)
+  View* view = CheckAndGetView(self);
+  if (!view || !view->handle_drag_enter)
     return NSDragOperationNone;
 
   DraggingInfoMac dragging_info(info);
@@ -68,8 +74,8 @@ NSDragOperation DraggingEntered(NSView* self, SEL _cmd, id<NSDraggingInfo> info)
 }
 
 NSDragOperation DraggingUpdated(NSView* self, SEL _cmd, id<NSDraggingInfo> info) {
-  View* view = [self shell];
-  if (!view->handle_drag_update)
+  View* view = CheckAndGetView(self);
+  if (!view || !view->handle_drag_update)
     return [self nuPrivate]->last_drop_operation;
 
   DraggingInfoMac dragging_info(info);
@@ -79,8 +85,8 @@ NSDragOperation DraggingUpdated(NSView* self, SEL _cmd, id<NSDraggingInfo> info)
 }
 
 void DraggingExited(NSView* self, SEL _cmd, id<NSDraggingInfo> info) {
-  View* view = [self shell];
-  if (view->on_drag_leave.IsEmpty())
+  View* view = CheckAndGetView(self);
+  if (!view || view->on_drag_leave.IsEmpty())
     return;
 
   DraggingInfoMac dragging_info(info);
@@ -88,7 +94,9 @@ void DraggingExited(NSView* self, SEL _cmd, id<NSDraggingInfo> info) {
 }
 
 BOOL PerformDragOperation(NSView* self, SEL _cmd, id<NSDraggingInfo> info) {
-  View* view = [self shell];
+  View* view = CheckAndGetView(self);
+  if (!view)
+    return NO;
 
   // Emit on_drag_leave to match the behavir on GTK.
   DraggingInfoMac dragging_info(info);
