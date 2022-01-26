@@ -37,7 +37,8 @@ class Toolbar;
 #endif
 
 // The native window.
-class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
+class NATIVEUI_EXPORT Window : public base::RefCounted<Window>,
+                               public Responder<Window> {
  public:
   struct Options {
     // Whether the window has a chrome.
@@ -45,6 +46,10 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
     // Whether the window is transparent.
     bool transparent = false;
 
+#if defined(OS_LINUX) || defined(OS_WIN)
+    // The window can not be activated.
+    bool no_activate = false;
+#endif
 #if defined(OS_MAC)
     // Show window buttons for the frameless window.
     bool show_traffic_lights = false;
@@ -66,8 +71,12 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
   void Center();
   void SetContentSize(const SizeF& size);
   SizeF GetContentSize() const;
+  RectF GetContentBounds() const;
   void SetBounds(const RectF& bounds);
   RectF GetBounds() const;
+
+  RectF ContentBoundsToWindowBounds(const RectF& bounds) const;
+  RectF WindowBoundsToContentBounds(const RectF& bounds) const;
 
   void SetSizeConstraints(const SizeF& min_size, const SizeF& max_size);
   std::tuple<SizeF, SizeF> GetSizeConstraints() const;
@@ -103,6 +112,10 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
   std::string GetTitle() const;
   void SetBackgroundColor(Color color);
 
+  void SetCapture();
+  void ReleaseCapture();
+  bool HasCapture() const;
+
 #if defined(OS_MAC)
   void SetToolbar(scoped_refptr<Toolbar> toolbar);
   Toolbar* GetToolbar() const { return toolbar_.get(); }
@@ -137,12 +150,13 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window> {
   Signal<void(Window*)> on_close;
   Signal<void(Window*)> on_focus;
   Signal<void(Window*)> on_blur;
+  Signal<void(Window*)> on_capture_lost;
 
   // Delegate methods.
   std::function<bool(Window*)> should_close;
 
  protected:
-  virtual ~Window();
+  ~Window() override;
 
  private:
   friend class base::RefCounted<Window>;

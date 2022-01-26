@@ -6,8 +6,6 @@
 
 #include <gtk/gtk.h>
 
-#include <algorithm>
-
 #include "nativeui/gtk/util/widget_util.h"
 #include "nativeui/menu_bar.h"
 
@@ -18,8 +16,11 @@ namespace {
 // Window private data.
 struct NUWindowPrivate {
   Window* delegate = nullptr;
-  // Window states.
+  bool is_popup = false;
+  bool is_csd = false;
+  // Cached window bounds, which is the content area including menu bar.
   RectF bounds;
+  // Cached window states.
   int window_state = 0;
   // Insets of native window frame.
   InsetsF native_frame;
@@ -30,6 +31,8 @@ struct NUWindowPrivate {
   bool use_content_minmax_size = false;
   SizeF min_size;
   SizeF max_size;
+  // Mouse capture.
+  GdkDevice* captured_device = nullptr;
   // Input shape fields.
   bool is_input_shape_set = false;
   bool is_draw_handler_set = false;
@@ -40,70 +43,6 @@ struct NUWindowPrivate {
 inline NUWindowPrivate* GetPrivate(const Window* window) {
   return static_cast<NUWindowPrivate*>(g_object_get_data(
       G_OBJECT(window->GetNative()), "private"));
-}
-
-// Create a region from all opaque and semi-transparent points in the context.
-cairo_region_t* CreateRegionForNonAlphaArea(cairo_t* cr) {
-  // Calculate the extents of the context.
-  GdkRectangle extents;
-  double x1 = 0, y1 = 0, x2 = 0, y2 = 0;
-  cairo_clip_extents(cr, &x1, &y1, &x2, &y2);
-  extents.x = std::floor(x1);
-  extents.y = std::floor(y1);
-  extents.width = std::max(std::ceil(x2) - extents.x, 0.);
-  extents.height = std::max(std::ceil(y2) - extents.y, 0.);
-
-  // The entire surface is a region if there is no alpha channel.
-  cairo_surface_t* surface = cairo_get_target(cr);
-  if (cairo_surface_get_content(surface) == CAIRO_CONTENT_COLOR)
-    return cairo_region_create_rectangle(&extents);
-
-  cairo_surface_t* image;
-  if (cairo_surface_get_type(surface) != CAIRO_SURFACE_TYPE_IMAGE ||
-      cairo_image_surface_get_format(surface) != CAIRO_FORMAT_A8) {
-    // We work on A8 images to get full alpha channel.
-    image = cairo_image_surface_create(CAIRO_FORMAT_A8,
-                                       extents.width, extents.height);
-    cairo_t* image_cr = cairo_create(image);
-    cairo_set_source_surface(image_cr, surface, -extents.x, -extents.y);
-    cairo_paint(image_cr);
-    cairo_surface_flush(image);
-    cairo_destroy(image_cr);
-  } else {
-    image = cairo_surface_reference(surface);
-    cairo_surface_flush(image);
-  }
-
-  // Iterate through the image.
-  uint8_t* data = cairo_image_surface_get_data(image);
-  int stride = cairo_image_surface_get_stride(image);
-
-  cairo_region_t* region = cairo_region_create();
-  for (int y = 0; y < extents.height; y++) {
-    for (int x = 0; x < extents.width; x++) {
-      // Find a row with all transparent pixels.
-      int ps = x;
-      while (x < extents.width) {
-        // Only full-transparent pixels are treated as transparent, this is
-        // to match the behavior of macOS and Win32.
-        if (data[x] == 0)
-          break;
-        x++;
-      }
-
-      if (x > ps) {
-        // Add the row to region.
-        GdkRectangle rect = {ps, y, x - ps, 1};
-        cairo_region_union_rectangle(region, &rect);
-      }
-    }
-
-    data += stride;
-  }
-
-  cairo_surface_destroy(image);
-  cairo_region_translate(region, extents.x, extents.y);
-  return region;
 }
 
 // User clicks the close button.
@@ -120,8 +59,8 @@ gboolean OnMap(GtkWidget* widget, GdkEvent* event, NUWindowPrivate* priv) {
   // Calculate the native window frame.
   GetNativeFrameInsets(widget, &priv->native_frame);
   // Calculate the client shadow for CSD window.
-  if (IsUsingCSD(GTK_WINDOW(widget)))
-    priv->client_shadow = GetClientShadow(GTK_WINDOW(widget));
+  if (priv->is_csd)
+    GetClientShadow(GTK_WINDOW(widget), &priv->client_shadow, &priv->bounds);
   // Set size constraints if needed.
   if (priv->needs_to_update_minmax_size) {
     if (priv->use_content_minmax_size)
@@ -136,8 +75,8 @@ gboolean OnMap(GtkWidget* widget, GdkEvent* event, NUWindowPrivate* priv) {
 gboolean OnConfigure(GtkWidget* widget, GdkEventConfigure* event,
                      NUWindowPrivate* priv) {
   priv->bounds = RectF(event->x, event->y, event->width, event->height);
-  if (!IsUsingCSD(GTK_WINDOW(widget)))
-    priv->bounds.Inset(-priv->native_frame);
+  if (priv->is_csd)
+    priv->bounds.Inset(priv->client_shadow);
   return FALSE;
 }
 
@@ -145,6 +84,13 @@ gboolean OnConfigure(GtkWidget* widget, GdkEventConfigure* event,
 gboolean OnWindowState(GtkWidget* widget, GdkEvent* event,
                        NUWindowPrivate* priv) {
   priv->window_state = event->window_state.new_window_state;
+  return FALSE;
+}
+
+// Window has lost grab.
+gboolean OnWindowGrabBroken(GtkWidget*, GdkEventGrabBroken*, Window* window) {
+  GetPrivate(window)->captured_device = nullptr;
+  window->on_capture_lost.Emit(window);
   return FALSE;
 }
 
@@ -190,10 +136,12 @@ inline int GetMenuBarHeight(const Window* window) {
 }  // namespace
 
 void Window::PlatformInit(const Options& options) {
-  window_ = GTK_WINDOW(gtk_window_new(GTK_WINDOW_TOPLEVEL));
+  window_ = GTK_WINDOW(gtk_window_new(
+        options.no_activate ? GTK_WINDOW_POPUP : GTK_WINDOW_TOPLEVEL));
 
   NUWindowPrivate* priv = new NUWindowPrivate;
   priv->delegate = this;
+  priv->is_popup = options.no_activate;
   g_object_set_data_full(G_OBJECT(window_), "private", priv,
                          Delete<NUWindowPrivate>);
 
@@ -207,13 +155,23 @@ void Window::PlatformInit(const Options& options) {
                    G_CALLBACK(OnConfigure), priv);
   g_signal_connect(window_, "window-state-event",
                    G_CALLBACK(OnWindowState), priv);
+  g_signal_connect(window_, "grab-broken-event",
+                   G_CALLBACK(OnWindowGrabBroken), this);
   g_signal_connect(window_, "notify::is-active",
                    G_CALLBACK(OnIsActiveChanged), this);
 
-  if (!options.frame) {
+  // Lazy install event handlers.
+  on_mouse_down.SetDelegate(this, kOnMouseClick);
+  on_mouse_up.SetDelegate(this, kOnMouseClick);
+  on_mouse_move.SetDelegate(this, kOnMouseMove);
+  on_mouse_enter.SetDelegate(this, kOnMouseMove);
+  on_mouse_leave.SetDelegate(this, kOnMouseMove);
+
+  if (!options.frame && !priv->is_popup) {
     // Rely on client-side decoration to provide window features for frameless
     // window, like resizing and shadows.
     EnableCSD(window_);
+    priv->is_csd = true;
   }
 
   if (options.transparent) {
@@ -283,34 +241,65 @@ void Window::SetContentSize(const SizeF& size) {
   ResizeWindow(window_, IsResizable(), size.width(), height);
   // Save the size request.
   NUWindowPrivate* priv = GetPrivate(this);
-  priv->bounds.Inset(priv->native_frame);
   priv->bounds.set_width(size.width());
   priv->bounds.set_height(height);
-  priv->bounds.Inset(-priv->native_frame);
 }
 
 SizeF Window::GetContentSize() const {
+  return GetContentBounds().size();
+}
+
+RectF Window::GetContentBounds() const {
   NUWindowPrivate* priv = GetPrivate(this);
   RectF cbounds = priv->bounds;
-  cbounds.Inset(priv->native_frame);
-  cbounds.set_height(cbounds.height() - GetMenuBarHeight(this));
-  return cbounds.size();
+  // Popup window does not receive configure event, do not use cached bounds.
+  if (priv->is_popup && gtk_widget_get_mapped(GTK_WIDGET(window_))) {
+    GdkWindow* gdkwindow = gtk_widget_get_window(GTK_WIDGET(window_));
+    if (gdkwindow) {
+      int x, y, width, height;
+      gdk_window_get_geometry(gdkwindow, &x, &y, &width, &height);
+      cbounds = RectF(x, y, width, height);
+    }
+  }
+  cbounds.Inset(0, GetMenuBarHeight(this), 0, 0);
+  return cbounds;
 }
 
 void Window::SetBounds(const RectF& bounds) {
-  // Save the size request.
   NUWindowPrivate* priv = GetPrivate(this);
-  priv->bounds = bounds;
   // GTK does not count frame when resizing window.
+  // FIXME(zcbenz): Setting bounds before window is mapped would result in
+  // wrong window size, as the size of native frame is not available yet.
   RectF cbounds(bounds);
   cbounds.Inset(priv->native_frame);
   ResizeWindow(window_, IsResizable(), cbounds.width(), cbounds.height());
   gtk_window_move(window_, cbounds.x(), cbounds.y());
+  // Save the size request.
+  priv->bounds = cbounds;
 }
 
 RectF Window::GetBounds() const {
+  return ContentBoundsToWindowBounds(GetContentBounds());
+}
+
+RectF Window::ContentBoundsToWindowBounds(const RectF& bounds) const {
   NUWindowPrivate* priv = GetPrivate(this);
-  return priv->bounds;
+  if (priv->is_popup)
+    return bounds;
+  RectF result = bounds;
+  result.Inset(0, -GetMenuBarHeight(this), 0, 0);
+  result.Inset(-priv->native_frame);
+  return result;
+}
+
+RectF Window::WindowBoundsToContentBounds(const RectF& bounds) const {
+  NUWindowPrivate* priv = GetPrivate(this);
+  if (priv->is_popup)
+    return bounds;
+  RectF result = bounds;
+  result.Inset(priv->native_frame);
+  result.Inset(0, GetMenuBarHeight(this), 0, 0);
+  return result;
 }
 
 void Window::SetSizeConstraints(const SizeF& min_size, const SizeF& max_size) {
@@ -332,16 +321,14 @@ void Window::SetSizeConstraints(const SizeF& min_size, const SizeF& max_size) {
   int flags = 0;
   if (!min_size.IsEmpty()) {
     RectF bounds(min_size);
-    bounds.Inset(IsUsingCSD(window_) ? -priv->client_shadow
-                                     : priv->native_frame);
+    bounds.Inset(priv->is_csd ? -priv->client_shadow : priv->native_frame);
     flags |= GDK_HINT_MIN_SIZE;
     hints.min_width = bounds.width();
     hints.min_height = bounds.height();
   }
   if (!max_size.IsEmpty()) {
     RectF bounds(max_size);
-    bounds.Inset(IsUsingCSD(window_) ? -priv->client_shadow
-                                     : priv->native_frame);
+    bounds.Inset(priv->is_csd ? -priv->client_shadow : priv->native_frame);
     flags |= GDK_HINT_MAX_SIZE;
     hints.max_width = bounds.width();
     hints.max_height = bounds.height();
@@ -377,7 +364,7 @@ void Window::SetContentSizeConstraints(const SizeF& min_size,
   if (!min_size.IsEmpty()) {
     RectF bounds(min_size);
     bounds.set_height(bounds.height() + GetMenuBarHeight(this));
-    if (IsUsingCSD(window_))
+    if (priv->is_csd)
       bounds.Inset(-priv->client_shadow);
     priv->min_size = bounds.size();
     flags |= GDK_HINT_MIN_SIZE;
@@ -387,7 +374,7 @@ void Window::SetContentSizeConstraints(const SizeF& min_size,
   if (!max_size.IsEmpty()) {
     RectF bounds(max_size);
     bounds.set_height(bounds.height() + GetMenuBarHeight(this));
-    if (IsUsingCSD(window_))
+    if (priv->is_csd)
       bounds.Inset(-priv->client_shadow);
     priv->max_size = bounds.size();
     flags |= GDK_HINT_MAX_SIZE;
@@ -498,13 +485,17 @@ void Window::SetResizable(bool resizable) {
   // For transparent window, using CSD means having extra shadow and border, so
   // we only use CSD when window is not resizable.
   if (!HasFrame() && IsTransparent()) {
-    if (IsUsingCSD(window_) && !resizable) {
+    auto* priv = GetPrivate(this);
+    if (priv->is_csd && !resizable) {
       DisableCSD(window_);
-    } else if (!IsUsingCSD(window_) && resizable) {
-      EnableCSD(window_);
-      // Update client shadow.
+      priv->is_csd = false;
       if (gtk_widget_get_mapped(GTK_WIDGET(window_)))
-        GetPrivate(this)->client_shadow = GetClientShadow(window_);
+        priv->client_shadow = InsetsF();
+    } else if (!priv->is_csd && resizable) {
+      EnableCSD(window_);
+      priv->is_csd = true;
+      if (gtk_widget_get_mapped(GTK_WIDGET(window_)))
+        GetClientShadow(window_, &priv->client_shadow, &priv->bounds);
     }
   }
 }
@@ -551,6 +542,39 @@ void Window::SetBackgroundColor(Color color) {
   GdkRGBA gcolor = color.ToGdkRGBA();
   gtk_widget_override_background_color(GTK_WIDGET(window_),
                                        GTK_STATE_FLAG_NORMAL, &gcolor);
+}
+
+void Window::SetCapture() {
+  if (HasCapture())
+    ReleaseCapture();
+  GdkWindow* window = gtk_widget_get_window(GTK_WIDGET(window_));
+  if (!window)
+    return;
+  GdkDevice* device = gtk_get_current_event_device();
+  if (gdk_device_get_source(device) != GDK_SOURCE_MOUSE)
+    device = gdk_device_get_associated_device(device);
+  if (!device)
+    return;
+  const GdkEventMask mask = GdkEventMask(GDK_BUTTON_PRESS_MASK |
+                                         GDK_BUTTON_RELEASE_MASK |
+                                         GDK_POINTER_MOTION_HINT_MASK |
+                                         GDK_POINTER_MOTION_MASK);
+  gdk_device_grab(device, window, GDK_OWNERSHIP_WINDOW, TRUE, mask,
+                  NULL, GDK_CURRENT_TIME);
+  gtk_device_grab_add(GTK_WIDGET(window_), device, TRUE);
+  GetPrivate(this)->captured_device = device;
+}
+
+void Window::ReleaseCapture() {
+  GdkDevice* device = GetPrivate(this)->captured_device;
+  if (!device)
+    return;
+  gdk_device_ungrab(device, GDK_CURRENT_TIME);
+  gtk_device_grab_remove(GTK_WIDGET(window_), device);
+}
+
+bool Window::HasCapture() const {
+  return GetPrivate(this)->captured_device;
 }
 
 void Window::SetSkipTaskbar(bool skip) {

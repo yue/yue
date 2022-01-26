@@ -57,14 +57,14 @@ void Container::Layout() {
     // not change its size.
     // TODO(zcbenz): Revisit the logic here, should have a cleaner way.
     if (dirty_)
-      SetChildBoundsFromCSS();
+      UpdateChildBounds();
     return;
   }
 
   // So this is a root CSS node, calculate the layout and set bounds.
   SizeF size(GetBounds().size());
   YGNodeCalculateLayout(node(), size.width(), size.height(), YGDirectionLTR);
-  SetChildBoundsFromCSS();
+  UpdateChildBounds();
 }
 
 bool Container::IsContainer() const {
@@ -76,7 +76,7 @@ void Container::OnSizeChanged() {
   if (IsRootYGNode(this))
     Layout();
   else
-    SetChildBoundsFromCSS();
+    UpdateChildBounds();
 }
 
 SizeF Container::GetPreferredSize() const {
@@ -141,7 +141,7 @@ void Container::RemoveChildView(View* view) {
   Layout();
 }
 
-void Container::SetChildBoundsFromCSS() {
+void Container::UpdateChildBounds() {
   dirty_ = false;
   if (!IsVisible())
     return;

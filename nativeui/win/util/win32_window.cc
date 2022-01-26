@@ -60,6 +60,23 @@ Win32Window::~Win32Window() {
   ::DestroyWindow(hwnd_);
 }
 
+void Win32Window::SetWindowStyle(LONG style, bool on) {
+  LONG styles = ::GetWindowLong(hwnd_, GWL_STYLE);
+  if (on)
+    styles |= style;
+  else
+    styles &= ~style;
+  ::SetWindowLong(hwnd_, GWL_STYLE, styles);
+}
+
+bool Win32Window::HasWindowStyle(LONG style) const {
+  return (::GetWindowLong(hwnd_, GWL_STYLE) & style) != 0;
+}
+
+void Win32Window::ExecuteSystemMenuCommand(int command) {
+  SendMessage(hwnd_, WM_SYSCOMMAND, command, 0);
+}
+
 HICON Win32Window::GetDefaultWindowIcon() const {
   // Use the icon of the exe by default.
   return LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(1));

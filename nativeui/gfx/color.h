@@ -39,6 +39,7 @@ class NATIVEUI_EXPORT Color {
     DisabledText,
     Control,
     WindowBackground,
+    Border,
   };
 
   static Color Get(Name name);

@@ -1,0 +1,18 @@
+name: DatePicker::Options
+header: nativeui/date_picker.h
+type: struct
+namespace: nu
+description: Options for creating DatePicker.
+
+properties:
+  - property: int elements
+    optional: true
+    description: A bit array of `elements` to display, default is `<!enum>DatePicker::ELEMENT_YEAR_MONTH_DAY`.
+    lang_detail:
+      cpp: |
+        Available elements can be found in `<!type>DatePicker::Element`.
+
+  - property: bool has_stepper
+    optional: true
+    description: Whether to show a stepper in the text field, default is true.
+    detail: Note that only certain platforms with certain elements can show stepper.

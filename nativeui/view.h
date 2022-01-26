@@ -15,7 +15,7 @@
 #include "nativeui/gfx/color.h"
 #include "nativeui/gfx/geometry/rect_f.h"
 #include "nativeui/gfx/geometry/size_f.h"
-#include "nativeui/signal.h"
+#include "nativeui/responder.h"
 
 typedef struct YGNode *YGNodeRef;
 typedef struct YGConfig *YGConfigRef;
@@ -24,13 +24,12 @@ namespace nu {
 
 class Cursor;
 class Font;
+class Popover;
 class Window;
-struct MouseEvent;
-struct KeyEvent;
 
 // The base class for all kinds of views.
 class NATIVEUI_EXPORT View : public base::RefCounted<View>,
-                             public SignalDelegate {
+                             public Responder<View> {
  public:
   // The view class name.
   static const char kClassName[];
@@ -50,6 +49,7 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View>,
 
   // Get position and size.
   RectF GetBounds() const;
+  RectF GetBoundsInWindow() const;
 
   // Internal: The real pixel bounds that depends on the scale factor.
   void SetPixelBounds(const Rect& bounds);
@@ -155,6 +155,7 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View>,
   // Internal: Set parent view.
   void SetParent(View* parent);
   void BecomeContentView(Window* window);
+  void BecomeContentView();
 
   // Internal: Whether this class inherits from Container.
   virtual bool IsContainer() const;
@@ -172,13 +173,6 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View>,
   Font* font() const { return font_.get(); }
 
   // Events.
-  Signal<bool(View*, const MouseEvent&)> on_mouse_down;
-  Signal<bool(View*, const MouseEvent&)> on_mouse_up;
-  Signal<void(View*, const MouseEvent&)> on_mouse_move;
-  Signal<void(View*, const MouseEvent&)> on_mouse_enter;
-  Signal<void(View*, const MouseEvent&)> on_mouse_leave;
-  Signal<bool(View*, const KeyEvent&)> on_key_down;
-  Signal<bool(View*, const KeyEvent&)> on_key_up;
   Signal<void(View*, DraggingInfo*)> on_drag_leave;
   Signal<void(View*)> on_size_changed;
   Signal<void(View*)> on_capture_lost;
@@ -195,11 +189,10 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View>,
   // Update the default style.
   void UpdateDefaultStyle();
 
-  // Event types.
-  enum { kOnMouseClick, kOnMouseMove, kOnKey };
-
+#if !defined(OS_LINUX)
   // SignalDelegate:
   void OnConnect(int identifier) override;
+#endif
 
   // Called by subclasses to take the ownership of |view|.
   void TakeOverView(NativeView view);
@@ -214,9 +207,6 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View>,
 
 #if defined(OS_LINUX)
   // Whether events have been installed.
-  bool on_mouse_move_installed_ = false;
-  bool on_mouse_click_installed_ = false;
-  bool on_key_installed_ = false;
   bool on_drop_installed_ = false;
 #endif
 

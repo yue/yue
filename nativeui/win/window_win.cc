@@ -47,6 +47,16 @@ const DWORD kWindowDefaultFramelessStyle =
 // The thickness of an auto-hide taskbar in pixels.
 const int kAutoHideTaskbarThicknessPx = 2;
 
+// Compute extends window style from options.
+inline DWORD ComputeWindowExStyle(const Window::Options& options) {
+  DWORD style = 0;
+  if (options.transparent)
+    style |= WS_EX_LAYERED;
+  if (options.no_activate)
+    style |= WS_EX_NOACTIVATE;
+  return style;
+}
+
 // Convert between window and client areas.
 Size ContentToWindowSize(Win32Window* window, bool has_menu_bar,
                          const Size& size) {
@@ -75,7 +85,7 @@ WindowImpl::WindowImpl(const Window::Options& options, Window* delegate)
     : Win32Window(L"", NULL,
                   options.frame ? kWindowDefaultStyle
                                 : kWindowDefaultFramelessStyle,
-                  options.transparent ? WS_EX_LAYERED : 0),
+                  ComputeWindowExStyle(options)),
       scale_factor_(GetScaleFactorForHWND(hwnd())),
       delegate_(delegate) {
   if (options.frame) {
@@ -227,23 +237,6 @@ void WindowImpl::SetHasShadow(bool has) {
   if (has)
     shadow = {0, 0, 1, 0};
   ::DwmExtendFrameIntoClientArea(hwnd(), &shadow);
-}
-
-void WindowImpl::SetWindowStyle(LONG style, bool on) {
-  LONG styles = ::GetWindowLong(hwnd(), GWL_STYLE);
-  if (on)
-    styles |= style;
-  else
-    styles &= ~style;
-  ::SetWindowLong(hwnd(), GWL_STYLE, styles);
-}
-
-bool WindowImpl::HasWindowStyle(LONG style) const {
-  return (::GetWindowLong(hwnd(), GWL_STYLE) & style) != 0;
-}
-
-void WindowImpl::ExecuteSystemMenuCommand(int command) {
-  SendMessage(hwnd(), WM_SYSCOMMAND, command, 0);
 }
 
 int WindowImpl::DoDrag(std::vector<Clipboard::Data> data,

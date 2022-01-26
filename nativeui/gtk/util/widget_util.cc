@@ -4,8 +4,10 @@
 
 #include "nativeui/gtk/util/widget_util.h"
 
-#include "base/logging.h"
+#include <algorithm>
+
 #include "nativeui/gfx/color.h"
+#include "nativeui/gfx/geometry/rect_f.h"
 
 #ifdef GDK_WINDOWING_X11
 #include <gdk/gdkx.h>
@@ -119,20 +121,29 @@ bool GetNativeFrameInsets(GtkWidget* window, InsetsF* insets) {
 #endif
 }
 
-InsetsF GetClientShadow(GtkWindow* window) {
+bool GetClientShadow(GtkWindow* window,
+                     InsetsF* client_shadow,
+                     RectF* bounds_without_shadow,
+                     RectF* bounds_with_shadow) {
   GdkWindow* gdkwindow = gtk_widget_get_window(GTK_WIDGET(window));
-  DCHECK(gdkwindow) << "Can only get client shadow from realized window.";
+  if (!gdkwindow)
+    return false;
   // Bounds without client shadow.
   int x, y, width, height;
   gtk_window_get_position(window, &x, &y);
   gtk_window_get_size(window, &width, &height);
+  if (bounds_without_shadow)
+    *bounds_without_shadow = RectF(x, y, width, height);
   // Bounds with client shadow.
   int sx, sy, swidth, sheight;
   gdk_window_get_geometry(gdkwindow, &sx, &sy, &swidth, &sheight);
-  return InsetsF(y - sy,
-                 x - sx,
-                 (sy + sheight) - (y + height),
-                 (sx + swidth) - (x + width));
+  if (bounds_with_shadow)
+    *bounds_with_shadow = RectF(sx, sy, swidth, sheight);
+  // Client shadow is their insets.
+  *client_shadow =  InsetsF(y - sy, x - sx,
+                            (sy + sheight) - (y + height),
+                            (sx + swidth) - (x + width));
+  return true;
 }
 
 void ForceSizeAllocation(GtkWindow* window, GtkWidget* view) {
@@ -171,6 +182,69 @@ void ResizeWindow(GtkWindow* window, bool resizable, int width, int height) {
 
   // Notify the content view of the resize.
   ForceSizeAllocation(window, vbox);
+}
+
+cairo_region_t* CreateRegionForNonAlphaArea(cairo_t* cr) {
+  // Calculate the extents of the context.
+  GdkRectangle extents;
+  double x1 = 0, y1 = 0, x2 = 0, y2 = 0;
+  cairo_clip_extents(cr, &x1, &y1, &x2, &y2);
+  extents.x = std::floor(x1);
+  extents.y = std::floor(y1);
+  extents.width = std::max(std::ceil(x2) - extents.x, 0.);
+  extents.height = std::max(std::ceil(y2) - extents.y, 0.);
+
+  // The entire surface is a region if there is no alpha channel.
+  cairo_surface_t* surface = cairo_get_target(cr);
+  if (cairo_surface_get_content(surface) == CAIRO_CONTENT_COLOR)
+    return cairo_region_create_rectangle(&extents);
+
+  cairo_surface_t* image;
+  if (cairo_surface_get_type(surface) != CAIRO_SURFACE_TYPE_IMAGE ||
+      cairo_image_surface_get_format(surface) != CAIRO_FORMAT_A8) {
+    // We work on A8 images to get full alpha channel.
+    image = cairo_image_surface_create(CAIRO_FORMAT_A8,
+                                       extents.width, extents.height);
+    cairo_t* image_cr = cairo_create(image);
+    cairo_set_source_surface(image_cr, surface, -extents.x, -extents.y);
+    cairo_paint(image_cr);
+    cairo_surface_flush(image);
+    cairo_destroy(image_cr);
+  } else {
+    image = cairo_surface_reference(surface);
+    cairo_surface_flush(image);
+  }
+
+  // Iterate through the image.
+  uint8_t* data = cairo_image_surface_get_data(image);
+  int stride = cairo_image_surface_get_stride(image);
+
+  cairo_region_t* region = cairo_region_create();
+  for (int y = 0; y < extents.height; y++) {
+    for (int x = 0; x < extents.width; x++) {
+      // Find a row with all transparent pixels.
+      int ps = x;
+      while (x < extents.width) {
+        // Only full-transparent pixels are treated as transparent, this is
+        // to match the behavior of macOS and Win32.
+        if (data[x] == 0)
+          break;
+        x++;
+      }
+
+      if (x > ps) {
+        // Add the row to region.
+        GdkRectangle rect = {ps, y, x - ps, 1};
+        cairo_region_union_rectangle(region, &rect);
+      }
+    }
+
+    data += stride;
+  }
+
+  cairo_surface_destroy(image);
+  cairo_region_translate(region, extents.x, extents.y);
+  return region;
 }
 
 }  // namespace nu

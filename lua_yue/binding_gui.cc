@@ -21,13 +21,28 @@ template<>
 struct Type<base::FilePath> {
   static constexpr const char* name = "FilePath";
   static inline void Push(State* state, const base::FilePath& value) {
-    return lua::Push(state, value.value());;
+    return lua::Push(state, value.value());
   }
   static inline bool To(State* state, int index, base::FilePath* out) {
     base::FilePath::StringType str;
     if (!lua::To(state, index, &str))
       return false;
     *out = base::FilePath(str);
+    return true;
+  }
+};
+
+template<>
+struct Type<base::Time> {
+  static constexpr const char* name = "Time";
+  static inline void Push(State* state, const base::Time& value) {
+    lua_pushinteger(state, value.ToTimeT());
+  }
+  static inline bool To(State* state, int index, base::Time* out) {
+    lua_Integer integer;
+    if (!Type<lua_Integer>::To(state, index, &integer))
+      return false;
+    *out = base::Time::FromTimeT(integer);
     return true;
   }
 };
@@ -1612,6 +1627,18 @@ struct Type<nu::Toolbar> {
 };
 #endif
 
+template<typename T>
+struct Type<nu::Responder<T>*> {
+  static constexpr const char* name = "Responder";
+  static inline bool To(State* state, int index, nu::Responder<T>** out) {
+    T* target;
+    if (!Type<T*>::To(state, index, &target))
+      return false;
+    *out = target;
+    return true;
+  }
+};
+
 template<>
 struct Type<nu::Window::Options> {
   static constexpr const char* name = "WindowOptions";
@@ -2055,6 +2082,44 @@ struct Type<nu::Browser> {
         Push(state, it);
       lua_pcall(state, static_cast<int>(value.GetList().size()), 0, 0);
     });
+  }
+};
+
+template<>
+struct Type<nu::DatePicker::Options> {
+  static constexpr const char* name = "DatePickerOptions";
+  static inline bool To(State* state, int index, nu::DatePicker::Options* out) {
+    if (GetType(state, index) != LuaType::Table)
+      return false;
+    return ReadOptions(state, index,
+                       "elements", &out->elements,
+                       "hasstepper", &out->has_stepper);
+  }
+};
+
+template<>
+struct Type<nu::DatePicker> {
+  using base = nu::View;
+  static constexpr const char* name = "DatePicker";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "elementyearmonth",
+           static_cast<int>(nu::DatePicker::ELEMENT_YEAR_MONTH),
+           "elementyearmonthday",
+           static_cast<int>(nu::DatePicker::ELEMENT_YEAR_MONTH_DAY),
+           "elementhourminute",
+           static_cast<int>(nu::DatePicker::ELEMENT_HOUR_MINUTE),
+           "elementhourminutesecond",
+           static_cast<int>(nu::DatePicker::ELEMENT_HOUR_MINUTE_SECOND),
+           "create",
+           &CreateOnHeap<nu::DatePicker, const nu::DatePicker::Options&>,
+           "setdate", &nu::DatePicker::SetDate,
+           "getdate", &nu::DatePicker::GetDate,
+           "setrange", &nu::DatePicker::SetRange,
+           "getrange", &nu::DatePicker::GetRange,
+           "hasstepper", &nu::DatePicker::HasStepper);
+    RawSetProperty(state, metatable,
+                   "ondatechange", &nu::DatePicker::on_date_change);
   }
 };
 
@@ -2662,6 +2727,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::ProtocolFileJob>(state, "ProtocolFileJob");
   BindType<nu::ProtocolAsarJob>(state, "ProtocolAsarJob");
   BindType<nu::Browser>(state, "Browser");
+  BindType<nu::DatePicker>(state, "DatePicker");
   BindType<nu::Entry>(state, "Entry");
   BindType<nu::Label>(state, "Label");
   BindType<nu::Picker>(state, "Picker");

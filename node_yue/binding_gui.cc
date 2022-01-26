@@ -6,6 +6,7 @@
 #include <node_buffer.h>
 
 #include "base/notreached.h"
+#include "base/time/time.h"
 #include "nativeui/nativeui.h"
 #include "node_yue/binding_signal.h"
 #include "node_yue/binding_values.h"
@@ -34,7 +35,7 @@ struct Type<base::FilePath> {
   static constexpr const char* name = "FilePath";
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    const base::FilePath& value) {
-    return vb::ToV8(context, value.value());;
+    return vb::ToV8(context, value.value());
   }
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
@@ -43,6 +44,27 @@ struct Type<base::FilePath> {
     if (!vb::FromV8(context, value, &str))
       return false;
     *out = base::FilePath(str);
+    return true;
+  }
+};
+
+template<>
+struct Type<base::Time> {
+  static constexpr const char* name = "Time";
+  static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
+                                   const base::Time& value) {
+    v8::Local<v8::Value> date;
+    if (v8::Date::New(context, value.ToJsTimeIgnoringNull()).ToLocal(&date))
+      return date;
+    else
+      return v8::Null(context->GetIsolate());
+  }
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     base::Time* out) {
+    if (!value->IsDate())
+      return false;
+    *out = base::Time::FromJsTime(value.As<v8::Date>()->ValueOf());
     return true;
   }
 };
@@ -1796,6 +1818,20 @@ struct Type<nu::Toolbar> {
 };
 #endif
 
+template<typename T>
+struct Type<nu::Responder<T>*> {
+  static constexpr const char* name = "Responder";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::Responder<T>** out) {
+    T* target;
+    if (!Type<T*>::FromV8(context, value, &target))
+      return false;
+    *out = target;
+    return true;
+  }
+};
+
 template<>
 struct Type<nu::Window::Options> {
   static constexpr const char* name = "WindowOptions";
@@ -2342,6 +2378,51 @@ struct Type<nu::Browser> {
     std::ignore = refs->Delete(context, ToV8(context, bname));
     // Pass down.
     browser->RemoveBinding(bname);
+  }
+};
+
+template<>
+struct Type<nu::DatePicker::Options> {
+  static constexpr const char* name = "DatePickerOptions";
+  static bool FromV8(v8::Local<v8::Context> context,
+                     v8::Local<v8::Value> value,
+                     nu::DatePicker::Options* out) {
+    if (!value->IsObject())
+      return false;
+    return ReadOptions(context, value.As<v8::Object>(),
+                       "elements", &out->elements,
+                       "hasStepper", &out->has_stepper);
+  }
+};
+
+template<>
+struct Type<nu::DatePicker> {
+  using base = nu::View;
+  static constexpr const char* name = "DatePicker";
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+    Set(context, constructor,
+        "elementYearMonth",
+        static_cast<int>(nu::DatePicker::ELEMENT_YEAR_MONTH),
+        "elementYearMonthDay",
+        static_cast<int>(nu::DatePicker::ELEMENT_YEAR_MONTH_DAY),
+        "elementHourMinute",
+        static_cast<int>(nu::DatePicker::ELEMENT_HOUR_MINUTE),
+        "elementHourMinuteSecond",
+        static_cast<int>(nu::DatePicker::ELEMENT_HOUR_MINUTE_SECOND),
+        "create",
+        &CreateOnHeap<nu::DatePicker, const nu::DatePicker::Options&>);
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "setDate", &nu::DatePicker::SetDate,
+        "getDate", &nu::DatePicker::GetDate,
+        "setRange", &nu::DatePicker::SetRange,
+        "getRange", &nu::DatePicker::GetRange,
+        "hasStepper", &nu::DatePicker::HasStepper);
+    SetProperty(context, templ,
+                "onDateChange", &nu::DatePicker::on_date_change);
   }
 };
 
@@ -3028,6 +3109,7 @@ void Initialize(v8::Local<v8::Object> exports,
           "ProtocolFileJob",    vb::Constructor<nu::ProtocolFileJob>(),
           "ProtocolAsarJob",    vb::Constructor<nu::ProtocolAsarJob>(),
           "Browser",            vb::Constructor<nu::Browser>(),
+          "DatePicker",         vb::Constructor<nu::DatePicker>(),
           "Entry",              vb::Constructor<nu::Entry>(),
           "Label",              vb::Constructor<nu::Label>(),
           "Picker",             vb::Constructor<nu::Picker>(),

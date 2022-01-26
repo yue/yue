@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#include "nativeui/gtk/scoped_gobject.h"
+#include "nativeui/gtk/util/scoped_gobject.h"
 
 namespace nu {
 

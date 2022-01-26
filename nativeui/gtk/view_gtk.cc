@@ -9,7 +9,6 @@
 #include "base/strings/stringprintf.h"
 #include "nativeui/container.h"
 #include "nativeui/cursor.h"
-#include "nativeui/events/event.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/gfx/geometry/point_f.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
@@ -18,6 +17,7 @@
 #include "nativeui/gtk/nu_container.h"
 #include "nativeui/gtk/util/clipboard_util.h"
 #include "nativeui/gtk/util/widget_util.h"
+#include "nativeui/window.h"
 
 namespace nu {
 
@@ -78,55 +78,6 @@ void OnSizeAllocate(GtkWidget* widget, GdkRectangle* allocation,
 void OnRealize(GtkWidget* widget, View* view) {
   if (view->cursor())
     NUSetCursor(widget, view->cursor()->GetNative());
-}
-
-gboolean OnMouseMove(GtkWidget* widget, GdkEvent* event, View* view) {
-  // If user is dragging a widget that supports mouseDownMoveWindow, then we
-  // need to move the window.
-  if (event->motion.state & GDK_BUTTON1_MASK &&
-      view->IsMouseDownCanMoveWindow()) {
-    GtkWidget* toplevel = gtk_widget_get_toplevel(widget);
-    if (gtk_widget_is_toplevel(toplevel)) {
-      GdkWindow* window = gtk_widget_get_window(toplevel);
-      gdk_window_begin_move_drag(window, 1,
-                                 event->motion.x_root, event->motion.y_root,
-                                 event->motion.time);
-      return true;
-    }
-  }
-
-  // Otherwise dispatch the event.
-  if (!view->on_mouse_move.IsEmpty()) {
-    view->on_mouse_move.Emit(view, MouseEvent(event, widget));
-    return false;
-  }
-
-  return false;
-}
-
-gboolean OnMouseEvent(GtkWidget* widget, GdkEvent* event, View* view) {
-  switch (event->any.type) {
-    case GDK_BUTTON_PRESS:
-      return view->on_mouse_down.Emit(view, MouseEvent(event, widget));
-    case GDK_BUTTON_RELEASE:
-      return view->on_mouse_up.Emit(view, MouseEvent(event, widget));
-    case GDK_ENTER_NOTIFY:
-      view->on_mouse_enter.Emit(view, MouseEvent(event, widget));
-      return false;
-    case GDK_LEAVE_NOTIFY:
-      view->on_mouse_leave.Emit(view, MouseEvent(event, widget));
-      return false;
-    default:
-      return false;
-  }
-}
-
-gboolean OnKeyDown(GtkWidget* widget, GdkEvent* event, View* view) {
-  return view->on_key_down.Emit(view, KeyEvent(event, widget));
-}
-
-gboolean OnKeyUp(GtkWidget* widget, GdkEvent* event, View* view) {
-  return view->on_key_up.Emit(view, KeyEvent(event, widget));
 }
 
 void OnDragEnd(GtkWidget*, GdkDragContext*, NUViewPrivate* priv) {
@@ -240,38 +191,6 @@ void View::PlatformDestroy() {
   }
 }
 
-void View::OnConnect(int identifier) {
-  switch (identifier) {
-    case kOnMouseMove:
-      if (!on_mouse_move_installed_) {
-        g_signal_connect(view_, "motion-notify-event",
-                         G_CALLBACK(OnMouseMove), this);
-        g_signal_connect(view_, "enter-notify-event",
-                         G_CALLBACK(OnMouseEvent), this);
-        g_signal_connect(view_, "leave-notify-event",
-                         G_CALLBACK(OnMouseEvent), this);
-        on_mouse_move_installed_ = true;
-      }
-      break;
-    case kOnMouseClick:
-      if (!on_mouse_click_installed_) {
-        g_signal_connect(view_, "button-press-event",
-                         G_CALLBACK(OnMouseEvent), this);
-        g_signal_connect(view_, "button-release-event",
-                         G_CALLBACK(OnMouseEvent), this);
-        on_mouse_click_installed_ = true;
-      }
-      break;
-    case kOnKey:
-      if (!on_key_installed_) {
-        g_signal_connect(view_, "key-press-event", G_CALLBACK(OnKeyDown), this);
-        g_signal_connect(view_, "key-release-event", G_CALLBACK(OnKeyUp), this);
-        on_key_installed_ = true;
-      }
-      break;
-  }
-}
-
 void View::TakeOverView(NativeView view) {
   view_ = view;
   g_object_ref_sink(view);
@@ -285,15 +204,6 @@ void View::TakeOverView(NativeView view) {
   // Make the view accepts events.
   gtk_widget_add_events(view, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
                               GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK);
-
-  // Lazy install event handlers.
-  on_mouse_down.SetDelegate(this, kOnMouseClick);
-  on_mouse_up.SetDelegate(this, kOnMouseClick);
-  on_mouse_move.SetDelegate(this, kOnMouseMove);
-  on_mouse_enter.SetDelegate(this, kOnMouseMove);
-  on_mouse_leave.SetDelegate(this, kOnMouseMove);
-  on_key_down.SetDelegate(this, kOnKey);
-  on_key_up.SetDelegate(this, kOnKey);
 
   // Install event hooks.
   g_signal_connect(view, "size-allocate", G_CALLBACK(OnSizeAllocate), priv);
@@ -320,6 +230,20 @@ void View::SetBounds(const RectF& bounds) {
 
 RectF View::GetBounds() const {
   return RectF(GetPixelBounds());
+}
+
+RectF View::GetBoundsInWindow() const {
+  GdkRectangle rect;
+  gtk_widget_get_allocation(view_, &rect);
+  // Calculate relative position to content view, since we consider menu bar
+  // and other decorations as non client area.
+  if (window_) {
+    GdkRectangle root;
+    gtk_widget_get_allocation(window_->GetContentView()->GetNative(), &root);
+    rect.x -= root.x;
+    rect.y -= root.y;
+  }
+  return RectF(Rect(rect));
 }
 
 void View::SetPixelBounds(const Rect& bounds) {

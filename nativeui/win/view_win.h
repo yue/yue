@@ -105,11 +105,6 @@ class ViewImpl {
   /////////////////////////////////////////////////////////////////////////////
   // Drag and drop
 
-  // Drop source events.
-  // virtual void OnDragSourceCancel();
-  // virtual void OnDragSourceDrop();
-  // virtual void OnDragSourceMove();
-
   // Drop target events.
   virtual int OnDragEnter(IDataObject* data, int effect, const Point& point);
   virtual int OnDragUpdate(IDataObject* data, int effect, const Point& point);

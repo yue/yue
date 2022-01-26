@@ -47,10 +47,6 @@ class WindowImpl : public Win32Window,
   void SetBackgroundColor(nu::Color color);
   void SetHasShadow(bool has);
 
-  void SetWindowStyle(LONG style, bool on);
-  bool HasWindowStyle(LONG style) const;
-  void ExecuteSystemMenuCommand(int command);
-
   int DoDrag(std::vector<Clipboard::Data> data,
              int operations,
              const DragOptions& options);

@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE.chromium file.
 
-#ifndef NATIVEUI_GTK_SCOPED_GOBJECT_H_
-#define NATIVEUI_GTK_SCOPED_GOBJECT_H_
+#ifndef NATIVEUI_GTK_UTIL_SCOPED_GOBJECT_H_
+#define NATIVEUI_GTK_UTIL_SCOPED_GOBJECT_H_
 
 namespace nu {
 
@@ -61,4 +61,4 @@ class ScopedGObject {
 
 }  // namespace nu
 
-#endif  // NATIVEUI_GTK_SCOPED_GOBJECT_H_
+#endif  // NATIVEUI_GTK_UTIL_SCOPED_GOBJECT_H_

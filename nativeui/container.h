@@ -47,7 +47,7 @@ class NATIVEUI_EXPORT Container : public View {
   }
 
   // Internal: Used by certain implementations to refresh layout.
-  void SetChildBoundsFromCSS();
+  virtual void UpdateChildBounds();
 
   // Events.
   Signal<void(Container*, Painter*, RectF)> on_draw;

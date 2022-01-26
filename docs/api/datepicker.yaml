@@ -1,0 +1,55 @@
+name: DatePicker
+component: gui
+header: nativeui/date_picker.h
+type: refcounted
+namespace: nu
+inherit: View
+description: A view displays date and time with editing ability.
+
+constructors:
+  - signature: DatePicker(const DatePicker::Options& options)
+    lang: ['cpp']
+    description: Create a new `DatePicker` with `options`.
+
+class_methods:
+  - signature: DatePicker* Create(const DatePicker::Options& options)
+    lang: ['lua', 'js']
+    description: Create a new `DatePicker` with `options`.
+
+class_properties:
+  - property: const char* kClassName
+    lang: ['cpp']
+    description: The class name of this view.
+
+  - property: int ElementYearMonth
+    lang: ['lua', 'js']
+
+  - property: int ElementYearMonthDay
+    lang: ['lua', 'js']
+
+  - property: int ElementHourMinute
+    lang: ['lua', 'js']
+
+  - property: int ElementHourMinuteSecond
+    lang: ['lua', 'js']
+
+methods:
+  - signature: void SetDate(const base::Time& time)
+    description: Set the selected date to `time`.
+
+  - signature: base::Time GetDate() const
+    description: Get the selected date.
+
+  - signature: void SetRange(const absl::optional<base::Time>& minimum,
+                             const absl::optional<base::Time>& maximum)
+    description: Set the `minimum` and `maximum` date values.
+
+  - signature: std::tuple<absl::optional<base::Time>, absl::optional<base::Time>> GetRange() const
+    description: Return  the `minimum` and `maximum` date values.
+
+  - signature: bool HasStepper() const
+    description: Return whether there is a stepper attached to the text field.
+
+events:
+  - signature: void on_date_change(DatePicker* self)
+    description: Emitted when the selected date has been changed.

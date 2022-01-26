@@ -152,6 +152,11 @@ void View::BecomeContentView(Window* window) {
   parent_ = nullptr;
 }
 
+void View::BecomeContentView() {
+  window_ = nullptr;
+  parent_ = nullptr;
+}
+
 bool View::IsContainer() const {
   return false;
 }

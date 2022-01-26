@@ -14,6 +14,8 @@
 
 namespace nu {
 
+class RectF;
+
 bool GtkVersionCheck(int major = 0, int minor = 0, int micro = 0);
 
 SizeF GetPreferredSizeForWidget(NativeView widget);
@@ -39,13 +41,19 @@ bool GetNativeFrameInsets(GtkWidget* window, InsetsF* insets);
 
 // Return the insets of client shadow when using CSD.
 // Due to limitations of GTK, this only works for configured window.
-InsetsF GetClientShadow(GtkWindow* window);
+bool GetClientShadow(GtkWindow* window,
+                     InsetsF* client_shadow,
+                     RectF* bounds_without_shadow = nullptr,
+                     RectF* bounds_with_shadow = nullptr);
 
 // Force window to allocate size for content view.
 void ForceSizeAllocation(GtkWindow* window, GtkWidget* view);
 
 // Resize window's client area ignoring the size request.
 void ResizeWindow(GtkWindow* window, bool resizable, int width, int height);
+
+// Create a region from all opaque and semi-transparent points in the context.
+cairo_region_t* CreateRegionForNonAlphaArea(cairo_t* cr);
 
 // A helper to call destructor for a type.
 template<typename T>

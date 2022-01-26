@@ -15,7 +15,7 @@
 #include "base/strings/string_split.h"
 #include "base/strings/string_tokenizer.h"
 #include "base/strings/string_util.h"
-#include "nativeui/gtk/scoped_gobject.h"
+#include "nativeui/gtk/util/scoped_gobject.h"
 #include "nativeui/gtk/util/widget_util.h"
 
 #if GTK_MAJOR_VERSION > 2
@@ -328,6 +328,16 @@ Color GetBgColor(const std::string& css_selector) {
   return GetBgColorFromStyleContext(GetStyleContextFromCss(css_selector));
 }
 
+Color GetBorderColor(const std::string& css_selector) {
+  // Borders have the same issue as backgrounds, due to the
+  // border-image property.
+  auto context = GetStyleContextFromCss(css_selector);
+  Size size(24, 24);
+  CairoSurface surface(size);
+  gtk_render_frame(context, surface.cairo(), 0, 0, size.width(), size.height());
+  return surface.GetAveragePixelValue(true);
+}
+
 }  // namespace
 
 GtkTheme::GtkTheme() {
@@ -362,6 +372,9 @@ Color GtkTheme::GetColor(Color::Name name) {
     case Color::Name::Control:
     case Color::Name::WindowBackground:
       color = GetBgColor("");
+      break;
+    case Color::Name::Border:
+      color = GetBorderColor("GtkEntry#entry");
       break;
     default:
       NOTREACHED();

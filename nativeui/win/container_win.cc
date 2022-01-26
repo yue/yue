@@ -218,7 +218,7 @@ class ContainerAdapter : public ContainerImpl,
 
   // ContainerImpl::Adapter:
   void Layout() override {
-    container_->SetChildBoundsFromCSS();
+    container_->UpdateChildBounds();
   }
 
   void ForEach(const std::function<bool(ViewImpl*)>& callback,

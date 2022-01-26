@@ -77,6 +77,11 @@ class NATIVEUI_EXPORT Painter {
   // Fill |rect|.
   virtual void FillRect(const RectF& rect) = 0;
 
+#if defined(OS_LINUX)
+  // Stroke and fill a |path|.
+  virtual void DrawPath() = 0;
+#endif
+
   // Draw image.
   virtual void DrawImage(const Image* image, const RectF& rect) = 0;
   virtual void DrawImageFromRect(const Image* image, const RectF& src,

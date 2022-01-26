@@ -151,6 +151,13 @@ void PainterGtk::FillRect(const RectF& rect) {
   cairo_fill(context_);
 }
 
+void PainterGtk::DrawPath() {
+  SetSourceColor(false);
+  cairo_fill_preserve(context_);
+  SetSourceColor(true);
+  cairo_stroke(context_);
+}
+
 void PainterGtk::DrawImage(const Image* image, const RectF& rect) {
   DrawImageFromRect(image, RectF(image->GetSize()), rect);
 }

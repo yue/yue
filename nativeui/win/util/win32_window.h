@@ -22,6 +22,10 @@ class Win32Window {
  public:
   virtual ~Win32Window();
 
+  void SetWindowStyle(LONG style, bool on);
+  bool HasWindowStyle(LONG style) const;
+  void ExecuteSystemMenuCommand(int command);
+
   // Returns the HWND associated with this Window.
   HWND hwnd() const { return hwnd_; }
 

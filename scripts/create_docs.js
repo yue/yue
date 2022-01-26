@@ -336,8 +336,11 @@ function parseParameters(lang, str) {
 
 // Parse param.
 function parseParam(lang, str) {
-  let match = str.trim().match(/(.+) (\w+)/)
-  return { type: parseType(lang, match[1]), name: parseName(lang, match[2]) }
+  const space = str.lastIndexOf(' ')
+  return {
+    type: parseType(lang, str.substr(0, space)),
+    name: parseName(lang, str.substr(space + 1))
+  }
 }
 
 // Convert method name from C++ to |lang|.
@@ -360,23 +363,24 @@ function parseType(lang, str) {
     type.name = type.name.substr('const '.length)
   if (type.name.endsWith('*') || type.name.endsWith('&'))
     type.name = type.name.substr(0, type.name.length - 1)
-  // Parse the templates.
-  let match = type.name.match(/^(.*)<(.*)>$/)
-  if (match) {
-    type.name = match[1]
+  // Get the matched type, do not use regexp as it can not do longest match.
+  const leftAngle = type.name.indexOf('<')
+  const rightAngle = type.name.lastIndexOf('>')
+  if (leftAngle > 0 && rightAngle > leftAngle) {
+    const matchedType = type.name.substring(leftAngle + 1, rightAngle)
+    type.name = type.name.substr(0, leftAngle)
     if (type.name == 'std::tuple') {
-      type.template = match[1]
-      type.args = match[2].split(',').map((t) => parseType(lang, t.trim()))
+      type.args = matchedType.split(',').map((t) => parseType(lang, t.trim()))
     } else if (type.name == 'scoped_refptr') {
-      type.name = match[2]
+      type.name = matchedType
     } else if (type.name == 'base::Optional' || type.name == 'absl::optional') {
-      type.name = match[2]
+      type.name = matchedType
       type.nullable = true
     }
     // For js we want to pass some more information for TypeScript.
     if (lang == 'js') {
       if (type.name == 'std::vector' || type.name == 'std::set')
-        type.elementType = parseType(lang, match[2])
+        type.elementType = parseType(lang, matchedType)
     }
   }
   // No need to convert types for C++.
@@ -409,6 +413,7 @@ function parseType(lang, str) {
       case 'std::vector': type.name = 'table'; break
       case 'std::set': type.name = 'table'; break
       case 'base::FilePath': type.name = 'string'; break
+      case 'base::Time': type.name = 'number'; break
       case 'base::Value': type.name = 'any'; break
       default: builtin = false
     }
@@ -431,6 +436,7 @@ function parseType(lang, str) {
       case 'std::vector': type.name = 'Array'; break
       case 'std::set': type.name = 'Array'; break
       case 'base::FilePath': type.name = 'String'; break
+      case 'base::Time': type.name = 'Date'; break
       case 'base::Value': type.name = 'Any'; break
       default: builtin = false
     }
@@ -447,27 +453,29 @@ function parseType(lang, str) {
 // Convert inline code.
 function parseInlineCode(lang, type, code) {
   switch (type) {
-    case 'name':
+    case 'name': {
       return parseName(lang, code)
-    case 'method':
-      let parts
-      let separator
-      for (separator of ['.', '::']) {
-        if (code.includes(separator)) {
-          parts = code.split(separator)
-          break
-        }
-      }
-      if (lang != 'cpp')
-        separator = '.'
-      const typeInfo = parseType(lang, parseName(lang, parts[0]))
-      const signature = parseShortSignature(lang, parts[1])
+    }
+    case 'method': {
+      const [type, member, separator] = separateTypeAndMember(lang, code)
+      const typeInfo = parseType(lang, parseName(lang, type))
+      const signature = parseShortSignature(lang, member)
       return `<code><a class="type" href="${typeInfo.id}.html#${signature.id}">${typeInfo.name}${separator}${signature.str}</a></code>`
-    case 'type':
+    }
+    case 'type': {
       const info = parseType(lang, code)
       return `<code><a class="type" href="${info.id}.html">${info.name}</a></code>`
-    case 'enum class':
+    }
+    case 'enum class': {
       return parseEnumClass(lang, code)
+    }
+    case 'enum': {
+      if (lang == 'cpp')
+        return code
+      const [type, member, separator] = separateTypeAndMember(lang, code)
+      const typeInfo = parseType(lang, type)
+      return `<code><a class="type" href="${typeInfo.id}.html#${parseName('lua', member)}">${typeInfo.name}${separator}${upperCaseToCamelCase(member)}</a></code>`
+    }
     case '':
       return code
     default:
@@ -515,6 +523,27 @@ function camelToDash(str) {
     prevLowerCase = !isUpperCase
   }
   return ret.replace(/-+/g, '-').toLowerCase()
+}
+
+// Convert a UPPER_CASE to camelCase.
+function upperCaseToCamelCase(str) {
+  return str.toLowerCase().split('_')
+            .reduce((a, b) => a + b.charAt(0).toUpperCase() + b.slice(1))
+}
+
+// Separator type and member.
+function separateTypeAndMember(lang, code) {
+  let parts
+  let separator
+  for (separator of ['.', '::']) {
+    if (code.includes(separator)) {
+      parts = code.split(separator)
+      break
+    }
+  }
+  if (lang != 'cpp')
+    separator = '.'
+  return parts.concat(separator)
 }
 
 // Put the extra parameter descriptions into signature object.

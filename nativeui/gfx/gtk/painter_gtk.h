@@ -47,6 +47,7 @@ class PainterGtk : public Painter {
   void Clear() override;
   void StrokeRect(const RectF& rect) override;
   void FillRect(const RectF& rect) override;
+  void DrawPath() override;
   void DrawImage(const Image* image, const RectF& rect) override;
   void DrawImageFromRect(const Image* image, const RectF& src,
                          const RectF& dest) override;

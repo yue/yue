@@ -65,12 +65,12 @@ template<typename T, typename Enable = void>
 struct Type {};
 
 template<>
-struct Type<int> {
+struct Type<lua_Integer> {
   static constexpr const char* name = "integer";
-  static inline void Push(State* state, int number) {
+  static inline void Push(State* state, lua_Integer number) {
     lua_pushinteger(state, number);
   }
-  static inline bool To(State* state, int index, int* out) {
+  static inline bool To(State* state, int index, lua_Integer* out) {
     int success = 0;
     int ret = lua_tointegerx(state, index, &success);
     if (success)
@@ -79,6 +79,23 @@ struct Type<int> {
   }
 };
 
+#if defined(ARCH_CPU_64_BITS) || LUA_VERSION_NUM > 501
+template<>
+struct Type<int> {
+  static constexpr const char* name = "integer";
+  static inline void Push(State* state, int number) {
+    lua_pushinteger(state, number);
+  }
+  static inline bool To(State* state, int index, int* out) {
+    lua_Integer integer;
+    if (!Type<lua_Integer>::To(state, index, &integer))
+      return false;
+    *out = static_cast<int>(integer);
+    return true;
+  }
+};
+#endif
+
 template<>
 struct Type<uint32_t> {
   static constexpr const char* name = "integer";
@@ -86,11 +103,11 @@ struct Type<uint32_t> {
     lua_pushinteger(state, number);
   }
   static inline bool To(State* state, int index, uint32_t* out) {
-    int success = 0;
-    int ret = lua_tointegerx(state, index, &success);
-    if (success)
-      *out = ret;
-    return success != 0;
+    lua_Integer integer;
+    if (!Type<lua_Integer>::To(state, index, &integer))
+      return false;
+    *out = static_cast<uint32_t>(integer);
+    return true;
   }
 };
 

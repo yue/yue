@@ -143,7 +143,7 @@ static void nu_container_size_allocate(GtkWidget* widget,
   // sizes of children, we have to allocate size here otherwise children
   // may have problems rendering.
   NUContainerPrivate* priv = NU_CONTAINER(widget)->priv;
-  priv->delegate->SetChildBoundsFromCSS();
+  priv->delegate->UpdateChildBounds();
 
   if (gtk_widget_get_realized(widget) && priv->event_window) {
     gdk_window_move_resize(priv->event_window,
