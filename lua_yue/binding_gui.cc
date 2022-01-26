@@ -82,7 +82,8 @@ struct Type<nu::Size> {
     }
     if (GetType(state, index) != LuaType::Table)
       return false;
-    RawGetAndPop(state, index, "width", &width, "height", &height);
+    if (!ReadOptions(state, index, "width", &width, "height", &height))
+      return false;
     *out = nu::Size(width, height);
     return true;
   }
@@ -103,7 +104,8 @@ struct Type<nu::SizeF> {
     }
     if (GetType(state, index) != LuaType::Table)
       return false;
-    RawGetAndPop(state, index, "width", &width, "height", &height);
+    if (!ReadOptions(state, index, "width", &width, "height", &height))
+      return false;
     *out = nu::SizeF(width, height);
     return true;
   }
@@ -127,8 +129,10 @@ struct Type<nu::RectF> {
     }
     if (GetType(state, index) != LuaType::Table)
       return false;
-    RawGetAndPop(state, index, "x", &x, "y", &y);
-    RawGetAndPop(state, index, "width", &width, "height", &height);
+    if (!ReadOptions(state, index,
+                     "x", &x, "y", &y,
+                     "width", &width, "height", &height))
+      return false;
     *out = nu::RectF(x, y, width, height);
     return true;
   }
@@ -149,7 +153,8 @@ struct Type<nu::Vector2dF> {
     }
     if (GetType(state, index) != LuaType::Table)
       return false;
-    RawGetAndPop(state, index, "x", &x, "y", &y);
+    if (!ReadOptions(state, index, "x", &x, "y", &y))
+      return false;
     *out = nu::Vector2dF(x, y);
     return true;
   }
@@ -170,7 +175,8 @@ struct Type<nu::PointF> {
     }
     if (GetType(state, index) != LuaType::Table)
       return false;
-    RawGetAndPop(state, index, "x", &x, "y", &y);
+    if (!ReadOptions(state, index, "x", &x, "y", &y))
+      return false;
     *out = nu::PointF(x, y);
     return true;
   }
@@ -352,13 +358,12 @@ struct Type<nu::App::ShortcutOptions> {
   static constexpr const char* name = "AppShortcutOptions";
   static inline bool To(State* state, int index,
                         nu::App::ShortcutOptions* out) {
-    if (GetType(state, index) == LuaType::Table) {
-      RawGetAndPop(state, index,
-                   "arguments", &out->arguments,
-                   "description", &out->description,
-                   "workingdir", &out->working_dir);
-    }
-    return true;
+    if (GetType(state, index) != LuaType::Table)
+      return false;
+    return ReadOptions(state, index,
+                       "arguments", &out->arguments,
+                       "description", &out->description,
+                       "workingdir", &out->working_dir);
   }
 };
 #endif
@@ -855,10 +860,7 @@ struct Type<nu::DragOptions> {
   static inline bool To(State* state, int index, nu::DragOptions* out) {
     if (GetType(state, index) != LuaType::Table)
       return false;
-    nu::Image* image;
-    if (RawGetAndPop(state, index, "image", &image))
-      out->image = image;
-    return true;
+    return ReadOptions(state, index, "image", &out->image);
   }
 };
 
@@ -916,18 +918,14 @@ struct Type<nu::TextFormat> {
   static inline bool To(State* state, int index, nu::TextFormat* out) {
     if (GetType(state, index) != LuaType::Table)
       return false;
-    RawGetAndPop(state, index, "align", &out->align);
-    RawGetAndPop(state, index, "valign", &out->valign);
-    RawGetAndPop(state, index, "wrap", &out->wrap);
-    RawGetAndPop(state, index, "ellipsis", &out->ellipsis);
-    return true;
+    return ReadOptions(state, index,
+                       "align", &out->align, "valign", &out->valign,
+                       "wrap", &out->wrap, "ellipsis", &out->ellipsis);
   }
   static inline void Push(State* state, const nu::TextFormat& options) {
     NewTable(state, 0, 4);
-    RawSet(state, -1, "align", options.align);
-    RawSet(state, -1, "valign", options.valign);
-    RawSet(state, -1, "wrap", options.wrap);
-    RawSet(state, -1, "ellipsis", options.ellipsis);
+    RawSet(state, -1, "align", options.align, "valign", options.valign,
+                      "wrap", options.wrap, "ellipsis", options.ellipsis);
   }
 };
 
@@ -937,11 +935,8 @@ struct Type<nu::TextAttributes> {
   static inline bool To(State* state, int index, nu::TextAttributes* out) {
     if (!Type<nu::TextFormat>::To(state, index, out))
       return false;
-    nu::Font* font;
-    if (RawGetAndPop(state, index, "font", &font))
-      out->font = font;
-    RawGetAndPop(state, index, "color", &out->color);
-    return true;
+    return ReadOptions(state, index,
+                       "font", &out->font, "color", &out->color);
   }
 };
 
@@ -1469,13 +1464,12 @@ struct Type<nu::NotificationCenter::COMServerOptions> {
   static constexpr const char* name = "NotificationCenterCOMServerOptions";
   static inline bool To(State* state, int index,
                         nu::NotificationCenter::COMServerOptions* out) {
-    if (GetType(state, index) == LuaType::Table) {
-      RawGetAndPop(state, index,
-                   "writeregistry", &out->write_registry,
-                   "arguments", &out->arguments,
-                   "toastactivatorclsid", &out->toast_activator_clsid);
-    }
-    return true;
+    if (GetType(state, index) != LuaType::Table)
+      return false;
+    return ReadOptions(state, index,
+                       "writeregistry", &out->write_registry,
+                       "arguments", &out->arguments,
+                       "toastactivatorclsid", &out->toast_activator_clsid);
   }
 };
 
@@ -1562,18 +1556,14 @@ struct Type<nu::Toolbar::Item> {
   static inline bool To(State* state, int index, nu::Toolbar::Item* out) {
     if (GetType(state, index) != LuaType::Table)
       return false;
-    nu::Image* image;
-    if (RawGetAndPop(state, index, "image", &image))
-      out->image = image;
-    nu::View* view;
-    if (RawGetAndPop(state, index, "view", &view))
-      out->view = view;
-    RawGetAndPop(state, index, "label", &out->label);
-    RawGetAndPop(state, index, "minsize", &out->min_size);
-    RawGetAndPop(state, index, "maxsize", &out->max_size);
-    RawGetAndPop(state, index, "subitems", &out->subitems);
-    RawGetAndPop(state, index, "onclick", &out->on_click);
-    return true;
+    return ReadOptions(state, index,
+                       "image", &out->image,
+                       "view", &out->view,
+                       "label", &out->label,
+                       "minsize", &out->min_size,
+                       "maxsize", &out->max_size,
+                       "subitems", &out->subitems,
+                       "onclick", &out->on_click);
   }
 };
 
@@ -1626,15 +1616,14 @@ template<>
 struct Type<nu::Window::Options> {
   static constexpr const char* name = "WindowOptions";
   static inline bool To(State* state, int index, nu::Window::Options* out) {
-    if (GetType(state, index) == LuaType::Table) {
-      RawGetAndPop(state, index, "frame", &out->frame);
-      RawGetAndPop(state, index, "transparent", &out->transparent);
+    if (GetType(state, index) != LuaType::Table)
+      return false;
+    return ReadOptions(state, index,
+                       "frame", &out->frame,
 #if defined(OS_MAC)
-      RawGetAndPop(state, index,
-                   "showtrafficlights", &out->show_traffic_lights);
+                       "showtrafficlights", &out->show_traffic_lights,
 #endif
-    }
-    return true;
+                       "transparent", &out->transparent);
   }
 };
 
@@ -1932,9 +1921,8 @@ struct Type<nu::Button> {
     if (To(context->state, 1, &title)) {
       return new nu::Button(title);
     } else if (GetType(context->state, 1) == LuaType::Table) {
-      RawGetAndPop(context->state, 1, "title", &title);
       nu::Button::Type type = nu::Button::Type::Normal;
-      RawGetAndPop(context->state, 1, "type", &type);
+      ReadOptions(context->state, 1, "title", &title, "type", &type);
       return new nu::Button(title, type);
     } else {
       context->has_error = true;
@@ -1991,22 +1979,21 @@ template<>
 struct Type<nu::Browser::Options> {
   static constexpr const char* name = "BrowserOptions";
   static inline bool To(State* state, int index, nu::Browser::Options* out) {
-    if (GetType(state, index) == LuaType::Table) {
-      RawGetAndPop(
-          state, index,
+    if (GetType(state, index) != LuaType::Table)
+      return false;
+    return ReadOptions(
+        state, index,
 #if defined(OS_MAC) || defined(OS_LINUX)
-          "allowfileaccessfromfiles", &out->allow_file_access_from_files,
+        "allowfileaccessfromfiles", &out->allow_file_access_from_files,
 #endif
 #if defined(OS_LINUX)
-          "hardwareacceleration", &out->hardware_acceleration,
+        "hardwareacceleration", &out->hardware_acceleration,
 #endif
 #if defined(OS_WIN) && defined(WEBVIEW2_SUPPORT)
-          "webview2support", &out->webview2_support,
+        "webview2support", &out->webview2_support,
 #endif
-          "devtools", &out->devtools,
-          "contextmenu", &out->context_menu);
-    }
-    return true;
+        "devtools", &out->devtools,
+        "contextmenu", &out->context_menu);
   }
 };
 
@@ -2458,15 +2445,15 @@ struct Type<nu::Table::ColumnOptions> {
   static constexpr const char* name = "TableColumnOptions";
   static inline bool To(State* state, int index,
                         nu::Table::ColumnOptions* out) {
-    if (GetType(state, index) == LuaType::Table) {
-      RawGetAndPop(state, index, "type", &out->type);
-      RawGetAndPop(state, index, "ondraw", &out->on_draw);
-      RawGetAndPop(state, index, "width", &out->width);
-      int column;
-      if (RawGetAndPop(state, index, "column", &column))
-        out->column = column - 1;
-    }
-    return true;
+    if (GetType(state, index) != LuaType::Table)
+      return false;
+    int column;
+    if (RawGetAndPop(state, index, "column", &column))
+      out->column = column - 1;
+    return ReadOptions(state, index,
+                       "type", &out->type,
+                       "ondraw", &out->on_draw,
+                       "width", &out->width);
   }
 };
 

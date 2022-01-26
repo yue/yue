@@ -56,8 +56,50 @@ TEST_F(TableTest, RawGetWithPop) {
 
 TEST_F(TableTest, RawGetWithPopNonExistKey) {
   lua::NewTable(state_);
+  lua::RawSet(state_, 1, "key", "value");
   std::function<void()> f;
-  ASSERT_FALSE(lua::RawGetAndPop(state_, 1, "key", &f));
+  EXPECT_FALSE(lua::RawGetAndPop(state_, 1, "non-exist", &f));
+  std::string str;
+  EXPECT_FALSE(lua::RawGetAndPop(state_, 1, "key", &str, "non-exist", &f));
+}
+
+TEST_F(TableTest, RawGetWithPopWrongType) {
+  lua::NewTable(state_);
+  lua::RawSet(state_, 1, "key", "value");
+  int number;
+  ASSERT_FALSE(lua::RawGetAndPop(state_, 1, "key", &number));
+}
+
+TEST_F(TableTest, ReadOptions) {
+  lua::NewTable(state_);
+  lua::RawSet(state_, 1, "key1", 123, "key2", "value");
+  int number;
+  std::string str;
+  ASSERT_TRUE(lua::ReadOptions(state_, 1, "key1", &number, "key2", &str));
+  EXPECT_EQ(number, 123);
+  EXPECT_EQ(str, "value");
+  EXPECT_EQ(lua::GetTop(state_), 1);
+  bool b;
+  ASSERT_FALSE(lua::RawGetAndPop(state_, 1, "key1", &b));
+  ASSERT_EQ(lua::GetTop(state_), 1);
+}
+
+TEST_F(TableTest, ReadOptionsNonExistKey) {
+  lua::NewTable(state_);
+  lua::RawSet(state_, 1, "key", "value");
+  std::function<void()> f;
+  ASSERT_TRUE(lua::ReadOptions(state_, 1, "non-exist", &f));
+  EXPECT_FALSE(f);
+  std::string str;
+  ASSERT_TRUE(lua::ReadOptions(state_, 1, "key", &str, "non-exist", &f));
+  EXPECT_FALSE(f);
+}
+
+TEST_F(TableTest, ReadOptionsWrongType) {
+  lua::NewTable(state_);
+  lua::RawSet(state_, 1, "key", "value");
+  int number;
+  ASSERT_FALSE(lua::ReadOptions(state_, 1, "key", &number));
 }
 
 TEST_F(TableTest, PSetGet) {
