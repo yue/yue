@@ -59,11 +59,12 @@ source_set("lua_unittests_source_set") {
 
   sources = [
     "callback_unittest.cc",
-    "ref_method_unittest.cc",
     "handle_unittest.cc",
     "index_unittest.cc",
-    "lua_unittest.cc",
     "metatable_unittest.cc",
+    "ref_method_unittest.cc",
+    "stack_unittest.cc",
+    "table_unittest.cc",
   ]
 
   public_deps = [
