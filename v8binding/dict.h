@@ -100,9 +100,14 @@ inline bool Set(v8::Local<v8::Context> context, Dict dict,
 template<typename Key, typename Value>
 inline bool Get(v8::Local<v8::Context> context, v8::Local<v8::Object> object,
                 Key&& key, Value* out) {
+  // Check key before get, otherwise this method will always return true for
+  // Key == v8::Local<v8::Value>.
+  v8::Local<v8::Value> v8_key = ToV8(context, std::forward<Key>(key));
+  v8::Maybe<bool> has = object->Has(context, v8_key);
+  if (has.IsNothing() || !has.FromJust())
+    return false;
   v8::Local<v8::Value> value;
-  if (!object->Get(context,
-                   ToV8(context, std::forward<Key>(key))).ToLocal(&value))
+  if (!object->Get(context, v8_key).ToLocal(&value))
     return false;
   return FromV8(context, value, out);
 }
@@ -111,8 +116,32 @@ inline bool Get(v8::Local<v8::Context> context, v8::Local<v8::Object> object,
 template<typename Key, typename Value, typename... ArgTypes>
 inline bool Get(v8::Local<v8::Context> context, v8::Local<v8::Object> object,
                 Key&& key, Value* out, ArgTypes&&... args) {
-  return Get(context, object, std::forward<Key>(key), out) &
-         Get(context, object, std::forward<ArgTypes>(args)...);
+  bool success = Get(context, object, std::forward<Key>(key), out);
+  success &= Get(context, object, std::forward<ArgTypes>(args)...);
+  return success;
+}
+
+// Like Get but ignore unexist keys.
+template<typename Key, typename Value>
+inline bool ReadOptions(v8::Local<v8::Context> context,
+                        v8::Local<v8::Object> object,
+                        Key&& key, Value* out) {
+  v8::Local<v8::Value> v8_key = ToV8(context, std::forward<Key>(key));
+  v8::Maybe<bool> has = object->Has(context, v8_key);
+  if (has.IsNothing() || !has.FromJust())
+    return true;
+  v8::Local<v8::Value> value;
+  if (!object->Get(context, v8_key).ToLocal(&value))
+    return false;
+  return FromV8(context, value, out);
+}
+template<typename Key, typename Value, typename... ArgTypes>
+inline bool ReadOptions(v8::Local<v8::Context> context,
+                        v8::Local<v8::Object> object,
+                        Key&& key, Value* out, ArgTypes&&... args) {
+  bool success = ReadOptions(context, object, std::forward<Key>(key), out);
+  success &= ReadOptions(context, object, std::forward<ArgTypes>(args)...);
+  return success;
 }
 
 // Return a hidden map attached to object.

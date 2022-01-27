@@ -101,7 +101,9 @@ struct Type<nu::Size> {
     if (!value->IsObject())
       return false;
     int width = 0, height = 0;
-    Get(context, value.As<v8::Object>(), "width", &width, "height", &height);
+    if (!ReadOptions(context, value.As<v8::Object>(),
+                     "width", &width, "height", &height))
+      return false;
     *out = nu::Size(width, height);
     return true;
   }
@@ -122,7 +124,9 @@ struct Type<nu::SizeF> {
     if (!value->IsObject())
       return false;
     float width = 0, height = 0;
-    Get(context, value.As<v8::Object>(), "width", &width, "height", &height);
+    if (!ReadOptions(context, value.As<v8::Object>(),
+                     "width", &width, "height", &height))
+      return false;
     *out = nu::SizeF(width, height);
     return true;
   }
@@ -144,8 +148,10 @@ struct Type<nu::RectF> {
     if (!value->IsObject())
       return false;
     float x = 0, y = 0, width = 0, height = 0;
-    Get(context, value.As<v8::Object>(), "x", &x, "y", &y);
-    Get(context, value.As<v8::Object>(), "width", &width, "height", &height);
+    if (!ReadOptions(context, value.As<v8::Object>(),
+                     "x", &x, "y", &y,
+                     "width", &width, "height", &height))
+      return false;
     *out = nu::RectF(x, y, width, height);
     return true;
   }
@@ -166,7 +172,8 @@ struct Type<nu::Vector2dF> {
     if (!value->IsObject())
       return false;
     float x = 0, y = 0;
-    Get(context, value.As<v8::Object>(), "x", &x, "y", &y);
+    if (!ReadOptions(context, value.As<v8::Object>(), "x", &x, "y", &y))
+      return false;
     *out = nu::Vector2dF(x, y);
     return true;
   }
@@ -187,7 +194,8 @@ struct Type<nu::PointF> {
     if (!value->IsObject())
       return false;
     float x = 0, y = 0;
-    Get(context, value.As<v8::Object>(), "x", &x, "y", &y);
+    if (!ReadOptions(context, value.As<v8::Object>(), "x", &x, "y", &y))
+      return false;
     *out = nu::PointF(x, y);
     return true;
   }
@@ -388,14 +396,12 @@ struct Type<nu::App::ShortcutOptions> {
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::App::ShortcutOptions* out) {
-    auto obj = value.As<v8::Object>();
-    if (obj.IsEmpty())
+    if (!value->IsObject())
       return false;
-    Get(context, obj,
-        "arguments", &out->arguments,
-        "description", &out->description,
-        "workingDir", &out->working_dir);
-    return true;
+    return ReadOptions(context, value.As<v8::Object>(),
+                       "arguments", &out->arguments,
+                       "description", &out->description,
+                       "workingDir", &out->working_dir);
   }
 };
 #endif
@@ -932,11 +938,8 @@ struct Type<nu::DragOptions> {
                      nu::DragOptions* out) {
     if (!value->IsObject())
       return false;
-    v8::Local<v8::Object> obj = value.As<v8::Object>();
-    nu::Image* image;
-    if (Get(context, obj, "image", &image))
-      out->image = image;
-    return true;
+    return ReadOptions(context, value.As<v8::Object>(),
+                       "image", &out->image);
   }
 };
 
@@ -999,12 +1002,11 @@ struct Type<nu::TextFormat> {
                      nu::TextFormat* out) {
     if (!value->IsObject())
       return false;
-    v8::Local<v8::Object> obj = value.As<v8::Object>();
-    Get(context, obj, "align", &out->align);
-    Get(context, obj, "valign", &out->valign);
-    Get(context, obj, "wrap", &out->wrap);
-    Get(context, obj, "ellipsis", &out->ellipsis);
-    return true;
+    return ReadOptions(context, value.As<v8::Object>(),
+                       "align", &out->align,
+                       "valign", &out->valign,
+                       "wrap", &out->wrap,
+                       "ellipsis", &out->ellipsis);
   }
   static v8::Local<v8::Value> ToV8(v8::Local<v8::Context> context,
                                    const nu::TextFormat& options) {
@@ -1025,12 +1027,9 @@ struct Type<nu::TextAttributes> {
                      nu::TextAttributes* out) {
     if (!Type<nu::TextFormat>::FromV8(context, value, out))
       return false;
-    v8::Local<v8::Object> obj = value.As<v8::Object>();
-    nu::Font* font;
-    if (Get(context, obj, "font", &font))
-      out->font = font;
-    Get(context, obj, "color", &out->color);
-    return true;
+    return ReadOptions(context, value.As<v8::Object>(),
+                       "font", &out->font,
+                       "color", &out->color);
   }
 };
 
@@ -1633,14 +1632,12 @@ struct Type<nu::NotificationCenter::COMServerOptions> {
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::NotificationCenter::COMServerOptions* out) {
-    auto obj = value.As<v8::Object>();
-    if (obj.IsEmpty())
+    if (!value->IsObject())
       return false;
-    Get(context, obj,
-        "writeRegistry", &out->write_registry,
-        "arguments", &out->arguments,
-        "toastActivatorClsid", &out->toast_activator_clsid);
-    return true;
+    return ReadOptions(context, value.As<v8::Object>(),
+                       "writeRegistry", &out->write_registry,
+                       "arguments", &out->arguments,
+                       "toastActivatorClsid", &out->toast_activator_clsid);
   }
 };
 
@@ -1737,19 +1734,14 @@ struct Type<nu::Toolbar::Item> {
                      nu::Toolbar::Item* out) {
     if (!value->IsObject())
       return false;
-    v8::Local<v8::Object> obj = value.As<v8::Object>();
-    nu::Image* image;
-    if (Get(context, obj, "image", &image))
-      out->image = image;
-    nu::View* view;
-    if (Get(context, obj, "view", &view))
-      out->view = view;
-    Get(context, obj, "label", &out->label);
-    Get(context, obj, "minSize", &out->min_size);
-    Get(context, obj, "maxSize", &out->max_size);
-    Get(context, obj, "subitems", &out->subitems);
-    Get(context, obj, "onClick", &out->on_click);
-    return true;
+    return ReadOptions(context, value.As<v8::Object>(),
+                       "image", &out->image,
+                       "view", &out->view,
+                       "label", &out->label,
+                       "minSize", &out->min_size,
+                       "maxSize", &out->max_size,
+                       "subitems", &out->subitems,
+                       "onClick", &out->on_click);
   }
 };
 
@@ -1810,15 +1802,14 @@ struct Type<nu::Window::Options> {
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::Window::Options* out) {
-    auto obj = value.As<v8::Object>();
-    if (obj.IsEmpty())
+    if (!value->IsObject())
       return false;
-    Get(context, obj, "frame", &out->frame);
-    Get(context, obj, "transparent", &out->transparent);
+    return ReadOptions(context, value.As<v8::Object>(),
+                       "frame", &out->frame,
 #if defined(OS_MAC)
-    Get(context, obj, "showTrafficLights", &out->show_traffic_lights);
+                       "showTrafficLights", &out->show_traffic_lights,
 #endif
-    return true;
+                       "transparent", &out->transparent);
   }
 };
 
@@ -2149,10 +2140,10 @@ struct Type<nu::Button> {
     if (FromV8(context, value, &title)) {
       return new nu::Button(title);
     } else if (value->IsObject()) {
-      v8::Local<v8::Object> obj = value.As<v8::Object>();
-      Get(context, obj, "title", &title);
       nu::Button::Type type = nu::Button::Type::Normal;
-      Get(context, obj, "type", &type);
+      ReadOptions(context, value.As<v8::Object>(),
+                  "title", &title,
+                  "type", &type);
       return new nu::Button(title, type);
     } else {
       args->ThrowError("String or Object");
@@ -2227,10 +2218,10 @@ struct Type<nu::Browser::Options> {
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::Browser::Options* out) {
-    auto obj = value.As<v8::Object>();
-    if (obj.IsEmpty())
+    if (!value->IsObject())
       return false;
-    Get(context, obj,
+    return ReadOptions(
+        context, value.As<v8::Object>(),
 #if defined(OS_MAC) || defined(OS_LINUX)
         "allowFileAccessFromFiles", &out->allow_file_access_from_files,
 #endif
@@ -2242,7 +2233,6 @@ struct Type<nu::Browser::Options> {
 #endif
         "devtools", &out->devtools,
         "contextMenu", &out->context_menu);
-    return true;
   }
 };
 
@@ -2765,16 +2755,16 @@ struct Type<nu::Table::ColumnOptions> {
   static bool FromV8(v8::Local<v8::Context> context,
                      v8::Local<v8::Value> value,
                      nu::Table::ColumnOptions* out) {
-    auto obj = value.As<v8::Object>();
-    if (obj.IsEmpty())
+    if (!value->IsObject())
       return false;
-    Get(context, obj, "type", &out->type);
+    auto obj = value.As<v8::Object>();
     v8::Local<v8::Value> on_draw_val;
     if (Get(context, obj, "onDraw", &on_draw_val))
       WeakFunctionFromV8(context, on_draw_val, &out->on_draw);
-    Get(context, obj, "column", &out->column);
-    Get(context, obj, "width", &out->width);
-    return true;
+    return ReadOptions(context, obj,
+                       "type", &out->type,
+                       "column", &out->column,
+                       "width", &out->width);
   }
 };
 
