@@ -10,11 +10,29 @@
 
 @interface NUPicker : NSPopUpButton<NUView> {
  @private
+  nu::Picker* shell_;
   nu::NUPrivate private_;
 }
+- (id)initWithShell:(nu::Picker*)shell;
+- (IBAction)onSelectionChange:(id)sender;
 @end
 
 @implementation NUPicker
+
+- (id)initWithShell:(nu::Picker*)shell {
+  if ((self = [super initWithFrame:NSZeroRect pullsDown:NO])) {
+    shell_ = shell;
+    [self setTarget:self];
+    [self setAction:@selector(onSelectionChange:)];
+    [self setPreferredEdge:NSMinYEdge];
+    [[self cell] setArrowPosition:NSPopUpArrowAtBottom];
+  }
+  return self;
+}
+
+- (IBAction)onSelectionChange:(id)sender {
+  shell_->on_selection_change.Emit(shell_);
+}
 
 - (nu::NUPrivate*)nuPrivate {
   return &private_;
@@ -40,38 +58,9 @@
 
 @end
 
-@interface NUPickerDelegate : NSObject {
- @private
-  nu::Picker* shell_;
-}
-- (id)initWithShell:(nu::Picker*)shell;
-- (IBAction)onChange:(id)sender;
-@end
-
-@implementation NUPickerDelegate
-
-- (id)initWithShell:(nu::Picker*)shell {
-  if ((self = [super init]))
-    shell_ = shell;
-  return self;
-}
-
-- (IBAction)onChange:(id)sender {
-  shell_->on_selection_change.Emit(shell_);
-}
-
-@end
-
 namespace nu {
 
-Picker::Picker()
-    : Picker([[NUPicker alloc] initWithFrame:NSZeroRect pullsDown:NO]) {
-  auto* picker = static_cast<NUPicker*>(GetNative());
-  [picker setTarget:[[NUPickerDelegate alloc] initWithShell:this]];
-  [picker setAction:@selector(onChange:)];
-  [picker setPreferredEdge:NSMinYEdge];
-  [[picker cell] setArrowPosition:NSPopUpArrowAtBottom];
-
+Picker::Picker() : Picker([[NUPicker alloc] initWithShell:this]) {
   // The subclass overrides GetMinimumSize, so we must let subclass call
   // UpdateDefaultStyle itself.
   UpdateDefaultStyle();
@@ -79,14 +68,6 @@ Picker::Picker()
 
 Picker::Picker(NativeView view) {
   TakeOverView(view);
-}
-
-Picker::~Picker() {
-  auto* picker = static_cast<NSControl*>(GetNative());
-  if (picker.target) {
-    [picker.target release];
-    [picker setTarget:nil];
-  }
 }
 
 void Picker::AddItem(const std::string& text) {

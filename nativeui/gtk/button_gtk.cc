@@ -41,9 +41,6 @@ Button::Button(const std::string& title, Type type) {
   g_signal_connect(GetNative(), "clicked", G_CALLBACK(OnButtonClick), this);
 }
 
-Button::~Button() {
-}
-
 void Button::MakeDefault() {
   GtkWidget* button = GetNative();
   g_object_set_data(G_OBJECT(button), "default", this);

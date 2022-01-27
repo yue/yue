@@ -9,6 +9,8 @@ namespace nu {
 // static
 const char Picker::kClassName[] = "Picker";
 
+Picker::~Picker() = default;
+
 const char* Picker::GetClassName() const {
   return kClassName;
 }

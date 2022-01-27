@@ -241,9 +241,6 @@ Button::Button(const std::string& title, Type type) {
   SetTitle(title);
 }
 
-Button::~Button() {
-}
-
 void Button::MakeDefault() {
   auto* button = static_cast<ButtonImpl*>(GetNative());
   button->MakeDefault();

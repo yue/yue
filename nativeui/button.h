@@ -65,10 +65,9 @@ class NATIVEUI_EXPORT Button : public View {
   // Events.
   Signal<void(Button*)> on_click;
 
- protected:
+ private:
   ~Button() override;
 
- private:
   void PlatformSetImage(Image* image);
   void PlatformSetTitle(const std::string& title);
 

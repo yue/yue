@@ -13,6 +13,8 @@ namespace nu {
 // static
 const char Button::kClassName[] = "Button";
 
+Button::~Button() = default;
+
 void Button::SetImage(scoped_refptr<Image> image) {
   image_ = std::move(image);
   PlatformSetImage(image_.get());

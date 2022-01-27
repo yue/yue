@@ -46,9 +46,6 @@ Picker::Picker(NativeView view) {
   UpdateDefaultStyle();
 }
 
-Picker::~Picker() {
-}
-
 void Picker::AddItem(const std::string& text) {
   // Check for duplicate item.
   bool duplicate = false;

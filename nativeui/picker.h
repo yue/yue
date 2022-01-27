@@ -36,10 +36,10 @@ class NATIVEUI_EXPORT Picker : public View {
   Signal<void(Picker*)> on_selection_change;
 
  protected:
-  ~Picker() override;
-
   // Used by subclass.
   explicit Picker(NativeView view);
+
+  ~Picker() override;
 };
 
 }  // namespace nu

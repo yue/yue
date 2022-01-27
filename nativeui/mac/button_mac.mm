@@ -34,11 +34,27 @@ nu::InsetsF GetButtonInsets(NSButton* button) {
 
 @interface NUButton : NSButton<NUView> {
  @private
+  nu::Button* shell_;
   nu::NUPrivate private_;
 }
+- (id)initWithShell:(nu::Button*)shell;
+- (IBAction)onClick:(id)sender;
 @end
 
 @implementation NUButton
+
+- (id)initWithShell:(nu::Button*)shell {
+  if ((self = [super init])) {
+    shell_ = shell;
+    [self setTarget:self];
+    [self setAction:@selector(onClick:)];
+  }
+  return self;
+}
+
+- (IBAction)onClick:(id)sender {
+  shell_->on_click.Emit(shell_);
+}
 
 - (nu::NUPrivate*)nuPrivate {
   return &private_;
@@ -89,51 +105,18 @@ nu::InsetsF GetButtonInsets(NSButton* button) {
 
 @end
 
-// The button delegate to catch click events.
-@interface NUButtonDelegate : NSObject {
- @private
-  nu::Button* shell_;
-}
-- (id)initWithShell:(nu::Button*)shell;
-- (IBAction)onClick:(id)sender;
-@end
-
-@implementation NUButtonDelegate
-
-- (id)initWithShell:(nu::Button*)shell {
-  if ((self = [super init]))
-    shell_ = shell;
-  return self;
-}
-
-- (IBAction)onClick:(id)sender {
-  shell_->on_click.Emit(shell_);
-}
-
-@end
-
 namespace nu {
 
 Button::Button(const std::string& title, Type type) {
-  NSButton* button = [[NUButton alloc] init];
+  NSButton* button = [[NUButton alloc] initWithShell:this];
   if (type == Type::Normal)
     [button setBezelStyle:NSRoundedBezelStyle];
   else if (type == Type::Checkbox)
     [button setButtonType:NSSwitchButton];
   else if (type == Type::Radio)
     [button setButtonType:NSRadioButton];
-
-  [button setTarget:[[NUButtonDelegate alloc] initWithShell:this]];
-  [button setAction:@selector(onClick:)];
   TakeOverView(button);
-
   SetTitle(title);
-}
-
-Button::~Button() {
-  NSButton* button = static_cast<NSButton*>(GetNative());
-  [button.target release];
-  [button setTarget:nil];
 }
 
 void Button::MakeDefault() {

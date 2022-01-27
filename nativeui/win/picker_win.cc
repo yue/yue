@@ -58,9 +58,6 @@ Picker::Picker(NativeView view) {
   UpdateDefaultStyle();
 }
 
-Picker::~Picker() {
-}
-
 void Picker::AddItem(const std::string& text) {
   auto* picker = static_cast<PickerImpl*>(GetNative());
   std::wstring text16 = base::UTF8ToWide(text);

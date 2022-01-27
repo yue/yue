@@ -4,23 +4,27 @@
 
 #include "nativeui/slider.h"
 
-#include "base/mac/scoped_nsobject.h"
 #include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/nu_view.h"
 
-@interface NUSliderDelegate : NSObject {
+@interface NUSlider : NSSlider<NUView> {
  @private
   nu::Slider* shell_;
+  nu::NUPrivate private_;
 }
 - (id)initWithShell:(nu::Slider*)shell;
 - (IBAction)onValueChange:(id)sender;
 @end
 
-@implementation NUSliderDelegate
+@implementation NUSlider
 
 - (id)initWithShell:(nu::Slider*)shell {
-  if ((self = [super init]))
+  if ((self = [super init])) {
     shell_ = shell;
+    [self setTarget:self];
+    [self setAction:@selector(onValueChange:)];
+    [self setMaxValue:100.];
+  }
   return self;
 }
 
@@ -30,29 +34,6 @@
   NSEvent* event = [[NSApplication sharedApplication] currentEvent];
   if (event.type == NSLeftMouseUp)
     shell_->on_sliding_complete.Emit(shell_);
-}
-
-@end
-
-
-@interface NUSlider : NSSlider<NUView> {
- @private
-  base::scoped_nsobject<NUSliderDelegate> delegate_;
-  nu::NUPrivate private_;
-}
-- (id)initWithShell:(nu::Slider*)shell;
-@end
-
-@implementation NUSlider
-
-- (id)initWithShell:(nu::Slider*)shell {
-  if ((self = [super init])) {
-    delegate_.reset([[NUSliderDelegate alloc] initWithShell:shell]);
-    [self setMaxValue:100.];
-    [self setTarget:delegate_];
-    [self setAction:@selector(onValueChange:)];
-  }
-  return self;
 }
 
 - (nu::NUPrivate*)nuPrivate {
