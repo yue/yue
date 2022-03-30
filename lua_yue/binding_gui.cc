@@ -1086,7 +1086,7 @@ struct Type<nu::FileDialog::Filter> {
   }
   static inline bool To(State* state, int index,
                         nu::FileDialog::Filter* out) {
-    if (GetType(state, index) == LuaType::Table)
+    if (GetType(state, index) != LuaType::Table)
       return false;
     return RawGetAndPop(state, index,
                         "description", &std::get<0>(*out),
@@ -1425,7 +1425,7 @@ struct Type<nu::Notification::Action> {
   static constexpr const char* name = "NotificationAction";
   static inline bool To(State* state, int index,
                         nu::Notification::Action* out) {
-    if (GetType(state, index) == LuaType::Table)
+    if (GetType(state, index) != LuaType::Table)
       return false;
     return RawGetAndPop(state, index,
                         "info", &out->info,
