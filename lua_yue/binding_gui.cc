@@ -1119,7 +1119,7 @@ struct Type<nu::FileDialog> {
 
 template<>
 struct Type<nu::FileOpenDialog> {
-  using base = nu::FileOpenDialog;
+  using base = nu::FileDialog;
   static constexpr const char* name = "FileOpenDialog";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
@@ -1130,7 +1130,7 @@ struct Type<nu::FileOpenDialog> {
 
 template<>
 struct Type<nu::FileSaveDialog> {
-  using base = nu::FileSaveDialog;
+  using base = nu::FileDialog;
   static constexpr const char* name = "FileSaveDialog";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
