@@ -7,7 +7,6 @@
 #include <utility>
 #include <vector>
 
-#include "base/cxx17_backports.h"
 #include "base/notreached.h"
 #include "base/strings/string_util.h"
 #include "base/strings/utf_string_conversions.h"
@@ -51,8 +50,8 @@ std::string ReadMarkupFromSelectionData(GtkSelectionData* selection) {
 
   // GTK adds some prefix in markup result, remove it have consistent result.
   if (base::StartsWith(markup, kMarkupPrefix, base::CompareCase::SENSITIVE))
-    return markup.substr(base::size(kMarkupPrefix) - 1,
-                         markup.length() - (base::size(kMarkupPrefix) - 1));
+    return markup.substr(std::size(kMarkupPrefix) - 1,
+                         markup.length() - (std::size(kMarkupPrefix) - 1));
 
   return markup;
 }

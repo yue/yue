@@ -70,16 +70,16 @@ MessageLoop::TimerId MessageLoop::SetTimeout(int ms, Task task) {
   // Schedule a task to run the callback.
   dispatch_time_t t = dispatch_time(DISPATCH_TIME_NOW, ms * NSEC_PER_MSEC);
   dispatch_after(t, dispatch_get_main_queue(), ^{
-    Task task;
+    Task moved_task;
     {
       base::AutoLock auto_lock(lock_);
       auto it = tasks_.find(id);
       if (it == tasks_.end())  // cleared
         return;
-      task = std::move(it->second);
+      moved_task = std::move(it->second);
       tasks_.erase(it);
     }
-    task();
+    moved_task();
   });
   return id;
 }

@@ -11,7 +11,6 @@
 #include <vssym32.h>
 
 #include "base/check_op.h"
-#include "base/cxx17_backports.h"
 #include "base/notreached.h"
 #include "base/win/registry.h"
 #include "base/win/win_util.h"
@@ -354,7 +353,7 @@ HRESULT NativeTheme::PaintScrollbarArrow(
     int index =
         static_cast<int>(part) - static_cast<int>(Part::ScrollbarUpArrow);
     DCHECK_GE(index, 0);
-    DCHECK_LT(static_cast<size_t>(index), base::size(state_id_matrix));
+    DCHECK_LT(static_cast<size_t>(index), std::size(state_id_matrix));
     int state_id = state_id_matrix[index][static_cast<int>(state)];
 
     // Hovering means that the cursor is over the scrollbar, but not over the

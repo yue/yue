@@ -7,6 +7,8 @@
 #include <gtk/gtk.h>
 #include <pango/pangofc-fontmap.h>
 
+#include <iostream>
+
 #include "nativeui/gtk/util/fontconfig.h"
 
 namespace nu {

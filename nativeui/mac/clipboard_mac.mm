@@ -6,7 +6,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-#include "base/cxx17_backports.h"
 #include "base/notreached.h"
 #include "base/mac/foundation_util.h"
 #include "base/mac/scoped_nsobject.h"
@@ -102,8 +101,8 @@ Clipboard::Data Clipboard::GetData(Data::Type type) const {
       // The HTML may have meta prefix in it, remove it for consistent result.
       std::string html = base::SysNSStringToUTF8(contents);
       if (base::StartsWith(html, kMarkupPrefix, base::CompareCase::SENSITIVE))
-        html = html.substr(base::size(kMarkupPrefix) - 1,
-                           html.length() - (base::size(kMarkupPrefix) - 1));
+        html = html.substr(std::size(kMarkupPrefix) - 1,
+                           html.length() - (std::size(kMarkupPrefix) - 1));
       return Data(Data::Type::HTML, std::move(html));
     }
     case Data::Type::Image: {

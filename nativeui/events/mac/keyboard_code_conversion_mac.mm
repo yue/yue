@@ -12,7 +12,6 @@
 
 #include "base/check.h"
 #include "base/check_op.h"
-#include "base/cxx17_backports.h"
 #include "base/logging.h"
 
 namespace nu {
@@ -450,7 +449,7 @@ int MacKeyCodeForWindowsKeyCode(KeyboardCode keycode,
   const KeyCodeMap* ptr = std::lower_bound(
       std::begin(kKeyCodesMap), std::end(kKeyCodesMap), from);
 
-  if (ptr >= kKeyCodesMap + base::size(kKeyCodesMap) ||
+  if (ptr >= kKeyCodesMap + std::size(kKeyCodesMap) ||
       ptr->keycode != keycode || ptr->macKeycode == -1)
     return -1;
 

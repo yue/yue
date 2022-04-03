@@ -39,8 +39,8 @@ except ImportError:
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
-URL_PREFIX = 'http://s3.amazonaws.com'
-URL_PATH = 'gh-contractor-zcbenz/toolchain'
+URL_PREFIX = 'https://github.com'
+URL_PATH = 'yue/debian-sysroot-image-creator/releases/download'
 
 VALID_ARCHS = ('arm', 'arm64', 'i386', 'amd64', 'mips', 'mips64el')
 
@@ -51,22 +51,10 @@ ARCH_TRANSLATIONS = {
     'mips64': 'mips64el',
 }
 
-DEFAULT_TARGET_PLATFORM = 'stretch'
+DEFAULT_TARGET_PLATFORM = 'sid'
 
 class Error(Exception):
   pass
-
-
-def GetSha1(filename):
-  sha1 = hashlib.sha1()
-  with open(filename, 'rb') as f:
-    while True:
-      # Read in 1mb chunks, so it doesn't all have to be loaded into memory.
-      chunk = f.read(1024*1024)
-      if not chunk:
-        break
-      sha1.update(chunk)
-  return sha1.hexdigest()
 
 
 def main(args):
@@ -82,11 +70,6 @@ def main(args):
   if not sys.platform.startswith('linux'):
     return 0
 
-  if options.print_hash:
-    arch = options.print_hash
-    print(GetSysrootDict(DEFAULT_TARGET_PLATFORM,
-                         ARCH_TRANSLATIONS.get(arch, arch))['Sha1Sum'])
-    return 0
   if options.arch:
     InstallSysroot(DEFAULT_TARGET_PLATFORM,
                    ARCH_TRANSLATIONS.get(options.arch, options.arch))
@@ -115,14 +98,14 @@ def GetSysrootDict(target_platform, target_arch):
 def InstallSysroot(target_platform, target_arch):
   sysroot_dict = GetSysrootDict(target_platform, target_arch)
   tarball_filename = sysroot_dict['Tarball']
-  tarball_sha1sum = sysroot_dict['Sha1Sum']
-  revision = sysroot_dict['Revision']
+  tarball_version = sysroot_dict['Version']
   # TODO(thestig) Consider putting this elsewhere to avoid having to recreate
   # it on every build.
   linux_dir = os.path.dirname(os.path.dirname(SCRIPT_DIR))
   sysroot = os.path.join(linux_dir, 'third_party', sysroot_dict['SysrootDir'])
 
-  url = '%s/%s/%s/%s' % (URL_PREFIX, URL_PATH, revision, tarball_filename)
+  url = '%s/%s/%s/%s' % (URL_PREFIX, URL_PATH, tarball_version,
+                         tarball_filename)
 
   stamp = os.path.join(sysroot, '.stamp')
   if os.path.exists(stamp):
@@ -149,10 +132,6 @@ def InstallSysroot(target_platform, target_arch):
       pass
   else:
     raise Error('Failed to download %s' % url)
-  sha1sum = GetSha1(tarball)
-  if sha1sum != tarball_sha1sum:
-    raise Error('Tarball sha1sum is wrong.'
-                'Expected %s, actual: %s' % (tarball_sha1sum, sha1sum))
   subprocess.check_call(['tar', 'xf', tarball, '-C', sysroot])
   os.remove(tarball)
 

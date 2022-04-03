@@ -10,7 +10,6 @@
 
 #include "base/check.h"
 #include "base/files/file_path.h"
-#include "base/ignore_result.h"
 #include "base/logging.h"
 #include "base/strings/stringprintf.h"
 #include "nativeui/app.h"
@@ -198,7 +197,7 @@ void Tray::SetMenu(scoped_refptr<Menu> menu) {
 }
 
 std::string Tray::WriteImage(Image* icon) {
-  ignore_result(temp_dir_.Delete());
+  std::ignore = temp_dir_.Delete();
   if (!temp_dir_.CreateUniqueTempDir())
     return "";
 

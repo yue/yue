@@ -4,6 +4,8 @@
 
 #include "nativeui/lifetime.h"
 
+#include <iostream>
+
 #include "nativeui/mac/nu_application_delegate.h"
 
 namespace nu {

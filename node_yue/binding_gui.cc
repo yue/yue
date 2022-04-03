@@ -5,7 +5,6 @@
 #include <node.h>
 #include <node_buffer.h>
 
-#include "base/ignore_result.h"
 #include "base/notreached.h"
 #include "nativeui/nativeui.h"
 #include "node_yue/binding_signal.h"
@@ -2283,24 +2282,24 @@ struct Type<nu::Browser> {
                 "onFailNavigation", &nu::Browser::on_fail_navigation);
   }
   static void AddBinding(Arguments* args,
-                         const std::string& name,
+                         const std::string& bname,
                          v8::Local<v8::Function> func) {
     nu::Browser* browser;
     if (!args->GetHolder(&browser))
       return;
-    // this[bindings][name] = func.
+    // this[bindings][bname] = func.
     v8::Local<v8::Context> context = args->GetContext();
     v8::Local<v8::Map> refs = vb::GetAttachedTable(
         context, args->This(), "bindings");
-    ignore_result(refs->Set(context, ToV8(context, name), func));
+    std::ignore = refs->Set(context, ToV8(context, bname), func);
     // The func must be stored as weak reference.
     v8::Isolate* isolate = args->isolate();
     std::shared_ptr<internal::V8FunctionWrapper> func_ref(
         new internal::V8FunctionWrapper(isolate, func));
     func_ref->SetWeak();
     // Parse base::Value and call func with v8 args.
-    browser->AddRawBinding(name, [isolate, func_ref](nu::Browser* browser,
-                                                     ::base::Value value) {
+    browser->AddRawBinding(bname, [isolate, func_ref](nu::Browser* browser,
+                                                      ::base::Value value) {
       Locker locker(isolate);
       v8::HandleScope handle_scope(isolate);
       v8::MicrotasksScope script_scope(isolate,
@@ -2317,32 +2316,32 @@ struct Type<nu::Browser> {
     });
   }
   static void AddRawBinding(Arguments* args,
-                            const std::string& name,
+                            const std::string& bname,
                             v8::Local<v8::Function> func) {
     nu::Browser* browser;
     if (!args->GetHolder(&browser))
       return;
-    // this[bindings][name] = func
+    // this[bindings][bname] = func
     v8::Local<v8::Context> context = args->GetContext();
     v8::Local<v8::Map> refs = vb::GetAttachedTable(
         context, args->This(), "bindings");
-    ignore_result(refs->Set(context, ToV8(context, name), func));
+    std::ignore = refs->Set(context, ToV8(context, bname), func);
     // The func must be stored as weak reference.
     nu::Browser::BindingFunc callback;
     WeakFunctionFromV8(context, func, &callback);
-    browser->AddRawBinding(name, callback);
+    browser->AddRawBinding(bname, callback);
   }
-  static void RemoveBinding(Arguments* args, const std::string& name) {
+  static void RemoveBinding(Arguments* args, const std::string& bname) {
     nu::Browser* browser;
     if (!args->GetHolder(&browser))
       return;
-    // delete this[bindings][name]
+    // delete this[bindings][bname]
     v8::Local<v8::Context> context = args->GetContext();
     v8::Local<v8::Map> refs = vb::GetAttachedTable(
         context, args->This(), "bindings");
-    ignore_result(refs->Delete(context, ToV8(context, name)));
+    std::ignore = refs->Delete(context, ToV8(context, bname));
     // Pass down.
-    browser->RemoveBinding(name);
+    browser->RemoveBinding(bname);
   }
 };
 

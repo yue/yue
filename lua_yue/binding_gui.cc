@@ -1307,9 +1307,9 @@ struct Type<nu::MenuItem> {
     if (To(state, -1, &submenu) || GetType(state, -1) == LuaType::Table) {
       if (!item) item = new nu::MenuItem(nu::MenuItem::Type::Submenu);
       if (!submenu) {
-        CallContext context(state);
-        context.current_arg = AbsIndex(state, -1);
-        submenu = Type<nu::Menu>::Create(&context);
+        CallContext sub_context(state);
+        sub_context.current_arg = AbsIndex(state, -1);
+        submenu = Type<nu::Menu>::Create(&sub_context);
       }
       item->SetSubmenu(submenu);
     }
@@ -2039,7 +2039,7 @@ struct Type<nu::Browser> {
   }
   static void AddBinding(CallContext* context,
                          nu::Browser* browser,
-                         const std::string& name) {
+                         const std::string& bname) {
     State* state = context->state;
     if (GetType(state, 3) != LuaType::Function) {
       Push(state, "The arg 3 should be function");
@@ -2048,8 +2048,8 @@ struct Type<nu::Browser> {
     }
     // Persistent the function and pass it to lambda.
     auto ref = std::make_shared<Persistent>(state, 3);
-    browser->AddRawBinding(name, [state, ref](nu::Browser* browser,
-                                              ::base::Value value) {
+    browser->AddRawBinding(bname, [state, ref](nu::Browser* browser,
+                                               ::base::Value value) {
       ref->Push();
       for (const auto& it : value.GetList())
         Push(state, it);

@@ -64,11 +64,11 @@ cairo_region_t* CreateRegionForNonAlphaArea(cairo_t* cr) {
     // We work on A8 images to get full alpha channel.
     image = cairo_image_surface_create(CAIRO_FORMAT_A8,
                                        extents.width, extents.height);
-    cairo_t* cr = cairo_create(image);
-    cairo_set_source_surface(cr, surface, -extents.x, -extents.y);
-    cairo_paint(cr);
+    cairo_t* image_cr = cairo_create(image);
+    cairo_set_source_surface(image_cr, surface, -extents.x, -extents.y);
+    cairo_paint(image_cr);
     cairo_surface_flush(image);
-    cairo_destroy(cr);
+    cairo_destroy(image_cr);
   } else {
     image = cairo_surface_reference(surface);
     cairo_surface_flush(image);

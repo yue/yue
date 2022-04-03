@@ -85,7 +85,7 @@ bool App::CreateStartMenuShortcut(
   return base::win::CreateOrUpdateShortcutLink(
       GetStartMenuShortcutPath(),
       properties,
-      base::win::SHORTCUT_CREATE_ALWAYS);
+      base::win::ShortcutOperation::kCreateAlways);
 }
 
 base::FilePath App::GetStartMenuShortcutPath() const {

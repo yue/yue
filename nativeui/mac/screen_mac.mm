@@ -9,7 +9,6 @@
 
 #include <map>
 
-#include "base/cxx17_backports.h"
 #include "base/mac/scoped_nsobject.h"
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/gfx/mac/coordinate_conversion.h"
@@ -164,7 +163,7 @@ Screen::DisplayList Screen::CreateAllDisplays() {
   // doesn't hurt.
   CGDirectDisplayID online_displays[1024];
   CGDisplayCount online_display_count = 0;
-  if (CGGetOnlineDisplayList(base::size(online_displays), online_displays,
+  if (CGGetOnlineDisplayList(std::size(online_displays), online_displays,
                              &online_display_count) != kCGErrorSuccess) {
     return {CreatePrimaryDisplay()};
   }

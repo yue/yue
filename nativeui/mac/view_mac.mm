@@ -60,7 +60,7 @@ void View::OnConnect(int identifier) {
     case kOnMouseMove:
       // Install event tracking area.
       [view_ enableTracking];
-      FALLTHROUGH;
+      [[fallthrough]];
     case kOnMouseClick:
       AddMouseEventHandlerToClass([view_ class]);
       break;

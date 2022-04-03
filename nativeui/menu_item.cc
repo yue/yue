@@ -6,7 +6,6 @@
 
 #include <utility>
 
-#include "base/cxx17_backports.h"
 #include "nativeui/accelerator_manager.h"
 #include "nativeui/gfx/image.h"
 #include "nativeui/menu.h"
@@ -49,7 +48,7 @@ struct {
 };
 
 static_assert(
-    base::size(g_roles_map) == static_cast<size_t>(MenuItem::Role::ItemCount),
+    std::size(g_roles_map) == static_cast<size_t>(MenuItem::Role::ItemCount),
     "g_roles_map should be updated with roles");
 
 // Get the MenuItem type from its role.

@@ -149,11 +149,11 @@ void KeyExpansion(uint8_t* RoundKey, const uint8_t* Key) {
       // [a0,a1,a2,a3] becomes [a1,a2,a3,a0]
 
       // Function RotWord()
-      int k = tempa[0];
+      int l = tempa[0];
       tempa[0] = tempa[1];
       tempa[1] = tempa[2];
       tempa[2] = tempa[3];
-      tempa[3] = k;
+      tempa[3] = l;
 
       // SubWord() is a function that takes a four-byte input word and
       // applies the S-box to each of the four bytes to produce an output word.

@@ -215,7 +215,7 @@ KeyboardCode KeyboardCodeFromKeyIdentifier(const std::string& s,
 
   const KeyCodeMap* ptr = std::lower_bound(
       std::begin(kKeyCodesMap), std::end(kKeyCodesMap), from);
-  if (ptr >= kKeyCodesMap + base::size(kKeyCodesMap) || ptr->name != str)
+  if (ptr >= kKeyCodesMap + std::size(kKeyCodesMap) || ptr->name != str)
     return VKEY_UNKNOWN;
 
   return ptr->keycode;

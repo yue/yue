@@ -7,7 +7,6 @@
 #include <gtk/gtk.h>
 #include <webkit2/webkit2.h>
 
-#include "base/cxx17_backports.h"
 #include "nativeui/gtk/util/undoable_text_buffer.h"
 #include "nativeui/menu.h"
 #include "nativeui/menu_bar.h"
@@ -31,7 +30,7 @@ struct {
 };
 
 static_assert(
-    base::size(g_edit_map) == static_cast<size_t>(MenuItem::Role::Redo) + 1,
+    std::size(g_edit_map) == static_cast<size_t>(MenuItem::Role::Redo) + 1,
     "Stock edit items should map the roles");
 
 // Handling role item clicking.

@@ -24,7 +24,7 @@ const luaVersions = [
 ]
 
 // The version of gn.
-const gnVersion = '0.8.0'
+const gnVersion = '0.8.2'
 
 // The common build configurations.
 const gnConfig = [
@@ -56,7 +56,6 @@ if (targetOs == 'mac') {
 const gnSysrootConfig = [
   'use_sysroot=true',
   'target_sysroot_dir="//third_party/"',
-  'debian_platform="stretch"'
 ]
 
 module.exports = {

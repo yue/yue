@@ -410,11 +410,11 @@ struct Type<std::map<K, V>> {
       if (maybe_v8value.IsEmpty())
         return false;
       K key;
-      V value;
+      V sub;
       if (!Type<K>::FromV8(context, v8key, &key) ||
-          !Type<V>::FromV8(context, maybe_v8value.ToLocalChecked(), &value))
+          !Type<V>::FromV8(context, maybe_v8value.ToLocalChecked(), &sub))
         return false;
-      (*out)[key] = std::move(value);
+      (*out)[key] = std::move(sub);
     }
     return true;
   }

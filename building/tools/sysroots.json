@@ -1,38 +1,22 @@
 {
-    "stretch_amd64": {
-        "Revision": "90b6c270c0c30c6043ddc6965b744f54f8ee56cc",
-        "Sha1Sum": "d7d9386db5bb8b9b191546a5fa7487c7a6f00a7f",
-        "SysrootDir": "debian_stretch_amd64-sysroot",
-        "Tarball": "debian_stretch_amd64_sysroot.tgz"
+    "sid_amd64": {
+        "Version": "20220402",
+        "SysrootDir": "debian_sid_amd64-sysroot",
+        "Tarball": "debian_sid_amd64_sysroot.tar.xz"
     },
-    "stretch_arm": {
-        "Revision": "90b6c270c0c30c6043ddc6965b744f54f8ee56cc",
-        "Sha1Sum": "ae9a4f805a5977ad040779e055c7e9cc14243120",
-        "SysrootDir": "debian_stretch_arm-sysroot",
-        "Tarball": "debian_stretch_arm_sysroot.tgz"
+    "sid_arm": {
+        "Version": "20220402",
+        "SysrootDir": "debian_sid_arm-sysroot",
+        "Tarball": "debian_sid_arm_sysroot.tar.xz"
     },
-    "stretch_arm64": {
-        "Revision": "90b6c270c0c30c6043ddc6965b744f54f8ee56cc",
-        "Sha1Sum": "c1a1434e2f4e9cbb2fcfe1efb64f0938da5793c3",
-        "SysrootDir": "debian_stretch_arm64-sysroot",
-        "Tarball": "debian_stretch_arm64_sysroot.tgz"
+    "sid_arm64": {
+        "Version": "20220402",
+        "SysrootDir": "debian_sid_arm64-sysroot",
+        "Tarball": "debian_sid_arm64_sysroot.tar.xz"
     },
-    "stretch_i386": {
-        "Revision": "90b6c270c0c30c6043ddc6965b744f54f8ee56cc",
-        "Sha1Sum": "bc6216a200c576926245de2a1666938f6f509d0b",
-        "SysrootDir": "debian_stretch_i386-sysroot",
-        "Tarball": "debian_stretch_i386_sysroot.tgz"
-    },
-    "stretch_mips": {
-        "Revision": "90b6c270c0c30c6043ddc6965b744f54f8ee56cc",
-        "Sha1Sum": "a87e562192115721436b35e5e38098183df38ca9",
-        "SysrootDir": "debian_stretch_mips-sysroot",
-        "Tarball": "debian_stretch_mips_sysroot.tgz"
-    },
-    "stretch_mips64el": {
-        "Revision": "90b6c270c0c30c6043ddc6965b744f54f8ee56cc",
-        "Sha1Sum": "76f2c61847eaf4a1aebda4b4292f5b8d9fb24916",
-        "SysrootDir": "debian_stretch_mips64el-sysroot",
-        "Tarball": "debian_stretch_mips64el_sysroot.tgz"
+    "sid_i386": {
+        "Version": "20220402",
+        "SysrootDir": "debian_sid_i386-sysroot",
+        "Tarball": "debian_sid_i386_sysroot.tar.xz"
     }
 }
