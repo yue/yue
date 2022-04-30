@@ -1,0 +1,117 @@
+name: Yue
+
+on: push
+
+env:
+  AZURE_PIPELINES: true
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    continue-on-error: false
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-20.04, windows-2019, macos-11]
+        arch: [x64, arm64]
+        include:
+          - os: ubuntu-20.04
+            arch: x86
+          - os: ubuntu-20.04
+            arch: arm
+          - os: windows-2019
+            arch: x86
+
+    steps:
+      - name: Install Edge Canary
+        if: startsWith(matrix.os, 'windows')
+        shell: pwsh
+        run: |
+          Start-BitsTransfer -Source 'https://go.microsoft.com/fwlink/?linkid=2084649&Channel=Canary&language=en-us' -Destination EdgeSetup.exe
+          if (-not (Test-Path 'EdgeSetup.exe')) {
+            Throw 'Failed to download Edge'
+          }
+          Start-Process -Wait -FilePath './EdgeSetup.exe' -ArgumentList '/silent', '/install'
+
+      - name: Install Linux Dependencies
+        if: startsWith(matrix.os, 'ubuntu')
+        run: |
+          sudo apt update
+          sudo apt install -y cmake libgtk-3-dev libnotify-dev libwebkit2gtk-4.0-dev
+
+      - name: Install Linux Cross Compilation Toolchains
+        if: startsWith(matrix.os, 'ubuntu') && matrix.arch != 'x64'
+        run: sudo apt install -y gcc-multilib g++-multilib
+
+      - name: Install Linux Arm Toolchains
+        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'arm')
+        run: sudo apt install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf libc6-dev-armhf-cross linux-libc-dev-armhf-cross binutils-aarch64-linux-gnu
+
+      - uses: actions/setup-python@v3
+        with:
+          python-version: '3.x'
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Build and Test (Windows, macOS)
+        if: ${{ !startsWith(matrix.os, 'ubuntu') }}
+        run: node scripts/cibuild.js --target-cpu=${{ matrix.arch }}
+
+      - name: Build and Test (Linux)
+        if: startsWith(matrix.os, 'ubuntu')
+        run: xvfb-run node scripts/cibuild.js --target-cpu=${{ matrix.arch }}
+
+      - name: Upload Binary Files
+        uses: actions/upload-artifact@v3
+        with:
+          path: |
+            out/Dist/lua_yue_*.zip
+            out/Dist/node_yue_node_*.zip
+            out/Dist/node_yue_electron_*.zip
+          retention-days: 1
+
+      - name: Upload Library Files
+        if: matrix.arch == 'x64'
+        uses: actions/upload-artifact@v3
+        with:
+          path: |
+            out/Dist/libyue_*.zip
+          retention-days: 1
+
+      - name: Upload Document Files
+        if: startsWith(matrix.os, 'ubuntu') && matrix.arch == 'x64'
+        uses: actions/upload-artifact@v3
+        with:
+          path: |
+            out/Dist/node_yue_types_*.zip
+            out/Dist/yue_docs_*.zip
+          retention-days: 1
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Lint
+        run: node ./scripts/cpplint.js
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [build, lint]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Files
+        uses: actions/download-artifact@v3
+
+      - name: Release
+        uses: softprops/action-gh-release@v0.1.14
+        with:
+          draft: true
+          name: Yue ${{ github.ref_name }}
+          body: '## Changelog'
+          files: artifact/*.zip

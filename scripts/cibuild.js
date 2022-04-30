@@ -13,9 +13,6 @@ const fs = require('fs-extra')
 // Mark this is CI build.
 process.env.CI = 'true'
 
-// Lint code.
-execSync('node ./scripts/cpplint.js')
-
 // Bootstrap.
 execSync(`node ./scripts/bootstrap.js --target-cpu=${targetCpu}`)
 
