@@ -11,7 +11,7 @@
 #include <utility>
 #include <vector>
 
-#include "node.h"  // NOLINT(build/include)
+#include "node.h"  // NOLINT(build/include_directory)
 #include "v8binding/arguments.h"
 #include "v8binding/locker.h"
 #include "v8binding/template_util.h"

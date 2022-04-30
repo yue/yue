@@ -7,8 +7,8 @@
 #define NODE_YUE_NODE_INTEGRATION_H_
 
 #include "base/memory/weak_ptr.h"
-#include "uv.h"  // NOLINT(build/include)
-#include "v8.h"  // NOLINT(build/include)
+#include "uv.h"  // NOLINT
+#include "v8.h"  // NOLINT
 
 namespace nu {
 class Lifetime;

@@ -4,7 +4,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {exec} = require('child_process')
+const {spawn} = require('child_process')
 const {lstatSync, readdirSync} = require('fs')
 const path = require('path')
 
@@ -48,10 +48,10 @@ let hasError = false
 const cpplint = path.join('building', 'tools', 'cpplint.py')
 while (sourceFiles.length) {
   const chunck = sourceFiles.splice(0, 100)
-  const child = exec(`python ${cpplint} --quiet ${chunck.join(' ')}`)
-  child.stderr.on('data', (chunck) => {
-    hasError = true
-    process.stdout.write(chunck)
+  const child = spawn('python', [cpplint, ...chunck], {stdio: 'inherit'})
+  child.on('close', (code) => {
+    if (code != 0)
+      hasError = true
   })
 }
 
@@ -61,7 +61,7 @@ process.on('beforeExit', (code) => {
 
 // Util function to list files recursively
 function listFiles(dirs) {
-  result = []
+  let result = []
   for (const dir of dirs) {
     const subdirs = readdirSync(dir)
     for (const sub of subdirs) {

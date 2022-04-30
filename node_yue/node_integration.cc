@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "nativeui/message_loop.h"
-#include "node.h"  // NOLINT(build/include)
+#include "node.h"  // NOLINT
 
 namespace node_yue {
 
