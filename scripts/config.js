@@ -5,17 +5,15 @@ const webview2Version = '1.0.622.22'
 
 // The versions of language bindings to build against.
 const nodeVersions = [
-  '12.22.7',
-  '14.18.1',
-  '16.13.0',
-  '17.1.0',
+  '14.19.1',
+  '16.15.0',
+  '17.9.0',
 ]
 const electronVersions = [
-  '12.2.3',
-  '13.6.2',
-  '14.2.1',
-  '15.3.2',
-  '16.0.2',
+  '15.5.2',
+  '16.2.3',
+  '17.4.1',
+  '18.1.0',
 ]
 const luaVersions = [
   '5.3.6',
@@ -43,11 +41,8 @@ if (clang) {
 }
 if (targetOs == 'mac') {
   gnConfig.push('mac_deployment_target="10.10.0"',
+                'mac_sdk_min="11.0"',
                 'use_xcode_clang=true')
-  if (targetCpu == 'arm64')
-    gnConfig.push('mac_sdk_min="11.0"')
-  else
-    gnConfig.push('mac_sdk_min="10.15"')
 } else if (targetOs == 'win') {
   gnConfig.push(`webview2_version="${webview2Version}"`)
 }
