@@ -1,0 +1,41 @@
+name: Responder
+component: gui
+header: nativeui/responder.h
+type: refcounted
+namespace: nu
+description: Base class of Window and View for event processing.
+
+methods:
+  - signature: const char* GetClassName() const
+    lang: ['cpp']
+    description: Return the receiving responder's class name.
+    detail: |
+      A class name is a string which uniquely identifies the class. It is
+      intended to be used as a way to find out during run time if a responder
+      can be safely casted to a specific subclass.
+
+  - signature: NativeResponder GetNative() const
+    lang: ['cpp']
+    description: Return the native type wrapped by the responder.
+
+events:
+  - signature: bool on_mouse_down(Responder* self, const MouseEvent& event)
+    description: Emitted when pressing mouse buttons.
+
+  - signature: bool on_mouse_up(Responder* self, const MouseEvent& event)
+    description: Emitted when releasing mouse buttons.
+
+  - signature: void on_mouse_move(Responder* self, const MouseEvent& event)
+    description: Emitted when user moves mouse in the view/window.
+
+  - signature: void on_mouse_enter(Responder* self, const MouseEvent& event)
+    description: Emitted when mouse enters the view/window.
+
+  - signature: void on_mouse_leave(Responder* self, const MouseEvent& event)
+    description: Emitted when mouse leaves the view/window.
+
+  - signature: bool on_key_down(Responder* self, const KeyEvent& event)
+    description: Emitted when pressing keyboard.
+
+  - signature: bool on_key_up(Responder* self, const KeyEvent& event)
+    description: Emitted when releasing keyboard.

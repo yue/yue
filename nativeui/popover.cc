@@ -102,7 +102,7 @@ Popover::Popover() {
   window_->SetResizable(false);
   window_->SetSkipTaskbar(true);
   window_->should_close = [](Window*) { return false; };
-  window_->on_mouse_up.Connect([this](Window*, const MouseEvent&) {
+  window_->on_mouse_up.Connect([this](Responder*, const MouseEvent&) {
     PointF pos = Screen::GetCurrent()->GetCursorScreenPoint();
     if (!window_->GetBounds().Contains(pos))
       Close();

@@ -5,44 +5,60 @@
 #ifndef NATIVEUI_RESPONDER_H_
 #define NATIVEUI_RESPONDER_H_
 
+#include "base/memory/ref_counted.h"
 #include "nativeui/signal.h"
+#include "nativeui/types.h"
 
 namespace nu {
 
 struct MouseEvent;
 struct KeyEvent;
 
-template<typename T>
-class NATIVEUI_EXPORT Responder : public SignalDelegate {
+class NATIVEUI_EXPORT Responder : public SignalDelegate,
+                                  public base::RefCounted<Responder> {
  public:
+  // Return the receiving responder's class name. A class name is a string
+  // which uniquely identifies the class. It is intended to be used as a way to
+  // find out during run time if a responder can be safely casted to a specific
+  // subclass.
+  virtual const char* GetClassName() const = 0;
+
+  // Get the native object.
+  NativeResponder GetNative() const { return responder_; }
+
   // Events.
-  Signal<bool(T*, const MouseEvent&)> on_mouse_down;
-  Signal<bool(T*, const MouseEvent&)> on_mouse_up;
-  Signal<void(T*, const MouseEvent&)> on_mouse_move;
-  Signal<void(T*, const MouseEvent&)> on_mouse_enter;
-  Signal<void(T*, const MouseEvent&)> on_mouse_leave;
-  Signal<bool(T*, const KeyEvent&)> on_key_down;
-  Signal<bool(T*, const KeyEvent&)> on_key_up;
+  Signal<bool(Responder*, const MouseEvent&)> on_mouse_down;
+  Signal<bool(Responder*, const MouseEvent&)> on_mouse_up;
+  Signal<void(Responder*, const MouseEvent&)> on_mouse_move;
+  Signal<void(Responder*, const MouseEvent&)> on_mouse_enter;
+  Signal<void(Responder*, const MouseEvent&)> on_mouse_leave;
+  Signal<bool(Responder*, const KeyEvent&)> on_key_down;
+  Signal<bool(Responder*, const KeyEvent&)> on_key_up;
 
  protected:
-  // Event types.
-  enum { kOnMouseClick, kOnMouseMove, kOnKey };
+  friend class base::RefCounted<Responder>;
 
-#if defined(OS_LINUX)
   Responder();
+  ~Responder() override;
 
   // SignalDelegate:
   void OnConnect(int identifier) override;
-#endif
+
+  // FIXME(zcbenz): Needs a more decent way to handle this.
+  NativeResponder responder_;
 
  private:
-#if defined(OS_LINUX)
+  // Event types.
+  enum { kOnMouseClick, kOnMouseMove, kOnKey };
+
+  virtual void PlatformInstallMouseClickEvents();
+  virtual void PlatformInstallMouseMoveEvents();
+  void PlatformInstallKeyEvents();
+
   // Whether events have been installed.
   bool on_mouse_click_installed_ = false;
   bool on_mouse_move_installed_ = false;
   bool on_key_installed_ = false;
-  bool on_drop_installed_ = false;
-#endif
 };
 
 }  // namespace nu

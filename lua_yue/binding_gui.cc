@@ -1627,15 +1627,18 @@ struct Type<nu::Toolbar> {
 };
 #endif
 
-template<typename T>
-struct Type<nu::Responder<T>*> {
+template<>
+struct Type<nu::Responder> {
   static constexpr const char* name = "Responder";
-  static inline bool To(State* state, int index, nu::Responder<T>** out) {
-    T* target;
-    if (!Type<T*>::To(state, index, &target))
-      return false;
-    *out = target;
-    return true;
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSetProperty(state, metatable,
+                   "onmousedown", &nu::Responder::on_mouse_down,
+                   "onmouseup", &nu::Responder::on_mouse_up,
+                   "onmousemove", &nu::Responder::on_mouse_move,
+                   "onmouseenter", &nu::Responder::on_mouse_enter,
+                   "onmouseleave", &nu::Responder::on_mouse_leave,
+                   "onkeydown", &nu::Responder::on_key_down,
+                   "onkeyup", &nu::Responder::on_key_up);
   }
 };
 
@@ -1656,6 +1659,7 @@ struct Type<nu::Window::Options> {
 
 template<>
 struct Type<nu::Window> {
+  using base = nu::Responder;
   static constexpr const char* name = "Window";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
@@ -1732,6 +1736,7 @@ struct Type<nu::Window> {
 
 template<>
 struct Type<nu::View> {
+  using base = nu::Responder;
   static constexpr const char* name = "View";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
@@ -1774,13 +1779,6 @@ struct Type<nu::View> {
            "getparent", &nu::View::GetParent,
            "getwindow", &nu::View::GetWindow);
     RawSetProperty(state, metatable,
-                   "onmousedown", &nu::View::on_mouse_down,
-                   "onmouseup", &nu::View::on_mouse_up,
-                   "onmousemove", &nu::View::on_mouse_move,
-                   "onmouseenter", &nu::View::on_mouse_enter,
-                   "onmouseleave", &nu::View::on_mouse_leave,
-                   "onkeydown", &nu::View::on_key_down,
-                   "onkeyup", &nu::View::on_key_up,
                    "ondragleave", &nu::View::on_drag_leave,
                    "onsizechanged", &nu::View::on_size_changed,
                    "oncapturelost", &nu::View::on_capture_lost,
@@ -2719,7 +2717,9 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::MessageBox>(state, "MessageBox");
   BindType<nu::Notification>(state, "Notification");
   BindType<nu::NotificationCenter>(state, "NotificationCenter");
+  BindType<nu::Responder>(state, "Responder");
   BindType<nu::Window>(state, "Window");
+  BindType<nu::View>(state, "View");
   BindType<nu::ComboBox>(state, "ComboBox");
   BindType<nu::Container>(state, "Container");
   BindType<nu::Button>(state, "Button");

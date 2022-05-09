@@ -41,9 +41,6 @@ std::string ParseName(const std::string& name) {
 
 }  // namespace
 
-// static
-const char View::kClassName[] = "View";
-
 View::View() : view_(nullptr) {
   // Create node with the default yoga config.
   yoga_config_ = YGConfigNew();
@@ -58,10 +55,6 @@ View::~View() {
   // Free yoga config and node.
   YGNodeFree(node_);
   YGConfigFree(yoga_config_);
-}
-
-const char* View::GetClassName() const {
-  return kClassName;
 }
 
 void View::SetVisible(bool visible) {

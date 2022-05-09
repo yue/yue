@@ -37,9 +37,11 @@ class Toolbar;
 #endif
 
 // The native window.
-class NATIVEUI_EXPORT Window : public base::RefCounted<Window>,
-                               public Responder<Window> {
+class NATIVEUI_EXPORT Window : public Responder {
  public:
+  // The view class name.
+  static const char kClassName[];
+
   struct Options {
     // Whether the window has a chrome.
     bool frame = true;
@@ -146,6 +148,9 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window>,
   // Internal: Get the yogo config object.
   YGConfigRef GetYogaConfig() const { return yoga_config_; }
 
+  // Responder:
+  const char* GetClassName() const override;
+
   // Events.
   Signal<void(Window*)> on_close;
   Signal<void(Window*)> on_focus;
@@ -159,8 +164,6 @@ class NATIVEUI_EXPORT Window : public base::RefCounted<Window>,
   ~Window() override;
 
  private:
-  friend class base::RefCounted<Window>;
-
   // Following platform implementations should only be called by wrappers.
   void PlatformInit(const Options& options);
   void PlatformDestroy();

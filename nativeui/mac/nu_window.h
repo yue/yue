@@ -5,20 +5,22 @@
 #ifndef NATIVEUI_MAC_NU_WINDOW_H_
 #define NATIVEUI_MAC_NU_WINDOW_H_
 
-#import <Cocoa/Cocoa.h>
+#include "base/mac/scoped_nsobject.h"
+#include "nativeui/mac/nu_responder.h"
 
 namespace nu {
 class Window;
 }
 
-@interface NUWindow : NSWindow {
+@interface NUWindow : NSWindow<NUResponder> {
  @private
+  base::scoped_nsobject<NSTrackingArea> tracking_area_;
   nu::Window* shell_;
   bool can_resize_;
 }
 - (void)setShell:(nu::Window*)shell;
-- (nu::Window*)shell;
 - (void)setWindowStyle:(NSUInteger)style on:(bool)yes;
+- (bool)hasTrackingArea;
 @end
 
 #endif  // NATIVEUI_MAC_NU_WINDOW_H_

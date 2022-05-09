@@ -12,6 +12,7 @@
 #include "nativeui/win/drag_drop/drag_source.h"
 #include "nativeui/win/drag_drop/drop_target.h"
 #include "nativeui/win/focus_manager.h"
+#include "nativeui/win/responder_win.h"
 #include "nativeui/win/util/win32_window.h"
 #include "nativeui/window.h"
 
@@ -20,6 +21,7 @@ namespace nu {
 class DataObject;
 
 class WindowImpl : public Win32Window,
+                   public ResponderImpl,
                    public DragSource::Delegate,
                    public DropTarget::Delegate {
  public:
@@ -35,7 +37,7 @@ class WindowImpl : public Win32Window,
   // Make the window HWND acquire focus without triggering focus events.
   void FocusWithoutEvent();
 
-  bool HandleKeyEvent(const KeyEvent& event);
+  bool HandleKeyEvent(NativeEvent event);
 
   void SetCapture(ViewImpl* view);
   void ReleaseCapture();
@@ -64,8 +66,7 @@ class WindowImpl : public Win32Window,
   Color background_color() const { return background_color_; }
   bool has_shadow() const { return has_shadow_; }
   bool drag_drop_in_progress() const { return drag_drop_in_progress_; }
-  float scale_factor() const { return scale_factor_; }
-  Window* delegate() { return delegate_; }
+  Window* delegate() { return static_cast<Window*>(ResponderImpl::delegate()); }
 
  protected:
   CR_BEGIN_MSG_MAP_EX(WindowImpl, Win32Window)
@@ -179,12 +180,6 @@ class WindowImpl : public Win32Window,
   scoped_refptr<DropTarget> drop_target_;
 
   bool drag_drop_in_progress_ = false;
-
-  // The scale factor of current window.
-  float scale_factor_;
-
-  // The public Window interface.
-  Window* delegate_;
 };
 
 }  // namespace nu

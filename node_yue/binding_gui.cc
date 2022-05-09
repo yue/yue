@@ -1818,17 +1818,22 @@ struct Type<nu::Toolbar> {
 };
 #endif
 
-template<typename T>
-struct Type<nu::Responder<T>*> {
+template<>
+struct Type<nu::Responder> {
   static constexpr const char* name = "Responder";
-  static bool FromV8(v8::Local<v8::Context> context,
-                     v8::Local<v8::Value> value,
-                     nu::Responder<T>** out) {
-    T* target;
-    if (!Type<T*>::FromV8(context, value, &target))
-      return false;
-    *out = target;
-    return true;
+  static void BuildConstructor(v8::Local<v8::Context> context,
+                               v8::Local<v8::Object> constructor) {
+  }
+  static void BuildPrototype(v8::Local<v8::Context> context,
+                             v8::Local<v8::ObjectTemplate> templ) {
+    SetProperty(context, templ,
+                "onMouseDown", &nu::Responder::on_mouse_down,
+                "onMouseUp", &nu::Responder::on_mouse_up,
+                "onMouseMove", &nu::Responder::on_mouse_move,
+                "onMouseEnter", &nu::Responder::on_mouse_enter,
+                "onMouseLeave", &nu::Responder::on_mouse_leave,
+                "onKeyDown", &nu::Responder::on_key_down,
+                "onKeyUp", &nu::Responder::on_key_up);
   }
 };
 
@@ -1851,6 +1856,7 @@ struct Type<nu::Window::Options> {
 
 template<>
 struct Type<nu::Window> {
+  using base = nu::Responder;
   static constexpr const char* name = "Window";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
@@ -1931,6 +1937,7 @@ struct Type<nu::Window> {
 
 template<>
 struct Type<nu::View> {
+  using base = nu::Responder;
   static constexpr const char* name = "View";
   static void BuildConstructor(v8::Local<v8::Context> context,
                                v8::Local<v8::Object> constructor) {
@@ -1977,13 +1984,6 @@ struct Type<nu::View> {
         "getParent", &nu::View::GetParent,
         "getWindow", &nu::View::GetWindow);
     SetProperty(context, templ,
-                "onMouseDown", &nu::View::on_mouse_down,
-                "onMouseUp", &nu::View::on_mouse_up,
-                "onMouseMove", &nu::View::on_mouse_move,
-                "onMouseEnter", &nu::View::on_mouse_enter,
-                "onMouseLeave", &nu::View::on_mouse_leave,
-                "onKeyDown", &nu::View::on_key_down,
-                "onKeyUp", &nu::View::on_key_up,
                 "onDragLeave", &nu::View::on_drag_leave,
                 "onSizeChanged", &nu::View::on_size_changed,
                 "onCaptureLost", &nu::View::on_capture_lost,
@@ -3100,6 +3100,7 @@ void Initialize(v8::Local<v8::Object> exports,
           "MessageBox",         vb::Constructor<nu::MessageBox>(),
           "Notification",       vb::Constructor<nu::Notification>(),
           "NotificationCenter", vb::Constructor<nu::NotificationCenter>(),
+          "Responder",          vb::Constructor<nu::Responder>(),
           "Window",             vb::Constructor<nu::Window>(),
           "View",               vb::Constructor<nu::View>(),
           "ComboBox",           vb::Constructor<nu::ComboBox>(),

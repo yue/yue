@@ -5,13 +5,11 @@
 #ifndef NATIVEUI_MAC_NU_VIEW_H_
 #define NATIVEUI_MAC_NU_VIEW_H_
 
-#import <Cocoa/Cocoa.h>
-
 #include "nativeui/gfx/color.h"
+#include "nativeui/mac/nu_responder.h"
 
 namespace nu {
 class Font;
-class View;
 struct NUPrivate;
 }
 
@@ -26,10 +24,7 @@ struct NUPrivate;
 @end
 
 // Extended methods of NUView.
-@interface NSView (NUViewMethods) <NUView>
-- (nu::View*)shell;
-- (void)enableTracking;
-- (void)disableTracking;
+@interface NSView (NUViewMethods) <NUResponder, NUView>
 @end
 
 namespace nu {

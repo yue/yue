@@ -95,16 +95,6 @@ class NATIVEUI_EXPORT Browser : public View {
     AddBinding(name, std::function<RunType>(func));
   }
 
-  // Events.
-  Signal<void(Browser*)> on_close;
-  Signal<void(Browser*)> on_update_command;
-  Signal<void(Browser*)> on_change_loading;
-  Signal<void(Browser*, std::string)> on_update_title;
-  Signal<void(Browser*, std::string)> on_start_navigation;
-  Signal<void(Browser*, std::string)> on_commit_navigation;
-  Signal<void(Browser*, std::string, int)> on_fail_navigation;
-  Signal<void(Browser*, std::string)> on_finish_navigation;
-
   // Internal: Called from web pages to invoke native bindings.
   bool InvokeBindings(const std::string& json_arg);
 
@@ -118,8 +108,24 @@ class NATIVEUI_EXPORT Browser : public View {
   std::function<void()>& pending_load() { return pending_load_; }
 #endif
 
+  // Events.
+  Signal<void(Browser*)> on_close;
+  Signal<void(Browser*)> on_update_command;
+  Signal<void(Browser*)> on_change_loading;
+  Signal<void(Browser*, std::string)> on_update_title;
+  Signal<void(Browser*, std::string)> on_start_navigation;
+  Signal<void(Browser*, std::string)> on_commit_navigation;
+  Signal<void(Browser*, std::string, int)> on_fail_navigation;
+  Signal<void(Browser*, std::string)> on_finish_navigation;
+
  protected:
   ~Browser() override;
+
+#if defined(OS_MAC)
+  // Responder:
+  void PlatformInstallMouseClickEvents() override;
+  void PlatformInstallMouseMoveEvents() override;
+#endif
 
  private:
   void PlatformInit(Options options);

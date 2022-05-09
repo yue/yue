@@ -36,7 +36,7 @@ event will not be executed. While returning `false` means the slot is only
 observing the event.
 
 ```cpp
-bool OnMouseDown(nu::View* self, const nu::MouseEvent& event) {
+bool OnMouseDown(nu::Responder* self, const nu::MouseEvent& event) {
   return true;
 }
 
@@ -52,7 +52,7 @@ Unlike event that can have multiple handlers connected, a delegate is a single
 
 ```cpp
 void Main(nu::Window* window) {
-  window->should_close = [](nu::Window* self) { return false; };
+  window->should_close = [](nu::Responder* self) { return false; };
 }
 ```
 

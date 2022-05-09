@@ -9,15 +9,16 @@
 
 namespace nu {
 
-class View;
+class Responder;
 
-// Dynamically add event methods to a NSView.
-void AddMouseEventHandlerToClass(Class cl);
-void AddKeyEventHandlerToClass(Class cl);
-void AddDragDropHandlerToClass(Class cl);
+// Dynamically add event methods to NSView/NSWindow.
+void AddMouseClickEventHandler(NSResponder* responder);
+void AddMouseMoveEventHandler(NSResponder* responder);
+void AddKeyEventHandler(NSResponder* responder);
+void AddDragDropHandler(NSResponder* responder);
 
-// Dispatch mouse events to a view.
-bool DispatchMouseEvent(View* view, NSEvent* event);
+// Dispatch mouse events to a responder.
+bool DispatchMouseEvent(Responder* responder, NSEvent* event);
 
 }  // namespace nu
 

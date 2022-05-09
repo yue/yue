@@ -3,6 +3,7 @@ component: gui
 header: nativeui/window.h
 type: refcounted
 namespace: nu
+inherit: Responder
 description: Native window.
 
 constructors:
@@ -14,6 +15,11 @@ class_methods:
   - signature: Window* Create(Window::Options options)
     lang: ['lua', 'js']
     description: Create a new window with `options`.
+
+class_properties:
+  - property: const char* kClassName
+    lang: ['cpp']
+    description: The class name of window.
 
 methods:
   - signature: void Close()
@@ -220,10 +226,6 @@ methods:
 
   - signature: std::vector<Window*> GetChildWindows() const
     description: Return all the child windows of this window.
-
-  - signature: NativeWindow GetNative() const
-    lang: ['cpp']
-    description: Return the native instance wrapped the window.
 
 events:
   - signature: void on_close(Window* self)

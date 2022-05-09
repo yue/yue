@@ -49,6 +49,15 @@
   shell_->on_blur.Emit(shell_);
 }
 
+- (void)windowDidResize:(NSNotification*)notification {
+  // NSWindows does not have a updateTrackingAreas method, so update on resize.
+  NUWindow* window = static_cast<NUWindow*>(shell_->GetNative());
+  if ([window hasTrackingArea]) {
+    [window disableTracking];
+    [window enableTracking];
+  }
+}
+
 @end
 
 namespace nu {
@@ -63,7 +72,7 @@ void Window::PlatformInit(const Options& options) {
                   backing:NSBackingStoreBuffered
                     defer:YES];
   [window setShell:this];
-  window_ = window;
+  responder_ = window_ = window;
 
   [window_ setDelegate:[[NUWindowDelegate alloc] initWithShell:this]];
   [window_ setReleasedWhenClosed:NO];
@@ -129,7 +138,10 @@ bool Window::HasShadow() const {
 }
 
 void Window::PlatformSetContentView(View* view) {
+  bool has_tracking_area = [static_cast<NUWindow*>(window_) hasTrackingArea];
   if (content_view_) {
+    if (has_tracking_area)
+      [window_ disableTracking];
     [content_view_->GetNative() removeFromSuperview];
     if (IsNUView(content_view_->GetNative())) {
       NUPrivate* priv = [content_view_->GetNative() nuPrivate];
@@ -151,6 +163,8 @@ void Window::PlatformSetContentView(View* view) {
     // Make sure top corners are rounded:
     [content_view setWantsLayer:!IsTransparent()];
   }
+  if (has_tracking_area)
+    [window_ enableTracking];
 }
 
 void Window::Center() {

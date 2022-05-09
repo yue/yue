@@ -5,15 +5,13 @@
 
 #include "nativeui/mac/nu_window.h"
 
+#include "nativeui/window.h"
+
 @implementation NUWindow
 
 - (void)setShell:(nu::Window*)shell {
   shell_ = shell;
   can_resize_ = true;
-}
-
-- (nu::Window*)shell {
-  return shell_;
 }
 
 - (void)setWindowStyle:(NSUInteger)style on:(bool)yes {
@@ -33,6 +31,35 @@
   // Change style mask will make the zoom button revert to default, probably
   // a bug of Cocoa.
   [[self standardWindowButton:NSWindowZoomButton] setEnabled:maximizable];
+}
+
+- (bool)hasTrackingArea {
+  return tracking_area_;
+}
+
+- (nu::Responder*)shell {
+  return shell_;
+}
+
+- (void)enableTracking {
+  if (tracking_area_)
+    return;
+  NSTrackingAreaOptions trackingOptions = NSTrackingMouseEnteredAndExited |
+                                          NSTrackingMouseMoved |
+                                          NSTrackingActiveAlways |
+                                          NSTrackingInVisibleRect;
+  tracking_area_.reset([[NSTrackingArea alloc] initWithRect:NSZeroRect
+                                                    options:trackingOptions
+                                                      owner:self
+                                                   userInfo:nil]);
+  [[self contentView] addTrackingArea:tracking_area_.get()];
+}
+
+- (void)disableTracking {
+  if (!tracking_area_)
+    return;
+  [[self contentView] removeTrackingArea:tracking_area_.get()];
+  tracking_area_.reset();
 }
 
 - (NSRect)constrainFrameRect:(NSRect)frameRect toScreen:(NSScreen*)screen {

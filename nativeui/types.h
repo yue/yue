@@ -54,6 +54,7 @@ typedef struct CGContext* CGContextRef;
 @class NSStatusItem;
 @class NSToolbar;
 @class NSView;
+@class NSResponder;
 @class NSWindow;
 @class NUNotificationCenterDelegate;
 #else
@@ -74,6 +75,7 @@ class NSScreen;
 class NSStatusItem;
 class NSToolbar;
 struct NSView;
+class NSResponder;
 class NSWindow;
 class NUNotificationCenterDelegate;
 #endif  // __OBJC__
@@ -94,6 +96,7 @@ class ClipboardImpl;
 class ComServerModule;
 class DoubleBuffer;
 class FileDialogImpl;
+class ResponderImpl;
 class TrayImpl;
 class ViewImpl;
 class WindowImpl;
@@ -124,6 +127,7 @@ using NativeMenu = NSMenu*;
 using NativeMenuItem = NSMenuItem*;
 using NativeNotification = NSUserNotification*;
 using NativeNotificationCenter = NUNotificationCenterDelegate*;
+using NativeResponder = NSResponder*;
 using NativeToolbar = NSToolbar*;
 using NativeTray = NSStatusItem*;
 #elif defined(OS_LINUX)
@@ -144,6 +148,7 @@ using NativeMenu = GtkMenuShell*;
 using NativeMenuItem = GtkMenuItem*;
 using NativeNotification = NotificationData*;
 using NativeNotificationCenter = GDBusProxy*;
+using NativeResponder = GtkWidget*;
 using NativeTray = AppIndicator*;
 #elif defined(OS_WIN)
 using NativeAttributedText = AttributedTextImpl*;
@@ -163,11 +168,8 @@ using NativeMenu = HMENU;
 using NativeMenuItem = MenuItemData*;
 using NativeNotification = NotificationImpl*;
 using NativeNotificationCenter = ComServerModule*;
+using NativeResponder = ResponderImpl*;
 using NativeTray = TrayImpl*;
-#elif defined(OS_IOS)
-using NativeView = UIView*;
-using NativeWindow UIWindow*;
-using NativeFont = UIFont*;
 #endif
 
 }  // namespace nu

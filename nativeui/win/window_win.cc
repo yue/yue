@@ -86,8 +86,7 @@ WindowImpl::WindowImpl(const Window::Options& options, Window* delegate)
                   options.frame ? kWindowDefaultStyle
                                 : kWindowDefaultFramelessStyle,
                   ComputeWindowExStyle(options)),
-      scale_factor_(GetScaleFactorForHWND(hwnd())),
-      delegate_(delegate) {
+      ResponderImpl(GetScaleFactorForHWND(hwnd()), delegate) {
   if (options.frame) {
     // Normal window always has shadow.
     has_shadow_ = true;
@@ -138,7 +137,7 @@ Rect WindowImpl::GetContentPixelBounds() {
 
 void WindowImpl::AdvanceFocus() {
   focus_manager_.set_show_focus_ring(true);
-  focus_manager_.AdvanceFocus(delegate_->GetContentView()->GetNative(),
+  focus_manager_.AdvanceFocus(delegate()->GetContentView()->GetNative(),
                               IsShiftPressed());
 }
 
@@ -148,16 +147,22 @@ void WindowImpl::FocusWithoutEvent() {
   ignore_focus_ = false;
 }
 
-bool WindowImpl::HandleKeyEvent(const KeyEvent& event) {
-  if (event.type == EventType::KeyDown && delegate_->GetMenuBar()) {
-    Accelerator accelerator(event);
-    int id = delegate_->GetMenuBar()->accel_manager()->Process(accelerator);
-    if (id != -1) {
-      DispatchCommandToItem(delegate_->GetMenuBar(), id);
-      return true;
-    }
-  }
-  return false;
+bool WindowImpl::HandleKeyEvent(NativeEvent event) {
+  // Ask the event handler of window.
+  if (EmitKeyEvent(event))
+    return true;
+  // If not handled then pass the event to menu.
+  if (!delegate()->GetMenuBar())
+    return false;
+  KeyEvent key_event(event, this);
+  if (key_event.type != EventType::KeyDown)
+    return false;
+  Accelerator accelerator(key_event);
+  int id = delegate()->GetMenuBar()->accel_manager()->Process(accelerator);
+  if (id == -1)
+    return false;
+  DispatchCommandToItem(delegate()->GetMenuBar(), id);
+  return true;
 }
 
 void WindowImpl::SetCapture(ViewImpl* view) {
@@ -227,7 +232,7 @@ void WindowImpl::SetBackgroundColor(nu::Color color) {
 }
 
 void WindowImpl::SetHasShadow(bool has) {
-  if (delegate_->HasFrame())
+  if (delegate()->HasFrame())
     return;
   BOOL enabled = FALSE;
   if (!SUCCEEDED(DwmIsCompositionEnabled(&enabled)) || !enabled)
@@ -300,16 +305,16 @@ void WindowImpl::OnCaptureChanged(HWND window) {
 }
 
 void WindowImpl::OnClose() {
-  if (!delegate_->should_close ||
-      delegate_->should_close(delegate_)) {
-    delegate_->NotifyWindowClosed();
+  if (!delegate()->should_close ||
+      delegate()->should_close(delegate())) {
+    delegate()->NotifyWindowClosed();
     SetMsgHandled(false);
   }
 }
 
 void WindowImpl::OnCommand(UINT code, int command, HWND window) {
-  if (!code && !window && delegate_->GetMenuBar()) {
-    DispatchCommandToItem(delegate_->GetMenuBar(), command);
+  if (!code && !window && delegate()->GetMenuBar()) {
+    DispatchCommandToItem(delegate()->GetMenuBar(), command);
     return;
   } else if (::GetParent(window) != hwnd()) {
     LOG(ERROR) << "Received notification " << code << " " << command
@@ -322,13 +327,13 @@ void WindowImpl::OnCommand(UINT code, int command, HWND window) {
 }
 
 void WindowImpl::OnMenuShow(BOOL is_popup) {
-  if (!is_popup && delegate_->GetMenuBar())
-    delegate_->GetMenuBar()->OnMenuShow();
+  if (!is_popup && delegate()->GetMenuBar())
+    delegate()->GetMenuBar()->OnMenuShow();
 }
 
 void WindowImpl::OnMenuHide(BOOL is_popup) {
-  if (!is_popup && delegate_->GetMenuBar())
-    delegate_->GetMenuBar()->OnMenuHide();
+  if (!is_popup && delegate()->GetMenuBar())
+    delegate()->GetMenuBar()->OnMenuHide();
 }
 
 LRESULT WindowImpl::OnNotify(int id, LPNMHDR pnmh) {
@@ -340,9 +345,9 @@ LRESULT WindowImpl::OnNotify(int id, LPNMHDR pnmh) {
 }
 
 void WindowImpl::OnSize(UINT param, const Size& size) {
-  if (!delegate_->GetContentView())
+  if (!delegate()->GetContentView())
     return;
-  delegate_->GetContentView()->GetNative()->SizeAllocate(Rect(size));
+  delegate()->GetContentView()->GetNative()->SizeAllocate(Rect(size));
   RedrawWindow(hwnd(), NULL, NULL, RDW_INVALIDATE | RDW_ALLCHILDREN);
 }
 
@@ -356,21 +361,21 @@ void WindowImpl::OnFocus(HWND old) {
   if (focused_view && focused_view->type() == ControlType::Subwin)
     focused_view->SetFocus(true);
 
-  delegate_->on_focus.Emit(delegate_);
+  delegate()->on_focus.Emit(delegate());
   SetMsgHandled(false);
 }
 
 void WindowImpl::OnBlur(HWND old) {
-  delegate_->on_blur.Emit(delegate_);
+  delegate()->on_blur.Emit(delegate());
   SetMsgHandled(false);
 }
 
 LRESULT WindowImpl::OnDPIChanged(UINT msg, WPARAM w_param, LPARAM l_param) {
   float new_scale_factor = GetScalingFactorFromDPI(LOWORD(w_param));
-  if (new_scale_factor != scale_factor_) {
-    scale_factor_ = new_scale_factor;
+  if (new_scale_factor != scale_factor()) {
+    set_scale_factor(new_scale_factor);
     // Notify the content view of DPI change.
-    delegate_->GetContentView()->GetNative()->BecomeContentView(this);
+    delegate()->GetContentView()->GetNative()->BecomeContentView(this);
     // Move to the new window position under new DPI.
     SetPixelBounds(Rect(*reinterpret_cast<RECT*>(l_param)));
   }
@@ -382,7 +387,8 @@ LRESULT WindowImpl::OnMouseMove(UINT message, WPARAM w_param, LPARAM l_param) {
   if (!mouse_in_window_) {
     mouse_in_window_ = true;
     if (!captured_view_)
-      delegate_->GetContentView()->GetNative()->OnMouseEnter(&msg);
+      delegate()->GetContentView()->GetNative()->OnMouseEnter(&msg);
+    EmitMouseEnterEvent(&msg);
     TrackMouse(true);
   }
 
@@ -391,7 +397,8 @@ LRESULT WindowImpl::OnMouseMove(UINT message, WPARAM w_param, LPARAM l_param) {
     return 0;
   }
 
-  delegate_->GetContentView()->GetNative()->OnMouseMove(&msg);
+  delegate()->GetContentView()->GetNative()->OnMouseMove(&msg);
+  EmitMouseMoveEvent(&msg);
   return 0;
 }
 
@@ -405,7 +412,8 @@ LRESULT WindowImpl::OnMouseLeave(UINT message, WPARAM w_param, LPARAM l_param) {
     return 0;
   }
 
-  delegate_->GetContentView()->GetNative()->OnMouseLeave(&msg);
+  delegate()->GetContentView()->GetNative()->OnMouseLeave(&msg);
+  EmitMouseLeaveEvent(&msg);
   return 0;
 }
 
@@ -414,7 +422,7 @@ LRESULT WindowImpl::OnMouseWheel(UINT message, WPARAM w_param, LPARAM l_param) {
   POINT p = { CR_GET_X_LPARAM(l_param), CR_GET_Y_LPARAM(l_param) };
   ::ScreenToClient(hwnd(), &p);
   Win32Message msg = {message, w_param, MAKELPARAM(p.x, p.y)};
-  if (!delegate_->GetContentView()->GetNative()->OnMouseWheel(&msg))
+  if (!delegate()->GetContentView()->GetNative()->OnMouseWheel(&msg))
     SetMsgHandled(false);
   return 0;
 }
@@ -427,8 +435,12 @@ LRESULT WindowImpl::OnMouseClick(UINT message, WPARAM w_param, LPARAM l_param) {
   }
 
   // Pass the event to view.
-  if (!delegate_->GetContentView()->GetNative()->OnMouseClick(&msg))
-    SetMsgHandled(false);
+  if (delegate()->GetContentView()->GetNative()->OnMouseClick(&msg))
+    return 0;
+  // And then to the window.
+  if (EmitMouseClickEvent(&msg))
+    return 0;
+  SetMsgHandled(false);
   return 0;
 }
 
@@ -439,8 +451,8 @@ LRESULT WindowImpl::OnKeyEvent(UINT message, WPARAM w_param, LPARAM l_param) {
       focus_manager()->focused_view()->OnKeyEvent(&msg))
     return 0;
 
-  // If no one handles it then pass the event to menu.
-  if (!HandleKeyEvent(KeyEvent(&msg, delegate_->GetContentView()->GetNative())))
+  // Then to the window.
+  if (!HandleKeyEvent(&msg))
     SetMsgHandled(false);
   return 0;
 }
@@ -467,7 +479,7 @@ void WindowImpl::OnPaint(HDC) {
   // Always update the whole buffer for transparent window.
   Rect bounds(GetContentPixelBounds());
   Rect dirty;
-  if (delegate_->IsTransparent())
+  if (delegate()->IsTransparent())
     dirty = Rect(bounds.size());
   else
     dirty = Rect(ps.rcPaint);
@@ -484,16 +496,16 @@ void WindowImpl::OnPaint(HDC) {
     // Draw.
     {
       // Background.
-      PainterWin painter(buffer.dc(), bounds.size(), scale_factor_);
+      PainterWin painter(buffer.dc(), bounds.size(), scale_factor());
       painter.SetColor(background_color_);
       painter.FillRectPixel(dirty);
 
       // Controls.
-      delegate_->GetContentView()->GetNative()->Draw(&painter, dirty);
+      delegate()->GetContentView()->GetNative()->Draw(&painter, dirty);
     }
 
     // Update layered window.
-    if (delegate_->IsTransparent()) {
+    if (delegate()->IsTransparent()) {
       RECT wr;
       ::GetWindowRect(hwnd(), &wr);
       SIZE size = {wr.right - wr.left, wr.bottom - wr.top};
@@ -538,7 +550,7 @@ void WindowImpl::OnGetMinMaxInfo(MINMAXINFO* minmax_info) {
 
 LRESULT WindowImpl::OnNCHitTest(UINT msg, WPARAM w_param, LPARAM l_param) {
   // Only override this for frameless window.
-  if (delegate_->HasFrame()) {
+  if (delegate()->HasFrame()) {
     SetMsgHandled(false);
     return 0;
   }
@@ -554,7 +566,7 @@ LRESULT WindowImpl::OnNCHitTest(UINT msg, WPARAM w_param, LPARAM l_param) {
   Point point(temp);
 
   // Calculate the resize handle.
-  if (delegate_->IsResizable() && !(IsMaximized() || IsFullscreen())) {
+  if (delegate()->IsResizable() && !(IsMaximized() || IsFullscreen())) {
     Rect bounds = GetPixelBounds();
     int border_thickness = GetFrameThickness(scale_factor());
     int corner_width =
@@ -593,7 +605,7 @@ LRESULT WindowImpl::OnNCHitTest(UINT msg, WPARAM w_param, LPARAM l_param) {
   }
 
   // Get result from content view.
-  return delegate_->GetContentView()->GetNative()->HitTest(point);
+  return delegate()->GetContentView()->GetNative()->HitTest(point);
 }
 
 LRESULT WindowImpl::OnNCCalcSize(BOOL mode, LPARAM l_param) {
@@ -639,7 +651,7 @@ LRESULT WindowImpl::OnNCCalcSize(BOOL mode, LPARAM l_param) {
 
   Insets insets;
   bool got_insets = GetClientAreaInsets(&insets);
-  if (!got_insets && !IsFullscreen() && !(mode && !delegate_->HasFrame())) {
+  if (!got_insets && !IsFullscreen() && !(mode && !delegate()->HasFrame())) {
     SetMsgHandled(FALSE);
     return 0;
   }
@@ -656,7 +668,7 @@ LRESULT WindowImpl::OnNCCalcSize(BOOL mode, LPARAM l_param) {
     if (MonitorHasAutohideTaskbarForEdge(ABE_LEFT, monitor))
       client_rect->left += kAutoHideTaskbarThicknessPx;
     if (MonitorHasAutohideTaskbarForEdge(ABE_TOP, monitor)) {
-      if (delegate_->HasFrame()) {
+      if (delegate()->HasFrame()) {
         // Tricky bit.  Due to a bug in DwmDefWindowProc()'s handling of
         // WM_NCHITTEST, having any nonclient area atop the window causes the
         // caption buttons to draw onscreen but not respond to mouse
@@ -711,7 +723,7 @@ LRESULT WindowImpl::OnSetCursor(UINT message, WPARAM w_param, LPARAM l_param) {
 
     // Set view cursors.
     ViewImpl* view = captured_view_ ? captured_view_
-                                    : delegate_->GetContentView()->GetNative();
+                                    : delegate()->GetContentView()->GetNative();
     if (view->OnSetCursor(&msg)) {
       return TRUE;
     } else {
@@ -768,21 +780,21 @@ void WindowImpl::OnDragSourceMove() {
 }
 
 int WindowImpl::OnDragEnter(IDataObject* data, int effect, const Point& point) {
-  return delegate_->GetContentView()->GetNative()->OnDragEnter(
+  return delegate()->GetContentView()->GetNative()->OnDragEnter(
       data, effect, point);
 }
 
 int WindowImpl::OnDragOver(IDataObject* data, int effect, const Point& point) {
-  return delegate_->GetContentView()->GetNative()->OnDragUpdate(
+  return delegate()->GetContentView()->GetNative()->OnDragUpdate(
       data, effect, point);
 }
 
 void WindowImpl::OnDragLeave(IDataObject* data) {
-  return delegate_->GetContentView()->GetNative()->OnDragLeave(data);
+  return delegate()->GetContentView()->GetNative()->OnDragLeave(data);
 }
 
 int WindowImpl::OnDrop(IDataObject* data, int effect, const Point& point) {
-  return delegate_->GetContentView()->GetNative()->OnDrop(data, effect, point);
+  return delegate()->GetContentView()->GetNative()->OnDrop(data, effect, point);
 }
 
 void WindowImpl::TrackMouse(bool enable) {
@@ -797,7 +809,7 @@ void WindowImpl::TrackMouse(bool enable) {
 bool WindowImpl::GetClientAreaInsets(Insets* insets) {
   // Returning false causes the default handling in OnNCCalcSize() to
   // be invoked.
-  if (delegate_->HasFrame())
+  if (delegate()->HasFrame())
     return false;
 
   if (IsMaximized()) {
@@ -817,7 +829,7 @@ bool WindowImpl::GetClientAreaInsets(Insets* insets) {
 // Public Window API implementation.
 
 void Window::PlatformInit(const Options& options) {
-  window_ = new WindowImpl(options, this);
+  responder_ = window_ = new WindowImpl(options, this);
 
   YGConfigSetPointScaleFactor(yoga_config_,
                               GetScaleFactorForHWND(window_->hwnd()));

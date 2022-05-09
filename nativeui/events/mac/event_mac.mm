@@ -120,21 +120,33 @@ int EventModifiersFromNS(NSEventModifierFlags flags) {
   return flags & (MASK_SHIFT | MASK_CONTROL | MASK_ALT | MASK_META);
 }
 
-PointF GetPosInView(NSEvent* event, NSView* view) {
-  NSPoint point = [view convertPoint:[event locationInWindow] fromView:nil];
-  if ([view isFlipped])
+PointF GetPosInWindow(NSEvent* event) {
+  NSPoint point = [event locationInWindow];
+  NSWindow* window = [event window];
+  if (!window)
     return PointF(point);
-  NSRect frame = [view frame];
+  NSRect frame = [window contentRectForFrameRect:[window frame]];
   return PointF(point.x, NSHeight(frame) - point.y);
 }
 
-PointF GetPosInWindow(NSEvent* event, NSView* view) {
-  NSPoint point = [event locationInWindow];
-  if ([view isFlipped])
-    return PointF(point);
-  NSWindow* window = [event window];
-  NSRect frame = [window contentRectForFrameRect:[window frame]];
-  return PointF(point.x, NSHeight(frame) - point.y);
+PointF GetPosInWindow(NSEvent* event, NSResponder* responder) {
+  if ([responder isKindOfClass:[NSView class]] &&
+      [static_cast<NSView*>(responder) isFlipped]) {
+    return PointF([event locationInWindow]);
+  }
+  return GetPosInWindow(event);
+}
+
+PointF GetPosInView(NSEvent* event, NSResponder* responder) {
+  if ([responder isKindOfClass:[NSView class]]) {
+    NSView* view = static_cast<NSView*>(responder);
+    NSPoint point = [view convertPoint:[event locationInWindow] fromView:nil];
+    if ([view isFlipped])
+      return PointF(point);
+    NSRect frame = [view frame];
+    return PointF(point.x, NSHeight(frame) - point.y);
+  }
+  return GetPosInWindow(event);
 }
 
 }  // namespace
@@ -159,22 +171,22 @@ bool Event::IsMetaPressed() {
   return [NSEvent modifierFlags] & NSCommandKeyMask;
 }
 
-Event::Event(NativeEvent event, NativeView view)
+Event::Event(NativeEvent event, NativeResponder responder)
     : type(EventTypeFromNS(event)),
       modifiers(EventModifiersFromNS([event modifierFlags])),
       timestamp([event timestamp] * 1000),
       native_event(event) {
 }
 
-MouseEvent::MouseEvent(NativeEvent event, NativeView view)
-    : Event(event, view),
+MouseEvent::MouseEvent(NativeEvent event, NativeResponder responder)
+    : Event(event, responder),
       button([event buttonNumber] + 1),
-      position_in_view(GetPosInView(event, view)),
-      position_in_window(GetPosInWindow(event, view)) {
+      position_in_view(GetPosInView(event, responder)),
+      position_in_window(GetPosInWindow(event, responder)) {
 }
 
-KeyEvent::KeyEvent(NativeEvent event, NativeView view)
-    : Event(event, view),
+KeyEvent::KeyEvent(NativeEvent event, NativeResponder responder)
+    : Event(event, responder),
       key(KeyboardCodeFromNSEvent(event)) {
 }
 

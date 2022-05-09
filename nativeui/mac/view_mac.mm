@@ -55,23 +55,8 @@ void View::PlatformDestroy() {
   [view_ release];
 }
 
-void View::OnConnect(int identifier) {
-  switch (identifier) {
-    case kOnMouseMove:
-      // Install event tracking area.
-      [view_ enableTracking];
-      [[fallthrough]];
-    case kOnMouseClick:
-      AddMouseEventHandlerToClass([view_ class]);
-      break;
-    case kOnKey:
-      AddKeyEventHandlerToClass([view_ class]);
-      break;
-  }
-}
-
 void View::TakeOverView(NativeView view) {
-  view_ = view;
+  responder_ = view_ = view;
 
   if (!IsNUView(view))
     return;
@@ -94,18 +79,6 @@ void View::TakeOverView(NativeView view) {
   super_impl = reinterpret_cast<BOOL (*)(NSView*, SEL)>(
       [[view superclass] instanceMethodForSelector:cmd]);
   priv->draggable = super_impl(view, cmd);
-
-  // Lazy install event handlers.
-  on_key_down.SetDelegate(this, kOnKey);
-  on_key_up.SetDelegate(this, kOnKey);
-  // WKWebView does not like having mouse event handlers installed.
-  if (GetClassName() != Browser::kClassName) {
-    on_mouse_down.SetDelegate(this, kOnMouseClick);
-    on_mouse_up.SetDelegate(this, kOnMouseClick);
-    on_mouse_move.SetDelegate(this, kOnMouseMove);
-    on_mouse_enter.SetDelegate(this, kOnMouseMove);
-    on_mouse_leave.SetDelegate(this, kOnMouseMove);
-  }
 }
 
 void View::SetBounds(const RectF& bounds) {
@@ -324,7 +297,7 @@ void View::RegisterDraggedTypes(std::set<Clipboard::Data::Type> types) {
     }
   }
   [view_ registerForDraggedTypes:newTypes];
-  AddDragDropHandlerToClass([view_ class]);
+  AddDragDropHandler(view_);
 }
 
 void View::PlatformSetCursor(Cursor* cursor) {

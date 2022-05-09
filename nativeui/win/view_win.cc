@@ -17,11 +17,10 @@
 namespace nu {
 
 ViewImpl::ViewImpl(ControlType type, View* delegate)
-    : type_(type),
+    : ResponderImpl(Screen::GetDefaultScaleFactor(), delegate),
+      type_(type),
       font_(Font::Default()),
-      color_(Color::Get(Color::Name::Text)),
-      scale_factor_(Screen::GetDefaultScaleFactor()),
-      delegate_(delegate) {}
+      color_(Color::Get(Color::Name::Text)) {}
 
 ViewImpl::~ViewImpl() {}
 
@@ -35,8 +34,8 @@ void ViewImpl::SizeAllocate(const Rect& size_allocation) {
   size_allocation_ = size_allocation;
   Invalidate(size_allocation_);  // new
 
-  if (size_changed && delegate_)
-    delegate_->OnSizeChanged();
+  if (size_changed && delegate())
+    delegate()->OnSizeChanged();
 }
 
 UINT ViewImpl::HitTest(const Point& point) const {
@@ -157,24 +156,15 @@ void ViewImpl::Draw(PainterWin* painter, const Rect& dirty) {
 }
 
 void ViewImpl::OnMouseMove(NativeEvent event) {
-  if (!delegate() || delegate()->on_mouse_move.IsEmpty())
-    return;
-  event->w_param = 0;
-  delegate()->on_mouse_move.Emit(delegate(), MouseEvent(event, this));
+  EmitMouseMoveEvent(event);
 }
 
 void ViewImpl::OnMouseEnter(NativeEvent event) {
-  if (!delegate() || delegate()->on_mouse_enter.IsEmpty())
-    return;
-  event->w_param = 1;
-  delegate()->on_mouse_enter.Emit(delegate(), MouseEvent(event, this));
+  EmitMouseEnterEvent(event);
 }
 
 void ViewImpl::OnMouseLeave(NativeEvent event) {
-  if (!delegate() || delegate()->on_mouse_leave.IsEmpty())
-    return;
-  event->w_param = 2;
-  delegate()->on_mouse_leave.Emit(delegate(), MouseEvent(event, this));
+  EmitMouseLeaveEvent(event);
 }
 
 bool ViewImpl::OnMouseWheel(NativeEvent event) {
@@ -185,7 +175,6 @@ bool ViewImpl::OnMouseClick(NativeEvent event) {
   // If the view is disabled, prevent future processes.
   if (!is_enabled())
     return true;
-
   // Clicking a view should move the focus to it.
   // This has to be done before handling the mouse event, because user may
   // want to move focus to other view later.
@@ -194,17 +183,7 @@ bool ViewImpl::OnMouseClick(NativeEvent event) {
     window()->FocusWithoutEvent();  // need this to take focus from subwin
     window()->focus_manager()->TakeFocus(this);
   }
-
-  if (!delegate())
-    return false;
-  MouseEvent client_event(event, this);
-  if (client_event.type == EventType::MouseDown &&
-      delegate()->on_mouse_down.Emit(delegate(), client_event))
-    return true;
-  if (client_event.type == EventType::MouseUp &&
-      delegate()->on_mouse_up.Emit(delegate(), client_event))
-    return true;
-  return false;
+  return EmitMouseClickEvent(event);
 }
 
 bool ViewImpl::OnSetCursor(NativeEvent event) {
@@ -221,20 +200,15 @@ void ViewImpl::OnCaptureLost() {
 }
 
 bool ViewImpl::OnKeyEvent(NativeEvent event) {
-  if (!is_enabled() || !delegate())
+  if (!is_enabled())
     return false;
-  KeyEvent client_event(event, this);
-  if (client_event.type == EventType::KeyDown &&
-      delegate()->on_key_down.Emit(delegate(), client_event))
-    return true;
-  if (client_event.type == EventType::KeyUp &&
-      delegate()->on_key_up.Emit(delegate(), client_event))
+  if (EmitKeyEvent(event))
     return true;
   // Pass to parent if this view ignores the event.
   if (delegate()->GetParent())
     return delegate()->GetParent()->GetNative()->OnKeyEvent(event);
   else if (window())
-    return window()->HandleKeyEvent(client_event);
+    return window()->HandleKeyEvent(event);
   return false;
 }
 
@@ -329,12 +303,12 @@ void ViewImpl::Invalidate() {
 void ViewImpl::ParentChanged() {
   VisibilityChanged();
   // Scale the bounds after moving to a new parent.
-  float new_scale_factor = window_ ? window_->scale_factor() : scale_factor_;
-  if (new_scale_factor != scale_factor_) {
+  float new_scale_factor = window_ ? window_->scale_factor() : scale_factor();
+  if (new_scale_factor != scale_factor()) {
     size_allocation_ =
         ToNearestRect(ScaleRect(RectF(size_allocation_),
-                                new_scale_factor / scale_factor_));
-    scale_factor_ = new_scale_factor;
+                                new_scale_factor / scale_factor()));
+    set_scale_factor(new_scale_factor);
   }
   // Always notify when parent is changed, since certain measurements are done
   // based on the native window.
@@ -348,11 +322,8 @@ void View::PlatformDestroy() {
   delete view_;
 }
 
-void View::OnConnect(int identifier) {
-}
-
 void View::TakeOverView(NativeView view) {
-  view_ = view;
+  responder_ = view_ = view;
 }
 
 Vector2dF View::OffsetFromView(const View* from) const {

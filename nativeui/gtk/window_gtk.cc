@@ -136,7 +136,7 @@ inline int GetMenuBarHeight(const Window* window) {
 }  // namespace
 
 void Window::PlatformInit(const Options& options) {
-  window_ = GTK_WINDOW(gtk_window_new(
+  window_ = GTK_WINDOW(responder_ = gtk_window_new(
         options.no_activate ? GTK_WINDOW_POPUP : GTK_WINDOW_TOPLEVEL));
 
   NUWindowPrivate* priv = new NUWindowPrivate;
@@ -159,13 +159,6 @@ void Window::PlatformInit(const Options& options) {
                    G_CALLBACK(OnWindowGrabBroken), this);
   g_signal_connect(window_, "notify::is-active",
                    G_CALLBACK(OnIsActiveChanged), this);
-
-  // Lazy install event handlers.
-  on_mouse_down.SetDelegate(this, kOnMouseClick);
-  on_mouse_up.SetDelegate(this, kOnMouseClick);
-  on_mouse_move.SetDelegate(this, kOnMouseMove);
-  on_mouse_enter.SetDelegate(this, kOnMouseMove);
-  on_mouse_leave.SetDelegate(this, kOnMouseMove);
 
   if (!options.frame && !priv->is_popup) {
     // Rely on client-side decoration to provide window features for frameless

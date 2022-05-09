@@ -81,9 +81,17 @@ int GetButtonNumber(UINT message) {
   }
 }
 
-PointF GetPosInView(const Point& point, NativeView view) {
-  Point view_point = point - view->size_allocation().OffsetFromOrigin();
-  return ScalePoint(PointF(view_point), 1.f / view->scale_factor());
+PointF GetPosInWindow(NativeEvent event, NativeResponder responder) {
+  return ScalePoint(PointF(Point(event->l_param)),
+                    1.f / responder->scale_factor());
+}
+
+PointF GetPosInView(NativeEvent event, NativeResponder responder) {
+  if (responder->delegate()->GetClassName() == Window::kClassName)
+    return GetPosInWindow(event, responder);
+  ViewImpl* view = static_cast<ViewImpl*>(responder);
+  Point p = Point(event->l_param) - view->size_allocation().OffsetFromOrigin();
+  return ScalePoint(PointF(p), 1.f / view->scale_factor());
 }
 
 }  // namespace
@@ -108,23 +116,22 @@ bool Event::IsMetaPressed() {
   return (::GetKeyState(VK_LWIN) & 0x8000) || (::GetKeyState(VK_RWIN) & 0x8000);
 }
 
-Event::Event(NativeEvent event, NativeView view)
+Event::Event(NativeEvent event, NativeResponder responder)
     : type(EventTypeFromMessage(event)),
       modifiers(GetCurrentModifiers()),
       timestamp(::GetTickCount()),
       native_event(event) {
 }
 
-MouseEvent::MouseEvent(NativeEvent event, NativeView view)
-    : Event(event, view),
+MouseEvent::MouseEvent(NativeEvent event, NativeResponder responder)
+    : Event(event, responder),
       button(GetButtonNumber(event->message)),
-      position_in_view(GetPosInView(Point(event->l_param), view)),
-      position_in_window(ScalePoint(PointF(Point(event->l_param)),
-                                    1.f / view->scale_factor())) {
+      position_in_view(GetPosInView(event, responder)),
+      position_in_window(GetPosInWindow(event, responder)) {
 }
 
-KeyEvent::KeyEvent(NativeEvent event, NativeView view)
-    : Event(event, view),
+KeyEvent::KeyEvent(NativeEvent event, NativeResponder responder)
+    : Event(event, responder),
       key(static_cast<KeyboardCode>(event->w_param)) {
 }
 

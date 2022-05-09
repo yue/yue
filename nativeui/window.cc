@@ -18,6 +18,9 @@
 
 namespace nu {
 
+// static
+const char Window::kClassName[] = "Window";
+
 Window::Window(const Options& options)
     : has_frame_(options.frame),
       transparent_(options.transparent),
@@ -126,6 +129,10 @@ void Window::NotifyWindowClosed() {
     i->Close();
   }
   on_close.Emit(this);
+}
+
+const char* Window::GetClassName() const {
+  return kClassName;
 }
 
 }  // namespace nu

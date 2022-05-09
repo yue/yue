@@ -324,6 +324,14 @@ void Browser::PlatformUpdateBindings() {
   [webview updateBindings];
 }
 
+void Browser::PlatformInstallMouseClickEvents() {
+  // WKWebView does not like having mouse event handlers installed.
+}
+
+void Browser::PlatformInstallMouseMoveEvents() {
+  // WKWebView does not like having mouse event handlers installed.
+}
+
 // static
 bool Browser::RegisterProtocol(const std::string& scheme,
                                ProtocolHandler handler) {

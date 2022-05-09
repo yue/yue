@@ -3,6 +3,7 @@ component: gui
 header: nativeui/view.h
 type: refcounted
 namespace: nu
+inherit: Responder
 description: Base class for GUI components.
 
 detail: |
@@ -20,19 +21,7 @@ lang_detail:
     container->AddChildView(new nu::Label("child"));
     ```
 
-class_properties:
-  - property: const char* kClassName
-    lang: ['cpp']
-    description: The class name of this view.
-
 methods:
-  - signature: const char* GetClassName() const
-    lang: ['cpp']
-    description: Return the class name.
-    detail: |
-      The returned value is guarenteed to be the `kClassName` property of each
-      view.
-
   - signature: Vector2dF OffsetFromView(const View* view) const
     description: Return offset from `view`.
 
@@ -210,32 +199,7 @@ methods:
   - signature: Window* GetWindow() const
     description: Return the window that the view belongs to.
 
-  - signature: NativeView GetNative() const
-    lang: ['cpp']
-    description: Return the native type wrapped by the view.
-
 events:
-  - signature: bool on_mouse_down(View* self, const MouseEvent& event)
-    description: Emitted when pressing mouse buttons.
-
-  - signature: bool on_mouse_up(View* self, const MouseEvent& event)
-    description: Emitted when releasing mouse buttons.
-
-  - signature: void on_mouse_move(View* self, const MouseEvent& event)
-    description: Emitted when user moves mouse in the view.
-
-  - signature: void on_mouse_enter(View* self, const MouseEvent& event)
-    description: Emitted when mouse enters the view.
-
-  - signature: void on_mouse_leave(View* self, const MouseEvent& event)
-    description: Emitted when mouse leaves the view.
-
-  - signature: bool on_key_down(View* self, const KeyEvent& event)
-    description: Emitted when pressing keyboard.
-
-  - signature: bool on_key_up(View* self, const KeyEvent& event)
-    description: Emitted when releasing keyboard.
-
   - signature: void on_drag_leave(View* self, DraggingInfo* info)>
     description: Emitted when cursor leaves the view while dragging.
     detail: |

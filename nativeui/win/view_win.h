@@ -34,7 +34,7 @@ enum class ControlType {
 };
 
 // The common base for native window based view and directui view.
-class ViewImpl {
+class ViewImpl : public ResponderImpl {
  public:
   virtual ~ViewImpl();
 
@@ -153,10 +153,7 @@ class ViewImpl {
   // Set control's viewport, only called by Scroll.
   void set_viewport(ScrollImpl* scroll) { viewport_ = scroll; }
 
-  // Returns the DPI of current view.
-  float scale_factor() const { return scale_factor_; }
-
-  Cursor* cursor() const { return delegate_ ? delegate_->cursor() : nullptr; }
+  Cursor* cursor() const { return delegate() ? delegate()->cursor() : nullptr; }
   Font* font() const { return font_; }
   Color color() const { return color_; }
   Color background_color() const { return background_color_; }
@@ -165,7 +162,10 @@ class ViewImpl {
   WindowImpl* window() const { return window_; }
   ViewImpl* parent() const { return parent_; }
   ControlType type() const { return type_; }
-  View* delegate() const { return delegate_; }
+
+  View* delegate() const {
+    return static_cast<View*>(ResponderImpl::delegate());
+  }
 
  protected:
   ViewImpl(ControlType type, View* delegate);
@@ -216,12 +216,6 @@ class ViewImpl {
 
   // The viewport that owns this view.
   ScrollImpl* viewport_ = nullptr;
-
-  // The scale factor this view uses.
-  float scale_factor_;
-
-  // The view which this class implements, this can be nullptr;
-  View* delegate_;
 
   // The absolute bounds relative to the origin of window.
   Rect size_allocation_;

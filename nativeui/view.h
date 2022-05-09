@@ -9,7 +9,6 @@
 #include <string>
 #include <vector>
 
-#include "base/memory/ref_counted.h"
 #include "nativeui/clipboard.h"
 #include "nativeui/dragging_info.h"
 #include "nativeui/gfx/color.h"
@@ -28,18 +27,8 @@ class Popover;
 class Window;
 
 // The base class for all kinds of views.
-class NATIVEUI_EXPORT View : public base::RefCounted<View>,
-                             public Responder<View> {
+class NATIVEUI_EXPORT View : public Responder {
  public:
-  // The view class name.
-  static const char kClassName[];
-
-  // Return the receiving view's class name. A view class is a string which
-  // uniquely identifies the view class. It is intended to be used as a way to
-  // find out during run time if a view can be safely casted to a specific view
-  // subclass.
-  virtual const char* GetClassName() const;
-
   // Coordiante convertions.
   Vector2dF OffsetFromView(const View* from) const;
   Vector2dF OffsetFromWindow() const;
@@ -189,11 +178,6 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View>,
   // Update the default style.
   void UpdateDefaultStyle();
 
-#if !defined(OS_LINUX)
-  // SignalDelegate:
-  void OnConnect(int identifier) override;
-#endif
-
   // Called by subclasses to take the ownership of |view|.
   void TakeOverView(NativeView view);
 
@@ -203,8 +187,6 @@ class NATIVEUI_EXPORT View : public base::RefCounted<View>,
   void PlatformSetFont(Font* font);
 
  private:
-  friend class base::RefCounted<View>;
-
 #if defined(OS_LINUX)
   // Whether events have been installed.
   bool on_drop_installed_ = false;

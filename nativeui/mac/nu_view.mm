@@ -21,7 +21,9 @@ bool IsFramelessWindow(NSView* view) {
     return false;
   if (![[view window] respondsToSelector:@selector(shell)])
     return false;
-  return ![static_cast<NUWindow*>([view window]) shell]->HasFrame();
+  Window* window = static_cast<Window*>(
+      [static_cast<NUWindow*>([view window]) shell]);
+  return !window->HasFrame();
 }
 
 // Create a fake mouse event.
@@ -45,27 +47,8 @@ bool NUInjected(NSView* self, SEL _cmd) {
   return true;
 }
 
-View* GetShell(NSView* self, SEL _cmd) {
+Responder* GetShell(NSView* self, SEL _cmd) {
   return [self nuPrivate]->shell;
-}
-
-BOOL AcceptsFirstResponder(NSView* self, SEL _cmd) {
-  return [self nuPrivate]->focusable;
-}
-
-BOOL MouseDownCanMoveWindow(NSView* self, SEL _cmd) {
-  return [self nuPrivate]->draggable;
-}
-
-void ResetCursorRects(NSView* self, SEL _cmd) {
-  NUPrivate* priv = [self nuPrivate];
-  if (priv->cursor) {
-    [self addCursorRect:[self bounds] cursor:priv->cursor];
-  } else {
-    auto super_impl = reinterpret_cast<decltype(&ResetCursorRects)>(
-        [[self superclass] instanceMethodForSelector:_cmd]);
-    super_impl(self, _cmd);
-  }
 }
 
 void EnableTracking(NSView* self, SEL _cmd) {
@@ -88,6 +71,25 @@ void DisableTracking(NSView* self, SEL _cmd) {
   if (priv->tracking_area) {
     [self removeTrackingArea:priv->tracking_area.get()];
     priv->tracking_area.reset();
+  }
+}
+
+BOOL AcceptsFirstResponder(NSView* self, SEL _cmd) {
+  return [self nuPrivate]->focusable;
+}
+
+BOOL MouseDownCanMoveWindow(NSView* self, SEL _cmd) {
+  return [self nuPrivate]->draggable;
+}
+
+void ResetCursorRects(NSView* self, SEL _cmd) {
+  NUPrivate* priv = [self nuPrivate];
+  if (priv->cursor) {
+    [self addCursorRect:[self bounds] cursor:priv->cursor];
+  } else {
+    auto super_impl = reinterpret_cast<decltype(&ResetCursorRects)>(
+        [[self superclass] instanceMethodForSelector:_cmd]);
+    super_impl(self, _cmd);
   }
 }
 
@@ -136,7 +138,7 @@ void SetFrameSize(NSView* self, SEL _cmd, NSSize size) {
   super_impl(self, _cmd, size);
 
   if (size.width != old_size.width || size.height != old_size.height)
-    [self shell]->OnSizeChanged();
+    static_cast<View*>([self shell])->OnSizeChanged();
 }
 
 // The contentView gets moved around during certain full-screen operations.
@@ -164,14 +166,15 @@ void InstallNUViewMethods(Class cl) {
   class_addMethod(cl, @selector(nuInjected), (IMP)NUInjected, "B@:");
 
   class_addMethod(cl, @selector(shell), (IMP)GetShell, "^v@:");
+  class_addMethod(cl, @selector(enableTracking), (IMP)EnableTracking, "v@:");
+  class_addMethod(cl, @selector(disableTracking), (IMP)DisableTracking, "v@:");
+
   class_addMethod(cl, @selector(acceptsFirstResponder),
                   (IMP)AcceptsFirstResponder, "B@:");
   class_addMethod(cl, @selector(mouseDownCanMoveWindow),
                   (IMP)MouseDownCanMoveWindow, "B@:");
   class_addMethod(cl, @selector(resetCursorRects),
                   (IMP)ResetCursorRects, "v@");
-  class_addMethod(cl, @selector(enableTracking), (IMP)EnableTracking, "v@:");
-  class_addMethod(cl, @selector(disableTracking), (IMP)DisableTracking, "v@:");
   class_addMethod(cl, @selector(updateTrackingAreas),
                   (IMP)UpdateTrackingAreas, "v@");
   class_addMethod(cl, @selector(setFrameSize:),

@@ -338,8 +338,8 @@ function parseParameters(lang, str) {
 function parseParam(lang, str) {
   const space = str.lastIndexOf(' ')
   return {
-    type: parseType(lang, str.substr(0, space)),
-    name: parseName(lang, str.substr(space + 1))
+    type: parseType(lang, str.substr(0, space).trim()),
+    name: parseName(lang, str.substr(space + 1).trim())
   }
 }
 

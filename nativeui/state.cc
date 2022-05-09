@@ -71,7 +71,8 @@ State::~State() {
   DCHECK_EQ(GetCurrent(), this);
   lazy_tls_ptr.Pointer()->Set(nullptr);
 
-  DCHECK_EQ(YGConfigGetInstanceCount(), 0) <<
+  // Note that some methods may use default config which is never released.
+  DCHECK_LE(YGConfigGetInstanceCount(), 1) <<
       "There are instances of YGConfig leaked on exit";
   LeakTracker<ProtocolJob>::CheckForLeaks();
 }

@@ -122,6 +122,10 @@ class Calendar : public View {
   }
 
   // View:
+  const char* GetClassName() const override {
+    return "Calendar";
+  }
+
   SizeF GetMinimumSize() const override {
     return GetPreferredSizeForWidget(GetNative());
   }
@@ -161,6 +165,10 @@ class ClockNumber : public View {
   }
 
   // View:
+  const char* GetClassName() const override {
+    return "ClockNumber";
+  }
+
   SizeF GetMinimumSize() const override {
     return SizeF(50, 120);
   }

@@ -45,13 +45,13 @@ struct NATIVEUI_EXPORT Event {
 
  protected:
   // Base Event class should nenver be created by user.
-  Event(NativeEvent event, NativeView view);
+  Event(NativeEvent event, NativeResponder responder);
 };
 
 // Mouse click events.
 struct NATIVEUI_EXPORT MouseEvent : public Event {
   // Create from the native event.
-  MouseEvent(NativeEvent event, NativeView view);
+  MouseEvent(NativeEvent event, NativeResponder responder);
 
   int button;
   PointF position_in_view;
@@ -61,7 +61,7 @@ struct NATIVEUI_EXPORT MouseEvent : public Event {
 // Key events.
 struct NATIVEUI_EXPORT KeyEvent: public Event {
   // Create from the native event.
-  KeyEvent(NativeEvent event, NativeView view);
+  KeyEvent(NativeEvent event, NativeResponder responder);
 
   KeyboardCode key;
 };
