@@ -32,10 +32,10 @@ nu::InsetsF GetButtonInsets(NSButton* button) {
 
 }  // namespace
 
-@interface NUButton : NSButton<NUView> {
+@interface NUButton : NSButton<NUViewMethods> {
  @private
   nu::Button* shell_;
-  nu::NUPrivate private_;
+  nu::NUViewPrivate private_;
 }
 - (id)initWithShell:(nu::Button*)shell;
 - (IBAction)onClick:(id)sender;
@@ -56,7 +56,7 @@ nu::InsetsF GetButtonInsets(NSButton* button) {
   shell_->on_click.Emit(shell_);
 }
 
-- (nu::NUPrivate*)nuPrivate {
+- (nu::NUViewPrivate*)nuPrivate {
   return &private_;
 }
 

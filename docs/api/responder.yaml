@@ -14,6 +14,15 @@ methods:
       intended to be used as a way to find out during run time if a responder
       can be safely casted to a specific subclass.
 
+  - signature: void SetCapture()
+    description: Set mouse capture to the responder.
+
+  - signature: void ReleaseCapture()
+    description: Release mouse capture if the responder has mouse capture.
+
+  - signature: bool HasCapture() const
+    description: Return whether the responder has mouse capture.
+
   - signature: NativeResponder GetNative() const
     lang: ['cpp']
     description: Return the native type wrapped by the responder.
@@ -26,16 +35,19 @@ events:
     description: Emitted when releasing mouse buttons.
 
   - signature: void on_mouse_move(Responder* self, const MouseEvent& event)
-    description: Emitted when user moves mouse in the view/window.
+    description: Emitted when user moves mouse in the responder.
 
   - signature: void on_mouse_enter(Responder* self, const MouseEvent& event)
-    description: Emitted when mouse enters the view/window.
+    description: Emitted when mouse enters the responder.
 
   - signature: void on_mouse_leave(Responder* self, const MouseEvent& event)
-    description: Emitted when mouse leaves the view/window.
+    description: Emitted when mouse leaves the responder.
 
   - signature: bool on_key_down(Responder* self, const KeyEvent& event)
     description: Emitted when pressing keyboard.
 
   - signature: bool on_key_up(Responder* self, const KeyEvent& event)
     description: Emitted when releasing keyboard.
+
+  - signature: void on_capture_lost(Responder* self)
+    description: Emitted when the mouse capture on responder has been released.

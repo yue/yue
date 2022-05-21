@@ -9,15 +9,15 @@
 #include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/nu_view.h"
 
-@interface NUEntry : NSTextField<NUView> {
+@interface NUEntry : NSTextField<NUViewMethods> {
  @private
-  nu::NUPrivate private_;
+  nu::NUViewPrivate private_;
 }
 @end
 
 @implementation NUEntry
 
-- (nu::NUPrivate*)nuPrivate {
+- (nu::NUViewPrivate*)nuPrivate {
   return &private_;
 }
 
@@ -44,15 +44,15 @@
 @end
 
 // It is sad that with Object-C we have to repeat the code.
-@interface NUSecureEntry : NSSecureTextField<NUView> {
+@interface NUSecureEntry : NSSecureTextField<NUViewMethods> {
  @private
-  nu::NUPrivate private_;
+  nu::NUViewPrivate private_;
 }
 @end
 
 @implementation NUSecureEntry
 
-- (nu::NUPrivate*)nuPrivate {
+- (nu::NUViewPrivate*)nuPrivate {
   return &private_;
 }
 

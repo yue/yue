@@ -410,21 +410,6 @@ bool View::IsFocusable() const {
   return GetNative()->is_focusable();
 }
 
-void View::SetCapture() {
-  if (view_->window())
-    view_->window()->SetCapture(GetNative());
-}
-
-void View::ReleaseCapture() {
-  if (view_->window())
-    view_->window()->ReleaseCapture();
-}
-
-bool View::HasCapture() const {
-  return view_->window() &&
-         view_->window()->captured_view() == view_;
-}
-
 void View::SetMouseDownCanMoveWindow(bool yes) {
   view_->set_draggable(yes);
 }

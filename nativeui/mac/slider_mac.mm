@@ -7,10 +7,10 @@
 #include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/nu_view.h"
 
-@interface NUSlider : NSSlider<NUView> {
+@interface NUSlider : NSSlider<NUViewMethods> {
  @private
   nu::Slider* shell_;
-  nu::NUPrivate private_;
+  nu::NUViewPrivate private_;
 }
 - (id)initWithShell:(nu::Slider*)shell;
 - (IBAction)onValueChange:(id)sender;
@@ -36,7 +36,7 @@
     shell_->on_sliding_complete.Emit(shell_);
 }
 
-- (nu::NUPrivate*)nuPrivate {
+- (nu::NUViewPrivate*)nuPrivate {
   return &private_;
 }
 

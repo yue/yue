@@ -5,11 +5,10 @@
 #include "nativeui/mac/mouse_capture.h"
 
 #include "nativeui/mac/events_handler.h"
-#include "nativeui/view.h"
 
 namespace nu {
 
-MouseCapture::MouseCapture(View* view) : view_(view) {
+MouseCapture::MouseCapture(Responder* responder) : responder_(responder) {
   NSEventMask event_mask =
       NSLeftMouseDownMask | NSLeftMouseUpMask | NSRightMouseDownMask |
       NSRightMouseUpMask | NSMouseMovedMask | NSLeftMouseDraggedMask |
@@ -33,7 +32,7 @@ MouseCapture::~MouseCapture() {
 }
 
 void MouseCapture::ProcessCapturedMouseEvent(NSEvent* event) {
-  DispatchMouseEvent(view_, event);
+  DispatchMouseEvent(responder_, event);
 }
 
 }  // namespace nu

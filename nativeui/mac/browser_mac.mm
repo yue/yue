@@ -42,9 +42,9 @@
 
 @end
 
-@interface NUWebView : WKWebView<NUView> {
+@interface NUWebView : WKWebView<NUViewMethods> {
  @private
-  nu::NUPrivate private_;
+  nu::NUViewPrivate private_;
   nu::Browser::Options options_;
   nu::Browser* shell_;
   base::scoped_nsobject<NUScriptMessageHandler> handler_;
@@ -139,7 +139,7 @@
     [menu removeAllItems];
 }
 
-- (nu::NUPrivate*)nuPrivate {
+- (nu::NUViewPrivate*)nuPrivate {
   return &private_;
 }
 

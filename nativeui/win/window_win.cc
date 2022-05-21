@@ -165,14 +165,22 @@ bool WindowImpl::HandleKeyEvent(NativeEvent event) {
   return true;
 }
 
-void WindowImpl::SetCapture(ViewImpl* view) {
-  captured_view_ = view;
+void WindowImpl::SetCapture() {
   ::SetCapture(hwnd());
 }
 
+void WindowImpl::SetCapture(ViewImpl* view) {
+  captured_view_ = view;
+  SetCapture();
+}
+
 void WindowImpl::ReleaseCapture() {
-  if (::GetCapture() == hwnd())
+  if (HasCapture())
     ::ReleaseCapture();
+}
+
+bool WindowImpl::HasCapture() const {
+  return ::GetCapture() == hwnd();
 }
 
 bool WindowImpl::IsMaximized() const {

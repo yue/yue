@@ -10,6 +10,7 @@
 #include "nativeui/events/event.h"
 #include "nativeui/mac/dragging_info_mac.h"
 #include "nativeui/mac/nu_private.h"
+#include "nativeui/mac/nu_responder.h"
 #include "nativeui/mac/nu_view.h"
 #include "nativeui/mac/nu_window.h"
 #include "nativeui/view.h"
@@ -202,14 +203,12 @@ bool DispatchMouseEvent(Responder* responder, NSEvent* event) {
       prevent_default = true;
       break;
     case EventType::MouseEnter:
-      if (responder->GetClassName() != Window::kClassName)
-        [static_cast<View*>(responder)->GetNative() nuPrivate]->hovered = true;
+      [responder->GetNative() nuPrivate]->hovered = true;
       responder->on_mouse_enter.Emit(responder, mouse_event);
       prevent_default = true;
       break;
     case EventType::MouseLeave:
-      if (responder->GetClassName() != Window::kClassName)
-        [static_cast<View*>(responder)->GetNative() nuPrivate]->hovered = false;
+      [responder->GetNative() nuPrivate]->hovered = false;
       responder->on_mouse_leave.Emit(responder, mouse_event);
       prevent_default = true;
       break;

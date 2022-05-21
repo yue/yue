@@ -17,16 +17,12 @@
 #include "nativeui/mac/drag_drop/data_provider.h"
 #include "nativeui/mac/drag_drop/nested_run_loop.h"
 #include "nativeui/mac/events_handler.h"
-#include "nativeui/mac/mouse_capture.h"
 #include "nativeui/mac/nu_private.h"
+#include "nativeui/mac/nu_responder.h"
 
 namespace nu {
 
 namespace {
-
-// There is no way to know when another application has installed an event
-// monitor, we have to assume only current app can capture view.
-View* g_captured_view = nullptr;
 
 // It's much more convenient to return an NSString than a
 // base::ScopedCFTypeRef<CFStringRef>, since the methods on NSPasteboardItem
@@ -43,13 +39,13 @@ NSString* UTIFromPboardType(NSString* type) {
 }  // namespace
 
 void View::PlatformDestroy() {
-  if (IsNUView(view_)) {
+  if (IsNUResponder(view_)) {
     // Release all hooks before destroying the view.
     [view_ disableTracking];
     CancelDrag();
     ReleaseCapture();
     // The view may be referenced after this class gets destroyed.
-    NUPrivate* priv = [view_ nuPrivate];
+    NUViewPrivate* priv = [view_ nuPrivate];
     priv->shell = nullptr;
   }
   [view_ release];
@@ -58,14 +54,14 @@ void View::PlatformDestroy() {
 void View::TakeOverView(NativeView view) {
   responder_ = view_ = view;
 
-  if (!IsNUView(view))
+  if (!IsNUResponder(view))
     return;
 
   // Install events handle for the view's class.
   InstallNUViewMethods([view class]);
 
   // Initialize private bits of the view.
-  NUPrivate* priv = [view nuPrivate];
+  NUViewPrivate* priv = [view nuPrivate];
   priv->shell = this;
 
   // Set the |focusable| property to the parent class's default one.
@@ -151,7 +147,7 @@ bool View::HasFocus() const {
 }
 
 void View::SetFocusable(bool focusable) {
-  NUPrivate* priv = [view_ nuPrivate];
+  NUViewPrivate* priv = [view_ nuPrivate];
   priv->focusable = focusable;
 }
 
@@ -159,31 +155,8 @@ bool View::IsFocusable() const {
   return [view_ acceptsFirstResponder];
 }
 
-void View::SetCapture() {
-  if (g_captured_view)
-    g_captured_view->ReleaseCapture();
-
-  NUPrivate* priv = [view_ nuPrivate];
-  priv->mouse_capture.reset(new MouseCapture(this));
-  g_captured_view = this;
-}
-
-void View::ReleaseCapture() {
-  if (g_captured_view != this)
-    return;
-
-  NUPrivate* priv = [view_ nuPrivate];
-  priv->mouse_capture.reset();
-  g_captured_view = nullptr;
-  on_capture_lost.Emit(this);
-}
-
-bool View::HasCapture() const {
-  return g_captured_view == this;
-}
-
 void View::SetMouseDownCanMoveWindow(bool yes) {
-  NUPrivate* priv = [view_ nuPrivate];
+  NUViewPrivate* priv = [view_ nuPrivate];
   priv->draggable = yes;
 
   // AppKit will not update its cache of mouseDownCanMoveWindow unless something
@@ -203,7 +176,7 @@ int View::DoDragWithOptions(std::vector<Clipboard::Data> data,
   if (data.empty())
     return DRAG_OPERATION_NONE;
 
-  NUPrivate* priv = [view_ nuPrivate];
+  NUViewPrivate* priv = [view_ nuPrivate];
   priv->supported_drag_operation = operations;
   priv->data_source.reset([[DataProvider alloc] initWithData:std::move(data)]);
 
@@ -266,7 +239,7 @@ int View::DoDragWithOptions(std::vector<Clipboard::Data> data,
 }
 
 void View::CancelDrag() {
-  NUPrivate* priv = [view_ nuPrivate];
+  NUViewPrivate* priv = [view_ nuPrivate];
   if (priv->quit_dragging)
     priv->quit_dragging();
 }
@@ -301,7 +274,7 @@ void View::RegisterDraggedTypes(std::set<Clipboard::Data::Type> types) {
 }
 
 void View::PlatformSetCursor(Cursor* cursor) {
-  if (IsNUView(view_)) {
+  if (IsNUResponder(view_)) {
     if (cursor)
       [view_ nuPrivate]->cursor.reset([cursor->GetNative() retain]);
     else
@@ -310,17 +283,17 @@ void View::PlatformSetCursor(Cursor* cursor) {
 }
 
 void View::PlatformSetFont(Font* font) {
-  if (IsNUView(view_))
+  if (IsNUResponder(view_))
     [view_ setNUFont:font];
 }
 
 void View::SetColor(Color color) {
-  if (IsNUView(view_))
+  if (IsNUResponder(view_))
     [view_ setNUColor:color];
 }
 
 void View::SetBackgroundColor(Color color) {
-  if (IsNUView(view_))
+  if (IsNUResponder(view_))
     [view_ setNUBackgroundColor:color];
 }
 

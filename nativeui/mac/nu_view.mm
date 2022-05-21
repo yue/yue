@@ -8,6 +8,7 @@
 
 #include "base/mac/mac_util.h"
 #include "nativeui/mac/nu_private.h"
+#include "nativeui/mac/nu_responder.h"
 #include "nativeui/mac/nu_window.h"
 #include "nativeui/window.h"
 
@@ -17,12 +18,9 @@ namespace {
 
 // Returns whether the view belongs to a frameless window.
 bool IsFramelessWindow(NSView* view) {
-  if (![view window])
-    return false;
   if (![[view window] respondsToSelector:@selector(shell)])
     return false;
-  Window* window = static_cast<Window*>(
-      [static_cast<NUWindow*>([view window]) shell]);
+  Window* window = [[view window] shell];
   return !window->HasFrame();
 }
 
@@ -43,16 +41,16 @@ NSEvent* FakeEvent(NSView* view, NSEventType type) {
 
 // Following methods are overrided in NUView.
 
-bool NUInjected(NSView* self, SEL _cmd) {
+bool NUViewInjected(NSView* self, SEL _cmd) {
   return true;
 }
 
-Responder* GetShell(NSView* self, SEL _cmd) {
+Responder* GetViewShell(NSView* self, SEL _cmd) {
   return [self nuPrivate]->shell;
 }
 
-void EnableTracking(NSView* self, SEL _cmd) {
-  NUPrivate* priv = [self nuPrivate];
+void EnableViewTracking(NSView* self, SEL _cmd) {
+  NUViewPrivate* priv = [self nuPrivate];
   if (priv->tracking_area)
     return;
   NSTrackingAreaOptions trackingOptions = NSTrackingMouseEnteredAndExited |
@@ -66,8 +64,8 @@ void EnableTracking(NSView* self, SEL _cmd) {
   [self addTrackingArea:priv->tracking_area.get()];
 }
 
-void DisableTracking(NSView* self, SEL _cmd) {
-  NUPrivate* priv = [self nuPrivate];
+void DisableViewTracking(NSView* self, SEL _cmd) {
+  NUViewPrivate* priv = [self nuPrivate];
   if (priv->tracking_area) {
     [self removeTrackingArea:priv->tracking_area.get()];
     priv->tracking_area.reset();
@@ -83,7 +81,7 @@ BOOL MouseDownCanMoveWindow(NSView* self, SEL _cmd) {
 }
 
 void ResetCursorRects(NSView* self, SEL _cmd) {
-  NUPrivate* priv = [self nuPrivate];
+  NUViewPrivate* priv = [self nuPrivate];
   if (priv->cursor) {
     [self addCursorRect:[self bounds] cursor:priv->cursor];
   } else {
@@ -95,12 +93,13 @@ void ResetCursorRects(NSView* self, SEL _cmd) {
 
 // Fix mouseExited isn't called when mouse leaves trackingArea while scrolling:
 // https://stackoverflow.com/questions/8979639
-void UpdateTrackingAreas(NSView* self, SEL _cmd) {
-  auto super_impl = reinterpret_cast<decltype(&UpdateTrackingAreas)>(
+void UpdateViewTrackingAreas(NSView* self, SEL _cmd) {
+  auto super_impl = reinterpret_cast<decltype(&UpdateViewTrackingAreas)>(
       [[self superclass] instanceMethodForSelector:_cmd]);
   super_impl(self, _cmd);
 
-  if (![self window])
+  NUViewPrivate* priv = [self nuPrivate];
+  if (![self window] || !priv->tracking_area)
     return;
 
   [self disableTracking];
@@ -108,7 +107,6 @@ void UpdateTrackingAreas(NSView* self, SEL _cmd) {
   NSPoint mouse = [[self window] mouseLocationOutsideOfEventStream];
   mouse = [self convertPoint:mouse fromView:nil];
 
-  NUPrivate* priv = [self nuPrivate];
   if (NSPointInRect(mouse, [self bounds])) {  // mouse in view.
     if (!priv->hovered)
       [self mouseEntered:FakeEvent(self, NSMouseEntered)];
@@ -138,7 +136,7 @@ void SetFrameSize(NSView* self, SEL _cmd, NSSize size) {
   super_impl(self, _cmd, size);
 
   if (size.width != old_size.width || size.height != old_size.height)
-    static_cast<View*>([self shell])->OnSizeChanged();
+    [self shell]->OnSizeChanged();
 }
 
 // The contentView gets moved around during certain full-screen operations.
@@ -156,18 +154,16 @@ void ViewDidMoveToSuperview(NSView* self, SEL _cmd) {
 
 }  // namespace
 
-bool IsNUView(id view) {
-  return [view respondsToSelector:@selector(nuPrivate)];
-}
-
 void InstallNUViewMethods(Class cl) {
   if ([cl instancesRespondToSelector:@selector(nuInjected)])
     return;
-  class_addMethod(cl, @selector(nuInjected), (IMP)NUInjected, "B@:");
+  class_addMethod(cl, @selector(nuInjected), (IMP)NUViewInjected, "B@:");
 
-  class_addMethod(cl, @selector(shell), (IMP)GetShell, "^v@:");
-  class_addMethod(cl, @selector(enableTracking), (IMP)EnableTracking, "v@:");
-  class_addMethod(cl, @selector(disableTracking), (IMP)DisableTracking, "v@:");
+  class_addMethod(cl, @selector(shell), (IMP)GetViewShell, "^v@:");
+  class_addMethod(cl, @selector(enableTracking),
+                  (IMP)EnableViewTracking, "v@:");
+  class_addMethod(cl, @selector(disableTracking),
+                  (IMP)DisableViewTracking, "v@:");
 
   class_addMethod(cl, @selector(acceptsFirstResponder),
                   (IMP)AcceptsFirstResponder, "B@:");
@@ -176,7 +172,7 @@ void InstallNUViewMethods(Class cl) {
   class_addMethod(cl, @selector(resetCursorRects),
                   (IMP)ResetCursorRects, "v@");
   class_addMethod(cl, @selector(updateTrackingAreas),
-                  (IMP)UpdateTrackingAreas, "v@");
+                  (IMP)UpdateViewTrackingAreas, "v@:");
   class_addMethod(cl, @selector(setFrameSize:),
                   (IMP)SetFrameSize, "v@:{_NSSize=ff}");
   class_addMethod(cl, @selector(viewDidMoveToSuperview),

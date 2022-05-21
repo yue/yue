@@ -23,6 +23,11 @@ class NATIVEUI_EXPORT Responder : public SignalDelegate,
   // subclass.
   virtual const char* GetClassName() const = 0;
 
+  // Capture mouse.
+  void SetCapture();
+  void ReleaseCapture();
+  bool HasCapture() const;
+
   // Get the native object.
   NativeResponder GetNative() const { return responder_; }
 
@@ -34,6 +39,7 @@ class NATIVEUI_EXPORT Responder : public SignalDelegate,
   Signal<void(Responder*, const MouseEvent&)> on_mouse_leave;
   Signal<bool(Responder*, const KeyEvent&)> on_key_down;
   Signal<bool(Responder*, const KeyEvent&)> on_key_up;
+  Signal<void(Responder*)> on_capture_lost;
 
  protected:
   friend class base::RefCounted<Responder>;

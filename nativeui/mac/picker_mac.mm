@@ -8,10 +8,10 @@
 #include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/nu_view.h"
 
-@interface NUPicker : NSPopUpButton<NUView> {
+@interface NUPicker : NSPopUpButton<NUViewMethods> {
  @private
   nu::Picker* shell_;
-  nu::NUPrivate private_;
+  nu::NUViewPrivate private_;
 }
 - (id)initWithShell:(nu::Picker*)shell;
 - (IBAction)onSelectionChange:(id)sender;
@@ -34,7 +34,7 @@
   shell_->on_selection_change.Emit(shell_);
 }
 
-- (nu::NUPrivate*)nuPrivate {
+- (nu::NUViewPrivate*)nuPrivate {
   return &private_;
 }
 

@@ -47,13 +47,13 @@
 
 @end
 
-@interface NUTable : NSScrollView<NUView> {
+@interface NUTable : NSScrollView<NUViewMethods> {
  @private
   base::scoped_nsobject<NSTableView> tableView_;
   base::scoped_nsobject<NUTableDelegate> delegate_;
   base::scoped_nsobject<NUTableDataSource> dataSource_;
   base::scoped_nsobject<NSTableHeaderView> headerView_;
-  nu::NUPrivate private_;
+  nu::NUViewPrivate private_;
 }
 - (id)initWithShell:(nu::Table*)shell;
 - (void)setColumnsVisible:(bool)visible;
@@ -94,7 +94,7 @@
   [tableView_ scrollRowToVisible:0];
 }
 
-- (nu::NUPrivate*)nuPrivate {
+- (nu::NUViewPrivate*)nuPrivate {
   return &private_;
 }
 

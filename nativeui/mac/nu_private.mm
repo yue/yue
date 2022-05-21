@@ -8,10 +8,8 @@
 
 namespace nu {
 
-NUPrivate::NUPrivate() {
-}
+NUPrivate::NUPrivate() = default;
 
-NUPrivate::~NUPrivate() {
-}
+NUPrivate::~NUPrivate() = default;
 
 }  // namespace nu

@@ -23,9 +23,6 @@ namespace nu {
 
 namespace {
 
-// The view that has the capture.
-View* g_grabbed_view = nullptr;
-
 // View private data.
 struct NUViewPrivate {
   View* delegate;
@@ -329,40 +326,6 @@ void View::SetFocusable(bool focusable) {
 
 bool View::IsFocusable() const {
   return gtk_widget_get_can_focus(view_);
-}
-
-void View::SetCapture() {
-  // Get the GDK window.
-  GdkWindow* window;
-  if (NU_IS_CONTAINER(view_))
-    window = nu_container_get_window(NU_CONTAINER(view_));
-  else
-    window = gtk_widget_get_window(view_);
-  if (!window)
-    return;
-
-  const GdkEventMask mask = GdkEventMask(GDK_BUTTON_PRESS_MASK |
-                                         GDK_BUTTON_RELEASE_MASK |
-                                         GDK_POINTER_MOTION_HINT_MASK |
-                                         GDK_POINTER_MOTION_MASK);
-  if (gdk_pointer_grab(window, FALSE, mask, NULL, NULL,
-                       GDK_CURRENT_TIME) == GDK_GRAB_SUCCESS)
-    g_grabbed_view = this;
-}
-
-void View::ReleaseCapture() {
-  gdk_pointer_ungrab(GDK_CURRENT_TIME);
-
-  // In X11 the grab can not be hijacked by other applications, so the only
-  // possible case for losing capture is to call this function.
-  if (g_grabbed_view) {
-    g_grabbed_view->on_capture_lost.Emit(g_grabbed_view);
-    g_grabbed_view = nullptr;
-  }
-}
-
-bool View::HasCapture() const {
-  return gdk_pointer_is_grabbed() && g_grabbed_view == this;
 }
 
 void View::SetMouseDownCanMoveWindow(bool yes) {

@@ -10,9 +10,9 @@
 #include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/nu_view.h"
 
-@interface NUChromeView : NSView<NUView> {
+@interface NUChromeView : NSView<NUViewMethods> {
  @private
-  nu::NUPrivate private_;
+  nu::NUViewPrivate private_;
   scoped_refptr<nu::AttributedText> text_;
 }
 @end
@@ -37,7 +37,7 @@
                              nu::RectF(nu::SizeF([self frame].size)));
 }
 
-- (nu::NUPrivate*)nuPrivate {
+- (nu::NUViewPrivate*)nuPrivate {
   return &private_;
 }
 

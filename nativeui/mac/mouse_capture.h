@@ -9,12 +9,12 @@
 
 namespace nu {
 
-class View;
+class Responder;
 
 // Simulating the SetCapture of Windows.
 class MouseCapture {
  public:
-  explicit MouseCapture(View* view);
+  explicit MouseCapture(Responder* responder);
   ~MouseCapture();
 
   MouseCapture& operator=(const MouseCapture&) = delete;
@@ -23,7 +23,7 @@ class MouseCapture {
  private:
   void ProcessCapturedMouseEvent(NSEvent* event);
 
-  View* view_;
+  Responder* responder_;
   id local_monitor_;
   id global_monitor_;
 };

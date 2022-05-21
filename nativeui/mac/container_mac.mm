@@ -5,10 +5,11 @@
 #include "nativeui/mac/container_mac.h"
 
 #include "nativeui/gfx/mac/painter_mac.h"
+#include "nativeui/mac/nu_responder.h"
 
 @implementation NUContainer
 
-- (nu::NUPrivate*)nuPrivate {
+- (nu::NUViewPrivate*)nuPrivate {
   return &private_;
 }
 
@@ -61,11 +62,11 @@ void Container::PlatformAddChildView(View* child) {
   [GetNative() addSubview:child->GetNative()];
   // Handle the wants_layer_infected routine, which makes every view in
   // relationship with this view has wantsLayer set to true.
-  NUPrivate* priv = [GetNative() nuPrivate];
+  NUViewPrivate* priv = [GetNative() nuPrivate];
   if (priv->wants_layer_infected) {
     [child->GetNative() setWantsLayer:YES];
   } else {
-    if (IsNUView(child->GetNative()) &&
+    if (IsNUResponder(child->GetNative()) &&
         [child->GetNative() nuPrivate]->wants_layer_infected) {
       // Just got infected, set wantsLayer on all children.
       priv->wants_layer_infected = true;
@@ -80,7 +81,7 @@ void Container::PlatformRemoveChildView(View* child) {
   [child->GetNative() removeFromSuperview];
   // Revert wantsLayer to default.
   NSView* nc = child->GetNative();
-  if (IsNUView(nc))
+  if (IsNUResponder(nc))
     [nc setWantsLayer:[nc nuPrivate]->wants_layer];
   else
     [nc setWantsLayer:NO];

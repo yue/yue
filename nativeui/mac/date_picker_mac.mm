@@ -11,10 +11,10 @@
 #include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/nu_view.h"
 
-@interface NUDatePicker : NSDatePicker<NUView> {
+@interface NUDatePicker : NSDatePicker<NUViewMethods> {
  @private
   nu::DatePicker* shell_;
-  nu::NUPrivate private_;
+  nu::NUViewPrivate private_;
 }
 - (id)initWithShell:(nu::DatePicker*)shell;
 - (void)onDateChange:(id)sender;
@@ -36,7 +36,7 @@
   shell_->on_date_change.Emit(shell_);
 }
 
-- (nu::NUPrivate*)nuPrivate {
+- (nu::NUViewPrivate*)nuPrivate {
   return &private_;
 }
 

@@ -40,11 +40,11 @@
 
 @end
 
-@interface NUTextEdit : NSScrollView<NUView> {
+@interface NUTextEdit : NSScrollView<NUViewMethods> {
  @private
   base::scoped_nsobject<NSTextView> textView_;
   base::scoped_nsobject<NUTextViewDelegate> delegate_;
-  nu::NUPrivate private_;
+  nu::NUViewPrivate private_;
 }
 - (id)initWithShell:(nu::TextEdit*)shell;
 @end
@@ -69,7 +69,7 @@
   return self;
 }
 
-- (nu::NUPrivate*)nuPrivate {
+- (nu::NUViewPrivate*)nuPrivate {
   return &private_;
 }
 

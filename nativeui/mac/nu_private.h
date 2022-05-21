@@ -17,26 +17,41 @@
 namespace nu {
 
 class MouseCapture;
-class View;
+class Responder;
 
 // A private class that holds nativeui specific private data.
 // Object-C does not support multi-inheiritance, so it is impossible to add
 // common data members for UI elements. Our workaround is to manually add
 // this class as member for each view.
 struct NUPrivate {
+  Responder* shell = nullptr;
+  bool hovered = false;
+  base::scoped_nsobject<NSTrackingArea> tracking_area;
+  std::unique_ptr<MouseCapture> mouse_capture;
+
+ protected:
   NUPrivate();
   ~NUPrivate();
 
-  View* shell = nullptr;
+ private:
+  // Prevent heap allocation.
+  void* operator new(size_t);
+  void* operator new[](size_t);
+  void operator delete(void *);
+  void operator delete[](void*);
+};
+
+struct NUWindowPrivate : public NUPrivate {
+  bool can_resize = true;
+};
+
+struct NUViewPrivate : public NUPrivate {
   bool focusable = true;
   bool draggable = false;
-  bool hovered = false;
   bool is_content_view = false;
   bool wants_layer = false;  // default value for wantsLayer
   bool wants_layer_infected = false;  // infects the wantsLayer property
   base::scoped_nsobject<NSCursor> cursor;
-  base::scoped_nsobject<NSTrackingArea> tracking_area;
-  std::unique_ptr<MouseCapture> mouse_capture;
 
   // Drag target properties.
   int last_drop_operation = -1;  // cached drop result

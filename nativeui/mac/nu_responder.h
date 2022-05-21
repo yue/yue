@@ -9,17 +9,22 @@
 
 namespace nu {
 class Responder;
+struct NUPrivate;
 }
 
-// The methods that every View and Window should implemented.
-@protocol NUResponder
+// Extended methods of NUResponder.
+@interface NSResponder (NUResponderMethods)
+- (nu::NUPrivate*)nuPrivate;
 - (nu::Responder*)shell;
 - (void)enableTracking;
 - (void)disableTracking;
 @end
 
-// Extended methods of NUResponder.
-@interface NSResponder (NUResponderMethods) <NUResponder>
-@end
+namespace nu {
+
+// Return whether a class is part of nativeui system.
+bool IsNUResponder(id responder);
+
+}  // namespace nu
 
 #endif  // NATIVEUI_MAC_NU_RESPONDER_H_

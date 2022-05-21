@@ -7,11 +7,15 @@
 #include <gtk/gtk.h>
 
 #include "nativeui/events/event.h"
+#include "nativeui/gtk/nu_container.h"
 #include "nativeui/window.h"
 
 namespace nu {
 
 namespace {
+
+// The view that has the capture.
+Responder* g_grabbed_responder = nullptr;
 
 bool HandleViewDragging(GtkWidget* widget, GdkEvent* event, View* view) {
   // If user is dragging a widget that supports mouseDownMoveWindow, then we
@@ -69,6 +73,40 @@ gboolean OnKeyUp(GtkWidget* widget, GdkEvent* event, Responder* responder) {
 }
 
 }  // namespace
+
+void Responder::SetCapture() {
+  // Get the GDK window.
+  GdkWindow* window;
+  if (NU_IS_CONTAINER(GetNative()))
+    window = nu_container_get_window(NU_CONTAINER(GetNative()));
+  else
+    window = gtk_widget_get_window(GetNative());
+  if (!window)
+    return;
+
+  const GdkEventMask mask = GdkEventMask(GDK_BUTTON_PRESS_MASK |
+                                         GDK_BUTTON_RELEASE_MASK |
+                                         GDK_POINTER_MOTION_HINT_MASK |
+                                         GDK_POINTER_MOTION_MASK);
+  if (gdk_pointer_grab(window, FALSE, mask, NULL, NULL,
+                       GDK_CURRENT_TIME) == GDK_GRAB_SUCCESS)
+    g_grabbed_responder = this;
+}
+
+void Responder::ReleaseCapture() {
+  gdk_pointer_ungrab(GDK_CURRENT_TIME);
+
+  // In X11 the grab can not be hijacked by other applications, so the only
+  // possible case for losing capture is to call this function.
+  if (g_grabbed_responder) {
+    g_grabbed_responder->on_capture_lost.Emit(g_grabbed_responder);
+    g_grabbed_responder = nullptr;
+  }
+}
+
+bool Responder::HasCapture() const {
+  return gdk_pointer_is_grabbed() && g_grabbed_responder == this;
+}
 
 void Responder::PlatformInstallMouseClickEvents() {
   g_signal_connect(GetNative(), "button-press-event",

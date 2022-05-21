@@ -5,22 +5,33 @@
 #ifndef NATIVEUI_MAC_NU_WINDOW_H_
 #define NATIVEUI_MAC_NU_WINDOW_H_
 
+#import <Cocoa/Cocoa.h>
+
 #include "base/mac/scoped_nsobject.h"
-#include "nativeui/mac/nu_responder.h"
 
 namespace nu {
 class Window;
+struct NUWindowPrivate;
 }
 
-@interface NUWindow : NSWindow<NUResponder> {
- @private
-  base::scoped_nsobject<NSTrackingArea> tracking_area_;
-  nu::Window* shell_;
-  bool can_resize_;
-}
-- (void)setShell:(nu::Window*)shell;
-- (void)setWindowStyle:(NSUInteger)style on:(bool)yes;
-- (bool)hasTrackingArea;
+// The methods that Window and Panel should implemented.
+@protocol NUWindowMethods
+- (nu::NUWindowPrivate*)nuPrivate;
 @end
+
+// Extended methods of NUWindow.
+@interface NSWindow (NUWindowMethods) <NUWindowMethods>
+- (nu::Window*)shell;
+- (bool)hasTrackingArea;
+- (void)updateTrackingAreas;
+- (void)setWindowStyle:(NSUInteger)style on:(bool)yes;
+@end
+
+namespace nu {
+
+// Add custom window methods to class.
+void InstallNUWindowMethods(Class cl);
+
+}  // namespace nu
 
 #endif  // NATIVEUI_MAC_NU_WINDOW_H_

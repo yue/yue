@@ -6,6 +6,8 @@
 
 #include "nativeui/events/event.h"
 #include "nativeui/events/win/event_win.h"
+#include "nativeui/win/view_win.h"
+#include "nativeui/win/window_win.h"
 
 namespace nu {
 
@@ -58,6 +60,41 @@ bool ResponderImpl::EmitKeyEvent(NativeEvent event) {
       delegate()->on_key_up.Emit(delegate(), client_event))
     return true;
   return false;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Public Responder API implementation.
+
+void Responder::SetCapture() {
+  if (GetClassName() == Window::kClassName) {
+    auto* win = static_cast<WindowImpl*>(GetNative());
+    win->SetCapture();
+  } else {
+    auto* view = static_cast<ViewImpl*>(GetNative());
+    if (view->window())
+      view->window()->SetCapture(view);
+  }
+}
+
+void Responder::ReleaseCapture() {
+  if (GetClassName() == Window::kClassName) {
+    auto* win = static_cast<WindowImpl*>(GetNative());
+    win->ReleaseCapture();
+  } else {
+    auto* view = static_cast<ViewImpl*>(GetNative());
+    if (view->window())
+      view->window()->ReleaseCapture();
+  }
+}
+
+bool Responder::HasCapture() const {
+  if (GetClassName() == Window::kClassName) {
+    auto* win = static_cast<WindowImpl*>(GetNative());
+    return win->HasCapture();
+  } else {
+    auto* view = static_cast<ViewImpl*>(GetNative());
+    return view->window() && view->window()->captured_view() == view;
+  }
 }
 
 void Responder::PlatformInstallMouseClickEvents() {

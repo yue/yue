@@ -33,10 +33,10 @@
 @end
 
 
-@interface NUTab : NSTabView<NUView> {
+@interface NUTab : NSTabView<NUViewMethods> {
  @private
   base::scoped_nsobject<NUTabDelegate> delegate_;
-  nu::NUPrivate private_;
+  nu::NUViewPrivate private_;
 }
 - (id)initWithShell:(nu::Tab*)shell;
 @end
@@ -51,7 +51,7 @@
   return self;
 }
 
-- (nu::NUPrivate*)nuPrivate {
+- (nu::NUViewPrivate*)nuPrivate {
   return &private_;
 }
 

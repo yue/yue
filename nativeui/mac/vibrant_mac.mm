@@ -9,15 +9,15 @@
 #include "base/mac/sdk_forward_declarations.h"
 #include "nativeui/mac/container_mac.h"
 
-@interface NUVibrant : NSVisualEffectView<NUView> {
+@interface NUVibrant : NSVisualEffectView<NUViewMethods> {
  @private
-  nu::NUPrivate private_;
+  nu::NUViewPrivate private_;
 }
 @end
 
 @implementation NUVibrant
 
-- (nu::NUPrivate*)nuPrivate {
+- (nu::NUViewPrivate*)nuPrivate {
   return &private_;
 }
 

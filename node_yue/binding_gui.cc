@@ -1826,6 +1826,10 @@ struct Type<nu::Responder> {
   }
   static void BuildPrototype(v8::Local<v8::Context> context,
                              v8::Local<v8::ObjectTemplate> templ) {
+    Set(context, templ,
+        "setCapture", &nu::Responder::SetCapture,
+        "releaseCapture", &nu::Responder::ReleaseCapture,
+        "hasCapture", &nu::Responder::HasCapture);
     SetProperty(context, templ,
                 "onMouseDown", &nu::Responder::on_mouse_down,
                 "onMouseUp", &nu::Responder::on_mouse_up,
@@ -1833,7 +1837,8 @@ struct Type<nu::Responder> {
                 "onMouseEnter", &nu::Responder::on_mouse_enter,
                 "onMouseLeave", &nu::Responder::on_mouse_leave,
                 "onKeyDown", &nu::Responder::on_key_down,
-                "onKeyUp", &nu::Responder::on_key_up);
+                "onKeyUp", &nu::Responder::on_key_up,
+                "onCaptureLost", &nu::View::on_capture_lost);
   }
 };
 
@@ -1960,9 +1965,6 @@ struct Type<nu::View> {
         "hasFocus", &nu::View::HasFocus,
         "setFocusable", &nu::View::SetFocusable,
         "isFocusable", &nu::View::IsFocusable,
-        "setCapture", &nu::View::SetCapture,
-        "releaseCapture", &nu::View::ReleaseCapture,
-        "hasCapture", &nu::View::HasCapture,
         "setMouseDownCanMoveWindow", &nu::View::SetMouseDownCanMoveWindow,
         "isMouseDownCanMoveWindow", &nu::View::IsMouseDownCanMoveWindow,
         "doDrag", &nu::View::DoDrag,
@@ -1986,7 +1988,6 @@ struct Type<nu::View> {
     SetProperty(context, templ,
                 "onDragLeave", &nu::View::on_drag_leave,
                 "onSizeChanged", &nu::View::on_size_changed,
-                "onCaptureLost", &nu::View::on_capture_lost,
                 "handleDragEnter", &nu::View::handle_drag_enter,
                 "handleDragUpdate", &nu::View::handle_drag_update,
                 "handleDrop", &nu::View::handle_drop);

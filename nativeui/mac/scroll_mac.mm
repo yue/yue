@@ -7,9 +7,9 @@
 #include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/nu_view.h"
 
-@interface NUScroll : NSScrollView<NUView> {
+@interface NUScroll : NSScrollView<NUViewMethods> {
  @private
-  nu::NUPrivate private_;
+  nu::NUViewPrivate private_;
   nu::Scroll* shell_;
   BOOL subscribed_;
   NSSize content_size_;
@@ -60,7 +60,7 @@
   shell_->on_scroll.Emit(shell_);
 }
 
-- (nu::NUPrivate*)nuPrivate {
+- (nu::NUViewPrivate*)nuPrivate {
   return &private_;
 }
 

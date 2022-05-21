@@ -11,16 +11,16 @@
 
 // Note that we don't use NSImageView because it sets the minimal frame duration
 // to 100ms, which is too slow for progress indicators.
-@interface NUGifPlayer : NSView<NUView> {
+@interface NUGifPlayer : NSView<NUViewMethods> {
  @private
-  nu::NUPrivate private_;
+  nu::NUViewPrivate private_;
   nu::Color background_color_;
 }
 @end
 
 @implementation NUGifPlayer
 
-- (nu::NUPrivate*)nuPrivate {
+- (nu::NUViewPrivate*)nuPrivate {
   return &private_;
 }
 

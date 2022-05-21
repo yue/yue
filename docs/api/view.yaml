@@ -67,15 +67,6 @@ methods:
   - signature: bool IsFocusable() const
     description: Return whether the view can be focused on.
 
-  - signature: void SetCapture()
-    description: Set mouse capture to the view.
-
-  - signature: void ReleaseCapture()
-    description: Release mouse capture if the view has mouse capture.
-
-  - signature: bool HasCapture() const
-    description: Return whether the view has mouse capture.
-
   - signature: void SetMouseDownCanMoveWindow(bool can)
     description: Set whether dragging mouse would move the window.
     detail: |
@@ -208,9 +199,6 @@ events:
 
   - signature: void on_size_changed(View* self)
     description: Emitted when the view's size has been changed.
-
-  - signature: void on_capture_lost(View* self)
-    description: Emitted when the mouse capture on view has been released.
 
 delegates:
   - signature: int handle_drag_enter(View* self, DraggingInfo* info, const PointF& point)

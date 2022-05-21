@@ -10,6 +10,7 @@
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/gfx/mac/coordinate_conversion.h"
 #include "nativeui/mac/nu_private.h"
+#include "nativeui/mac/nu_responder.h"
 #include "nativeui/mac/nu_view.h"
 #include "nativeui/mac/nu_window.h"
 #include "third_party/yoga/Yoga.h"
@@ -17,6 +18,20 @@
 #if defined(OS_MAC)
 #include "nativeui/toolbar.h"
 #endif
+
+@interface NUWindow : NSWindow<NUWindowMethods> {
+ @private
+  nu::NUWindowPrivate private_;
+}
+@end
+
+@implementation NUWindow
+
+- (nu::NUWindowPrivate*)nuPrivate {
+  return &private_;
+}
+
+@end
 
 @interface NUWindowDelegate : NSObject<NSWindowDelegate> {
  @private
@@ -50,12 +65,8 @@
 }
 
 - (void)windowDidResize:(NSNotification*)notification {
-  // NSWindows does not have a updateTrackingAreas method, so update on resize.
-  NUWindow* window = static_cast<NUWindow*>(shell_->GetNative());
-  if ([window hasTrackingArea]) {
-    [window disableTracking];
-    [window enableTracking];
-  }
+  // NSWindow does not have a updateTrackingAreas method, so update on resize.
+  [shell_->GetNative() updateTrackingAreas];
 }
 
 @end
@@ -63,6 +74,8 @@
 namespace nu {
 
 void Window::PlatformInit(const Options& options) {
+  InstallNUWindowMethods([NUWindow class]);
+
   NSUInteger styleMask = NSTitledWindowMask | NSMiniaturizableWindowMask |
                          NSClosableWindowMask | NSResizableWindowMask |
                          NSTexturedBackgroundWindowMask;
@@ -71,9 +84,9 @@ void Window::PlatformInit(const Options& options) {
                 styleMask:styleMask
                   backing:NSBackingStoreBuffered
                     defer:YES];
-  [window setShell:this];
   responder_ = window_ = window;
 
+  [window_ nuPrivate]->shell = this;
   [window_ setDelegate:[[NUWindowDelegate alloc] initWithShell:this]];
   [window_ setReleasedWhenClosed:NO];
 
@@ -138,13 +151,13 @@ bool Window::HasShadow() const {
 }
 
 void Window::PlatformSetContentView(View* view) {
-  bool has_tracking_area = [static_cast<NUWindow*>(window_) hasTrackingArea];
+  bool has_tracking_area = [window_ hasTrackingArea];
   if (content_view_) {
     if (has_tracking_area)
       [window_ disableTracking];
     [content_view_->GetNative() removeFromSuperview];
-    if (IsNUView(content_view_->GetNative())) {
-      NUPrivate* priv = [content_view_->GetNative() nuPrivate];
+    if (IsNUResponder(content_view_->GetNative())) {
+      NUViewPrivate* priv = [content_view_->GetNative() nuPrivate];
       priv->is_content_view = false;
       // Revert wantsLayer to default.
       [content_view_->GetNative() setWantsLayer:priv->wants_layer];
@@ -154,7 +167,7 @@ void Window::PlatformSetContentView(View* view) {
   }
 
   NSView* content_view = view->GetNative();
-  if (IsNUView(content_view))
+  if (IsNUResponder(content_view))
     [content_view nuPrivate]->is_content_view = true;
   [window_ setContentView:content_view];
 
@@ -313,7 +326,7 @@ bool Window::IsMinimized() const {
 }
 
 void Window::SetResizable(bool yes) {
-  [static_cast<NUWindow*>(window_) setWindowStyle:NSResizableWindowMask on:yes];
+  [window_ setWindowStyle:NSResizableWindowMask on:yes];
 }
 
 bool Window::IsResizable() const {
@@ -329,8 +342,7 @@ bool Window::IsMaximizable() const {
 }
 
 void Window::SetMinimizable(bool minimizable) {
-  [static_cast<NUWindow*>(window_) setWindowStyle:NSMiniaturizableWindowMask
-                                               on:minimizable];
+  [window_ setWindowStyle:NSMiniaturizableWindowMask on:minimizable];
 }
 
 bool Window::IsMinimizable() const {
@@ -372,9 +384,7 @@ bool Window::IsTitleVisible() const {
 }
 
 void Window::SetFullSizeContentView(bool full) {
-  [static_cast<NUWindow*>(window_)
-      setWindowStyle:NSFullSizeContentViewWindowMask
-                  on:full];
+  [window_ setWindowStyle:NSFullSizeContentViewWindowMask on:full];
 }
 
 bool Window::IsFullSizeContentView() const {

@@ -39,8 +39,10 @@ class WindowImpl : public Win32Window,
 
   bool HandleKeyEvent(NativeEvent event);
 
+  void SetCapture();
   void SetCapture(ViewImpl* view);
   void ReleaseCapture();
+  bool HasCapture() const;
 
   bool IsMaximized() const;
   void SetFullscreen(bool fullscreen);

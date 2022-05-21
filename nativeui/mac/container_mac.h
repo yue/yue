@@ -9,9 +9,9 @@
 #include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/nu_view.h"
 
-@interface NUContainer : NSView<NUView> {
+@interface NUContainer : NSView<NUViewMethods> {
  @private
-  nu::NUPrivate private_;
+  nu::NUViewPrivate private_;
   nu::Color background_color_;
 }
 @end

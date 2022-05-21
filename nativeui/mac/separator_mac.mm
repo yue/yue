@@ -7,10 +7,10 @@
 #include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/nu_view.h"
 
-@interface NUSeparator : NSBox<NUView> {
+@interface NUSeparator : NSBox<NUViewMethods> {
  @private
   nu::Orientation orientation_;
-  nu::NUPrivate private_;
+  nu::NUViewPrivate private_;
 }
 - (id)initWithShell:(nu::Separator*)shell
         orientation:(nu::Orientation)orientation;
@@ -32,7 +32,7 @@
   return orientation_;
 }
 
-- (nu::NUPrivate*)nuPrivate {
+- (nu::NUViewPrivate*)nuPrivate {
   return &private_;
 }
 

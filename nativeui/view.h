@@ -73,11 +73,6 @@ class NATIVEUI_EXPORT View : public Responder {
   void SetFocusable(bool focusable);
   bool IsFocusable() const;
 
-  // Capture mouse.
-  void SetCapture();
-  void ReleaseCapture();
-  bool HasCapture() const;
-
   // Dragging the view would move the window.
   void SetMouseDownCanMoveWindow(bool yes);
   bool IsMouseDownCanMoveWindow() const;
@@ -164,7 +159,6 @@ class NATIVEUI_EXPORT View : public Responder {
   // Events.
   Signal<void(View*, DraggingInfo*)> on_drag_leave;
   Signal<void(View*)> on_size_changed;
-  Signal<void(View*)> on_capture_lost;
 
   // Delegates.
   std::function<int(View*, DraggingInfo*, const PointF&)> handle_drag_enter;

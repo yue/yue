@@ -1631,6 +1631,10 @@ template<>
 struct Type<nu::Responder> {
   static constexpr const char* name = "Responder";
   static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "setcapture", &nu::Responder::SetCapture,
+           "releasecapture", &nu::Responder::ReleaseCapture,
+           "hascapture", &nu::Responder::HasCapture);
     RawSetProperty(state, metatable,
                    "onmousedown", &nu::Responder::on_mouse_down,
                    "onmouseup", &nu::Responder::on_mouse_up,
@@ -1638,7 +1642,8 @@ struct Type<nu::Responder> {
                    "onmouseenter", &nu::Responder::on_mouse_enter,
                    "onmouseleave", &nu::Responder::on_mouse_leave,
                    "onkeydown", &nu::Responder::on_key_down,
-                   "onkeyup", &nu::Responder::on_key_up);
+                   "onkeyup", &nu::Responder::on_key_up,
+                   "oncapturelost", &nu::View::on_capture_lost);
   }
 };
 
@@ -1755,9 +1760,6 @@ struct Type<nu::View> {
            "hasfocus", &nu::View::HasFocus,
            "setfocusable", &nu::View::SetFocusable,
            "isfocusable", &nu::View::IsFocusable,
-           "setcapture", &nu::View::SetCapture,
-           "releasecapture", &nu::View::ReleaseCapture,
-           "hascapture", &nu::View::HasCapture,
            "setmousedowncanmovewindow", &nu::View::SetMouseDownCanMoveWindow,
            "ismousedowncanmovewindow", &nu::View::IsMouseDownCanMoveWindow,
            "dodrag", &nu::View::DoDrag,
@@ -1781,7 +1783,6 @@ struct Type<nu::View> {
     RawSetProperty(state, metatable,
                    "ondragleave", &nu::View::on_drag_leave,
                    "onsizechanged", &nu::View::on_size_changed,
-                   "oncapturelost", &nu::View::on_capture_lost,
                    "handledragenter", &nu::View::handle_drag_enter,
                    "handledragupdate", &nu::View::handle_drag_update,
                    "handledrop", &nu::View::handle_drop);

@@ -5,17 +5,19 @@
 #ifndef NATIVEUI_MAC_NU_VIEW_H_
 #define NATIVEUI_MAC_NU_VIEW_H_
 
+#import <Cocoa/Cocoa.h>
+
 #include "nativeui/gfx/color.h"
-#include "nativeui/mac/nu_responder.h"
 
 namespace nu {
 class Font;
-struct NUPrivate;
+class View;
+struct NUViewPrivate;
 }
 
 // The methods that every View should implemented.
-@protocol NUView
-- (nu::NUPrivate*)nuPrivate;
+@protocol NUViewMethods
+- (nu::NUViewPrivate*)nuPrivate;
 - (void)setNUFont:(nu::Font*)font;
 - (void)setNUColor:(nu::Color)color;
 - (void)setNUBackgroundColor:(nu::Color)color;
@@ -24,13 +26,11 @@ struct NUPrivate;
 @end
 
 // Extended methods of NUView.
-@interface NSView (NUViewMethods) <NUResponder, NUView>
+@interface NSView (NUViewMethods) <NUViewMethods>
+- (nu::View*)shell;
 @end
 
 namespace nu {
-
-// Return whether a class is part of nativeui system.
-bool IsNUView(id view);
 
 // Add custom view methods to class.
 void InstallNUViewMethods(Class cl);

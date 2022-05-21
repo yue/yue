@@ -283,6 +283,7 @@ jumbo_component("nativeui") {
       "mac/nu_private.h",
       "mac/nu_private.mm",
       "mac/nu_responder.h",
+      "mac/nu_responder.mm",
       "mac/nu_view.h",
       "mac/nu_view.mm",
       "mac/nu_window.h",
