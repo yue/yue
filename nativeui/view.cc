@@ -126,27 +126,15 @@ SizeF View::GetMinimumSize() const {
 }
 
 void View::SetParent(View* parent) {
-  if (parent) {
-    window_ = parent->window_;
+  if (parent)
     YGConfigCopy(yoga_config_, parent->yoga_config_);
-  } else {
-    window_ = nullptr;
-  }
   parent_ = parent;
 }
 
 void View::BecomeContentView(Window* window) {
   if (window) {
-    window_ = window;
     YGConfigCopy(yoga_config_, window->GetYogaConfig());
-  } else {
-    window_ = nullptr;
   }
-  parent_ = nullptr;
-}
-
-void View::BecomeContentView() {
-  window_ = nullptr;
   parent_ = nullptr;
 }
 

@@ -39,13 +39,13 @@ Window::Window(const Options& options)
 Window::~Window() {
   PlatformDestroy();
   YGConfigFree(yoga_config_);
-  content_view_->BecomeContentView();
+  content_view_->BecomeContentView(nullptr);
 }
 
 void Window::SetContentView(scoped_refptr<View> view) {
   CHECK(view) << "Content view can not be null";
   if (content_view_)
-    content_view_->BecomeContentView();
+    content_view_->BecomeContentView(nullptr);
   PlatformSetContentView(view.get());
   content_view_ = std::move(view);
   content_view_->BecomeContentView(this);

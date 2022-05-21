@@ -113,6 +113,8 @@ WindowImpl::WindowImpl(const Window::Options& options, Window* delegate)
 WindowImpl::~WindowImpl() {
   if (drag_drop_in_progress_)
     CancelDrag();
+  if (delegate()->GetContentView())
+    delegate()->GetContentView()->GetNative()->BecomeContentView(nullptr);
 }
 
 void WindowImpl::SetPixelBounds(const Rect& bounds) {
@@ -835,6 +837,11 @@ bool WindowImpl::GetClientAreaInsets(Insets* insets) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Public Window API implementation.
+
+// static
+Window* Window::FromNative(NativeWindow window) {
+  return window ? window->delegate() : nullptr;
+}
 
 void Window::PlatformInit(const Options& options) {
   responder_ = window_ = new WindowImpl(options, this);

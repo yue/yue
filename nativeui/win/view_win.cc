@@ -456,4 +456,8 @@ void View::SetBackgroundColor(Color color) {
   view_->SetBackgroundColor(color);
 }
 
+Window* View::GetWindow() const {
+  return Window::FromNative(view_->window());
+}
+
 }  // namespace nu

@@ -71,6 +71,37 @@ TEST_F(ContainerTest, WindowReference) {
   EXPECT_EQ(v1->GetWindow(), window_.get());
   container_->RemoveChildView(v1.get());
   EXPECT_EQ(v1->GetWindow(), nullptr);
+  container_->AddChildView(v1.get());
+  EXPECT_EQ(v1->GetWindow(), window_.get());
+}
+
+TEST_F(ContainerTest, NestedWindowReference) {
+  scoped_refptr<nu::Container> wrapper = new nu::Container;
+  scoped_refptr<nu::Label> v1 = new nu::Label;
+  EXPECT_EQ(v1->GetWindow(), nullptr);
+  container_->AddChildView(wrapper);
+  wrapper->AddChildView(v1);
+  EXPECT_EQ(v1->GetWindow(), window_);
+  wrapper->RemoveChildView(v1.get());
+  EXPECT_EQ(v1->GetWindow(), nullptr);
+  wrapper->AddChildView(v1);
+  EXPECT_EQ(v1->GetWindow(), window_);
+}
+
+TEST_F(ContainerTest, WindowReferenceAfterChangingContentView) {
+  scoped_refptr<nu::Container> content_view = new nu::Container;
+  scoped_refptr<nu::Container> wrapper = new nu::Container;
+  scoped_refptr<nu::Label> v1 = new nu::Label;
+  content_view->AddChildView(wrapper);
+  wrapper->AddChildView(v1);
+  EXPECT_EQ(v1->GetWindow(), nullptr);
+
+  window_->SetContentView(content_view);
+  EXPECT_EQ(v1->GetWindow(), window_);
+  wrapper->RemoveChildView(v1.get());
+  EXPECT_EQ(v1->GetWindow(), nullptr);
+  wrapper->AddChildView(v1);
+  EXPECT_EQ(v1->GetWindow(), window_);
 }
 
 TEST_F(ContainerTest, SetBounds) {
@@ -108,11 +139,11 @@ TEST_F(ContainerTest, VisibleLayout) {
 
 TEST_F(ContainerTest, RemoveAndAddBack) {
   scoped_refptr<nu::Label> v = new nu::Label;
-  container_->AddChildView(v.get());
+  container_->AddChildView(v);
   EXPECT_EQ(container_->ChildCount(), 1);
   container_->RemoveChildView(v.get());
   EXPECT_EQ(container_->ChildCount(), 0);
-  container_->AddChildView(v.get());
+  container_->AddChildView(v);
   EXPECT_EQ(container_->ChildCount(), 1);
 }
 

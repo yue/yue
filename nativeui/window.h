@@ -42,6 +42,8 @@ class NATIVEUI_EXPORT Window : public Responder {
   // The view class name.
   static const char kClassName[];
 
+  static Window* FromNative(NativeWindow window);
+
   struct Options {
     // Whether the window has a chrome.
     bool frame = true;

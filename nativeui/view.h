@@ -131,7 +131,7 @@ class NATIVEUI_EXPORT View : public Responder {
   View* GetParent() const { return parent_; }
 
   // Get window.
-  Window* GetWindow() const { return window_; }
+  Window* GetWindow() const;
 
   // Get the native View object.
   NativeView GetNative() const { return view_; }
@@ -139,7 +139,6 @@ class NATIVEUI_EXPORT View : public Responder {
   // Internal: Set parent view.
   void SetParent(View* parent);
   void BecomeContentView(Window* window);
-  void BecomeContentView();
 
   // Internal: Whether this class inherits from Container.
   virtual bool IsContainer() const;
@@ -188,7 +187,6 @@ class NATIVEUI_EXPORT View : public Responder {
 
   // Relationships.
   View* parent_ = nullptr;
-  Window* window_ = nullptr;
 
   // The native implementation.
   NativeView view_;

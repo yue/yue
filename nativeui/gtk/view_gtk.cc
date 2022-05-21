@@ -234,9 +234,10 @@ RectF View::GetBoundsInWindow() const {
   gtk_widget_get_allocation(view_, &rect);
   // Calculate relative position to content view, since we consider menu bar
   // and other decorations as non client area.
-  if (window_) {
+  Window* window = GetWindow();
+  if (window) {
     GdkRectangle root;
-    gtk_widget_get_allocation(window_->GetContentView()->GetNative(), &root);
+    gtk_widget_get_allocation(window->GetContentView()->GetNative(), &root);
     rect.x -= root.x;
     rect.y -= root.y;
   }
@@ -439,6 +440,13 @@ void View::SetBackgroundColor(Color color) {
   ApplyStyle(view_, "background-color",
              base::StringPrintf("* { background-color: %s; }",
                                 color.ToString().c_str()));
+}
+
+Window* View::GetWindow() const {
+  GtkWidget* toplevel = gtk_widget_get_toplevel(view_);
+  if (!gtk_widget_is_toplevel(toplevel))
+    return nullptr;
+  return Window::FromNative(GTK_WINDOW(toplevel));
 }
 
 }  // namespace nu

@@ -19,6 +19,7 @@
 #include "nativeui/mac/events_handler.h"
 #include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/nu_responder.h"
+#include "nativeui/window.h"
 
 namespace nu {
 
@@ -304,6 +305,10 @@ void View::SetWantsLayer(bool wants) {
 
 bool View::WantsLayer() const {
   return [view_ wantsLayer];
+}
+
+Window* View::GetWindow() const {
+  return Window::FromNative([view_ window]);
 }
 
 }  // namespace nu

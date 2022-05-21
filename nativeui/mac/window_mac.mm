@@ -73,6 +73,13 @@
 
 namespace nu {
 
+// static
+Window* Window::FromNative(NativeWindow window) {
+  if (!IsNUResponder(window))
+    return nullptr;
+  return [window shell];
+}
+
 void Window::PlatformInit(const Options& options) {
   InstallNUWindowMethods([NUWindow class]);
 
@@ -129,6 +136,7 @@ void Window::PlatformDestroy() {
   // Clear the delegate class.
   [[window_ delegate] release];
   [window_ setDelegate:nil];
+  [window_ nuPrivate]->shell = nullptr;
 
   // The [window_ release] won't close the window, we have to explicitly ask
   // window to close.

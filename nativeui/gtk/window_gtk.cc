@@ -15,7 +15,7 @@ namespace {
 
 // Window private data.
 struct NUWindowPrivate {
-  Window* delegate = nullptr;
+  Window* shell = nullptr;
   bool is_popup = false;
   bool is_csd = false;
   // Cached window bounds, which is the content area including menu bar.
@@ -40,9 +40,12 @@ struct NUWindowPrivate {
 };
 
 // Helper to receive private data.
-inline NUWindowPrivate* GetPrivate(const Window* window) {
+inline NUWindowPrivate* GetPrivate(GtkWindow* window) {
   return static_cast<NUWindowPrivate*>(g_object_get_data(
-      G_OBJECT(window->GetNative()), "private"));
+      G_OBJECT(window), "private"));
+}
+inline NUWindowPrivate* GetPrivate(const Window* window) {
+  return GetPrivate(window->GetNative());
 }
 
 // User clicks the close button.
@@ -64,9 +67,9 @@ gboolean OnMap(GtkWidget* widget, GdkEvent* event, NUWindowPrivate* priv) {
   // Set size constraints if needed.
   if (priv->needs_to_update_minmax_size) {
     if (priv->use_content_minmax_size)
-      priv->delegate->SetContentSizeConstraints(priv->min_size, priv->max_size);
+      priv->shell->SetContentSizeConstraints(priv->min_size, priv->max_size);
     else
-      priv->delegate->SetSizeConstraints(priv->min_size, priv->max_size);
+      priv->shell->SetSizeConstraints(priv->min_size, priv->max_size);
   }
   return FALSE;
 }
@@ -135,12 +138,18 @@ inline int GetMenuBarHeight(const Window* window) {
 
 }  // namespace
 
+// static
+Window* Window::FromNative(NativeWindow window) {
+  NUWindowPrivate* priv = GetPrivate(window);
+  return priv ? priv->shell : nullptr;
+}
+
 void Window::PlatformInit(const Options& options) {
   window_ = GTK_WINDOW(responder_ = gtk_window_new(
         options.no_activate ? GTK_WINDOW_POPUP : GTK_WINDOW_TOPLEVEL));
 
   NUWindowPrivate* priv = new NUWindowPrivate;
-  priv->delegate = this;
+  priv->shell = this;
   priv->is_popup = options.no_activate;
   g_object_set_data_full(G_OBJECT(window_), "private", priv,
                          Delete<NUWindowPrivate>);
@@ -183,8 +192,11 @@ void Window::PlatformInit(const Options& options) {
 }
 
 void Window::PlatformDestroy() {
-  if (window_)
-    gtk_widget_destroy(GTK_WIDGET(window_));
+  if (!window_)
+    return;
+  GetPrivate(this)->shell = nullptr;
+  gtk_widget_destroy(GTK_WIDGET(window_));
+  window_ = nullptr;
 }
 
 void Window::Close() {
@@ -192,9 +204,7 @@ void Window::Close() {
     return;
 
   NotifyWindowClosed();
-  gtk_widget_destroy(GTK_WIDGET(window_));
-
-  window_ = nullptr;
+  PlatformDestroy();
 }
 
 void Window::SetHasShadow(bool has) {
