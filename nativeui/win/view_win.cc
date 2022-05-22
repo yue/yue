@@ -17,8 +17,7 @@
 namespace nu {
 
 ViewImpl::ViewImpl(ControlType type, View* delegate)
-    : ResponderImpl(Screen::GetDefaultScaleFactor(), delegate),
-      type_(type),
+    : ResponderImpl(Screen::GetDefaultScaleFactor(), type, delegate),
       font_(Font::Default()),
       color_(Color::Get(Color::Name::Text)) {}
 
@@ -323,7 +322,7 @@ void View::PlatformDestroy() {
 }
 
 void View::TakeOverView(NativeView view) {
-  responder_ = view_ = view;
+  InitResponder(view_ = view, Type::View);
 }
 
 Vector2dF View::OffsetFromView(const View* from) const {

@@ -145,8 +145,10 @@ Window* Window::FromNative(NativeWindow window) {
 }
 
 void Window::PlatformInit(const Options& options) {
-  window_ = GTK_WINDOW(responder_ = gtk_window_new(
-        options.no_activate ? GTK_WINDOW_POPUP : GTK_WINDOW_TOPLEVEL));
+  InitResponder(gtk_window_new(options.no_activate ? GTK_WINDOW_POPUP
+                                                   : GTK_WINDOW_TOPLEVEL),
+                Type::Window);
+  window_ = GTK_WINDOW(Responder::GetNative());
 
   NUWindowPrivate* priv = new NUWindowPrivate;
   priv->shell = this;

@@ -31,6 +31,14 @@ class NATIVEUI_EXPORT Responder : public SignalDelegate,
   // Get the native object.
   NativeResponder GetNative() const { return responder_; }
 
+  // The type of the responder, currently we only have View and Window, but it
+  // is possible to have things like Popover and Panel in future.
+  enum class Type {
+    View,
+    Window,
+  };
+  Type GetType() const { return type_; }
+
   // Events.
   Signal<bool(Responder*, const MouseEvent&)> on_mouse_down;
   Signal<bool(Responder*, const MouseEvent&)> on_mouse_up;
@@ -47,11 +55,10 @@ class NATIVEUI_EXPORT Responder : public SignalDelegate,
   Responder();
   ~Responder() override;
 
+  void InitResponder(NativeResponder native, Type type);
+
   // SignalDelegate:
   void OnConnect(int identifier) override;
-
-  // FIXME(zcbenz): Needs a more decent way to handle this.
-  NativeResponder responder_;
 
  private:
   // Event types.
@@ -65,6 +72,9 @@ class NATIVEUI_EXPORT Responder : public SignalDelegate,
   bool on_mouse_click_installed_ = false;
   bool on_mouse_move_installed_ = false;
   bool on_key_installed_ = false;
+
+  Type type_;
+  NativeResponder responder_ = nullptr;
 };
 
 }  // namespace nu

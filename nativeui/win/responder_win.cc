@@ -11,8 +11,11 @@
 
 namespace nu {
 
-ResponderImpl::ResponderImpl(float scale_factor, Responder* delegate)
+ResponderImpl::ResponderImpl(float scale_factor,
+                             ControlType type,
+                             Responder* delegate)
   : scale_factor_(scale_factor),
+    type_(type),
     delegate_(delegate) {}
 
 void ResponderImpl::EmitMouseMoveEvent(NativeEvent event) {
@@ -66,10 +69,10 @@ bool ResponderImpl::EmitKeyEvent(NativeEvent event) {
 // Public Responder API implementation.
 
 void Responder::SetCapture() {
-  if (GetClassName() == Window::kClassName) {
+  if (GetType() == Type::Window) {
     auto* win = static_cast<WindowImpl*>(GetNative());
     win->SetCapture();
-  } else {
+  } else if (GetType() == Type::View) {
     auto* view = static_cast<ViewImpl*>(GetNative());
     if (view->window())
       view->window()->SetCapture(view);
@@ -77,10 +80,10 @@ void Responder::SetCapture() {
 }
 
 void Responder::ReleaseCapture() {
-  if (GetClassName() == Window::kClassName) {
+  if (GetType() == Type::Window) {
     auto* win = static_cast<WindowImpl*>(GetNative());
     win->ReleaseCapture();
-  } else {
+  } else if (GetType() == Type::View) {
     auto* view = static_cast<ViewImpl*>(GetNative());
     if (view->window())
       view->window()->ReleaseCapture();
@@ -88,10 +91,10 @@ void Responder::ReleaseCapture() {
 }
 
 bool Responder::HasCapture() const {
-  if (GetClassName() == Window::kClassName) {
+  if (GetType() == Type::Window) {
     auto* win = static_cast<WindowImpl*>(GetNative());
     return win->HasCapture();
-  } else {
+  } else if (GetType() == Type::View) {
     auto* view = static_cast<ViewImpl*>(GetNative());
     return view->window() && view->window()->captured_view() == view;
   }

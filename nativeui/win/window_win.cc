@@ -86,7 +86,9 @@ WindowImpl::WindowImpl(const Window::Options& options, Window* delegate)
                   options.frame ? kWindowDefaultStyle
                                 : kWindowDefaultFramelessStyle,
                   ComputeWindowExStyle(options)),
-      ResponderImpl(GetScaleFactorForHWND(hwnd()), delegate) {
+      ResponderImpl(GetScaleFactorForHWND(hwnd()),
+                    ControlType::Window,
+                    delegate) {
   if (options.frame) {
     // Normal window always has shadow.
     has_shadow_ = true;
@@ -844,8 +846,9 @@ Window* Window::FromNative(NativeWindow window) {
 }
 
 void Window::PlatformInit(const Options& options) {
-  responder_ = window_ = new WindowImpl(options, this);
+  window_ = new WindowImpl(options, this);
 
+  InitResponder(window_, Type::Window);
   YGConfigSetPointScaleFactor(yoga_config_,
                               GetScaleFactorForHWND(window_->hwnd()));
 }

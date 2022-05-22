@@ -189,7 +189,7 @@ void View::PlatformDestroy() {
 }
 
 void View::TakeOverView(NativeView view) {
-  responder_ = view_ = view;
+  InitResponder(view_ = view, Type::View);
   g_object_ref_sink(view);
   gtk_widget_show(view);  // visible by default
 

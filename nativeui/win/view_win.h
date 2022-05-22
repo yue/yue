@@ -17,22 +17,6 @@ namespace nu {
 class ScrollImpl;
 class WindowImpl;
 
-// Possible control types.
-// We only add new types when it is necessary, otherwise a new View should
-// usually just be |Container| or |View|.
-enum class ControlType {
-  View,
-  Subwin,
-  Scrollbar,
-  // Button types.
-  Button,
-  Checkbox,
-  Radio,
-  // Container types, other types should NOT be appended after Container.
-  Container,
-  Scroll,
-};
-
 // The common base for native window based view and directui view.
 class ViewImpl : public ResponderImpl {
  public:
@@ -161,7 +145,6 @@ class ViewImpl : public ResponderImpl {
 
   WindowImpl* window() const { return window_; }
   ViewImpl* parent() const { return parent_; }
-  ControlType type() const { return type_; }
 
   View* delegate() const {
     return static_cast<View*>(ResponderImpl::delegate());
@@ -174,8 +157,6 @@ class ViewImpl : public ResponderImpl {
   void ParentChanged();
 
  private:
-  ControlType type_;
-
   // Whether the view can have focus.
   bool focusable_ = false;
 

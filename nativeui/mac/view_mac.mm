@@ -53,7 +53,7 @@ void View::PlatformDestroy() {
 }
 
 void View::TakeOverView(NativeView view) {
-  responder_ = view_ = view;
+  InitResponder(view_ = view, Type::View);
 
   if (!IsNUResponder(view))
     return;

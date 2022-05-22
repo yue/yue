@@ -9,13 +9,33 @@
 
 namespace nu {
 
+// Possible control types.
+// We only add new types when it is necessary, otherwise a new View should
+// usually just be |Container| or |View|.
+enum class ControlType {
+  // Window types.
+  Window,
+  // View types.
+  View,
+  Subwin,
+  Scrollbar,
+  // Button types.
+  Button,
+  Checkbox,
+  Radio,
+  // Container types, other types should NOT be appended after Container.
+  Container,
+  Scroll,
+};
+
 class ResponderImpl {
  public:
   float scale_factor() const { return scale_factor_; }
+  ControlType type() const { return type_; }
   Responder* delegate() const { return delegate_; }
 
  protected:
-  ResponderImpl(float scale_factor, Responder* delegate);
+  ResponderImpl(float scale_factor, ControlType type, Responder* delegate);
 
   void EmitMouseMoveEvent(NativeEvent event);
   void EmitMouseEnterEvent(NativeEvent event);
@@ -27,6 +47,7 @@ class ResponderImpl {
 
  private:
   float scale_factor_;
+  ControlType type_;
   Responder* delegate_;
 };
 

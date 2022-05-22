@@ -91,7 +91,7 @@ void Window::PlatformInit(const Options& options) {
                 styleMask:styleMask
                   backing:NSBackingStoreBuffered
                     defer:YES];
-  responder_ = window_ = window;
+  InitResponder(window_ = window, Type::Window);
 
   [window_ nuPrivate]->shell = this;
   [window_ setDelegate:[[NUWindowDelegate alloc] initWithShell:this]];

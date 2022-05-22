@@ -87,7 +87,7 @@ PointF GetPosInWindow(NativeEvent event, NativeResponder responder) {
 }
 
 PointF GetPosInView(NativeEvent event, NativeResponder responder) {
-  if (responder->delegate()->GetClassName() == Window::kClassName)
+  if (responder->type() < ControlType::View)
     return GetPosInWindow(event, responder);
   ViewImpl* view = static_cast<ViewImpl*>(responder);
   Point p = Point(event->l_param) - view->size_allocation().OffsetFromOrigin();

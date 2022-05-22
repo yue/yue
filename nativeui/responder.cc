@@ -19,6 +19,11 @@ Responder::Responder() {
 
 Responder::~Responder() = default;
 
+void Responder::InitResponder(NativeResponder native, Type type) {
+  responder_ = native;
+  type_ = type;
+}
+
 void Responder::OnConnect(int identifier) {
   switch (identifier) {
     case kOnMouseClick:

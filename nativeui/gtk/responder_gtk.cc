@@ -35,7 +35,7 @@ bool HandleViewDragging(GtkWidget* widget, GdkEvent* event, View* view) {
 }
 
 gboolean OnMouseMove(GtkWidget* widget, GdkEvent* event, Responder* responder) {
-  if (responder->GetClassName() != Window::kClassName &&
+  if (responder->GetType() == Responder::Type::View &&
       HandleViewDragging(widget, event, static_cast<View*>(responder)))
     return true;
   if (!responder->on_mouse_move.IsEmpty()) {
