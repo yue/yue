@@ -39,6 +39,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y cmake libgtk-3-dev libnotify-dev libwebkit2gtk-4.0-dev
+          /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
 
       - name: Install Linux Cross Compilation Toolchains
         if: startsWith(matrix.os, 'ubuntu') && matrix.arch != 'x64'
@@ -55,13 +56,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Build and Test (Windows, macOS)
-        if: ${{ !startsWith(matrix.os, 'ubuntu') }}
+      - name: Build and Test
+        env:
+          DISPLAY: ':99.0'
         run: node scripts/cibuild.js --target-cpu=${{ matrix.arch }}
-
-      - name: Build and Test (Linux)
-        if: startsWith(matrix.os, 'ubuntu')
-        run: xvfb-run node scripts/cibuild.js --target-cpu=${{ matrix.arch }}
 
       - name: Upload Binary Files
         uses: actions/upload-artifact@v3
