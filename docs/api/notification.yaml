@@ -152,7 +152,7 @@ methods:
       Different platforms may choose to put the image in different places, there
       is no guarentee on where the image is placed.
 
-  - signature: void SetImagePlacement(base::Optional<std::wstring> placement)
+  - signature: void SetImagePlacement(absl::optional<std::wstring> placement)
     platform: ['Windows']
     description: Set the `placement` attribute of the image.
     detail: |
@@ -189,7 +189,7 @@ methods:
     platform: ['macOS', 'Windows']
     description: Return the unique identifier of the notification.
 
-  - signature: void SetXML(base::Optional<std::wstring> xml)
+  - signature: void SetXML(absl::optional<std::wstring> xml)
     platform: ['Windows']
     description: Set custom XML of the toast notification.
     detail: |
