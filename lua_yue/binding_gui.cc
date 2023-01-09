@@ -1517,6 +1517,14 @@ struct Type<nu::NotificationCenter> {
            &nu::NotificationCenter::GetToastActivatorCLSID);
 #endif
     RawSetProperty(state, metatable,
+#if defined(OS_MAC) || defined(OS_WIN)
+                   "onnotificationreply",
+                   &nu::NotificationCenter::on_notification_reply,
+#endif
+#if defined(OS_WIN)
+                   "ontoastactivate",
+                   &nu::NotificationCenter::on_toast_activate,
+#endif
                    "onnotificationshow",
                    &nu::NotificationCenter::on_notification_show,
                    "onnotificationclose",
@@ -1525,16 +1533,6 @@ struct Type<nu::NotificationCenter> {
                    &nu::NotificationCenter::on_notification_click,
                    "onnotificationaction",
                    &nu::NotificationCenter::on_notification_action);
-#if defined(OS_MAC) || defined(OS_WIN)
-    RawSetProperty(state, metatable,
-                   "onnotificationreply",
-                   &nu::NotificationCenter::on_notification_reply);
-#endif
-#if defined(OS_WIN)
-    RawSetProperty(state, metatable,
-                   "ontoastactivate",
-                   &nu::NotificationCenter::on_toast_activate);
-#endif
   }
 };
 
