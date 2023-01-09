@@ -48,6 +48,12 @@ methods:
     description: |
       Set a `folder` that is always selected when the dialog is opened
 
+      On macOS file dialogs of sandboxed apps may silently ignore the folder
+      selection, notwithstanding that the user may be able to subsequently
+      navigate to the folder and the app successfully access files within
+      the folder. The behavior depends on the app's entitlements and the
+      particular folder specified.
+
   - signature: void SetOptions(int options)
     description: A bit array of `options`.
     lang_detail:
