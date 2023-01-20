@@ -19,6 +19,9 @@ class NATIVEUI_EXPORT Button : public View {
     Normal,
     Checkbox,
     Radio,
+#if defined(OS_MAC)
+    Disclosure,
+#endif
   };
   explicit Button(const std::string& title, Type type = Type::Normal);
 
