@@ -109,12 +109,16 @@ namespace nu {
 
 Button::Button(const std::string& title, Type type) {
   NSButton* button = [[NUButton alloc] initWithShell:this];
-  if (type == Type::Normal)
+  if (type == Type::Normal) {
     [button setBezelStyle:NSRoundedBezelStyle];
-  else if (type == Type::Checkbox)
+  } else if (type == Type::Checkbox) {
     [button setButtonType:NSSwitchButton];
-  else if (type == Type::Radio)
+  } else if (type == Type::Radio) {
     [button setButtonType:NSRadioButton];
+  } else if (type == Type::Disclosure) {
+    [button setButtonType:NSButtonTypeOnOff];
+    [button setBezelStyle:NSBezelStyleDisclosure];
+  }
   TakeOverView(button);
   SetTitle(title);
 }

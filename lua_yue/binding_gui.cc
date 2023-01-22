@@ -1853,6 +1853,11 @@ struct Type<nu::Button::Type> {
     } else if (type == "radio") {
       *out = nu::Button::Type::Radio;
       return true;
+#if defined(OS_MAC)
+    } else if (type == "disclosure") {
+      *out = nu::Button::Type::Disclosure;
+      return true;
+#endif
     } else {
       return false;
     }
@@ -1907,7 +1912,7 @@ struct Type<nu::Button::Style> {
       *out = nu::Button::Style::Recessed;
       return true;
     } else if (style == "rounded-disclosure") {
-      *out = nu::Button::Style::Recessed;
+      *out = nu::Button::Style::RoundedDisclosure;
       return true;
     } else if (style == "inline") {
       *out = nu::Button::Style::Inline;

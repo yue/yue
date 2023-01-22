@@ -8,3 +8,5 @@ enums:
   - name: Normal
   - name: Checkbox
   - name: Radio
+  - name: Disclosure
+    description: Only available on macOS.
