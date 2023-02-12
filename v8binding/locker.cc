@@ -9,7 +9,11 @@
 namespace vb {
 
 Locker::Locker(v8::Isolate* isolate) {
+#if V8_MAJOR_VERSION >= 10
+  if (v8::Locker::IsLocked(isolate))
+#else
   if (v8::Locker::IsActive())
+#endif
     locker_.reset(new v8::Locker(isolate));
 }
 

@@ -263,7 +263,11 @@ struct V8FunctionInvoker<v8::Local<v8::Value>(ArgTypes...)> {
       ThrowError(isolate, "The function has been garbage collected");
       return v8::Null(isolate);
     }
+#if V8_MAJOR_VERSION >= 10
+    auto context = func->GetCreationContextChecked();
+#else
     auto context = func->CreationContext();
+#endif
     std::vector<v8::Local<v8::Value>> args = {
         ToV8(context, std::forward<ArgTypes>(raw))...
     };
@@ -293,7 +297,11 @@ struct V8FunctionInvoker<void(ArgTypes...)> {
       ThrowError(isolate, "The function has been garbage collected");
       return;
     }
+#if V8_MAJOR_VERSION >= 10
+    auto context = func->GetCreationContextChecked();
+#else
     auto context = func->CreationContext();
+#endif
     std::vector<v8::Local<v8::Value>> args = {
         ToV8(context, std::forward<ArgTypes>(raw))...
     };
@@ -319,7 +327,11 @@ struct V8FunctionInvoker<ReturnType(ArgTypes...)> {
       ThrowError(isolate, "The function has been garbage collected");
       return ret;
     }
+#if V8_MAJOR_VERSION >= 10
+    auto context = func->GetCreationContextChecked();
+#else
     auto context = func->CreationContext();
+#endif
     std::vector<v8::Local<v8::Value>> args = {
         ToV8(context, std::forward<ArgTypes>(raw))...
     };

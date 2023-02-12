@@ -60,7 +60,6 @@ if (targetOs == 'win' && targetCpu.startsWith('arm'))
   process.exit(0)
 const runtimes = {
   node: nodeVersions,
-  electron: electronVersions,
 }
 for (let runtime in runtimes) {
   for (let nodever of runtimes[runtime])

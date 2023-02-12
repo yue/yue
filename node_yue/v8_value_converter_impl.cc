@@ -295,7 +295,12 @@ v8::Local<v8::Value> V8ValueConverterImpl::ToArrayBuffer(
     v8::Isolate* isolate,
     v8::Local<v8::Object> creation_context,
     const base::Value* value) const {
+#if V8_MAJOR_VERSION >= 10
+  DCHECK(creation_context->GetCreationContextChecked() ==
+       isolate->GetCurrentContext());
+#else
   DCHECK(creation_context->CreationContext() == isolate->GetCurrentContext());
+#endif
   v8::MaybeLocal<v8::Object> buffer = node::Buffer::Copy(
       isolate,
       reinterpret_cast<const char *>(value->GetBlob().data()),
@@ -397,9 +402,16 @@ std::unique_ptr<base::Value> V8ValueConverterImpl::FromV8Array(
   std::unique_ptr<v8::Context::Scope> scope;
   // If val was created in a different context than our current one, change to
   // that context, but change back after val is converted.
+#if V8_MAJOR_VERSION >= 10
+  v8::Local<v8::Context> creation_context;
+  if (val->GetCreationContext().ToLocal(&creation_context) &&
+      creation_context != isolate->GetCurrentContext())
+    scope = std::make_unique<v8::Context::Scope>(creation_context);
+#else
   if (!val->CreationContext().IsEmpty() &&
       val->CreationContext() != isolate->GetCurrentContext())
     scope.reset(new v8::Context::Scope(val->CreationContext()));
+#endif
 
   std::unique_ptr<base::ListValue> result(new base::ListValue());
 
@@ -458,9 +470,16 @@ std::unique_ptr<base::Value> V8ValueConverterImpl::FromV8Object(
   std::unique_ptr<v8::Context::Scope> scope;
   // If val was created in a different context than our current one, change to
   // that context, but change back after val is converted.
+#if V8_MAJOR_VERSION >= 10
+  v8::Local<v8::Context> creation_context;
+  if (val->GetCreationContext().ToLocal(&creation_context) &&
+      creation_context != isolate->GetCurrentContext())
+    scope = std::make_unique<v8::Context::Scope>(creation_context);
+#else
   if (!val->CreationContext().IsEmpty() &&
       val->CreationContext() != isolate->GetCurrentContext())
     scope.reset(new v8::Context::Scope(val->CreationContext()));
+#endif
 
   // Don't consider DOM objects. This check matches isHostObject() in Blink's
   // bindings/v8/V8Binding.h used in structured cloning. It reads:

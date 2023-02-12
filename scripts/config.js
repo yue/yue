@@ -7,13 +7,12 @@ const webview2Version = '1.0.622.22'
 const nodeVersions = [
   '14.19.1',
   '16.15.0',
-  '17.9.0',
+  '18.14.0',
+  '19.6.0',
 ]
 const electronVersions = [
-  '15.5.2',
-  '16.2.3',
-  '17.4.1',
-  '18.1.0',
+  '20.3.12',
+  '21.4.1',
 ]
 const luaVersions = [
   '5.3.6',

@@ -2348,7 +2348,11 @@ struct Type<nu::Browser> {
                                        v8::MicrotasksScope::kRunMicrotasks);
       auto func = func_ref->Get(isolate);
       DCHECK(!func.IsEmpty());
+#if V8_MAJOR_VERSION >= 10
+      auto context = func->GetCreationContextChecked();
+#else
       auto context = func->CreationContext();
+#endif
       std::vector<v8::Local<v8::Value>> args;
       args.reserve(value.GetList().size());
       for (const auto& it : value.GetList())
