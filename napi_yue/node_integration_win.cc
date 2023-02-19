@@ -3,11 +3,11 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "node_yue/node_integration_win.h"
+#include "napi_yue/node_integration_win.h"
 
 #include <windows.h>
 
-namespace node_yue {
+namespace napi_yue {
 
 NodeIntegrationWin::NodeIntegrationWin() {
 }
@@ -43,4 +43,4 @@ NodeIntegration* NodeIntegration::Create() {
   return new NodeIntegrationWin();
 }
 
-}  // namespace node_yue
+}  // namespace napi_yue

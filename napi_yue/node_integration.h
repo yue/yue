@@ -3,18 +3,17 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef NODE_YUE_NODE_INTEGRATION_H_
-#define NODE_YUE_NODE_INTEGRATION_H_
+#ifndef NAPI_YUE_NODE_INTEGRATION_H_
+#define NAPI_YUE_NODE_INTEGRATION_H_
 
 #include "base/memory/weak_ptr.h"
 #include "uv.h"  // NOLINT
-#include "v8.h"  // NOLINT
 
 namespace nu {
 class Lifetime;
 }
 
-namespace node_yue {
+namespace napi_yue {
 
 class NodeIntegration {
  public:
@@ -65,6 +64,6 @@ class NodeIntegration {
   base::WeakPtrFactory<NodeIntegration> weak_factory_;
 };
 
-}  // namespace node_yue
+}  // namespace napi_yue
 
-#endif  // NODE_YUE_NODE_INTEGRATION_H_
+#endif  // NAPI_YUE_NODE_INTEGRATION_H_

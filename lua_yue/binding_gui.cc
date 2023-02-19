@@ -18,6 +18,40 @@
 namespace lua {
 
 template<>
+struct Type<nu::Accelerator> {
+  static constexpr const char* name = "Accelerator";
+  static inline bool To(State* state, int index, nu::Accelerator* out) {
+    std::string description;
+    if (!lua::To(state, index, &description))
+      return false;
+    nu::Accelerator tmp(description);
+    if (tmp.IsEmpty())
+      return false;
+    *out = tmp;
+    return true;
+  }
+};
+
+template<>
+struct Type<nu::Buffer> {
+  static constexpr const char* name = "Buffer";
+  static inline void Push(State* state, const nu::Buffer& value) {
+    lua_pushlstring(state, static_cast<char*>(value.content()), value.size());
+  }
+  static inline bool To(State* state, int index, nu::Buffer* out) {
+    if (GetType(state, index) != LuaType::String)
+      return false;
+    size_t size = 0;
+    const char* str = lua_tolstring(state, index, &size);
+    if (!str)
+      return false;
+    // We are assuming the Buffer is consumed immediately.
+    *out = nu::Buffer::Wrap(str, size);
+    return true;
+  }
+};
+
+template<>
 struct Type<base::FilePath> {
   static constexpr const char* name = "FilePath";
   static inline void Push(State* state, const base::FilePath& value) {
@@ -44,41 +78,6 @@ struct Type<base::Time> {
       return false;
     *out = base::Time::FromTimeT(integer);
     return true;
-  }
-};
-
-template<>
-struct Type<nu::Buffer> {
-  static constexpr const char* name = "Buffer";
-  static inline void Push(State* state, const nu::Buffer& value) {
-    lua_pushlstring(state, static_cast<char*>(value.content()), value.size());
-  }
-  static inline bool To(State* state, int index, nu::Buffer* out) {
-    if (GetType(state, index) != LuaType::String)
-      return false;
-    size_t size = 0;
-    const char* str = lua_tolstring(state, index, &size);
-    if (!str)
-      return false;
-    // We are assuming the Buffer is consumed immediately.
-    *out = nu::Buffer::Wrap(str, size);
-    return true;
-  }
-};
-
-template<>
-struct Type<nu::Display> {
-  static constexpr const char* name = "Display";
-  static inline void Push(State* state, const nu::Display& display) {
-    lua::NewTable(state);
-    lua::RawSet(state, -1,
-                "id", display.id,
-                "scalefactor", display.scale_factor,
-#if defined(OS_MAC)
-                "internal", display.internal,
-#endif
-                "bounds", display.bounds,
-                "workarea", display.work_area);
   }
 };
 
@@ -198,6 +197,22 @@ struct Type<nu::PointF> {
 };
 
 template<>
+struct Type<nu::Display> {
+  static constexpr const char* name = "Display";
+  static inline void Push(State* state, const nu::Display& display) {
+    lua::NewTable(state);
+    lua::RawSet(state, -1,
+                "id", display.id,
+                "scalefactor", display.scale_factor,
+#if defined(OS_MAC)
+                "internal", display.internal,
+#endif
+                "bounds", display.bounds,
+                "workarea", display.work_area);
+  }
+};
+
+template<>
 struct Type<nu::ImageScale> {
   static constexpr const char* name = "ImageScale";
   static inline bool To(State* state, int index, nu::ImageScale* out) {
@@ -237,6 +252,14 @@ struct Type<nu::ImageScale> {
 };
 
 template<>
+struct Type<nu::KeyboardCode> {
+  static constexpr const char* name = "KeyboardCode";
+  static inline void Push(State* state, nu::KeyboardCode code) {
+    lua::Push(state, nu::KeyboardCodeToStr(code));
+  }
+};
+
+template<>
 struct Type<nu::Orientation> {
   static constexpr const char* name = "Orientation";
   static inline bool To(State* state, int index, nu::Orientation* out) {
@@ -266,66 +289,62 @@ struct Type<nu::Orientation> {
 };
 
 template<>
-struct Type<nu::Accelerator> {
-  static constexpr const char* name = "Accelerator";
-  static inline bool To(State* state, int index, nu::Accelerator* out) {
-    std::string description;
-    if (!lua::To(state, index, &description))
+struct Type<nu::TextAlign> {
+  static constexpr const char* name = "TextAlign";
+  static inline bool To(State* state, int value, nu::TextAlign* out) {
+    base::StringPiece align;
+    if (!lua::To(state, value, &align))
       return false;
-    nu::Accelerator tmp(description);
-    if (tmp.IsEmpty())
+    if (align == "start")
+      *out = nu::TextAlign::Start;
+    else if (align == "center")
+      *out = nu::TextAlign::Center;
+    else if (align == "end")
+      *out = nu::TextAlign::End;
+    else
       return false;
-    *out = tmp;
     return true;
   }
-};
-
-#if defined(OS_MAC)
-template<>
-struct Type<nu::Lifetime::Reply> {
-  static constexpr const char* name = "Lifetime::Reply";
-  static inline bool To(State* state, int index, nu::Lifetime::Reply* out) {
-    std::string reply;
-    if (!lua::To(state, index, &reply))
-      return false;
-    if (reply == "success") {
-      *out = nu::Lifetime::Reply::Success;
-      return true;
-    } else if (reply == "cancel") {
-      *out = nu::Lifetime::Reply::Cancel;
-      return true;
-    } else if (reply == "failure") {
-      *out = nu::Lifetime::Reply::Failure;
-      return true;
-    } else {
-      return false;
+  static inline void Push(State* state, nu::TextAlign align) {
+    switch (align) {
+      case nu::TextAlign::Center:
+        lua::Push(state, "center");
+        break;
+      case nu::TextAlign::End:
+        lua::Push(state, "end");
+        break;
+      default:
+        lua::Push(state, "start");
+        break;
     }
   }
 };
-#endif
 
 template<>
-struct Type<nu::Lifetime> {
-  static constexpr const char* name = "Lifetime";
-  static void BuildMetaTable(State* state, int index) {
-#if defined(OS_MAC)
-    RawSetProperty(state, index,
-                   "onready", &nu::Lifetime::on_ready,
-                   "onactivate", &nu::Lifetime::on_activate,
-                   "openfiles", &nu::Lifetime::open_files);
-#endif
+struct Type<nu::TextFormat> {
+  static constexpr const char* name = "TextFormat";
+  static inline bool To(State* state, int index, nu::TextFormat* out) {
+    if (GetType(state, index) != LuaType::Table)
+      return false;
+    return ReadOptions(state, index,
+                       "align", &out->align, "valign", &out->valign,
+                       "wrap", &out->wrap, "ellipsis", &out->ellipsis);
+  }
+  static inline void Push(State* state, const nu::TextFormat& options) {
+    NewTable(state, 0, 4);
+    RawSet(state, -1, "align", options.align, "valign", options.valign,
+                      "wrap", options.wrap, "ellipsis", options.ellipsis);
   }
 };
 
 template<>
-struct Type<nu::MessageLoop> {
-  static constexpr const char* name = "MessageLoop";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index,
-           "run", &nu::MessageLoop::Run,
-           "quit", &nu::MessageLoop::Quit,
-           "posttask", &nu::MessageLoop::PostTask,
-           "postdelayedtask", &nu::MessageLoop::PostDelayedTask);
+struct Type<nu::TextAttributes> {
+  static constexpr const char* name = "TextAttributes";
+  static inline bool To(State* state, int index, nu::TextAttributes* out) {
+    if (!Type<nu::TextFormat>::To(state, index, out))
+      return false;
+    return ReadOptions(state, index,
+                       "font", &out->font, "color", &out->color);
   }
 };
 
@@ -437,8 +456,6 @@ struct Type<nu::AttributedText> {
            "create", &CreateOnHeap<nu::AttributedText,
                                    const std::string&,
                                    nu::TextAttributes>,
-           "setformat", &nu::AttributedText::SetFormat,
-           "getformat", &nu::AttributedText::GetFormat,
            "setfont", &nu::AttributedText::SetFont,
 #if !defined(OS_WIN)
            "setfontfor", &SetFontFor,
@@ -449,6 +466,8 @@ struct Type<nu::AttributedText> {
 #endif
            "clear", &nu::AttributedText::Clear,
            "getboundsfor", &nu::AttributedText::GetBoundsFor,
+           "setformat", &nu::AttributedText::SetFormat,
+           "getformat", &nu::AttributedText::GetFormat,
            "settext", &nu::AttributedText::SetText,
            "gettext", &nu::AttributedText::GetText);
   }
@@ -465,120 +484,209 @@ struct Type<nu::AttributedText> {
 };
 
 template<>
-struct Type<nu::Font::Weight> {
-  static constexpr const char* name = "FontWeight";
-  static inline bool To(State* state, int index, nu::Font::Weight* out) {
-    std::string weight;
-    if (!lua::To(state, index, &weight))
+struct Type<nu::Browser::Options> {
+  static constexpr const char* name = "BrowserOptions";
+  static inline bool To(State* state, int index, nu::Browser::Options* out) {
+    if (GetType(state, index) != LuaType::Table)
       return false;
-    if (weight == "thin") {
-      *out = nu::Font::Weight::Thin;
-      return true;
-    } else if (weight == "extra-light") {
-      *out = nu::Font::Weight::ExtraLight;
-      return true;
-    } else if (weight == "light") {
-      *out = nu::Font::Weight::Light;
-      return true;
-    } else if (weight == "normal") {
-      *out = nu::Font::Weight::Normal;
-      return true;
-    } else if (weight == "medium") {
-      *out = nu::Font::Weight::Medium;
-      return true;
-    } else if (weight == "semi-bold") {
-      *out = nu::Font::Weight::SemiBold;
-      return true;
-    } else if (weight == "bold") {
-      *out = nu::Font::Weight::Bold;
-      return true;
-    } else if (weight == "extra-bold") {
-      *out = nu::Font::Weight::ExtraBold;
-      return true;
-    } else if (weight == "black") {
-      *out = nu::Font::Weight::Black;
-      return true;
-    } else {
-      return false;
-    }
-  }
-  static inline void Push(State* state, nu::Font::Weight weight) {
-    switch (weight) {
-      case nu::Font::Weight::Thin:
-        lua::Push(state, "thin");
-        break;
-      case nu::Font::Weight::ExtraLight:
-        lua::Push(state, "extra-light");
-        break;
-      case nu::Font::Weight::Light:
-        lua::Push(state, "light");
-        break;
-      case nu::Font::Weight::Normal:
-        lua::Push(state, "normal");
-        break;
-      case nu::Font::Weight::Medium:
-        lua::Push(state, "medium");
-        break;
-      case nu::Font::Weight::SemiBold:
-        lua::Push(state, "semi-bold");
-        break;
-      case nu::Font::Weight::Bold:
-        lua::Push(state, "bold");
-        break;
-      case nu::Font::Weight::ExtraBold:
-        lua::Push(state, "extra-bold");
-        break;
-      case nu::Font::Weight::Black:
-        lua::Push(state, "black");
-        break;
-    }
+    return ReadOptions(
+        state, index,
+#if defined(OS_MAC) || defined(OS_LINUX)
+        "allowfileaccessfromfiles", &out->allow_file_access_from_files,
+#endif
+#if defined(OS_LINUX)
+        "hardwareacceleration", &out->hardware_acceleration,
+#endif
+#if defined(OS_WIN) && defined(WEBVIEW2_SUPPORT)
+        "webview2support", &out->webview2_support,
+#endif
+        "devtools", &out->devtools,
+        "contextmenu", &out->context_menu);
   }
 };
 
 template<>
-struct Type<nu::Font::Style> {
-  static constexpr const char* name = "FontStyle";
-  static inline bool To(State* state, int index, nu::Font::Style* out) {
+struct Type<nu::Browser> {
+  using Base = nu::View;
+  static constexpr const char* name = "Browser";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateOnHeap<nu::Browser, nu::Browser::Options>,
+           "registerprotocol", &nu::Browser::RegisterProtocol,
+           "unregisterprotocol", &nu::Browser::UnregisterProtocol,
+           "loadurl", &nu::Browser::LoadURL,
+           "loadhtml", &nu::Browser::LoadHTML,
+           "geturl", &nu::Browser::GetURL,
+           "gettitle", &nu::Browser::GetTitle,
+           "setuseragent", &nu::Browser::SetUserAgent,
+#if defined(OS_MAC)
+           "ismagnifiable", &nu::Browser::IsMagnifiable,
+           "setmagnifiable", &nu::Browser::SetMagnifiable,
+#endif
+           "executejavascript", &nu::Browser::ExecuteJavaScript,
+           "goback", &nu::Browser::GoBack,
+           "cangoback", &nu::Browser::CanGoBack,
+           "goforward", &nu::Browser::GoForward,
+           "cangoforward", &nu::Browser::CanGoForward,
+           "reload", &nu::Browser::Reload,
+           "stop", &nu::Browser::Stop,
+           "isloading", &nu::Browser::IsLoading,
+           "setbindingname", &nu::Browser::SetBindingName,
+           "addbinding", &AddBinding,
+           "addrawbinding", &nu::Browser::AddRawBinding,
+           "removebinding", &nu::Browser::RemoveBinding);
+    RawSetProperty(state, metatable,
+                   "onclose", &nu::Browser::on_close,
+                   "onupdatecommand", &nu::Browser::on_update_command,
+                   "onchangeloading", &nu::Browser::on_change_loading,
+                   "onupdatetitle", &nu::Browser::on_update_title,
+                   "onstartnavigation", &nu::Browser::on_start_navigation,
+                   "oncommitnavigation", &nu::Browser::on_commit_navigation,
+                   "onfinishnavigation", &nu::Browser::on_finish_navigation,
+                   "onfailnavigation", &nu::Browser::on_fail_navigation);
+  }
+  static void AddBinding(CallContext* context,
+                         nu::Browser* browser,
+                         const std::string& bname) {
+    State* state = context->state;
+    if (GetType(state, 3) != LuaType::Function) {
+      Push(state, "The arg 3 should be function");
+      context->has_error = true;
+      return;
+    }
+    // Persistent the function and pass it to lambda.
+    auto ref = std::make_shared<Persistent>(state, 3);
+    browser->AddRawBinding(bname, [state, ref](nu::Browser* browser,
+                                               ::base::Value value) {
+      ref->Push();
+      for (const auto& it : value.GetList())
+        Push(state, it);
+      lua_pcall(state, static_cast<int>(value.GetList().size()), 0, 0);
+    });
+  }
+};
+
+#if defined(OS_MAC)
+template<>
+struct Type<nu::Button::Style> {
+  static constexpr const char* name = "ButtonStyle";
+  static bool To(State* state, int index, nu::Button::Style* out) {
     std::string style;
     if (!lua::To(state, index, &style))
       return false;
-    if (style == "normal") {
-      *out = nu::Font::Style::Normal;
+    if (style == "rounded") {
+      *out = nu::Button::Style::Rounded;
       return true;
-    } else if (style == "italic") {
-      *out = nu::Font::Style::Italic;
+    } else if (style == "regular-square") {
+      *out = nu::Button::Style::RegularSquare;
+      return true;
+    } else if (style == "thick-square") {
+      *out = nu::Button::Style::ThickSquare;
+      return true;
+    } else if (style == "thicker-square") {
+      *out = nu::Button::Style::ThickerSquare;
+      return true;
+    } else if (style == "disclosure") {
+      *out = nu::Button::Style::Disclosure;
+      return true;
+    } else if (style == "shadowless-square") {
+      *out = nu::Button::Style::ShadowlessSquare;
+      return true;
+    } else if (style == "circular") {
+      *out = nu::Button::Style::Circular;
+      return true;
+    } else if (style == "textured-square") {
+      *out = nu::Button::Style::TexturedSquare;
+      return true;
+    } else if (style == "help-button") {
+      *out = nu::Button::Style::HelpButton;
+      return true;
+    } else if (style == "small-square") {
+      *out = nu::Button::Style::SmallSquare;
+      return true;
+    } else if (style == "textured-rounded") {
+      *out = nu::Button::Style::TexturedRounded;
+      return true;
+    } else if (style == "round-rect") {
+      *out = nu::Button::Style::RoundRect;
+      return true;
+    } else if (style == "recessed") {
+      *out = nu::Button::Style::Recessed;
+      return true;
+    } else if (style == "rounded-disclosure") {
+      *out = nu::Button::Style::RoundedDisclosure;
+      return true;
+    } else if (style == "inline") {
+      *out = nu::Button::Style::Inline;
       return true;
     } else {
       return false;
     }
   }
-  static inline void Push(State* state, nu::Font::Style style) {
-    switch (style) {
-      case nu::Font::Style::Normal:
-        lua::Push(state, "normal");
-        break;
-      case nu::Font::Style::Italic:
-        lua::Push(state, "italic");
-        break;
+};
+#endif
+
+template<>
+struct Type<nu::Button::Type> {
+  static constexpr const char* name = "ButtonType";
+  static bool To(State* state, int index, nu::Button::Type* out) {
+    std::string type;
+    if (!lua::To(state, index, &type))
+      return false;
+    if (type.empty() || type == "normal") {
+      *out = nu::Button::Type::Normal;
+      return true;
+    } else if (type == "checkbox") {
+      *out = nu::Button::Type::Checkbox;
+      return true;
+    } else if (type == "radio") {
+      *out = nu::Button::Type::Radio;
+      return true;
+#if defined(OS_MAC)
+    } else if (type == "disclosure") {
+      *out = nu::Button::Type::Disclosure;
+      return true;
+#endif
+    } else {
+      return false;
     }
   }
 };
 
 template<>
-struct Type<nu::Font> {
-  static constexpr const char* name = "Font";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index,
-           "create", &CreateOnHeap<nu::Font, const std::string&, float,
-                                   nu::Font::Weight, nu::Font::Style>,
-           "createfrompath", &CreateOnHeap<nu::Font, const base::FilePath&,
-                                           float>,
-           "default", &nu::Font::Default,
-           "derive", &nu::Font::Derive,
-           "getname", &nu::Font::GetName,
-           "getsize", &nu::Font::GetSize,
-           "getweight", &nu::Font::GetWeight,
-           "getstyle", &nu::Font::GetStyle);
+struct Type<nu::Button> {
+  using Base = nu::View;
+  static constexpr const char* name = "Button";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &Create,
+           "makedefault", &nu::Button::MakeDefault,
+           "settitle", &nu::Button::SetTitle,
+           "gettitle", &nu::Button::GetTitle,
+#if defined(OS_MAC)
+           "setbuttonstyle", &nu::Button::SetButtonStyle,
+           "sethasborder", &nu::Button::SetHasBorder,
+           "hasborder", &nu::Button::HasBorder,
+#endif
+           "setchecked", &nu::Button::SetChecked,
+           "ischecked", &nu::Button::IsChecked,
+           "setimage", &nu::Button::SetImage,
+           "getimage", &nu::Button::GetImage);
+    RawSetProperty(state, metatable, "onclick", &nu::Button::on_click);
+  }
+  static nu::Button* Create(CallContext* context) {
+    std::string title;
+    if (To(context->state, 1, &title)) {
+      return new nu::Button(title);
+    } else if (GetType(context->state, 1) == LuaType::Table) {
+      nu::Button::Type type = nu::Button::Type::Normal;
+      ReadOptions(context->state, 1, "title", &title, "type", &type);
+      return new nu::Button(title, type);
+    } else {
+      context->has_error = true;
+      Push(context->state, "Button must be created with string or table");
+      return nullptr;
+    }
   }
 };
 
@@ -797,6 +905,51 @@ struct Type<nu::Color> {
 };
 
 template<>
+struct Type<nu::ComboBox> {
+  using Base = nu::Picker;
+  static constexpr const char* name = "ComboBox";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "create", &CreateOnHeap<nu::ComboBox>,
+           "settext", &nu::ComboBox::SetText,
+           "gettext", &nu::ComboBox::GetText);
+    RawSetProperty(state, index,
+                   "ontextchange", &nu::ComboBox::on_text_change);
+  }
+};
+
+template<>
+struct Type<nu::Container> {
+  using Base = nu::View;
+  static constexpr const char* name = "Container";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "create", &CreateOnHeap<nu::Container>,
+           "getpreferredsize", &nu::Container::GetPreferredSize,
+           "getpreferredwidthforheight",
+           &nu::Container::GetPreferredWidthForHeight,
+           "getpreferredheightforwidth",
+           &nu::Container::GetPreferredHeightForWidth,
+           "addchildview",
+           RefMethod(state, &nu::Container::AddChildView, RefType::Ref),
+           "addchildviewat",
+           RefMethod(state, &AddChildViewAt, RefType::Ref),
+           "removechildview",
+           RefMethod(state, &nu::Container::RemoveChildView, RefType::Deref),
+           "childcount", &nu::Container::ChildCount,
+           "childat", &ChildAt);
+    RawSetProperty(state, index, "ondraw", &nu::Container::on_draw);
+  }
+  // Transalte 1-based index to 0-based.
+  static inline void AddChildViewAt(nu::Container* c, nu::View* view, int i) {
+    c->AddChildViewAt(view, i - 1);
+  }
+  static inline nu::View* ChildAt(nu::Container* container, int i) {
+    return container->ChildAt(i - 1);
+  }
+};
+
+template<>
 struct Type<nu::Cursor::Type> {
   static constexpr const char* name = "CursorType";
   static inline bool To(State* state, int index, nu::Cursor::Type* out) {
@@ -855,6 +1008,44 @@ struct Type<nu::Cursor> {
 };
 
 template<>
+struct Type<nu::DatePicker::Options> {
+  static constexpr const char* name = "DatePickerOptions";
+  static inline bool To(State* state, int index, nu::DatePicker::Options* out) {
+    if (GetType(state, index) != LuaType::Table)
+      return false;
+    return ReadOptions(state, index,
+                       "elements", &out->elements,
+                       "hasstepper", &out->has_stepper);
+  }
+};
+
+template<>
+struct Type<nu::DatePicker> {
+  using Base = nu::View;
+  static constexpr const char* name = "DatePicker";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "elementyearmonth",
+           static_cast<int>(nu::DatePicker::ELEMENT_YEAR_MONTH),
+           "elementyearmonthday",
+           static_cast<int>(nu::DatePicker::ELEMENT_YEAR_MONTH_DAY),
+           "elementhourminute",
+           static_cast<int>(nu::DatePicker::ELEMENT_HOUR_MINUTE),
+           "elementhourminutesecond",
+           static_cast<int>(nu::DatePicker::ELEMENT_HOUR_MINUTE_SECOND),
+           "create",
+           &CreateOnHeap<nu::DatePicker, const nu::DatePicker::Options&>,
+           "setdate", &nu::DatePicker::SetDate,
+           "getdate", &nu::DatePicker::GetDate,
+           "setrange", &nu::DatePicker::SetRange,
+           "getrange", &nu::DatePicker::GetRange,
+           "hasstepper", &nu::DatePicker::HasStepper);
+    RawSetProperty(state, metatable,
+                   "ondatechange", &nu::DatePicker::on_date_change);
+  }
+};
+
+template<>
 struct Type<nu::DraggingInfo> {
   static constexpr const char* name = "DraggingInfo";
   static void BuildMetaTable(State* state, int index) {
@@ -880,115 +1071,35 @@ struct Type<nu::DragOptions> {
 };
 
 template<>
-struct Type<nu::Image> {
-  static constexpr const char* name = "Image";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index,
-           "createempty", &CreateOnHeap<nu::Image>,
-           "createfrompath", &CreateOnHeap<nu::Image, const base::FilePath&>,
-           "createfrombuffer", &CreateOnHeap<nu::Image,
-                                             const nu::Buffer&,
-                                             float>,
-           "isempty", &nu::Image::IsEmpty,
-           "getsize", &nu::Image::GetSize,
-           "getscalefactor", &nu::Image::GetScaleFactor);
-  }
-};
-
-template<>
-struct Type<nu::TextAlign> {
-  static constexpr const char* name = "TextAlign";
-  static inline bool To(State* state, int value, nu::TextAlign* out) {
-    base::StringPiece align;
-    if (!lua::To(state, value, &align))
+struct Type<nu::Entry::Type> {
+  static constexpr const char* name = "EntryType";
+  static bool To(State* state, int index, nu::Entry::Type* out) {
+    std::string type;
+    if (!lua::To(state, index, &type))
       return false;
-    if (align == "start")
-      *out = nu::TextAlign::Start;
-    else if (align == "center")
-      *out = nu::TextAlign::Center;
-    else if (align == "end")
-      *out = nu::TextAlign::End;
+    if (type == "normal")
+      *out = nu::Entry::Type::Normal;
+    else if (type == "password")
+      *out = nu::Entry::Type::Password;
     else
       return false;
     return true;
   }
-  static inline void Push(State* state, nu::TextAlign align) {
-    switch (align) {
-      case nu::TextAlign::Center:
-        lua::Push(state, "center");
-        break;
-      case nu::TextAlign::End:
-        lua::Push(state, "end");
-        break;
-      default:
-        lua::Push(state, "start");
-        break;
-    }
-  }
 };
 
 template<>
-struct Type<nu::TextFormat> {
-  static constexpr const char* name = "TextFormat";
-  static inline bool To(State* state, int index, nu::TextFormat* out) {
-    if (GetType(state, index) != LuaType::Table)
-      return false;
-    return ReadOptions(state, index,
-                       "align", &out->align, "valign", &out->valign,
-                       "wrap", &out->wrap, "ellipsis", &out->ellipsis);
-  }
-  static inline void Push(State* state, const nu::TextFormat& options) {
-    NewTable(state, 0, 4);
-    RawSet(state, -1, "align", options.align, "valign", options.valign,
-                      "wrap", options.wrap, "ellipsis", options.ellipsis);
-  }
-};
-
-template<>
-struct Type<nu::TextAttributes> {
-  static constexpr const char* name = "TextAttributes";
-  static inline bool To(State* state, int index, nu::TextAttributes* out) {
-    if (!Type<nu::TextFormat>::To(state, index, out))
-      return false;
-    return ReadOptions(state, index,
-                       "font", &out->font, "color", &out->color);
-  }
-};
-
-template<>
-struct Type<nu::Painter> {
-  static constexpr const char* name = "Painter";
+struct Type<nu::Entry> {
+  using Base = nu::View;
+  static constexpr const char* name = "Entry";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
-           "save", &nu::Painter::Save,
-           "restore", &nu::Painter::Restore,
-           "beginpath", &nu::Painter::BeginPath,
-           "closepath", &nu::Painter::ClosePath,
-           "moveto", &nu::Painter::MoveTo,
-           "lineto", &nu::Painter::LineTo,
-           "beziercurveto", &nu::Painter::BezierCurveTo,
-           "arc", &nu::Painter::Arc,
-           "rect", &nu::Painter::Rect,
-           "clip", &nu::Painter::Clip,
-           "cliprect", &nu::Painter::ClipRect,
-           "translate", &nu::Painter::Translate,
-           "rotate", &nu::Painter::Rotate,
-           "scale", &nu::Painter::Scale,
-           "setcolor", &nu::Painter::SetColor,
-           "setstrokecolor", &nu::Painter::SetStrokeColor,
-           "setfillcolor", &nu::Painter::SetFillColor,
-           "setlinewidth", &nu::Painter::SetLineWidth,
-           "stroke", &nu::Painter::Stroke,
-           "fill", &nu::Painter::Fill,
-           "clear", &nu::Painter::Clear,
-           "strokerect", &nu::Painter::StrokeRect,
-           "fillrect", &nu::Painter::FillRect,
-           "drawimage", &nu::Painter::DrawImage,
-           "drawimagefromrect", &nu::Painter::DrawImageFromRect,
-           "drawcanvas", &nu::Painter::DrawCanvas,
-           "drawcanvasfromrect", &nu::Painter::DrawCanvasFromRect,
-           "drawattributedtext", &nu::Painter::DrawAttributedText,
-           "drawtext", &nu::Painter::DrawText);
+           "create", &CreateOnHeap<nu::Entry>,
+           "createtype", &CreateOnHeap<nu::Entry, nu::Entry::Type>,
+           "settext", &nu::Entry::SetText,
+           "gettext", &nu::Entry::GetText);
+    RawSetProperty(state, metatable,
+                   "onactivate", &nu::Entry::on_activate,
+                   "ontextchange", &nu::Entry::on_text_change);
   }
 };
 
@@ -1052,7 +1163,7 @@ struct Type<nu::Event> {
 
 template<>
 struct Type<nu::MouseEvent> {
-  using base = nu::Event;
+  using Base = nu::Event;
   static constexpr const char* name = "MouseEvent";
   static inline void Push(State* state, const nu::MouseEvent& event) {
     NewTable(state);
@@ -1065,16 +1176,8 @@ struct Type<nu::MouseEvent> {
 };
 
 template<>
-struct Type<nu::KeyboardCode> {
-  static constexpr const char* name = "KeyboardCode";
-  static inline void Push(State* state, nu::KeyboardCode code) {
-    lua::Push(state, nu::KeyboardCodeToStr(code));
-  }
-};
-
-template<>
 struct Type<nu::KeyEvent> {
-  using base = nu::Event;
+  using Base = nu::Event;
   static constexpr const char* name = "KeyEvent";
   static inline void Push(State* state, const nu::KeyEvent& event) {
     NewTable(state);
@@ -1129,7 +1232,7 @@ struct Type<nu::FileDialog> {
 
 template<>
 struct Type<nu::FileOpenDialog> {
-  using base = nu::FileDialog;
+  using Base = nu::FileDialog;
   static constexpr const char* name = "FileOpenDialog";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
@@ -1140,11 +1243,290 @@ struct Type<nu::FileOpenDialog> {
 
 template<>
 struct Type<nu::FileSaveDialog> {
-  using base = nu::FileDialog;
+  using Base = nu::FileDialog;
   static constexpr const char* name = "FileSaveDialog";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::FileSaveDialog>);
+  }
+};
+
+template<>
+struct Type<nu::Font::Weight> {
+  static constexpr const char* name = "FontWeight";
+  static inline bool To(State* state, int index, nu::Font::Weight* out) {
+    std::string weight;
+    if (!lua::To(state, index, &weight))
+      return false;
+    if (weight == "thin") {
+      *out = nu::Font::Weight::Thin;
+      return true;
+    } else if (weight == "extra-light") {
+      *out = nu::Font::Weight::ExtraLight;
+      return true;
+    } else if (weight == "light") {
+      *out = nu::Font::Weight::Light;
+      return true;
+    } else if (weight == "normal") {
+      *out = nu::Font::Weight::Normal;
+      return true;
+    } else if (weight == "medium") {
+      *out = nu::Font::Weight::Medium;
+      return true;
+    } else if (weight == "semi-bold") {
+      *out = nu::Font::Weight::SemiBold;
+      return true;
+    } else if (weight == "bold") {
+      *out = nu::Font::Weight::Bold;
+      return true;
+    } else if (weight == "extra-bold") {
+      *out = nu::Font::Weight::ExtraBold;
+      return true;
+    } else if (weight == "black") {
+      *out = nu::Font::Weight::Black;
+      return true;
+    } else {
+      return false;
+    }
+  }
+  static inline void Push(State* state, nu::Font::Weight weight) {
+    switch (weight) {
+      case nu::Font::Weight::Thin:
+        lua::Push(state, "thin");
+        break;
+      case nu::Font::Weight::ExtraLight:
+        lua::Push(state, "extra-light");
+        break;
+      case nu::Font::Weight::Light:
+        lua::Push(state, "light");
+        break;
+      case nu::Font::Weight::Normal:
+        lua::Push(state, "normal");
+        break;
+      case nu::Font::Weight::Medium:
+        lua::Push(state, "medium");
+        break;
+      case nu::Font::Weight::SemiBold:
+        lua::Push(state, "semi-bold");
+        break;
+      case nu::Font::Weight::Bold:
+        lua::Push(state, "bold");
+        break;
+      case nu::Font::Weight::ExtraBold:
+        lua::Push(state, "extra-bold");
+        break;
+      case nu::Font::Weight::Black:
+        lua::Push(state, "black");
+        break;
+    }
+  }
+};
+
+template<>
+struct Type<nu::Font::Style> {
+  static constexpr const char* name = "FontStyle";
+  static inline bool To(State* state, int index, nu::Font::Style* out) {
+    std::string style;
+    if (!lua::To(state, index, &style))
+      return false;
+    if (style == "normal") {
+      *out = nu::Font::Style::Normal;
+      return true;
+    } else if (style == "italic") {
+      *out = nu::Font::Style::Italic;
+      return true;
+    } else {
+      return false;
+    }
+  }
+  static inline void Push(State* state, nu::Font::Style style) {
+    switch (style) {
+      case nu::Font::Style::Normal:
+        lua::Push(state, "normal");
+        break;
+      case nu::Font::Style::Italic:
+        lua::Push(state, "italic");
+        break;
+    }
+  }
+};
+
+template<>
+struct Type<nu::Font> {
+  static constexpr const char* name = "Font";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "create", &CreateOnHeap<nu::Font, const std::string&, float,
+                                   nu::Font::Weight, nu::Font::Style>,
+           "createfrompath", &CreateOnHeap<nu::Font, const base::FilePath&,
+                                           float>,
+           "default", &nu::Font::Default,
+           "derive", &nu::Font::Derive,
+           "getname", &nu::Font::GetName,
+           "getsize", &nu::Font::GetSize,
+           "getweight", &nu::Font::GetWeight,
+           "getstyle", &nu::Font::GetStyle);
+  }
+};
+
+template<>
+struct Type<nu::GifPlayer> {
+  using Base = nu::View;
+  static constexpr const char* name = "GifPlayer";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateOnHeap<nu::GifPlayer>,
+           "setimage", &nu::GifPlayer::SetImage,
+           "getimage", &nu::GifPlayer::GetImage,
+           "setanimating", &nu::GifPlayer::SetAnimating,
+           "isanimating", &nu::GifPlayer::IsAnimating,
+           "setscale", &nu::GifPlayer::SetScale,
+           "getscale", &nu::GifPlayer::GetScale);
+  }
+};
+
+template<>
+struct Type<nu::Group> {
+  using Base = nu::View;
+  static constexpr const char* name = "Group";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateOnHeap<nu::Group, const std::string&>,
+           "setcontentview",
+           RefMethod(state, &nu::Group::SetContentView,
+                     RefType::Reset, "content"),
+           "getcontentview", &nu::Group::GetContentView,
+           "settitle", &nu::Group::SetTitle,
+           "gettitle", &nu::Group::GetTitle);
+  }
+};
+
+template<>
+struct Type<nu::Image> {
+  static constexpr const char* name = "Image";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "createempty", &CreateOnHeap<nu::Image>,
+           "createfrompath", &CreateOnHeap<nu::Image, const base::FilePath&>,
+           "createfrombuffer", &CreateOnHeap<nu::Image,
+                                             const nu::Buffer&,
+                                             float>,
+           "isempty", &nu::Image::IsEmpty,
+           "getsize", &nu::Image::GetSize,
+           "getscalefactor", &nu::Image::GetScaleFactor);
+  }
+};
+
+template<>
+struct Type<nu::Label> {
+  using Base = nu::View;
+  static constexpr const char* name = "Label";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateOnHeap<nu::Label, const std::string&>,
+           "createwithattributedtext",
+           &CreateOnHeap<nu::Label, nu::AttributedText*>,
+           "settext", &nu::Label::SetText,
+           "gettext", &nu::Label::GetText,
+           "setalign", &nu::Label::SetAlign,
+           "setvalign", &nu::Label::SetVAlign,
+           "setattributedtext",
+           RefMethod(state, &nu::Label::SetAttributedText,
+                     RefType::Reset, "atext"),
+           "getattributedtext", &nu::Label::GetAttributedText);
+  }
+};
+
+#if defined(OS_MAC)
+template<>
+struct Type<nu::Lifetime::Reply> {
+  static constexpr const char* name = "Lifetime::Reply";
+  static inline bool To(State* state, int index, nu::Lifetime::Reply* out) {
+    std::string reply;
+    if (!lua::To(state, index, &reply))
+      return false;
+    if (reply == "success") {
+      *out = nu::Lifetime::Reply::Success;
+      return true;
+    } else if (reply == "cancel") {
+      *out = nu::Lifetime::Reply::Cancel;
+      return true;
+    } else if (reply == "failure") {
+      *out = nu::Lifetime::Reply::Failure;
+      return true;
+    } else {
+      return false;
+    }
+  }
+};
+#endif
+
+template<>
+struct Type<nu::Lifetime> {
+  static constexpr const char* name = "Lifetime";
+  static void BuildMetaTable(State* state, int index) {
+#if defined(OS_MAC)
+    RawSetProperty(state, index,
+                   "onready", &nu::Lifetime::on_ready,
+                   "onactivate", &nu::Lifetime::on_activate,
+                   "openfiles", &nu::Lifetime::open_files);
+#endif
+  }
+};
+
+template<>
+struct Type<nu::MessageBox::Type> {
+  static constexpr const char* name = "MessageBoxType";
+  static bool To(State* state, int index, nu::MessageBox::Type* out) {
+    std::string type;
+    if (!lua::To(state, index, &type))
+      return false;
+    if (type == "none")
+      *out = nu::MessageBox::Type::None;
+    else if (type == "information")
+      *out = nu::MessageBox::Type::Information;
+    else if (type == "warning")
+      *out = nu::MessageBox::Type::Warning;
+    else if (type == "error")
+      *out = nu::MessageBox::Type::Error;
+    else
+      return false;
+    return true;
+  }
+};
+
+template<>
+struct Type<nu::MessageBox> {
+  static constexpr const char* name = "MessageBox";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateOnHeap<nu::MessageBox>,
+           "run", &nu::MessageBox::Run,
+           "runforwindow", &nu::MessageBox::RunForWindow,
+#if defined(OS_LINUX) || defined(OS_WIN)
+           "show", &nu::MessageBox::Show,
+#endif
+           "showforwindow", &nu::MessageBox::ShowForWindow,
+           "close", &nu::MessageBox::Close,
+           "settype", &nu::MessageBox::SetType,
+#if defined(OS_LINUX) || defined(OS_WIN)
+           "settitle", &nu::MessageBox::SetTitle,
+#endif
+           "addbutton", &nu::MessageBox::AddButton,
+           "setdefaultresponse", &nu::MessageBox::SetDefaultResponse,
+           "setcancelresponse", &nu::MessageBox::SetCancelResponse,
+           "settext", &nu::MessageBox::SetText,
+           "setinformativetext", &nu::MessageBox::SetInformativeText,
+#if defined(OS_LINUX) || defined(OS_MAC)
+           "setaccessoryview",
+           RefMethod(state, &nu::MessageBox::SetAccessoryView,
+                     RefType::Reset, "accv"),
+           "getaccessoryview", &nu::MessageBox::GetAccessoryView,
+#endif
+           "setimage", &nu::MessageBox::SetImage,
+           "getimage", &nu::MessageBox::GetImage);
+    RawSetProperty(state, metatable,
+                   "onresponse", &nu::MessageBox::on_response);
   }
 };
 
@@ -1171,7 +1553,7 @@ void ReadMenuItems(State* state, int metatable, nu::MenuBase* menu);
 
 template<>
 struct Type<nu::MenuBar> {
-  using base = nu::MenuBase;
+  using Base = nu::MenuBase;
   static constexpr const char* name = "MenuBar";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
@@ -1186,7 +1568,7 @@ struct Type<nu::MenuBar> {
 
 template<>
 struct Type<nu::Menu> {
-  using base = nu::MenuBase;
+  using Base = nu::MenuBase;
   static constexpr const char* name = "Menu";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
@@ -1375,58 +1757,14 @@ void ReadMenuItems(State* state, int options, nu::MenuBase* menu) {
 }
 
 template<>
-struct Type<nu::MessageBox::Type> {
-  static constexpr const char* name = "MessageBoxType";
-  static bool To(State* state, int index, nu::MessageBox::Type* out) {
-    std::string type;
-    if (!lua::To(state, index, &type))
-      return false;
-    if (type == "none")
-      *out = nu::MessageBox::Type::None;
-    else if (type == "information")
-      *out = nu::MessageBox::Type::Information;
-    else if (type == "warning")
-      *out = nu::MessageBox::Type::Warning;
-    else if (type == "error")
-      *out = nu::MessageBox::Type::Error;
-    else
-      return false;
-    return true;
-  }
-};
-
-template<>
-struct Type<nu::MessageBox> {
-  static constexpr const char* name = "MessageBox";
-  static void BuildMetaTable(State* state, int metatable) {
-    RawSet(state, metatable,
-           "create", &CreateOnHeap<nu::MessageBox>,
-           "run", &nu::MessageBox::Run,
-           "runforwindow", &nu::MessageBox::RunForWindow,
-#if defined(OS_LINUX) || defined(OS_WIN)
-           "show", &nu::MessageBox::Show,
-#endif
-           "showforwindow", &nu::MessageBox::ShowForWindow,
-           "close", &nu::MessageBox::Close,
-           "settype", &nu::MessageBox::SetType,
-#if defined(OS_LINUX) || defined(OS_WIN)
-           "settitle", &nu::MessageBox::SetTitle,
-#endif
-           "addbutton", &nu::MessageBox::AddButton,
-           "setdefaultresponse", &nu::MessageBox::SetDefaultResponse,
-           "setcancelresponse", &nu::MessageBox::SetCancelResponse,
-           "settext", &nu::MessageBox::SetText,
-           "setinformativetext", &nu::MessageBox::SetInformativeText,
-#if defined(OS_LINUX) || defined(OS_MAC)
-           "setaccessoryview",
-           RefMethod(state, &nu::MessageBox::SetAccessoryView,
-                     RefType::Reset, "accv"),
-           "getaccessoryview", &nu::MessageBox::GetAccessoryView,
-#endif
-           "setimage", &nu::MessageBox::SetImage,
-           "getimage", &nu::MessageBox::GetImage);
-    RawSetProperty(state, metatable,
-                   "onresponse", &nu::MessageBox::on_response);
+struct Type<nu::MessageLoop> {
+  static constexpr const char* name = "MessageLoop";
+  static void BuildMetaTable(State* state, int index) {
+    RawSet(state, index,
+           "run", &nu::MessageLoop::Run,
+           "quit", &nu::MessageLoop::Quit,
+           "posttask", &nu::MessageLoop::PostTask,
+           "postdelayedtask", &nu::MessageLoop::PostDelayedTask);
   }
 };
 
@@ -1537,664 +1875,45 @@ struct Type<nu::NotificationCenter> {
 };
 
 template<>
-struct Type<nu::Tray> {
-  static constexpr const char* name = "Tray";
+struct Type<nu::Painter> {
+  static constexpr const char* name = "Painter";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
-#if defined(OS_MAC)
-           "createwithtitle", &CreateOnHeap<nu::Tray, const std::string&>,
-#endif
-           "createwithimage", &CreateOnHeap<nu::Tray, scoped_refptr<nu::Image>>,
-           "remove", &nu::Tray::Remove,
-#if defined(OS_MAC) || defined(OS_WIN)
-           "getbounds", &nu::Tray::GetBounds,
-#endif
-#if defined(OS_MAC) || defined(OS_LINUX)
-           "settitle", &nu::Tray::SetTitle,
-#endif
-           "setimage", &nu::Tray::SetImage,
-#if defined(OS_MAC)
-           "setpressedimage", &nu::Tray::SetPressedImage,
-#endif
-           "setmenu",
-           RefMethod(state, &nu::Tray::SetMenu, RefType::Reset, "menu"));
-    RawSetProperty(state, metatable, "onclick", &nu::Tray::on_click);
-  }
-};
-
-#if defined(OS_MAC)
-template<>
-struct Type<nu::Toolbar::Item> {
-  static constexpr const char* name = "Toolbar::Item";
-  static inline bool To(State* state, int index, nu::Toolbar::Item* out) {
-    if (GetType(state, index) != LuaType::Table)
-      return false;
-    return ReadOptions(state, index,
-                       "image", &out->image,
-                       "view", &out->view,
-                       "label", &out->label,
-                       "minsize", &out->min_size,
-                       "maxsize", &out->max_size,
-                       "subitems", &out->subitems,
-                       "onclick", &out->on_click);
-  }
-};
-
-template<>
-struct Type<nu::Toolbar::DisplayMode> {
-  static constexpr const char* name = "ToolbarDisplayMode";
-  static inline bool To(State* state, int index,
-                        nu::Toolbar::DisplayMode* out) {
-    std::string mode;
-    if (!lua::To(state, index, &mode))
-      return false;
-    if (mode == "default") {
-      *out = nu::Toolbar::DisplayMode::Default;
-      return true;
-    } else if (mode == "icon-and-label") {
-      *out = nu::Toolbar::DisplayMode::IconAndLabel;
-      return true;
-    } else if (mode == "icon") {
-      *out = nu::Toolbar::DisplayMode::Icon;
-      return true;
-    } else if (mode == "label") {
-      *out = nu::Toolbar::DisplayMode::Label;
-      return true;
-    } else {
-      return false;
-    }
-  }
-};
-
-template<>
-struct Type<nu::Toolbar> {
-  static constexpr const char* name = "Toolbar";
-  static void BuildMetaTable(State* state, int metatable) {
-    RawSet(state, metatable,
-           "create", &CreateOnHeap<nu::Toolbar, const std::string&>,
-           "setdefaultitemidentifiers", &nu::Toolbar::SetDefaultItemIdentifiers,
-           "setalloweditemidentifiers", &nu::Toolbar::SetAllowedItemIdentifiers,
-           "setallowcustomization", &nu::Toolbar::SetAllowCustomization,
-           "setdisplaymode", &nu::Toolbar::SetDisplayMode,
-           "setvisible", &nu::Toolbar::SetVisible,
-           "isvisible", &nu::Toolbar::IsVisible,
-           "getidentifier", &nu::Toolbar::GetIdentifier);
-    RawSetProperty(state, metatable,
-                   "getitem", &nu::Toolbar::get_item);
-  }
-};
-#endif
-
-template<>
-struct Type<nu::Responder> {
-  static constexpr const char* name = "Responder";
-  static void BuildMetaTable(State* state, int metatable) {
-    RawSet(state, metatable,
-           "setcapture", &nu::Responder::SetCapture,
-           "releasecapture", &nu::Responder::ReleaseCapture,
-           "hascapture", &nu::Responder::HasCapture);
-    RawSetProperty(state, metatable,
-                   "onmousedown", &nu::Responder::on_mouse_down,
-                   "onmouseup", &nu::Responder::on_mouse_up,
-                   "onmousemove", &nu::Responder::on_mouse_move,
-                   "onmouseenter", &nu::Responder::on_mouse_enter,
-                   "onmouseleave", &nu::Responder::on_mouse_leave,
-                   "onkeydown", &nu::Responder::on_key_down,
-                   "onkeyup", &nu::Responder::on_key_up,
-                   "oncapturelost", &nu::View::on_capture_lost);
-  }
-};
-
-template<>
-struct Type<nu::Window::Options> {
-  static constexpr const char* name = "WindowOptions";
-  static inline bool To(State* state, int index, nu::Window::Options* out) {
-    if (GetType(state, index) != LuaType::Table)
-      return false;
-    return ReadOptions(state, index,
-                       "frame", &out->frame,
-#if defined(OS_MAC)
-                       "showtrafficlights", &out->show_traffic_lights,
-#endif
-                       "transparent", &out->transparent);
-  }
-};
-
-template<>
-struct Type<nu::Window> {
-  using base = nu::Responder;
-  static constexpr const char* name = "Window";
-  static void BuildMetaTable(State* state, int metatable) {
-    RawSet(state, metatable,
-           "create", &CreateOnHeap<nu::Window, const nu::Window::Options&>,
-           "close", &nu::Window::Close,
-           "sethasshadow", &nu::Window::SetHasShadow,
-           "hasshadow", &nu::Window::HasShadow,
-           "center", &nu::Window::Center,
-           "setcontentview",
-           RefMethod(state, &nu::Window::SetContentView,
-                     RefType::Reset, "content"),
-           "getcontentview", &nu::Window::GetContentView,
-           "setcontentsize", &nu::Window::SetContentSize,
-           "getcontentsize", &nu::Window::GetContentSize,
-           "setbounds", &nu::Window::SetBounds,
-           "getbounds", &nu::Window::GetBounds,
-           "setsizeconstraints", &nu::Window::SetSizeConstraints,
-           "getsizeconstraints", &nu::Window::GetSizeConstraints,
-           "setcontentsizeconstraints", &nu::Window::SetContentSizeConstraints,
-           "getcontentsizeconstraints", &nu::Window::GetContentSizeConstraints,
-           "activate", &nu::Window::Activate,
-           "deactivate", &nu::Window::Deactivate,
-           "isActive", &nu::Window::IsActive,
-           "setvisible", &nu::Window::SetVisible,
-           "isvisible", &nu::Window::IsVisible,
-           "setalwaysontop", &nu::Window::SetAlwaysOnTop,
-           "isalwaysontop", &nu::Window::IsAlwaysOnTop,
-           "setfullscreen", &nu::Window::SetFullscreen,
-           "isfullscreen", &nu::Window::IsFullscreen,
-           "maximize", &nu::Window::Maximize,
-           "unmaximize", &nu::Window::Unmaximize,
-           "ismaximized", &nu::Window::IsMaximized,
-           "minimize", &nu::Window::Minimize,
-           "restore", &nu::Window::Restore,
-           "isminimized", &nu::Window::IsMinimized,
-           "setresizable", &nu::Window::SetResizable,
-           "isresizable", &nu::Window::IsResizable,
-           "setmaximizable", &nu::Window::SetMaximizable,
-           "ismaximizable", &nu::Window::IsMaximizable,
-           "setminimizable", &nu::Window::SetMinimizable,
-           "isminimizable", &nu::Window::IsMinimizable,
-           "setmovable", &nu::Window::SetMovable,
-           "ismovable", &nu::Window::IsMovable,
-           "settitle", &nu::Window::SetTitle,
-           "gettitle", &nu::Window::GetTitle,
-           "setbackgroundcolor", &nu::Window::SetBackgroundColor,
-#if defined(OS_MAC)
-           "settoolbar", &nu::Window::SetToolbar,
-           "gettoolbar", &nu::Window::GetToolbar,
-           "settitlevisible", &nu::Window::SetTitleVisible,
-           "istitlevisible", &nu::Window::IsTitleVisible,
-           "setfullsizecontentview", &nu::Window::SetFullSizeContentView,
-           "isfullsizecontentview", &nu::Window::IsFullSizeContentView,
-#endif
-#if defined(OS_WIN) || defined(OS_LINUX)
-           "setskiptaskbar", &nu::Window::SetSkipTaskbar,
-           "seticon", &nu::Window::SetIcon,
-           "setmenubar",
-           RefMethod(state, &nu::Window::SetMenuBar, RefType::Reset, "menubar"),
-           "getmenubar", &nu::Window::GetMenuBar,
-#endif
-           "addchildwindow",
-           RefMethod(state, &nu::Window::AddChildWindow, RefType::Ref),
-           "removechildview",
-           RefMethod(state, &nu::Window::RemoveChildWindow, RefType::Deref),
-           "getchildwindows", &nu::Window::GetChildWindows);
-    RawSetProperty(state, metatable,
-                   "onclose", &nu::Window::on_close,
-                   "onfocus", &nu::Window::on_focus,
-                   "onblur", &nu::Window::on_blur,
-                   "shouldclose", &nu::Window::should_close);
-  }
-};
-
-template<>
-struct Type<nu::View> {
-  using base = nu::Responder;
-  static constexpr const char* name = "View";
-  static void BuildMetaTable(State* state, int metatable) {
-    RawSet(state, metatable,
-           "offsetfromview", &nu::View::OffsetFromView,
-           "offsetfromwindow", &nu::View::OffsetFromWindow,
-           "setbounds", &nu::View::SetBounds,
-           "getbounds", &nu::View::GetBounds,
-           "layout", &nu::View::Layout,
-           "schedulepaint", &nu::View::SchedulePaint,
-           "schedulepaintrect", &nu::View::SchedulePaintRect,
-           "setvisible", &nu::View::SetVisible,
-           "isvisible", &nu::View::IsVisible,
-           "setenabled", &nu::View::SetEnabled,
-           "isenabled", &nu::View::IsEnabled,
-           "focus", &nu::View::Focus,
-           "hasfocus", &nu::View::HasFocus,
-           "setfocusable", &nu::View::SetFocusable,
-           "isfocusable", &nu::View::IsFocusable,
-           "setmousedowncanmovewindow", &nu::View::SetMouseDownCanMoveWindow,
-           "ismousedowncanmovewindow", &nu::View::IsMouseDownCanMoveWindow,
-           "dodrag", &nu::View::DoDrag,
-           "dodragwithoptions", &nu::View::DoDragWithOptions,
-           "canceldrag", &nu::View::CancelDrag,
-           "isdragging", &nu::View::IsDragging,
-           "registerdraggedtypes", &nu::View::RegisterDraggedTypes,
-           "setcursor", &nu::View::SetCursor,
-           "setfont", &nu::View::SetFont,
-           "setcolor", &nu::View::SetColor,
-           "setbackgroundcolor", &nu::View::SetBackgroundColor,
-           "setstyle", &SetStyle,
-           "getcomputedlayout", &nu::View::GetComputedLayout,
-           "getminimumsize", &nu::View::GetMinimumSize,
-#if defined(OS_MAC)
-           "setwantslayer", &nu::View::SetWantsLayer,
-           "wantslayer", &nu::View::WantsLayer,
-#endif
-           "getparent", &nu::View::GetParent,
-           "getwindow", &nu::View::GetWindow);
-    RawSetProperty(state, metatable,
-                   "ondragleave", &nu::View::on_drag_leave,
-                   "onsizechanged", &nu::View::on_size_changed,
-                   "handledragenter", &nu::View::handle_drag_enter,
-                   "handledragupdate", &nu::View::handle_drag_update,
-                   "handledrop", &nu::View::handle_drop);
-  }
-  static void SetStyle(nu::View* view,
-                       const std::map<std::string, std::string>& styles) {
-    for (const auto& it : styles)
-      view->SetStyleProperty(it.first, it.second);
-    view->Layout();
-  }
-};
-template<>
-struct Type<nu::ComboBox> {
-  using base = nu::Picker;
-  static constexpr const char* name = "ComboBox";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index,
-           "create", &CreateOnHeap<nu::ComboBox>,
-           "settext", &nu::ComboBox::SetText,
-           "gettext", &nu::ComboBox::GetText);
-    RawSetProperty(state, index,
-                   "ontextchange", &nu::ComboBox::on_text_change);
-  }
-};
-
-template<>
-struct Type<nu::Container> {
-  using base = nu::View;
-  static constexpr const char* name = "Container";
-  static void BuildMetaTable(State* state, int index) {
-    RawSet(state, index,
-           "create", &CreateOnHeap<nu::Container>,
-           "getpreferredsize", &nu::Container::GetPreferredSize,
-           "getpreferredwidthforheight",
-           &nu::Container::GetPreferredWidthForHeight,
-           "getpreferredheightforwidth",
-           &nu::Container::GetPreferredHeightForWidth,
-           "addchildview",
-           RefMethod(state, &nu::Container::AddChildView, RefType::Ref),
-           "addchildviewat",
-           RefMethod(state, &AddChildViewAt, RefType::Ref),
-           "removechildview",
-           RefMethod(state, &nu::Container::RemoveChildView, RefType::Deref),
-           "childcount", &nu::Container::ChildCount,
-           "childat", &ChildAt);
-    RawSetProperty(state, index, "ondraw", &nu::Container::on_draw);
-  }
-  // Transalte 1-based index to 0-based.
-  static inline void AddChildViewAt(nu::Container* c, nu::View* view, int i) {
-    c->AddChildViewAt(view, i - 1);
-  }
-  static inline nu::View* ChildAt(nu::Container* container, int i) {
-    return container->ChildAt(i - 1);
-  }
-};
-
-template<>
-struct Type<nu::Button::Type> {
-  static constexpr const char* name = "ButtonType";
-  static bool To(State* state, int index, nu::Button::Type* out) {
-    std::string type;
-    if (!lua::To(state, index, &type))
-      return false;
-    if (type.empty() || type == "normal") {
-      *out = nu::Button::Type::Normal;
-      return true;
-    } else if (type == "checkbox") {
-      *out = nu::Button::Type::Checkbox;
-      return true;
-    } else if (type == "radio") {
-      *out = nu::Button::Type::Radio;
-      return true;
-#if defined(OS_MAC)
-    } else if (type == "disclosure") {
-      *out = nu::Button::Type::Disclosure;
-      return true;
-#endif
-    } else {
-      return false;
-    }
-  }
-};
-
-#if defined(OS_MAC)
-template<>
-struct Type<nu::Button::Style> {
-  static constexpr const char* name = "ButtonStyle";
-  static bool To(State* state, int index, nu::Button::Style* out) {
-    std::string style;
-    if (!lua::To(state, index, &style))
-      return false;
-    if (style == "rounded") {
-      *out = nu::Button::Style::Rounded;
-      return true;
-    } else if (style == "regular-square") {
-      *out = nu::Button::Style::RegularSquare;
-      return true;
-    } else if (style == "thick-square") {
-      *out = nu::Button::Style::ThickSquare;
-      return true;
-    } else if (style == "thicker-square") {
-      *out = nu::Button::Style::ThickerSquare;
-      return true;
-    } else if (style == "disclosure") {
-      *out = nu::Button::Style::Disclosure;
-      return true;
-    } else if (style == "shadowless-square") {
-      *out = nu::Button::Style::ShadowlessSquare;
-      return true;
-    } else if (style == "circular") {
-      *out = nu::Button::Style::Circular;
-      return true;
-    } else if (style == "textured-square") {
-      *out = nu::Button::Style::TexturedSquare;
-      return true;
-    } else if (style == "help-button") {
-      *out = nu::Button::Style::HelpButton;
-      return true;
-    } else if (style == "small-square") {
-      *out = nu::Button::Style::SmallSquare;
-      return true;
-    } else if (style == "textured-rounded") {
-      *out = nu::Button::Style::TexturedRounded;
-      return true;
-    } else if (style == "round-rect") {
-      *out = nu::Button::Style::RoundRect;
-      return true;
-    } else if (style == "recessed") {
-      *out = nu::Button::Style::Recessed;
-      return true;
-    } else if (style == "rounded-disclosure") {
-      *out = nu::Button::Style::RoundedDisclosure;
-      return true;
-    } else if (style == "inline") {
-      *out = nu::Button::Style::Inline;
-      return true;
-    } else {
-      return false;
-    }
-  }
-};
-#endif
-
-template<>
-struct Type<nu::Button> {
-  using base = nu::View;
-  static constexpr const char* name = "Button";
-  static void BuildMetaTable(State* state, int metatable) {
-    RawSet(state, metatable,
-           "create", &Create,
-           "makedefault", &nu::Button::MakeDefault,
-           "settitle", &nu::Button::SetTitle,
-           "gettitle", &nu::Button::GetTitle,
-#if defined(OS_MAC)
-           "setbuttonstyle", &nu::Button::SetButtonStyle,
-           "sethasborder", &nu::Button::SetHasBorder,
-           "hasborder", &nu::Button::HasBorder,
-#endif
-           "setchecked", &nu::Button::SetChecked,
-           "ischecked", &nu::Button::IsChecked,
-           "setimage", &nu::Button::SetImage,
-           "getimage", &nu::Button::GetImage);
-    RawSetProperty(state, metatable, "onclick", &nu::Button::on_click);
-  }
-  static nu::Button* Create(CallContext* context) {
-    std::string title;
-    if (To(context->state, 1, &title)) {
-      return new nu::Button(title);
-    } else if (GetType(context->state, 1) == LuaType::Table) {
-      nu::Button::Type type = nu::Button::Type::Normal;
-      ReadOptions(context->state, 1, "title", &title, "type", &type);
-      return new nu::Button(title, type);
-    } else {
-      context->has_error = true;
-      Push(context->state, "Button must be created with string or table");
-      return nullptr;
-    }
-  }
-};
-
-template<>
-struct Type<nu::ProtocolJob> {
-  static constexpr const char* name = "ProtocolJob";
-  static void BuildMetaTable(State* state, int metatable) {
-  }
-};
-
-template<>
-struct Type<nu::ProtocolStringJob> {
-  using base = nu::ProtocolJob;
-  static constexpr const char* name = "ProtocolStringJob";
-  static void BuildMetaTable(State* state, int metatable) {
-    RawSet(state, metatable,
-           "create", &CreateOnHeap<nu::ProtocolStringJob,
-                                   const std::string&,
-                                   const std::string&>);
-  }
-};
-
-template<>
-struct Type<nu::ProtocolFileJob> {
-  using base = nu::ProtocolJob;
-  static constexpr const char* name = "ProtocolFileJob";
-  static void BuildMetaTable(State* state, int metatable) {
-    RawSet(state, metatable,
-           "create", &CreateOnHeap<nu::ProtocolFileJob,
-                                   const ::base::FilePath&>);
-  }
-};
-
-template<>
-struct Type<nu::ProtocolAsarJob> {
-  using base = nu::ProtocolFileJob;
-  static constexpr const char* name = "ProtocolAsarJob";
-  static void BuildMetaTable(State* state, int metatable) {
-    RawSet(state, metatable,
-           "create", &CreateOnHeap<nu::ProtocolAsarJob,
-                                   const ::base::FilePath&,
-                                   const std::string&>,
-           "setdecipher", &nu::ProtocolAsarJob::SetDecipher);
-  }
-};
-
-template<>
-struct Type<nu::Browser::Options> {
-  static constexpr const char* name = "BrowserOptions";
-  static inline bool To(State* state, int index, nu::Browser::Options* out) {
-    if (GetType(state, index) != LuaType::Table)
-      return false;
-    return ReadOptions(
-        state, index,
-#if defined(OS_MAC) || defined(OS_LINUX)
-        "allowfileaccessfromfiles", &out->allow_file_access_from_files,
-#endif
-#if defined(OS_LINUX)
-        "hardwareacceleration", &out->hardware_acceleration,
-#endif
-#if defined(OS_WIN) && defined(WEBVIEW2_SUPPORT)
-        "webview2support", &out->webview2_support,
-#endif
-        "devtools", &out->devtools,
-        "contextmenu", &out->context_menu);
-  }
-};
-
-template<>
-struct Type<nu::Browser> {
-  using base = nu::View;
-  static constexpr const char* name = "Browser";
-  static void BuildMetaTable(State* state, int metatable) {
-    RawSet(state, metatable,
-           "create", &CreateOnHeap<nu::Browser, nu::Browser::Options>,
-           "registerprotocol", &nu::Browser::RegisterProtocol,
-           "unregisterprotocol", &nu::Browser::UnregisterProtocol,
-           "loadurl", &nu::Browser::LoadURL,
-           "loadhtml", &nu::Browser::LoadHTML,
-           "geturl", &nu::Browser::GetURL,
-           "gettitle", &nu::Browser::GetTitle,
-           "setuseragent", &nu::Browser::SetUserAgent,
-#if defined(OS_MAC)
-           "ismagnifiable", &nu::Browser::IsMagnifiable,
-           "setmagnifiable", &nu::Browser::SetMagnifiable,
-#endif
-           "executejavascript", &nu::Browser::ExecuteJavaScript,
-           "goback", &nu::Browser::GoBack,
-           "cangoback", &nu::Browser::CanGoBack,
-           "goforward", &nu::Browser::GoForward,
-           "cangoforward", &nu::Browser::CanGoForward,
-           "reload", &nu::Browser::Reload,
-           "stop", &nu::Browser::Stop,
-           "isloading", &nu::Browser::IsLoading,
-           "setbindingname", &nu::Browser::SetBindingName,
-           "addbinding", &AddBinding,
-           "addrawbinding", &nu::Browser::AddRawBinding,
-           "removebinding", &nu::Browser::RemoveBinding);
-    RawSetProperty(state, metatable,
-                   "onclose", &nu::Browser::on_close,
-                   "onupdatecommand", &nu::Browser::on_update_command,
-                   "onchangeloading", &nu::Browser::on_change_loading,
-                   "onupdatetitle", &nu::Browser::on_update_title,
-                   "onstartnavigation", &nu::Browser::on_start_navigation,
-                   "oncommitnavigation", &nu::Browser::on_commit_navigation,
-                   "onfinishnavigation", &nu::Browser::on_finish_navigation,
-                   "onfailnavigation", &nu::Browser::on_fail_navigation);
-  }
-  static void AddBinding(CallContext* context,
-                         nu::Browser* browser,
-                         const std::string& bname) {
-    State* state = context->state;
-    if (GetType(state, 3) != LuaType::Function) {
-      Push(state, "The arg 3 should be function");
-      context->has_error = true;
-      return;
-    }
-    // Persistent the function and pass it to lambda.
-    auto ref = std::make_shared<Persistent>(state, 3);
-    browser->AddRawBinding(bname, [state, ref](nu::Browser* browser,
-                                               ::base::Value value) {
-      ref->Push();
-      for (const auto& it : value.GetList())
-        Push(state, it);
-      lua_pcall(state, static_cast<int>(value.GetList().size()), 0, 0);
-    });
-  }
-};
-
-template<>
-struct Type<nu::DatePicker::Options> {
-  static constexpr const char* name = "DatePickerOptions";
-  static inline bool To(State* state, int index, nu::DatePicker::Options* out) {
-    if (GetType(state, index) != LuaType::Table)
-      return false;
-    return ReadOptions(state, index,
-                       "elements", &out->elements,
-                       "hasstepper", &out->has_stepper);
-  }
-};
-
-template<>
-struct Type<nu::DatePicker> {
-  using base = nu::View;
-  static constexpr const char* name = "DatePicker";
-  static void BuildMetaTable(State* state, int metatable) {
-    RawSet(state, metatable,
-           "elementyearmonth",
-           static_cast<int>(nu::DatePicker::ELEMENT_YEAR_MONTH),
-           "elementyearmonthday",
-           static_cast<int>(nu::DatePicker::ELEMENT_YEAR_MONTH_DAY),
-           "elementhourminute",
-           static_cast<int>(nu::DatePicker::ELEMENT_HOUR_MINUTE),
-           "elementhourminutesecond",
-           static_cast<int>(nu::DatePicker::ELEMENT_HOUR_MINUTE_SECOND),
-           "create",
-           &CreateOnHeap<nu::DatePicker, const nu::DatePicker::Options&>,
-           "setdate", &nu::DatePicker::SetDate,
-           "getdate", &nu::DatePicker::GetDate,
-           "setrange", &nu::DatePicker::SetRange,
-           "getrange", &nu::DatePicker::GetRange,
-           "hasstepper", &nu::DatePicker::HasStepper);
-    RawSetProperty(state, metatable,
-                   "ondatechange", &nu::DatePicker::on_date_change);
-  }
-};
-
-template<>
-struct Type<nu::Entry::Type> {
-  static constexpr const char* name = "EntryType";
-  static bool To(State* state, int index, nu::Entry::Type* out) {
-    std::string type;
-    if (!lua::To(state, index, &type))
-      return false;
-    if (type == "normal")
-      *out = nu::Entry::Type::Normal;
-    else if (type == "password")
-      *out = nu::Entry::Type::Password;
-    else
-      return false;
-    return true;
-  }
-};
-
-template<>
-struct Type<nu::Entry> {
-  using base = nu::View;
-  static constexpr const char* name = "Entry";
-  static void BuildMetaTable(State* state, int metatable) {
-    RawSet(state, metatable,
-           "create", &CreateOnHeap<nu::Entry>,
-           "createtype", &CreateOnHeap<nu::Entry, nu::Entry::Type>,
-           "settext", &nu::Entry::SetText,
-           "gettext", &nu::Entry::GetText);
-    RawSetProperty(state, metatable,
-                   "onactivate", &nu::Entry::on_activate,
-                   "ontextchange", &nu::Entry::on_text_change);
-  }
-};
-
-template<>
-struct Type<nu::Label> {
-  using base = nu::View;
-  static constexpr const char* name = "Label";
-  static void BuildMetaTable(State* state, int metatable) {
-    RawSet(state, metatable,
-           "create", &CreateOnHeap<nu::Label, const std::string&>,
-           "createwithattributedtext",
-           &CreateOnHeap<nu::Label, nu::AttributedText*>,
-           "settext", &nu::Label::SetText,
-           "gettext", &nu::Label::GetText,
-           "setalign", &nu::Label::SetAlign,
-           "setvalign", &nu::Label::SetVAlign,
-           "setattributedtext",
-           RefMethod(state, &nu::Label::SetAttributedText,
-                     RefType::Reset, "atext"),
-           "getattributedtext", &nu::Label::GetAttributedText);
-  }
-};
-
-template<>
-struct Type<nu::ProgressBar> {
-  using base = nu::View;
-  static constexpr const char* name = "ProgressBar";
-  static void BuildMetaTable(State* state, int metatable) {
-    RawSet(state, metatable,
-           "create", &CreateOnHeap<nu::ProgressBar>,
-           "setvalue", &nu::ProgressBar::SetValue,
-           "getvalue", &nu::ProgressBar::GetValue,
-           "setindeterminate", &nu::ProgressBar::SetIndeterminate,
-           "isindeterminate", &nu::ProgressBar::IsIndeterminate);
+           "save", &nu::Painter::Save,
+           "restore", &nu::Painter::Restore,
+           "beginpath", &nu::Painter::BeginPath,
+           "closepath", &nu::Painter::ClosePath,
+           "moveto", &nu::Painter::MoveTo,
+           "lineto", &nu::Painter::LineTo,
+           "beziercurveto", &nu::Painter::BezierCurveTo,
+           "arc", &nu::Painter::Arc,
+           "rect", &nu::Painter::Rect,
+           "clip", &nu::Painter::Clip,
+           "cliprect", &nu::Painter::ClipRect,
+           "translate", &nu::Painter::Translate,
+           "rotate", &nu::Painter::Rotate,
+           "scale", &nu::Painter::Scale,
+           "setcolor", &nu::Painter::SetColor,
+           "setstrokecolor", &nu::Painter::SetStrokeColor,
+           "setfillcolor", &nu::Painter::SetFillColor,
+           "setlinewidth", &nu::Painter::SetLineWidth,
+           "stroke", &nu::Painter::Stroke,
+           "fill", &nu::Painter::Fill,
+           "clear", &nu::Painter::Clear,
+           "strokerect", &nu::Painter::StrokeRect,
+           "fillrect", &nu::Painter::FillRect,
+           "drawimage", &nu::Painter::DrawImage,
+           "drawimagefromrect", &nu::Painter::DrawImageFromRect,
+           "drawcanvas", &nu::Painter::DrawCanvas,
+           "drawcanvasfromrect", &nu::Painter::DrawCanvasFromRect,
+           "drawattributedtext", &nu::Painter::DrawAttributedText,
+           "drawtext", &nu::Painter::DrawText);
   }
 };
 
 template<>
 struct Type<nu::Picker> {
-  using base = nu::View;
+  using Base = nu::View;
   static constexpr const char* name = "Picker";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
@@ -2221,34 +1940,79 @@ struct Type<nu::Picker> {
 };
 
 template<>
-struct Type<nu::GifPlayer> {
-  using base = nu::View;
-  static constexpr const char* name = "GifPlayer";
+struct Type<nu::ProgressBar> {
+  using Base = nu::View;
+  static constexpr const char* name = "ProgressBar";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
-           "create", &CreateOnHeap<nu::GifPlayer>,
-           "setimage", &nu::GifPlayer::SetImage,
-           "getimage", &nu::GifPlayer::GetImage,
-           "setanimating", &nu::GifPlayer::SetAnimating,
-           "isanimating", &nu::GifPlayer::IsAnimating,
-           "setscale", &nu::GifPlayer::SetScale,
-           "getscale", &nu::GifPlayer::GetScale);
+           "create", &CreateOnHeap<nu::ProgressBar>,
+           "setvalue", &nu::ProgressBar::SetValue,
+           "getvalue", &nu::ProgressBar::GetValue,
+           "setindeterminate", &nu::ProgressBar::SetIndeterminate,
+           "isindeterminate", &nu::ProgressBar::IsIndeterminate);
   }
 };
 
 template<>
-struct Type<nu::Group> {
-  using base = nu::View;
-  static constexpr const char* name = "Group";
+struct Type<nu::ProtocolJob> {
+  static constexpr const char* name = "ProtocolJob";
+  static void BuildMetaTable(State* state, int metatable) {
+  }
+};
+
+template<>
+struct Type<nu::ProtocolAsarJob> {
+  using Base = nu::ProtocolFileJob;
+  static constexpr const char* name = "ProtocolAsarJob";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
-           "create", &CreateOnHeap<nu::Group, const std::string&>,
-           "setcontentview",
-           RefMethod(state, &nu::Group::SetContentView,
-                     RefType::Reset, "content"),
-           "getcontentview", &nu::Group::GetContentView,
-           "settitle", &nu::Group::SetTitle,
-           "gettitle", &nu::Group::GetTitle);
+           "create", &CreateOnHeap<nu::ProtocolAsarJob,
+                                   const ::base::FilePath&,
+                                   const std::string&>,
+           "setdecipher", &nu::ProtocolAsarJob::SetDecipher);
+  }
+};
+
+template<>
+struct Type<nu::ProtocolFileJob> {
+  using Base = nu::ProtocolJob;
+  static constexpr const char* name = "ProtocolFileJob";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateOnHeap<nu::ProtocolFileJob,
+                                   const ::base::FilePath&>);
+  }
+};
+
+template<>
+struct Type<nu::ProtocolStringJob> {
+  using Base = nu::ProtocolJob;
+  static constexpr const char* name = "ProtocolStringJob";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateOnHeap<nu::ProtocolStringJob,
+                                   const std::string&,
+                                   const std::string&>);
+  }
+};
+
+template<>
+struct Type<nu::Responder> {
+  static constexpr const char* name = "Responder";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "setcapture", &nu::Responder::SetCapture,
+           "releasecapture", &nu::Responder::ReleaseCapture,
+           "hascapture", &nu::Responder::HasCapture);
+    RawSetProperty(state, metatable,
+                   "onmousedown", &nu::Responder::on_mouse_down,
+                   "onmouseup", &nu::Responder::on_mouse_up,
+                   "onmousemove", &nu::Responder::on_mouse_move,
+                   "onmouseenter", &nu::Responder::on_mouse_enter,
+                   "onmouseleave", &nu::Responder::on_mouse_leave,
+                   "onkeydown", &nu::Responder::on_key_down,
+                   "onkeyup", &nu::Responder::on_key_up,
+                   "oncapturelost", &nu::View::on_capture_lost);
   }
 };
 
@@ -2333,7 +2097,7 @@ struct Type<nu::Scroll::Elasticity> {
 
 template<>
 struct Type<nu::Scroll> {
-  using base = nu::View;
+  using Base = nu::View;
   static constexpr const char* name = "Scroll";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
@@ -2364,7 +2128,7 @@ struct Type<nu::Scroll> {
 
 template<>
 struct Type<nu::Separator> {
-  using base = nu::View;
+  using Base = nu::View;
   static constexpr const char* name = "Separator";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
@@ -2374,7 +2138,7 @@ struct Type<nu::Separator> {
 
 template<>
 struct Type<nu::Slider> {
-  using base = nu::View;
+  using Base = nu::View;
   static constexpr const char* name = "Slider";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
@@ -2393,7 +2157,7 @@ struct Type<nu::Slider> {
 
 template<>
 struct Type<nu::Tab> {
-  using base = nu::View;
+  using Base = nu::View;
   static constexpr const char* name = "Tab";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
@@ -2456,7 +2220,7 @@ struct Type<nu::TableModel> {
 
 template<>
 struct Type<nu::AbstractTableModel> {
-  using base = nu::TableModel;
+  using Base = nu::TableModel;
   static constexpr const char* name = "AbstractTableModel";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable, "create", &Create);
@@ -2472,7 +2236,7 @@ struct Type<nu::AbstractTableModel> {
 
 template<>
 struct Type<nu::SimpleTableModel> {
-  using base = nu::TableModel;
+  using Base = nu::TableModel;
   static constexpr const char* name = "SimpleTableModel";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
@@ -2526,7 +2290,7 @@ struct Type<nu::Table::ColumnOptions> {
 
 template<>
 struct Type<nu::Table> {
-  using base = nu::View;
+  using Base = nu::View;
   static constexpr const char* name = "Table";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
@@ -2557,7 +2321,7 @@ struct Type<nu::Table> {
 
 template<>
 struct Type<nu::TextEdit> {
-  using base = nu::View;
+  using Base = nu::View;
   static constexpr const char* name = "TextEdit";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
@@ -2592,6 +2356,95 @@ struct Type<nu::TextEdit> {
                    "ontextchange", &nu::TextEdit::on_text_change,
                    "shouldinsertnewline",
                    &nu::TextEdit::should_insert_new_line);
+  }
+};
+
+#if defined(OS_MAC)
+template<>
+struct Type<nu::Toolbar::Item> {
+  static constexpr const char* name = "Toolbar::Item";
+  static inline bool To(State* state, int index, nu::Toolbar::Item* out) {
+    if (GetType(state, index) != LuaType::Table)
+      return false;
+    return ReadOptions(state, index,
+                       "image", &out->image,
+                       "view", &out->view,
+                       "label", &out->label,
+                       "minsize", &out->min_size,
+                       "maxsize", &out->max_size,
+                       "subitems", &out->subitems,
+                       "onclick", &out->on_click);
+  }
+};
+
+template<>
+struct Type<nu::Toolbar::DisplayMode> {
+  static constexpr const char* name = "ToolbarDisplayMode";
+  static inline bool To(State* state, int index,
+                        nu::Toolbar::DisplayMode* out) {
+    std::string mode;
+    if (!lua::To(state, index, &mode))
+      return false;
+    if (mode == "default") {
+      *out = nu::Toolbar::DisplayMode::Default;
+      return true;
+    } else if (mode == "icon-and-label") {
+      *out = nu::Toolbar::DisplayMode::IconAndLabel;
+      return true;
+    } else if (mode == "icon") {
+      *out = nu::Toolbar::DisplayMode::Icon;
+      return true;
+    } else if (mode == "label") {
+      *out = nu::Toolbar::DisplayMode::Label;
+      return true;
+    } else {
+      return false;
+    }
+  }
+};
+
+template<>
+struct Type<nu::Toolbar> {
+  static constexpr const char* name = "Toolbar";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateOnHeap<nu::Toolbar, const std::string&>,
+           "setdefaultitemidentifiers", &nu::Toolbar::SetDefaultItemIdentifiers,
+           "setalloweditemidentifiers", &nu::Toolbar::SetAllowedItemIdentifiers,
+           "setallowcustomization", &nu::Toolbar::SetAllowCustomization,
+           "setdisplaymode", &nu::Toolbar::SetDisplayMode,
+           "setvisible", &nu::Toolbar::SetVisible,
+           "isvisible", &nu::Toolbar::IsVisible,
+           "getidentifier", &nu::Toolbar::GetIdentifier);
+    RawSetProperty(state, metatable,
+                   "getitem", &nu::Toolbar::get_item);
+  }
+};
+#endif
+
+template<>
+struct Type<nu::Tray> {
+  static constexpr const char* name = "Tray";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+#if defined(OS_MAC)
+           "createwithtitle", &CreateOnHeap<nu::Tray, const std::string&>,
+#endif
+           "createwithimage", &CreateOnHeap<nu::Tray, scoped_refptr<nu::Image>>,
+           "remove", &nu::Tray::Remove,
+#if defined(OS_MAC) || defined(OS_WIN)
+           "getbounds", &nu::Tray::GetBounds,
+#endif
+#if defined(OS_MAC) || defined(OS_LINUX)
+           "settitle", &nu::Tray::SetTitle,
+#endif
+           "setimage", &nu::Tray::SetImage,
+#if defined(OS_MAC)
+           "setpressedimage", &nu::Tray::SetPressedImage,
+#endif
+           "setmenu",
+           RefMethod(state, &nu::Tray::SetMenu, RefType::Reset, "menu"));
+    RawSetProperty(state, metatable, "onclick", &nu::Tray::on_click);
   }
 };
 
@@ -2659,7 +2512,7 @@ struct Type<nu::Vibrant::BlendingMode> {
 
 template<>
 struct Type<nu::Vibrant> {
-  using base = nu::Container;
+  using Base = nu::Container;
   static constexpr const char* name = "Vibrant";
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
@@ -2671,6 +2524,154 @@ struct Type<nu::Vibrant> {
   }
 };
 #endif
+
+template<>
+struct Type<nu::View> {
+  using Base = nu::Responder;
+  static constexpr const char* name = "View";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "offsetfromview", &nu::View::OffsetFromView,
+           "offsetfromwindow", &nu::View::OffsetFromWindow,
+           "setbounds", &nu::View::SetBounds,
+           "getbounds", &nu::View::GetBounds,
+           "layout", &nu::View::Layout,
+           "schedulepaint", &nu::View::SchedulePaint,
+           "schedulepaintrect", &nu::View::SchedulePaintRect,
+           "setvisible", &nu::View::SetVisible,
+           "isvisible", &nu::View::IsVisible,
+           "setenabled", &nu::View::SetEnabled,
+           "isenabled", &nu::View::IsEnabled,
+           "focus", &nu::View::Focus,
+           "hasfocus", &nu::View::HasFocus,
+           "setfocusable", &nu::View::SetFocusable,
+           "isfocusable", &nu::View::IsFocusable,
+           "setmousedowncanmovewindow", &nu::View::SetMouseDownCanMoveWindow,
+           "ismousedowncanmovewindow", &nu::View::IsMouseDownCanMoveWindow,
+           "dodrag", &nu::View::DoDrag,
+           "dodragwithoptions", &nu::View::DoDragWithOptions,
+           "canceldrag", &nu::View::CancelDrag,
+           "isdragging", &nu::View::IsDragging,
+           "registerdraggedtypes", &nu::View::RegisterDraggedTypes,
+           "setcursor", &nu::View::SetCursor,
+           "setfont", &nu::View::SetFont,
+           "setcolor", &nu::View::SetColor,
+           "setbackgroundcolor", &nu::View::SetBackgroundColor,
+           "setstyle", &SetStyle,
+           "getcomputedlayout", &nu::View::GetComputedLayout,
+           "getminimumsize", &nu::View::GetMinimumSize,
+#if defined(OS_MAC)
+           "setwantslayer", &nu::View::SetWantsLayer,
+           "wantslayer", &nu::View::WantsLayer,
+#endif
+           "getparent", &nu::View::GetParent,
+           "getwindow", &nu::View::GetWindow);
+    RawSetProperty(state, metatable,
+                   "ondragleave", &nu::View::on_drag_leave,
+                   "onsizechanged", &nu::View::on_size_changed,
+                   "handledragenter", &nu::View::handle_drag_enter,
+                   "handledragupdate", &nu::View::handle_drag_update,
+                   "handledrop", &nu::View::handle_drop);
+  }
+  static void SetStyle(nu::View* view,
+                       const std::map<std::string, std::string>& styles) {
+    for (const auto& it : styles)
+      view->SetStyleProperty(it.first, it.second);
+    view->Layout();
+  }
+};
+
+template<>
+struct Type<nu::Window::Options> {
+  static constexpr const char* name = "WindowOptions";
+  static inline bool To(State* state, int index, nu::Window::Options* out) {
+    if (GetType(state, index) != LuaType::Table)
+      return false;
+    return ReadOptions(state, index,
+                       "frame", &out->frame,
+#if defined(OS_MAC)
+                       "showtrafficlights", &out->show_traffic_lights,
+#endif
+                       "transparent", &out->transparent);
+  }
+};
+
+template<>
+struct Type<nu::Window> {
+  using Base = nu::Responder;
+  static constexpr const char* name = "Window";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "create", &CreateOnHeap<nu::Window, const nu::Window::Options&>,
+           "close", &nu::Window::Close,
+           "sethasshadow", &nu::Window::SetHasShadow,
+           "hasshadow", &nu::Window::HasShadow,
+           "center", &nu::Window::Center,
+           "setcontentview",
+           RefMethod(state, &nu::Window::SetContentView,
+                     RefType::Reset, "content"),
+           "getcontentview", &nu::Window::GetContentView,
+           "setcontentsize", &nu::Window::SetContentSize,
+           "getcontentsize", &nu::Window::GetContentSize,
+           "setbounds", &nu::Window::SetBounds,
+           "getbounds", &nu::Window::GetBounds,
+           "setsizeconstraints", &nu::Window::SetSizeConstraints,
+           "getsizeconstraints", &nu::Window::GetSizeConstraints,
+           "setcontentsizeconstraints", &nu::Window::SetContentSizeConstraints,
+           "getcontentsizeconstraints", &nu::Window::GetContentSizeConstraints,
+           "activate", &nu::Window::Activate,
+           "deactivate", &nu::Window::Deactivate,
+           "isActive", &nu::Window::IsActive,
+           "setvisible", &nu::Window::SetVisible,
+           "isvisible", &nu::Window::IsVisible,
+           "setalwaysontop", &nu::Window::SetAlwaysOnTop,
+           "isalwaysontop", &nu::Window::IsAlwaysOnTop,
+           "setfullscreen", &nu::Window::SetFullscreen,
+           "isfullscreen", &nu::Window::IsFullscreen,
+           "maximize", &nu::Window::Maximize,
+           "unmaximize", &nu::Window::Unmaximize,
+           "ismaximized", &nu::Window::IsMaximized,
+           "minimize", &nu::Window::Minimize,
+           "restore", &nu::Window::Restore,
+           "isminimized", &nu::Window::IsMinimized,
+           "setresizable", &nu::Window::SetResizable,
+           "isresizable", &nu::Window::IsResizable,
+           "setmaximizable", &nu::Window::SetMaximizable,
+           "ismaximizable", &nu::Window::IsMaximizable,
+           "setminimizable", &nu::Window::SetMinimizable,
+           "isminimizable", &nu::Window::IsMinimizable,
+           "setmovable", &nu::Window::SetMovable,
+           "ismovable", &nu::Window::IsMovable,
+           "settitle", &nu::Window::SetTitle,
+           "gettitle", &nu::Window::GetTitle,
+           "setbackgroundcolor", &nu::Window::SetBackgroundColor,
+#if defined(OS_MAC)
+           "settoolbar", &nu::Window::SetToolbar,
+           "gettoolbar", &nu::Window::GetToolbar,
+           "settitlevisible", &nu::Window::SetTitleVisible,
+           "istitlevisible", &nu::Window::IsTitleVisible,
+           "setfullsizecontentview", &nu::Window::SetFullSizeContentView,
+           "isfullsizecontentview", &nu::Window::IsFullSizeContentView,
+#endif
+#if defined(OS_WIN) || defined(OS_LINUX)
+           "setskiptaskbar", &nu::Window::SetSkipTaskbar,
+           "seticon", &nu::Window::SetIcon,
+           "setmenubar",
+           RefMethod(state, &nu::Window::SetMenuBar, RefType::Reset, "menubar"),
+           "getmenubar", &nu::Window::GetMenuBar,
+#endif
+           "addchildwindow",
+           RefMethod(state, &nu::Window::AddChildWindow, RefType::Ref),
+           "removechildview",
+           RefMethod(state, &nu::Window::RemoveChildWindow, RefType::Deref),
+           "getchildwindows", &nu::Window::GetChildWindows);
+    RawSetProperty(state, metatable,
+                   "onclose", &nu::Window::on_close,
+                   "onfocus", &nu::Window::on_focus,
+                   "onblur", &nu::Window::on_blur,
+                   "shouldclose", &nu::Window::should_close);
+  }
+};
 
 }  // namespace lua
 
@@ -2698,46 +2699,44 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   lua_rawset(state, -3);
 
   // Classes.
-  BindType<nu::Lifetime>(state, "Lifetime");
-  BindType<nu::MessageLoop>(state, "MessageLoop");
   BindType<nu::App>(state, "App");
   BindType<nu::Appearance>(state, "Appearance");
   BindType<nu::AttributedText>(state, "AttributedText");
-  BindType<nu::Font>(state, "Font");
+  BindType<nu::Browser>(state, "Browser");
+  BindType<nu::Button>(state, "Button");
   BindType<nu::Canvas>(state, "Canvas");
   BindType<nu::Clipboard>(state, "Clipboard");
   BindType<nu::Color>(state, "Color");
+  BindType<nu::ComboBox>(state, "ComboBox");
+  BindType<nu::Container>(state, "Container");
   BindType<nu::Cursor>(state, "Cursor");
+  BindType<nu::DatePicker>(state, "DatePicker");
   BindType<nu::DraggingInfo>(state, "DraggingInfo");
-  BindType<nu::Image>(state, "Image");
-  BindType<nu::Painter>(state, "Painter");
+  BindType<nu::Entry>(state, "Entry");
   BindType<nu::Event>(state, "Event");
   BindType<nu::FileDialog>(state, "FileDialog");
   BindType<nu::FileOpenDialog>(state, "FileOpenDialog");
   BindType<nu::FileSaveDialog>(state, "FileSaveDialog");
+  BindType<nu::Font>(state, "Font");
+  BindType<nu::GifPlayer>(state, "GifPlayer");
+  BindType<nu::Group>(state, "Group");
+  BindType<nu::Image>(state, "Image");
+  BindType<nu::Label>(state, "Label");
+  BindType<nu::Lifetime>(state, "Lifetime");
+  BindType<nu::MessageBox>(state, "MessageBox");
+  BindType<nu::MessageLoop>(state, "MessageLoop");
   BindType<nu::MenuBar>(state, "MenuBar");
   BindType<nu::Menu>(state, "Menu");
   BindType<nu::MenuItem>(state, "MenuItem");
-  BindType<nu::MessageBox>(state, "MessageBox");
   BindType<nu::Notification>(state, "Notification");
   BindType<nu::NotificationCenter>(state, "NotificationCenter");
-  BindType<nu::Responder>(state, "Responder");
-  BindType<nu::Window>(state, "Window");
-  BindType<nu::View>(state, "View");
-  BindType<nu::ComboBox>(state, "ComboBox");
-  BindType<nu::Container>(state, "Container");
-  BindType<nu::Button>(state, "Button");
-  BindType<nu::ProtocolStringJob>(state, "ProtocolStringJob");
-  BindType<nu::ProtocolFileJob>(state, "ProtocolFileJob");
-  BindType<nu::ProtocolAsarJob>(state, "ProtocolAsarJob");
-  BindType<nu::Browser>(state, "Browser");
-  BindType<nu::DatePicker>(state, "DatePicker");
-  BindType<nu::Entry>(state, "Entry");
-  BindType<nu::Label>(state, "Label");
+  BindType<nu::Painter>(state, "Painter");
   BindType<nu::Picker>(state, "Picker");
   BindType<nu::ProgressBar>(state, "ProgressBar");
-  BindType<nu::GifPlayer>(state, "GifPlayer");
-  BindType<nu::Group>(state, "Group");
+  BindType<nu::ProtocolAsarJob>(state, "ProtocolAsarJob");
+  BindType<nu::ProtocolFileJob>(state, "ProtocolFileJob");
+  BindType<nu::ProtocolStringJob>(state, "ProtocolStringJob");
+  BindType<nu::Responder>(state, "Responder");
   BindType<nu::Screen>(state, "Screen");
   BindType<nu::Scroll>(state, "Scroll");
   BindType<nu::Separator>(state, "Separator");
@@ -2748,16 +2747,20 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::SimpleTableModel>(state, "SimpleTableModel");
   BindType<nu::Table>(state, "Table");
   BindType<nu::TextEdit>(state, "TextEdit");
-  BindType<nu::Tray>(state, "Tray");
 #if defined(OS_MAC)
   BindType<nu::Toolbar>(state, "Toolbar");
+#endif
+  BindType<nu::Tray>(state, "Tray");
+#if defined(OS_MAC)
   BindType<nu::Vibrant>(state, "Vibrant");
 #endif
+  BindType<nu::View>(state, "View");
+  BindType<nu::Window>(state, "Window");
   // Properties.
   lua::RawSet(state, -1,
-              "lifetime",           nu::Lifetime::GetCurrent(),
               "app",                nu::App::GetCurrent(),
               "appearance",         nu::Appearance::GetCurrent(),
+              "lifetime",           nu::Lifetime::GetCurrent(),
               "notificationcenter", nu::NotificationCenter::GetCurrent(),
               "screen",             nu::Screen::GetCurrent());
   return 1;

@@ -10,3 +10,6 @@
 [submodule "third_party/lua-compat-5.3"]
 	path = third_party/lua-compat-5.3
 	url = https://github.com/keplerproject/lua-compat-5.3
+[submodule "third_party/kizunapi"]
+	path = third_party/kizunapi
+	url = https://github.com/zcbenz/kizunapi

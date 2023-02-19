@@ -3,7 +3,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "node_yue/node_integration_mac.h"
+#include "napi_yue/node_integration_mac.h"
 
 #include <errno.h>
 #include <sys/select.h>
@@ -11,7 +11,7 @@
 #include <sys/time.h>
 #include <sys/types.h>
 
-namespace node_yue {
+namespace napi_yue {
 
 NodeIntegrationMac::NodeIntegrationMac() {
 }
@@ -45,4 +45,4 @@ NodeIntegration* NodeIntegration::Create() {
   return new NodeIntegrationMac();
 }
 
-}  // namespace node_yue
+}  // namespace napi_yue

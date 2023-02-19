@@ -6,6 +6,11 @@
 
 const {argv, execSync, spawnSync, streamPromise} = require('./common')
 
+if (argv.length < 2) {
+  console.error('Usage: test_node_extension runtime version [outDir]')
+  process.exit(1)
+}
+
 const fs = require('fs')
 const path = require('path')
 const extract = require('extract-zip')
@@ -15,11 +20,8 @@ const useTmpDir = require('use-tmp-dir')
 
 const runtime = argv[0]
 const version = argv[1].startsWith('v') ? argv[1] : `v${argv[1]}`
-const platform = argv[2] ? argv[2] : process.platform
-if (!runtime || !version) {
-  console.error('Usage: test_node_extension runtime version')
-  process.exit(1)
-}
+const outDir = argv[2] ? argv[2] : 'out/Component'
+const platform = argv[3] ? argv[3] : process.platform
 
 useTmpDir(async (tmpDir) => {
   if (runtime == 'electron')
@@ -39,7 +41,7 @@ useTmpDir(async (tmpDir) => {
 function testElectron(cwd) {
   execSync(`npm install electron@${version}`, {cwd})
   const electron = require(path.join(cwd, 'node_modules', 'electron'))
-  spawnSync(electron, ['node_yue/smoke_test.js', 'out/Node'])
+  process.exit(spawnSync(electron, ['napi_yue/test', outDir]).status)
 }
 
 async function testNode(cwd) {
@@ -56,5 +58,5 @@ async function testNode(cwd) {
     await tar.x({file: filepath, cwd})
     node = path.join(cwd, filename, 'bin', 'node')
   }
-  spawnSync(node, ['node_yue/smoke_test.js', 'out/Node'])
+  process.exit(spawnSync(node, ['--expose-gc', 'napi_yue/test', outDir, '--run-gc-tests']).status)
 }

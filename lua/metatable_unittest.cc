@@ -153,7 +153,7 @@ namespace lua {
 
 template<>
 struct Type<DerivedClass> {
-  using base = TestClass;
+  using Base = TestClass;
   static constexpr const char* name = "DerivedClass";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index,
@@ -234,7 +234,7 @@ namespace lua {
 
 template<>
 struct Type<DerivedClass2> {
-  using base = DerivedClass;
+  using Base = DerivedClass;
   static constexpr const char* name = "DerivedClass2";
   static void BuildMetaTable(State* state, int index) {
     RawSet(state, index, "new", &CreateOnHeap<DerivedClass2>,

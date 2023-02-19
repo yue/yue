@@ -35,7 +35,7 @@ if ((targetCpu == hostCpu) || (targetOs == 'win' && targetCpu == 'x86')) {
 // Test node modules can load.
 if (targetCpu == 'x64') {
   for (const config of ['Release', 'Debug'])
-    execSync(`node node_yue/smoke_test.js out/${config}`)
+    execSync(`node napi_yue/test out/${config}`)
 }
 
 fs.emptyDirSync('out/Dist')
@@ -58,10 +58,16 @@ for (const luaver of luaVersions)
 // Build node extensions.
 if (targetOs == 'win' && targetCpu.startsWith('arm'))
   process.exit(0)
+execSync('node ./scripts/create_node_extension.js')
+
+// Test node extension on different versions of Node.
+if (hostCpu != targetCpu)
+  process.exit(0)
 const runtimes = {
+  electron: electronVersions,
   node: nodeVersions,
 }
 for (let runtime in runtimes) {
   for (let nodever of runtimes[runtime])
-    execSync(`node ./scripts/create_node_extension.js --target-cpu=${targetCpu} ${runtime} ${nodever}`)
+    execSync(`node ./scripts/test_node_extension.js ${runtime} ${nodever} out/Release`)
 }

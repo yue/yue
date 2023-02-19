@@ -22,7 +22,7 @@ fs.writeFileSync(target, generateDocs(docsDir))
 // Write zip.
 createZip()
   .addFile('out/Dist/index.d.ts', 'out/Dist')
-  .writeToFile(`node_yue_types_${version}`)
+  .writeToFile(`yue_typescript_declarations_${version}`)
 
 // Scan |docsDir| and generate types declarations from JSON files.
 function generateDocs(docsDir) {

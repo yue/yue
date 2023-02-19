@@ -3,11 +3,11 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "node_yue/node_integration_linux.h"
+#include "napi_yue/node_integration_linux.h"
 
 #include <sys/epoll.h>
 
-namespace node_yue {
+namespace napi_yue {
 
 NodeIntegrationLinux::NodeIntegrationLinux() : epoll_(epoll_create(1)) {
   int backend_fd = uv_backend_fd(uv_loop_);
@@ -36,4 +36,4 @@ NodeIntegration* NodeIntegration::Create() {
   return new NodeIntegrationLinux();
 }
 
-}  // namespace node_yue
+}  // namespace napi_yue

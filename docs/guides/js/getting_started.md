@@ -20,24 +20,6 @@ npm i gui
 But note that `gui` is a native module, you have to reinstall it whenever you
 change Node.js versions or platforms.
 
-Only Node.js v12 and above are supported.
-
-### Electron
-
-For Electron you must follow the [Using Native Node Modules][native-module]
-guide on installing the `gui` module:
-
-```bash
-# Runtime is electron.
-export npm_config_runtime=electron
-# Electron's version.
-export npm_config_target=13.1.8
-# The architecture of Electron, can be ia32, arm or x64.
-export npm_config_arch=x64
-# Install the module, and store cache to ~/.electron-gyp.
-HOME=~/.electron-gyp npm i gui
-```
-
 ## Using Yue
 
 Like other Node.js modules, Yue can be used with a simple `require('gui')`, but

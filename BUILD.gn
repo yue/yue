@@ -5,11 +5,11 @@
 group("default") {
   deps = [
     "//lua_yue",
-    "//node_yue",
+    "//napi_yue",
     "//sample_app",
   ]
 
   if (is_win && (target_cpu == "arm" || target_cpu == "arm64")) {
-    deps -= ["//node_yue"]
+    deps -= ["//napi_yue"]
   }
 }

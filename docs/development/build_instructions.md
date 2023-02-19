@@ -11,7 +11,7 @@ build scripts before actually building Yue.
 
 * x64 operating system
 * Git
-* Python 2.7 (used by [GN][gn])
+* Python 3 (used by [GN][gn])
 * Node.js 10 or later (used by Yue's build scripts)
 
 ### Windows
@@ -29,7 +29,7 @@ build scripts before actually building Yue.
 
 * macOS >= 10.15
 * Xcode >= 11
-  * macOS 10.15 SDK
+  * macOS 11 SDK
 
 ## Bootstrapping
 
@@ -67,7 +67,7 @@ node scripts/build.js out/Debug nativeui_unittests
 
 ### Building Node.js native modules
 
-By default building the `node_yue` target would build the Node.js native module
+By default building the `napi_yue` target would build the Node.js native module
 for the Node.js installed on your system, to build for other versions and
 runtimes, you can use the `scripts/create_node_extension.js` script.
 

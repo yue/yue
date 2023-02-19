@@ -35,8 +35,8 @@ const sourceFiles = listFiles([
   'lua',
   'lua_yue',
   'nativeui',
-  'node_yue',
-  'v8binding'])
+  'napi_yue',
+])
 .filter((name) => {
   return name.endsWith('.cc') || name.endsWith('.h')
 })

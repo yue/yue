@@ -73,6 +73,8 @@ template<typename Sig> class Signal;
 template<typename... Args>
 class Signal<void(Args...)> : public SignalBase<void(Args...)> {
  public:
+  using Base = SignalBase<void(Args...)>;
+
   template<typename... EmitArgs>
   void Emit(EmitArgs&&... args) {
     // Copy the list before iterating, since it is possible that user removes
@@ -87,6 +89,8 @@ class Signal<void(Args...)> : public SignalBase<void(Args...)> {
 template<typename... Args>
 class Signal<bool(Args...)> : public SignalBase<bool(Args...)> {
  public:
+  using Base = SignalBase<bool(Args...)>;
+
   template<typename... EmitArgs>
   bool Emit(EmitArgs&&... args) {
     // Copy the list before iterating, since it is possible that user removes

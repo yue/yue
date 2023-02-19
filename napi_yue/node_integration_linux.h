@@ -3,12 +3,12 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef NODE_YUE_NODE_INTEGRATION_LINUX_H_
-#define NODE_YUE_NODE_INTEGRATION_LINUX_H_
+#ifndef NAPI_YUE_NODE_INTEGRATION_LINUX_H_
+#define NAPI_YUE_NODE_INTEGRATION_LINUX_H_
 
-#include "node_yue/node_integration.h"
+#include "napi_yue/node_integration.h"
 
-namespace node_yue {
+namespace napi_yue {
 
 class NodeIntegrationLinux : public NodeIntegration {
  public:
@@ -22,6 +22,6 @@ class NodeIntegrationLinux : public NodeIntegration {
   int epoll_;
 };
 
-}  // namespace node_yue
+}  // namespace napi_yue
 
-#endif  // NODE_YUE_NODE_INTEGRATION_LINUX_H_
+#endif  // NAPI_YUE_NODE_INTEGRATION_LINUX_H_

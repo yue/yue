@@ -3,7 +3,7 @@ const {clang, targetCpu, targetOs} = require('./common')
 // The version of nuget WebView2 package.
 const webview2Version = '1.0.622.22'
 
-// The versions of language bindings to build against.
+// The versions of language bindings to test against.
 const nodeVersions = [
   '14.19.1',
   '16.15.0',
@@ -11,8 +11,9 @@ const nodeVersions = [
   '19.6.0',
 ]
 const electronVersions = [
-  '20.3.12',
   '21.4.1',
+  '22.3.0',
+  '23.1.0',
 ]
 const luaVersions = [
   '5.3.6',

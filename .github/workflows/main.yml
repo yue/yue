@@ -66,8 +66,7 @@ jobs:
         with:
           path: |
             out/Dist/lua_yue_*.zip
-            out/Dist/node_yue_node_*.zip
-            out/Dist/node_yue_electron_*.zip
+            out/Dist/napi_yue_*.zip
           retention-days: 1
 
       - name: Upload Library Files
@@ -83,7 +82,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           path: |
-            out/Dist/node_yue_types_*.zip
+            out/Dist/yue_typescript_declarations_*.zip
             out/Dist/yue_docs_*.zip
           retention-days: 1
 
@@ -107,7 +106,7 @@ jobs:
         uses: actions/download-artifact@v3
 
       - name: Release
-        uses: softprops/action-gh-release@v0.1.14
+        uses: softprops/action-gh-release@v0.1.15
         with:
           draft: true
           name: Yue ${{ github.ref_name }}

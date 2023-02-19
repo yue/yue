@@ -3,7 +3,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "node_yue/node_integration.h"
+#include "napi_yue/node_integration.h"
 
 #include <functional>
 #include <string>
@@ -12,7 +12,7 @@
 #include "nativeui/message_loop.h"
 #include "node.h"  // NOLINT
 
-namespace node_yue {
+namespace napi_yue {
 
 NodeIntegration::NodeIntegration()
     : uv_loop_(uv_default_loop()),
@@ -93,4 +93,4 @@ void NodeIntegration::EmbedThreadRunner(void *arg) {
   }
 }
 
-}  // namespace node_yue
+}  // namespace napi_yue

@@ -1,0 +1,101 @@
+# Copyright 2017 Cheng Zhao. All rights reserved.
+# Use of this source code is governed by the license that can be found in the
+# LICENSE file.
+
+declare_args() {
+  # The version of Node to build against to.
+  node_version = "v18.14.0"
+  # The runtime used.
+  node_runtime = "node"
+}
+
+loadable_module("napi_yue") {
+  output_name = "gui"
+  output_extension = "node"
+  output_prefix_override = true  # do not add "lib" prefix
+
+  defines = [ "NODE_GYP_MODULE_NAME=$output_name" ]
+  include_dirs = [ "//third_party/kizunapi" ]
+
+  sources = [
+    "binding_ptr.h",
+    "binding_signal.h",
+    "binding_value.h",
+    "binding_value.cc",
+    "bindings.cc",
+    "node_integration.cc",
+    "node_integration.h",
+  ]
+
+  if (is_linux) {
+    sources += [
+      "node_integration_linux.cc",
+      "node_integration_linux.h",
+    ]
+  }
+
+  if (is_mac) {
+    sources += [
+      "node_integration_mac.cc",
+      "node_integration_mac.h",
+    ]
+  }
+
+  if (is_win) {
+    sources += [
+      "delay_load_hook_win.cc",
+      "node_integration_win.cc",
+      "node_integration_win.h",
+    ]
+  }
+
+  deps = [
+    "//base",
+    "//nativeui",
+  ]
+
+  configs += [ ":node_config" ]
+
+  if (is_linux && is_component_build) {
+    configs += [ "//build/config/gcc:rpath_for_built_shared_libraries" ]
+  }
+
+  if (is_win) {
+    ldflags = [
+      "/DELAYLOAD:node.exe",
+      "/DELAYLOAD:node.dll",
+      "/DELAYLOAD:yode.exe",
+    ]
+  } else {
+    # Suppress unused warnings from kizunapi.
+    cflags_cc = [ "-Wno-unused" ]
+  }
+}
+
+config("node_config") {
+  defines = [
+    "USING_UV_SHARED=1",
+    "USING_V8_SHARED=1",
+    "BUILDING_NODE_EXTENSION",
+  ]
+
+  node_dir = "//third_party/" + node_runtime + "-" + node_version
+
+  include_dirs = [
+    node_dir + "/include/node",
+    node_dir + "/src",
+    node_dir + "/deps",
+    node_dir + "/deps/uv/include",
+    node_dir + "/deps/v8/include",
+  ]
+
+  if (is_mac) {
+    ldflags = [
+      "-undefined", "dynamic_lookup",
+    ]
+  } else if (is_win) {
+    libs = [
+      node_dir + "/" + target_cpu + "/node.lib",
+    ]
+  }
+}

@@ -74,14 +74,14 @@ struct InheritanceChain {
 
 template<typename T>
 struct InheritanceChain<T, typename std::enable_if<std::is_class<
-                               typename Type<T>::base>::value>::type> {
+                               typename Type<T>::Base>::value>::type> {
   static inline void Push(State* state) {
     if (NewMetaTable<T>(state))  // already created.
       return;
 
     // Inherit from base type's metatable.
     StackAutoReset reset(state);
-    InheritanceChain<typename Type<T>::base>::Push(state);
+    InheritanceChain<typename Type<T>::Base>::Push(state);
     RawSet(state, -2, "__super", ValueOnStack(state, -1));
   }
 };
