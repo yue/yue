@@ -9,7 +9,7 @@ namespace nu {
 DraggingInfoMac::DraggingInfoMac(id<NSDraggingInfo> info)
    : DraggingInfo([info draggingSourceOperationMask]),
      // According to Apple:
-     // Although a standard dragging pasteboard (obtained using NSDragPboard) is
+     // Although a standard dragging pasteboard (obtained using NSPasteboardNameDrag) is
      // provided as a convenience in getting the pasteboard for dragging data,
      // there is NO guarantee that this will be the pasteboard used in a cross-
      // process drag. Thus, to guarantee getting the correct pasteboard, your

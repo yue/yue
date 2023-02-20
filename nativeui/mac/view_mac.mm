@@ -191,9 +191,9 @@ int View::DoDragWithOptions(std::vector<Clipboard::Data> data,
   NSWindow* window = [view_ window];
   NSPoint position = [window mouseLocationOutsideOfEventStream];
   NSTimeInterval event_time = [[NSApp currentEvent] timestamp];
-  NSEvent* event = [NSEvent mouseEventWithType:NSLeftMouseDragged
+  NSEvent* event = [NSEvent mouseEventWithType:NSEventTypeLeftMouseDragged
                                       location:position
-                                 modifierFlags:NSLeftMouseDraggedMask
+                                 modifierFlags:NSEventMaskLeftMouseDragged
                                      timestamp:event_time
                                   windowNumber:[window windowNumber]
                                        context:nil

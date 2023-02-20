@@ -4,6 +4,7 @@
 
 #include "nativeui/clipboard.h"
 
+#include <iostream>
 #include <utility>
 
 #include "base/notreached.h"

@@ -49,65 +49,65 @@ bool IsKeyUpEvent(NSEvent* event) {
   switch ([event keyCode]) {
     case 54:  // Right Command
       return IsModifierKeyUp([event modifierFlags], kRightCommandKeyMask,
-                             kLeftCommandKeyMask, NSCommandKeyMask);
+                             kLeftCommandKeyMask, NSEventModifierFlagCommand);
     case 55:  // Left Command
       return IsModifierKeyUp([event modifierFlags], kLeftCommandKeyMask,
-                             kRightCommandKeyMask, NSCommandKeyMask);
+                             kRightCommandKeyMask, NSEventModifierFlagCommand);
 
     case 57:  // Capslock
-      return ([event modifierFlags] & NSAlphaShiftKeyMask) == 0;
+      return ([event modifierFlags] & NSEventModifierFlagCapsLock) == 0;
 
     case 56:  // Left Shift
       return IsModifierKeyUp([event modifierFlags], kLeftShiftKeyMask,
-                             kRightShiftKeyMask, NSShiftKeyMask);
+                             kRightShiftKeyMask, NSEventModifierFlagShift);
     case 60:  // Right Shift
       return IsModifierKeyUp([event modifierFlags], kRightShiftKeyMask,
-                             kLeftShiftKeyMask, NSShiftKeyMask);
+                             kLeftShiftKeyMask, NSEventModifierFlagShift);
 
     case 58:  // Left Alt
       return IsModifierKeyUp([event modifierFlags], kLeftAlternateKeyMask,
-                             kRightAlternateKeyMask, NSAlternateKeyMask);
+                             kRightAlternateKeyMask, NSEventModifierFlagOption);
     case 61:  // Right Alt
       return IsModifierKeyUp([event modifierFlags], kRightAlternateKeyMask,
-                             kLeftAlternateKeyMask, NSAlternateKeyMask);
+                             kLeftAlternateKeyMask, NSEventModifierFlagOption);
 
     case 59:  // Left Ctrl
       return IsModifierKeyUp([event modifierFlags], kLeftControlKeyMask,
-                             kRightControlKeyMask, NSControlKeyMask);
+                             kRightControlKeyMask, NSEventModifierFlagControl);
     case 62:  // Right Ctrl
       return IsModifierKeyUp([event modifierFlags], kRightControlKeyMask,
-                             kLeftControlKeyMask, NSControlKeyMask);
+                             kLeftControlKeyMask, NSEventModifierFlagControl);
 
     case 63:  // Function
-      return ([event modifierFlags] & NSFunctionKeyMask) == 0;
+      return ([event modifierFlags] & NSEventModifierFlagFunction) == 0;
   }
   return false;
 }
 
 EventType EventTypeFromNS(NSEvent* event) {
   switch ([event type]) {
-    case NSLeftMouseDown:
-    case NSRightMouseDown:
-    case NSOtherMouseDown:
+    case NSEventTypeLeftMouseDown:
+    case NSEventTypeRightMouseDown:
+    case NSEventTypeOtherMouseDown:
       return EventType::MouseDown;
-    case NSLeftMouseUp:
-    case NSRightMouseUp:
-    case NSOtherMouseUp:
+    case NSEventTypeLeftMouseUp:
+    case NSEventTypeRightMouseUp:
+    case NSEventTypeOtherMouseUp:
       return EventType::MouseUp;
-    case NSLeftMouseDragged:
-    case NSRightMouseDragged:
-    case NSOtherMouseDragged:
-    case NSMouseMoved:
+    case NSEventTypeLeftMouseDragged:
+    case NSEventTypeRightMouseDragged:
+    case NSEventTypeOtherMouseDragged:
+    case NSEventTypeMouseMoved:
       return EventType::MouseMove;
-    case NSMouseEntered:
+    case NSEventTypeMouseEntered:
       return EventType::MouseEnter;
-    case NSMouseExited:
+    case NSEventTypeMouseExited:
       return EventType::MouseLeave;
-    case NSKeyDown:
+    case NSEventTypeKeyDown:
       return EventType::KeyDown;
-    case NSKeyUp:
+    case NSEventTypeKeyUp:
       return EventType::KeyUp;
-    case NSFlagsChanged:
+    case NSEventTypeFlagsChanged:
       return IsKeyUpEvent(event) ? EventType::KeyUp : EventType::KeyDown;
     default:
       return EventType::Unknown;
@@ -153,22 +153,22 @@ PointF GetPosInView(NSEvent* event, NSResponder* responder) {
 
 // static
 bool Event::IsShiftPressed() {
-  return [NSEvent modifierFlags] & NSShiftKeyMask;
+  return [NSEvent modifierFlags] & NSEventModifierFlagShift;
 }
 
 // static
 bool Event::IsControlPressed() {
-  return [NSEvent modifierFlags] & NSControlKeyMask;
+  return [NSEvent modifierFlags] & NSEventModifierFlagControl;
 }
 
 // static
 bool Event::IsAltPressed() {
-  return [NSEvent modifierFlags] & NSAlternateKeyMask;
+  return [NSEvent modifierFlags] & NSEventModifierFlagOption;
 }
 
 // static
 bool Event::IsMetaPressed() {
-  return [NSEvent modifierFlags] & NSCommandKeyMask;
+  return [NSEvent modifierFlags] & NSEventModifierFlagCommand;
 }
 
 Event::Event(NativeEvent event, NativeResponder responder)

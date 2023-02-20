@@ -29,7 +29,7 @@ void MessageLoop::Run() {
 void MessageLoop::Quit() {
   [NSApp stop:nil];
   // Must post an event, otherwise an idle loop may not response to stop.
-  [NSApp postEvent:[NSEvent otherEventWithType:NSApplicationDefined
+  [NSApp postEvent:[NSEvent otherEventWithType:NSEventTypeApplicationDefined
                                       location:NSZeroPoint
                                  modifierFlags:0
                                      timestamp:0

@@ -31,7 +31,7 @@ napi_status Type<base::Value>::ToNode(napi_env env,
     case base::Value::Type::BINARY:
       return napi_create_buffer_copy(
           env, value.GetBlob().size(), value.GetBlob().data(), nullptr, result);
-    case base::Value::Type::DICTIONARY: {
+    case base::Value::Type::DICT: {
       napi_status s = napi_create_object(env, result);
       if (s == napi_ok) {
         for (const auto it : value.GetDict()) {

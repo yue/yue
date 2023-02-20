@@ -49,11 +49,11 @@ NativeClipboard Clipboard::PlatformCreate(Type type) {
     case Type::CopyPaste:
       return [NSPasteboard generalPasteboard];
     case Type::Drag:
-      return [NSPasteboard pasteboardWithName:NSDragPboard];
+      return [NSPasteboard pasteboardWithName:NSPasteboardNameDrag];
     case Type::Find:
-      return [NSPasteboard pasteboardWithName:NSFindPboard];
+      return [NSPasteboard pasteboardWithName:NSPasteboardNameFind];
     case Type::Font:
-      return [NSPasteboard pasteboardWithName:NSFontPboard];
+      return [NSPasteboard pasteboardWithName:NSPasteboardNameFont];
     default:
       NOTREACHED() << "Type::Count is not a valid clipboard type";
   }

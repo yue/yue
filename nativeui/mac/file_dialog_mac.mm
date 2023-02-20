@@ -31,18 +31,18 @@ base::FilePath FileDialog::GetResult() const {
 }
 
 bool FileDialog::Run() {
-  return [dialog_ runModal] == NSFileHandlingPanelOKButton;
+  return [dialog_ runModal] == NSModalResponseOK;
 }
 
 bool FileDialog::RunForWindow(Window* window) {
-  __block int chosen = NSFileHandlingPanelCancelButton;
+  __block int chosen = NSModalResponseCancel;
   [dialog_ beginSheetModalForWindow:window->GetNative()
                  completionHandler:^(NSInteger c) {
     chosen = c;
     [NSApp stopModal];
   }];
   [NSApp runModalForWindow:window->GetNative()];
-  return chosen == NSFileHandlingPanelOKButton;
+  return chosen == NSModalResponseOK;
 }
 
 void FileDialog::SetTitle(const std::string& title) {

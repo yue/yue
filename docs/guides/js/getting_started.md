@@ -18,7 +18,7 @@ npm i gui
 ```
 
 But note that `gui` is a native module, you have to reinstall it whenever you
-change Node.js versions or platforms.
+change platforms.
 
 ## Using Yue
 

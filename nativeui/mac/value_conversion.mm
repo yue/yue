@@ -29,21 +29,19 @@ base::Value NSValueToBaseValue(id value) {
     else
       return base::Value([value intValue]);
   } else if ([value isKindOfClass:[NSArray class]]) {
-    base::Value::ListStorage arr;
+    base::Value::List arr;
     arr.reserve([value count]);
     for (id item in value)
-      arr.push_back(NSValueToBaseValue(item));
+      arr.Append(NSValueToBaseValue(item));
     return base::Value(std::move(arr));
   } else if ([value isKindOfClass:[NSDictionary class]]) {
-    base::DictionaryValue dict;
+    base::Value::Dict dict;
     for (id key in value) {
       std::string str_key = base::SysNSStringToUTF8(
           [key isKindOfClass:[NSString class]] ? key : [key description]);
-      auto vval = std::make_unique<base::Value>(
-          NSValueToBaseValue([value objectForKey:key]));
-      dict.SetWithoutPathExpansion(str_key.c_str(), std::move(vval));
+      dict.Set(str_key.c_str(), NSValueToBaseValue([value objectForKey:key]));
     }
-    return std::move(dict);
+    return base::Value(std::move(dict));
   } else {
     return base::Value(base::SysNSStringToUTF8([value description]));
   }

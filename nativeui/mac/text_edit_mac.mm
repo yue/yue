@@ -193,7 +193,8 @@ std::string TextEdit::GetTextInRange(int start, int end) const {
 void TextEdit::InsertText(const std::string& text) {
   auto* textView = static_cast<NSTextView*>(
       [static_cast<NUTextEdit*>(GetNative()) documentView]);
-  [textView insertText:base::SysUTF8ToNSString(text)];
+  [textView insertText:base::SysUTF8ToNSString(text)
+       replacementRange:[textView selectedRange]];
 }
 
 void TextEdit::InsertTextAt(const std::string& text, int pos) {

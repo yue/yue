@@ -4,7 +4,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {clang, targetCpu, targetOs, execSync, spawnSync} = require('./common')
+const {clang, hostCpu, targetCpu, targetOs, execSync, spawnSync} = require('./common')
 const {gnConfig, gnSysrootConfig, luaVersions} = require('./config')
 
 // Get the arch of sysroot.
@@ -50,6 +50,8 @@ const releaseConfig = [
 if (targetOs == 'linux') {
   debugConfig.push(...gnSysrootConfig)
   releaseConfig.push(...gnSysrootConfig)
+  if (targetCpu != hostCpu)
+    componentConfig.push(...gnSysrootConfig)
 }
 
 gen('out/Component', componentConfig)

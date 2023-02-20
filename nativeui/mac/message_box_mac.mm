@@ -60,13 +60,13 @@ void MessageBox::SetType(Type type) {
   switch (type) {
     case Type::None:
     case Type::Information:
-      box_.alertStyle = NSInformationalAlertStyle;
+      box_.alertStyle = NSAlertStyleInformational;
       break;
     case Type::Warning:
-      box_.alertStyle = NSWarningAlertStyle;
+      box_.alertStyle = NSAlertStyleWarning;
       break;
     case Type::Error:
-      box_.alertStyle = NSCriticalAlertStyle;
+      box_.alertStyle = NSAlertStyleCritical;
       break;
   }
 }

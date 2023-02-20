@@ -191,12 +191,12 @@ methods:
   - signature: void SetFullSizeContentView(bool full)
     platform: ['macOS']
     description: |
-      Set the `NSFullSizeContentViewWindowMask` style on the window.
+      Set the `NSWindowStyleMaskFullSizeContentView` style on the window.
 
   - signature: bool IsFullSizeContentView() const
     platform: ['macOS']
     description: |
-      Return whether the window has `NSFullSizeContentViewWindowMask` style.
+      Return whether the window has `NSWindowStyleMaskFullSizeContentView` style.
 
   - signature: void SetSkipTaskbar(bool skip)
     platform: ['Windows', 'Linux']

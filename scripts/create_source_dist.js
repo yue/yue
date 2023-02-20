@@ -37,8 +37,10 @@ function GenerateProject() {
   ])
   fs.emptyDirSync('out/Source')
   process.env.JUMBO_INCLUDE_FILE_CONTENTS = 'true'
-  spawnSync('gn', ['gen', 'out/Source', `--args=${args.join(' ')}`])
-  spawnSync('ninja', ['-C', 'out/Source', 'nativeui'])
+  if (spawnSync('gn', ['gen', 'out/Source', `--args=${args.join(' ')}`]).status != 0)
+    process.exit(1)
+  if (spawnSync('ninja', ['-C', 'out/Source', 'nativeui']).status != 0)
+    process.exit(2)
 }
 
 async function GetAllDeps(target) {
@@ -99,9 +101,8 @@ function CopySources(sources, headers) {
       'third_party/googletest/src/googletest/include'
     ],
   }
-  if (targetOs === 'mac') {
-    EXTRA_HEADERS[''] = [ 'third_party/apple_apsl' ]
-  } else if (targetOs === 'win') {
+  if (targetOs === 'win') {
+    CopySource('//base/allocator/partition_allocator/partition_alloc_base/win/win_handle_types_list.inc', path.join(targetDir, 'include'))
     CopySource('//base/win/win_handle_types_list.inc', path.join(targetDir, 'include'))
     CopySource('//base/win/windows_defines.inc', path.join(targetDir, 'include'))
     CopySource('//base/win/windows_undefines.inc', path.join(targetDir, 'include'))

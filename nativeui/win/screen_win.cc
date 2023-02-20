@@ -41,11 +41,36 @@ Size GetDPI() {
   return Size(dpi_x, dpi_y);
 }
 
+bool IsProcessPerMonitorDpiAware() {
+  enum class PerMonitorDpiAware {
+    UNKNOWN = 0,
+    PER_MONITOR_DPI_UNAWARE,
+    PER_MONITOR_DPI_AWARE,
+  };
+  static PerMonitorDpiAware per_monitor_dpi_aware = PerMonitorDpiAware::UNKNOWN;
+  if (per_monitor_dpi_aware == PerMonitorDpiAware::UNKNOWN) {
+    per_monitor_dpi_aware = PerMonitorDpiAware::PER_MONITOR_DPI_UNAWARE;
+    HMODULE shcore_dll = ::LoadLibrary(L"shcore.dll");
+    if (shcore_dll) {
+      auto get_process_dpi_awareness_func =
+          reinterpret_cast<decltype(::GetProcessDpiAwareness)*>(
+              ::GetProcAddress(shcore_dll, "GetProcessDpiAwareness"));
+      if (get_process_dpi_awareness_func) {
+        PROCESS_DPI_AWARENESS awareness;
+        if (SUCCEEDED(get_process_dpi_awareness_func(nullptr, &awareness)) &&
+            awareness == PROCESS_PER_MONITOR_DPI_AWARE)
+          per_monitor_dpi_aware = PerMonitorDpiAware::PER_MONITOR_DPI_AWARE;
+      }
+    }
+  }
+  return per_monitor_dpi_aware == PerMonitorDpiAware::PER_MONITOR_DPI_AWARE;
+}
+
 // Gets the DPI for a particular monitor, or 0 if per-monitor DPI is nuot
 // supported or can't be read.
 int GetPerMonitorDPI(HMONITOR monitor) {
   // Most versions of Windows we will encounter are DPI-aware.
-  if (!base::win::IsProcessPerMonitorDpiAware())
+  if (!IsProcessPerMonitorDpiAware())
     return 0;
 
   static auto get_dpi_for_monitor_func = []() {
@@ -100,7 +125,7 @@ PointF ScalePointRelative(const PointF& point,
 
 float GetScaleFactorForHWND(HWND hwnd) {
   HMONITOR monitor = ::MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
-  if (base::win::IsProcessPerMonitorDpiAware())
+  if (IsProcessPerMonitorDpiAware())
     return GetScalingFactorFromDPI(GetPerMonitorDPI(monitor));
   return Screen::GetDefaultScaleFactor();
 }
@@ -114,7 +139,7 @@ float GetScalingFactorFromDPI(int dpi) {
 }
 
 int GetSystemMetricsForScaleFactor(float scale_factor, int metric) {
-  if (base::win::IsProcessPerMonitorDpiAware()) {
+  if (IsProcessPerMonitorDpiAware()) {
     static auto get_metric_for_dpi_func = []() {
       using GetSystemMetricsForDpiPtr = decltype(::GetSystemMetricsForDpi)*;
       HMODULE user32_dll = ::LoadLibrary(L"user32.dll");

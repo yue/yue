@@ -22,6 +22,16 @@ namespace {
 // The version of asar format we supports.
 const uint8_t kSupportedAsarVersion = 2;
 
+const base::Value* FindPathInValue(const base::Value& value,
+                                   const std::vector<base::StringPiece>& path) {
+  const base::Value* cur = &value;
+  for (const base::StringPiece& component : path) {
+    if (!cur->is_dict() || (cur = cur->FindKey(component)) == nullptr)
+      return nullptr;
+  }
+  return cur;
+}
+
 }  // namespace
 
 AsarArchive::AsarArchive(base::File file, bool extended_format)
@@ -75,13 +85,14 @@ bool AsarArchive::GetFileInfo(const std::string& path, FileInfo* info) {
       path, "/\\", base::KEEP_WHITESPACE, base::SPLIT_WANT_NONEMPTY);
   std::vector<base::StringPiece> key;
   key.reserve(components.size() * 2);
+  const char* filesKey = "files";
   for (const base::StringPiece& c : components) {
-    key.push_back("files");
+    key.push_back(filesKey);
     key.push_back(c);
   }
 
   // Search for the node representing path.
-  const base::Value* node = header_.FindPath(key);
+  const base::Value* node = FindPathInValue(header_, key);
   if (!node)
     return false;
 

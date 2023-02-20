@@ -5,6 +5,7 @@
 #include "nativeui/gtk/util/widget_util.h"
 
 #include <algorithm>
+#include <iostream>
 
 #include "nativeui/gfx/color.h"
 #include "nativeui/gfx/geometry/rect_f.h"

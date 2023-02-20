@@ -55,7 +55,7 @@ void Type<base::Value>::Push(State* state, const base::Value& value) {
                       reinterpret_cast<const char*>(value.GetBlob().data()),
                       value.GetBlob().size());
       return;
-    case base::Value::Type::DICTIONARY: {
+    case base::Value::Type::DICT: {
       NewTable(state, 0, static_cast<int>(value.DictSize()));
       for (const auto it : value.DictItems()) {
         lua::Push(state, it.first);
@@ -95,13 +95,16 @@ bool Type<base::Value>::To(State* state, int index, base::Value* out) {
     case LuaType::Table: {
       size_t size = 0;
       if (IsTableArray(state, index, &size)) {
-        std::vector<base::Value> storage;
-        if (!lua::To(state, index, &storage))
+        std::vector<base::Value> list;
+        if (!lua::To(state, index, &list))
           return false;
+        base::Value::List storage;
+        storage.reserve(list.size());
+        for (auto& it : list)
+          storage.Append(std::move(it));
         *out = base::Value(std::move(storage));
       } else {
-        *out = base::Value(base::Value::Type::DICTIONARY);
-        auto* dict = static_cast<base::DictionaryValue*>(out);
+        *out = base::Value(base::Value::Type::DICT);
         StackAutoReset reset(state);
         lua_pushnil(state);
         while (lua_next(state, index) != 0) {
@@ -110,8 +113,7 @@ bool Type<base::Value>::To(State* state, int index, base::Value* out) {
           if (!lua::To(state, -2, &key) || !lua::To(state, -1, &value))
             return false;
           lua_pop(state, 1);
-          auto vval = std::make_unique<base::Value>(std::move(value));
-          dict->SetWithoutPathExpansion(key.c_str(), std::move(vval));
+          out->GetDict().Set(key.c_str(), std::move(value));
         }
       }
       break;

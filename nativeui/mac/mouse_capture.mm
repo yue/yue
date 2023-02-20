@@ -10,11 +10,13 @@ namespace nu {
 
 MouseCapture::MouseCapture(Responder* responder) : responder_(responder) {
   NSEventMask event_mask =
-      NSLeftMouseDownMask | NSLeftMouseUpMask | NSRightMouseDownMask |
-      NSRightMouseUpMask | NSMouseMovedMask | NSLeftMouseDraggedMask |
-      NSRightMouseDraggedMask | NSMouseEnteredMask | NSMouseExitedMask |
-      NSScrollWheelMask | NSOtherMouseDownMask | NSOtherMouseUpMask |
-      NSOtherMouseDraggedMask;
+      NSEventMaskLeftMouseDown | NSEventMaskLeftMouseUp |
+      NSEventMaskRightMouseDown | NSEventMaskRightMouseUp |
+      NSEventMaskMouseMoved | NSEventMaskLeftMouseDragged |
+      NSEventMaskRightMouseDragged | NSEventMaskMouseEntered |
+      NSEventMaskMouseExited | NSEventMaskScrollWheel |
+      NSEventMaskOtherMouseDown | NSEventMaskOtherMouseUp |
+      NSEventMaskOtherMouseDragged;
   local_monitor_ = [NSEvent addLocalMonitorForEventsMatchingMask:event_mask
       handler:^NSEvent*(NSEvent* event) {
         ProcessCapturedMouseEvent(event);

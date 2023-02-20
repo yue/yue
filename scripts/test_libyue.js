@@ -45,10 +45,11 @@ function generateProject(config) {
     const buildDir = `build_${targetCpu}`
     fs.ensureDirSync(buildDir)
     const platform = targetCpu == 'x64' ? 'x64' : 'Win32'
-    const args = ['-S', '.', '-G', 'Visual Studio 16 2019', '-B', buildDir, '-A', platform]
+    const args = ['-S', '.', '-G', 'Visual Studio 17 2022', '-B', buildDir, '-A', platform]
     if (clang)
       args.push('-T', 'ClangCL')
-    spawnSync('cmake', args)
+    if (spawnSync('cmake', args).status != 0)
+      process.exit(1)
   } else {
     const buildDir = `build_${config}`
     fs.ensureDirSync(buildDir)
@@ -63,19 +64,19 @@ function buildProject(config) {
       execSync(`cmake --build build_${targetCpu} --config ${config} --parallel ${cpus}`)
     } else {
       const vsPaths = [
-        'C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\MSBuild\\Current\\Bin',
-        'C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\MSBuild\\Current\\Bin',
+        'C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin',
+        'C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\MSBuild\\Current\\Bin',
         process.env.PATH
       ]
       const env = Object.assign(process.env, {PATH: vsPaths.join(path.delimiter)})
       const platform = targetCpu == 'x64' ? 'x64' : 'Win32'
-      spawnSync(
-        'msbuild',
-        ['Yue.sln',
-          `/maxcpucount:${cpus}`,
-          `/p:Configuration=${config}`,
-          `/p:Platform=${platform}`],
-        {cwd: `build_${targetCpu}`, env})
+      if (spawnSync('msbuild',
+                    ['Yue.sln',
+                      `/maxcpucount:${cpus}`,
+                      `/p:Configuration=${config}`,
+                      `/p:Platform=${platform}`],
+                    {cwd: `build_${targetCpu}`, env}).status != 0)
+        process.exit(2)
     }
   } else {
     execSync(`make -j ${cpus}`, {cwd: `build_${config}`})

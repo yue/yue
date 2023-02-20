@@ -128,6 +128,8 @@ of building apps with Yue from source code using CMake. To try it:
    __Linux__
 
    ```bash
+   CC=clang
+   CXX=clang++
    cmake .. -D CMAKE_BUILD_TYPE=Release
    make
    ```
@@ -135,7 +137,7 @@ of building apps with Yue from source code using CMake. To try it:
    __Windows__
 
    ```bash
-   cmake .. -G "Visual Studio 16 2019" -A x64
+   cmake .. -G "Visual Studio 17 2022" -A x64
    start Yue.sln
    ```
 

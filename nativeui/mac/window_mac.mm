@@ -83,9 +83,9 @@ Window* Window::FromNative(NativeWindow window) {
 void Window::PlatformInit(const Options& options) {
   InstallNUWindowMethods([NUWindow class]);
 
-  NSUInteger styleMask = NSTitledWindowMask | NSMiniaturizableWindowMask |
-                         NSClosableWindowMask | NSResizableWindowMask |
-                         NSTexturedBackgroundWindowMask;
+  NSUInteger styleMask = NSWindowStyleMaskTitled | NSWindowStyleMaskMiniaturizable |
+                         NSWindowStyleMaskClosable | NSWindowStyleMaskResizable |
+                         NSWindowStyleMaskTexturedBackground;
   NUWindow* window = [[NUWindow alloc]
       initWithContentRect:NSZeroRect
                 styleMask:styleMask
@@ -98,8 +98,7 @@ void Window::PlatformInit(const Options& options) {
   [window_ setReleasedWhenClosed:NO];
 
   // Disable tab menu items.
-  if (base::mac::IsAtLeastOS10_12())
-    [window_ setTabbingMode:NSWindowTabbingModeDisallowed];
+  [window_ setTabbingMode:NSWindowTabbingModeDisallowed];
 
   YGConfigSetPointScaleFactor(yoga_config_,
                               [window_ screen].backingScaleFactor);
@@ -110,7 +109,7 @@ void Window::PlatformInit(const Options& options) {
     [window_ setTitleVisibility:NSWindowTitleHidden];
 
     // The fullscreen button should always be hidden for frameless window.
-    [[window_ standardWindowButton:NSWindowFullScreenButton] setHidden:YES];
+    [[window_ standardWindowButton:NSWindowZoomButton] setHidden:YES];
 
     if (!options.show_traffic_lights) {
       // Hide the window buttons.
@@ -295,7 +294,7 @@ void Window::SetFullscreen(bool fullscreen) {
 }
 
 bool Window::IsFullscreen() const {
-  return [window_ styleMask] & NSFullScreenWindowMask;
+  return [window_ styleMask] & NSWindowStyleMaskFullScreen;
 }
 
 void Window::Maximize() {
@@ -334,11 +333,11 @@ bool Window::IsMinimized() const {
 }
 
 void Window::SetResizable(bool yes) {
-  [window_ setWindowStyle:NSResizableWindowMask on:yes];
+  [window_ setWindowStyle:NSWindowStyleMaskResizable on:yes];
 }
 
 bool Window::IsResizable() const {
-  return [window_ styleMask] & NSResizableWindowMask;
+  return [window_ styleMask] & NSWindowStyleMaskResizable;
 }
 
 void Window::SetMaximizable(bool yes) {
@@ -350,11 +349,11 @@ bool Window::IsMaximizable() const {
 }
 
 void Window::SetMinimizable(bool minimizable) {
-  [window_ setWindowStyle:NSMiniaturizableWindowMask on:minimizable];
+  [window_ setWindowStyle:NSWindowStyleMaskMiniaturizable on:minimizable];
 }
 
 bool Window::IsMinimizable() const {
-  return [window_ styleMask] & NSMiniaturizableWindowMask;
+  return [window_ styleMask] & NSWindowStyleMaskMiniaturizable;
 }
 
 void Window::SetMovable(bool movable) {
@@ -392,11 +391,11 @@ bool Window::IsTitleVisible() const {
 }
 
 void Window::SetFullSizeContentView(bool full) {
-  [window_ setWindowStyle:NSFullSizeContentViewWindowMask on:full];
+  [window_ setWindowStyle:NSWindowStyleMaskFullSizeContentView on:full];
 }
 
 bool Window::IsFullSizeContentView() const {
-  return [window_ styleMask] & NSFullSizeContentViewWindowMask;
+  return [window_ styleMask] & NSWindowStyleMaskFullSizeContentView;
 }
 
 void Window::PlatformAddChildWindow(Window* child) {

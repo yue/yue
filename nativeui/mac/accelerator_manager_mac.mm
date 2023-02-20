@@ -29,7 +29,7 @@ void AcceleratorManager::RegisterAccelerator(MenuItem* item,
   // Make some special cases more visual friendly.
   int modifiers = accelerator.GetModifiers();
   if (character != characterIgnoringModifiers)
-    modifiers ^= NSShiftKeyMask;
+    modifiers ^= NSEventModifierFlagShift;
   if (character == NSDeleteFunctionKey)
     character = NSDeleteCharacter;
 

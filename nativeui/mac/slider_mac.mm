@@ -32,7 +32,7 @@
   shell_->on_value_change.Emit(shell_);
 
   NSEvent* event = [[NSApplication sharedApplication] currentEvent];
-  if (event.type == NSLeftMouseUp)
+  if (event.type == NSEventTypeLeftMouseUp)
     shell_->on_sliding_complete.Emit(shell_);
 }
 

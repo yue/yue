@@ -6,7 +6,6 @@
 
 #pragma clang diagnostic ignored "-Wunguarded-availability"
 
-#include "base/mac/sdk_forward_declarations.h"
 #include "nativeui/mac/container_mac.h"
 
 @interface NUVibrant : NSVisualEffectView<NUViewMethods> {

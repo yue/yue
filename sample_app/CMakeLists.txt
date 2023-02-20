@@ -36,7 +36,7 @@ add_library(${LIBYUE} ${YUE_SOURCES})
 target_include_directories(${LIBYUE} PUBLIC include)
 
 # Use C++17 standard.
-target_compile_features(${LIBYUE} PUBLIC cxx_std_17)
+target_compile_features(${LIBYUE} PUBLIC cxx_std_20)
 
 # macOS configuration.
 if(APPLE)
@@ -58,13 +58,16 @@ endif()
 if(WIN32)
   target_compile_definitions(${LIBYUE} PUBLIC
                              _WINDOWS WIN32 WIN32_LEAN_AND_MEAN NOMINMAX
-                             _UNICODE UNICODE)
+                             _UNICODE UNICODE
+                             # base::StackContainer is unhappy with it
+                             $<$<CONFIG:Debug>:_ITERATOR_DEBUG_LEVEL=0>)
   target_link_libraries(${LIBYUE} PUBLIC
                         setupapi.lib powrprof.lib ws2_32.lib dbghelp.lib
                         shlwapi.lib version.lib winmm.lib wbemuuid.lib
                         psapi.lib dwmapi.lib propsys.lib comctl32.lib
                         gdi32.lib gdiplus.lib urlmon.lib userenv.lib
-                        uxtheme.lib delayimp.lib runtimeobject.lib)
+                        uxtheme.lib delayimp.lib runtimeobject.lib ntdll.lib
+                        shcore.lib)
   set_target_properties(${LIBYUE} PROPERTIES COMPILE_FLAGS
                         "/wd4244 /wd4267 /wd4996")
   target_link_options(${LIBYUE} PUBLIC

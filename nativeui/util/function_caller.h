@@ -197,7 +197,7 @@ struct IsConvertibleToRunType : std::false_type {};
 
 template <typename Callable>
 struct IsConvertibleToRunType<Callable,
-                              base::void_t<decltype(&Callable::operator())>>
+                              std::void_t<decltype(&Callable::operator())>>
     : std::is_convertible<Callable, ExtractCallableRunType<Callable>*> {};
 
 // FunctorTraits<>

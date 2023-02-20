@@ -187,9 +187,9 @@ const KeyCodeMap kKeyCodesMap[] = {
 bool IsKeypadOrNumericKeyEvent(NSEvent* event) {
   // Check that this is the type of event that has a keyCode.
   switch ([event type]) {
-    case NSKeyDown:
-    case NSKeyUp:
-    case NSFlagsChanged:
+    case NSEventTypeKeyDown:
+    case NSEventTypeKeyUp:
+    case NSEventTypeFlagsChanged:
       break;
     default:
       return false;
@@ -438,7 +438,7 @@ int MacKeyCodeForWindowsKeyCode(KeyboardCode keycode,
                                 unichar* keyboard_character) {
   // In release code, |flags| is used to lookup accelerators, so logic to handle
   // caps lock properly isn't implemented.
-  DCHECK_EQ(0u, flags & NSAlphaShiftKeyMask);
+  DCHECK_EQ(0u, flags & NSEventModifierFlagCapsLock);
 
   KeyCodeMap from;
   from.keycode = keycode;
@@ -463,7 +463,7 @@ int MacKeyCodeForWindowsKeyCode(KeyboardCode keycode,
   *us_keyboard_shifted_character = ptr->characterIgnoringAllModifiers;
 
   // Fill in |us_keyboard_shifted_character| according to flags.
-  if (flags & NSShiftKeyMask) {
+  if (flags & NSEventModifierFlagShift) {
     if (keycode >= VKEY_0 && keycode <= VKEY_9) {
       *us_keyboard_shifted_character =
           kShiftCharsForNumberKeys[keycode - VKEY_0];
@@ -519,7 +519,7 @@ KeyboardCode KeyboardCodeFromNSEvent(NSEvent* event) {
   // Numeric keys 0-9 should always return |keyCode| 0-9.
   // https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode#Printable_keys_in_standard_position
   if (!IsKeypadOrNumericKeyEvent(event) &&
-      ([event type] == NSKeyDown || [event type] == NSKeyUp)) {
+      ([event type] == NSEventTypeKeyDown || [event type] == NSEventTypeKeyUp)) {
     // Handles Dvorak-QWERTY Cmd case.
     // https://github.com/WebKit/webkit/blob/4d41c98b1de467f5d2a8fcba84d7c5268f11b0cc/Source/WebCore/platform/mac/PlatformEventFactoryMac.mm#L329
     NSString* characters = [event characters];

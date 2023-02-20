@@ -109,10 +109,10 @@ void UpdateViewTrackingAreas(NSView* self, SEL _cmd) {
 
   if (NSPointInRect(mouse, [self bounds])) {  // mouse in view.
     if (!priv->hovered)
-      [self mouseEntered:FakeEvent(self, NSMouseEntered)];
+      [self mouseEntered:FakeEvent(self, NSEventTypeMouseEntered)];
   } else {  // mouse not in view.
     if (priv->hovered)
-      [self mouseExited:FakeEvent(self, NSMouseExited)];
+      [self mouseExited:FakeEvent(self, NSEventTypeMouseExited)];
   }
 
   [self enableTracking];

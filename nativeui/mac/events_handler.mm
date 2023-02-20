@@ -6,6 +6,8 @@
 
 #include <objc/objc-runtime.h>
 
+#include <iostream>
+
 #include "base/notreached.h"
 #include "nativeui/events/event.h"
 #include "nativeui/mac/dragging_info_mac.h"

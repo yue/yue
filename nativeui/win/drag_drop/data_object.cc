@@ -6,6 +6,7 @@
 #include "nativeui/win/drag_drop/data_object.h"
 
 #include <algorithm>
+#include <iostream>
 #include <iterator>
 #include <string>
 #include <utility>

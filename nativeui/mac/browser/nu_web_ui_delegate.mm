@@ -86,13 +86,13 @@
   if ([webview window]) {
     [openPanel beginSheetModalForWindow:webview.window
                       completionHandler:^(NSInteger result) {
-      completionHandler(result == NSFileHandlingPanelOKButton ? [openPanel URLs]
+      completionHandler(result == NSModalResponseOK ? [openPanel URLs]
                                                               : nil);
       [openPanel release];
     }];
   } else {
     NSInteger result = [[openPanel autorelease] runModal];
-    completionHandler(result == NSFileHandlingPanelOKButton ? [openPanel URLs]
+    completionHandler(result == NSModalResponseOK ? [openPanel URLs]
                                                             : nil);
   }
 }

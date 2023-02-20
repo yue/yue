@@ -59,7 +59,7 @@ winui::Notifications::IToastNotifier* GetNotifier() {
       std::wstring app_user_model_id = app->GetAppUserModelID();
       if (app_user_model_id.empty()) {
         LOG(ERROR) << "AppUserModelID is not set";
-        return false;
+        return nullptr;
       }
       hr = toast_manager->CreateToastNotifierWithId(
           ScopedHString::Create(app_user_model_id.c_str()).get(),

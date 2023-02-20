@@ -4,6 +4,7 @@
 
 #include "nativeui/win/dragging_info_win.h"
 
+#include <iostream>
 #include <string>
 #include <utility>
 #include <vector>

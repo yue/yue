@@ -180,7 +180,7 @@ void PainterMac::DrawImage(const Image* image, const RectF& rect) {
   GraphicsContextScope scoped(target_context_);
   [image->GetNative() drawInRect:rect.ToCGRect()
                         fromRect:NSZeroRect
-                       operation:NSCompositeSourceOver
+                       operation:NSCompositingOperationSourceOver
                         fraction:1.0
                   respectFlipped:YES
                            hints:nil];
@@ -195,7 +195,7 @@ void PainterMac::DrawImageFromRect(const Image* image, const RectF& src,
   GraphicsContextScope scoped(target_context_);
   [image->GetNative() drawInRect:dest.ToCGRect()
                         fromRect:flipped.ToCGRect()
-                       operation:NSCompositeSourceOver
+                       operation:NSCompositingOperationSourceOver
                         fraction:1.0
                   respectFlipped:YES
                            hints:nil];
@@ -206,7 +206,7 @@ void PainterMac::DrawCanvas(Canvas* canvas, const RectF& rect) {
   GraphicsContextScope scoped(target_context_);
   [image drawInRect:rect.ToCGRect()
            fromRect:NSZeroRect
-          operation:NSCompositeSourceOver
+          operation:NSCompositingOperationSourceOver
            fraction:1.0
      respectFlipped:NO
               hints:nil];
@@ -218,7 +218,7 @@ void PainterMac::DrawCanvasFromRect(Canvas* canvas, const RectF& src,
   GraphicsContextScope scoped(target_context_);
   [image drawInRect:dest.ToCGRect()
            fromRect:src.ToCGRect()
-          operation:NSCompositeSourceOver
+          operation:NSCompositingOperationSourceOver
            fraction:1.0
      respectFlipped:NO
               hints:nil];

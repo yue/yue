@@ -22,15 +22,12 @@ const luaVersions = [
 ]
 
 // The version of gn.
-const gnVersion = '0.8.2'
+const gnVersion = '0.8.3'
 
 // The common build configurations.
 const gnConfig = [
   `target_cpu="${targetCpu}"`,
   `lua_version="v${luaVersions[0]}"`,
-  'use_allocator="none"',
-  'use_allocator_shim=false',
-  'use_partition_alloc=false',
   'fatal_linker_warnings=false',
 ]
 if (clang) {
@@ -39,17 +36,14 @@ if (clang) {
 } else {
   gnConfig.push('is_clang=false')
 }
-if (targetOs == 'mac') {
-  gnConfig.push('mac_deployment_target="10.10.0"',
-                'mac_sdk_min="11.0"',
-                'use_xcode_clang=true')
-} else if (targetOs == 'win') {
+if (targetOs == 'win') {
   gnConfig.push(`webview2_version="${webview2Version}"`)
 }
 
 // The build configuration for sysroot.
 const gnSysrootConfig = [
   'use_sysroot=true',
+  'debian_platform="sid"',
   'target_sysroot_dir="//third_party/"',
 ]
 

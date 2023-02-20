@@ -4,6 +4,8 @@
 
 #include "nativeui/state.h"
 
+#include <iostream>
+
 #include "base/lazy_instance.h"
 #include "base/threading/thread_local.h"
 #include "nativeui/appearance.h"
