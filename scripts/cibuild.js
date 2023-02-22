@@ -56,18 +56,17 @@ for (const luaver of luaVersions)
   execSync(`node ./scripts/create_lua_extension.js --target-cpu=${targetCpu} lua ${luaver}`)
 
 // Build node extensions.
-if (targetOs == 'win' && targetCpu.startsWith('arm'))
-  process.exit(0)
-execSync('node ./scripts/create_node_extension.js')
+if (!(targetOs == 'win' && targetCpu == 'arm'))
+  execSync('node ./scripts/create_node_extension.js')
 
 // Test node extension on different versions of Node.
-if (hostCpu != targetCpu)
-  process.exit(0)
-const runtimes = {
-  electron: electronVersions,
-  node: nodeVersions,
-}
-for (let runtime in runtimes) {
-  for (let nodever of runtimes[runtime])
-    execSync(`node ./scripts/test_node_extension.js ${runtime} ${nodever} out/Release`)
+if (hostCpu == targetCpu) {
+  const runtimes = {
+    electron: electronVersions,
+    node: nodeVersions,
+  }
+  for (let runtime in runtimes) {
+    for (let nodever of runtimes[runtime])
+      execSync(`node ./scripts/test_node_extension.js ${runtime} ${nodever} out/Release`)
+  }
 }

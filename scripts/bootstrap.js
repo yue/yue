@@ -31,7 +31,7 @@ execSync(`node scripts/download_lua_sources.js lua ${luaVersions[0]}`)
 const commonConfig = gnConfig.slice()
 if (process.env.CI === 'true')
   commonConfig.push('use_jumbo_build=true')
-if (!(targetOs == 'win' && targetCpu.startsWith('arm')))
+if (!(targetOs == 'win' && targetCpu == 'arm'))
   commonConfig.push(`node_version="${process.version}"`)
 
 const componentConfig = [

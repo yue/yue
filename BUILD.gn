@@ -9,7 +9,7 @@ group("default") {
     "//sample_app",
   ]
 
-  if (is_win && (target_cpu == "arm" || target_cpu == "arm64")) {
+  if (is_win && target_cpu == "arm") {
     deps -= ["//napi_yue"]
   }
 }

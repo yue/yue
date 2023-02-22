@@ -57,7 +57,7 @@ useTmpDir(async (cwd) => {
     else if (targetCpu == 'x86')
       await downloadNodeLib('x86')
     else if (targetCpu == 'arm64')
-      await downloadNodeLib('arm64')
+      await downloadNodeLibWinArm64()
     else
       throw new Error(`Unsupported targetCpu: ${targetCpu}`)
   }
@@ -66,6 +66,15 @@ useTmpDir(async (cwd) => {
 async function downloadNodeLib(arch) {
   await fs.emptyDir(libDir)
   const url = `${prefix[runtime]}/${version}/win-${arch}/node.lib`
+  const res = await fetch(url)
+  res.body.pipe(fs.createWriteStream(path.join(libDir, 'node.lib')))
+  return streamPromise(res.body)
+}
+
+async function downloadNodeLibWinArm64() {
+  const availableArm64Build = 'https://unofficial-builds.nodejs.org/download/release/v18.12.1/'
+  await fs.emptyDir(libDir)
+  const url = `${availableArm64Build}/win-arm64/node.lib`
   const res = await fetch(url)
   res.body.pipe(fs.createWriteStream(path.join(libDir, 'node.lib')))
   return streamPromise(res.body)
