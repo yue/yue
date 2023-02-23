@@ -105,12 +105,15 @@ jobs:
 
     steps:
       - name: Download Files
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v3.0.2
 
       - name: Release
-        uses: softprops/action-gh-release@v0.1.15
+        uses: ncipollo/release-action@v1.12.0
         with:
-          draft: true
           name: Yue ${{ github.ref_name }}
           body: '## Changelog'
-          files: artifact/*.zip
+          draft: true
+          artifacts: artifact/*.zip
+          artifactErrorsFailBuild: true
+          allowUpdates: true
+          updateOnlyUnreleased: true
