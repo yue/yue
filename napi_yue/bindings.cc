@@ -2,6 +2,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
+#include "base/environment.h"
 #include "base/notreached.h"
 #include "base/time/time.h"
 #include "napi_yue/binding_ptr.h"
@@ -10,7 +11,6 @@
 #include "napi_yue/node_integration.h"
 
 #if defined(OS_LINUX) || defined(OS_MAC)
-#include "base/environment.h"
 #include "base/strings/string_number_conversions.h"
 #elif defined(OS_WIN)
 #include "base/strings/string_util_win.h"
@@ -3007,15 +3007,15 @@ napi_value GetAttachedTable(napi_env env, napi_value value) {
 napi_value Initialize(napi_env env, napi_value exports) {
   CHECK(GetRuntime(env, &is_electron, &is_yode));
 
+  std::unique_ptr<base::Environment> sys_env = base::Environment::Create();
 #if defined(OS_LINUX)
   // Both node and WebKit are using SIGUSR1, avoid conflict.
-  std::unique_ptr<base::Environment> sys_env = base::Environment::Create();
   if (!sys_env->HasVar("JSC_SIGNAL_FOR_GC"))
     sys_env->SetVar("JSC_SIGNAL_FOR_GC", base::NumberToString(SIGUSR2));
 #endif
 
 #if defined(OS_WIN)
-  if (!is_electron) {
+  if (!is_electron && !sys_env->HasVar("CI")) {
     // Show system dialog on crash.
     SetErrorMode(GetErrorMode() & ~SEM_NOGPFAULTERRORBOX);
   }
