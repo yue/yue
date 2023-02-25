@@ -36,9 +36,8 @@ class TestTableModel : public nu::TableModel {
     return 10000;
   }
 
-  const base::Value* GetValue(uint32_t column, uint32_t row) const override {
-    value_ = base::Value(base::StringPrintf("%d_%d", column, row));
-    return &value_;
+  base::Value GetValue(uint32_t column, uint32_t row) const override {
+    return base::Value(base::StringPrintf("%d_%d", column, row));
   }
 
   void SetValue(uint32_t column, uint32_t row, base::Value value) override {
@@ -46,8 +45,6 @@ class TestTableModel : public nu::TableModel {
 
  private:
   ~TestTableModel() override {}
-
-  mutable base::Value value_;
 };
 
 TEST_F(TableTest, SelectSingleRow) {

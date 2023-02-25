@@ -2,8 +2,9 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/gtk/nu_tree_model.h"
+#include "nativeui/gtk/table/nu_tree_model.h"
 
+#include "nativeui/gtk/table/nu_boxed_value.h"
 #include "nativeui/table.h"
 #include "nativeui/table_model.h"
 
@@ -122,9 +123,9 @@ static void nu_tree_model_get_value(GtkTreeModel* tree_model,
     return;
   NUTreeModelPrivate* priv = NU_TREE_MODEL(tree_model)->priv;
   gint row = GPOINTER_TO_INT(iter->user_data);
-  g_value_init(value, G_TYPE_POINTER);
-  g_value_set_pointer(
-      value, const_cast<base::Value*>(priv->model->GetValue(column, row)));
+  g_value_init(value, NU_BOXED_VALUE);
+  g_value_take_boxed(value,
+                     nu_boxed_value_new(priv->model->GetValue(column, row)));
 }
 
 static gboolean nu_tree_model_iter_next(GtkTreeModel* tree_model,

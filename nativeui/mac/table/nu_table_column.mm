@@ -2,7 +2,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/mac/nu_table_column.h"
+#include "nativeui/mac/table/nu_table_column.h"
 
 #include "base/strings/sys_string_conversions.h"
 

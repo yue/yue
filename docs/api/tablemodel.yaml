@@ -29,15 +29,11 @@ methods:
     lang_detail:
       cpp: This is a pure virtual method, subclass must override this method.
 
-  - signature: const base::Value* GetValue(uint32_t column, uint32_t row) const
+  - signature: base::Value GetValue(uint32_t column, uint32_t row) const
     abstract: true
     lang: ['cpp']
     description: Return the reference to the data at `column` and `row`.
-    detail: |
-      Caller should not store the return value, as it is a temporary reference
-      that may immediately get destroyed after exiting current stack.
-
-      This is a pure virtual method, subclass must override this method.
+    detail: This is a pure virtual method, subclass must override this method.
 
   - signature: Any GetValue(uint32_t column, uint32_t row) const
     abstract: true

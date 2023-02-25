@@ -2,8 +2,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef NATIVEUI_MAC_NU_TABLE_COLUMN_H_
-#define NATIVEUI_MAC_NU_TABLE_COLUMN_H_
+#ifndef NATIVEUI_MAC_TABLE_NU_TABLE_COLUMN_H_
+#define NATIVEUI_MAC_TABLE_NU_TABLE_COLUMN_H_
 
 #import <Cocoa/Cocoa.h>
 
@@ -18,4 +18,4 @@
             options:(const nu::Table::ColumnOptions&)options;
 @end
 
-#endif  // NATIVEUI_MAC_NU_TABLE_COLUMN_H_
+#endif  // NATIVEUI_MAC_TABLE_NU_TABLE_COLUMN_H_

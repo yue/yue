@@ -2,8 +2,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef NATIVEUI_GTK_NU_CUSTOM_CELL_RENDERER_H_
-#define NATIVEUI_GTK_NU_CUSTOM_CELL_RENDERER_H_
+#ifndef NATIVEUI_GTK_TABLE_NU_CUSTOM_CELL_RENDERER_H_
+#define NATIVEUI_GTK_TABLE_NU_CUSTOM_CELL_RENDERER_H_
 
 #include <gtk/gtk.h>
 
@@ -39,4 +39,4 @@ GtkCellRenderer* nu_custom_cell_renderer_new(
 
 }  // namespace nu
 
-#endif  // NATIVEUI_GTK_NU_CUSTOM_CELL_RENDERER_H_
+#endif  // NATIVEUI_GTK_TABLE_NU_CUSTOM_CELL_RENDERER_H_

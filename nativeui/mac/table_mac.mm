@@ -7,10 +7,10 @@
 #include "base/mac/scoped_nsobject.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/mac/nu_private.h"
-#include "nativeui/mac/nu_table_cell.h"
-#include "nativeui/mac/nu_table_column.h"
-#include "nativeui/mac/nu_table_data_source.h"
 #include "nativeui/mac/nu_view.h"
+#include "nativeui/mac/table/nu_table_cell.h"
+#include "nativeui/mac/table/nu_table_column.h"
+#include "nativeui/mac/table/nu_table_data_source.h"
 
 @interface NUTableDelegate : NSObject<NSTableViewDelegate> {
  @private

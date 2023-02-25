@@ -55,19 +55,15 @@ uint32_t AbstractTableModel::GetRowCount() const {
   return get_row_count(const_cast<AbstractTableModel*>(this));
 }
 
-const base::Value* AbstractTableModel::GetValue(
+base::Value AbstractTableModel::GetValue(
     uint32_t column, uint32_t row) const {
   if (!get_value)
-    return nullptr;
+    return base::Value();
   if (!index_starts_from_0_) {
     column += 1;
     row += 1;
   }
-  // We can not get a reference from scripting languages, so we just store a
-  // temporary copy and return a reference to the copy.
-  auto* self = const_cast<AbstractTableModel*>(this);
-  self->copy_ = get_value(self, column, row);
-  return &copy_;
+  return get_value(const_cast<AbstractTableModel*>(this), column, row);
 }
 
 void AbstractTableModel::SetValue(uint32_t column, uint32_t row,
@@ -111,11 +107,11 @@ uint32_t SimpleTableModel::GetRowCount() const {
   return static_cast<uint32_t>(rows_.size());
 }
 
-const base::Value* SimpleTableModel::GetValue(
+base::Value SimpleTableModel::GetValue(
     uint32_t column, uint32_t row) const {
   if (columns_ >= 0 && column < columns_ && row >= 0 && row < rows_.size())
-    return &rows_[row][column];
-  return nullptr;
+    return rows_[row][column].Clone();
+  return base::Value();
 }
 
 void SimpleTableModel::SetValue(uint32_t column, uint32_t row,

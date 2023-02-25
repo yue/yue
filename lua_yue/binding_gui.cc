@@ -2202,7 +2202,7 @@ struct Type<nu::TableModel> {
                        ::base::Value value) {
     model->SetValue(column - 1, row - 1, std::move(value));
   }
-  static const base::Value* GetValue(
+  static base::Value GetValue(
       nu::TableModel* model, uint32_t column, uint32_t row) {
     return model->GetValue(column - 1, row - 1);
   }

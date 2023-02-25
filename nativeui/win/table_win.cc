@@ -67,9 +67,9 @@ void TableImpl::UpdateColumnsWidth(TableModel* model) {
       width = kDefaultColumnWidth * scale_factor();
       // If there is data in model, use the first cell's width.
       if (model && model->GetRowCount() > 0) {
-        const base::Value* value = model->GetValue(i, 0);
-        if (value && value->is_string()) {
-          std::wstring text = base::UTF8ToWide(value->GetString());
+        base::Value value = model->GetValue(i, 0);
+        if (value.is_string()) {
+          std::wstring text = base::UTF8ToWide(value.GetString());
           int text_width = ListView_GetStringWidth(hwnd(), text.c_str());
           // Add some padding.
           text_width += (i == 0 ? 7 : 14) * scale_factor();
@@ -164,12 +164,10 @@ LRESULT TableImpl::OnGetDispInfo(NMLVDISPINFO* nm, int column, int row) {
   auto* model = static_cast<Table*>(delegate())->GetModel();
   if (!model)
     return 0;
-  const base::Value* value = model->GetValue(column, row);
-  if (!value)
-    return 0;
+  base::Value value = model->GetValue(column, row);
   // Always set text regardless of cell type, for increased accessbility.
-  if ((nm->item.mask & LVIF_TEXT) && value->is_string()) {
-    text_cache_ = base::UTF8ToWide(value->GetString());
+  if ((nm->item.mask & LVIF_TEXT) && value.is_string()) {
+    text_cache_ = base::UTF8ToWide(value.GetString());
     nm->item.pszText = const_cast<wchar_t*>(text_cache_.c_str());
     return TRUE;
   }
@@ -200,7 +198,6 @@ LRESULT TableImpl::OnCustomDraw(NMLVCUSTOMDRAW* nm, int row) {
     const auto& options = columns_[i];
     if (options.type != Table::ColumnType::Custom || !options.on_draw)
       continue;
-    const base::Value* value = model->GetValue(options.column, row);
     // Calculate the rect of each cell.
     RECT rc;
     ListView_GetSubItemRect(hwnd(), row, i, LVIR_BOUNDS, &rc);
@@ -214,7 +211,7 @@ LRESULT TableImpl::OnCustomDraw(NMLVCUSTOMDRAW* nm, int row) {
     painter.ClipRectPixel(Rect(rect.size()));
     options.on_draw(&painter,
                     RectF(ScaleSize(SizeF(rect.size()), 1.f / scale_factor())),
-                    value ? value->Clone() : base::Value());
+                    model->GetValue(options.column, row));
   }
   return CDRF_SKIPDEFAULT;
 }
@@ -249,9 +246,9 @@ LRESULT TableImpl::OnBeginEdit(NMLVDISPINFO* nm, int row) {
     // Update text in edit window.
     auto* model = static_cast<Table*>(delegate())->GetModel();
     if (model) {
-      const base::Value* value = model->GetValue(column, row);
-      if (value && value->is_string()) {
-        std::wstring text16 = base::UTF8ToWide(value->GetString());
+      base::Value value = model->GetValue(column, row);
+      if (value.is_string()) {
+        std::wstring text16 = base::UTF8ToWide(value.GetString());
         ::SetWindowTextW(edit_hwnd_, text16.c_str());
       }
     }

@@ -2,8 +2,8 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#ifndef NATIVEUI_GTK_NU_TREE_MODEL_H_
-#define NATIVEUI_GTK_NU_TREE_MODEL_H_
+#ifndef NATIVEUI_GTK_TABLE_NU_TREE_MODEL_H_
+#define NATIVEUI_GTK_TABLE_NU_TREE_MODEL_H_
 
 #include <gtk/gtk.h>
 
@@ -38,4 +38,4 @@ NUTreeModel* nu_tree_model_new(Table* table, TableModel* model);
 
 }  // namespace nu
 
-#endif  // NATIVEUI_GTK_NU_TREE_MODEL_H_
+#endif  // NATIVEUI_GTK_TABLE_NU_TREE_MODEL_H_

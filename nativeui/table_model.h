@@ -24,9 +24,7 @@ class NATIVEUI_EXPORT TableModel : public base::RefCounted<TableModel> {
   virtual uint32_t GetRowCount() const = 0;
 
   // Return the reference to the data in the model.
-  // Caller should not store the return value, as it is a temporary reference
-  // that may immediately get destroyed after exiting current stack.
-  virtual const base::Value* GetValue(uint32_t column, uint32_t row) const = 0;
+  virtual base::Value GetValue(uint32_t column, uint32_t row) const = 0;
 
   // Change the value.
   virtual void SetValue(uint32_t column, uint32_t row, base::Value value) = 0;
@@ -59,7 +57,7 @@ class NATIVEUI_EXPORT AbstractTableModel : public TableModel {
 
   // TableModel:
   uint32_t GetRowCount() const override;
-  const base::Value* GetValue(uint32_t column, uint32_t row) const override;
+  base::Value GetValue(uint32_t column, uint32_t row) const override;
   void SetValue(uint32_t column, uint32_t row, base::Value value) override;
 
   // Delegate methods.
@@ -88,7 +86,7 @@ class NATIVEUI_EXPORT SimpleTableModel : public TableModel {
 
   // TableModel:
   uint32_t GetRowCount() const override;
-  const base::Value* GetValue(uint32_t column, uint32_t row) const override;
+  base::Value GetValue(uint32_t column, uint32_t row) const override;
   void SetValue(uint32_t column, uint32_t row, base::Value value) override;
 
  protected:

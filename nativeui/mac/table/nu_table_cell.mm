@@ -2,12 +2,13 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/mac/nu_table_cell.h"
+#include "nativeui/mac/table/nu_table_cell.h"
 
 #include "base/mac/scoped_nsobject.h"
 #include "base/strings/sys_string_conversions.h"
 #include "base/values.h"
 #include "nativeui/gfx/mac/painter_mac.h"
+#include "nativeui/mac/table/nu_wrapped_value.h"
 #include "nativeui/mac/value_conversion.h"
 #include "nativeui/table_model.h"
 
@@ -97,20 +98,19 @@
 
   // Note: we have to store a copy of the value, the reference will be away
   // after current stack ends.
-  const base::Value* value = static_cast<const base::Value*>(
-      [static_cast<NSValue*>(obj) pointerValue]);
+  base::Value value = [static_cast<NUWrappedValue*>(obj) pass];
   switch (type_) {
     case nu::Table::ColumnType::Text:
     case nu::Table::ColumnType::Edit: {
-      if (value && value->is_string())
-        self.textField.stringValue = base::SysUTF8ToNSString(value->GetString());
+      if (value.is_string())
+        self.textField.stringValue = base::SysUTF8ToNSString(value.GetString());
       break;
     }
 
     case nu::Table::ColumnType::Custom: {
       auto* customView = static_cast<NUCustomTableCellView*>(
           [[self subviews] firstObject]);
-      [customView setValue:(value ? value->Clone() : base::Value())];
+      [customView setValue:std::move(value)];
       [customView setNeedsDisplay:YES];
       break;
     }

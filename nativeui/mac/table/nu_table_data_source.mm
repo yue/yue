@@ -2,8 +2,9 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/mac/nu_table_column.h"
-#include "nativeui/mac/nu_table_data_source.h"
+#include "nativeui/mac/table/nu_table_column.h"
+#include "nativeui/mac/table/nu_table_data_source.h"
+#include "nativeui/mac/table/nu_wrapped_value.h"
 
 @implementation NUTableDataSource
 
@@ -21,8 +22,8 @@
     objectValueForTableColumn:(NSTableColumn*)nsTableColumn
                           row:(NSInteger)row {
   auto* tableColumn = static_cast<NUTableColumn*>(nsTableColumn);
-  const base::Value* value = model_->GetValue(tableColumn.columnInModel, row);
-  return [NSValue valueWithPointer:value];
+  return [NUWrappedValue
+      valueWithValue:model_->GetValue(tableColumn.columnInModel, row)];
 }
 
 @end

@@ -6,8 +6,8 @@
 
 #include "base/logging.h"
 #include "base/values.h"
-#include "nativeui/gtk/nu_custom_cell_renderer.h"
-#include "nativeui/gtk/nu_tree_model.h"
+#include "nativeui/gtk/table/nu_custom_cell_renderer.h"
+#include "nativeui/gtk/table/nu_tree_model.h"
 #include "nativeui/gtk/util/widget_util.h"
 #include "nativeui/table_model.h"
 
@@ -63,9 +63,7 @@ void TreeCellData(GtkTreeViewColumn* tree_column,
   // Read value from model.
   GValue gval = G_VALUE_INIT;
   gtk_tree_model_get_value(tree_model, iter, options->column, &gval);
-  const auto* value =
-      static_cast<const base::Value*>(g_value_get_pointer(&gval));
-  g_value_unset(&gval);
+  auto* value = static_cast<base::Value*>(g_value_get_boxed(&gval));
 
   // Pass value.
   switch (options->type) {
@@ -81,6 +79,7 @@ void TreeCellData(GtkTreeViewColumn* tree_column,
       break;
     }
   }
+  g_value_unset(&gval);
 }
 
 }  // namespace

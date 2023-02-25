@@ -2,7 +2,9 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-#include "nativeui/gtk/nu_custom_cell_renderer.h"
+#include "nativeui/gtk/table/nu_custom_cell_renderer.h"
+
+#include <utility>
 
 #include "base/values.h"
 #include "nativeui/gfx/gtk/painter_gtk.h"
@@ -76,9 +78,9 @@ static void nu_custom_cell_renderer_set_property(GObject* object,
     return;
   }
   NUCustomCellRendererPrivate* priv = NU_CUSTOM_CELL_RENDERER(object)->priv;
-  auto* value = static_cast<const base::Value*>(g_value_get_pointer(gval));
+  auto* value = static_cast<base::Value*>(g_value_get_pointer(gval));
   if (value)
-    priv->value = base::Value(value->Clone());
+    priv->value = base::Value(std::move(*value));
   else
     priv->value = base::Value();
 }
