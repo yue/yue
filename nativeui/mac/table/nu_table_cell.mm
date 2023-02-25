@@ -63,9 +63,17 @@
         [textField setDrawsBackground:NO];
         [textField setBezeled:NO];
         [textField setSelectable:YES];
-        [textField setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
         [self setTextField:textField];
         [self addSubview:textField];
+        // Remove default layout.
+        [textField setTranslatesAutoresizingMaskIntoConstraints:NO];
+        // Make the textField has vertical center alignment.
+        [NSLayoutConstraint activateConstraints:@[
+          // Vertical center.
+          [NSLayoutConstraint constraintWithItem:textField attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeCenterY multiplier:1 constant:0],
+          // Take full width.
+          [NSLayoutConstraint constraintWithItem:textField attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeWidth multiplier:1 constant:0],
+        ]];
         break;
       }
 

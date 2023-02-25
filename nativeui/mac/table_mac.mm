@@ -31,17 +31,16 @@
   viewForTableColumn:(NSTableColumn*)nsTableColumn
                  row:(NSInteger)row {
   auto* tableColumn = static_cast<NUTableColumn*>(nsTableColumn);
-  auto* reuse = [tableView makeViewWithIdentifier:[tableColumn identifier]
-                                            owner:self];
-  NUTableCell* tableCell = nullptr;
-  if (reuse)
-    tableCell = static_cast<NUTableCell*>(reuse);
-  else
+  auto* tableCell = static_cast<NUTableCell*>(
+      [tableView makeViewWithIdentifier:[tableColumn identifier] owner:self]);
+  if (!tableCell) {
     tableCell = [[[NUTableCell alloc]
         initWithColumnOptions:[tableColumn options]] autorelease];
-  [tableCell setTableModel:shell_->GetModel()
-                    column:[tableColumn columnInModel]
-                       row:row];
+    [tableCell setIdentifier:[tableColumn identifier]];
+    [tableCell setTableModel:shell_->GetModel()
+                      column:[tableColumn columnInModel]
+                         row:row];
+  }
   return tableCell;
 }
 
