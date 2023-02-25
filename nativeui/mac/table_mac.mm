@@ -69,6 +69,9 @@
     [self setHasVerticalScroller:YES];
     [self setHasHorizontalScroller:YES];
     [self setDocumentView:tableView_];
+    // Table with header is incorrectly scrolled.
+    // https://bugs.eclipse.org/bugs/show_bug.cgi?id=575259
+    [self setFrame:NSMakeRect(0, 0, 100, 100)];
   }
   return self;
 }
@@ -89,8 +92,6 @@
   else
     dataSource_.reset();
   [tableView_ setDataSource:dataSource_];
-  // Somehow the content may have some offset, scroll to top.
-  [tableView_ scrollRowToVisible:0];
 }
 
 - (nu::NUViewPrivate*)nuPrivate {

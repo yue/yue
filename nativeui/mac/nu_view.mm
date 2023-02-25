@@ -135,8 +135,11 @@ void SetFrameSize(NSView* self, SEL _cmd, NSSize size) {
       [[self superclass] instanceMethodForSelector:_cmd]);
   super_impl(self, _cmd, size);
 
-  if (size.width != old_size.width || size.height != old_size.height)
-    [self shell]->OnSizeChanged();
+  if (size.width != old_size.width || size.height != old_size.height) {
+    View* shell = [self shell];
+    if (shell)  // setFrame may be called before a view is full initialized
+      shell->OnSizeChanged();
+  }
 }
 
 // The contentView gets moved around during certain full-screen operations.
