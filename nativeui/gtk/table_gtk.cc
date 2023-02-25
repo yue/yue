@@ -5,6 +5,7 @@
 #include "nativeui/table.h"
 
 #include "base/logging.h"
+#include "base/notreached.h"
 #include "base/values.h"
 #include "nativeui/gtk/table/nu_custom_cell_renderer.h"
 #include "nativeui/gtk/table/nu_tree_model.h"
@@ -184,28 +185,60 @@ float Table::GetRowHeight() const {
       g_object_get_data(G_OBJECT(GetNative()), "row-height")));
 }
 
+void Table::EnableMultipleSelection(bool enable) {
+  GtkTreeSelection* selection = gtk_tree_view_get_selection(
+      GTK_TREE_VIEW(g_object_get_data(G_OBJECT(GetNative()), "tree-view")));
+  gtk_tree_selection_set_mode(selection, enable ? GTK_SELECTION_MULTIPLE
+                                                : GTK_SELECTION_SINGLE);
+}
+
+bool Table::IsMultipleSelectionEnabled() const {
+  GtkTreeSelection* selection = gtk_tree_view_get_selection(
+      GTK_TREE_VIEW(g_object_get_data(G_OBJECT(GetNative()), "tree-view")));
+  GtkSelectionMode mode = gtk_tree_selection_get_mode(selection);
+  return mode == GTK_SELECTION_MULTIPLE;
+}
+
 void Table::SelectRow(int row) {
-  auto* tree_view = GTK_TREE_VIEW(g_object_get_data(G_OBJECT(GetNative()),
-                                                    "tree-view"));
-  auto* tree_model = gtk_tree_view_get_model(tree_view);
-  if (!tree_model)
-    return;
-  GtkTreeSelection* selection = gtk_tree_view_get_selection(tree_view);
-  GtkTreeIter iter = {true, GINT_TO_POINTER(row)};
-  gtk_tree_selection_select_iter(selection, &iter);
+  SelectRows({row});
 }
 
 int Table::GetSelectedRow() const {
-  auto* tree_view = GTK_TREE_VIEW(g_object_get_data(G_OBJECT(GetNative()),
-                                                    "tree-view"));
-  auto* tree_model = gtk_tree_view_get_model(tree_view);
-  if (!tree_model)
-    return -1;
+  GtkTreeSelection* selection = gtk_tree_view_get_selection(
+      GTK_TREE_VIEW(g_object_get_data(G_OBJECT(GetNative()), "tree-view")));
   GtkTreeIter iter;
-  GtkTreeSelection* selection = gtk_tree_view_get_selection(tree_view);
-  if (gtk_tree_selection_get_selected(selection, &tree_model, &iter))
+  if (gtk_tree_selection_get_selected(selection, nullptr, &iter))
     return GPOINTER_TO_INT(iter.user_data);
   return -1;
+}
+
+void Table::SelectRows(std::set<int> rows) {
+  GtkTreeSelection* selection = gtk_tree_view_get_selection(
+      GTK_TREE_VIEW(g_object_get_data(G_OBJECT(GetNative()), "tree-view")));
+  gtk_tree_selection_unselect_all(selection);
+  for (int row : rows) {
+    GtkTreeIter iter = {true, GINT_TO_POINTER(row)};
+    gtk_tree_selection_select_iter(selection, &iter);
+  }
+}
+
+std::set<int> Table::GetSelectedRows() const {
+  GtkTreeSelection* selection = gtk_tree_view_get_selection(
+      GTK_TREE_VIEW(g_object_get_data(G_OBJECT(GetNative()), "tree-view")));
+  GList* list = gtk_tree_selection_get_selected_rows(selection, nullptr);
+  std::set<int> rows;
+  for (GList* node = list; node != nullptr; node = node->next) {
+    auto* path = static_cast<GtkTreePath*>(node->data);
+    gint* indices = gtk_tree_path_get_indices(path);
+    if (!indices) {
+      NOTREACHED();
+      continue;
+    }
+    rows.insert(indices[0]);
+  }
+  g_list_foreach(list, (GFunc)gtk_tree_path_free, nullptr);
+  g_list_free(list);
+  return rows;
 }
 
 void Table::NotifyRowInsertion(uint32_t row) {

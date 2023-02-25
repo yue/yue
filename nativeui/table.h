@@ -5,6 +5,7 @@
 #ifndef NATIVEUI_TABLE_H_
 #define NATIVEUI_TABLE_H_
 
+#include <set>
 #include <string>
 
 #include "nativeui/view.h"
@@ -55,8 +56,12 @@ class NATIVEUI_EXPORT Table : public View {
   bool IsColumnsVisible() const;
   void SetRowHeight(float height);
   float GetRowHeight() const;
+  void EnableMultipleSelection(bool enable);
+  bool IsMultipleSelectionEnabled() const;
   void SelectRow(int row);
   int GetSelectedRow() const;
+  void SelectRows(std::set<int> rows);
+  std::set<int> GetSelectedRows() const;
 
   // View:
   const char* GetClassName() const override;

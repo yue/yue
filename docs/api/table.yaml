@@ -71,6 +71,14 @@ methods:
   - signature: float GetRowHeight() const
     description: Return the `height` of each row.
 
+  - signature: void EnableMultipleSelection(bool enable)
+    description: |
+      Set whether it is allowed to select more than one row at a time.
+
+  - signature: bool IsMultipleSelectionEnabled() const
+    description: |
+      Return whether it is allowed to select more than one row at a time.
+
   - signature: void SelectRow(int row)
     description: Select a `row`.
 
@@ -79,3 +87,9 @@ methods:
     detail: |
       For table that allows multiple selections, this will return the index of
       first selected row. When no row is selected, `-1` will be returned.
+
+  - signature: void SelectRows(std::set<int> rows)
+    description: Select multiple `rows`.
+
+  - signature: std::set<int> GetSelectedRows() const
+    description: Return selected rows' indexes.

@@ -7,6 +7,7 @@
 #include <commctrl.h>
 
 #include <algorithm>
+#include <set>
 #include <string>
 #include <utility>
 
@@ -363,14 +364,41 @@ float Table::GetRowHeight() const {
   return table->GetRowHeight();
 }
 
-void Table::SelectRow(int row) {
+void Table::EnableMultipleSelection(bool enable) {
   auto* table = static_cast<TableImpl*>(GetNative());
-  ListView_SetItemState(table->hwnd(), row, LVIS_SELECTED, LVIS_SELECTED);
+  table->SetWindowStyle(LVS_SINGLESEL, !enable);
+}
+
+bool Table::IsMultipleSelectionEnabled() const {
+  auto* table = static_cast<TableImpl*>(GetNative());
+  return !table->HasWindowStyle(LVS_SINGLESEL);
+}
+
+void Table::SelectRow(int row) {
+  SelectRows({row});
 }
 
 int Table::GetSelectedRow() const {
   auto* table = static_cast<TableImpl*>(GetNative());
   return ListView_GetNextItem(table->hwnd(), -1, LVNI_SELECTED);
+}
+
+void Table::SelectRows(std::set<int> rows) {
+  auto* table = static_cast<TableImpl*>(GetNative());
+  ListView_SetItemState(table->hwnd(), -1, 0, LVIS_SELECTED);
+  for (int row : rows)
+    ListView_SetItemState(table->hwnd(), row, LVIS_SELECTED, LVIS_SELECTED);
+}
+
+std::set<int> Table::GetSelectedRows() const {
+  auto* table = static_cast<TableImpl*>(GetNative());
+  std::set<int> rows;
+  int i = ListView_GetNextItem(table->hwnd(), -1, LVNI_SELECTED);
+  while (i >= 0) {
+    rows.insert(i);
+    i = ListView_GetNextItem(table->hwnd(), i, LVNI_SELECTED);
+  }
+  return rows;
 }
 
 void Table::NotifyRowInsertion(uint32_t row) {

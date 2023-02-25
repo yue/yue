@@ -6,6 +6,7 @@
 
 #include <map>
 #include <memory>
+#include <set>
 #include <string>
 #include <utility>
 #include <vector>
@@ -2307,8 +2308,13 @@ struct Type<nu::Table> {
            "iscolumnsvisible", &nu::Table::IsColumnsVisible,
            "setrowheight", &nu::Table::SetRowHeight,
            "getrowheight", &nu::Table::GetRowHeight,
+           "enablemultipleselection", &nu::Table::EnableMultipleSelection,
+           "ismultipleselectionenabled",
+           &nu::Table::IsMultipleSelectionEnabled,
            "selectrow", &SelectRow,
-           "getselectedrow", &GetSelectedRow);
+           "getselectedrow", &GetSelectedRow,
+           "selectrows", &SelectRows,
+           "getselectedrows", &GetSelectedRows);
   }
   static void SelectRow(nu::Table* table, int row) {
     table->SelectRow(row - 1);
@@ -2316,6 +2322,19 @@ struct Type<nu::Table> {
   static int GetSelectedRow(nu::Table* table) {
     int index = table->GetSelectedRow();
     return index == -1 ? -1 : index + 1;
+  }
+  static void SelectRows(nu::Table* table, std::set<int> rows) {
+    std::set<int> one_less;
+    for (int row : rows)
+      one_less.insert(row - 1);
+    table->SelectRows(std::move(one_less));
+  }
+  static std::set<int> GetSelectedRows(nu::Table* table) {
+    std::set<int> rows = table->GetSelectedRows();
+    std::set<int> one_more;
+    for (int row : rows)
+      one_more.insert(row + 1);
+    return one_more;
   }
 };
 

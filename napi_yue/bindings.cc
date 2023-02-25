@@ -2539,8 +2539,12 @@ struct Type<nu::Table> {
         "isColumnsVisible", &nu::Table::IsColumnsVisible,
         "setRowHeight", &nu::Table::SetRowHeight,
         "getRowHeight", &nu::Table::GetRowHeight,
+        "enableMultipleSelection", &nu::Table::EnableMultipleSelection,
+        "isMultipleSelectionEnabled", &nu::Table::IsMultipleSelectionEnabled,
         "selectRow", &nu::Table::SelectRow,
-        "getSelectedRow", &nu::Table::GetSelectedRow);
+        "getSelectedRow", &nu::Table::GetSelectedRow,
+        "selectRows", &nu::Table::SelectRows,
+        "getSelectedRows", &nu::Table::GetSelectedRows);
   }
 };
 

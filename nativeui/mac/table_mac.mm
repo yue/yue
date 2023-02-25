@@ -175,6 +175,18 @@ float Table::GetRowHeight() const {
   return [tableView rowHeight];
 }
 
+void Table::EnableMultipleSelection(bool enable) {
+  auto* tableView = static_cast<NSTableView*>(
+      [static_cast<NUTable*>(GetNative()) documentView]);
+  [tableView setAllowsMultipleSelection:enable];
+}
+
+bool Table::IsMultipleSelectionEnabled() const {
+  auto* tableView = static_cast<NSTableView*>(
+      [static_cast<NUTable*>(GetNative()) documentView]);
+  return [tableView allowsMultipleSelection];
+}
+
 void Table::SelectRow(int row) {
   auto* tableView = static_cast<NSTableView*>(
       [static_cast<NUTable*>(GetNative()) documentView]);
@@ -186,6 +198,28 @@ int Table::GetSelectedRow() const {
   auto* tableView = static_cast<NSTableView*>(
       [static_cast<NUTable*>(GetNative()) documentView]);
   return [tableView selectedRow];
+}
+
+void Table::SelectRows(std::set<int> rows) {
+  auto* tableView = static_cast<NSTableView*>(
+      [static_cast<NUTable*>(GetNative()) documentView]);
+  NSMutableIndexSet* index = [NSMutableIndexSet indexSet];
+  for (int row : rows)
+    [index addIndex:row];
+  [tableView selectRowIndexes:index byExtendingSelection:NO];
+}
+
+std::set<int> Table::GetSelectedRows() const {
+  auto* tableView = static_cast<NSTableView*>(
+      [static_cast<NUTable*>(GetNative()) documentView]);
+  NSIndexSet* index = [tableView selectedRowIndexes];
+  std::set<int> selection;
+  for (NSUInteger i = [index firstIndex];
+       i != NSNotFound;
+       i = [index indexGreaterThanIndex:i]) {
+    selection.insert(i);
+  }
+  return selection;
 }
 
 void Table::NotifyRowInsertion(uint32_t row) {
