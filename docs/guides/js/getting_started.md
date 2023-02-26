@@ -139,7 +139,7 @@ const menu = gui.MenuBar.create([
       {
         label: 'Quit',
         accelerator: 'CmdOrCtrl+Q',
-        onClick: () => gui.messageLoop.quit()
+        onClick: () => gui.MessageLoop.quit()
       },
     ],
   },
@@ -259,7 +259,7 @@ assignment.
 
 ```js
 // Quit when window is closed.
-win.onClose = () => gui.messageLoop.quit()
+win.onClose = () => gui.MessageLoop.quit()
 // The size of content view.
 win.setContentSize({width: 400, height: 400})
 // Put the window in the center of screen.
