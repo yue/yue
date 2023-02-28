@@ -15,8 +15,6 @@ let sysrootArch = {
   arm64: 'arm64',
 }[targetCpu]
 
-if (clang)
-  execSync('python3 building/tools/update-clang.py')
 if (process.platform == 'linux')
   execSync(`python3 building/tools/install-sysroot.py --arch ${sysrootArch}`)
 else if (process.platform == 'win32')
@@ -27,6 +25,9 @@ execSync('git submodule update --init --recursive')
 execSync('node scripts/download_gn.js')
 execSync(`node scripts/download_node_headers.js node ${process.version} ${targetOs} ${targetCpu}`)
 execSync(`node scripts/download_lua_sources.js lua ${luaVersions[0]}`)
+
+if (clang && process.platform != 'darwin')
+  execSync('python3 building/tools/gn/tools/clang/scripts/update.py')
 
 const commonConfig = gnConfig.slice()
 if (process.env.CI === 'true')

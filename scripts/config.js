@@ -22,20 +22,15 @@ const luaVersions = [
 ]
 
 // The version of gn.
-const gnVersion = '0.8.3'
+const gnVersion = '0.9.4'
 
 // The common build configurations.
 const gnConfig = [
+  `is_clang=${clang}`,
   `target_cpu="${targetCpu}"`,
   `lua_version="v${luaVersions[0]}"`,
   'fatal_linker_warnings=false',
 ]
-if (clang) {
-  gnConfig.push('is_clang=true',
-                'clang_update_script="//building/tools/update-clang.py"')
-} else {
-  gnConfig.push('is_clang=false')
-}
 if (targetOs == 'win') {
   gnConfig.push(`webview2_version="${webview2Version}"`)
 }

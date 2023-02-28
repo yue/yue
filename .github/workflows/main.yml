@@ -2,9 +2,6 @@ name: Yue
 
 on: push
 
-env:
-  CI: true
-
 jobs:
   build:
     runs-on: ${{ matrix.os }}
