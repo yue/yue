@@ -4,7 +4,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {clang, hostCpu, targetCpu, targetOs, execSync, spawnSync} = require('./common')
+const {argv, clang, hostCpu, targetCpu, targetOs, execSync, spawnSync} = require('./common')
 const {gnConfig, gnSysrootConfig, luaVersions} = require('./config')
 
 // Get the arch of sysroot.
@@ -34,6 +34,10 @@ if (process.env.CI === 'true')
   commonConfig.push('use_jumbo_build=true')
 if (!(targetOs == 'win' && targetCpu == 'arm'))
   commonConfig.push(`node_version="${process.version}"`)
+for (const arg of argv) {
+  if (arg.startsWith('--extra-args='))
+    commonConfig.push(...arg.substr(arg.indexOf('=') + 1).split(' '))
+}
 
 const componentConfig = [
   'is_component_build=true',

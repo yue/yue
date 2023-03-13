@@ -35,19 +35,22 @@ const targetOs = {
   linux: 'linux',
   darwin: 'mac',
 }[process.platform]
+const hostOs = targetOs
 
 // Get target_cpu from args.gn.
 let targetCpu = 'x64'
-let clang = targetOs != 'win'
+let clang = hostOs != 'win'
+let goma = false
 if (fs.existsSync('out/Release/args.gn')) {
   const content = String(fs.readFileSync('out/Release/args.gn'))
-  const match = content.match(/target_cpu = "(.*)"/)
-  if (match && match.length > 1)
-    targetCpu = match[1]
-  if (content.includes('is_clang = true'))
-    clang = true
-  else
-    clang = false
+  const matchCpu = content.match(/target_cpu = "(.*)"/)
+  if (matchCpu && matchCpu.length > 1)
+    targetCpu = matchCpu[1]
+  const matchOs = content.match(/target_os = "(.*)"/)
+  if (matchOs && matchOs.length > 1)
+    targetOs = matchOs[1]
+  clang = content.includes('is_clang = true')
+  goma = content.includes('use_goma = true') || content.includes('goma.gn')
 }
 
 let hostCpu = process.arch
@@ -68,6 +71,9 @@ const argv = process.argv.slice(2).filter((arg) => {
     return false
   } else if (arg.startsWith('--target-cpu=')) {
     targetCpu = arg.substr(arg.indexOf('=') + 1)
+    return false
+  } else if (arg.startsWith('--target-os=')) {
+    targetOs = arg.substr(arg.indexOf('=') + 1)
     return false
   } else {
     return true
@@ -196,10 +202,12 @@ module.exports = {
   verbose,
   version,
   clang,
+  goma,
   argv,
   targetCpu,
   targetOs,
   hostCpu,
+  hostOs,
   strip,
   download,
   searchFiles,
