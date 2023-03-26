@@ -30,6 +30,9 @@ class EditView : public SubwinView {
   void Paste();
   void SelectAll();
 
+  // SubwinView:
+  void SetBackgroundColor(Color color) override;
+
   bool is_editing() const { return is_editing_; }
 
  private:

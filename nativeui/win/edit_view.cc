@@ -71,6 +71,14 @@ void EditView::SelectAll() {
   ::SendMessage(hwnd(), EM_SETSEL, 0, -1);
 }
 
+void EditView::SetBackgroundColor(Color color) {
+  ViewImpl::SetBackgroundColor(color);
+  if (color.transparent())
+    ::SendMessage(hwnd(), EM_SETBKGNDCOLOR, TRUE, 0);
+  else
+    ::SendMessage(hwnd(), EM_SETBKGNDCOLOR, FALSE, color.ToCOLORREF());
+}
+
 void EditView::LoadRichEdit() {
   ::LoadLibraryW(L"msftedit.dll");
 }
