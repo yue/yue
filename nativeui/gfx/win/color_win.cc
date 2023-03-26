@@ -18,6 +18,7 @@ Color Color::Get(Name name) {
     case Color::Name::DisabledText:
       index = COLOR_GRAYTEXT;
       break;
+    case Color::Name::DisabledTextEditBackground:
     case Color::Name::Control:
       index = COLOR_BTNFACE;
       break;

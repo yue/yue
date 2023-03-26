@@ -982,6 +982,8 @@ struct Type<nu::Color::Name> {
         *out = nu::Color::Name::Text;
       else if (color_name == "disabled-text")
         *out = nu::Color::Name::DisabledText;
+      else if (color_name == "disabled-text-edit-background")
+        *out = nu::Color::Name::DisabledTextEditBackground;
       else if (color_name == "control")
         *out = nu::Color::Name::Control;
       else if (color_name == "window-background")
