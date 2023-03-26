@@ -16,6 +16,8 @@ namespace {
 nu::InsetsF GetButtonInsets(NSButton* button) {
   if ([button bezelStyle] == NSSmallSquareBezelStyle) {
     return nu::InsetsF(1, 0, 1, 0);
+  } else if ([button bezelStyle] == NSRegularSquareBezelStyle) {
+    return nu::InsetsF(3, 2, 4, 2);
   } else if ([button bezelStyle] == NSRoundedBezelStyle) {
     NSControlSize size = [[button cell] controlSize];
     switch (size) {
