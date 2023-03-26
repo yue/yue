@@ -57,6 +57,17 @@ void NUSetCursor(GtkWidget* widget, GdkCursor* cursor) {
     gdk_window_set_cursor(window, cursor);
 }
 
+// Some views are implemented by wrapping the actuall view inside a scroll
+// view, and we must operate on the actuall view.
+GtkWidget* GetTargetView(GtkWidget* view) {
+  if (!GTK_IS_SCROLLED_WINDOW(view))
+    return view;
+  void* data = g_object_get_data(G_OBJECT(view), "widget");
+  if (!data)
+    return view;
+  return GTK_WIDGET(data);
+}
+
 void OnSizeAllocate(GtkWidget* widget, GdkRectangle* allocation,
                     NUViewPrivate* priv) {
   // Ignore empty sizes on initialization.
@@ -314,11 +325,11 @@ bool View::IsEnabled() const {
 }
 
 void View::Focus() {
-  gtk_widget_grab_focus(view_);
+  gtk_widget_grab_focus(GetTargetView(view_));
 }
 
 bool View::HasFocus() const {
-  return gtk_widget_is_focus(view_);
+  return gtk_widget_is_focus(GetTargetView(view_));
 }
 
 void View::SetFocusable(bool focusable) {

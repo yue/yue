@@ -91,7 +91,7 @@ NativeView Table::PlatformCreate() {
   gtk_widget_show(tree_view);
 
   GtkWidget* scroll = gtk_scrolled_window_new(nullptr, nullptr);
-  g_object_set_data(G_OBJECT(scroll), "tree-view", tree_view);
+  g_object_set_data(G_OBJECT(scroll), "widget", tree_view);
   g_object_set_data(G_OBJECT(scroll), "row-height",
                     GINT_TO_POINTER(GetDefaultRowHeight()));
   gtk_container_add(GTK_CONTAINER(scroll), tree_view);
@@ -106,7 +106,7 @@ void Table::PlatformDestroy() {
 
 void Table::PlatformSetModel(TableModel* model) {
   auto* tree_view = GTK_TREE_VIEW(g_object_get_data(G_OBJECT(GetNative()),
-                                                    "tree-view"));
+                                                    "widget"));
   NUTreeModel* tree_model = nu_tree_model_new(this, model);
   gtk_tree_view_set_model(tree_view, GTK_TREE_MODEL(tree_model));
 }
@@ -114,7 +114,7 @@ void Table::PlatformSetModel(TableModel* model) {
 void Table::AddColumnWithOptions(const std::string& title,
                                  const ColumnOptions& options) {
   auto* tree_view = GTK_TREE_VIEW(g_object_get_data(G_OBJECT(GetNative()),
-                                                    "tree-view"));
+                                                    "widget"));
   // Create renderer.
   GtkCellRenderer* renderer = nullptr;
   switch (options.type) {
@@ -155,19 +155,19 @@ void Table::AddColumnWithOptions(const std::string& title,
 
 int Table::GetColumnCount() const {
   auto* tree_view = GTK_TREE_VIEW(g_object_get_data(G_OBJECT(GetNative()),
-                                                    "tree-view"));
+                                                    "widget"));
   return gtk_tree_view_get_n_columns(tree_view);
 }
 
 void Table::SetColumnsVisible(bool visible) {
   auto* tree_view = GTK_TREE_VIEW(g_object_get_data(G_OBJECT(GetNative()),
-                                                    "tree-view"));
+                                                    "widget"));
   gtk_tree_view_set_headers_visible(tree_view, visible);
 }
 
 bool Table::IsColumnsVisible() const {
   auto* tree_view = GTK_TREE_VIEW(g_object_get_data(G_OBJECT(GetNative()),
-                                                    "tree-view"));
+                                                    "widget"));
   return gtk_tree_view_get_headers_visible(tree_view);
 }
 
@@ -187,14 +187,14 @@ float Table::GetRowHeight() const {
 
 void Table::EnableMultipleSelection(bool enable) {
   GtkTreeSelection* selection = gtk_tree_view_get_selection(
-      GTK_TREE_VIEW(g_object_get_data(G_OBJECT(GetNative()), "tree-view")));
+      GTK_TREE_VIEW(g_object_get_data(G_OBJECT(GetNative()), "widget")));
   gtk_tree_selection_set_mode(selection, enable ? GTK_SELECTION_MULTIPLE
                                                 : GTK_SELECTION_SINGLE);
 }
 
 bool Table::IsMultipleSelectionEnabled() const {
   GtkTreeSelection* selection = gtk_tree_view_get_selection(
-      GTK_TREE_VIEW(g_object_get_data(G_OBJECT(GetNative()), "tree-view")));
+      GTK_TREE_VIEW(g_object_get_data(G_OBJECT(GetNative()), "widget")));
   GtkSelectionMode mode = gtk_tree_selection_get_mode(selection);
   return mode == GTK_SELECTION_MULTIPLE;
 }
@@ -205,7 +205,7 @@ void Table::SelectRow(int row) {
 
 int Table::GetSelectedRow() const {
   GtkTreeSelection* selection = gtk_tree_view_get_selection(
-      GTK_TREE_VIEW(g_object_get_data(G_OBJECT(GetNative()), "tree-view")));
+      GTK_TREE_VIEW(g_object_get_data(G_OBJECT(GetNative()), "widget")));
   GtkTreeIter iter;
   if (gtk_tree_selection_get_selected(selection, nullptr, &iter))
     return GPOINTER_TO_INT(iter.user_data);
@@ -214,7 +214,7 @@ int Table::GetSelectedRow() const {
 
 void Table::SelectRows(std::set<int> rows) {
   GtkTreeSelection* selection = gtk_tree_view_get_selection(
-      GTK_TREE_VIEW(g_object_get_data(G_OBJECT(GetNative()), "tree-view")));
+      GTK_TREE_VIEW(g_object_get_data(G_OBJECT(GetNative()), "widget")));
   gtk_tree_selection_unselect_all(selection);
   for (int row : rows) {
     GtkTreeIter iter = {true, GINT_TO_POINTER(row)};
@@ -224,7 +224,7 @@ void Table::SelectRows(std::set<int> rows) {
 
 std::set<int> Table::GetSelectedRows() const {
   GtkTreeSelection* selection = gtk_tree_view_get_selection(
-      GTK_TREE_VIEW(g_object_get_data(G_OBJECT(GetNative()), "tree-view")));
+      GTK_TREE_VIEW(g_object_get_data(G_OBJECT(GetNative()), "widget")));
   GList* list = gtk_tree_selection_get_selected_rows(selection, nullptr);
   std::set<int> rows;
   for (GList* node = list; node != nullptr; node = node->next) {
@@ -243,7 +243,7 @@ std::set<int> Table::GetSelectedRows() const {
 
 void Table::NotifyRowInsertion(uint32_t row) {
   auto* tree_view = GTK_TREE_VIEW(g_object_get_data(G_OBJECT(GetNative()),
-                                                    "tree-view"));
+                                                    "widget"));
   auto* tree_model = gtk_tree_view_get_model(tree_view);
   if (!tree_model)
     return;
@@ -255,7 +255,7 @@ void Table::NotifyRowInsertion(uint32_t row) {
 
 void Table::NotifyRowDeletion(uint32_t row) {
   auto* tree_view = GTK_TREE_VIEW(g_object_get_data(G_OBJECT(GetNative()),
-                                                    "tree-view"));
+                                                    "widget"));
   auto* tree_model = gtk_tree_view_get_model(tree_view);
   if (!tree_model)
     return;
@@ -266,7 +266,7 @@ void Table::NotifyRowDeletion(uint32_t row) {
 
 void Table::NotifyValueChange(uint32_t column, uint32_t row) {
   auto* tree_view = GTK_TREE_VIEW(g_object_get_data(G_OBJECT(GetNative()),
-                                                    "tree-view"));
+                                                    "widget"));
   auto* tree_model = gtk_tree_view_get_model(tree_view);
   if (!tree_model)
     return;
