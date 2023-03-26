@@ -19,7 +19,7 @@ struct AttributedTextImpl {
   std::wstring text;
   scoped_refptr<Font> font;
   std::unique_ptr<Gdiplus::SolidBrush> brush;
-  Gdiplus::StringFormat format;;
+  Gdiplus::StringFormat format;
 };
 
 }  // namespace nu

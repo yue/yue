@@ -158,7 +158,8 @@ RectF TextEdit::GetTextBounds() const {
   scoped_refptr<AttributedText> attributed_text =
       new AttributedText(GetWindowString(edit->hwnd()), TextFormat());
   attributed_text->SetFont(edit->font());
-  RectF bounds = attributed_text->GetBoundsFor(SizeF(GetBounds().size()));
+  RectF bounds = attributed_text->GetBoundsFor(
+      SizeF(GetBounds().width(), INT_MAX));
   // The richedit adds paddings.
   return RectF(0, 0,
                bounds.width() + 2 * kTextEditPadding,
