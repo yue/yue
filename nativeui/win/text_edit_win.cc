@@ -29,7 +29,7 @@ class TextEditImpl : public EditView {
   // SubwinView:
   void OnCommand(UINT code, int command) override {
     TextEdit* edit = static_cast<TextEdit*>(delegate());
-    if (code == EN_CHANGE)
+    if (code == EN_CHANGE && !is_editing())
       edit->on_text_change.Emit(edit);
   }
 
