@@ -24,8 +24,9 @@ GtkPolicyType ToGTK(Scroll::Policy policy) {
     return GTK_POLICY_AUTOMATIC;
 }
 
-void OnTextChange(GtkTextBuffer*, TextEdit* edit) {
-  edit->on_text_change.Emit(edit);
+void OnTextChange(GtkTextBuffer* buffer, TextEdit* edit) {
+  if (!g_object_get_data(G_OBJECT(buffer), "is-editing"))
+    edit->on_text_change.Emit(edit);
 }
 
 gboolean OnKeyPress(GtkWidget*, GdkEventKey* event, TextEdit* edit) {
@@ -59,7 +60,9 @@ TextEdit::~TextEdit() {
 void TextEdit::SetText(const std::string& text) {
   GtkTextBuffer* buffer = gtk_text_view_get_buffer(
       GTK_TEXT_VIEW(g_object_get_data(G_OBJECT(GetNative()), "widget")));
+  g_object_set_data(G_OBJECT(buffer), "is-editing", this);
   gtk_text_buffer_set_text(buffer, text.c_str(), text.size());
+  g_object_set_data(G_OBJECT(buffer), "is-editing", nullptr);
 }
 
 std::string TextEdit::GetText() const {
