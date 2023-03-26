@@ -12,11 +12,11 @@
 
 namespace nu {
 
-EditView::EditView(View* delegate, DWORD styles)
+EditView::EditView(View* delegate, DWORD styles, DWORD ex_styles)
     : SubwinView((LoadRichEdit(), delegate),  // load dll before constructor
                  MSFTEDIT_CLASS,
                  WS_CHILD | WS_VISIBLE | styles,
-                 WS_EX_CLIENTEDGE) {
+                 ex_styles) {
   set_focusable(true);
   ::SendMessage(hwnd(), EM_SETEVENTMASK, 0L, ENM_CHANGE | ENM_REQUESTRESIZE);
 }

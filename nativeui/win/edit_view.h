@@ -13,7 +13,7 @@ namespace nu {
 
 class EditView : public SubwinView {
  public:
-  EditView(View* delegate, DWORD styles);
+  EditView(View* delegate, DWORD styles, DWORD ex_styles = 0);
 
   void SetPlainText();
 

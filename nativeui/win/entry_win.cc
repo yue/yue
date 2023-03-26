@@ -16,7 +16,9 @@ const int kEntryPadding = 1;
 class EntryImpl : public EditView {
  public:
   explicit EntryImpl(Entry* delegate)
-      : EditView(delegate, ES_AUTOHSCROLL | WS_CHILD | WS_VISIBLE) {
+      : EditView(delegate,
+                 ES_AUTOHSCROLL | WS_CHILD | WS_VISIBLE,
+                 WS_EX_CLIENTEDGE) {
     SetPlainText();
   }
 
