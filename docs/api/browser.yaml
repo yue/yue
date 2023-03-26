@@ -110,10 +110,13 @@ methods:
       `code`.
 
       Note that due to limitations of system toolkits, the execution may fail if
-      the result of `code` can not be fully converted to JSON.
+      the result of execution of `code` can not be fully converted to JSON.
 
       On Windows with WebView2 backend, the `success` may be true even when
       exception is threw in the executed code.
+
+      On Windows with IE backend, the `code` is executed synchronously and
+      the `callback` is called before this API returns.
 
   - signature: void GoBack()
     description: Navigate to the back item in the back-forward list.

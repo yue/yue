@@ -152,20 +152,10 @@ void BrowserImplIE::SetUserAgent(const std::string& ua) {
 void BrowserImplIE::ExecuteJavaScript(
     std::wstring code,
     const Browser::ExecutionCallback& callback) {
-  // IE executes the script syncronously but we need async behavior to keep
-  // consistency with other platforms, so delay the task to next tick.
-  //
-  // Note that std::function does not support move-only types, so we have to
-  // keep a copy of all arguments instead of using std::bind.
-  auto ref = weak_factory_.GetWeakPtr();
-  MessageLoop::PostTask([ref, code, callback]() {
-    if (ref) {
-      base::Value result;
-      bool success = ref->Eval(code, &result);
-      if (callback)
-        callback(success, std::move(result));
-    }
-  });
+  base::Value result;
+  bool success = Eval(code, &result);
+  if (callback)
+    callback(success, std::move(result));
 }
 
 void BrowserImplIE::GoBack() {
