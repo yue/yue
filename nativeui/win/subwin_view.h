@@ -28,6 +28,7 @@ class SubwinView : public Win32Window, public ViewImpl {
   void VisibilityChanged() override;
   void SetFont(Font* font) override;
   void SetBackgroundColor(Color color) override;
+  void SetState(ControlState state) override;
   void Draw(PainterWin* painter, const Rect& dirty) override;
 
   WNDPROC proc() const { return proc_; }

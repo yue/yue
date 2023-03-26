@@ -386,7 +386,8 @@ bool View::IsTreeVisible() const {
 void View::SetEnabled(bool enable) {
   GetNative()->set_enabled(enable);
   GetNative()->SetState(enable ? ControlState::Normal : ControlState::Disabled);
-  GetNative()->SetFocus(false);
+  if (!enable)
+    GetNative()->SetFocus(false);
 }
 
 bool View::IsEnabled() const {

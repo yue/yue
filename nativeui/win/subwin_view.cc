@@ -118,6 +118,11 @@ void SubwinView::SetBackgroundColor(Color color) {
     bg_brush_.reset(CreateSolidBrush(color.ToCOLORREF()));
 }
 
+void SubwinView::SetState(ControlState state) {
+  ViewImpl::SetState(state);
+  ::EnableWindow(hwnd(), state != ControlState::Disabled);
+}
+
 void SubwinView::Draw(PainterWin* painter, const Rect& dirty) {
   // There is nothing to draw in a sub window.
 }
