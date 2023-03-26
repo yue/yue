@@ -56,7 +56,8 @@ void Button::PlatformSetTitle(const std::string& title) {
 }
 
 std::string Button::GetTitle() const {
-  return gtk_button_get_label(GTK_BUTTON(GetNative()));
+  const char* title = gtk_button_get_label(GTK_BUTTON(GetNative()));
+  return title ? std::string(title) : std::string();
 }
 
 void Button::SetChecked(bool checked) {
@@ -81,7 +82,9 @@ void Button::PlatformSetImage(Image* image) {
 }
 
 SizeF Button::GetMinimumSize() const {
-  return GetPreferredSizeForWidget(GetNative());
+  // GTK's button can get quite small, but still give some minimal sizes to
+  // avoid warnings from GTK of "Negative content height".
+  return SizeF(15, 15);
 }
 
 }  // namespace nu
