@@ -37,6 +37,7 @@ class NATIVEUI_EXPORT Color {
   enum class Name {
     Text,
     DisabledText,
+    TextEditBackground,
     DisabledTextEditBackground,
     Control,
     WindowBackground,

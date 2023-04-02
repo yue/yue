@@ -369,6 +369,9 @@ Color GtkTheme::GetColor(Color::Name name) {
     case Color::Name::DisabledText:
       color = GetFgColor("GtkLabel:disabled");
       break;
+    case Color::Name::TextEditBackground:
+      color = GetBgColor("GtkTextView#textview.view");
+      break;
     case Color::Name::DisabledTextEditBackground:
       color = GetBgColor("GtkTextView#textview.view:disabled");
       break;

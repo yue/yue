@@ -9,6 +9,8 @@ enums:
     description: Normal text color.
   - name: DisabledText
     description: Text Color for disabled views.
+  - name: TextEditBackground
+    description: Background Color for TextEdit view.
   - name: DisabledTextEditBackground
     description: Background Color for disabled TextEdit view.
   - name: Control

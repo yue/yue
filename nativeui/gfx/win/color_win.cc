@@ -22,6 +22,7 @@ Color Color::Get(Name name) {
     case Color::Name::Control:
       index = COLOR_BTNFACE;
       break;
+    case Color::Name::TextEditBackground:
     case Color::Name::WindowBackground:
       index = COLOR_WINDOW;
       break;

@@ -21,8 +21,9 @@ Color Color::Get(Name name) {
     case Color::Name::DisabledText:
       color = [NSColor disabledControlTextColor];
       break;
+    case Color::Name::TextEditBackground:
+    // Disabled textedit does not have a different background color.
     case Color::Name::DisabledTextEditBackground:
-      // Disabled textedit does not have a different background color.
       color = [NSColor textBackgroundColor];
       break;
     case Color::Name::Control:
