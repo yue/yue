@@ -61,9 +61,11 @@
     [textView_ setAllowsUndo:YES];
     [textView_ setHorizontallyResizable:YES];
     [textView_ setVerticallyResizable:YES];
+    [textView_ setTextContainerInset:NSMakeSize(0, 0)];
     [textView_ setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
     [[textView_ textContainer] setContainerSize:NSMakeSize(FLT_MAX, FLT_MAX)];
     [[textView_ textContainer] setWidthTracksTextView:YES];
+    [[textView_ textContainer] setLineFragmentPadding:0];
     self.documentView = textView_.get();
   }
   return self;
