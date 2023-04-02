@@ -7,6 +7,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
+#include "nativeui/gfx/attributed_text.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/gtk/util/undoable_text_buffer.h"
 #include "nativeui/gtk/util/widget_util.h"
@@ -205,20 +206,11 @@ void TextEdit::SetScrollbarPolicy(Scroll::Policy h_policy,
 }
 
 RectF TextEdit::GetTextBounds() const {
-  // There is no reliable way to get the real text extends with GtkTextView
-  // APIs, getting widget preferred size or scroll window upper value does not
-  // work when widget is not mapped, and it returns wrong values with empty
-  // lines.
-  std::string text = GetText();
-  PangoLayout* layout =
-      pango_layout_new(gtk_widget_get_pango_context(GetNative()));
+  scoped_refptr<AttributedText> attributed_text =
+      new AttributedText(GetText(), TextFormat());
   if (font())
-    pango_layout_set_font_description(layout, font()->GetNative());
-  pango_layout_set_text(layout, text.c_str(), text.size());
-  int w, h;
-  pango_layout_get_pixel_size(layout, &w, &h);
-  g_object_unref(layout);
-  return RectF(0, 0, w, h);
+    attributed_text->SetFont(font());
+  return attributed_text->GetBoundsFor(SizeF(GetBounds().width(), FLT_MAX));
 }
 
 }  // namespace nu
