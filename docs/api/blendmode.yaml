@@ -1,0 +1,32 @@
+name: BlendMode
+header: nativeui/painter.h
+type: enum class
+namespace: nu
+description: Compositing operations.
+
+enums:
+  - name: Normal
+  - name: Multiply
+  - name: Screen
+  - name: Overlay
+  - name: Darken
+  - name: Lighten
+  - name: ColorDodge
+  - name: ColorBurn
+  - name: SoftLight
+  - name: HardLight
+  - name: Difference
+  - name: Exclusion
+  - name: Hue
+  - name: Saturation
+  - name: Color
+  - name: Luminosity
+  - name: Clear
+  - name: Copy
+  - name: SourceIn
+  - name: SourceOut
+  - name: SourceAtop
+  - name: DestinationOver
+  - name: DestinationIn
+  - name: DestinationAtop
+  - name: Xor

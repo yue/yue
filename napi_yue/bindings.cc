@@ -265,6 +265,72 @@ struct Type<nu::PointF> {
 };
 
 template<>
+struct Type<nu::BlendMode> {
+  static constexpr const char* name = "BlendMode";
+  static napi_status FromNode(napi_env env,
+                              napi_value value,
+                              nu::BlendMode* out) {
+    std::string mode;
+    napi_status s = ConvertFromNode(env, value, &mode);
+    if (s == napi_ok) {
+      if (mode == "normal")
+        *out = nu::BlendMode::Normal;
+      else if (mode == "multiply")
+        *out = nu::BlendMode::Multiply;
+      else if (mode == "screen")
+        *out = nu::BlendMode::Screen;
+      else if (mode == "overlay")
+        *out = nu::BlendMode::Overlay;
+      else if (mode == "darken")
+        *out = nu::BlendMode::Darken;
+      else if (mode == "lighten")
+        *out = nu::BlendMode::Lighten;
+      else if (mode == "color-dodge")
+        *out = nu::BlendMode::ColorDodge;
+      else if (mode == "color-burn")
+        *out = nu::BlendMode::ColorBurn;
+      else if (mode == "soft-light")
+        *out = nu::BlendMode::SoftLight;
+      else if (mode == "hard-light")
+        *out = nu::BlendMode::HardLight;
+      else if (mode == "difference")
+        *out = nu::BlendMode::Difference;
+      else if (mode == "exclusion")
+        *out = nu::BlendMode::Exclusion;
+      else if (mode == "hue")
+        *out = nu::BlendMode::Hue;
+      else if (mode == "saturation")
+        *out = nu::BlendMode::Saturation;
+      else if (mode == "color")
+        *out = nu::BlendMode::Color;
+      else if (mode == "luminosity")
+        *out = nu::BlendMode::Luminosity;
+      else if (mode == "clear")
+        *out = nu::BlendMode::Clear;
+      else if (mode == "copy")
+        *out = nu::BlendMode::Copy;
+      else if (mode == "source-in")
+        *out = nu::BlendMode::SourceIn;
+      else if (mode == "source-out")
+        *out = nu::BlendMode::SourceOut;
+      else if (mode == "source-atop")
+        *out = nu::BlendMode::SourceAtop;
+      else if (mode == "destination-over")
+        *out = nu::BlendMode::DestinationOver;
+      else if (mode == "destination-in")
+        *out = nu::BlendMode::DestinationIn;
+      else if (mode == "destination-atop")
+        *out = nu::BlendMode::DestinationAtop;
+      else if (mode == "xor")
+        *out = nu::BlendMode::Xor;
+      else
+        return napi_invalid_arg;
+    }
+    return s;
+  }
+};
+
+template<>
 struct Type<nu::Display> {
   static constexpr const char* name = "Display";
   static napi_status ToNode(napi_env env,
@@ -2103,6 +2169,7 @@ struct Type<nu::Painter> {
     Set(env, prototype,
         "save", &nu::Painter::Save,
         "restore", &nu::Painter::Restore,
+        "setBlendMode", &nu::Painter::SetBlendMode,
         "beginPath", &nu::Painter::BeginPath,
         "closePath", &nu::Painter::ClosePath,
         "moveTo", &nu::Painter::MoveTo,

@@ -19,6 +19,39 @@
 
 namespace nu {
 
+namespace {
+
+// Maps to mac blend modes.
+cairo_operator_t g_blend_modes[static_cast<size_t>(BlendMode::Size)] = {
+  CAIRO_OPERATOR_OVER,
+  CAIRO_OPERATOR_MULTIPLY,
+  CAIRO_OPERATOR_SCREEN,
+  CAIRO_OPERATOR_OVERLAY,
+  CAIRO_OPERATOR_DARKEN,
+  CAIRO_OPERATOR_LIGHTEN,
+  CAIRO_OPERATOR_COLOR_DODGE,
+  CAIRO_OPERATOR_COLOR_BURN,
+  CAIRO_OPERATOR_SOFT_LIGHT,
+  CAIRO_OPERATOR_HARD_LIGHT,
+  CAIRO_OPERATOR_DIFFERENCE,
+  CAIRO_OPERATOR_EXCLUSION,
+  CAIRO_OPERATOR_HSL_HUE,
+  CAIRO_OPERATOR_HSL_SATURATION,
+  CAIRO_OPERATOR_HSL_COLOR,
+  CAIRO_OPERATOR_HSL_LUMINOSITY,
+  CAIRO_OPERATOR_CLEAR,
+  CAIRO_OPERATOR_SOURCE,
+  CAIRO_OPERATOR_IN,
+  CAIRO_OPERATOR_OUT,
+  CAIRO_OPERATOR_ATOP,
+  CAIRO_OPERATOR_OVER,
+  CAIRO_OPERATOR_DEST_IN,
+  CAIRO_OPERATOR_DEST_ATOP,
+  CAIRO_OPERATOR_XOR,
+};
+
+}  // namespace
+
 PainterGtk::PainterGtk(cairo_t* context, SizeF size)
     : context_(context),
       size_(std::move(size)),
@@ -48,6 +81,13 @@ void PainterGtk::Restore() {
     return;
   states_.pop();
   cairo_restore(context_);
+}
+
+void PainterGtk::SetBlendMode(BlendMode mode) {
+  int index = static_cast<int>(mode);
+  if (index < 0 || index >= static_cast<int>(BlendMode::Size))
+    return;
+  cairo_set_operator(context_, g_blend_modes[index]);
 }
 
 void PainterGtk::BeginPath() {

@@ -23,6 +23,35 @@ class AttributedText;
 class Canvas;
 class Image;
 
+enum class BlendMode : int {
+  Normal = 0,
+  Multiply,
+  Screen,
+  Overlay,
+  Darken,
+  Lighten,
+  ColorDodge,
+  ColorBurn,
+  SoftLight,
+  HardLight,
+  Difference,
+  Exclusion,
+  Hue,
+  Saturation,
+  Color,
+  Luminosity,
+  Clear,
+  Copy,
+  SourceIn,
+  SourceOut,
+  SourceAtop,
+  DestinationOver,
+  DestinationIn,
+  DestinationAtop,
+  Xor,
+  Size,
+};
+
 // The interface for painting on canvas or window.
 class NATIVEUI_EXPORT Painter {
  public:
@@ -31,6 +60,9 @@ class NATIVEUI_EXPORT Painter {
   // Save/Restore current state.
   virtual void Save() = 0;
   virtual void Restore() = 0;
+
+  // The blend mode.
+  virtual void SetBlendMode(BlendMode mode) = 0;
 
   // Path operations.
   virtual void BeginPath() = 0;

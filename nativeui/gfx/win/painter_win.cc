@@ -62,6 +62,13 @@ void PainterWin::Restore() {
   states_.pop();
 }
 
+void PainterWin::SetBlendMode(BlendMode mode) {
+  if (mode == BlendMode::Copy)
+    graphics_.SetCompositingMode(Gdiplus::CompositingModeSourceCopy);
+  else
+    graphics_.SetCompositingMode(Gdiplus::CompositingModeSourceOver);
+}
+
 void PainterWin::BeginPath() {
   use_gdi_current_point_ = true;
   path_.Reset();

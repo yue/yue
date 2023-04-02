@@ -18,6 +18,35 @@ namespace nu {
 
 namespace {
 
+// Maps to mac blend modes.
+CGBlendMode g_blend_modes[static_cast<size_t>(BlendMode::Size)] = {
+  kCGBlendModeNormal,
+  kCGBlendModeMultiply,
+  kCGBlendModeScreen,
+  kCGBlendModeOverlay,
+  kCGBlendModeDarken,
+  kCGBlendModeLighten,
+  kCGBlendModeColorDodge,
+  kCGBlendModeColorBurn,
+  kCGBlendModeSoftLight,
+  kCGBlendModeHardLight,
+  kCGBlendModeDifference,
+  kCGBlendModeExclusion,
+  kCGBlendModeHue,
+  kCGBlendModeSaturation,
+  kCGBlendModeColor,
+  kCGBlendModeLuminosity,
+  kCGBlendModeClear,
+  kCGBlendModeCopy,
+  kCGBlendModeSourceIn,
+  kCGBlendModeSourceOut,
+  kCGBlendModeSourceAtop,
+  kCGBlendModeDestinationOver,
+  kCGBlendModeDestinationIn,
+  kCGBlendModeDestinationAtop,
+  kCGBlendModeXOR,
+};
+
 // Create a NSImage from bitmap.
 base::scoped_nsobject<NSImage> CreateNSImageFromCanvas(Canvas* canvas) {
   base::ScopedCFTypeRef<CGImageRef> cgimage(
@@ -83,6 +112,13 @@ void PainterMac::Save() {
 
 void PainterMac::Restore() {
   CGContextRestoreGState(context_);
+}
+
+void PainterMac::SetBlendMode(BlendMode mode) {
+  int index = static_cast<int>(mode);
+  if (index < 0 || index >= static_cast<int>(BlendMode::Size))
+    return;
+  CGContextSetBlendMode(context_, g_blend_modes[index]);
 }
 
 void PainterMac::BeginPath() {

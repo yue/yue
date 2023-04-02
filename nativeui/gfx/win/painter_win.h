@@ -34,6 +34,7 @@ class PainterWin : public Painter {
   // Painter:
   void Save() override;
   void Restore() override;
+  void SetBlendMode(BlendMode mode) override;
   void BeginPath() override;
   void ClosePath() override;
   void MoveTo(const PointF& point) override;
