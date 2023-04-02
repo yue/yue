@@ -245,12 +245,4 @@ std::tuple<Scroll::Elasticity, Scroll::Elasticity> TextEdit::GetScrollElasticity
   return std::make_tuple(h, v);
 }
 
-RectF TextEdit::GetTextBounds() const {
-  auto* textView = static_cast<NSTextView*>(
-      [static_cast<NUTextEdit*>(GetNative()) documentView]);
-  [textView.layoutManager ensureLayoutForTextContainer:textView.textContainer];
-  return RectF([textView.layoutManager
-      usedRectForTextContainer:textView.textContainer]);
-}
-
 }  // namespace nu

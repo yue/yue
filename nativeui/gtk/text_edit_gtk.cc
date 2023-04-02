@@ -7,7 +7,6 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
-#include "nativeui/gfx/attributed_text.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/gtk/util/undoable_text_buffer.h"
 #include "nativeui/gtk/util/widget_util.h"
@@ -203,14 +202,6 @@ void TextEdit::SetScrollbarPolicy(Scroll::Policy h_policy,
                                   Scroll::Policy v_policy) {
   gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(GetNative()),
                                  ToGTK(h_policy), ToGTK(v_policy));
-}
-
-RectF TextEdit::GetTextBounds() const {
-  scoped_refptr<AttributedText> attributed_text =
-      new AttributedText(GetText(), TextFormat());
-  if (font())
-    attributed_text->SetFont(font());
-  return attributed_text->GetBoundsFor(SizeF(GetBounds().width(), FLT_MAX));
 }
 
 }  // namespace nu

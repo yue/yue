@@ -4,6 +4,8 @@
 
 #include "nativeui/text_edit.h"
 
+#include "nativeui/gfx/attributed_text.h"
+
 namespace nu {
 
 // static
@@ -12,5 +14,15 @@ const char TextEdit::kClassName[] = "TextEdit";
 const char* TextEdit::GetClassName() const {
   return kClassName;
 }
+
+#if defined(OS_MAC) || defined(OS_LINUX)
+RectF TextEdit::GetTextBounds() const {
+  scoped_refptr<AttributedText> attributed_text =
+      new AttributedText(GetText(), TextFormat());
+  if (font())
+    attributed_text->SetFont(font());
+  return attributed_text->GetBoundsFor(SizeF(GetBounds().width(), FLT_MAX));
+}
+#endif
 
 }  // namespace nu
