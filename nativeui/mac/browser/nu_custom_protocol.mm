@@ -96,7 +96,8 @@ base::Lock g_lock;
     }
     if (handler) {
       job = handler(url);
-      job->AddRef();
+      if (job)
+        job->AddRef();
     }
     // Wake up the thread that waits for the job.
     dispatch_semaphore_signal(semaphore);
