@@ -1417,6 +1417,10 @@ struct Type<nu::Image> {
                                              const nu::Buffer&,
                                              float>,
            "isempty", &nu::Image::IsEmpty,
+#if defined(OS_MAC)
+           "settemplate", &nu::Image::SetTemplate,
+           "istemplate", &nu::Image::IsTemplate,
+#endif
            "getsize", &nu::Image::GetSize,
            "getscalefactor", &nu::Image::GetScaleFactor);
   }

@@ -49,6 +49,15 @@ class_methods:
     description: *ref3
 
 methods:
+  - signature: bool IsEmpty() const
+    description: Return whether the image has any data.
+
+  - signature: void SetTemplate(bool is)
+    description: Set whether the image is a template image.
+
+  - signature: bool IsTemplate() const
+    description: Return whether the image is a template image.
+
   - signature: SizeF GetSize() const
     description: Return image's size in DIP.
 

@@ -1571,6 +1571,10 @@ struct Type<nu::Image> {
         "createFromBuffer", &CreateOnHeap<nu::Image, const nu::Buffer&, float>);
     Set(env, prototype,
         "isEmpty", &nu::Image::IsEmpty,
+#if defined(OS_MAC)
+        "setTemplate", &nu::Image::SetTemplate,
+        "isTemplate", &nu::Image::IsTemplate,
+#endif
         "getSize", &nu::Image::GetSize,
         "getScaleFactor", &nu::Image::GetScaleFactor);
   }

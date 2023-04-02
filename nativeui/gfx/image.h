@@ -46,6 +46,12 @@ class NATIVEUI_EXPORT Image : public base::RefCounted<Image> {
   // Whether the image is empty.
   bool IsEmpty() const;
 
+#if defined(OS_MAC)
+  // Template images.
+  void SetTemplate(bool is);
+  bool IsTemplate() const;
+#endif
+
   // Get the size of image.
   SizeF GetSize() const;
 

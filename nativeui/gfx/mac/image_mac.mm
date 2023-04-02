@@ -109,6 +109,14 @@ bool Image::IsEmpty() const {
   return [[image_ representations] count] == 0;
 }
 
+void Image::SetTemplate(bool is) {
+  [image_ setTemplate:is];
+}
+
+bool Image::IsTemplate() const {
+  return [image_ isTemplate];
+}
+
 SizeF Image::GetSize() const {
   return SizeF([image_ size]);
 }
