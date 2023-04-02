@@ -9,6 +9,7 @@
 #include "base/mac/scoped_cftyperef.h"
 #include "base/strings/pattern.h"
 #include "base/strings/sys_string_conversions.h"
+#include "nativeui/gfx/geometry/rect_f.h"
 
 namespace nu {
 
@@ -119,6 +120,20 @@ bool Image::IsTemplate() const {
 
 SizeF Image::GetSize() const {
   return SizeF([image_ size]);
+}
+
+Image* Image::Tint(Color color) const {
+  NSImage* tinted = [[NSImage alloc] initWithSize:[image_ size]];
+  [tinted lockFocus];
+  [image_ drawAtPoint:NSZeroPoint
+             fromRect:NSZeroRect
+            operation:NSCompositingOperationSourceOver
+             fraction:1.0];
+  [color.ToNSColor() set];
+  NSRectFillUsingOperation(RectF(GetSize()).ToCGRect(),
+                           NSCompositingOperationSourceAtop);
+  [tinted unlockFocus];
+  return new Image(tinted, scale_factor_);
 }
 
 NSBitmapImageRep* Image::GetAnimationRep() const {

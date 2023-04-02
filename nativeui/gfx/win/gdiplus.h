@@ -15,6 +15,9 @@ namespace Gdiplus {
   using std::min;
 }  // namespace Gdiplus
 
+// Enable GdiPlus v1.1 features.
+#define GDIPVER 0x0110
+
 #include <gdiplus.h>  // NOLINT
 
 #include "base/notreached.h"

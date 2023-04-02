@@ -64,6 +64,13 @@ methods:
   - signature: float GetScaleFactor() const
     description: Return image's scale factor.
 
+  - signature: Image* Tint(Color color) const
+    description: Return a new image that has tint color applied.
+    detail: |
+      On Windows the tint color is applied by using color matrix, while other
+      platforms use `<!enum class>SourceAtop` blend mode. So the result image
+      might very likely look different on Windows.
+
   - signature: NativeImage GetNative() const
     lang: ['cpp']
     description: Return the native instance wrapped by the class.

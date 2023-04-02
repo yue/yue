@@ -19,8 +19,7 @@ methods:
   - signature: void SetBlendMode(BlendMode mode)
     description: Set how sample values are composited.
     detail: |
-      On Windows only `<!enum class>BlendMode::Normal` and
-      `<!enum class>BlendMode::Copy` are supported.
+      On Windows only `<!enum class>Normal` and `<!enum class>Copy` are supported.
 
   - signature: void BeginPath()
     description: Create a new path.

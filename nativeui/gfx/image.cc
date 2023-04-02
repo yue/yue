@@ -38,7 +38,8 @@ ScaleFactorPair kScaleFactorPairs[] = {
 
 }  // namespace
 
-Image::Image(NativeImage image) : image_(image) {}
+Image::Image(NativeImage image, float scale_factor)
+    : scale_factor_(scale_factor), image_(image) {}
 
 // static
 float Image::GetScaleFactorFromFilePath(const base::FilePath& path) {

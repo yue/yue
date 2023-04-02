@@ -11,6 +11,7 @@
 #include "base/files/file_path.h"
 #include "base/memory/ref_counted.h"
 #include "nativeui/buffer.h"
+#include "nativeui/gfx/color.h"
 #include "nativeui/gfx/geometry/size_f.h"
 #include "nativeui/types.h"
 
@@ -34,7 +35,7 @@ class NATIVEUI_EXPORT Image : public base::RefCounted<Image> {
   Image();
 
   // Take over an existing image.
-  explicit Image(NativeImage take);
+  explicit Image(NativeImage take, float scale_factor = 1.f);
 
   // Create an image by reading from |path|.
   // The @2x suffix in basename will make the image have scale factor.
@@ -57,6 +58,9 @@ class NATIVEUI_EXPORT Image : public base::RefCounted<Image> {
 
   // Get the scale factor of image.
   float GetScaleFactor() const { return scale_factor_; }
+
+  // Return a new image that has tint color applied.
+  Image* Tint(Color color) const;
 
   // Write the image to file.
   // Note: Do not make it a public API for now, we need to figure out a

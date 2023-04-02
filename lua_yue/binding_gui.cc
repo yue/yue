@@ -1485,7 +1485,8 @@ struct Type<nu::Image> {
            "istemplate", &nu::Image::IsTemplate,
 #endif
            "getsize", &nu::Image::GetSize,
-           "getscalefactor", &nu::Image::GetScaleFactor);
+           "getscalefactor", &nu::Image::GetScaleFactor,
+           "tint", &nu::Image::Tint);
   }
 };
 

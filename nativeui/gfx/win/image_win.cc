@@ -70,6 +70,37 @@ SizeF Image::GetSize() const {
                    1.f / scale_factor_);
 }
 
+Image* Image::Tint(Color color) const {
+  Gdiplus::Image* image = const_cast<Gdiplus::Image*>(image_);
+  // Create a bitmap to draw on.
+  float width = image->GetWidth();
+  float height = image->GetHeight();
+  std::unique_ptr<Gdiplus::Bitmap> bitmap(
+      new Gdiplus::Bitmap(width, height, PixelFormat32bppARGB));
+  Gdiplus::Graphics graphics(bitmap.get());
+  // Set color matrix for tint.
+  Gdiplus::ColorMatrix matrix = {
+    color.r() / 255., 0, 0, 0, 0,
+    0, color.g() / 255., 0, 0, 0,
+    0, 0, color.b() / 255., 0, 0,
+    0, 0, 0, color.a() / 255., 0,
+    // FIXME(zcbenz): Other platforms use BlenMode::SourceAtop to apply the
+    // tint color, which is not possible with GDI+. Using 0.5 is a very poor
+    // way to achive the mixed colors.
+    0.5, 0.5, 0.5, 0, 1,
+  };
+  Gdiplus::ImageAttributes attributes;
+  attributes.SetColorMatrix(&matrix);
+  // Draw tinted image.
+  graphics.DrawImage(image_,
+                     Gdiplus::RectF(0, 0, width, height),
+                     Gdiplus::RectF(0, 0, width, height),
+                     Gdiplus::UnitPixel,
+                     &attributes);
+  // Create new image.
+  return new Image(bitmap.release(), scale_factor_);
+}
+
 bool Image::WriteToFile(const std::string& format,
                         const base::FilePath& target) {
   CLSID encoder;
