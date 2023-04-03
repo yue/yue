@@ -150,6 +150,9 @@
 }
 
 - (void)setNUBackgroundColor:(nu::Color)color {
+  if (@available(macOS 12.0, *)) {
+    [self setUnderPageBackgroundColor:color.ToNSColor()];
+  }
 }
 
 - (void)setNUEnabled:(BOOL)enabled {
