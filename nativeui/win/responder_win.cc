@@ -43,12 +43,26 @@ bool ResponderImpl::EmitMouseClickEvent(NativeEvent event) {
   if (!delegate())
     return false;
   MouseEvent client_event(event, this);
-  if (client_event.type == EventType::MouseDown &&
-      delegate()->on_mouse_down.Emit(delegate(), client_event))
-    return true;
-  if (client_event.type == EventType::MouseUp &&
-      delegate()->on_mouse_up.Emit(delegate(), client_event))
-    return true;
+  if (client_event.type == EventType::MouseDown) {
+    // Implicitly capture mouse when user handles mouse down and up events.
+    if (!delegate()->on_mouse_down.IsEmpty() ||
+        !delegate()->on_mouse_up.IsEmpty()) {
+      implicit_capture_ = true;
+      delegate()->SetCapture();
+    }
+    // Emit the event.
+    if (delegate()->on_mouse_down.Emit(delegate(), client_event))
+      return true;
+  }
+  if (client_event.type == EventType::MouseUp) {
+    // Always releases on capture.
+    if (delegate()->HasCapture())
+      delegate()->ReleaseCapture();
+    implicit_capture_ = false;
+    // Emit the event.
+    if (delegate()->on_mouse_up.Emit(delegate(), client_event))
+      return true;
+  }
   return false;
 }
 

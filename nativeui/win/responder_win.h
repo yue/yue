@@ -49,6 +49,7 @@ class ResponderImpl {
   float scale_factor_;
   ControlType type_;
   Responder* delegate_;
+  bool implicit_capture_ = false;
 };
 
 }  // namespace nu
