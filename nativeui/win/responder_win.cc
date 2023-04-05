@@ -44,8 +44,9 @@ bool ResponderImpl::EmitMouseClickEvent(NativeEvent event) {
     return false;
   MouseEvent client_event(event, this);
   if (client_event.type == EventType::MouseDown) {
-    // Implicitly capture mouse when user handles mouse down and up events.
+    // Implicitly capture mouse when user handles mouse events.
     if (!delegate()->on_mouse_down.IsEmpty() ||
+        !delegate()->on_mouse_move.IsEmpty() ||
         !delegate()->on_mouse_up.IsEmpty()) {
       implicit_capture_ = true;
       delegate()->SetCapture();
