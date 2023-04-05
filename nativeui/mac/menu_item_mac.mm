@@ -31,9 +31,9 @@
 }
 
 - (BOOL)validateUserInterfaceItem:(id<NSValidatedUserInterfaceItem>)item {
-  if (!shell_->validate)
-    return YES;
-  return shell_->validate(shell_);
+  if (shell_->validate)
+    return shell_->validate(shell_);
+  return shell_->IsEnabled();
 }
 
 @end
