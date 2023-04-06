@@ -59,10 +59,11 @@
     [textView_ setDelegate:delegate_.get()];
     [textView_ setRichText:NO];
     [textView_ setAllowsUndo:YES];
-    [textView_ setHorizontallyResizable:YES];
+    // Do not change width to fix text, i.e. alwasys wrap text.
+    [textView_ setHorizontallyResizable:NO];
     [textView_ setVerticallyResizable:YES];
     [textView_ setTextContainerInset:NSMakeSize(0, 0)];
-    [textView_ setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
+    [textView_ setAutoresizingMask:NSViewWidthSizable];
     [[textView_ textContainer] setContainerSize:NSMakeSize(FLT_MAX, FLT_MAX)];
     [[textView_ textContainer] setWidthTracksTextView:YES];
     [[textView_ textContainer] setLineFragmentPadding:0];
