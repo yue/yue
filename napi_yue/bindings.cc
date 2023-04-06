@@ -733,7 +733,6 @@ struct Type<nu::Browser> {
     browser->AddRawBinding(bname, [ref = std::move(ref)](nu::Browser* browser,
                                                          base::Value value) {
       HandleScope handle_scope(ref.Env());
-      CallbackScope callback_scope(ref.Env());
       napi_value func = ref.Value();
       if (!func)
         return;
@@ -741,7 +740,7 @@ struct Type<nu::Browser> {
       args.reserve(value.GetList().size());
       for (const auto& it : value.GetList())
         args.push_back(ToNode(ref.Env(), it));
-      napi_call_function(ref.Env(), func, func, args.size(),
+      napi_make_callback(ref.Env(), nullptr, func, func, args.size(),
                          args.empty() ? nullptr : &args.front(), nullptr);
     });
   }
