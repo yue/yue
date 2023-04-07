@@ -39,14 +39,29 @@ TEST_F(ViewTest, OffsetFromWindow) {
   window->SetContentSize(nu::SizeF(200, 200));
   scoped_refptr<nu::Container> container(new nu::Container);
   window->SetContentView(container.get());
-#if !defined(OS_WIN)
   EXPECT_GE(container->OffsetFromWindow().x(), 0);
   EXPECT_GE(container->OffsetFromWindow().y(), 0);
-#endif
   view_->SetStyle("flex", 1, "margin", 10);
   container->AddChildView(view_.get());
   EXPECT_EQ(view_->OffsetFromWindow(),
             nu::Vector2dF(10, 10) + container->OffsetFromWindow());
+}
+
+TEST_F(ViewTest, BoundsInScreen) {
+  scoped_refptr<nu::Window> window(new nu::Window(nu::Window::Options()));
+  window->SetContentSize(nu::SizeF(200, 200));
+  scoped_refptr<nu::Container> container(new nu::Container);
+  window->SetContentView(container.get());
+  view_->SetStyle("flex", 1, "margin", 10);
+  container->AddChildView(view_.get());
+  EXPECT_EQ(nu::RectF(container->GetBounds().size()) +
+            container->OffsetFromWindow() +
+            container->GetWindow()->GetBounds().OffsetFromOrigin(),
+            container->GetBoundsInScreen());
+  EXPECT_EQ(nu::RectF(view_->GetBounds().size()) +
+            view_->OffsetFromWindow() +
+            view_->GetWindow()->GetBounds().OffsetFromOrigin(),
+            view_->GetBoundsInScreen());
 }
 
 TEST_F(ViewTest, SetVisible) {

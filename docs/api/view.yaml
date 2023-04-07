@@ -31,6 +31,9 @@ methods:
   - signature: RectF GetBounds() const
     description: Return the position and size of the view, relative to its parent.
 
+  - signature: RectF GetBoundsInScreen() const
+    description: Return the position and size of the view in the screen.
+
   - signature: void Layout()
     description: Make the view re-recalculate its layout.
 

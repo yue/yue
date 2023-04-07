@@ -339,7 +339,7 @@ Vector2dF View::OffsetFromWindow() const {
   Vector2d content_offset =
       window->GetNative()->GetPixelBounds().OffsetFromOrigin() -
       window->GetNative()->GetContentPixelBounds().OffsetFromOrigin();
-  return ScaleVector2d(view_offset + content_offset,
+  return ScaleVector2d(view_offset - content_offset,
                        1.f / view_->scale_factor());
 }
 
@@ -350,6 +350,23 @@ void View::SetBounds(const RectF& bounds) {
 
 RectF View::GetBounds() const {
   return ScaleRect(RectF(GetPixelBounds()), 1.0f / GetNative()->scale_factor());
+}
+
+RectF View::GetBoundsInScreen() const {
+  Window* window = GetWindow();
+  if (!window)
+    return GetBounds();
+  Rect rect = view_->size_allocation();
+  POINT top_left = { rect.x(), rect.y() };
+  POINT bottom_right = { rect.right(), rect.bottom() };
+  HWND hwnd = window->GetNative()->hwnd();
+  ::ClientToScreen(hwnd, &top_left);
+  ::ClientToScreen(hwnd, &bottom_right);
+  return ScaleRect(RectF(top_left.x,
+                         top_left.y,
+                         bottom_right.x - top_left.x,
+                         bottom_right.y - top_left.y),
+                   1.0f / GetNative()->scale_factor());
 }
 
 void View::SetPixelBounds(const Rect& bounds) {

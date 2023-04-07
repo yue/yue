@@ -243,6 +243,28 @@ RectF View::GetBounds() const {
   return RectF(GetPixelBounds());
 }
 
+RectF View::GetBoundsInScreen() const {
+  if (!GetWindow())
+    return GetBounds();
+  // If the widget has a window, then get the position of window directly.
+  GdkWindow* window = nullptr;
+  if (NU_IS_CONTAINER(view_))
+    window = nu_container_get_window(NU_CONTAINER(view_));
+  else if (gtk_widget_get_has_window(view_))
+    window = gtk_widget_get_window(view_);
+  if (window) {
+    gint x, y, width, height;
+    gdk_window_get_origin(window, &x, &y);
+    gdk_window_get_geometry(window, NULL, NULL, &width, &height);
+    return RectF(x, y, width, height);
+  }
+  // Otherwise fallback to manual computing, they shouldn't make a difference
+  // but we want to use raw APIs when possible for correctness.
+  return nu::RectF(GetBounds().size()) +
+         OffsetFromWindow() +
+         GetWindow()->GetBounds().OffsetFromOrigin();
+}
+
 void View::SetPixelBounds(const Rect& bounds) {
   // The size allocation is relative to the window instead of parent.
   GdkRectangle rect = bounds.ToGdkRectangle();

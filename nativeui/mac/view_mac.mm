@@ -5,6 +5,7 @@
 
 #include "nativeui/mac/nu_view.h"
 
+#include "base/logging.h"
 #include "base/mac/foundation_util.h"
 #include "base/mac/scoped_cftyperef.h"
 #include "nativeui/browser.h"
@@ -13,6 +14,7 @@
 #include "nativeui/gfx/font.h"
 #include "nativeui/gfx/geometry/point_conversions.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
+#include "nativeui/gfx/mac/coordinate_conversion.h"
 #include "nativeui/gfx/mac/painter_mac.h"
 #include "nativeui/mac/drag_drop/data_provider.h"
 #include "nativeui/mac/drag_drop/nested_run_loop.h"
@@ -95,14 +97,23 @@ Vector2dF View::OffsetFromWindow() const {
   if (!window)
     return Vector2dF();
   NSPoint point = [view_ convertPoint:NSZeroPoint toView:nil];
-  if (![view_ isFlipped])
-    return Vector2dF(point.x, point.y);
+  if ([view_ isFlipped])
+    return Vector2dF(point.x, NSHeight([window frame]) - point.y);
   NSRect frame = [window contentRectForFrameRect:[window frame]];
-  return Vector2dF(point.x, NSHeight(frame) - point.y);
+  return Vector2dF(point.x + NSWidth([window frame]) - NSWidth(frame),
+                   point.y + NSHeight([window frame]) - NSHeight(frame));
 }
 
 RectF View::GetBounds() const {
   return RectF([view_ frame]);
+}
+
+RectF View::GetBoundsInScreen() const {
+  NSWindow* window = [view_ window];
+  if (!window)
+    return GetBounds();
+  NSRect bounds = [view_ convertRect:[view_ bounds] toView:nil];
+  return ScreenRectFromNSRect([window convertRectToScreen:bounds]);
 }
 
 void View::SetPixelBounds(const Rect& bounds) {

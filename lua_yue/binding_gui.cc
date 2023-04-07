@@ -2651,6 +2651,7 @@ struct Type<nu::View> {
            "offsetfromwindow", &nu::View::OffsetFromWindow,
            "setbounds", &nu::View::SetBounds,
            "getbounds", &nu::View::GetBounds,
+           "getboundsinscreen", &nu::View::GetBoundsInScreen,
            "layout", &nu::View::Layout,
            "schedulepaint", &nu::View::SchedulePaint,
            "schedulepaintrect", &nu::View::SchedulePaintRect,
