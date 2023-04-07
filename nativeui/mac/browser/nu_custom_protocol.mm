@@ -7,6 +7,7 @@
 #include <map>
 
 #include "base/mac/scoped_nsobject.h"
+#include "base/no_destructor.h"
 #include "base/strings/sys_string_conversions.h"
 #include "base/synchronization/lock.h"
 
@@ -15,11 +16,18 @@ namespace {
 // Whether we have registered this protocol class.
 bool g_initailized = false;
 
-// A map of schemes and handlers.
-std::map<std::string, nu::Browser::ProtocolHandler> g_handlers;
-
 // Lock to guard the handlers map.
-base::Lock g_lock;
+base::Lock& GetProtocolHandlersLock() {
+  static base::NoDestructor<base::Lock> lock;
+  return *lock;
+}
+
+// A map of schemes and handlers.
+using ProtocolHandlerMap = std::map<std::string, nu::Browser::ProtocolHandler>;
+ProtocolHandlerMap& GetProtocolHandlers() {
+  static base::NoDestructor<ProtocolHandlerMap> handlers;
+  return *handlers;
+}
 
 }  // namespace
 
@@ -32,8 +40,8 @@ base::Lock g_lock;
     g_initailized = true;
   }
   {
-    base::AutoLock auto_lock(g_lock);
-    g_handlers[[scheme UTF8String]] = std::move(handler);
+    base::AutoLock auto_lock(GetProtocolHandlersLock());
+    GetProtocolHandlers()[[scheme UTF8String]] = std::move(handler);
   }
   // This private API can make WKWebview aware of our custom protocol class.
   Class cls = NSClassFromString(@"WKBrowsingContextController");
@@ -46,8 +54,8 @@ base::Lock g_lock;
 
 + (bool)unregisterProtocol:(NSString*)scheme {
   {
-    base::AutoLock auto_lock(g_lock);
-    g_handlers.erase([scheme UTF8String]);
+    base::AutoLock auto_lock(GetProtocolHandlersLock());
+    GetProtocolHandlers().erase([scheme UTF8String]);
   }
   // The private API to unregister protocol.
   Class cls = NSClassFromString(@"WKBrowsingContextController");
@@ -61,8 +69,9 @@ base::Lock g_lock;
 #pragma mark - NSURLProtocol
 
 + (BOOL)canInitWithRequest:(NSURLRequest*)request {
-  base::AutoLock auto_lock(g_lock);
-  return g_handlers.find([request.URL.scheme UTF8String]) != g_handlers.end();
+  base::AutoLock auto_lock(GetProtocolHandlersLock());
+  auto& handlers = GetProtocolHandlers();
+  return handlers.find([request.URL.scheme UTF8String]) != handlers.end();
 }
 
 + (NSURLRequest*)canonicalRequestForRequest:(NSURLRequest*)request {
@@ -89,9 +98,10 @@ base::Lock g_lock;
   dispatch_async(dispatch_get_main_queue(), ^{
     nu::Browser::ProtocolHandler handler;
     {
-      base::AutoLock auto_lock(g_lock);
-      auto it = g_handlers.find(scheme);
-      if (it != g_handlers.end())
+      base::AutoLock auto_lock(GetProtocolHandlersLock());
+      auto& handlers = GetProtocolHandlers();
+      auto it = handlers.find(scheme);
+      if (it != handlers.end())
         handler = it->second;
     }
     if (handler) {

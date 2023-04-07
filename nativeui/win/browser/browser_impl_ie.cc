@@ -9,6 +9,7 @@
 #include <map>
 #include <utility>
 
+#include "base/no_destructor.h"
 #include "base/strings/utf_string_conversions.h"
 #include "nativeui/message_loop.h"
 #include "nativeui/win/browser/browser_protocol_factory.h"
@@ -20,8 +21,12 @@ namespace nu {
 namespace {
 
 // Stores the protocol factories.
-std::map<std::wstring,
-         Microsoft::WRL::ComPtr<BrowserProtocolFactory>> g_protocol_factories;
+using ProtocolHandlerMap =
+    std::map<std::wstring, Microsoft::WRL::ComPtr<BrowserProtocolFactory>>;
+ProtocolHandlerMap& GetProtocolHandlers() {
+  static base::NoDestructor<ProtocolHandlerMap> handlers;
+  return *handlers;
+}
 
 }  // namespace
 
@@ -33,7 +38,7 @@ bool BrowserImplIE::RegisterProtocol(std::wstring scheme,
     return false;
   Microsoft::WRL::ComPtr<BrowserProtocolFactory> factory =
       new BrowserProtocolFactory(std::move(handler));
-  g_protocol_factories[scheme] = factory;
+  GetProtocolHandlers()[scheme] = factory;
   session->RegisterNameSpace(factory.Get(),
                              BrowserProtocolFactory::CLSID_BROWSER_PROTOCOL,
                              scheme.c_str(),
@@ -46,9 +51,9 @@ void BrowserImplIE::UnregisterProtocol(std::wstring scheme) {
   Microsoft::WRL::ComPtr<IInternetSession> session;
   if (FAILED(::CoInternetGetSession(0, &session, 0)))
     return;
-  session->UnregisterNameSpace(g_protocol_factories[scheme].Get(),
-                               scheme.c_str());
-  g_protocol_factories.erase(scheme);
+  auto& handlers = GetProtocolHandlers();
+  session->UnregisterNameSpace(handlers[scheme].Get(), scheme.c_str());
+  handlers.erase(scheme);
 }
 
 BrowserImplIE::BrowserImplIE(Browser::Options options, BrowserHolder* holder)
