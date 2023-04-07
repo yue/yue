@@ -3053,6 +3053,7 @@ struct Type<nu::Window> {
           AttachedTable(args).Set("menuBar", args[0]);
         }),
         "getMenuBar", &nu::Window::GetMenuBar,
+        "setMenuBarVisible", &nu::Window::SetMenuBarVisible,
 #endif
         "addChildWindow",
         WrapMethod(&nu::Window::AddChildWindow, [](Arguments args) {

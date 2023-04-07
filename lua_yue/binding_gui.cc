@@ -2776,6 +2776,7 @@ struct Type<nu::Window> {
            "setmenubar",
            RefMethod(state, &nu::Window::SetMenuBar, RefType::Reset, "menubar"),
            "getmenubar", &nu::Window::GetMenuBar,
+           "setmenubarvisible", &nu::Window::SetMenuBarVisible,
 #endif
            "addchildwindow",
            RefMethod(state, &nu::Window::AddChildWindow, RefType::Ref),

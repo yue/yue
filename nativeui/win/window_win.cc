@@ -58,18 +58,16 @@ inline DWORD ComputeWindowExStyle(const Window::Options& options) {
 }
 
 // Convert between window and client areas.
-Size ContentToWindowSize(Win32Window* window, bool has_menu_bar,
-                         const Size& size) {
+Size ContentToWindowSize(Win32Window* window, const Size& size) {
   RECT rect = Rect(size).ToRECT();
-  AdjustWindowRectEx(&rect, window->window_style(), has_menu_bar,
+  AdjustWindowRectEx(&rect, window->window_style(), !!GetMenu(window->hwnd()),
                      window->window_ex_style());
   return Rect(rect).size();
 }
 
-SizeF WindowToContentSize(Win32Window* window, bool has_menu_bar,
-                          const SizeF& size) {
+SizeF WindowToContentSize(Win32Window* window, const SizeF& size) {
   RECT rect = { 0 };
-  AdjustWindowRectEx(&rect, window->window_style(), has_menu_bar,
+  AdjustWindowRectEx(&rect, window->window_style(), !!GetMenu(window->hwnd()),
                      window->window_ex_style());
   Rect p(rect);
   return SizeF(size.width() - p.width(), size.height() - p.height());
@@ -883,7 +881,7 @@ void Window::PlatformSetContentView(View* view) {
 void Window::SetContentSize(const SizeF& size) {
   Size psize = ToRoundedSize(ScaleSize(size, window_->scale_factor()));
   if (HasFrame())
-    psize = ContentToWindowSize(window_, !!menu_bar_, psize);
+    psize = ContentToWindowSize(window_, psize);
   ::SetWindowPos(window_->hwnd(), NULL, 0, 0, psize.width(), psize.height(),
                  SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOMOVE);
 }
@@ -922,14 +920,12 @@ void Window::SetContentSizeConstraints(const SizeF& min_size,
     window_->set_min_size(Size());
   else
     window_->set_min_size(ContentToWindowSize(
-        window_,  !!menu_bar_,
-        ToRoundedSize(ScaleSize(min_size, window_->scale_factor()))));
+        window_, ToRoundedSize(ScaleSize(min_size, window_->scale_factor()))));
   if (max_size.IsEmpty())
     window_->set_max_size(Size());
   else
     window_->set_max_size(ContentToWindowSize(
-        window_,  !!menu_bar_,
-        ToRoundedSize(ScaleSize(max_size, window_->scale_factor()))));
+        window_, ToRoundedSize(ScaleSize(max_size, window_->scale_factor()))));
 }
 
 std::tuple<SizeF, SizeF> Window::GetContentSizeConstraints() const {
@@ -938,12 +934,12 @@ std::tuple<SizeF, SizeF> Window::GetContentSizeConstraints() const {
   return std::make_tuple(
       window_->min_size().IsEmpty() ?
           SizeF() :
-          WindowToContentSize(window_, !!menu_bar_,
+          WindowToContentSize(window_,
                               ScaleSize(SizeF(window_->min_size()),
                                         1.f / window_->scale_factor())),
       window_->max_size().IsEmpty() ?
           SizeF() :
-          WindowToContentSize(window_, !!menu_bar_,
+          WindowToContentSize(window_,
                               ScaleSize(SizeF(window_->max_size()),
                                         1.f / window_->scale_factor())));
 }
@@ -1086,6 +1082,12 @@ void Window::PlatformSetIcon(Image* icon) {
 
 void Window::PlatformSetMenuBar(MenuBar* menu_bar) {
   ::SetMenu(window_->hwnd(), menu_bar ? menu_bar->GetNative() : NULL);
+}
+
+void Window::SetMenuBarVisible(bool visible) {
+  if (!menu_bar_)
+    return;
+  ::SetMenu(window_->hwnd(), visible ? menu_bar_->GetNative() : NULL);
 }
 
 void Window::PlatformAddChildWindow(Window* child) {

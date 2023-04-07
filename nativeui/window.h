@@ -134,6 +134,7 @@ class NATIVEUI_EXPORT Window : public Responder {
   void SetIcon(scoped_refptr<Image> icon);
   void SetMenuBar(scoped_refptr<MenuBar> menu_bar);
   MenuBar* GetMenuBar() const { return menu_bar_.get(); }
+  void SetMenuBarVisible(bool visible);
 #endif
 
   Window* GetParentWindow() const { return parent_; }

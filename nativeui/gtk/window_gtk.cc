@@ -127,12 +127,14 @@ gboolean OnDrawBackground(GtkWidget* widget, cairo_t* cr,
 
 // Get the height of menubar.
 inline int GetMenuBarHeight(const Window* window) {
+  MenuBar* menu_bar = window->GetMenuBar();
+  if (!menu_bar)
+    return 0;
+  GtkWidget* widget = GTK_WIDGET(menu_bar->GetNative());
+  if (!gtk_widget_get_visible(widget))
+    return 0;
   int menu_bar_height = 0;
-  if (window->GetMenuBar()) {
-    gtk_widget_get_preferred_height(
-        GTK_WIDGET(window->GetMenuBar()->GetNative()),
-        &menu_bar_height, nullptr);
-  }
+  gtk_widget_get_preferred_height(widget, &menu_bar_height, nullptr);
   return menu_bar_height;
 }
 
@@ -609,6 +611,14 @@ void Window::PlatformSetMenuBar(MenuBar* menu_bar) {
   gtk_window_add_accel_group(window_,
                              menu_bar->accel_manager()->accel_group());
 
+  ForceSizeAllocation(window_, GTK_WIDGET(vbox));
+}
+
+void Window::SetMenuBarVisible(bool visible) {
+  if (!menu_bar_)
+    return;
+  GtkContainer* vbox = GTK_CONTAINER(gtk_bin_get_child(GTK_BIN(window_)));
+  gtk_widget_set_visible(GTK_WIDGET(menu_bar_->GetNative()), visible);
   ForceSizeAllocation(window_, GTK_WIDGET(vbox));
 }
 

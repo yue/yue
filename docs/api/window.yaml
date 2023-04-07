@@ -214,6 +214,14 @@ methods:
     platform: ['Windows', 'Linux']
     description: Return the window menu bar.
 
+  - signature: void SetMenuBarVisible(bool visible)
+    platform: ['Windows', 'Linux']
+    description: Set whether the window menu bar is visible.
+    detail: |
+      The accelerators of menu items will still work when menu bar is hidden.
+
+      Calling `<!name>SetMenu` will reset the menu bar to visible.
+
   - signature: Window* GetParentWindow() const
     description: Return the parent window.
 
