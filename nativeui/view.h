@@ -38,7 +38,6 @@ class NATIVEUI_EXPORT View : public Responder {
 
   // Get position and size.
   RectF GetBounds() const;
-  RectF GetBoundsInWindow() const;
 
   // Internal: The real pixel bounds that depends on the scale factor.
   void SetPixelBounds(const Rect& bounds);

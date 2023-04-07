@@ -34,6 +34,21 @@ TEST_F(ViewTest, SetContentView) {
   EXPECT_EQ(view_->GetBounds(), nu::RectF(0, 0, 200, 200));
 }
 
+TEST_F(ViewTest, OffsetFromWindow) {
+  scoped_refptr<nu::Window> window(new nu::Window(nu::Window::Options()));
+  window->SetContentSize(nu::SizeF(200, 200));
+  scoped_refptr<nu::Container> container(new nu::Container);
+  window->SetContentView(container.get());
+#if !defined(OS_WIN)
+  EXPECT_GE(container->OffsetFromWindow().x(), 0);
+  EXPECT_GE(container->OffsetFromWindow().y(), 0);
+#endif
+  view_->SetStyle("flex", 1, "margin", 10);
+  container->AddChildView(view_.get());
+  EXPECT_EQ(view_->OffsetFromWindow(),
+            nu::Vector2dF(10, 10) + container->OffsetFromWindow());
+}
+
 TEST_F(ViewTest, SetVisible) {
   EXPECT_EQ(view_->IsVisible(), true);
   view_->SetVisible(false);

@@ -126,6 +126,10 @@ void WindowImpl::SetPixelBounds(const Rect& bounds) {
 }
 
 Rect WindowImpl::GetPixelBounds() {
+  // The bounds returned by GetWindowRect does not match what you see on
+  // screen, and this is because Windows 10 added some invisible insets for
+  // resize handles.
+  // https://stackoverflow.com/questions/34139450
   RECT r;
   GetWindowRect(hwnd(), &r);
   return Rect(r);

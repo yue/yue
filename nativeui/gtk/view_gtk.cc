@@ -227,9 +227,12 @@ Vector2dF View::OffsetFromView(const View* from) const {
 }
 
 Vector2dF View::OffsetFromWindow() const {
-  GdkRectangle rect;
-  gtk_widget_get_allocation(GetNative(), &rect);
-  return Vector2dF(rect.x, rect.y);
+  Window* window = GetWindow();
+  if (!window)
+    return Vector2dF();
+  return OffsetFromView(window->GetContentView()) -
+         window->ContentBoundsToWindowBounds(
+             window->GetContentView()->GetBounds()).OffsetFromOrigin();
 }
 
 void View::SetBounds(const RectF& bounds) {
@@ -238,21 +241,6 @@ void View::SetBounds(const RectF& bounds) {
 
 RectF View::GetBounds() const {
   return RectF(GetPixelBounds());
-}
-
-RectF View::GetBoundsInWindow() const {
-  GdkRectangle rect;
-  gtk_widget_get_allocation(view_, &rect);
-  // Calculate relative position to content view, since we consider menu bar
-  // and other decorations as non client area.
-  Window* window = GetWindow();
-  if (window) {
-    GdkRectangle root;
-    gtk_widget_get_allocation(window->GetContentView()->GetNative(), &root);
-    rect.x -= root.x;
-    rect.y -= root.y;
-  }
-  return RectF(Rect(rect));
 }
 
 void View::SetPixelBounds(const Rect& bounds) {
@@ -289,6 +277,9 @@ Rect View::GetPixelBounds() const {
   // the behavior of other platforms by returning an empty rect.
   if (bounds == Rect(-1, -1, 1, 1) || bounds == Rect(0, 0, 1, 1))
     return Rect();
+  // For content view, we need to remove menubar height.
+  if (GetWindow() && GetWindow()->GetContentView() == this)
+    bounds.set_y(0);
   return bounds;
 }
 

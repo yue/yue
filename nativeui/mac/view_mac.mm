@@ -91,8 +91,14 @@ Vector2dF View::OffsetFromView(const View* from) const {
 }
 
 Vector2dF View::OffsetFromWindow() const {
+  NSWindow* window = [view_ window];
+  if (!window)
+    return Vector2dF();
   NSPoint point = [view_ convertPoint:NSZeroPoint toView:nil];
-  return Vector2dF(point.x, point.y);
+  if (![view_ isFlipped])
+    return Vector2dF(point.x, point.y);
+  NSRect frame = [window contentRectForFrameRect:[window frame]];
+  return Vector2dF(point.x, NSHeight(frame) - point.y);
 }
 
 RectF View::GetBounds() const {

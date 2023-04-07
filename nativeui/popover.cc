@@ -121,8 +121,9 @@ Popover::~Popover() = default;
 void Popover::ShowRelativeTo(View* view) {
   if (!view->GetWindow())
     return;
-  RectF vbounds = view->GetBoundsInWindow() +
-                  view->GetWindow()->GetContentBounds().OffsetFromOrigin();
+  RectF vbounds = RectF(view->GetBounds().size()) +
+                  view->OffsetFromWindow() +
+                  view->GetWindow()->GetBounds().OffsetFromOrigin();
   RectF bounds(window_->GetBounds().size());
   bounds.set_x(vbounds.x() + (vbounds.width() - bounds.width()) / 2);
   bounds.set_y(vbounds.bottom() + 1);

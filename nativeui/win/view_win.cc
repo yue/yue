@@ -332,7 +332,14 @@ Vector2dF View::OffsetFromView(const View* from) const {
 }
 
 Vector2dF View::OffsetFromWindow() const {
-  return ScaleVector2d(view_->size_allocation().OffsetFromOrigin(),
+  Window* window = GetWindow();
+  if (!window)
+    return Vector2dF();
+  Vector2d view_offset = view_->size_allocation().OffsetFromOrigin();
+  Vector2d content_offset =
+      window->GetNative()->GetPixelBounds().OffsetFromOrigin() -
+      window->GetNative()->GetContentPixelBounds().OffsetFromOrigin();
+  return ScaleVector2d(view_offset + content_offset,
                        1.f / view_->scale_factor());
 }
 
