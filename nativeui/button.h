@@ -13,6 +13,16 @@ namespace nu {
 
 class Image;
 
+#if defined(OS_MAC)
+// This is a direct map of NSControlSize.
+enum class ControlSize {
+  Mini = 2,
+  Small = 1,
+  Regular = 0,
+  Large = 3,
+};
+#endif
+
 class NATIVEUI_EXPORT Button : public View {
  public:
   enum class Type {
@@ -56,6 +66,8 @@ class NATIVEUI_EXPORT Button : public View {
     Inline,
   };
   void SetButtonStyle(Style style);
+
+  void SetControlSize(ControlSize size);
 
   void SetHasBorder(bool yes);
   bool HasBorder() const;

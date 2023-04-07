@@ -58,6 +58,10 @@ methods:
     platform: ['macOS']
     description: Set the visual style of the button.
 
+  - signature: void SetControlSize(ControlSize size)
+    platform: ['macOS']
+    description: Set the control size of the button.
+
   - signature: void SetHasBorder(bool yes)
     platform: ['macOS']
     description: Set whether the button has a border.

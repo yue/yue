@@ -260,6 +260,29 @@ struct Type<nu::BlendMode> {
   }
 };
 
+#if defined(OS_MAC)
+template<>
+struct Type<nu::ControlSize> {
+  static constexpr const char* name = "ControlSize";
+  static inline bool To(State* state, int index, nu::ControlSize* out) {
+    std::string size;
+    if (!lua::To(state, index, &size))
+      return false;
+    if (size == "mini")
+      *out = nu::ControlSize::Mini;
+    else if (size == "small")
+      *out = nu::ControlSize::Small;
+    else if (size == "regular")
+      *out = nu::ControlSize::Regular;
+    else if (size == "large")
+      *out = nu::ControlSize::Large;
+    else
+      return false;
+    return true;
+  }
+};
+#endif
+
 template<>
 struct Type<nu::Display> {
   static constexpr const char* name = "Display";
@@ -729,6 +752,7 @@ struct Type<nu::Button> {
            "gettitle", &nu::Button::GetTitle,
 #if defined(OS_MAC)
            "setbuttonstyle", &nu::Button::SetButtonStyle,
+           "setcontrolsize", &nu::Button::SetControlSize,
            "sethasborder", &nu::Button::SetHasBorder,
            "hasborder", &nu::Button::HasBorder,
 #endif

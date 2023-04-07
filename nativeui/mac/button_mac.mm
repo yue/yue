@@ -156,6 +156,12 @@ void Button::SetButtonStyle(Style style) {
   UpdateDefaultStyle();
 }
 
+void Button::SetControlSize(ControlSize size) {
+  auto* button = static_cast<NSButton*>(GetNative());
+  button.controlSize = static_cast<NSControlSize>(size);
+  UpdateDefaultStyle();
+}
+
 void Button::SetHasBorder(bool yes) {
   static_cast<NSButton*>(GetNative()).bordered = yes;
   UpdateDefaultStyle();

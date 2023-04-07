@@ -1,0 +1,11 @@
+name: ControlSize
+header: nativeui/button.h
+type: enum class
+namespace: nu
+description: Maps to `NSControlSize`.
+
+enums:
+  - name: Mini
+  - name: Small
+  - name: Regular
+  - name: Large
