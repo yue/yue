@@ -72,7 +72,7 @@ bool Clickable::OnMouseClick(NativeEvent event) {
 
 void Clickable::OnCaptureLost() {
   is_capturing_ = false;
-  if (!is_space_pressing_)
+  if (!is_space_pressing_ && state() != ControlState::Pressed)
     ResetState();
 }
 
