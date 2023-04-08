@@ -60,6 +60,11 @@ class NATIVEUI_EXPORT Container : public View {
 
   void PlatformInit();
   void PlatformDestroy();
+#if defined(OS_LINUX)
+  void PlatformInstallMouseClickEvents() override;
+  void PlatformInstallMouseMoveEvents() override;
+  void PlatformInstallKeyEvents() override;
+#endif
   void PlatformAddChildView(View* view);
   void PlatformRemoveChildView(View* view);
 

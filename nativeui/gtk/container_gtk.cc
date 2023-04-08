@@ -20,6 +20,28 @@ void Container::PlatformDestroy() {
   View::PlatformDestroy();
 }
 
+void Container::PlatformInstallMouseClickEvents() {
+  View::PlatformInstallMouseClickEvents();
+  nu_container_add_event_mask(
+      NU_CONTAINER(GetNative()),
+      GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
+}
+
+void Container::PlatformInstallMouseMoveEvents() {
+  View::PlatformInstallMouseMoveEvents();
+  nu_container_add_event_mask(
+      NU_CONTAINER(GetNative()),
+      GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK |
+      GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK);
+}
+
+void Container::PlatformInstallKeyEvents() {
+  View::PlatformInstallKeyEvents();
+  nu_container_add_event_mask(
+      NU_CONTAINER(GetNative()),
+      GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK);
+}
+
 void Container::PlatformAddChildView(View* child) {
   // If we are adding a radio button, we check whether there is already a radio
   // button in the container, and join radio group if so.

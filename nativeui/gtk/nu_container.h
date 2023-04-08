@@ -35,6 +35,7 @@ struct _NUContainerClass {
 GType nu_container_get_type();
 GtkWidget* nu_container_new(Container* delegate);
 GdkWindow* nu_container_get_window(NUContainer* widget);
+void nu_container_add_event_mask(NUContainer* widget, gint event_mask);
 
 }  // namespace nu
 

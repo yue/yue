@@ -12,7 +12,40 @@ namespace nu {
 struct _NUContainerPrivate {
   Container* delegate;
   GdkWindow* event_window;
+  gint event_mask;
 };
+
+namespace {
+
+// Create invisible input window.
+void CreateEventWindow(GtkWidget* widget, NUContainerPrivate* priv) {
+  GtkAllocation allocation;
+  gtk_widget_get_allocation(widget, &allocation);
+  GdkWindowAttr attributes;
+  attributes.window_type = GDK_WINDOW_CHILD;
+  attributes.x = allocation.x;
+  attributes.y = allocation.x;
+  attributes.width = allocation.width;
+  attributes.height = allocation.height;
+  attributes.wclass = GDK_INPUT_ONLY;
+  attributes.event_mask = gtk_widget_get_events(widget) | priv->event_mask;
+  priv->event_window = gdk_window_new(gtk_widget_get_parent_window(widget),
+                                      &attributes, GDK_WA_X | GDK_WA_Y);
+  gtk_widget_register_window(widget, priv->event_window);
+  gdk_window_move_resize(priv->event_window,
+                         allocation.x, allocation.y,
+                         allocation.width, allocation.height);
+}
+
+void DestroyEventWindow(GtkWidget* widget, NUContainerPrivate* priv) {
+  if (!priv->event_window)
+    return;
+  gtk_widget_unregister_window(widget, priv->event_window);
+  gdk_window_destroy(priv->event_window);
+  priv->event_window = nullptr;
+}
+
+}  // namespace
 
 static void nu_container_realize(GtkWidget* widget);
 static void nu_container_unrealize(GtkWidget* widget);
@@ -63,43 +96,11 @@ static void nu_container_class_init(NUContainerClass* nu_class) {
 
 static void nu_container_realize(GtkWidget* widget) {
   GTK_WIDGET_CLASS(nu_container_parent_class)->realize(widget);
-
-  // Create invisible input window.
-  GtkAllocation allocation;
-  gtk_widget_get_allocation(widget, &allocation);
-  GdkWindowAttr attributes;
-  attributes.window_type = GDK_WINDOW_CHILD;
-  attributes.x = allocation.x;
-  attributes.y = allocation.x;
-  attributes.width = allocation.width;
-  attributes.height = allocation.height;
-  attributes.wclass = GDK_INPUT_ONLY;
-  attributes.event_mask = gtk_widget_get_events(widget)
-                          | GDK_BUTTON_PRESS_MASK
-                          | GDK_BUTTON_RELEASE_MASK
-                          | GDK_POINTER_MOTION_MASK
-                          | GDK_POINTER_MOTION_HINT_MASK
-                          | GDK_ENTER_NOTIFY_MASK
-                          | GDK_LEAVE_NOTIFY_MASK
-                          | GDK_KEY_PRESS_MASK
-                          | GDK_KEY_RELEASE_MASK;
-  NUContainerPrivate* priv = NU_CONTAINER(widget)->priv;
-  priv->event_window = gdk_window_new(gtk_widget_get_parent_window(widget),
-                                      &attributes, GDK_WA_X | GDK_WA_Y);
-  gtk_widget_register_window(widget, priv->event_window);
-  gdk_window_move_resize(priv->event_window,
-                         allocation.x, allocation.y,
-                         allocation.width, allocation.height);
+  CreateEventWindow(widget, NU_CONTAINER(widget)->priv);
 }
 
 static void nu_container_unrealize(GtkWidget* widget) {
-  NUContainerPrivate* priv = NU_CONTAINER(widget)->priv;
-  if (priv->event_window) {
-    gtk_widget_unregister_window(widget, priv->event_window);
-    gdk_window_destroy(priv->event_window);
-    priv->event_window = nullptr;
-  }
-
+  DestroyEventWindow(widget, NU_CONTAINER(widget)->priv);
   GTK_WIDGET_CLASS(nu_container_parent_class)->unrealize(widget);
 }
 
@@ -201,13 +202,26 @@ static void nu_container_init(NUContainer* widget) {
 
 GtkWidget* nu_container_new(Container* delegate) {
   void* widget = g_object_new(NU_TYPE_CONTAINER, nullptr);
-  NU_CONTAINER(widget)->priv->delegate = delegate;
-  NU_CONTAINER(widget)->priv->event_window = nullptr;
+  auto* priv = NU_CONTAINER(widget)->priv;
+  priv->delegate = delegate;
+  priv->event_window = nullptr;
+  priv->event_mask = 0;
   return GTK_WIDGET(widget);
 }
 
 GdkWindow* nu_container_get_window(NUContainer* widget) {
   return widget->priv->event_window;
+}
+
+void nu_container_add_event_mask(NUContainer* container, gint event_mask) {
+  GtkWidget* widget = GTK_WIDGET(container);
+  gint new_event_mask = event_mask | container->priv->event_mask;
+  if (new_event_mask == container->priv->event_mask)
+    return;
+  container->priv->event_mask = new_event_mask;
+  DestroyEventWindow(widget, container->priv);
+  if (gtk_widget_get_realized(widget))
+    CreateEventWindow(widget, container->priv);
 }
 
 }  // namespace nu

@@ -60,13 +60,13 @@ class NATIVEUI_EXPORT Responder : public SignalDelegate,
   // SignalDelegate:
   void OnConnect(int identifier) override;
 
+  virtual void PlatformInstallMouseClickEvents();
+  virtual void PlatformInstallMouseMoveEvents();
+  virtual void PlatformInstallKeyEvents();
+
  private:
   // Event types.
   enum { kOnMouseClick, kOnMouseMove, kOnKey };
-
-  virtual void PlatformInstallMouseClickEvents();
-  virtual void PlatformInstallMouseMoveEvents();
-  void PlatformInstallKeyEvents();
 
   // Whether events have been installed.
   bool on_mouse_click_installed_ = false;
