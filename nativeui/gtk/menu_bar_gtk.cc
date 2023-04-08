@@ -9,7 +9,10 @@
 namespace nu {
 
 NativeMenu MenuBar::PlatformCreate() const {
-  return GTK_MENU_SHELL(gtk_menu_bar_new());
+  GtkWidget* menu = gtk_menu_bar_new();
+  // Make accelerators work even when menu bar is hidden.
+  g_signal_connect(menu, "can_activate_accel", G_CALLBACK(gtk_true), nullptr);
+  return GTK_MENU_SHELL(menu);
 }
 
 }  // namespace nu
