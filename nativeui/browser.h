@@ -127,6 +127,10 @@ class NATIVEUI_EXPORT Browser : public View {
   void PlatformInstallMouseMoveEvents() override;
 #endif
 
+#if defined(OS_LINUX)
+  void SetBackgroundColor(Color color) override;
+#endif
+
  private:
   void PlatformInit(Options options);
   void PlatformDestroy();

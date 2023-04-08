@@ -92,7 +92,7 @@ class NATIVEUI_EXPORT View : public Responder {
   // Display related styles.
   virtual void SetFont(scoped_refptr<Font> font);
   virtual void SetColor(Color color);
-  void SetBackgroundColor(Color color);
+  virtual void SetBackgroundColor(Color color);
 
   // Set layout related styles without doing layout.
   // While this is public API, it should only be used by language bindings.

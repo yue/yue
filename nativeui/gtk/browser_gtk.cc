@@ -301,6 +301,12 @@ bool Browser::IsLoading() const {
   return webkit_web_view_is_loading(WEBKIT_WEB_VIEW(GetNative()));
 }
 
+void Browser::SetBackgroundColor(Color color) {
+  View::SetBackgroundColor(color);
+  GdkRGBA gdkcolor = color.ToGdkRGBA();
+  webkit_web_view_set_background_color(WEBKIT_WEB_VIEW(GetNative()), &gdkcolor);
+}
+
 void Browser::PlatformUpdateBindings() {
   WebKitUserContentManager* manager =
       webkit_web_view_get_user_content_manager(WEBKIT_WEB_VIEW(GetNative()));
