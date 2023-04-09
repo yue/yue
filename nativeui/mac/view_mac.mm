@@ -5,7 +5,7 @@
 
 #include "nativeui/mac/nu_view.h"
 
-#include "base/logging.h"
+#include "base/strings/sys_string_conversions.h"
 #include "base/mac/foundation_util.h"
 #include "base/mac/scoped_cftyperef.h"
 #include "nativeui/browser.h"
@@ -298,6 +298,24 @@ void View::PlatformSetCursor(Cursor* cursor) {
     else
       [view_ nuPrivate]->cursor.reset();
   }
+}
+
+void View::PlatformSetTooltip(const std::string& tooltip) {
+  [view_ setToolTip:base::SysUTF8ToNSString(tooltip)];
+}
+
+int View::PlatformAddTooltipForRect(const std::string& tooltip, RectF rect) {
+  base::scoped_nsobject<NSString> str(
+      [base::SysUTF8ToNSString(tooltip) retain]);
+  int tag = [view_ addToolTipRect:rect.ToCGRect() owner:str.get() userData:nil];
+  // The method only takes a weak ref of passed object.
+  [view_ nuPrivate]->tooltips[tag] = std::move(str);
+  return tag;
+}
+
+void View::PlatformRemoveTooltip(int tag) {
+  [view_ removeToolTip:tag];
+  [view_ nuPrivate]->tooltips.erase(tag);
 }
 
 void View::PlatformSetFont(Font* font) {

@@ -21,6 +21,7 @@
 #include "nativeui/win/util/scoped_ole_initializer.h"
 #include "nativeui/win/util/subwin_holder.h"
 #include "nativeui/win/util/timer_host.h"
+#include "nativeui/win/util/tooltip_host.h"
 #include "nativeui/win/util/tray_host.h"
 #include "third_party/yoga/Yoga.h"
 
@@ -107,6 +108,12 @@ TimerHost* State::GetTimerHost() {
   if (!timer_host_)
     timer_host_.reset(new TimerHost);
   return timer_host_.get();
+}
+
+TooltipHost* State::GetTooltipHost() {
+  if (!tooltip_host_)
+    tooltip_host_.reset(new TooltipHost);
+  return tooltip_host_.get();
 }
 
 UINT State::GetNextCommandID() {

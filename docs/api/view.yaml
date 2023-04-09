@@ -138,6 +138,17 @@ methods:
       For certain views like `Label`, this may have remove the view's background
       color.
 
+  - signature: void SetTooltip(std::string tooltip)
+    description: Set the `tooltip` for the view.
+    detail: |
+      This method will clear all tooltips added by `<!name>AddTooltipForRect`.
+
+  - signature: int AddTooltipForRect(std::string tooltip, RectF rect)
+    description: Add `tooltip` for a defined `rect` in the view and return an ID for it.
+
+  - signature: void RemoveTooltip(int id)
+    description: Remove tooltip added by `<!name>AddTooltipForRect` with `id`.
+
   - signature: void SetFont(scoped_refptr<Font> font)
     description: Change the font used for drawing text in the view.
     detail: |

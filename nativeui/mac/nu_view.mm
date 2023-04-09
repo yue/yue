@@ -163,6 +163,7 @@ void InstallNUViewMethods(Class cl) {
   class_addMethod(cl, @selector(nuInjected), (IMP)NUViewInjected, "B@:");
 
   class_addMethod(cl, @selector(shell), (IMP)GetViewShell, "^v@:");
+
   class_addMethod(cl, @selector(enableTracking),
                   (IMP)EnableViewTracking, "v@:");
   class_addMethod(cl, @selector(disableTracking),

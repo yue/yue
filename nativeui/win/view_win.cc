@@ -11,8 +11,10 @@
 #include "nativeui/events/win/event_win.h"
 #include "nativeui/gfx/geometry/rect_conversions.h"
 #include "nativeui/screen.h"
+#include "nativeui/state.h"
 #include "nativeui/win/dragging_info_win.h"
 #include "nativeui/win/scroll_win.h"
+#include "nativeui/win/util/tooltip_host.h"
 
 namespace nu {
 
@@ -33,6 +35,15 @@ void ViewImpl::SizeAllocate(const Rect& size_allocation) {
   size_allocation_ = size_allocation;
   Invalidate(size_allocation_);  // new
 
+  // Update rect of default tooltip.
+  if (delegate() && window()) {
+    auto it = delegate()->tooltips_.find(delegate()->default_tooltip_id_);
+    if (it != delegate()->tooltips_.end()) {
+      State::GetCurrent()->GetTooltipHost()->UpdateTooltipRect(
+            window()->hwnd(), it->first, size_allocation_);
+    }
+  }
+
   if (size_changed && delegate())
     delegate()->OnSizeChanged();
 }
@@ -44,6 +55,28 @@ UINT ViewImpl::HitTest(const Point& point) const {
 void ViewImpl::SetParent(ViewImpl* parent) {
   if (window())
     window()->focus_manager()->RemoveFocus(this);
+
+  // Update tooltips when switching window of view.
+  if (delegate() && (!parent || (window() != parent->window()))) {
+    // When detached from a window, remove all tooltips.
+    if (window()) {
+      for (const auto& t : delegate()->tooltips_) {
+        State::GetCurrent()->GetTooltipHost()->RemoveTooltip(
+            window()->hwnd(), t.first);
+      }
+    }
+    // When attached to a window, add tooltips in this view.
+    if (parent && parent->window()) {
+      for (const auto& t : delegate()->tooltips_) {
+        State::GetCurrent()->GetTooltipHost()->AddTooltip(
+            parent->window()->hwnd(), t.first,
+            const_cast<LPWSTR>(t.second.text.c_str()),
+            t.first == delegate()->default_tooltip_id_ ?
+                size_allocation() :
+                ToNearestRect(ScaleRect(t.second.rect, scale_factor())));
+      }
+    }
+  }
 
   window_ = parent ? parent->window_ : nullptr;
   parent_ = parent;
@@ -466,6 +499,38 @@ void View::RegisterDraggedTypes(std::set<Clipboard::Data::Type> types) {
 }
 
 void View::PlatformSetCursor(Cursor* cursor) {
+}
+
+void View::PlatformSetTooltip(const std::wstring& tooltip) {
+  auto* host = State::GetCurrent()->GetTooltipHost();
+  if (!default_tooltip_id_)
+    default_tooltip_id_ = host->GetNextId();
+  if (view_->window()) {
+    host->RemoveTooltip(view_->window()->hwnd(), default_tooltip_id_);
+    host->AddTooltip(view_->window()->hwnd(), default_tooltip_id_,
+                     const_cast<LPWSTR>(tooltip.c_str()),
+                     view_->size_allocation());
+  }
+}
+
+int View::PlatformAddTooltipForRect(const std::wstring& tooltip, RectF rect) {
+  auto* host = State::GetCurrent()->GetTooltipHost();
+  int id = host->GetNextId();
+  if (view_->window()) {
+    host->RemoveTooltip(view_->window()->hwnd(), default_tooltip_id_);
+    host->AddTooltip(view_->window()->hwnd(), id,
+                     const_cast<LPWSTR>(tooltip.c_str()),
+                     ToNearestRect(
+                         ScaleRect(rect, GetNative()->scale_factor())));
+  }
+  return id;
+}
+
+void View::PlatformRemoveTooltip(int tag) {
+  if (view_->window()) {
+    auto* host = State::GetCurrent()->GetTooltipHost();
+    host->RemoveTooltip(view_->window()->hwnd(), tag);
+  }
 }
 
 void View::PlatformSetFont(Font* font) {

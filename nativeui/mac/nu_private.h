@@ -6,6 +6,7 @@
 #define NATIVEUI_MAC_NU_PRIVATE_H_
 
 #include <functional>
+#include <map>
 #include <memory>
 
 #include "base/mac/scoped_nsobject.h"
@@ -61,6 +62,9 @@ struct NUViewPrivate : public NUPrivate {
   int drag_result = 0;  // cached drag result
   std::function<void()> quit_dragging;  // quit current drag session
   base::scoped_nsobject<DataProvider> data_source;  // data of drag source
+
+  // Tooltip strings.
+  std::map<int, base::scoped_nsobject<NSString>> tooltips;
 };
 
 }  // namespace nu

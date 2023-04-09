@@ -24,6 +24,7 @@
 #include "nativeui/win/util/scoped_ole_initializer.h"
 #include "nativeui/win/util/subwin_holder.h"
 #include "nativeui/win/util/timer_host.h"
+#include "nativeui/win/util/tooltip_host.h"
 #include "nativeui/win/util/tray_host.h"
 #elif defined(OS_LINUX)
 #include "nativeui/gfx/gtk/gtk_theme.h"

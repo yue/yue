@@ -495,6 +495,8 @@ jumbo_component("nativeui") {
       "win/util/tray_host.h",
       "win/util/timer_host.cc",
       "win/util/timer_host.h",
+      "win/util/tooltip_host.cc",
+      "win/util/tooltip_host.h",
       "win/util/win32_window.cc",
       "win/util/win32_window.h",
     ]

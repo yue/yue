@@ -5,6 +5,7 @@
 #ifndef NATIVEUI_VIEW_H_
 #define NATIVEUI_VIEW_H_
 
+#include <map>
 #include <set>
 #include <string>
 #include <vector>
@@ -18,6 +19,10 @@
 
 typedef struct YGNode *YGNodeRef;
 typedef struct YGConfig *YGConfigRef;
+
+#if defined(OS_LINUX)
+typedef struct _GtkTooltip GtkTooltip;
+#endif
 
 namespace nu {
 
@@ -89,6 +94,11 @@ class NATIVEUI_EXPORT View : public Responder {
   // Custom cursor when mouse hovers the view.
   void SetCursor(scoped_refptr<Cursor> cursor);
 
+  // Tooltips.
+  void SetTooltip(std::string tooltip);
+  int AddTooltipForRect(std::string tooltip, RectF rect);
+  void RemoveTooltip(int id);
+
   // Display related styles.
   virtual void SetFont(scoped_refptr<Font> font);
   virtual void SetColor(Color color);
@@ -146,6 +156,10 @@ class NATIVEUI_EXPORT View : public Responder {
   // Internal: Notify that view's size has changed.
   virtual void OnSizeChanged();
 
+#if defined(OS_LINUX)
+  bool QueryTooltip(int x, int y, GtkTooltip* tooltip);
+#endif
+
   // Internal: Get the CSS node of the view.
   YGNodeRef node() const { return node_; }
 
@@ -177,9 +191,17 @@ class NATIVEUI_EXPORT View : public Responder {
   void PlatformDestroy();
   void PlatformSetVisible(bool visible);
   void PlatformSetCursor(Cursor* cursor);
+  void PlatformSetTooltip(const base::FilePath::StringType& tooltip);
+  int PlatformAddTooltipForRect(const base::FilePath::StringType& tooltip,
+                                RectF rect);
+  void PlatformRemoveTooltip(int id);
   void PlatformSetFont(Font* font);
 
  private:
+#if defined(OS_WIN)
+  friend class ViewImpl;
+#endif
+
 #if defined(OS_LINUX)
   // Whether events have been installed.
   bool on_drop_installed_ = false;
@@ -199,6 +221,24 @@ class NATIVEUI_EXPORT View : public Responder {
 
   // Custom cursor.
   scoped_refptr<Cursor> cursor_;
+
+#if defined(OS_LINUX) || defined(OS_WIN)
+  // Stores tooltips.
+  struct Tooltip {
+    base::FilePath::StringType text;
+    RectF rect;
+  };
+  std::map<int, Tooltip> tooltips_;
+  // On Windows all the views in one window can not have duplicate IDs, so we
+  // remember window's default ID. On Linux we just use 0 as default ID.
+  int default_tooltip_id_ = 0;
+#endif
+#if defined(OS_LINUX)
+  // On Linux each view's IDs are independent.
+  int next_tooltip_id_ = 0;
+  // Connections to tooltip-text signal.
+  gulong tooltip_signal_ = 0;
+#endif
 
   // The node recording CSS styles.
   YGNodeRef node_;

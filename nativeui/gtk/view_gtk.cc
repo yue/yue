@@ -187,6 +187,14 @@ void OnDragDataReceived(GtkWidget* widget, GdkDragContext* context,
   gtk_drag_finish(context, false, false, time);
 }
 
+// Callback called by the query-tooltip signal.
+gboolean OnQueryTooltip(GtkWidget*, gint x, gint y, gboolean keyboad_mode,
+                        GtkTooltip* tooltip, View* view) {
+  if (keyboad_mode)  // x and y are not defined
+    return FALSE;
+  return view->QueryTooltip(x, y, tooltip);
+}
+
 }  // namespace
 
 void View::PlatformDestroy() {
@@ -450,6 +458,30 @@ void View::PlatformSetCursor(Cursor* cursor) {
   NUSetCursor(view_, cursor ? cursor->GetNative(): nullptr);
 }
 
+void View::PlatformSetTooltip(const std::string& tooltip) {
+  // We own the tooltip string passed to the gtk.
+  gtk_widget_set_tooltip_text(view_, tooltip.c_str());
+}
+
+int View::PlatformAddTooltipForRect(const std::string& tooltip, RectF rect) {
+  // Connect to signal on demand.
+  if (tooltip_signal_ == 0) {
+    gtk_widget_set_has_tooltip(view_, true);
+    tooltip_signal_ = g_signal_connect(view_, "query-tooltip",
+                                       G_CALLBACK(OnQueryTooltip), this);
+  }
+  return ++next_tooltip_id_;
+}
+
+void View::PlatformRemoveTooltip(int id) {
+  // Disconnet signal when there are no more tooltips.
+  if (tooltips_.empty() && tooltip_signal_) {
+    gtk_widget_set_has_tooltip(view_, false);
+    g_signal_handler_disconnect(view_, tooltip_signal_);
+    tooltip_signal_ = 0;
+  }
+}
+
 void View::PlatformSetFont(Font* font) {
   gtk_widget_override_font(view_, font->GetNative());
 }
@@ -471,6 +503,16 @@ Window* View::GetWindow() const {
   if (!gtk_widget_is_toplevel(toplevel))
     return nullptr;
   return Window::FromNative(GTK_WINDOW(toplevel));
+}
+
+bool View::QueryTooltip(int x, int y, GtkTooltip* tooltip) {
+  for (const auto& t : tooltips_) {
+    if (t.second.rect.Contains(x, y)) {
+      gtk_tooltip_set_text(tooltip, t.second.text.c_str());
+      return true;
+    }
+  }
+  return false;
 }
 
 }  // namespace nu

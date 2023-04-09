@@ -37,6 +37,7 @@ class SubwinHolder;
 class ScopedOleInitializer;
 class TrayHost;
 class TimerHost;
+class TooltipHost;
 #elif defined(OS_LINUX)
 class GtkTheme;
 #endif
@@ -65,6 +66,7 @@ class NATIVEUI_EXPORT State {
   NativeTheme* GetNativeTheme();
   TrayHost* GetTrayHost();
   TimerHost* GetTimerHost();
+  TooltipHost* GetTooltipHost();
   UINT GetNextCommandID();
 #elif defined(OS_LINUX)
   GtkTheme* GetGtkTheme();
@@ -101,6 +103,7 @@ class NATIVEUI_EXPORT State {
   std::unique_ptr<NativeTheme> native_theme_;
   std::unique_ptr<TrayHost> tray_host_;
   std::unique_ptr<TimerHost> timer_host_;
+  std::unique_ptr<TooltipHost> tooltip_host_;
 
   // Next ID for custom WM_COMMAND items, the number came from:
   // https://msdn.microsoft.com/en-us/library/11861byt.aspx

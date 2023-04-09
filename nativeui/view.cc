@@ -15,6 +15,10 @@
 #include "nativeui/window.h"
 #include "third_party/yoga/Yoga.h"
 
+#if defined(OS_WIN)
+#include "base/strings/utf_string_conversions.h"
+#endif
+
 // This header required DEBUG to be defined.
 #if defined(DEBUG)
 #include "third_party/yoga/YGNodePrint.h"
@@ -81,6 +85,51 @@ void View::SetCursor(scoped_refptr<Cursor> cursor) {
     return;
   PlatformSetCursor(cursor.get());
   cursor_ = std::move(cursor);
+}
+
+void View::SetTooltip(std::string tooltip) {
+#if defined(OS_MAC)
+  PlatformSetTooltip(tooltip);
+#elif defined(OS_LINUX) || defined(OS_WIN)
+  Tooltip record = {
+#if defined(OS_WIN)
+      base::UTF8ToWide(tooltip),
+#else
+      std::move(tooltip),
+#endif
+      RectF()
+  };
+  PlatformSetTooltip(record.text);
+  tooltips_.clear();
+  tooltips_[default_tooltip_id_] = std::move(record);
+#endif
+}
+
+int View::AddTooltipForRect(std::string tooltip, RectF rect) {
+#if defined(OS_MAC)
+  // On mac the ID is generated from API.
+  return PlatformAddTooltipForRect(tooltip, rect);
+#elif defined(OS_LINUX) || defined(OS_WIN)
+  Tooltip record = {
+#if defined(OS_WIN)
+      base::UTF8ToWide(tooltip),
+#else
+      std::move(tooltip),
+#endif
+      RectF()
+  };
+  int id = PlatformAddTooltipForRect(record.text.c_str(), rect);
+  tooltips_.erase(default_tooltip_id_);
+  tooltips_[id] = std::move(record);
+  return id;
+#endif
+}
+
+void View::RemoveTooltip(int id) {
+#if defined(OS_LINUX) || defined(OS_WIN)
+  tooltips_.erase(id);
+#endif
+  PlatformRemoveTooltip(id);
 }
 
 void View::SetFont(scoped_refptr<Font> font) {
