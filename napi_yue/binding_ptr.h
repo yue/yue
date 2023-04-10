@@ -35,11 +35,13 @@ template<typename T>
 struct TypeBridge<T, typename std::enable_if<std::is_base_of<
                          base::subtle::RefCountedBase, T>::value>::type> {
   static T* Wrap(T* ptr) {
-    ptr->AddRef();
+    if (ptr)
+      ptr->AddRef();
     return ptr;
   }
   static void Finalize(T* ptr) {
-    ptr->Release();
+    if (ptr)
+      ptr->Release();
   }
 };
 
