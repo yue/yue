@@ -9,8 +9,8 @@ class TestContainer : public nu::Container {
  public:
   TestContainer() {}
 
-  void Layout() override {
-    nu::Container::Layout();
+  void UpdateChildBounds() override {
+    nu::Container::UpdateChildBounds();
     ++layout_count_;
   }
 
@@ -117,13 +117,6 @@ TEST_F(ContainerTest, Layout) {
   EXPECT_EQ(container_->layout_count(), 2);
   window_->SetBounds(nu::RectF(0, 0, 100, 200));
   EXPECT_EQ(container_->layout_count(), 3);
-}
-
-TEST_F(ContainerTest, ChildLayout) {
-  window_->SetBounds(nu::RectF(0, 0, 100, 200));
-  TestContainer* c1 = new TestContainer;
-  container_->AddChildView(c1);
-  EXPECT_EQ(c1->layout_count(), 0) << "Child CSS node should not layout";
 }
 
 TEST_F(ContainerTest, VisibleLayout) {

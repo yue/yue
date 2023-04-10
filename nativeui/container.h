@@ -24,7 +24,9 @@ class NATIVEUI_EXPORT Container : public View {
   const char* GetClassName() const override;
   void Layout() override;
   bool IsContainer() const override;
+#if defined(OS_MAC)
   void OnSizeChanged() override;
+#endif
 
   // Gets preferred size of view.
   SizeF GetPreferredSize() const;

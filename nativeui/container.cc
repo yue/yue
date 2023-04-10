@@ -61,9 +61,6 @@ void Container::Layout() {
     return;
   }
 
-  // So this is a root CSS node, calculate the layout and set bounds.
-  SizeF size(GetBounds().size());
-  YGNodeCalculateLayout(node(), size.width(), size.height(), YGDirectionLTR);
   UpdateChildBounds();
 }
 
@@ -71,13 +68,15 @@ bool Container::IsContainer() const {
   return true;
 }
 
+// Mac uses this event for layout, while other platforms do it in their
+// native subclasses (i.e. nu_container_size_allocate in GTK and
+// ContainerImpl::SizeAllocate in Win32).
+#if defined(OS_MAC)
 void Container::OnSizeChanged() {
   View::OnSizeChanged();
-  if (IsRootYGNode(this))
-    Layout();
-  else
-    UpdateChildBounds();
+  UpdateChildBounds();
 }
+#endif
 
 SizeF Container::GetPreferredSize() const {
   float nan = std::numeric_limits<float>::quiet_NaN();
@@ -145,6 +144,11 @@ void Container::UpdateChildBounds() {
   dirty_ = false;
   if (!IsVisible())
     return;
+  // For root CSS node, calculate the layout before setting bounds.
+  if (IsRootYGNode(this)) {
+    SizeF size = GetBounds().size();
+    YGNodeCalculateLayout(node(), size.width(), size.height(), YGDirectionLTR);
+  }
   for (int i = 0; i < ChildCount(); ++i) {
     View* child = ChildAt(i);
     if (child->IsVisible())
