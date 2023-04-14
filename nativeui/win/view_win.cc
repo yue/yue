@@ -436,7 +436,7 @@ bool View::IsVisible() const {
   return GetNative()->is_visible();
 }
 
-bool View::IsTreeVisible() const {
+bool View::IsVisibleInHierarchy() const {
   return GetNative()->is_tree_visible();
 }
 

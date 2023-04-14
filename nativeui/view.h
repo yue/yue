@@ -64,7 +64,7 @@ class NATIVEUI_EXPORT View : public Responder {
 
   // Whether the view and its parent are visible.
   // TODO(zcbenz): Find a better name before making it public.
-  bool IsTreeVisible() const;
+  bool IsVisibleInHierarchy() const;
 
   // Enable/disable the view.
   void SetEnabled(bool enable);

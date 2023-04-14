@@ -140,7 +140,7 @@ bool View::IsVisible() const {
   return ![view_ isHidden];
 }
 
-bool View::IsTreeVisible() const {
+bool View::IsVisibleInHierarchy() const {
   return ![view_ isHiddenOrHasHiddenAncestor];
 }
 

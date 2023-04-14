@@ -49,6 +49,9 @@ methods:
   - signature: bool IsVisible() const
     description: Return whether the view is visible.
 
+  - signature: bool IsVisibleInHierarchy() const
+    description: Return whether the view and its ancestors are visible.
+
   - signature: void SetEnabled(bool enable)
     description: Set whether the view is enabled.
     detail: |

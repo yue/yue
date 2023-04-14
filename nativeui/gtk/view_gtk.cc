@@ -330,7 +330,7 @@ bool View::IsVisible() const {
   return gtk_widget_get_visible(view_);
 }
 
-bool View::IsTreeVisible() const {
+bool View::IsVisibleInHierarchy() const {
   return gtk_widget_is_visible(view_);
 }
 

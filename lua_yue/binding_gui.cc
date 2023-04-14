@@ -2657,6 +2657,7 @@ struct Type<nu::View> {
            "schedulepaintrect", &nu::View::SchedulePaintRect,
            "setvisible", &nu::View::SetVisible,
            "isvisible", &nu::View::IsVisible,
+           "isvisibleinhierarchy", &nu::View::IsVisibleInHierarchy,
            "setenabled", &nu::View::SetEnabled,
            "isenabled", &nu::View::IsEnabled,
            "focus", &nu::View::Focus,

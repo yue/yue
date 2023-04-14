@@ -34,7 +34,7 @@ void GifPlayer::SetAnimating(bool animates) {
   }
   is_animating_ = animates;
   // Create a timer to play animation.
-  if (is_animating_ && IsTreeVisible())
+  if (is_animating_ && IsVisibleInHierarchy())
     ScheduleFrame();
 }
 
