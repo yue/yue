@@ -151,7 +151,7 @@ void Container::UpdateChildBounds() {
   }
   for (int i = 0; i < ChildCount(); ++i) {
     View* child = ChildAt(i);
-    if (child->IsVisible())
+    if (child->IsVisibleInHierarchy())
       child->SetBounds(GetYGNodeBounds(child->node()));
   }
 }

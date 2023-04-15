@@ -36,6 +36,7 @@ TEST_F(ViewTest, SetContentView) {
 
 TEST_F(ViewTest, OffsetFromWindow) {
   scoped_refptr<nu::Window> window(new nu::Window(nu::Window::Options()));
+  window->SetVisible(true);
   window->SetContentSize(nu::SizeF(200, 200));
   scoped_refptr<nu::Container> container(new nu::Container);
   window->SetContentView(container.get());
