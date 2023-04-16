@@ -5,8 +5,17 @@
 #include "nativeui/picker.h"
 
 #include "base/strings/sys_string_conversions.h"
+#include "nativeui/gfx/geometry/insets_f.h"
 #include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/nu_view.h"
+
+namespace {
+
+inline nu::InsetsF GetPopupButtonInsets(NSButton* button) {
+  return nu::InsetsF(0, 2, 3, 3);
+}
+
+}  // namespace
 
 @interface NUPicker : NSPopUpButton<NUViewMethods> {
  @private
@@ -54,6 +63,21 @@
 
 - (BOOL)isNUEnabled {
   return [self isEnabled];
+}
+
+// Fix wrong coordinates of NSPopUpButton.
+- (void)setFrame:(NSRect)frame {
+  nu::InsetsF border(GetPopupButtonInsets(self));
+  nu::RectF bounds(frame);
+  bounds.Inset(-border);
+  [super setFrame:bounds.ToCGRect()];
+}
+
+- (NSRect)frame {
+  nu::InsetsF border(GetPopupButtonInsets(self));
+  nu::RectF bounds([super frame]);
+  bounds.Inset(border);
+  return bounds.ToCGRect();
 }
 
 @end
@@ -108,8 +132,10 @@ int Picker::GetSelectedItemIndex() const {
 }
 
 SizeF Picker::GetMinimumSize() const {
-  auto* picker = static_cast<NSControl*>(GetNative());
-  return SizeF(0, picker.intrinsicContentSize.height);
+  auto* picker = static_cast<NUPicker*>(GetNative());
+  RectF bounds = RectF(SizeF([[picker cell] cellSize]));
+  bounds.Inset(GetPopupButtonInsets(picker));
+  return bounds.size();
 }
 
 }  // namespace nu
