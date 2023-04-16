@@ -10,3 +10,16 @@ enums:
   - name: Light
   - name: Dark
   - name: Titlebar
+  - name: Selection
+  - name: Menu
+  - name: Popover
+  - name: Sidebar
+  - name: HeaderView
+  - name: Sheet
+  - name: WindowBackground
+  - name: HUDWindow
+  - name: FullscreenUI
+  - name: Tooltip
+  - name: ContentBackground
+  - name: UnderWindowBackground
+  - name: UnderPageBackground

@@ -2572,31 +2572,81 @@ struct Type<nu::Vibrant::Material> {
     std::string material;
     if (!lua::To(state, index, &material))
       return false;
-    if (material == "appearance-based") {
+    if (material == "appearance-based")
       *out = nu::Vibrant::Material::AppearanceBased;
-      return true;
-    } else if (material == "light") {
+    else if (material == "light")
       *out = nu::Vibrant::Material::Light;
-      return true;
-    } else if (material == "dark") {
+    else if (material == "dark")
       *out = nu::Vibrant::Material::Dark;
-      return true;
-    } else if (material == "titlebar") {
+    else if (material == "titlebar")
       *out = nu::Vibrant::Material::Titlebar;
-      return true;
-    } else {
+    else if (material == "selection")
+      *out = nu::Vibrant::Material::Selection;
+    else if (material == "menu")
+      *out = nu::Vibrant::Material::Menu;
+    else if (material == "popover")
+      *out = nu::Vibrant::Material::Popover;
+    else if (material == "sidebar")
+      *out = nu::Vibrant::Material::Sidebar;
+    else if (material == "header-view")
+      *out = nu::Vibrant::Material::HeaderView;
+    else if (material == "sheet")
+      *out = nu::Vibrant::Material::Sheet;
+    else if (material == "window-background")
+      *out = nu::Vibrant::Material::WindowBackground;
+    else if (material == "hudwindow")
+      *out = nu::Vibrant::Material::HUDWindow;
+    else if (material == "fullscreen-ui")
+      *out = nu::Vibrant::Material::FullscreenUI;
+    else if (material == "tooltip")
+      *out = nu::Vibrant::Material::Tooltip;
+    else if (material == "content-background")
+      *out = nu::Vibrant::Material::ContentBackground;
+    else if (material == "under-window-background")
+      *out = nu::Vibrant::Material::UnderWindowBackground;
+    else if (material == "under-page-background")
+      *out = nu::Vibrant::Material::UnderPageBackground;
+    else
       return false;
-    }
+    return true;
   }
   static inline void Push(State* state, nu::Vibrant::Material material) {
-    if (material == nu::Vibrant::Material::Light)
+    if (material == nu::Vibrant::Material::AppearanceBased)
+      lua::Push(state, "appearance-based");
+    else if (material == nu::Vibrant::Material::Light)
       lua::Push(state, "light");
     else if (material == nu::Vibrant::Material::Dark)
       lua::Push(state, "dark");
     else if (material == nu::Vibrant::Material::Titlebar)
       lua::Push(state, "titlebar");
+    else if (material == nu::Vibrant::Material::Selection)
+      lua::Push(state, "selection");
+    else if (material == nu::Vibrant::Material::Menu)
+      lua::Push(state, "menu");
+    else if (material == nu::Vibrant::Material::Popover)
+      lua::Push(state, "popover");
+    else if (material == nu::Vibrant::Material::Sidebar)
+      lua::Push(state, "sidebar");
+    else if (material == nu::Vibrant::Material::HeaderView)
+      lua::Push(state, "header-view");
+    else if (material == nu::Vibrant::Material::Sheet)
+      lua::Push(state, "sheet");
+    else if (material == nu::Vibrant::Material::WindowBackground)
+      lua::Push(state, "window-background");
+    else if (material == nu::Vibrant::Material::HUDWindow)
+      lua::Push(state, "hudwindow");
+    else if (material == nu::Vibrant::Material::FullscreenUI)
+      lua::Push(state, "fullscreen-ui");
+    else if (material == nu::Vibrant::Material::Tooltip)
+      lua::Push(state, "tooltip");
+    else if (material == nu::Vibrant::Material::ContentBackground)
+      lua::Push(state, "content-background");
+    else if (material == nu::Vibrant::Material::UnderWindowBackground)
+      lua::Push(state, "under-window-background");
+    else if (material == nu::Vibrant::Material::UnderPageBackground)
+      lua::Push(state, "under-page-background");
     else
-      lua::Push(state, "appearance-based");
+      lua::Push(state, "unknown");
   }
 };
 

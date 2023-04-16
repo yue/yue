@@ -15,16 +15,29 @@ class NATIVEUI_EXPORT Vibrant : public Container {
 
   // Values here should match NSVisualEffectMaterial.
   enum class Material {
-    AppearanceBased,
-    Light,
-    Dark,
-    Titlebar,
+    AppearanceBased = 0,
+    Light = 1,
+    Dark = 2,
+    Titlebar = 3,
+    Selection = 4,
+    Menu = 5,
+    Popover = 6,
+    Sidebar = 7,
+    HeaderView = 10,
+    Sheet = 11,
+    WindowBackground = 12,
+    HUDWindow = 13,
+    FullscreenUI = 15,
+    Tooltip = 17,
+    ContentBackground = 18,
+    UnderWindowBackground = 21,
+    UnderPageBackground = 22,
   };
 
   // Values here should match NSVisualEffectBlendingMode.
   enum class BlendingMode {
-    BehindWindow,
-    WithinWindow,
+    BehindWindow = 0,
+    WithinWindow = 1,
   };
 
   // View class name.

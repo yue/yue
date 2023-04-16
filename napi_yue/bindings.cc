@@ -2812,14 +2812,40 @@ struct Type<nu::Vibrant::Material> {
                             nu::Vibrant::Material material,
                             napi_value* result) {
     switch (material) {
+      case nu::Vibrant::Material::AppearanceBased:
+        return ConvertToNode(env, "appearance-based", result);
       case nu::Vibrant::Material::Light:
         return ConvertToNode(env, "light", result);
       case nu::Vibrant::Material::Dark:
         return ConvertToNode(env, "dark", result);
       case nu::Vibrant::Material::Titlebar:
         return ConvertToNode(env, "titlebar", result);
-      case nu::Vibrant::Material::AppearanceBased:
-        return ConvertToNode(env, "appearance-based", result);
+      case nu::Vibrant::Material::Selection:
+        return ConvertToNode(env, "selection", result);
+      case nu::Vibrant::Material::Menu:
+        return ConvertToNode(env, "menu", result);
+      case nu::Vibrant::Material::Popover:
+        return ConvertToNode(env, "popover", result);
+      case nu::Vibrant::Material::Sidebar:
+        return ConvertToNode(env, "sidebar", result);
+      case nu::Vibrant::Material::HeaderView:
+        return ConvertToNode(env, "header-view", result);
+      case nu::Vibrant::Material::Sheet:
+        return ConvertToNode(env, "sheet", result);
+      case nu::Vibrant::Material::WindowBackground:
+        return ConvertToNode(env, "window-background", result);
+      case nu::Vibrant::Material::HUDWindow:
+        return ConvertToNode(env, "hudwindow", result);
+      case nu::Vibrant::Material::FullscreenUI:
+        return ConvertToNode(env, "fullscreen-ui", result);
+      case nu::Vibrant::Material::Tooltip:
+        return ConvertToNode(env, "tooltip", result);
+      case nu::Vibrant::Material::ContentBackground:
+        return ConvertToNode(env, "content-background", result);
+      case nu::Vibrant::Material::UnderWindowBackground:
+        return ConvertToNode(env, "under-window-background", result);
+      case nu::Vibrant::Material::UnderPageBackground:
+        return ConvertToNode(env, "under-page-background", result);
     }
     NOTREACHED();
     return napi_generic_failure;
@@ -2830,14 +2856,40 @@ struct Type<nu::Vibrant::Material> {
     std::string material;
     napi_status s = ConvertFromNode(env, value, &material);
     if (s == napi_ok) {
-      if (material == "light")
+      if (material == "appearance-based")
+        *out = nu::Vibrant::Material::AppearanceBased;
+      else if (material == "light")
         *out = nu::Vibrant::Material::Light;
       else if (material == "dark")
         *out = nu::Vibrant::Material::Dark;
       else if (material == "titlebar")
         *out = nu::Vibrant::Material::Titlebar;
-      else if (material == "appearance-based")
-        *out = nu::Vibrant::Material::AppearanceBased;
+      else if (material == "selection")
+        *out = nu::Vibrant::Material::Selection;
+      else if (material == "menu")
+        *out = nu::Vibrant::Material::Menu;
+      else if (material == "popover")
+        *out = nu::Vibrant::Material::Popover;
+      else if (material == "sidebar")
+        *out = nu::Vibrant::Material::Sidebar;
+      else if (material == "header-view")
+        *out = nu::Vibrant::Material::HeaderView;
+      else if (material == "sheet")
+        *out = nu::Vibrant::Material::Sheet;
+      else if (material == "window-background")
+        *out = nu::Vibrant::Material::WindowBackground;
+      else if (material == "hudwindow")
+        *out = nu::Vibrant::Material::HUDWindow;
+      else if (material == "fullscreen-ui")
+        *out = nu::Vibrant::Material::FullscreenUI;
+      else if (material == "tooltip")
+        *out = nu::Vibrant::Material::Tooltip;
+      else if (material == "content-background")
+        *out = nu::Vibrant::Material::ContentBackground;
+      else if (material == "under-window-background")
+        *out = nu::Vibrant::Material::UnderWindowBackground;
+      else if (material == "under-page-background")
+        *out = nu::Vibrant::Material::UnderPageBackground;
       else
         return napi_invalid_arg;
     }

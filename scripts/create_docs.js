@@ -513,16 +513,7 @@ function parseEnumClass(lang, name) {
 
 // Convert a camelCase to dash string.
 function camelToDash(str) {
-  let ret = ''
-  let prevLowerCase = false
-  for (let s of str) {
-    const isUpperCase = s.toUpperCase() == s
-    if (isUpperCase && prevLowerCase)
-      ret += '-'
-    ret += s
-    prevLowerCase = !isUpperCase
-  }
-  return ret.replace(/-+/g, '-').toLowerCase()
+  return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
 }
 
 // Convert a UPPER_CASE to camelCase.
