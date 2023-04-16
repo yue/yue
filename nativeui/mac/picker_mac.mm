@@ -105,6 +105,11 @@ void Picker::RemoveItemAt(int index) {
   [picker removeItemAtIndex:index];
 }
 
+void Picker::Clear() {
+  auto* picker = static_cast<NUPicker*>(GetNative());
+  [picker removeAllItems];
+}
+
 std::vector<std::string> Picker::GetItems() const {
   auto* picker = static_cast<NUPicker*>(GetNative());
   NSArray<NSString*>* items = [picker itemTitles];

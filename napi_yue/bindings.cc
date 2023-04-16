@@ -2239,6 +2239,7 @@ struct Type<nu::Picker> {
     Set(env, prototype,
         "addItem", &nu::Picker::AddItem,
         "removeItemAt", &nu::Picker::RemoveItemAt,
+        "clear", &nu::Picker::Clear,
         "getItems", &nu::Picker::GetItems,
         "selectItemAt", &nu::Picker::SelectItemAt,
         "getSelectedItem", &nu::Picker::GetSelectedItem,

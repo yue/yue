@@ -2018,6 +2018,7 @@ struct Type<nu::Picker> {
            "create", &CreateOnHeap<nu::Picker>,
            "additem", &nu::Picker::AddItem,
            "removeitemat", &RemoveItemAt,
+           "clear", &nu::Picker::Clear,
            "getitems", &nu::Picker::GetItems,
            "selectitemat", &SelectItemAt,
            "getselecteditem", &nu::Picker::GetSelectedItem,

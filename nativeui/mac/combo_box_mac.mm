@@ -116,6 +116,11 @@ void ComboBox::RemoveItemAt(int index) {
   [combobox removeItemAtIndex:index];
 }
 
+void ComboBox::Clear() {
+  auto* combobox = static_cast<NUComboBox*>(GetNative());
+  [combobox removeAllItems];
+}
+
 std::vector<std::string> ComboBox::GetItems() const {
   auto* combobox = static_cast<NUComboBox*>(GetNative());
   NSArray<NSString*>* items = [combobox objectValues];

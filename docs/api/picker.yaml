@@ -32,6 +32,9 @@ methods:
   - signature: void RemoveItemAt(int index)
     description: Remove the item at `index`.
 
+  - signature: void Clear()
+    description: Remove all items.
+
   - signature: std::vector<std::string> GetItems() const
     description: Return all items.
 

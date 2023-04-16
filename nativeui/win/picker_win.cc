@@ -78,6 +78,11 @@ void Picker::RemoveItemAt(int index) {
   ::SendMessage(picker->hwnd(), CB_DELETESTRING, index, 0L);
 }
 
+void Picker::Clear() {
+  auto* picker = static_cast<PickerImpl*>(GetNative());
+  ::SendMessage(picker->hwnd(), CB_RESETCONTENT, 0L, 0L);
+}
+
 std::vector<std::string> Picker::GetItems() const {
   auto* picker = static_cast<PickerImpl*>(GetNative());
   std::vector<std::string> result;

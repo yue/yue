@@ -73,6 +73,10 @@ void Picker::RemoveItemAt(int index) {
   gtk_combo_box_text_remove(GTK_COMBO_BOX_TEXT(GetNative()), index);
 }
 
+void Picker::Clear() {
+  gtk_combo_box_text_remove_all(GTK_COMBO_BOX_TEXT(GetNative()));
+}
+
 std::vector<std::string> Picker::GetItems() const {
   std::vector<std::string> result;
   IterateComboBox(GTK_COMBO_BOX(GetNative()), [&result](char* item) {

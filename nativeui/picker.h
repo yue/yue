@@ -23,6 +23,7 @@ class NATIVEUI_EXPORT Picker : public View {
   // ComboBox on macOS.
   virtual void AddItem(const std::string& text);
   virtual void RemoveItemAt(int index);
+  virtual void Clear();
   virtual std::vector<std::string> GetItems() const;
   virtual void SelectItemAt(int index);
   virtual std::string GetSelectedItem() const;
