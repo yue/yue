@@ -142,7 +142,7 @@ void Container::RemoveChildView(View* view) {
 
 void Container::UpdateChildBounds() {
   dirty_ = false;
-  if (!IsVisible())
+  if (!IsVisibleInHierarchy())
     return;
   // For root CSS node, calculate the layout before setting bounds.
   if (IsRootYGNode(this)) {

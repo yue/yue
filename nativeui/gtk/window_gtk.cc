@@ -18,8 +18,10 @@ struct NUWindowPrivate {
   Window* shell = nullptr;
   bool is_popup = false;
   bool is_csd = false;
-  // Cached window bounds, which is the content area including menu bar.
-  RectF bounds;
+  // Requested window bounds, including non-client area.
+  RectF requested_window_bounds;
+  // Cached client area bounds, including menu bar.
+  RectF client_area;
   // Cached window states.
   int window_state = 0;
   // Insets of native window frame.
@@ -62,8 +64,15 @@ gboolean OnMap(GtkWidget* widget, GdkEvent* event, NUWindowPrivate* priv) {
   // Calculate the native window frame.
   GetNativeFrameInsets(widget, &priv->native_frame);
   // Calculate the client shadow for CSD window.
-  if (priv->is_csd)
-    GetClientShadow(GTK_WINDOW(widget), &priv->client_shadow, &priv->bounds);
+  if (priv->is_csd) {
+    GetClientShadow(GTK_WINDOW(widget),
+                    &priv->client_shadow, &priv->client_area);
+  }
+  // Set bounds if needed.
+  if (!priv->requested_window_bounds.IsEmpty()) {
+    priv->shell->SetBounds(priv->requested_window_bounds);
+    priv->requested_window_bounds = RectF();
+  }
   // Set size constraints if needed.
   if (priv->needs_to_update_minmax_size) {
     if (priv->use_content_minmax_size)
@@ -77,9 +86,9 @@ gboolean OnMap(GtkWidget* widget, GdkEvent* event, NUWindowPrivate* priv) {
 // Window position/size has changed.
 gboolean OnConfigure(GtkWidget* widget, GdkEventConfigure* event,
                      NUWindowPrivate* priv) {
-  priv->bounds = RectF(event->x, event->y, event->width, event->height);
+  priv->client_area = RectF(event->x, event->y, event->width, event->height);
   if (priv->is_csd)
-    priv->bounds.Inset(priv->client_shadow);
+    priv->client_area.Inset(priv->client_shadow);
   return FALSE;
 }
 
@@ -248,8 +257,8 @@ void Window::SetContentSize(const SizeF& size) {
   ResizeWindow(window_, IsResizable(), size.width(), height);
   // Save the size request.
   NUWindowPrivate* priv = GetPrivate(this);
-  priv->bounds.set_width(size.width());
-  priv->bounds.set_height(height);
+  priv->client_area.set_width(size.width());
+  priv->client_area.set_height(height);
 }
 
 SizeF Window::GetContentSize() const {
@@ -258,7 +267,7 @@ SizeF Window::GetContentSize() const {
 
 RectF Window::GetContentBounds() const {
   NUWindowPrivate* priv = GetPrivate(this);
-  RectF cbounds = priv->bounds;
+  RectF cbounds = priv->client_area;
   // Popup window does not receive configure event, do not use cached bounds.
   if (priv->is_popup && gtk_widget_get_mapped(GTK_WIDGET(window_))) {
     GdkWindow* gdkwindow = gtk_widget_get_window(GTK_WIDGET(window_));
@@ -274,15 +283,19 @@ RectF Window::GetContentBounds() const {
 
 void Window::SetBounds(const RectF& bounds) {
   NUWindowPrivate* priv = GetPrivate(this);
+  gtk_window_move(window_, bounds.x(), bounds.y());
+  // When window is not mapped, the frame size is unknown, so we have to save
+  // the request here and resize when the window is mapped.
+  if (!gtk_widget_get_mapped(GTK_WIDGET(window_))) {
+    priv->requested_window_bounds = bounds;
+    return;
+  }
   // GTK does not count frame when resizing window.
-  // FIXME(zcbenz): Setting bounds before window is mapped would result in
-  // wrong window size, as the size of native frame is not available yet.
   RectF cbounds(bounds);
   cbounds.Inset(priv->native_frame);
   ResizeWindow(window_, IsResizable(), cbounds.width(), cbounds.height());
-  gtk_window_move(window_, cbounds.x(), cbounds.y());
   // Save the size request.
-  priv->bounds = cbounds;
+  priv->client_area = cbounds;
 }
 
 RectF Window::GetBounds() const {
@@ -502,7 +515,7 @@ void Window::SetResizable(bool resizable) {
       EnableCSD(window_);
       priv->is_csd = true;
       if (gtk_widget_get_mapped(GTK_WIDGET(window_)))
-        GetClientShadow(window_, &priv->client_shadow, &priv->bounds);
+        GetClientShadow(window_, &priv->client_shadow, &priv->client_area);
     }
   }
 }

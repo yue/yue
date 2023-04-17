@@ -141,9 +141,9 @@ bool GetClientShadow(GtkWindow* window,
   if (bounds_with_shadow)
     *bounds_with_shadow = RectF(sx, sy, swidth, sheight);
   // Client shadow is their insets.
-  *client_shadow =  InsetsF(y - sy, x - sx,
-                            (sy + sheight) - (y + height),
-                            (sx + swidth) - (x + width));
+  *client_shadow = InsetsF(y - sy, x - sx,
+                           (sy + sheight) - (y + height),
+                           (sx + swidth) - (x + width));
   return true;
 }
 
