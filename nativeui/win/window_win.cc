@@ -27,6 +27,7 @@
 #include "nativeui/gfx/win/native_theme.h"
 #include "nativeui/gfx/win/painter_win.h"
 #include "nativeui/menu_bar.h"
+#include "nativeui/screen.h"
 #include "nativeui/state.h"
 #include "nativeui/win/drag_drop/clipboard_util.h"
 #include "nativeui/win/drag_drop/data_object.h"
@@ -876,6 +877,18 @@ void Window::PlatformSetContentView(View* view) {
     content_view_->GetNative()->BecomeContentView(nullptr);
   view->GetNative()->BecomeContentView(window_);
   view->SetPixelBounds(Rect(window_->GetContentPixelBounds().size()));
+}
+
+void Window::Center() {
+  Display display = Screen::GetCurrent()->GetDisplayNearestWindow(this);
+  if (display.work_area.IsEmpty())
+    return;
+  RectF bounds = GetBounds();
+  if (bounds.IsEmpty())
+    return;
+  bounds.set_x((display.work_area.width() - bounds.width()) / 2);
+  bounds.set_y((display.work_area.height() - bounds.height()) / 2);
+  SetBounds(bounds);
 }
 
 void Window::SetContentSize(const SizeF& size) {

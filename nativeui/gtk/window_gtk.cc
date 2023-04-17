@@ -8,6 +8,7 @@
 
 #include "nativeui/gtk/util/widget_util.h"
 #include "nativeui/menu_bar.h"
+#include "nativeui/screen.h"
 
 namespace nu {
 
@@ -251,6 +252,18 @@ void Window::PlatformSetContentView(View* view) {
   }
 }
 
+void Window::Center() {
+  Display display = Screen::GetCurrent()->GetDisplayNearestWindow(this);
+  if (display.work_area.IsEmpty())
+    return;
+  RectF bounds = GetBounds();
+  if (bounds.IsEmpty())
+    return;
+  gtk_window_move(window_,
+                  (display.work_area.width() - bounds.width()) / 2,
+                  (display.work_area.height() - bounds.height()) / 2);
+}
+
 void Window::SetContentSize(const SizeF& size) {
   // Menubar is part of client area in GTK.
   float height = size.height() + GetMenuBarHeight(this);
@@ -288,6 +301,7 @@ void Window::SetBounds(const RectF& bounds) {
   // the request here and resize when the window is mapped.
   if (!gtk_widget_get_mapped(GTK_WIDGET(window_))) {
     priv->requested_window_bounds = bounds;
+    priv->client_area = bounds;
     return;
   }
   // GTK does not count frame when resizing window.

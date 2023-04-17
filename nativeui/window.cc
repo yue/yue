@@ -4,12 +4,11 @@
 
 #include "nativeui/window.h"
 
+#include <iostream>
 #include <utility>
 
-#include "base/logging.h"
 #include "nativeui/container.h"
 #include "nativeui/menu_bar.h"
-#include "nativeui/screen.h"
 #include "third_party/yoga/Yoga.h"
 
 #if defined(OS_MAC)
@@ -54,20 +53,6 @@ void Window::SetContentView(scoped_refptr<View> view) {
 View* Window::GetContentView() const {
   return content_view_.get();
 }
-
-#if defined(OS_WIN) || defined(OS_LINUX)
-void Window::Center() {
-  Display display = Screen::GetCurrent()->GetDisplayNearestWindow(this);
-  if (display.work_area.IsEmpty())
-    return;
-  RectF bounds = GetBounds();
-  if (bounds.IsEmpty())
-    return;
-  bounds.set_x((display.work_area.width() - bounds.width()) / 2);
-  bounds.set_y((display.work_area.height() - bounds.height()) / 2);
-  SetBounds(bounds);
-}
-#endif
 
 #if defined(OS_WIN) || defined(OS_MAC)
 SizeF Window::GetContentSize() const {
