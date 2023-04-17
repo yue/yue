@@ -68,16 +68,9 @@ void Scroll::PlatformSetContentView(View* view) {
 }
 
 void Scroll::SetContentSize(const SizeF& size) {
-  GetContentView()->SetBounds(RectF(size));
   // Viewport calculates the content view according to child's size request.
   gtk_widget_set_size_request(GetContentView()->GetNative(),
                               size.width(), size.height());
-  // Scroll to top-left after setting content size.
-  auto* window = GTK_SCROLLED_WINDOW(GetNative());
-  auto* h_adjust = gtk_scrolled_window_get_hadjustment(window);
-  auto* v_adjust = gtk_scrolled_window_get_vadjustment(window);
-  gtk_adjustment_set_value(h_adjust, gtk_adjustment_get_lower(h_adjust));
-  gtk_adjustment_set_value(v_adjust, gtk_adjustment_get_lower(v_adjust));
 }
 
 void Scroll::SetScrollPosition(float horizon, float vertical) {
