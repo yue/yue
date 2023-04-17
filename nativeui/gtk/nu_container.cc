@@ -141,7 +141,7 @@ static void nu_container_size_allocate(GtkWidget* widget,
   gtk_widget_set_allocation(widget, allocation);
 
   // Note that we don't use nu::Container::OnSizeChanged for updating layout,
-  // because GTK requires us do ing size allocation for children here otherwise
+  // because GTK requires us doing size allocation for children here otherwise
   // native widgets will have problems rendering.
   NUContainerPrivate* priv = NU_CONTAINER(widget)->priv;
   priv->delegate->UpdateChildBounds();

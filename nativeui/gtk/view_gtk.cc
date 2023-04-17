@@ -331,7 +331,15 @@ bool View::IsVisible() const {
 }
 
 bool View::IsVisibleInHierarchy() const {
-  return gtk_widget_is_visible(view_);
+  // The gtk_widget_is_visible API returns false if the window is not visible,
+  // while we don't want to consider window in our API.
+  const View* view = this;
+  while (view) {
+    if (!view->IsVisible())
+      return false;
+    view = view->GetParent();
+  }
+  return true;
 }
 
 void View::SetEnabled(bool enable) {
