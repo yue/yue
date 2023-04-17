@@ -66,7 +66,12 @@ int ButtonFromGdkEvent(GdkEvent* event) {
   switch (event->any.type) {
     case GDK_BUTTON_PRESS:
     case GDK_BUTTON_RELEASE:
-      return event->button.button;
+      if (event->button.button == 2)
+        return 3;
+      else if (event->button.button == 3)
+        return 2;
+      else
+        return 1;
     default:
       return 0;
   }
