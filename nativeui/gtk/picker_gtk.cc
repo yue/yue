@@ -59,10 +59,9 @@ void Picker::AddItem(const std::string& text) {
   if (duplicate)
     return;
 
-  // Add item and ignore event.
-  g_object_set_data(G_OBJECT(GetNative()), "ignore-change", this);
-  gtk_combo_box_text_append(
-      GTK_COMBO_BOX_TEXT(GetNative()), nullptr, text.c_str());
+  // Add item.
+  gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(GetNative()),
+                            nullptr, text.c_str());
 
   // Select the first item by default.
   if (GetSelectedItemIndex() == -1)
@@ -87,6 +86,7 @@ std::vector<std::string> Picker::GetItems() const {
 }
 
 void Picker::SelectItemAt(int index) {
+  g_object_set_data(G_OBJECT(GetNative()), "ignore-change", this);
   gtk_combo_box_set_active(GTK_COMBO_BOX(GetNative()), index);
 }
 
