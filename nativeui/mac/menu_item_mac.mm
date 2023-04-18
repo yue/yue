@@ -121,7 +121,11 @@ void MenuItem::PlatformInit() {
 }
 
 void MenuItem::PlatformDestroy() {
-  [menu_item_.target release];
+  // Some Cocoa APIs like [NSApp setWindowsMenu] will set a target for this
+  // menu item, so we must only release when we are sure the targe is created
+  // by us.
+  if (role_ == Role::None)
+    [menu_item_.target release];
   [menu_item_ release];
 }
 
