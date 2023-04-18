@@ -43,7 +43,7 @@ struct {
   { "About",        VKEY_UNKNOWN, 0 },
   { "Hide",         VKEY_H, CONTROL_OR_COMMAND },
   { "Hide Others",  VKEY_H, CONTROL_OR_COMMAND | MASK_ALT },
-  { "Unhide",       VKEY_UNKNOWN, 0 },
+  { "Show All",     VKEY_UNKNOWN, 0 },
 #endif
 };
 
