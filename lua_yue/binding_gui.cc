@@ -2261,7 +2261,8 @@ struct Type<nu::Tab> {
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &CreateOnHeap<nu::Tab>,
-           "addpage", RefMethod(state, &nu::Tab::AddPage, RefType::Ref),
+           "addpage",
+           RefMethod(state, &nu::Tab::AddPage, RefType::Ref, nullptr, 2),
            "removePage", RefMethod(state, &nu::Tab::RemovePage, RefType::Deref),
            "pagecount", &nu::Tab::PageCount,
            "pageat", &PageAt,

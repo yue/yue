@@ -2512,7 +2512,7 @@ struct Type<nu::Tab> {
         "create", &CreateOnHeap<nu::Tab>);
     Set(env, prototype,
         "addPage", WrapMethod(&nu::Tab::AddPage, [](Arguments args) {
-          AttachedTable(args).Set(args[0], true);
+          AttachedTable(args).Set(args[1], true);
         }),
         "removePage", WrapMethod(&nu::Tab::RemovePage, [](Arguments args) {
           AttachedTable(args).Delete(args[0]);
