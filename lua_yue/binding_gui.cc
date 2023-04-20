@@ -2416,6 +2416,8 @@ struct Type<nu::Table> {
            "getselectedrow", &GetSelectedRow,
            "selectrows", &SelectRows,
            "getselectedrows", &GetSelectedRows);
+    RawSetProperty(state, metatable,
+                   "onselectionchange", &nu::Table::on_selection_change);
   }
   static void SelectRow(nu::Table* table, int row) {
     table->SelectRow(row - 1);

@@ -68,6 +68,9 @@ class NATIVEUI_EXPORT Table : public View {
   // View:
   const char* GetClassName() const override;
 
+  // Events.
+  Signal<void(Table*)> on_selection_change;
+
  protected:
   ~Table() override;
 

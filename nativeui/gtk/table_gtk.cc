@@ -37,6 +37,11 @@ int GetDefaultRowHeight() {
   return preferred;
 }
 
+// Called when selection of row has changed.
+void OnTableSelectionChanged(GtkTreeSelection*, Table* table) {
+  table->on_selection_change.Emit(table);
+}
+
 // Called when user has done editing a cell.
 void OnEdited(GtkCellRendererText* cell,
               const gchar* path,
@@ -89,6 +94,11 @@ NativeView Table::PlatformCreate() {
   GtkWidget* tree_view = gtk_tree_view_new();
   gtk_tree_view_set_fixed_height_mode(GTK_TREE_VIEW(tree_view), true);
   gtk_widget_show(tree_view);
+
+  GtkTreeSelection* selection =
+      gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
+  g_signal_connect(selection, "changed", G_CALLBACK(OnTableSelectionChanged),
+                   this);
 
   GtkWidget* scroll = gtk_scrolled_window_new(nullptr, nullptr);
   g_object_set_data(G_OBJECT(scroll), "widget", tree_view);

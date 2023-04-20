@@ -44,6 +44,10 @@
   return tableCell;
 }
 
+- (void)tableViewSelectionDidChange:(NSNotification*)notification {
+  shell_->on_selection_change.Emit(shell_);
+}
+
 @end
 
 @interface NUTable : NSScrollView<NUViewMethods> {

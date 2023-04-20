@@ -99,3 +99,7 @@ methods:
 
   - signature: std::set<int> GetSelectedRows() const
     description: Return selected rows' indexes.
+
+events:
+  - signature: void on_selection_change(Picker* self)
+    description: Emitted when the table's selection has changed.

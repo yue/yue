@@ -150,6 +150,13 @@ LRESULT TableImpl::OnNotify(int code, LPNMHDR pnmh) {
       auto* nm = reinterpret_cast<NMLVDISPINFO*>(pnmh);
       return OnEndEdit(nm, nm->item.iItem);
     }
+    case LVN_ITEMCHANGED: {
+      auto* nm = reinterpret_cast<NMLISTVIEW*>(pnmh);
+      if ((nm->uChanged & LVIF_STATE) && (nm->uOldState ^ nm->uNewState)) {
+        auto* table = static_cast<Table*>(delegate());
+        table->on_selection_change.Emit(table);
+      }
+    }
     default:
       return 0;
   }
