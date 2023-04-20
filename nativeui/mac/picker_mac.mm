@@ -67,16 +67,14 @@ inline nu::InsetsF GetPopupButtonInsets(NSButton* button) {
 
 // Fix wrong coordinates of NSPopUpButton.
 - (void)setFrame:(NSRect)frame {
-  nu::InsetsF border(GetPopupButtonInsets(self));
   nu::RectF bounds(frame);
-  bounds.Inset(-border);
+  bounds.Inset(-GetPopupButtonInsets(self));
   [super setFrame:bounds.ToCGRect()];
 }
 
 - (NSRect)frame {
-  nu::InsetsF border(GetPopupButtonInsets(self));
   nu::RectF bounds([super frame]);
-  bounds.Inset(border);
+  bounds.Inset(GetPopupButtonInsets(self));
   return bounds.ToCGRect();
 }
 
