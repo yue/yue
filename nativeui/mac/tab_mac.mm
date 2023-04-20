@@ -94,6 +94,14 @@ inline nu::InsetsF GetTabInsets(NSTabView* button) {
   return bounds.ToCGRect();
 }
 
+- (NSRect)contentRect {
+  nu::RectF rect([super contentRect]);
+  nu::InsetsF insets = GetTabInsets(self);
+  rect.set_width(rect.width() + insets.left() + insets.right());
+  rect.set_height(rect.height() + insets.top() + insets.bottom());
+  return rect.ToCGRect();
+}
+
 @end
 
 namespace nu {
