@@ -364,6 +364,16 @@ float Table::GetRowHeight() const {
   return table->GetRowHeight();
 }
 
+void Table::SetHasBorder(bool yes) {
+  auto* table = static_cast<TableImpl*>(GetNative());
+  return table->SetWindowStyle(WS_BORDER, yes);
+}
+
+bool Table::HasBorder() const {
+  auto* table = static_cast<TableImpl*>(GetNative());
+  return table->HasWindowStyle(WS_BORDER);
+}
+
 void Table::EnableMultipleSelection(bool enable) {
   auto* table = static_cast<TableImpl*>(GetNative());
   table->SetWindowStyle(LVS_SINGLESEL, !enable);

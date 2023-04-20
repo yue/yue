@@ -71,6 +71,12 @@ methods:
   - signature: float GetRowHeight() const
     description: Return the `height` of each row.
 
+  - signature: void SetHasBorder(bool has)
+    description: Set whether the view has border.
+
+  - signature: bool HasBorder() const
+    description: Return whether the view has border.
+
   - signature: void EnableMultipleSelection(bool enable)
     description: |
       Set whether it is allowed to select more than one row at a time.

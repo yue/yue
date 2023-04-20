@@ -2642,6 +2642,8 @@ struct Type<nu::Table> {
         "isColumnsVisible", &nu::Table::IsColumnsVisible,
         "setRowHeight", &nu::Table::SetRowHeight,
         "getRowHeight", &nu::Table::GetRowHeight,
+        "setHasBorder", &nu::Table::SetHasBorder,
+        "hasBorder", &nu::Table::HasBorder,
         "enableMultipleSelection", &nu::Table::EnableMultipleSelection,
         "isMultipleSelectionEnabled", &nu::Table::IsMultipleSelectionEnabled,
         "selectRow", &nu::Table::SelectRow,

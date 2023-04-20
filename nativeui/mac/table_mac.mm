@@ -175,6 +175,16 @@ float Table::GetRowHeight() const {
   return [tableView rowHeight];
 }
 
+void Table::SetHasBorder(bool yes) {
+  auto* table = static_cast<NUTable*>(GetNative());
+  return [table setBorderType:NSBezelBorder];
+}
+
+bool Table::HasBorder() const {
+  auto* table = static_cast<NUTable*>(GetNative());
+  return [table borderType] != NSNoBorder;
+}
+
 void Table::EnableMultipleSelection(bool enable) {
   auto* tableView = static_cast<NSTableView*>(
       [static_cast<NUTable*>(GetNative()) documentView]);

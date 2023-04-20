@@ -185,6 +185,22 @@ float Table::GetRowHeight() const {
       g_object_get_data(G_OBJECT(GetNative()), "row-height")));
 }
 
+void Table::SetHasBorder(bool yes) {
+  if (yes == HasBorder())
+    return;
+  if (yes) {
+    ApplyStyle(GetNative(), "border", "scrolledwindow { border: 1px solid }");
+  } else {
+    void* border = g_object_get_data(G_OBJECT(GetNative()), "border");
+    gtk_style_context_remove_provider(gtk_widget_get_style_context(GetNative()),
+                                      GTK_STYLE_PROVIDER(border));
+  }
+}
+
+bool Table::HasBorder() const {
+  return g_object_get_data(G_OBJECT(GetNative()), "border");
+}
+
 void Table::EnableMultipleSelection(bool enable) {
   GtkTreeSelection* selection = gtk_tree_view_get_selection(
       GTK_TREE_VIEW(g_object_get_data(G_OBJECT(GetNative()), "widget")));

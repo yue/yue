@@ -56,6 +56,8 @@ class NATIVEUI_EXPORT Table : public View {
   bool IsColumnsVisible() const;
   void SetRowHeight(float height);
   float GetRowHeight() const;
+  void SetHasBorder(bool yes);
+  bool HasBorder() const;
   void EnableMultipleSelection(bool enable);
   bool IsMultipleSelectionEnabled() const;
   void SelectRow(int row);
