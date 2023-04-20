@@ -12,7 +12,8 @@
 namespace {
 
 inline nu::InsetsF GetPopupButtonInsets(NSButton* button) {
-  return nu::InsetsF(0, 2, 3, 3);
+  // The top -2 inset is needed to make the text in picker vertical aligned.
+  return nu::InsetsF(-2, 2, 3, 3);
 }
 
 }  // namespace
