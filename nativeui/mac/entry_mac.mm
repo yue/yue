@@ -114,6 +114,8 @@ Entry::Entry(Type type) {
   [entry setTarget:[[NUEntryDelegate alloc] initWithShell:this]];
   [entry setAction:@selector(onActivate:)];
   [entry setDelegate:entry.target];
+  [entry.cell setWraps:NO];
+  [entry.cell setScrollable:YES];
   TakeOverView(entry);
   UpdateDefaultStyle();
 }
