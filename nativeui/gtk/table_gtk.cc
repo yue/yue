@@ -37,6 +37,12 @@ int GetDefaultRowHeight() {
   return preferred;
 }
 
+// Called when user double-clicks a row.
+void OnTableRowActivated(GtkTreeView*, GtkTreePath*, GtkTreeViewColumn*,
+                         Table* table) {
+  table->on_row_activate.Emit(table, table->GetSelectedRow());
+}
+
 // Called when selection of row has changed.
 void OnTableSelectionChanged(GtkTreeSelection*, Table* table) {
   table->on_selection_change.Emit(table);
@@ -93,6 +99,8 @@ void TreeCellData(GtkTreeViewColumn* tree_column,
 NativeView Table::PlatformCreate() {
   GtkWidget* tree_view = gtk_tree_view_new();
   gtk_tree_view_set_fixed_height_mode(GTK_TREE_VIEW(tree_view), true);
+  g_signal_connect(tree_view, "row-activated", G_CALLBACK(OnTableRowActivated),
+                   this);
   gtk_widget_show(tree_view);
 
   GtkTreeSelection* selection =

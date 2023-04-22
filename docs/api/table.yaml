@@ -101,5 +101,8 @@ methods:
     description: Return selected rows' indexes.
 
 events:
-  - signature: void on_selection_change(Picker* self)
+  - signature: void on_selection_change(Table* self)
     description: Emitted when the table's selection has changed.
+
+  - signature: void on_row_activate(Table* self, int row)
+    description: Emitted when the user double-clicks a row.

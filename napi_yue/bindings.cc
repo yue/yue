@@ -2652,7 +2652,8 @@ struct Type<nu::Table> {
         "getSelectedRows", &nu::Table::GetSelectedRows);
     DefineProperties(
         env, prototype,
-        Signal("onSelectionChange", &nu::Table::on_selection_change));
+        Signal("onSelectionChange", &nu::Table::on_selection_change),
+        Signal("onRowActivate", &nu::Table::on_row_activate));
   }
 };
 

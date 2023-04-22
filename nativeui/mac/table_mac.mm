@@ -48,6 +48,12 @@
   shell_->on_selection_change.Emit(shell_);
 }
 
+- (void)doubleAction:(id)sender {
+  NSTableView* table = static_cast<NSTableView*>(sender);
+  if ([table clickedRow] != -1)
+    shell_->on_row_activate.Emit(shell_, [table clickedRow]);
+}
+
 @end
 
 @interface NUTable : NSScrollView<NUViewMethods> {
@@ -69,6 +75,8 @@
     tableView_.reset([[NSTableView alloc] init]);
     delegate_.reset([[NUTableDelegate alloc] initWithShell:shell]);
     [tableView_ setDelegate:delegate_];
+    [tableView_ setTarget:delegate_];
+    [tableView_ setDoubleAction:@selector(doubleAction:)];
     [self setBorderType:NSNoBorder];
     [self setHasVerticalScroller:YES];
     [self setHasHorizontalScroller:YES];
