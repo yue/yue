@@ -9,6 +9,7 @@
 
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "base/base_paths.h"
 #include "base/base_paths_win.h"
@@ -144,25 +145,73 @@ void BrowserImplWebview2::SetUserAgent(const std::string& ua) {
 void BrowserImplWebview2::ExecuteJavaScript(
     std::wstring code,
     const Browser::ExecutionCallback& callback) {
-  if (webview_) {
-    auto handler =
-        Microsoft::WRL::Callback<ICoreWebView2ExecuteScriptCompletedHandler>(
-            [callback](HRESULT res, LPCWSTR json) -> HRESULT {
-              if (!callback)
-                return S_OK;
-              base::Value result;
-              if (SUCCEEDED(res)) {
-                auto pv = base::JSONReader::Read(base::WideToUTF8(json));
-                if (pv)
-                  result = std::move(*pv);
-              }
-              // |res| would be S_OK even when the code throws, currently there
-              // is no way to know if the executaion succeeded.
-              callback(SUCCEEDED(res), std::move(result));
+  if (!webview_)
+    return;
+  auto handler =
+      Microsoft::WRL::Callback<ICoreWebView2ExecuteScriptCompletedHandler>(
+          [callback](HRESULT res, LPCWSTR json) -> HRESULT {
+            if (!SUCCEEDED(res) || !callback)
               return S_OK;
-            });
-    webview_->ExecuteScript(code.c_str(), handler.Get());
+            base::Value result;
+            if (SUCCEEDED(res)) {
+              auto pv = base::JSONReader::Read(base::WideToUTF8(json));
+              if (pv)
+                result = std::move(*pv);
+            }
+            // |res| would be S_OK even when the code throws, currently there
+            // is no way to know if the executaion succeeded.
+            callback(SUCCEEDED(res), std::move(result));
+            return S_OK;
+          });
+  webview_->ExecuteScript(code.c_str(), handler.Get());
+}
+
+void BrowserImplWebview2::GetCookiesForURL(
+    std::wstring url,
+    const Browser::CookiesCallback& callback) {
+  if (!callback)
+    return;
+  Microsoft::WRL::ComPtr<ICoreWebView2_2> webview2;
+  Microsoft::WRL::ComPtr<ICoreWebView2CookieManager> cookie_manager;
+  if (!webview_ ||
+      FAILED(webview_->QueryInterface<ICoreWebView2_2>(&webview2)) ||
+      FAILED(webview2->get_CookieManager(&cookie_manager))) {
+    callback({});
+    return;
   }
+  auto handler =
+      Microsoft::WRL::Callback<ICoreWebView2GetCookiesCompletedHandler>(
+          [callback](HRESULT res, ICoreWebView2CookieList* cookies) -> HRESULT {
+            UINT count;
+            if (SUCCEEDED(cookies->get_Count(&count))) {
+              std::vector<Cookie> result;
+              result.reserve(count);
+              for (UINT i = 0; i < count; ++i) {
+                Microsoft::WRL::ComPtr<ICoreWebView2Cookie> cookie;
+                if (FAILED(cookies->GetValueAtIndex(i, &cookie)) || !cookie)
+                  break;
+                base::win::ScopedCoMem<wchar_t> name, value, domain, path;
+                BOOL http_only = false, secure = false;
+                if (FAILED(cookie->get_Name(&name)) ||
+                    FAILED(cookie->get_Value(&value)) ||
+                    FAILED(cookie->get_Domain(&domain)) ||
+                    FAILED(cookie->get_Path(&path)) ||
+                    FAILED(cookie->get_IsHttpOnly(&http_only)) ||
+                    FAILED(cookie->get_IsSecure(&secure)))
+                  break;
+                result.emplace_back(Cookie(
+                    base::WideToUTF8(name.get()),
+                    base::WideToUTF8(value.get()),
+                    base::WideToUTF8(domain.get()),
+                    base::WideToUTF8(path.get()),
+                    static_cast<bool>(http_only),
+                    static_cast<bool>(secure)));
+              }
+              callback(std::move(result));
+            }
+            return S_OK;
+          });
+  cookie_manager->GetCookies(url.c_str(), handler.Get());
 }
 
 void BrowserImplWebview2::GoBack() {

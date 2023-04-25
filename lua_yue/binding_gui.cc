@@ -284,6 +284,34 @@ struct Type<nu::ControlSize> {
 #endif
 
 template<>
+struct Type<nu::Cookie> {
+  static constexpr const char* name = "Cookie";
+  static inline void Push(State* state, const nu::Cookie& value) {
+    lua::NewTable(state);
+    lua::RawSet(state, -1,
+                "name", value.name,
+                "value", value.value,
+                "domain", value.domain,
+                "path", value.path,
+                "httponly", value.http_only,
+                "secure", value.secure);
+  }
+  static inline bool To(State* state, int index, nu::Cookie* out) {
+    if (GetType(state, index) != LuaType::Table)
+      return false;
+    if (!ReadOptions(state, index,
+                     "name", &out->name,
+                     "value", &out->value,
+                     "domain", &out->domain,
+                     "path", &out->path,
+                     "httponly", &out->http_only,
+                     "secure", &out->secure))
+      return false;
+    return true;
+  }
+};
+
+template<>
 struct Type<nu::Display> {
   static constexpr const char* name = "Display";
   static inline void Push(State* state, const nu::Display& display) {
@@ -611,6 +639,7 @@ struct Type<nu::Browser> {
            "setmagnifiable", &nu::Browser::SetMagnifiable,
 #endif
            "executejavascript", &nu::Browser::ExecuteJavaScript,
+           "getcookiesforurl", &nu::Browser::GetCookiesForURL,
            "goback", &nu::Browser::GoBack,
            "cangoback", &nu::Browser::CanGoBack,
            "goforward", &nu::Browser::GoForward,

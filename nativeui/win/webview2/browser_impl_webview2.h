@@ -33,6 +33,9 @@ class BrowserImplWebview2 : public BrowserImpl {
       std::wstring code,
       const Browser::ExecutionCallback& callback) override;
 
+  void GetCookiesForURL(std::wstring url,
+                        const Browser::CookiesCallback& callback) override;
+
   void GoBack() override;
   bool CanGoBack() const override;
   void GoForward() override;

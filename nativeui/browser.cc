@@ -16,6 +16,15 @@
 
 namespace nu {
 
+Cookie::Cookie(std::string name, std::string value, std::string domain,
+               std::string path, bool http_only, bool secure)
+    : name(std::move(name)), value(std::move(value)), domain(std::move(domain)),
+      path(std::move(path)), http_only(http_only), secure(secure) {}
+
+Cookie::Cookie(const Cookie&) = default;
+Cookie::Cookie(Cookie&&) = default;
+Cookie::~Cookie() = default;
+
 // static
 const char Browser::kClassName[] = "Browser";
 

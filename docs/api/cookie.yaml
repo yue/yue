@@ -1,0 +1,13 @@
+name: Cookie
+header: nativeui/browser.h
+type: struct
+namespace: nu
+description: Browser cookie.
+
+properties:
+  - property: std::string name
+  - property: std::string value
+  - property: std::string domain
+  - property: std::string path
+  - property: bool http_only
+  - property: bool secure

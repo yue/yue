@@ -164,6 +164,11 @@ bool BrowserImpl::IsWebView2() const {
   return false;
 }
 
+void BrowserImpl::GetCookiesForURL(std::wstring url,
+                                   const Browser::CookiesCallback& callback) {
+  callback({});
+}
+
 bool BrowserImpl::ProcessWindowMessage(HWND window,
                                        UINT message,
                                        WPARAM w_param,
@@ -236,6 +241,12 @@ void Browser::ExecuteJavaScript(const std::string& code,
                                 const ExecutionCallback& callback) {
   auto* browser = static_cast<BrowserHolder*>(GetNative())->impl();
   browser->ExecuteJavaScript(base::UTF8ToWide(code), callback);
+}
+
+void Browser::GetCookiesForURL(const std::string& url,
+                               const CookiesCallback& callback) {
+  auto* browser = static_cast<BrowserHolder*>(GetNative())->impl();
+  browser->GetCookiesForURL(base::UTF8ToWide(url), callback);
 }
 
 void Browser::GoBack() {

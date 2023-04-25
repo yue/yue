@@ -627,7 +627,6 @@ if (webview2_support && is_win) {
   config("webview2") {
     include_dirs = [ "//third_party/$webview2/build/native/include" ]
     libs = [
-      "//third_party/$webview2/build/native/$target_cpu/WebView2Guid.lib",
       "//third_party/$webview2/build/native/$target_cpu/WebView2Loader.dll.lib",
     ]
     defines = ["WEBVIEW2_SUPPORT"]

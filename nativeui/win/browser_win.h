@@ -72,6 +72,9 @@ class BrowserImpl {
       std::wstring code,
       const Browser::ExecutionCallback& callback) = 0;
 
+  virtual void GetCookiesForURL(std::wstring url,
+                                const Browser::CookiesCallback& callback);
+
   virtual void GoBack() = 0;
   virtual bool CanGoBack() const = 0;
   virtual void GoForward() = 0;

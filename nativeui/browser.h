@@ -8,6 +8,7 @@
 #include <map>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "base/values.h"
 #include "nativeui/protocol_job.h"
@@ -16,10 +17,26 @@
 
 namespace nu {
 
+struct NATIVEUI_EXPORT Cookie {
+  Cookie(std::string name, std::string value, std::string domain,
+         std::string path, bool http_only, bool secure);
+  Cookie(const Cookie&);
+  Cookie(Cookie&&);
+  ~Cookie();
+
+  std::string name;
+  std::string value;
+  std::string domain;
+  std::string path;
+  bool http_only = false;
+  bool secure = false;
+};
+
 class NATIVEUI_EXPORT Browser : public View {
  public:
   using ProtocolHandler = std::function<ProtocolJob*(std::string)>;
   using ExecutionCallback = std::function<void(bool, base::Value)>;
+  using CookiesCallback = std::function<void(std::vector<Cookie>)>;
   using BindingFunc = std::function<void(Browser*, base::Value)>;
 
   struct Options {
@@ -65,6 +82,9 @@ class NATIVEUI_EXPORT Browser : public View {
 #endif
   void ExecuteJavaScript(const std::string& code,
                          const ExecutionCallback& callback);
+
+  void GetCookiesForURL(const std::string& url,
+                        const CookiesCallback& callback);
 
   void GoBack();
   bool CanGoBack() const;

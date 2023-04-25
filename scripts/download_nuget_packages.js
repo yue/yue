@@ -11,7 +11,7 @@ const path  = require('path')
 const fs    = require('fs-extra')
 const fetch = require('node-fetch')
 
-const nugetVersion = 'v5.5.1'
+const nugetVersion = 'v6.5.0'
 const nugetPackages = {
   'Microsoft.Web.WebView2': webview2Version
 }

@@ -357,6 +357,35 @@ struct Type<nu::ControlSize> {
 #endif
 
 template<>
+struct Type<nu::Cookie> {
+  static constexpr const char* name = "Cookie";
+  static napi_status ToNode(napi_env env,
+                            const nu::Cookie& value,
+                            napi_value* result) {
+    *result = CreateObject(env);
+    Set(env, *result,
+        "name", value.name,
+        "value", value.value,
+        "domain", value.domain,
+        "path", value.path,
+        "httpOnly", value.http_only,
+        "secure", value.secure);
+    return napi_ok;
+  }
+  static napi_status FromNode(napi_env env, napi_value value, nu::Cookie* out) {
+    if (!ReadOptions(env, value,
+                     "name", &out->name,
+                     "value", &out->value,
+                     "domain", &out->domain,
+                     "path", &out->path,
+                     "httpOnly", &out->http_only,
+                     "secure", &out->secure))
+      return napi_invalid_arg;
+    return napi_ok;
+  }
+};
+
+template<>
 struct Type<nu::Display> {
   static constexpr const char* name = "Display";
   static napi_status ToNode(napi_env env,
@@ -717,6 +746,7 @@ struct Type<nu::Browser> {
         "setMagnifiable", &nu::Browser::SetMagnifiable,
 #endif
         "executeJavaScript", &nu::Browser::ExecuteJavaScript,
+        "getCookiesForURL", &nu::Browser::GetCookiesForURL,
         "goBack", &nu::Browser::GoBack,
         "canGoBack", &nu::Browser::CanGoBack,
         "goForward", &nu::Browser::GoForward,

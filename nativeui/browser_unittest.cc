@@ -290,6 +290,34 @@ TEST_P(BrowserTest, ExecuteJavaScriptComplexResult) {
   nu::MessageLoop::Run();
 }
 
+TEST_P(BrowserTest, GetCookiesForURL) {
+#if defined(OS_WIN)
+  if (GetParam() == DEFAULT)
+    return;
+#if defined(WEBVIEW2_SUPPORT)
+  if (GetParam() == WEBVIEW2_IE)
+    return;
+#endif
+#endif
+  browser_->on_finish_navigation.Connect([](nu::Browser* browser,
+                                            const std::string& url) {
+    browser->ExecuteJavaScript("document.cookie = 'a=1'", nullptr);
+    browser->ExecuteJavaScript("document.cookie = 'b=2'", nullptr);
+    browser->ExecuteJavaScript("document.cookie = 'c=3; path=/sub;'",
+                               [browser](bool success, base::Value result) {
+      browser->GetCookiesForURL("https://example.com",
+                                [](std::vector<nu::Cookie> cookies) {
+        nu::MessageLoop::Quit();
+        ASSERT_EQ(cookies.size(), 2ul);
+      });
+    });
+  });
+  nu::MessageLoop::PostTask([&]() {
+    browser_->LoadURL("https://example.com");
+  });
+  nu::MessageLoop::Run();
+}
+
 TEST_P(BrowserTest, AddBinding) {
   std::function<void(nu::Browser*, bool, const std::string&, base::Value)>
       handler = [](nu::Browser*, bool b, const std::string& s, base::Value v) {

@@ -102,16 +102,39 @@ void OnBackForwadListChanged(WebKitBackForwardList* backforward_list,
 void OnJavaScriptFinish(WebKitWebView* webview,
                         GAsyncResult* result,
                         Browser::ExecutionCallback* callback) {
+  auto* js_result = webkit_web_view_run_javascript_finish(
+      webview, result, nullptr);
   if (*callback) {
-    auto* js_result = webkit_web_view_run_javascript_finish(
-        webview, result, nullptr);
-    if (!js_result) {
+    if (js_result)
+      (*callback)(true, JSResultToBaseValue(js_result));
+    else
       (*callback)(false, base::Value());
-      return;
-    }
-    (*callback)(true, JSResultToBaseValue(js_result));
-    webkit_javascript_result_unref(js_result);
   }
+  if (js_result)
+    webkit_javascript_result_unref(js_result);
+  delete callback;
+}
+
+void OnGetCookiesFinish(WebKitCookieManager* cookie_manager,
+                        GAsyncResult* result,
+                        Browser::CookiesCallback* callback) {
+  GList* cookies = webkit_cookie_manager_get_cookies_finish(
+      cookie_manager, result, nullptr);
+  CHECK(cookies);
+  std::vector<Cookie> ret;
+  for (GList* l = cookies; l; l = l->next) {
+    SoupCookie* cookie = static_cast<SoupCookie*>(l->data);
+    ret.push_back({
+      soup_cookie_get_name(cookie),
+      soup_cookie_get_value(cookie),
+      soup_cookie_get_domain(cookie),
+      soup_cookie_get_path(cookie),
+      static_cast<bool>(soup_cookie_get_http_only(cookie)),
+      static_cast<bool>(soup_cookie_get_secure(cookie)),
+    });
+  }
+  (*callback)(std::move(ret));
+  g_list_free_full(cookies, reinterpret_cast<GDestroyNotify>(soup_cookie_free));
   delete callback;
 }
 
@@ -271,6 +294,20 @@ void Browser::ExecuteJavaScript(const std::string& code,
       nullptr,
       reinterpret_cast<GAsyncReadyCallback>(&OnJavaScriptFinish),
       new ExecutionCallback(callback));
+}
+
+void Browser::GetCookiesForURL(const std::string& url,
+                               const CookiesCallback& callback) {
+  if (!callback)
+    return;
+  WebKitWebContext* context =
+      webkit_web_view_get_context(WEBKIT_WEB_VIEW(GetNative()));
+  WebKitCookieManager* cookie_manager =
+      webkit_web_context_get_cookie_manager(context);
+  webkit_cookie_manager_get_cookies(cookie_manager, url.c_str(),
+      nullptr,
+      reinterpret_cast<GAsyncReadyCallback>(&OnGetCookiesFinish),
+      new CookiesCallback(callback));
 }
 
 void Browser::GoBack() {

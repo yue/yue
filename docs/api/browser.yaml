@@ -118,6 +118,13 @@ methods:
       On Windows with IE backend, the `code` is executed synchronously and
       the `callback` is called before this API returns.
 
+  - signature: void GetCookiesForURL(const std::string& url, const std::function<void(std::vector<Cookie>)>&& callback)
+    description: Receive cookies under `url`.
+    detail: |
+      This API will include HTTP only cookies.
+
+      This API is not implemented on Windows with IE backend.
+
   - signature: void GoBack()
     description: Navigate to the back item in the back-forward list.
 

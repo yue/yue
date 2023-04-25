@@ -217,6 +217,36 @@
 
 namespace nu {
 
+namespace {
+
+bool CookieMatchesURL(NSHTTPCookie* cookie, NSURL* url) {
+  if ([cookie isSecure] && ![[url scheme] isEqualToString:@"https"])
+    return false;
+  if ([[cookie domain] hasPrefix:@"."]) {
+    if (![[url host] hasSuffix:[[cookie domain] substringFromIndex:1]])
+      return false;
+  } else {
+    if (![[url host] isEqualToString:[cookie domain]])
+      return false;
+  }
+  return ([[url path] length] == 0 && [[cookie path] isEqualToString:@"/"]) ||
+         [[url path] isEqualToString:[cookie path]] ||
+         [[url path] hasPrefix:[cookie path]];
+}
+
+Cookie NSCookieToNUCookie(NSHTTPCookie* cookie) {
+  return {
+    base::SysNSStringToUTF8([cookie name]),
+    base::SysNSStringToUTF8([cookie value]),
+    base::SysNSStringToUTF8([cookie domain]),
+    base::SysNSStringToUTF8([cookie path]),
+    static_cast<bool>([cookie isHTTPOnly]),
+    static_cast<bool>([cookie isSecure]),
+  };
+}
+
+}  // namespace
+
 void Browser::PlatformInit(Options options) {
   NUWebView* webview = [[NUWebView alloc] initWithShell:this
                                                 options:std::move(options)];
@@ -291,6 +321,24 @@ void Browser::ExecuteJavaScript(const std::string& code,
   [webview evaluateJavaScript:base::SysUTF8ToNSString(code)
             completionHandler:^(id result, NSError* error) {
     copied_callback(!error, NSValueToBaseValue(result));
+  }];
+}
+
+void Browser::GetCookiesForURL(const std::string& url,
+                               const CookiesCallback& callback) {
+  auto* webview = static_cast<NUWebView*>(GetNative());
+  WKHTTPCookieStore* store =
+      webview.configuration.websiteDataStore.httpCookieStore;
+  __block CookiesCallback copied_callback = callback;
+  __block std::string copied_url = url;
+  [store getAllCookies:^(NSArray<NSHTTPCookie*>* cookies) {
+    NSURL* nsurl = [NSURL URLWithString:base::SysUTF8ToNSString(copied_url)];
+    std::vector<Cookie> result;
+    for (NSHTTPCookie* cookie in cookies) {
+      if (CookieMatchesURL(cookie, nsurl))
+        result.push_back(NSCookieToNUCookie(cookie));
+    }
+    copied_callback(std::move(result));
   }];
 }
 
