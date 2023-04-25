@@ -112,11 +112,11 @@ class NATIVEUI_EXPORT Browser : public View {
   Signal<void(Browser*)> on_close;
   Signal<void(Browser*)> on_update_command;
   Signal<void(Browser*)> on_change_loading;
-  Signal<void(Browser*, std::string)> on_update_title;
-  Signal<void(Browser*, std::string)> on_start_navigation;
-  Signal<void(Browser*, std::string)> on_commit_navigation;
-  Signal<void(Browser*, std::string, int)> on_fail_navigation;
-  Signal<void(Browser*, std::string)> on_finish_navigation;
+  Signal<void(Browser*, const std::string&)> on_update_title;
+  Signal<void(Browser*, const std::string&)> on_start_navigation;
+  Signal<void(Browser*, const std::string&)> on_commit_navigation;
+  Signal<void(Browser*, const std::string&, int)> on_fail_navigation;
+  Signal<void(Browser*, const std::string&)> on_finish_navigation;
 
  protected:
   ~Browser() override;

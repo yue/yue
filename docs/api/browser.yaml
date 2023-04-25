@@ -211,17 +211,17 @@ events:
   - signature: void on_change_loading(Browser* self)
     description: Emitted when the browser starts or stops loading content.
 
-  - signature: void on_update_title(Browser* self, std::string title)
+  - signature: void on_update_title(Browser* self, const std::string& title)
     description: Emitted when document's title is changed.
 
-  - signature: void on_start_navigation(Browser* self, std::string url)
+  - signature: void on_start_navigation(Browser* self, const std::string& url)
     description: Emitted when the browser begins provisional navigation.
 
-  - signature: void on_commit_navigation(Browser* self, std::string url)
+  - signature: void on_commit_navigation(Browser* self, const std::string& url)
     description: Emitted when the browser begins to receive web content.
 
-  - signature: void on_finish_navigation(Browser* self, std::string url)
+  - signature: void on_finish_navigation(Browser* self, const std::string& url)
     description: Emitted when the navigation is complete.
 
-  - signature: void on_fail_navigation(Browser* self, std::string url, int code)
+  - signature: void on_fail_navigation(Browser* self, const std::string& url, int code)
     description: Emitted when the navigation fails.
