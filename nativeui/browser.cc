@@ -35,7 +35,7 @@ const char* Browser::GetClassName() const {
 
 void Browser::SetBindingName(const std::string& name) {
   base::EscapeJSONString(name, false, &binding_name_);
-  if (!stop_serving_)
+  if (!is_adding_bindings_ && !stop_serving_)
     PlatformUpdateBindings();
 }
 
@@ -45,7 +45,7 @@ void Browser::AddRawBinding(const std::string& name, BindingFunc func) {
   std::string escaped;
   base::EscapeJSONString(name, false, &escaped);
   bindings_[escaped] = std::move(func);
-  if (!stop_serving_)
+  if (!is_adding_bindings_ && !stop_serving_)
     PlatformUpdateBindings();
 }
 
@@ -55,12 +55,23 @@ void Browser::RemoveBinding(const std::string& name) {
   std::string escaped;
   base::EscapeJSONString(name, false, &escaped);
   bindings_.erase(escaped);
-  if (!stop_serving_)
+  if (!is_adding_bindings_ && !stop_serving_)
     PlatformUpdateBindings();
 }
 
 bool Browser::HasBindings() const {
   return !bindings_.empty();
+}
+
+void Browser::BeginAddingBindings() {
+  is_adding_bindings_ = true;
+}
+
+void Browser::EndAddingBindings() {
+  if (!is_adding_bindings_)
+    return;
+  is_adding_bindings_ = false;
+  PlatformUpdateBindings();
 }
 
 bool Browser::InvokeBindings(const std::string& json_str) {

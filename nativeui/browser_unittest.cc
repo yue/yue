@@ -310,15 +310,28 @@ TEST_P(BrowserTest, AddBinding) {
   nu::MessageLoop::Run();
 }
 
+TEST_P(BrowserTest, BeginAddingBindings) {
+  browser_->BeginAddingBindings();
+  browser_->AddBinding("method", []() {});
+  browser_->on_finish_navigation.Connect([&](nu::Browser* browser,
+                                             const std::string& url) {
+    browser->ExecuteJavaScript("window.method()",
+                               [](bool success, base::Value result) {
+      nu::MessageLoop::Quit();
+      ASSERT_EQ(result.is_none(), true);
+    });
+  });
+  nu::MessageLoop::PostTask([&]() {
+    browser_->LoadHTML("<body><script></script></body>", "about:blank");
+  });
+  nu::MessageLoop::Run();
+}
+
 void DummyFunction(const std::string&) {
 }
 
 TEST_P(BrowserTest, AddBindingFunctionPointer) {
   browser_->AddBinding("method", &DummyFunction);
-}
-
-TEST_P(BrowserTest, AddBindingCapturelessLabmda) {
-  browser_->AddBinding("method", []() {});
 }
 
 TEST_P(BrowserTest, SetBindingName) {

@@ -733,7 +733,9 @@ struct Type<nu::Browser> {
         "removeBinding",
         WrapMethod(&nu::Browser::RemoveBinding, [](Arguments args) {
           AttachedTable(args).GetOrCreateMap("bindings").Delete(args[0]);
-        }));
+        }),
+        "beginAddingBindings", &nu::Browser::BeginAddingBindings,
+        "endAddingBindings", &nu::Browser::EndAddingBindings);
     DefineProperties(
         env, prototype,
         Signal("onClose", &nu::Browser::on_close),

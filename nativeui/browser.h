@@ -78,6 +78,8 @@ class NATIVEUI_EXPORT Browser : public View {
   void AddRawBinding(const std::string& name, BindingFunc func);
   void RemoveBinding(const std::string& name);
   bool HasBindings() const;
+  void BeginAddingBindings();
+  void EndAddingBindings();
 
   // Automatically deduce argument types.
   template<typename Sig>
@@ -147,6 +149,7 @@ class NATIVEUI_EXPORT Browser : public View {
 
   std::string binding_name_;
   std::map<std::string, BindingFunc> bindings_;
+  bool is_adding_bindings_ = false;
 };
 
 }  // namespace nu

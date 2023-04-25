@@ -621,7 +621,9 @@ struct Type<nu::Browser> {
            "setbindingname", &nu::Browser::SetBindingName,
            "addbinding", &AddBinding,
            "addrawbinding", &nu::Browser::AddRawBinding,
-           "removebinding", &nu::Browser::RemoveBinding);
+           "removebinding", &nu::Browser::RemoveBinding,
+           "beginaddingbindings", &nu::Browser::BeginAddingBindings,
+           "endaddingbindings", &nu::Browser::EndAddingBindings);
     RawSetProperty(state, metatable,
                    "onclose", &nu::Browser::on_close,
                    "onupdatecommand", &nu::Browser::on_update_command,

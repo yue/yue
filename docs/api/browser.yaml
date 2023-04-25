@@ -201,6 +201,19 @@ methods:
   - signature: void RemoveBinding(const std::string& name)
     description: Remove the native binding with `name`.
 
+  - signature: void BeginAddingBindings()
+    description: |
+      Buffer following calls of `<!name>AddBinding` until
+      `<!name>EndAddingBindings` is called.
+    detail: |
+      Adding a native binding is an expensive operation, if you are adding a
+      lot of bindings, it is recommended to wrap the `<!name>AddBinding` calls
+      between a pair of `<!name>BeginAddingBindings` and `<!name>EndAddingBindings`
+      which will buffer the bindings and reduce the cost to minimal.
+
+  - signature: void EndAddingBindings()
+    description: Consolidate bindings added.
+
 events:
   - signature: void on_close(Browser* self)
     description: Emitted when the web page requests to close.
