@@ -768,8 +768,14 @@ struct Type<nu::Browser> {
       args.reserve(value.GetList().size());
       for (const auto& it : value.GetList())
         args.push_back(ToNode(ref.Env(), it));
-      napi_make_callback(ref.Env(), nullptr, func, func, args.size(),
-                         args.empty() ? nullptr : &args.front(), nullptr);
+      napi_status s = napi_make_callback(
+          ref.Env(), nullptr, func, func, args.size(),
+          args.empty() ? nullptr : &args.front(), nullptr);
+      if (s == napi_pending_exception) {
+        napi_value fatal_exception;
+        napi_get_and_clear_last_exception(ref.Env(), &fatal_exception);
+        napi_fatal_exception(ref.Env(), fatal_exception);
+      }
     });
   }
 };
