@@ -82,9 +82,7 @@ void Button::PlatformSetImage(Image* image) {
 }
 
 SizeF Button::GetMinimumSize() const {
-  // GTK's button can get quite small, but still give some minimal sizes to
-  // avoid warnings from GTK of "Negative content height".
-  return SizeF(15, 15);
+  return GetPreferredSizeForWidget(GetNative());
 }
 
 }  // namespace nu
