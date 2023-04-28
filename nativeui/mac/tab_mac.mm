@@ -7,17 +7,8 @@
 #include "base/mac/scoped_nsobject.h"
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/gfx/font.h"
-#include "nativeui/gfx/geometry/insets_f.h"
 #include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/nu_view.h"
-
-namespace {
-
-inline nu::InsetsF GetTabInsets(NSTabView* button) {
-  return nu::InsetsF(5, 7, 8, 6);
-}
-
-}  // namespace
 
 @interface NUTabDelegate : NSObject<NSTabViewDelegate> {
  @private
@@ -40,6 +31,7 @@ inline nu::InsetsF GetTabInsets(NSTabView* button) {
 }
 
 @end
+
 
 @interface NUTab : NSTabView<NUViewMethods> {
  @private
@@ -81,27 +73,6 @@ inline nu::InsetsF GetTabInsets(NSTabView* button) {
   return YES;
 }
 
-// Fix internal paddings of Tab.
-- (void)setFrame:(NSRect)frame {
-  nu::RectF bounds(frame);
-  bounds.Inset(-GetTabInsets(self));
-  [super setFrame:bounds.ToCGRect()];
-}
-
-- (NSRect)frame {
-  nu::RectF bounds([super frame]);
-  bounds.Inset(GetTabInsets(self));
-  return bounds.ToCGRect();
-}
-
-- (NSRect)contentRect {
-  nu::RectF rect([super contentRect]);
-  nu::InsetsF insets = GetTabInsets(self);
-  rect.set_width(rect.width() + insets.left() + insets.right());
-  rect.set_height(rect.height() + insets.top() + insets.bottom());
-  return rect.ToCGRect();
-}
-
 @end
 
 namespace nu {
@@ -139,9 +110,7 @@ int Tab::GetSelectedPageIndex() const {
 
 SizeF Tab::GetMinimumSize() const {
   auto* tab = static_cast<NUTab*>(GetNative());
-  RectF bounds = RectF(SizeF([tab minimumSize]));
-  bounds.Inset(GetTabInsets(tab));
-  return bounds.size();
+  return SizeF([tab minimumSize]);
 }
 
 }  // namespace nu
