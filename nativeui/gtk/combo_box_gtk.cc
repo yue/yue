@@ -11,10 +11,8 @@ namespace nu {
 namespace {
 
 void OnComTextChange(GObject* widget, ComboBox* combbox) {
-  if (g_object_get_data(widget, "ignore-change")) {
-    g_object_set_data(widget, "ignore-change", nullptr);
+  if (g_object_get_data(widget, "ignore-change"))
     return;
-  }
   combbox->on_text_change.Emit(combbox);
 }
 
@@ -33,6 +31,7 @@ void ComboBox::SetText(const std::string& text) {
   // Set text and ignore event.
   g_object_set_data(G_OBJECT(entry), "ignore-change", this);
   gtk_entry_set_text(GTK_ENTRY(entry), text.c_str());
+  g_object_set_data(G_OBJECT(entry), "ignore-change", nullptr);
 }
 
 std::string ComboBox::GetText() const {
@@ -45,6 +44,7 @@ void ComboBox::AddItem(const std::string& text) {
   g_object_set_data(G_OBJECT(GetNative()), "ignore-change", this);
   gtk_combo_box_text_append(
       GTK_COMBO_BOX_TEXT(GetNative()), nullptr, text.c_str());
+  g_object_set_data(G_OBJECT(GetNative()), "ignore-change", nullptr);
 }
 
 }  // namespace nu

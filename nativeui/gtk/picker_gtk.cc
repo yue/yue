@@ -13,10 +13,8 @@ namespace nu {
 namespace {
 
 void OnChanged(GObject* widget, Picker* picker) {
-  if (g_object_get_data(widget, "ignore-change")) {
-    g_object_set_data(widget, "ignore-change", nullptr);
+  if (g_object_get_data(widget, "ignore-change"))
     return;
-  }
   picker->on_selection_change.Emit(picker);
 }
 
@@ -60,20 +58,26 @@ void Picker::AddItem(const std::string& text) {
     return;
 
   // Add item.
+  g_object_set_data(G_OBJECT(GetNative()), "ignore-change", this);
   gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(GetNative()),
                             nullptr, text.c_str());
 
   // Select the first item by default.
   if (GetSelectedItemIndex() == -1)
     SelectItemAt(0);
+  g_object_set_data(G_OBJECT(GetNative()), "ignore-change", nullptr);
 }
 
 void Picker::RemoveItemAt(int index) {
+  g_object_set_data(G_OBJECT(GetNative()), "ignore-change", this);
   gtk_combo_box_text_remove(GTK_COMBO_BOX_TEXT(GetNative()), index);
+  g_object_set_data(G_OBJECT(GetNative()), "ignore-change", nullptr);
 }
 
 void Picker::Clear() {
+  g_object_set_data(G_OBJECT(GetNative()), "ignore-change", this);
   gtk_combo_box_text_remove_all(GTK_COMBO_BOX_TEXT(GetNative()));
+  g_object_set_data(G_OBJECT(GetNative()), "ignore-change", nullptr);
 }
 
 std::vector<std::string> Picker::GetItems() const {
@@ -88,6 +92,7 @@ std::vector<std::string> Picker::GetItems() const {
 void Picker::SelectItemAt(int index) {
   g_object_set_data(G_OBJECT(GetNative()), "ignore-change", this);
   gtk_combo_box_set_active(GTK_COMBO_BOX(GetNative()), index);
+  g_object_set_data(G_OBJECT(GetNative()), "ignore-change", nullptr);
 }
 
 std::string Picker::GetSelectedItem() const {
