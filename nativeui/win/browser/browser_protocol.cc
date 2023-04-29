@@ -8,7 +8,6 @@
 
 #include <string>
 
-#include "base/logging.h"
 #include "base/strings/utf_string_conversions.h"
 
 namespace nu {
@@ -99,12 +98,14 @@ IFACEMETHODIMP BrowserProtocol::Resume() {
 }
 
 IFACEMETHODIMP BrowserProtocol::Read(void *pv, ULONG cb, ULONG *pcbRead) {
+  if (!protocol_job_)  // read could happen after terminate
+    return S_FALSE;
   size_t nread = protocol_job_->Read(pv, cb);
+  *pcbRead = static_cast<ULONG>(nread);
   if (nread == 0) {
     sink_->ReportResult(S_OK, 0, NULL);
     return S_FALSE;
   }
-  *pcbRead = static_cast<ULONG>(nread);
   return S_OK;
 }
 
