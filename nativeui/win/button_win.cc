@@ -21,7 +21,7 @@ namespace nu {
 
 namespace {
 
-const int kButtonPadding = 1;
+const int kButtonPadding = 4;
 
 class ButtonImpl : public Clickable {
  public:
