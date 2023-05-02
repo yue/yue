@@ -11,6 +11,7 @@
 #include "nativeui/gfx/color.h"
 #include "nativeui/gfx/text.h"
 #include "nativeui/types.h"
+#include "third_party/abseil-cpp/absl/types/optional.h"
 
 namespace nu {
 
@@ -55,6 +56,14 @@ class NATIVEUI_EXPORT AttributedText : public base::RefCounted<AttributedText> {
   void PlatformUpdateFormat();
   void PlatformSetFontFor(scoped_refptr<Font> font, int start, int end);
   void PlatformSetColorFor(Color color, int start, int end);
+
+#if defined(OS_MAC)
+  // On macOS the attributes added must have range specified, so it is
+  // impossible to add attribute that applies on full text. We work around it
+  // by keeping a record of the attributes to add.
+  scoped_refptr<Font> font_;
+  absl::optional<Color> color_;
+#endif
 
   NativeAttributedText text_;
   TextFormat format_;

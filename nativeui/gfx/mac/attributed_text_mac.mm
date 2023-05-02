@@ -43,24 +43,30 @@ void AttributedText::PlatformSetFontFor(scoped_refptr<Font> font,
                                         int start, int end) {
   [text_ beginEditing];
   if (start == 0 && end == -1) {
+    font_ = font;
     [text_ removeAttribute:NSFontAttributeName
                      range:NSMakeRange(0, [text_ length])];
   }
-  [text_ addAttribute:NSFontAttributeName
-                value:font->GetNative()
-                range:NSMakeRange(start, IndexToLength(text_, start, end))];
+  if ([text_ length] > 0) {
+    [text_ addAttribute:NSFontAttributeName
+                  value:font->GetNative()
+                  range:NSMakeRange(start, IndexToLength(text_, start, end))];
+  }
   [text_ endEditing];
 }
 
 void AttributedText::PlatformSetColorFor(Color color, int start, int end) {
   [text_ beginEditing];
   if (start == 0 && end == -1) {
+    color_ = color;
     [text_ removeAttribute:NSForegroundColorAttributeName
                      range:NSMakeRange(0, [text_ length])];
   }
-  [text_ addAttribute:NSForegroundColorAttributeName
-                value:color.ToNSColor()
-                range:NSMakeRange(start, IndexToLength(text_, start, end))];
+  if ([text_ length] > 0) {
+    [text_ addAttribute:NSForegroundColorAttributeName
+                  value:color.ToNSColor()
+                  range:NSMakeRange(start, IndexToLength(text_, start, end))];
+  }
   [text_ endEditing];
 }
 
@@ -84,7 +90,32 @@ RectF AttributedText::GetBoundsFor(const SizeF& size) const {
 }
 
 void AttributedText::SetText(const std::string& text) {
-  [[text_ mutableString] setString:base::SysUTF8ToNSString(text)];
+  [text_ beginEditing];
+  // Remove old attributes after length change.
+  NSString* nsstr = base::SysUTF8ToNSString(text);
+  bool reapply_styles = [text_ length] != [nsstr length];
+  if (reapply_styles) {
+    [text_ removeAttribute:NSForegroundColorAttributeName
+                     range:NSMakeRange(0, [text_ length])];
+    [text_ removeAttribute:NSFontAttributeName
+                     range:NSMakeRange(0, [text_ length])];
+  }
+  // Set new text.
+  [[text_ mutableString] setString:nsstr];
+  // Re-apply attributes.
+  if (reapply_styles) {
+    if (font_) {
+      [text_ addAttribute:NSFontAttributeName
+                    value:font_->GetNative()
+                    range:NSMakeRange(0, [text_ length])];
+    }
+    if (color_) {
+      [text_ addAttribute:NSForegroundColorAttributeName
+                    value:color_->ToNSColor()
+                    range:NSMakeRange(0, [text_ length])];
+    }
+  }
+  [text_ endEditing];
 }
 
 std::string AttributedText::GetText() const {
