@@ -415,6 +415,7 @@ function parseType(lang, str) {
       case 'base::FilePath': type.name = 'string'; break
       case 'base::Time': type.name = 'number'; break
       case 'base::Value': type.name = 'any'; break
+      case 'userdata': type.name = 'userdata'; break
       default: builtin = false
     }
   } else if (lang == 'js') {

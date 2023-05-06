@@ -2363,6 +2363,9 @@ struct Type<nu::Responder> {
         "setCapture", &nu::Responder::SetCapture,
         "releaseCapture", &nu::Responder::ReleaseCapture,
         "hasCapture", &nu::Responder::HasCapture);
+#if defined(OS_LINUX) || defined(OS_MAC)
+    Set(env, prototype, "getNative", GetNative);
+#endif
     DefineProperties(
         env, prototype,
         Signal("onMouseDown", &nu::Responder::on_mouse_down),
@@ -2374,6 +2377,21 @@ struct Type<nu::Responder> {
         Signal("onKeyUp", &nu::Responder::on_key_up),
         Signal("onCaptureLost", &nu::View::on_capture_lost));
   }
+#if defined(OS_LINUX) || defined(OS_MAC)
+  static napi_value GetNative(Arguments args) {
+    nu::Responder* responder;
+    if (!args.GetThis(&responder))
+      return nullptr;
+    napi_value buffer;
+    void* data;
+    if (napi_create_buffer(args.Env(), sizeof(nu::NativeResponder), &data,
+                           &buffer) != napi_ok)
+      return nullptr;
+    nu::NativeResponder native = responder->GetNative();
+    memcpy(data, &native, sizeof(nu::NativeResponder));
+    return buffer;
+  }
+#endif
 };
 
 template<>

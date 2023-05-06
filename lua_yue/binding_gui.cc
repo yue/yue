@@ -2134,6 +2134,9 @@ struct Type<nu::Responder> {
            "setcapture", &nu::Responder::SetCapture,
            "releasecapture", &nu::Responder::ReleaseCapture,
            "hascapture", &nu::Responder::HasCapture);
+#if defined(OS_LINUX) || defined(OS_MAC)
+    RawSet(state, metatable, "getnative", GetNative);
+#endif
     RawSetProperty(state, metatable,
                    "onmousedown", &nu::Responder::on_mouse_down,
                    "onmouseup", &nu::Responder::on_mouse_up,
@@ -2144,6 +2147,11 @@ struct Type<nu::Responder> {
                    "onkeyup", &nu::Responder::on_key_up,
                    "oncapturelost", &nu::View::on_capture_lost);
   }
+#if defined(OS_LINUX) || defined(OS_MAC)
+  static void* GetNative(nu::Responder* responder) {
+    return responder->GetNative();
+  }
+#endif
 };
 
 template<>

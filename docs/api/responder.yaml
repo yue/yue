@@ -27,6 +27,34 @@ methods:
     lang: ['cpp']
     description: Return the native type wrapped by the responder.
 
+  - signature: Buffer GetNative() const
+    lang: ['js']
+    platform: ['Linux', 'macOS']
+    description: |
+      Return a Node.js `Buffer` containing the pointer of underlying native
+      widget wrapped by the responder.
+    detail: &getnative |
+      On Linux the C++ type of the pointer is `GtkWidget*`, and on macOS it is
+      `NSResponder*`. The actual subclass type depends on which type this
+      responder is, for example for `Window` you can expect the native type to
+      be `GtkWindow*` on Linux and `NSWindow*` on macOS, and for `View` it would
+      be `GtkWidget*` on Linux and `NSView*` on macOS.
+
+      However for subclasses of `View`, the native type is not specified, you
+      may find out the information by looking into the source code, but the type
+      might be changed in future updates. For example, the native type of
+      `TextEdit` is currently a `GtkScrolledWindow*` with a `GtkTextView*` in
+      it, but we may want to replace it with a custom widget when adding more
+      features in future.
+
+  - signature: userdata GetNative() const
+    lang: ['lua']
+    platform: ['Linux', 'macOS']
+    description: |
+      Return a light userdata containing the pointer of underlying native
+      widget wrapped by the responder.
+    detail: *getnative
+
 events:
   - signature: bool on_mouse_down(Responder* self, const MouseEvent& event)
     description: Emitted when pressing mouse buttons.
