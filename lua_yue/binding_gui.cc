@@ -1603,6 +1603,16 @@ struct Type<nu::Lifetime> {
 };
 
 template<>
+struct Type<nu::Locale> {
+  static constexpr const char* name = "Locale";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "getcurrentidentifier", &nu::Locale::GetCurrentIdentifier,
+           "getpreferredlanguages", &nu::Locale::GetPreferredLanguages);
+  }
+};
+
+template<>
 struct Type<nu::MessageBox::Type> {
   static constexpr const char* name = "MessageBoxType";
   static bool To(State* state, int index, nu::MessageBox::Type* out) {
@@ -2941,6 +2951,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::Image>(state, "Image");
   BindType<nu::Label>(state, "Label");
   BindType<nu::Lifetime>(state, "Lifetime");
+  BindType<nu::Locale>(state, "Locale");
   BindType<nu::MessageBox>(state, "MessageBox");
   BindType<nu::MessageLoop>(state, "MessageLoop");
   BindType<nu::MenuBar>(state, "MenuBar");

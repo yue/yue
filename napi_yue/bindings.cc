@@ -1789,6 +1789,18 @@ struct Type<nu::Lifetime> {
 };
 
 template<>
+struct Type<nu::Locale> {
+  static constexpr const char* name = "Locale";
+  static void Define(napi_env env,
+                     napi_value constructor,
+                     napi_value prototype) {
+    Set(env, constructor,
+        "getCurrentIdentifier", &nu::Locale::GetCurrentIdentifier,
+        "getPreferredLanguages", &nu::Locale::GetPreferredLanguages);
+  }
+};
+
+template<>
 struct Type<nu::MessageBox::Type> {
   static constexpr const char* name = "MessageBoxType";
   static napi_status FromNode(napi_env env,
@@ -3286,6 +3298,7 @@ napi_value Initialize(napi_env env, napi_value exports) {
           "Group",              ki::Class<nu::Group>(),
           "Image",              ki::Class<nu::Image>(),
           "Label",              ki::Class<nu::Label>(),
+          "Locale",             ki::Class<nu::Locale>(),
           "MessageBox",         ki::Class<nu::MessageBox>(),
           "MenuBar",            ki::Class<nu::MenuBar>(),
           "Menu",               ki::Class<nu::Menu>(),

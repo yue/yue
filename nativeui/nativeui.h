@@ -28,6 +28,7 @@
 #include "nativeui/group.h"
 #include "nativeui/label.h"
 #include "nativeui/lifetime.h"
+#include "nativeui/locale.h"
 #include "nativeui/menu.h"
 #include "nativeui/menu_bar.h"
 #include "nativeui/menu_item.h"
