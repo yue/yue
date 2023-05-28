@@ -4,24 +4,27 @@
 
 #include "nativeui/menu.h"
 
+#include "nativeui/events/event.h"
 #include "nativeui/menu_item.h"
+#include "nativeui/screen.h"
 #include "nativeui/state.h"
 #include "nativeui/win/menu_base_win.h"
 #include "nativeui/win/menu_item_win.h"
 
 namespace nu {
 
-Menu::Menu() : MenuBase(CreatePopupMenu()) {
-}
+Menu::Menu() : MenuBase(CreatePopupMenu()) {}
 
 void Menu::Popup() {
-  POINT p;
-  GetCursorPos(&p);
+  PopupAt(Event::GetMouseLocation());
+}
+
+void Menu::PopupAt(const PointF& point) {
+  Point pp = Screen::GetCurrent()->DIPToScreenPoint(point);
   OnMenuShow();
-  UINT id = TrackPopupMenuEx(GetNative(),
-                             TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD,
-                             p.x, p.y, State::GetCurrent()->GetSubwinHolder(),
-                             nullptr);
+  UINT id = TrackPopupMenuEx(
+      GetNative(), TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD,
+      pp.x(), pp.y(), State::GetCurrent()->GetSubwinHolder(), nullptr);
   OnMenuHide();
   if (id > 0)
     DispatchCommandToItem(this, id);

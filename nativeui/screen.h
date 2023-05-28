@@ -61,6 +61,11 @@ class NATIVEUI_EXPORT Screen : public SignalDelegate {
 
   PointF GetCursorScreenPoint();
 
+#if defined(OS_WIN)
+  // Internal: Convert a DIP point to pixel point in screen.
+  Point DIPToScreenPoint(const PointF& point);
+#endif
+
   // Internal: Used by observers to notify changes.
   void NotifyDisplaysChange();
 
@@ -86,7 +91,6 @@ class NATIVEUI_EXPORT Screen : public SignalDelegate {
 
   // Platform implementations.
 #if defined(OS_WIN)
-  Point DIPToScreenPoint(const PointF& point);
   static BOOL CALLBACK EnumMonitorCallback(HMONITOR, HDC, LPRECT, LPARAM);
 #endif
   static uint32_t DisplayIdFromNative(NativeDisplay native);

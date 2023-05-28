@@ -7,8 +7,8 @@
 
 #import <Cocoa/Cocoa.h>
 
-#include "base/logging.h"
 #include "nativeui/events/mac/keyboard_code_conversion_mac.h"
+#include "nativeui/gfx/mac/coordinate_conversion.h"
 
 namespace nu {
 
@@ -169,6 +169,11 @@ bool Event::IsAltPressed() {
 // static
 bool Event::IsMetaPressed() {
   return [NSEvent modifierFlags] & NSEventModifierFlagCommand;
+}
+
+// static
+PointF Event::GetMouseLocation() {
+  return ScreenPointFromNSPoint([NSEvent mouseLocation]);
 }
 
 Event::Event(NativeEvent event, NativeResponder responder)

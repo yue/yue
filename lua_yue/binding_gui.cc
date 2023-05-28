@@ -1711,7 +1711,8 @@ struct Type<nu::Menu> {
   static void BuildMetaTable(State* state, int metatable) {
     RawSet(state, metatable,
            "create", &Create,
-           "popup", &nu::Menu::Popup);
+           "popup", &nu::Menu::Popup,
+           "popupat", &nu::Menu::PopupAt);
   }
   static nu::Menu* Create(CallContext* context) {
     nu::Menu* menu = new nu::Menu;

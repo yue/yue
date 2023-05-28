@@ -8,6 +8,7 @@
 
 #include <list>
 
+#include "nativeui/events/event.h"
 #include "nativeui/window.h"
 
 namespace nu {
@@ -124,13 +125,7 @@ Display Screen::GetDisplayNearestPoint(const PointF& point) {
 }
 
 PointF Screen::GetCursorScreenPoint() {
-  GdkDisplay* display = gdk_display_get_default();
-  GdkSeat* seat = gdk_display_get_default_seat(display);
-  GdkDevice* mouse_device = gdk_seat_get_pointer(seat);
-  GdkWindow* window = gdk_get_default_root_window();
-  gint x = 0, y = 0;
-  gdk_window_get_device_position(window, mouse_device, &x, &y, nullptr);
-  return PointF(x, y);
+  return Event::GetMouseLocation();
 }
 
 // static

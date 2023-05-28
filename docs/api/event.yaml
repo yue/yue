@@ -18,6 +18,9 @@ class_methods:
     description: |
       Return whether <kbd>Win</kbd> or <kbd>Command</kbd> key is pressed.
 
+  - signature: PointF GetMouseLocation()
+    description: Return current mouse location in screen.
+
 class_properties:
   - property: int MaskShift
     lang: ['lua', 'js']

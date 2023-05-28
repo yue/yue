@@ -24,3 +24,8 @@ methods:
     description: |
       Show the popup menu at current mouse position, this method will block
       until the menu is dismissed.
+
+  - signature: void PopupAt(const PointF& point)
+    description: |
+      Show the popup menu at |point|, this method will block until the menu is
+      dismissed.

@@ -4,9 +4,9 @@
 
 #include "nativeui/events/win/event_win.h"
 
-#include "base/logging.h"
 #include "nativeui/events/event.h"
 #include "nativeui/gfx/geometry/point_conversions.h"
+#include "nativeui/screen.h"
 #include "nativeui/win/view_win.h"
 
 namespace nu {
@@ -114,6 +114,11 @@ bool Event::IsAltPressed() {
 // static
 bool Event::IsMetaPressed() {
   return (::GetKeyState(VK_LWIN) & 0x8000) || (::GetKeyState(VK_RWIN) & 0x8000);
+}
+
+// static
+PointF Event::GetMouseLocation() {
+  return Screen::GetCurrent()->GetCursorScreenPoint();
 }
 
 Event::Event(NativeEvent event, NativeResponder responder)

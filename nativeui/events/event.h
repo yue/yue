@@ -31,6 +31,9 @@ struct NATIVEUI_EXPORT Event {
   static bool IsAltPressed();
   static bool IsMetaPressed();
 
+  // Current mouse position.
+  static PointF GetMouseLocation();
+
   // Event type.
   EventType type;
 

@@ -5,6 +5,7 @@
 #ifndef NATIVEUI_MENU_H_
 #define NATIVEUI_MENU_H_
 
+#include "nativeui/gfx/geometry/point_f.h"
 #include "nativeui/menu_base.h"
 
 namespace nu {
@@ -20,6 +21,7 @@ class NATIVEUI_EXPORT Menu : public MenuBase {
   const char* GetClassName() const override;
 
   void Popup();
+  void PopupAt(const PointF& point);
 
  protected:
   ~Menu() override = default;

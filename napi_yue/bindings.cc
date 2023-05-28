@@ -1911,7 +1911,9 @@ struct Type<nu::Menu> {
                      napi_value constructor,
                      napi_value prototype) {
     Set(env, constructor, "create", &Create);
-    Set(env, prototype, "popup", &nu::Menu::Popup);
+    Set(env, prototype,
+        "popup", &nu::Menu::Popup,
+        "popupAt", &nu::Menu::PopupAt);
   }
   static nu::Menu* CreateRaw(napi_env env, napi_value options) {
     nu::Menu* menu = new nu::Menu;

@@ -6,15 +6,21 @@
 
 #import <Cocoa/Cocoa.h>
 
+#include "nativeui/events/event.h"
+#include "nativeui/gfx/mac/coordinate_conversion.h"
+
 namespace nu {
 
-Menu::Menu() : MenuBase([[NSMenu alloc] init]) {
-}
+Menu::Menu() : MenuBase([[NSMenu alloc] init]) {}
 
 void Menu::Popup() {
+  PopupAt(Event::GetMouseLocation());
+}
+
+void Menu::PopupAt(const PointF& point) {
   [GetNative() popUpMenuPositioningItem:nil
-                        atLocation:[NSEvent mouseLocation]
-                            inView:nil];
+                             atLocation:ScreenPointToNSPoint(point)
+                                 inView:nil];
 }
 
 }  // namespace nu

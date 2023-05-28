@@ -11,6 +11,7 @@
 
 #include "base/mac/scoped_nsobject.h"
 #include "base/strings/sys_string_conversions.h"
+#include "nativeui/events/event.h"
 #include "nativeui/gfx/mac/coordinate_conversion.h"
 #include "nativeui/window.h"
 
@@ -115,7 +116,7 @@ Display Screen::GetDisplayNearestPoint(const PointF& point) {
 }
 
 PointF Screen::GetCursorScreenPoint() {
-  return ScreenPointFromNSPoint([NSEvent mouseLocation]);
+  return Event::GetMouseLocation();
 }
 
 // static
