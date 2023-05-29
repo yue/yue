@@ -129,14 +129,6 @@ PointF GetPosInWindow(NSEvent* event) {
   return PointF(point.x, NSHeight(frame) - point.y);
 }
 
-PointF GetPosInWindow(NSEvent* event, NSResponder* responder) {
-  if ([responder isKindOfClass:[NSView class]] &&
-      [static_cast<NSView*>(responder) isFlipped]) {
-    return PointF([event locationInWindow]);
-  }
-  return GetPosInWindow(event);
-}
-
 PointF GetPosInView(NSEvent* event, NSResponder* responder) {
   if ([responder isKindOfClass:[NSView class]]) {
     NSView* view = static_cast<NSView*>(responder);
@@ -187,7 +179,7 @@ MouseEvent::MouseEvent(NativeEvent event, NativeResponder responder)
     : Event(event, responder),
       button([event buttonNumber] + 1),
       position_in_view(GetPosInView(event, responder)),
-      position_in_window(GetPosInWindow(event, responder)) {
+      position_in_window(GetPosInWindow(event)) {
 }
 
 KeyEvent::KeyEvent(NativeEvent event, NativeResponder responder)
