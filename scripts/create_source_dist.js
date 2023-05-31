@@ -108,6 +108,8 @@ function CopySources(sources, headers) {
     CopySource('//base/win/windows_undefines.inc', path.join(targetDir, 'include'))
     // This file is needed by Windows, but marked as posix.
     CopySource('//base/posix/eintr_wrapper.h', path.join(targetDir, 'include'))
+  } else if (targetOs == 'linux') {
+    CopySource('//third_party/x11proto/keysymdef.h', path.join(targetDir, 'include'))
   }
   for (const parent in EXTRA_HEADERS) {
     for (const dir of EXTRA_HEADERS[parent]) {

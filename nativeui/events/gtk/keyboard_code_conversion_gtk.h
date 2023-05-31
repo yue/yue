@@ -9,7 +9,11 @@
 
 namespace nu {
 
+// Converts a GDK keycode into a KeyboardCode.
 KeyboardCode KeyboardCodeFromGdkKeyCode(int keyval);
+
+// Converts a KeyboardCode into an X KeySym.
+int XKeysymForWindowsKeyCode(KeyboardCode keycode, bool shift);
 
 }  // namespace nu
 

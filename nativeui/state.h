@@ -26,6 +26,7 @@ namespace nu {
 
 class Appearance;
 class Font;
+class GlobalShortcut;
 class NotificationCenter;
 class Screen;
 
@@ -81,6 +82,9 @@ class NATIVEUI_EXPORT State {
   // Internal: Return the appearance object
   Appearance* GetAppearance();
 
+  // Internal: Return the globalShortcut object
+  GlobalShortcut* GetGlobalShortcut();
+
   // Internal: Return the notificationCenter object
   NotificationCenter* GetNotificationCenter();
 
@@ -120,6 +124,7 @@ class NATIVEUI_EXPORT State {
 
   std::unique_ptr<Screen> screen_;
   std::unique_ptr<Appearance> appearance_;
+  std::unique_ptr<GlobalShortcut> global_shortcut_;
   std::unique_ptr<NotificationCenter> notification_center_;
   scoped_refptr<Font> default_font_;
 

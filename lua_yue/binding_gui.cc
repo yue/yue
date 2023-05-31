@@ -1509,6 +1509,17 @@ struct Type<nu::GifPlayer> {
 };
 
 template<>
+struct Type<nu::GlobalShortcut> {
+  static constexpr const char* name = "GlobalShortcut";
+  static void BuildMetaTable(State* state, int metatable) {
+    RawSet(state, metatable,
+           "register", &nu::GlobalShortcut::Register,
+           "unregister", &nu::GlobalShortcut::Unregister,
+           "unregisterall", &nu::GlobalShortcut::UnregisterAll);
+  }
+};
+
+template<>
 struct Type<nu::Group> {
   using Base = nu::View;
   static constexpr const char* name = "Group";
@@ -2948,6 +2959,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   BindType<nu::FileSaveDialog>(state, "FileSaveDialog");
   BindType<nu::Font>(state, "Font");
   BindType<nu::GifPlayer>(state, "GifPlayer");
+  BindType<nu::GlobalShortcut>(state, "GlobalShortcut");
   BindType<nu::Group>(state, "Group");
   BindType<nu::Image>(state, "Image");
   BindType<nu::Label>(state, "Label");
@@ -2990,6 +3002,7 @@ extern "C" int luaopen_yue_gui(lua::State* state) {
   lua::RawSet(state, -1,
               "app",                nu::App::GetCurrent(),
               "appearance",         nu::Appearance::GetCurrent(),
+              "globalshortcut",     nu::GlobalShortcut::GetCurrent(),
               "lifetime",           nu::Lifetime::GetCurrent(),
               "notificationcenter", nu::NotificationCenter::GetCurrent(),
               "screen",             nu::Screen::GetCurrent());

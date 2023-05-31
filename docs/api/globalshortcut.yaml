@@ -1,0 +1,58 @@
+name: GlobalShortcut
+component: gui
+header: nativeui/global_shortcut.h
+type: class
+singleton: true
+namespace: nu
+description: Register global keyboard shortcuts.
+
+lang_detail:
+  cpp: |
+    This class can not be created by user, you must create `State` first and
+    then receive an instance of `GlobalShortcut` via `GlobalShortcut::GetCurrent`.
+
+    ```cpp
+    nu::State state;
+    nu::GlobalShortcut* global_shortcut = nu::GlobalShortcut::GetCurrent();
+    ```
+
+  lua: |
+    This class can not be created by user, you can only receive its global
+    instance from the `globalshortcut` property of the module:
+
+    ```lua
+    gui.globalshortcut:unregisterall()
+    ```
+
+  js: |
+    This class can not be created by user, you can only receive its global
+    instance from the `globalShortcut` property of the module:
+
+    ```js
+    gui.globalShortcut.unregisterAll()
+    ```
+
+class_methods:
+  - signature: GlobalShortcut* GetCurrent()
+    lang: ['cpp']
+    description: Return current GlobalShortcut instance.
+
+methods:
+  - signature: int Register(const Accelerator& accelerator, std::function<void()> callback)
+    description: |
+      Register a global keyboard shortcut that, `callback` will called when the
+      `accelerator` is pressed.
+    detail: |
+      An unsigned ID will returned on success, which can be used to undo the
+      registration. -1 will be returned on error.
+
+      This API will fail silently when the accelerator is already taken by other
+      apps, there is no way to know if an accelerator has already been
+      registered by other apps.
+
+  - signature: void Unregister(int id)
+    description: |
+      Unregister the shortcut with the `id` returned by `<!name>Register`.
+
+  - signature: void UnregisterAll()
+    description: Unregister all shortcuts registered in this app.

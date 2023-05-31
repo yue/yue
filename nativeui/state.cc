@@ -10,6 +10,7 @@
 #include "base/threading/thread_local.h"
 #include "nativeui/appearance.h"
 #include "nativeui/gfx/font.h"
+#include "nativeui/global_shortcut.h"
 #include "nativeui/notification_center.h"
 #include "nativeui/protocol_job.h"
 #include "nativeui/screen.h"
@@ -94,6 +95,12 @@ Appearance* State::GetAppearance() {
   if (!appearance_)
     appearance_.reset(new Appearance);
   return appearance_.get();
+}
+
+GlobalShortcut* State::GetGlobalShortcut() {
+  if (!global_shortcut_)
+    global_shortcut_.reset(new GlobalShortcut);
+  return global_shortcut_.get();
 }
 
 NotificationCenter* State::GetNotificationCenter() {

@@ -36,6 +36,11 @@ class NATIVEUI_EXPORT Accelerator {
   KeyboardCode GetKeyCode() const { return key_code_; }
   int GetModifiers() const { return modifiers_; }
 
+  bool IsShiftDown() const { return modifiers_ & MASK_SHIFT; }
+  bool IsCtrlDown() const { return modifiers_ & MASK_CONTROL; }
+  bool IsAltDown() const { return modifiers_ & MASK_ALT; }
+  bool IsCmdDown() const { return modifiers_ & MASK_META; }
+
  private:
   // The keycode (VK_...).
   KeyboardCode key_code_;

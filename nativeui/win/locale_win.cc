@@ -4,6 +4,8 @@
 
 #include "nativeui/locale.h"
 
+#include <windows.h>
+
 #include "base/strings/sys_string_conversions.h"
 #include "base/win/i18n.h"
 

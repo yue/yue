@@ -51,6 +51,8 @@ jumbo_component("nativeui") {
     "file_save_dialog.h",
     "gif_player.cc",
     "gif_player.h",
+    "global_shortcut.cc",
+    "global_shortcut.h",
     "group.cc",
     "group.h",
     "label.cc",
@@ -209,6 +211,7 @@ jumbo_component("nativeui") {
       "gtk/file_open_dialog_gtk.cc",
       "gtk/file_save_dialog_gtk.cc",
       "gtk/gif_player_gtk.cc",
+      "gtk/global_shortcut_gtk.cc",
       "gtk/group_gtk.cc",
       "gtk/label_gtk.cc",
       "gtk/locale_gtk.cc",
@@ -318,6 +321,7 @@ jumbo_component("nativeui") {
       "mac/file_open_dialog_mac.mm",
       "mac/file_save_dialog_mac.mm",
       "mac/gif_player_mac.mm",
+      "mac/global_shortcut_mac.mm",
       "mac/group_mac.mm",
       "mac/label_mac.mm",
       "mac/locale_mac.mm",
@@ -434,6 +438,7 @@ jumbo_component("nativeui") {
       "win/file_save_dialog_win.cc",
       "win/file_save_dialog_win.h",
       "win/gif_player_win.cc",
+      "win/global_shortcut_win.cc",
       "win/group_win.cc",
       "win/label_win.cc",
       "win/locale_win.cc",
@@ -537,6 +542,7 @@ jumbo_component("nativeui") {
   } else if (is_mac) {
     frameworks = [
       "AppKit.framework",
+      "Carbon.framework",
       "WebKit.framework",
     ]
   } else if (is_win) {

@@ -1670,6 +1670,19 @@ struct Type<nu::GifPlayer> {
 };
 
 template<>
+struct Type<nu::GlobalShortcut> {
+  static constexpr const char* name = "GlobalShortcut";
+  static void Define(napi_env env,
+                     napi_value constructor,
+                     napi_value prototype) {
+    Set(env, prototype,
+        "register", &nu::GlobalShortcut::Register,
+        "unregister", &nu::GlobalShortcut::Unregister,
+        "unregisterAll", &nu::GlobalShortcut::UnregisterAll);
+  }
+};
+
+template<>
 struct Type<nu::Group> {
   using Base = nu::View;
   static constexpr const char* name = "Group";
@@ -3297,6 +3310,7 @@ napi_value Initialize(napi_env env, napi_value exports) {
           "FileSaveDialog",     ki::Class<nu::FileSaveDialog>(),
           "Font",               ki::Class<nu::Font>(),
           "GifPlayer",          ki::Class<nu::GifPlayer>(),
+          "GlobalShortcut",     ki::Class<nu::GlobalShortcut>(),
           "Group",              ki::Class<nu::Group>(),
           "Image",              ki::Class<nu::Image>(),
           "Label",              ki::Class<nu::Label>(),
@@ -3336,6 +3350,7 @@ napi_value Initialize(napi_env env, napi_value exports) {
           // Properties.
           "app",                nu::App::GetCurrent(),
           "appearance",         nu::Appearance::GetCurrent(),
+          "globalShortcut",     nu::GlobalShortcut::GetCurrent(),
           "notificationCenter", nu::NotificationCenter::GetCurrent(),
           "screen",             nu::Screen::GetCurrent(),
           // Helper functions.

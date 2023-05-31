@@ -41,12 +41,13 @@ target_compile_features(${LIBYUE} PUBLIC cxx_std_20)
 # macOS configuration.
 if(APPLE)
   find_library(APPKIT AppKit)
+  find_library(CARBON Carbon)
   find_library(IOKIT IOKit)
   find_library(SECURITY Security)
   find_library(WEBKIT WebKit)
   find_library(OD OpenDirectory)
   target_link_libraries(${LIBYUE} PUBLIC
-                        ${APPKIT} ${IOKIT} ${SECURITY} ${WEBKIT} ${OD})
+                        ${APPKIT} ${CARBON} ${IOKIT} ${SECURITY} ${WEBKIT} ${OD})
   target_compile_definitions(${LIBYUE} PUBLIC SYSTEM_NATIVE_UTF8)
   set_target_properties(${LIBYUE} PROPERTIES COMPILE_FLAGS
                         "-Wno-deprecated-declarations")

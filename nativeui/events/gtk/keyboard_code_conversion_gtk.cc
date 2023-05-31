@@ -12,6 +12,9 @@
 #include <gdk/gdk.h>
 #include <gdk/gdkkeysyms.h>
 
+#include "base/logging.h"
+#include "third_party/x11proto/keysymdef.h"
+
 namespace nu {
 
 KeyboardCode KeyboardCodeFromGdkKeyCode(int keyval) {
@@ -210,6 +213,242 @@ KeyboardCode KeyboardCodeFromGdkKeyCode(int keyval) {
       return VKEY_OEM_7;  // case '\'': case '"': return 0xDE;
     default:
       return static_cast<KeyboardCode>(keyval);
+  }
+}
+
+int XKeysymForWindowsKeyCode(KeyboardCode keycode, bool shift) {
+  switch (keycode) {
+    case VKEY_NUMPAD0:
+      return XK_KP_0;
+    case VKEY_NUMPAD1:
+      return XK_KP_1;
+    case VKEY_NUMPAD2:
+      return XK_KP_2;
+    case VKEY_NUMPAD3:
+      return XK_KP_3;
+    case VKEY_NUMPAD4:
+      return XK_KP_4;
+    case VKEY_NUMPAD5:
+      return XK_KP_5;
+    case VKEY_NUMPAD6:
+      return XK_KP_6;
+    case VKEY_NUMPAD7:
+      return XK_KP_7;
+    case VKEY_NUMPAD8:
+      return XK_KP_8;
+    case VKEY_NUMPAD9:
+      return XK_KP_9;
+    case VKEY_MULTIPLY:
+      return XK_KP_Multiply;
+    case VKEY_ADD:
+      return XK_KP_Add;
+    case VKEY_SUBTRACT:
+      return XK_KP_Subtract;
+    case VKEY_DECIMAL:
+      return XK_KP_Decimal;
+    case VKEY_DIVIDE:
+      return XK_KP_Divide;
+
+    case VKEY_BACK:
+      return XK_BackSpace;
+    case VKEY_TAB:
+      return shift ? XK_ISO_Left_Tab : XK_Tab;
+    case VKEY_CLEAR:
+      return XK_Clear;
+    case VKEY_RETURN:
+      return XK_Return;
+    case VKEY_SHIFT:
+      return XK_Shift_L;
+    case VKEY_RSHIFT:
+      return XK_Shift_R;
+    case VKEY_CONTROL:
+      return XK_Control_L;
+
+    case VKEY_PAUSE:
+      return XK_Pause;
+    case VKEY_CAPITAL:
+      return XK_Caps_Lock;
+    case VKEY_KANA:
+      return XK_Kana_Lock;
+    case VKEY_HANJA:
+      return XK_Hangul_Hanja;
+    case VKEY_ESCAPE:
+      return XK_Escape;
+    case VKEY_SPACE:
+      return XK_space;
+    case VKEY_PRIOR:
+      return XK_Page_Up;
+    case VKEY_NEXT:
+      return XK_Page_Down;
+    case VKEY_END:
+      return XK_End;
+    case VKEY_HOME:
+      return XK_Home;
+    case VKEY_LEFT:
+      return XK_Left;
+    case VKEY_UP:
+      return XK_Up;
+    case VKEY_RIGHT:
+      return XK_Right;
+    case VKEY_DOWN:
+      return XK_Down;
+    case VKEY_SELECT:
+      return XK_Select;
+    case VKEY_PRINT:
+      return XK_Print;
+    case VKEY_EXECUTE:
+      return XK_Execute;
+    case VKEY_DELETE:
+      return XK_Delete;
+    case VKEY_HELP:
+      return XK_Help;
+    case VKEY_0:
+      return shift ? XK_parenright : XK_0;
+    case VKEY_1:
+      return shift ? XK_exclam : XK_1;
+    case VKEY_2:
+      return shift ? XK_at : XK_2;
+    case VKEY_3:
+      return shift ? XK_numbersign : XK_3;
+    case VKEY_4:
+      return shift ? XK_dollar : XK_4;
+    case VKEY_5:
+      return shift ? XK_percent : XK_5;
+    case VKEY_6:
+      return shift ? XK_asciicircum : XK_6;
+    case VKEY_7:
+      return shift ? XK_ampersand : XK_7;
+    case VKEY_8:
+      return shift ? XK_asterisk : XK_8;
+    case VKEY_9:
+      return shift ? XK_parenleft : XK_9;
+
+    case VKEY_A:
+    case VKEY_B:
+    case VKEY_C:
+    case VKEY_D:
+    case VKEY_E:
+    case VKEY_F:
+    case VKEY_G:
+    case VKEY_H:
+    case VKEY_I:
+    case VKEY_J:
+    case VKEY_K:
+    case VKEY_L:
+    case VKEY_M:
+    case VKEY_N:
+    case VKEY_O:
+    case VKEY_P:
+    case VKEY_Q:
+    case VKEY_R:
+    case VKEY_S:
+    case VKEY_T:
+    case VKEY_U:
+    case VKEY_V:
+    case VKEY_W:
+    case VKEY_X:
+    case VKEY_Y:
+    case VKEY_Z:
+      return (shift ? XK_A : XK_a) + (keycode - VKEY_A);
+
+    case VKEY_LWIN:
+      return XK_Super_L;
+    case VKEY_RWIN:
+      return XK_Super_R;
+
+    case VKEY_NUMLOCK:
+      return XK_Num_Lock;
+
+    case VKEY_SCROLL:
+      return XK_Scroll_Lock;
+
+    case VKEY_OEM_1:
+      return shift ? XK_colon : XK_semicolon;
+    case VKEY_OEM_PLUS:
+      return shift ? XK_plus : XK_equal;
+    case VKEY_OEM_COMMA:
+      return shift ? XK_less : XK_comma;
+    case VKEY_OEM_MINUS:
+      return shift ? XK_underscore : XK_minus;
+    case VKEY_OEM_PERIOD:
+      return shift ? XK_greater : XK_period;
+    case VKEY_OEM_2:
+      return shift ? XK_question : XK_slash;
+    case VKEY_OEM_3:
+      return shift ? XK_asciitilde : XK_quoteleft;
+    case VKEY_OEM_4:
+      return shift ? XK_braceleft : XK_bracketleft;
+    case VKEY_OEM_5:
+      return shift ? XK_bar : XK_backslash;
+    case VKEY_OEM_6:
+      return shift ? XK_braceright : XK_bracketright;
+    case VKEY_OEM_7:
+      return shift ? XK_quotedbl : XK_quoteright;
+
+    case VKEY_F1:
+    case VKEY_F2:
+    case VKEY_F3:
+    case VKEY_F4:
+    case VKEY_F5:
+    case VKEY_F6:
+    case VKEY_F7:
+    case VKEY_F8:
+    case VKEY_F9:
+    case VKEY_F10:
+    case VKEY_F11:
+    case VKEY_F12:
+    case VKEY_F13:
+    case VKEY_F14:
+    case VKEY_F15:
+    case VKEY_F16:
+    case VKEY_F17:
+    case VKEY_F18:
+    case VKEY_F19:
+    case VKEY_F20:
+    case VKEY_F21:
+    case VKEY_F22:
+    case VKEY_F23:
+    case VKEY_F24:
+      return XK_F1 + (keycode - VKEY_F1);
+
+    case VKEY_BROWSER_BACK:
+      return XF86XK_Back;
+    case VKEY_BROWSER_FORWARD:
+      return XF86XK_Forward;
+    case VKEY_BROWSER_REFRESH:
+      return XF86XK_Reload;
+    case VKEY_BROWSER_STOP:
+      return XF86XK_Stop;
+    case VKEY_BROWSER_SEARCH:
+      return XF86XK_Search;
+    case VKEY_BROWSER_FAVORITES:
+      return XF86XK_Favorites;
+    case VKEY_BROWSER_HOME:
+      return XF86XK_HomePage;
+    case VKEY_VOLUME_MUTE:
+      return XF86XK_AudioMute;
+    case VKEY_VOLUME_DOWN:
+      return XF86XK_AudioLowerVolume;
+    case VKEY_VOLUME_UP:
+      return XF86XK_AudioRaiseVolume;
+    case VKEY_MEDIA_NEXT_TRACK:
+      return XF86XK_AudioNext;
+    case VKEY_MEDIA_PREV_TRACK:
+      return XF86XK_AudioPrev;
+    case VKEY_MEDIA_STOP:
+      return XF86XK_AudioStop;
+    case VKEY_MEDIA_PLAY_PAUSE:
+      return XF86XK_AudioPlay;
+    case VKEY_MEDIA_LAUNCH_MAIL:
+      return XF86XK_Mail;
+    case VKEY_MEDIA_LAUNCH_APP1:
+      return XF86XK_LaunchA;
+    case VKEY_MEDIA_LAUNCH_APP2:
+      return XF86XK_LaunchB;
+
+    default:
+      LOG(WARNING) << "Unknown keycode:" << keycode;
+      return 0;
   }
 }
 
