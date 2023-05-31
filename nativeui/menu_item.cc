@@ -107,9 +107,9 @@ Image* MenuItem::GetImage() const {
 
 void MenuItem::SetAccelerator(const Accelerator& accelerator) {
   if (accel_manager_) {
-    if (accelerator.IsEmpty())
+    if (!accelerator_.IsEmpty())  // remove old
       accel_manager_->RemoveAccelerator(this, accelerator_);
-    else
+    if (!accelerator.IsEmpty())  // add new
       accel_manager_->RegisterAccelerator(this, accelerator);
   }
   accelerator_ = accelerator;
