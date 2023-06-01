@@ -13,7 +13,7 @@
 #include "nativeui/mac/nu_responder.h"
 #include "nativeui/mac/nu_view.h"
 #include "nativeui/mac/nu_window.h"
-#include "third_party/yoga/Yoga.h"
+#include "third_party/yoga/yoga/Yoga.h"
 
 #if defined(OS_MAC)
 #include "nativeui/toolbar.h"

@@ -4,7 +4,7 @@
 
 #include "nativeui/nativeui.h"
 #include "testing/gtest/include/gtest/gtest.h"
-#include "third_party/yoga/Yoga.h"
+#include "third_party/yoga/yoga/Yoga.h"
 
 class ButtonTest : public testing::Test {
  protected:

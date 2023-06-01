@@ -4,7 +4,7 @@
 
 #include "nativeui/separator.h"
 
-#include "third_party/yoga/Yoga.h"
+#include "third_party/yoga/yoga/Yoga.h"
 
 namespace nu {
 

@@ -23,7 +23,7 @@
 #include "nativeui/win/util/timer_host.h"
 #include "nativeui/win/util/tooltip_host.h"
 #include "nativeui/win/util/tray_host.h"
-#include "third_party/yoga/Yoga.h"
+#include "third_party/yoga/yoga/Yoga.h"
 
 namespace nu {
 

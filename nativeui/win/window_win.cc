@@ -35,7 +35,7 @@
 #include "nativeui/win/screen_win.h"
 #include "nativeui/win/subwin_view.h"
 #include "nativeui/win/util/hwnd_util.h"
-#include "third_party/yoga/Yoga.h"
+#include "third_party/yoga/yoga/Yoga.h"
 
 namespace nu {
 

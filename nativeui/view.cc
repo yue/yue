@@ -13,19 +13,11 @@
 #include "nativeui/state.h"
 #include "nativeui/util/yoga_util.h"
 #include "nativeui/window.h"
-#include "third_party/yoga/Yoga.h"
+#include "third_party/yoga/yoga/YGNodePrint.h"
+#include "third_party/yoga/yoga/Yoga.h"
 
 #if defined(OS_WIN)
 #include "base/strings/utf_string_conversions.h"
-#endif
-
-// This header required DEBUG to be defined.
-#if defined(DEBUG)
-#include "third_party/yoga/YGNodePrint.h"
-#else
-#define DEBUG
-#include "third_party/yoga/YGNodePrint.h"
-#undef DEBUG
 #endif
 
 namespace nu {

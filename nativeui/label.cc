@@ -9,7 +9,7 @@
 #include "nativeui/app.h"
 #include "nativeui/gfx/attributed_text.h"
 #include "nativeui/gfx/font.h"
-#include "third_party/yoga/Yoga.h"
+#include "third_party/yoga/yoga/Yoga.h"
 
 namespace nu {
 

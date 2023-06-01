@@ -11,7 +11,7 @@
 #include "base/logging.h"
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/string_util.h"
-#include "third_party/yoga/Yoga.h"
+#include "third_party/yoga/yoga/Yoga.h"
 
 namespace nu {
 
@@ -150,6 +150,17 @@ int PercentValue(const std::string& value) {
   return integer;
 }
 
+// The gap APIs are not consistent, provide wrappers for them.
+void YGNodeStyleSetGapAll(YGNodeRef node, float value) {
+  YGNodeStyleSetGap(node, YGGutterAll, value);
+}
+void YGNodeStyleSetGapColumn(YGNodeRef node, float value) {
+  YGNodeStyleSetGap(node, YGGutterColumn, value);
+}
+void YGNodeStyleSetGapRow(YGNodeRef node, float value) {
+  YGNodeStyleSetGap(node, YGGutterRow, value);
+}
+
 // We use int to represent enums.
 using IntSetter = void(*)(const YGNodeRef, int);
 using FloatSetter = void(*)(const YGNodeRef, float);
@@ -181,15 +192,18 @@ const std::tuple<const char*, IntConverter, IntSetter> int_setters[] = {
 };
 const std::pair<const char*, FloatSetter> float_setters[] = {
   { "aspectratio", YGNodeStyleSetAspectRatio },
+  { "columngap", YGNodeStyleSetGapColumn },
   { "flex", YGNodeStyleSetFlex },
   { "flexbasis", YGNodeStyleSetFlexBasis },
   { "flexgrow", YGNodeStyleSetFlexGrow },
   { "flexshrink", YGNodeStyleSetFlexShrink },
+  { "gap", YGNodeStyleSetGapAll },
   { "height", YGNodeStyleSetHeight },
   { "maxheight", YGNodeStyleSetMaxHeight },
   { "maxwidth", YGNodeStyleSetMaxWidth },
   { "minheight", YGNodeStyleSetMinHeight },
   { "minwidth", YGNodeStyleSetMinWidth },
+  { "rowgap", YGNodeStyleSetGapRow },
   { "width", YGNodeStyleSetWidth },
 };
 const std::pair<const char*, AutoSetter> auto_setters[] = {

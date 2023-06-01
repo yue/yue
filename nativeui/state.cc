@@ -14,7 +14,7 @@
 #include "nativeui/notification_center.h"
 #include "nativeui/protocol_job.h"
 #include "nativeui/screen.h"
-#include "third_party/yoga/Yoga.h"
+#include "third_party/yoga/yoga/Yoga.h"
 
 #if defined(OS_WIN)
 #include "base/scoped_native_library.h"
