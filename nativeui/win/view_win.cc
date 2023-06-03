@@ -130,6 +130,15 @@ void ViewImpl::SetFocus(bool focus) {
   if (is_focused_ == focus || !window())
     return;
   is_focused_ = focus;
+  if (delegate()) {
+    bool prevent;
+    if (focus)
+      prevent = delegate()->on_focus_in.Emit(delegate());
+    else
+      prevent = delegate()->on_focus_out.Emit(delegate());
+    if (prevent)
+      return;
+  }
   if (window()) {
     if (focus) {
       ::SetFocus(window()->hwnd());  // need this to take focus from subwin

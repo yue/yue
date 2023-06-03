@@ -76,6 +76,24 @@ BOOL AcceptsFirstResponder(NSView* self, SEL _cmd) {
   return [self nuPrivate]->focusable;
 }
 
+BOOL BecomeFirstResponder(NSView* self, SEL _cmd) {
+  View* shell = [self shell];
+  if (shell->on_focus_in.Emit(shell))
+    return YES;
+  auto super_impl = reinterpret_cast<decltype(&BecomeFirstResponder)>(
+      [[self superclass] instanceMethodForSelector:_cmd]);
+  return super_impl(self, _cmd);
+}
+
+BOOL ResignFirstResponder(NSView* self, SEL _cmd) {
+  View* shell = [self shell];
+  if (shell->on_focus_out.Emit(shell))
+    return YES;
+  auto super_impl = reinterpret_cast<decltype(&ResignFirstResponder)>(
+      [[self superclass] instanceMethodForSelector:_cmd]);
+  return super_impl(self, _cmd);
+}
+
 BOOL MouseDownCanMoveWindow(NSView* self, SEL _cmd) {
   return [self nuPrivate]->draggable;
 }
@@ -171,6 +189,11 @@ void InstallNUViewMethods(Class cl) {
 
   class_addMethod(cl, @selector(acceptsFirstResponder),
                   (IMP)AcceptsFirstResponder, "B@:");
+  class_addMethod(cl, @selector(becomeFirstResponder),
+                  (IMP)BecomeFirstResponder, "B@:");
+  class_addMethod(cl, @selector(resignFirstResponder),
+                  (IMP)ResignFirstResponder, "B@:");
+
   class_addMethod(cl, @selector(mouseDownCanMoveWindow),
                   (IMP)MouseDownCanMoveWindow, "B@:");
   class_addMethod(cl, @selector(resetCursorRects),

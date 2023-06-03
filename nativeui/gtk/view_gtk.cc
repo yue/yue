@@ -83,6 +83,14 @@ void OnSizeAllocate(GtkWidget* widget, GdkRectangle* allocation,
   }
 }
 
+gboolean OnFocusIn(GtkWidget* widget, GdkEventFocus* event, View* view) {
+  return view->on_focus_in.Emit(view);
+}
+
+gboolean OnFocusOut(GtkWidget* widget, GdkEventFocus* event, View* view) {
+  return view->on_focus_out.Emit(view);
+}
+
 void OnRealize(GtkWidget* widget, View* view) {
   if (view->cursor())
     NUSetCursor(widget, view->cursor()->GetNative());
@@ -223,6 +231,8 @@ void View::TakeOverView(NativeView view) {
 
   // Install event hooks.
   g_signal_connect(view, "size-allocate", G_CALLBACK(OnSizeAllocate), priv);
+  g_signal_connect(view, "focus-in-event", G_CALLBACK(OnFocusIn), this);
+  g_signal_connect(view, "focus-out-event", G_CALLBACK(OnFocusOut), this);
   g_signal_connect(view, "realize", G_CALLBACK(OnRealize), this);
 }
 

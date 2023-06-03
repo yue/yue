@@ -2808,6 +2808,8 @@ struct Type<nu::View> {
     RawSetProperty(state, metatable,
                    "ondragleave", &nu::View::on_drag_leave,
                    "onsizechanged", &nu::View::on_size_changed,
+                   "onfocusin", &nu::View::on_focus_in,
+                   "onfocusout", &nu::View::on_focus_out,
                    "handledragenter", &nu::View::handle_drag_enter,
                    "handledragupdate", &nu::View::handle_drag_update,
                    "handledrop", &nu::View::handle_drop);

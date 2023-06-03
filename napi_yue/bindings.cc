@@ -3089,6 +3089,8 @@ struct Type<nu::View> {
         env, prototype,
         Signal("onDragLeave", &nu::View::on_drag_leave),
         Signal("onSizeChanged", &nu::View::on_size_changed),
+        Signal("onFocusIn", &nu::View::on_focus_in),
+        Signal("onFocusOut", &nu::View::on_focus_out),
         Delegate("handleDragEnter", &nu::View::handle_drag_enter),
         Delegate("handleDragUpdate", &nu::View::handle_drag_update),
         Delegate("handleDrop", &nu::View::handle_drop));

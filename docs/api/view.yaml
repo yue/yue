@@ -217,6 +217,12 @@ events:
   - signature: void on_size_changed(View* self)
     description: Emitted when the view's size has been changed.
 
+  - signature: bool on_focus_in(View* self)
+    description: Emitted when the view gets keyboard focus.
+
+  - signature: bool on_focus_out(View* self)
+    description: Emitted when the view loses keyboard focus.
+
 delegates:
   - signature: int handle_drag_enter(View* self, DraggingInfo* info, const PointF& point)
     description: |

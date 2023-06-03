@@ -172,6 +172,8 @@ class NATIVEUI_EXPORT View : public Responder {
   // Events.
   Signal<void(View*, DraggingInfo*)> on_drag_leave;
   Signal<void(View*)> on_size_changed;
+  Signal<bool(View*)> on_focus_in;
+  Signal<bool(View*)> on_focus_out;
 
   // Delegates.
   std::function<int(View*, DraggingInfo*, const PointF&)> handle_drag_enter;
