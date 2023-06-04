@@ -139,7 +139,7 @@ function addClass(mod, isInterface = false) {
   output += '}'
   if (mod.singleton) {
     output += '\n\n'
-    output += `const ${mod.name.toLowerCase()}: ${mod.name};`
+    output += `const ${firstCharToLowerCase(mod.name)}: ${mod.name};`
   }
   return output
 }
@@ -240,4 +240,9 @@ function getModuleName(mod) {
 // Add 2 spaces indention.
 function indent(lines) {
   return lines.replace(/^(?!\s*$)/gm, ' '.repeat(2))
+}
+
+// Convert first char to lower case.
+function firstCharToLowerCase(str) {
+  return str.charAt(0).toLowerCase() + str.slice(1)
 }
