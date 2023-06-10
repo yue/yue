@@ -6,6 +6,9 @@
 
 #include <gtk/gtk.h>
 
+#include "base/strings/string_number_conversions.h"
+#include "nativeui/gfx/geometry/size_conversions.h"
+
 namespace nu {
 
 namespace {
@@ -100,6 +103,42 @@ Image* Image::Tint(Color color) const {
   gdk_pixbuf_simple_anim_add_frame(image, frame);
   g_object_unref(frame);
   return new Image(GDK_PIXBUF_ANIMATION(image), scale_factor_);
+}
+
+Image* Image::Resize(SizeF new_size, float scale_factor) const {
+  Size scaled_size = ToRoundedSize(ScaleSize(new_size, scale_factor));
+  GdkPixbuf* frame = gdk_pixbuf_scale_simple(
+      gdk_pixbuf_animation_get_static_image(image_),
+      scaled_size.width(),
+      scaled_size.height(),
+      GDK_INTERP_BILINEAR);
+  // Create new image.
+  GdkPixbufSimpleAnim* image = gdk_pixbuf_simple_anim_new(
+      scaled_size.width(), scaled_size.height(), 1.f);
+  gdk_pixbuf_simple_anim_add_frame(image, frame);
+  g_object_unref(frame);
+  return new Image(GDK_PIXBUF_ANIMATION(image), scale_factor);
+}
+
+Buffer Image::ToPNG() const {
+  gchar* buffer = nullptr;
+  gsize size = 0;
+  gdk_pixbuf_save_to_buffer(gdk_pixbuf_animation_get_static_image(image_),
+                            &buffer, &size, "png", nullptr, nullptr);
+  if (!buffer)
+    return Buffer();
+  return Buffer::TakeOver(buffer, size, g_free);
+}
+
+Buffer Image::ToJPEG(int quality) const {
+  gchar* buffer = nullptr;
+  gsize size = 0;
+  gdk_pixbuf_save_to_buffer(gdk_pixbuf_animation_get_static_image(image_),
+                            &buffer, &size, "jpeg", nullptr, "quality",
+                            base::NumberToString(quality).c_str(), nullptr);
+  if (!buffer)
+    return Buffer();
+  return Buffer::TakeOver(buffer, size, g_free);
 }
 
 bool Image::WriteToFile(const std::string& format,

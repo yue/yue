@@ -71,6 +71,18 @@ methods:
       platforms use `<!enum class>SourceAtop` blend mode. So the result image
       might very likely look different on Windows.
 
+  - signature: Image* Resize(SizeF new_size, float scale_factor) const
+    description: Return a new image resized to `new_size` with `scale_factor`.
+
+  - signature: Buffer ToPNG() const
+    description: Return a buffer containing the image's PNG encoded data.
+
+  - signature: Buffer ToJPEG(int quality) const
+    parameters:
+      quality:
+        description: Between 1-100.
+    description: Return a buffer containing the image's JPEG encoded data.
+
   - signature: NativeImage GetNative() const
     lang: ['cpp']
     description: Return the native instance wrapped by the class.

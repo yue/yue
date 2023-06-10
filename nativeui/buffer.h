@@ -6,7 +6,6 @@
 #define NATIVEUI_BUFFER_H_
 
 #include <functional>
-#include <memory>
 
 #include "build/build_config.h"
 #include "nativeui/nativeui_export.h"

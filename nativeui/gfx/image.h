@@ -62,6 +62,13 @@ class NATIVEUI_EXPORT Image : public base::RefCounted<Image> {
   // Return a new image that has tint color applied.
   Image* Tint(Color color) const;
 
+  // Return a resized new image, with new scale factor.
+  Image* Resize(SizeF new_size, float scale_factor) const;
+
+  // Convert the image to different formats.
+  Buffer ToPNG() const;
+  Buffer ToJPEG(int quality) const;
+
   // Write the image to file.
   // Note: Do not make it a public API for now, we need to figure out a
   // universal type conversion API with options first.

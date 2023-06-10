@@ -1720,7 +1720,10 @@ struct Type<nu::Image> {
 #endif
         "getSize", &nu::Image::GetSize,
         "getScaleFactor", &nu::Image::GetScaleFactor,
-        "tint", &nu::Image::Tint);
+        "tint", &nu::Image::Tint,
+        "resize", &nu::Image::Resize,
+        "toPNG", &nu::Image::ToPNG,
+        "toJPEG", &nu::Image::ToJPEG);
   }
 };
 

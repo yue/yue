@@ -35,6 +35,29 @@ bool GetEncoderClsid(base::WStringPiece format, CLSID* clsid) {
   return false;
 }
 
+Buffer EncodeImage(const Gdiplus::Image* image,
+                   base::WStringPiece mime_type,
+                   Gdiplus::EncoderParameters* params = nullptr) {
+  // Create an IStream object in memory.
+  Microsoft::WRL::ComPtr<IStream> stream;
+  ::CreateStreamOnHGlobal(nullptr, TRUE, &stream);
+  // Save the image to the stream as mime_type.
+  CLSID encoder;
+  if (!GetEncoderClsid(mime_type, &encoder))
+    return Buffer();
+  const_cast<Gdiplus::Image*>(image)->Save(stream.Get(), &encoder, params);
+  // Read the buffer from stream.
+  HGLOBAL hdata = nullptr;
+  if (FAILED(::GetHGlobalFromStream(stream.Get(), &hdata)))
+    return Buffer();
+  base::win::ScopedHGlobal<void*> locked_data(hdata);
+  size_t size = locked_data.Size();
+  void* memory = new char[size];
+  memcpy(memory, locked_data.release(), size);
+  return Buffer::TakeOver(memory, size,
+                          [](void* data) { delete static_cast<char*>(data); });
+}
+
 }  // namespace
 
 Image::Image() : image_(new Gdiplus::Image(L"")) {}
@@ -99,6 +122,34 @@ Image* Image::Tint(Color color) const {
                      &attributes);
   // Create new image.
   return new Image(bitmap.release(), scale_factor_);
+}
+
+Image* Image::Resize(SizeF new_size, float scale_factor) const {
+  // Create a bitmap to draw on.
+  SizeF scaled_size = ScaleSize(new_size, scale_factor);
+  std::unique_ptr<Gdiplus::Bitmap> bitmap(
+      new Gdiplus::Bitmap(scaled_size.width(), scaled_size.height(),
+                          PixelFormat32bppARGB));
+  // Draw on it.
+  Gdiplus::Graphics graphics(bitmap.get());
+  graphics.SetInterpolationMode(Gdiplus::InterpolationModeHighQualityBicubic);
+  graphics.DrawImage(image_, ToGdi(RectF(scaled_size)));
+  // Create new image.
+  return new Image(bitmap.release(), scale_factor);
+}
+
+Buffer Image::ToPNG() const {
+  return EncodeImage(image_, L"image/png");
+}
+
+Buffer Image::ToJPEG(int quality) const {
+  Gdiplus::EncoderParameters params;
+  params.Count = 1;
+  params.Parameter[0].Guid = Gdiplus::EncoderQuality;
+  params.Parameter[0].Type = Gdiplus::EncoderParameterValueTypeLong;
+  params.Parameter[0].NumberOfValues = 1;
+  params.Parameter[0].Value = &quality;
+  return EncodeImage(image_, L"image/jpeg", &params);
 }
 
 bool Image::WriteToFile(const std::string& format,

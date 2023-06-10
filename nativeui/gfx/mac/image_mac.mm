@@ -7,6 +7,7 @@
 #import <Cocoa/Cocoa.h>
 
 #include "base/mac/scoped_cftyperef.h"
+#include "base/mac/scoped_nsobject.h"
 #include "base/strings/pattern.h"
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/gfx/geometry/rect_f.h"
@@ -34,6 +35,19 @@ std::vector<float> GetFrameDurations(NSBitmapImageRep* bitmap,
     durations[i] = delay ? [delay floatValue] * 1000 : 100;
   }
   return durations;
+}
+
+Buffer EncodeImage(NSImage* image,
+                   NSBitmapImageFileType type,
+                   NSDictionary* properties) {
+  CGImageRef cg_image =
+      [image CGImageForProposedRect:nullptr context:nil hints:nil];
+  base::scoped_nsobject<NSBitmapImageRep> rep(
+      [[NSBitmapImageRep alloc] initWithCGImage:cg_image]);
+  NSData* data = [[rep representationUsingType:type
+                                    properties:properties] retain];
+  return Buffer::TakeOver(const_cast<void*>(data.bytes), data.length,
+                          [data](void*) { [data release]; });
 }
 
 }  // namespace
@@ -134,6 +148,43 @@ Image* Image::Tint(Color color) const {
                            NSCompositingOperationSourceAtop);
   [tinted unlockFocus];
   return new Image(tinted, scale_factor_);
+}
+
+Image* Image::Resize(SizeF new_size, float scale_factor) const {
+  base::scoped_nsobject<NSBitmapImageRep> rep([[NSBitmapImageRep alloc]
+      initWithBitmapDataPlanes:nullptr
+                    pixelsWide:new_size.width() * scale_factor
+                    pixelsHigh:new_size.height() * scale_factor
+                 bitsPerSample:8
+               samplesPerPixel:4
+                      hasAlpha:YES
+                      isPlanar:NO
+                colorSpaceName:NSCalibratedRGBColorSpace
+                   bytesPerRow:0
+                  bitsPerPixel:0]);
+  [rep setSize:new_size.ToCGSize()];
+
+  NSGraphicsContext* context =
+      [NSGraphicsContext graphicsContextWithBitmapImageRep:rep];
+  [NSGraphicsContext saveGraphicsState];
+  [NSGraphicsContext setCurrentContext:context];
+  [image_ drawInRect:RectF(new_size).ToCGRect()
+            fromRect:NSZeroRect
+           operation:NSCompositingOperationCopy fraction:1.0];
+  [NSGraphicsContext restoreGraphicsState];
+
+  NSImage* resized = [[NSImage alloc] initWithSize:new_size.ToCGSize()];
+  [resized addRepresentation:rep];
+  return new Image(resized, scale_factor);
+}
+
+Buffer Image::ToPNG() const {
+  return EncodeImage(image_, NSBitmapImageFileTypePNG, nullptr);
+}
+
+Buffer Image::ToJPEG(int quality) const {
+  NSDictionary* options = @{NSImageCompressionFactor: @(quality / 100.f)};
+  return EncodeImage(image_, NSBitmapImageFileTypePNG, options);
 }
 
 NSBitmapImageRep* Image::GetAnimationRep() const {
