@@ -1,25 +1,20 @@
 // Copyright 2017 Cheng Zhao. All rights reserved.
+// Copyright 2017 Electron contributors.
 // Use of this source code is governed by the license that can be found in the
-// LICENSE file.
+// LICENSE.chromium file.
 
 #include "nativeui/win/file_dialog_win.h"
 
+#include "base/logging.h"
 #include "base/strings/string_util.h"
 #include "base/strings/utf_string_conversions.h"
 #include "nativeui/win/window_win.h"
 
 namespace nu {
 
-FileDialogImpl::FileDialogImpl(ComPtr<IFileDialog>&& ptr) : dialog_(ptr) {
-  // Default filter.
-  COMDLG_FILTERSPEC spec = { L"All Files (*.*)", L"*.*" };
-  filterspec_.push_back(spec);
-  dialog_->SetFileTypes(static_cast<UINT>(filterspec_.size()),
-                        filterspec_.data());
-}
+FileDialogImpl::FileDialogImpl(ComPtr<IFileDialog>&& ptr) : dialog_(ptr) {}
 
-FileDialogImpl::~FileDialogImpl() {
-}
+FileDialogImpl::~FileDialogImpl() = default;
 
 std::wstring FileDialogImpl::GetResult() const {
   ComPtr<IShellItem> result;
@@ -67,16 +62,35 @@ int FileDialogImpl::GetOptions() const {
 
 void FileDialogImpl::SetFilters(
     const std::vector<FileDialog::Filter>& filters) {
-  ConvertFilters(filters);
+  if (!filterspec_.empty()) {
+    LOG(WARNING) << "SetFilters can only be called once on Windows.";
+    return;
+  }
+
+  // Convert filters to win32 format.
+  if (filters.empty()) {
+    COMDLG_FILTERSPEC spec = { L"All Files (*.*)", L"*.*" };
+    filterspec_.push_back(spec);
+  } else {
+    buffer_.reserve(filters.size() * 2);
+    for (const FileDialog::Filter& filter : filters) {
+      COMDLG_FILTERSPEC spec;
+      buffer_.push_back(base::UTF8ToWide(std::get<0>(filter)));
+      spec.pszName = buffer_.back().c_str();
+
+      std::vector<std::string> extensions(std::get<1>(filter));
+      for (std::string& extension : extensions)
+        extension.insert(0, "*.");
+      buffer_.push_back(base::UTF8ToWide(base::JoinString(extensions, ";")));
+      spec.pszSpec = buffer_.back().c_str();
+
+      filterspec_.push_back(spec);
+    }
+  }
+
   dialog_->SetFileTypes(static_cast<UINT>(filterspec_.size()),
                         filterspec_.data());
 
-  // By default, *.* will be added to the file name if file type is "*.*". In
-  // Electron, we disable it to make a better experience.
-  //
-  // From MSDN: https://msdn.microsoft.com/en-us/library/windows/desktop/
-  // bb775970(v=vs.85).aspx
-  //
   // If SetDefaultExtension is not called, the dialog will not update
   // automatically when user choose a new file type in the file dialog.
   //
@@ -102,33 +116,6 @@ std::wstring FileDialogImpl::GetPathFromItem(
   std::wstring filename = name;
   ::CoTaskMemFree(name);
   return filename;
-}
-
-void FileDialogImpl::ConvertFilters(
-    const std::vector<FileDialog::Filter>& filters) {
-  buffer_.clear();
-  filterspec_.clear();
-
-  if (filters.empty()) {
-    COMDLG_FILTERSPEC spec = { L"All Files (*.*)", L"*.*" };
-    filterspec_.push_back(spec);
-    return;
-  }
-
-  buffer_.reserve(filters.size() * 2);
-  for (const FileDialog::Filter& filter : filters) {
-    COMDLG_FILTERSPEC spec;
-    buffer_.push_back(base::UTF8ToWide(std::get<0>(filter)));
-    spec.pszName = buffer_.back().c_str();
-
-    std::vector<std::string> extensions(std::get<1>(filter));
-    for (std::string& extension : extensions)
-      extension.insert(0, "*.");
-    buffer_.push_back(base::UTF8ToWide(base::JoinString(extensions, ";")));
-    spec.pszSpec = buffer_.back().c_str();
-
-    filterspec_.push_back(spec);
-  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

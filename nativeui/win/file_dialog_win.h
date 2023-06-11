@@ -44,7 +44,6 @@ class FileDialogImpl {
   }
 
   std::wstring GetPathFromItem(const ComPtr<IShellItem>& item) const;
-  void ConvertFilters(const std::vector<FileDialog::Filter>& filters);
 
  private:
   ComPtr<IFileDialog> dialog_;
