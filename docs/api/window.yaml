@@ -170,6 +170,9 @@ methods:
   - signature: void SetBackgroundColor(Color color)
     description: Set the background color of the window.
 
+  - signature: float GetScaleFactor() const
+    description: Return the scale factor of the window.
+
   - signature: void SetToolbar(scoped_refptr<Toolbar> toolbar)
     platform: ['macOS']
     description: Set the window toolbar.

@@ -115,6 +115,7 @@ class NATIVEUI_EXPORT Window : public Responder {
   void SetTitle(const std::string& title);
   std::string GetTitle() const;
   void SetBackgroundColor(Color color);
+  float GetScaleFactor() const;
 
   void SetCapture();
   void ReleaseCapture();

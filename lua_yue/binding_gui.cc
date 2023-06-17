@@ -2889,6 +2889,7 @@ struct Type<nu::Window> {
            "settitle", &nu::Window::SetTitle,
            "gettitle", &nu::Window::GetTitle,
            "setbackgroundcolor", &nu::Window::SetBackgroundColor,
+           "getscalefactor", &nu::Window::GetScaleFactor,
 #if defined(OS_MAC)
            "settoolbar", &nu::Window::SetToolbar,
            "gettoolbar", &nu::Window::GetToolbar,

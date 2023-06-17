@@ -578,6 +578,10 @@ void Window::SetBackgroundColor(Color color) {
                                        GTK_STATE_FLAG_NORMAL, &gcolor);
 }
 
+float Window::GetScaleFactor() const {
+  return gtk_widget_get_scale_factor(GTK_WIDGET(window_));
+}
+
 void Window::SetCapture() {
   if (HasCapture())
     ReleaseCapture();

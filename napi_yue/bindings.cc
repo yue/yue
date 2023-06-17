@@ -3185,6 +3185,7 @@ struct Type<nu::Window> {
         "setTitle", &nu::Window::SetTitle,
         "getTitle", &nu::Window::GetTitle,
         "setBackgroundColor", &nu::Window::SetBackgroundColor,
+        "getScaleFactor", &nu::Window::GetScaleFactor,
 #if defined(OS_MAC)
         "setToolbar",
         WrapMethod(&nu::Window::SetToolbar, [](Arguments args) {

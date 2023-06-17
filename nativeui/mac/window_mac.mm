@@ -100,8 +100,7 @@ void Window::PlatformInit(const Options& options) {
   // Disable tab menu items.
   [window_ setTabbingMode:NSWindowTabbingModeDisallowed];
 
-  YGConfigSetPointScaleFactor(yoga_config_,
-                              [window_ screen].backingScaleFactor);
+  YGConfigSetPointScaleFactor(yoga_config_, GetScaleFactor());
 
   if (!HasFrame()) {
     // Remove title bar.
@@ -374,6 +373,10 @@ std::string Window::GetTitle() const {
 
 void Window::SetBackgroundColor(Color color) {
   [window_ setBackgroundColor:color.ToNSColor()];
+}
+
+float Window::GetScaleFactor() const {
+  return [window_ screen].backingScaleFactor;
 }
 
 void Window::SetToolbar(scoped_refptr<Toolbar> toolbar) {

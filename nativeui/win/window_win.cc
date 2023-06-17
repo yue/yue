@@ -852,8 +852,7 @@ void Window::PlatformInit(const Options& options) {
   window_ = new WindowImpl(options, this);
 
   InitResponder(window_, Type::Window);
-  YGConfigSetPointScaleFactor(yoga_config_,
-                              GetScaleFactorForHWND(window_->hwnd()));
+  YGConfigSetPointScaleFactor(yoga_config_, GetScaleFactor());
 }
 
 void Window::PlatformDestroy() {
@@ -1069,6 +1068,10 @@ std::string Window::GetTitle() const {
 
 void Window::SetBackgroundColor(Color color) {
   window_->SetBackgroundColor(color);
+}
+
+float Window::GetScaleFactor() const {
+  return window_->scale_factor();
 }
 
 void Window::SetSkipTaskbar(bool skip) {
