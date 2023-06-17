@@ -2682,6 +2682,8 @@ struct Type<nu::Table::ColumnType> {
         *out = nu::Table::ColumnType::Text;
       else if (type == "edit")
         *out = nu::Table::ColumnType::Edit;
+      else if (type == "checkbox")
+        *out = nu::Table::ColumnType::Checkbox;
       else if (type == "custom")
         *out = nu::Table::ColumnType::Custom;
       else
@@ -2746,7 +2748,8 @@ struct Type<nu::Table> {
     DefineProperties(
         env, prototype,
         Signal("onSelectionChange", &nu::Table::on_selection_change),
-        Signal("onRowActivate", &nu::Table::on_row_activate));
+        Signal("onRowActivate", &nu::Table::on_row_activate),
+        Signal("onToggleCheckbox", &nu::Table::on_toggle_checkbox));
   }
 };
 

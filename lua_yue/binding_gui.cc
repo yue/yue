@@ -2441,6 +2441,9 @@ struct Type<nu::Table::ColumnType> {
     } else if (type == "edit") {
       *out = nu::Table::ColumnType::Edit;
       return true;
+    } else if (type == "checkbox") {
+      *out = nu::Table::ColumnType::Checkbox;
+      return true;
     } else if (type == "custom") {
       *out = nu::Table::ColumnType::Custom;
       return true;
@@ -2497,7 +2500,8 @@ struct Type<nu::Table> {
            "getselectedrows", &GetSelectedRows);
     RawSetProperty(state, metatable,
                    "onselectionchange", &nu::Table::on_selection_change,
-                   "onrowactivate", &nu::Table::on_row_activate);
+                   "onrowactivate", &nu::Table::on_row_activate,
+                   "ontogglecheckbox", &nu::Table::on_toggle_checkbox);
   }
   static void SelectRow(nu::Table* table, int row) {
     table->SelectRow(row - 1);

@@ -24,6 +24,7 @@ class NATIVEUI_EXPORT Table : public View {
   enum class ColumnType {
     Text,
     Edit,
+    Checkbox,
     Custom,
   };
 
@@ -71,6 +72,7 @@ class NATIVEUI_EXPORT Table : public View {
   // Events.
   Signal<void(Table*, int row)> on_row_activate;
   Signal<void(Table*)> on_selection_change;
+  Signal<void(Table*, int column, int row)> on_toggle_checkbox;
 
  protected:
   ~Table() override;

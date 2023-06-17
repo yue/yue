@@ -37,6 +37,16 @@ int GetDefaultRowHeight() {
   return preferred;
 }
 
+// Get the row index from path.
+gint RowFromTreePath(const gchar* path) {
+  auto* tree_path = gtk_tree_path_new_from_string(path);
+  if (!tree_path)
+    return -1;
+  gint row = gtk_tree_path_get_indices(tree_path)[0];
+  gtk_tree_path_free(tree_path);
+  return row;
+}
+
 // Called when user double-clicks a row.
 void OnTableRowActivated(GtkTreeView*, GtkTreePath*, GtkTreeViewColumn*,
                          Table* table) {
@@ -49,19 +59,25 @@ void OnTableSelectionChanged(GtkTreeSelection*, Table* table) {
 }
 
 // Called when user has done editing a cell.
-void OnEdited(GtkCellRendererText* cell,
-              const gchar* path,
-              const gchar* new_text,
-              Table* table) {
-  // Get the row from path.
-  auto* tree_path = gtk_tree_path_new_from_string(path);
-  if (!tree_path)
-    return;
-  gint row = gtk_tree_path_get_indices(tree_path)[0];
-  gtk_tree_path_free(tree_path);
-  // Set value.
+void OnCellEdited(GtkCellRendererText* cell,
+                  const gchar* path,
+                  const gchar* new_text,
+                  Table* table) {
   gint column = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(cell), "column"));
-  table->GetModel()->SetValue(column, row, base::Value(new_text));
+  table->GetModel()->SetValue(column, RowFromTreePath(path),
+                              base::Value(new_text));
+}
+
+// Called when user clicks the checkbox in a cell.
+void OnCellToggled(GtkCellRendererToggle* cell,
+                   const gchar* path,
+                   Table* table) {
+  gint column = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(cell), "column"));
+  gint row = RowFromTreePath(path);
+  table->GetModel()->SetValue(
+      column, row,
+      base::Value(!table->GetModel()->GetValue(column, row).GetBool()));
+  table->on_toggle_checkbox.Emit(table, column, row);
 }
 
 // Called to provide data to cell renderer.
@@ -80,16 +96,19 @@ void TreeCellData(GtkTreeViewColumn* tree_column,
   // Pass value.
   switch (options->type) {
     case Table::ColumnType::Text:
-    case Table::ColumnType::Edit: {
+    case Table::ColumnType::Edit:
       if (value && value->is_string())
         g_object_set(renderer, "text", value->GetString().c_str(), nullptr);
       break;
-    }
 
-    case nu::Table::ColumnType::Custom: {
+    case Table::ColumnType::Checkbox:
+      if (value && value->is_bool())
+        g_object_set(renderer, "active", value->GetBool(), nullptr);
+      break;
+
+    case Table::ColumnType::Custom:
       g_object_set(renderer, "value", value, nullptr);
       break;
-    }
   }
   g_value_unset(&gval);
 }
@@ -141,8 +160,12 @@ void Table::AddColumnWithOptions(const std::string& title,
       renderer = gtk_cell_renderer_text_new();
       if (options.type == Table::ColumnType::Edit) {
         g_object_set(renderer, "editable", true, nullptr);
-        g_signal_connect(renderer, "edited", G_CALLBACK(OnEdited), this);
+        g_signal_connect(renderer, "edited", G_CALLBACK(OnCellEdited), this);
       }
+      break;
+    case Table::ColumnType::Checkbox:
+      renderer = gtk_cell_renderer_toggle_new();
+      g_signal_connect(renderer, "toggled", G_CALLBACK(OnCellToggled), this);
       break;
     case Table::ColumnType::Custom:
       renderer = nu_custom_cell_renderer_new(options);

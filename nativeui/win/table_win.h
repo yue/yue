@@ -28,6 +28,7 @@ class TableImpl : public SubwinView {
 
  protected:
   CR_BEGIN_MSG_MAP_EX(TableImpl, SubwinView)
+    CR_MSG_WM_ERASEBKGND(OnEraseBkgnd)
     CR_MSG_WM_PAINT(OnPaint)
     CR_MSG_WM_WINDOWPOSCHANGED(OnWindowPosChanged)
   CR_END_MSG_MAP()
@@ -36,6 +37,7 @@ class TableImpl : public SubwinView {
   LRESULT OnNotify(int code, LPNMHDR pnmh) override;
 
  private:
+  LRESULT OnEraseBkgnd(HDC dc);
   void OnPaint(HDC dc);
   void OnWindowPosChanged(WINDOWPOS* pos);
 
@@ -43,6 +45,17 @@ class TableImpl : public SubwinView {
   LRESULT OnCustomDraw(NMLVCUSTOMDRAW* nm, int row);
   LRESULT OnBeginEdit(NMLVDISPINFO* nm, int row);
   LRESULT OnEndEdit(NMLVDISPINFO* nm, int row);
+  LRESULT OnItemClick(Point point, int column, int row);
+
+  // Get bounds of a cell.
+  Rect GetCellBounds(int column, int row);
+  // Get bounds of checkbox.
+  Rect GetCheckboxBounds(int column, int row);
+  // Draw checkbox.
+  void DrawCheckboxCell(HDC hdc, int column, int row, const base::Value& value);
+  // Call on_draw to painter a part of row.
+  void InvokeOnDraw(const Table::ColumnOptions& options, HDC hdc, int column,
+                    int row, const base::Value& value);
 
   static LRESULT CALLBACK EditWndProc(HWND hwnd,
                                       UINT message,
@@ -62,6 +75,10 @@ class TableImpl : public SubwinView {
   int edit_row_ = -1;
   int edit_column_ = -1;
   Point edit_pos_;
+
+  // Information about checkbox icon.
+  HIMAGELIST checkbox_icons_ = NULL;
+  Size checkbox_size_;
 
   // The ImageList hack used for changing row height.
   HIMAGELIST image_list_ = NULL;

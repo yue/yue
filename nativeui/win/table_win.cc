@@ -11,6 +11,7 @@
 #include <string>
 #include <utility>
 
+#include "base/logging.h"
 #include "base/strings/utf_string_conversions.h"
 #include "nativeui/gfx/attributed_text.h"
 #include "nativeui/table_model.h"
@@ -23,8 +24,9 @@ TableImpl::TableImpl(Table* delegate)
                  LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_REPORT |
                  LVS_OWNERDATA | LVS_EDITLABELS | WS_CHILD | WS_VISIBLE) {
   set_focusable(true);
-  ListView_SetExtendedListViewStyle(hwnd(),
-                                    LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT);
+  ListView_SetExtendedListViewStyle(
+      hwnd(),
+      LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_CHECKBOXES);
 }
 
 TableImpl::~TableImpl() {
@@ -46,8 +48,17 @@ void TableImpl::AddColumnWithOptions(const std::wstring& title,
   columns_.emplace_back(std::move(options));
   UpdateColumnsWidth(static_cast<Table*>(delegate())->GetModel());
 
+  // Get checkbox information.
+  if (options.type == Table::ColumnType::Checkbox && !checkbox_icons_) {
+    checkbox_icons_ = ListView_GetImageList(hwnd(), LVSIL_STATE);
+    int width, height;
+    if (ImageList_GetIconSize(checkbox_icons_, &width, &height))
+      checkbox_size_ = Size(width, height);
+  }
+
   // Optimization in the custom draw handler.
-  if (options.type == Table::ColumnType::Custom)
+  if (options.type == Table::ColumnType::Checkbox ||
+      options.type == Table::ColumnType::Custom)
     has_custom_column_ = true;
 }
 
@@ -111,6 +122,11 @@ int TableImpl::GetRowHeight() const {
   return std::ceil(text->GetOneLineHeight());
 }
 
+LRESULT TableImpl::OnEraseBkgnd(HDC dc) {
+  // Reduce flicker on cell update.
+  return 1;
+}
+
 void TableImpl::OnPaint(HDC dc) {
   // Block redrawing of leftmost item when editing sub item.
   if (edit_proc_) {
@@ -149,6 +165,10 @@ LRESULT TableImpl::OnNotify(int code, LPNMHDR pnmh) {
     case LVN_ENDLABELEDIT: {
       auto* nm = reinterpret_cast<NMLVDISPINFO*>(pnmh);
       return OnEndEdit(nm, nm->item.iItem);
+    }
+    case NM_CLICK: {
+      auto* nm = reinterpret_cast<NMITEMACTIVATE*>(pnmh);
+      return OnItemClick(Point(nm->ptAction), nm->iSubItem, nm->iItem);
     }
     case LVN_ITEMACTIVATE: {
       static_assert(_WIN32_IE >= 0x0400);
@@ -210,22 +230,11 @@ LRESULT TableImpl::OnCustomDraw(NMLVCUSTOMDRAW* nm, int row) {
   // Draw custom type cells.
   for (int i = 0; i < GetColumnCount(); ++i) {
     const auto& options = columns_[i];
-    if (options.type != Table::ColumnType::Custom || !options.on_draw)
-      continue;
-    // Calculate the rect of each cell.
-    RECT rc;
-    ListView_GetSubItemRect(hwnd(), row, i, LVIR_BOUNDS, &rc);
-    Rect rect(rc);
-    // Reduce the cell area so the focus ring can show.
-    int space = 1 * scale_factor();
-    rect.Inset(space, space);
-    // Draw.
-    PainterWin painter(nm->nmcd.hdc, rect.size(), scale_factor());
-    painter.TranslatePixel(rect.OffsetFromOrigin());
-    painter.ClipRectPixel(Rect(rect.size()));
-    options.on_draw(&painter,
-                    RectF(ScaleSize(SizeF(rect.size()), 1.f / scale_factor())),
-                    model->GetValue(options.column, row));
+    // Draw cells.
+    if (options.type == Table::ColumnType::Checkbox)
+      DrawCheckboxCell(nm->nmcd.hdc, i, row, model->GetValue(i, row));
+    else if (options.type == Table::ColumnType::Custom)
+      InvokeOnDraw(options, nm->nmcd.hdc, i, row, model->GetValue(i, row));
   }
   return CDRF_SKIPDEFAULT;
 }
@@ -291,6 +300,59 @@ LRESULT TableImpl::OnEndEdit(NMLVDISPINFO* nm, int row) {
     return FALSE;
   }
   return TRUE;
+}
+
+LRESULT TableImpl::OnItemClick(Point point, int column, int row) {
+  if (columns_[column].type != Table::ColumnType::Checkbox)
+    return FALSE;
+  if (!GetCheckboxBounds(column, row).Contains(point))
+    return FALSE;
+  auto* table = static_cast<Table*>(delegate());
+  auto* model = table->GetModel();
+  if (!model)
+    return FALSE;
+  model->SetValue(column, row,
+                  base::Value(!model->GetValue(column, row).GetBool()));
+  table->on_toggle_checkbox.Emit(table, column, row);
+  return TRUE;
+}
+
+Rect TableImpl::GetCellBounds(int column, int row) {
+  RECT rc = {0};
+  ListView_GetSubItemRect(hwnd(), row, column, LVIR_BOUNDS, &rc);
+  return Rect(rc);
+}
+
+Rect TableImpl::GetCheckboxBounds(int column, int row) {
+  Rect rect = GetCellBounds(column, row);
+  return Rect(rect.x() + (rect.width() - checkbox_size_.width()) / 2,
+              rect.y() + (rect.height() - checkbox_size_.height()) / 2,
+              checkbox_size_.width(),
+              checkbox_size_.height());
+}
+
+void TableImpl::DrawCheckboxCell(HDC hdc, int column, int row,
+                                 const base::Value& value) {
+  if (!value.is_bool())
+    return;
+  Rect checkbox = GetCheckboxBounds(column, row);
+  ImageList_Draw(checkbox_icons_, value.GetBool(), hdc, checkbox.x(),
+                 checkbox.y(), ILD_TRANSPARENT);
+}
+
+void TableImpl::InvokeOnDraw(const Table::ColumnOptions& options, HDC hdc,
+                             int column, int row, const base::Value& value) {
+  // Reduce the cell area so the focus ring can show.
+  Rect rect = GetCellBounds(column, row);
+  int space = 1 * scale_factor();
+  rect.Inset(space, space);
+  // Draw.
+  PainterWin painter(hdc, rect.size(), scale_factor());
+  painter.TranslatePixel(rect.OffsetFromOrigin());
+  painter.ClipRectPixel(Rect(rect.size()));
+  options.on_draw(&painter,
+                  RectF(ScaleSize(SizeF(rect.size()), 1.f / scale_factor())),
+                  value);
 }
 
 // static

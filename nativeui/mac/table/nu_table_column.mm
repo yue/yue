@@ -30,10 +30,15 @@ int g_next_id = 0;
 
     // Handle width property.
     NSTableColumnResizingOptions resizingMask = NSTableColumnUserResizingMask;
-    if (columnOptions.width < 0)
-      resizingMask |= NSTableColumnAutoresizingMask;
-    else
+    if (columnOptions.width < 0) {
+      // Give checkbox a proper default size.
+      if (columnOptions.type == nu::Table::ColumnType::Checkbox)
+        self.width = 24;
+      else
+        resizingMask |= NSTableColumnAutoresizingMask;
+    } else {
       self.width = columnOptions.width;
+    }
     self.resizingMask = resizingMask;
   }
   return self;

@@ -76,6 +76,7 @@ void AbstractTableModel::SetValue(uint32_t column, uint32_t row,
   }
   set_value(const_cast<AbstractTableModel*>(this),
             column, row, std::move(value));
+  NotifyValueChange(column, row);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

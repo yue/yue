@@ -11,12 +11,14 @@
 
 @interface NUTableCell : NSTableCellView {
  @private
+  nu::Table* shell_;  // weak ptr
   nu::Table::ColumnType type_;
   nu::TableModel* model_;  // weak ptr
   uint32_t column_;
   uint32_t row_;
 }
-- (id)initWithColumnOptions:(const nu::Table::ColumnOptions&)options;
+- (id)initWithShell:(nu::Table*)shell
+      columnOptions:(const nu::Table::ColumnOptions&)options;
 - (void)setTableModel:(nu::TableModel*)model
                column:(uint32_t)column
                   row:(uint32_t)row;

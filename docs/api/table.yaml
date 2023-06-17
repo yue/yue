@@ -106,3 +106,6 @@ events:
 
   - signature: void on_row_activate(Table* self, int row)
     description: Emitted when the user double-clicks a row.
+
+  - signature: void on_toggle_checkbox(Table* self, int column, int row)
+    description: Emitted when the user clicks a cell to toggle checkbox.

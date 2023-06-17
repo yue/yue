@@ -9,6 +9,8 @@ enums:
     description: Renders readonly String value.
   - name: Edit
     description: Like `<!enum class>Text` but allows user to edit the text.
+  - name: Checkbox
+    description: Renders a checkbox, the data type must be Boolean.
   - name: Custom
     description: |
       Supports arbitrary type of data but a drawing function has to be provided.

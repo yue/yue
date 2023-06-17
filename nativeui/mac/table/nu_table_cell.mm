@@ -44,8 +44,10 @@
 
 @implementation NUTableCell
 
-- (id)initWithColumnOptions:(const nu::Table::ColumnOptions&)options {
+- (id)initWithShell:(nu::Table*)shell
+      columnOptions:(const nu::Table::ColumnOptions&)options {
   if ((self = [super init])) {
+    shell_ = shell;
     type_ = options.type;
     model_ = nullptr;
 
@@ -65,15 +67,18 @@
         [textField setSelectable:YES];
         [self setTextField:textField];
         [self addSubview:textField];
-        // Remove default layout.
-        [textField setTranslatesAutoresizingMaskIntoConstraints:NO];
-        // Make the textField has vertical center alignment.
-        [NSLayoutConstraint activateConstraints:@[
-          // Vertical center.
-          [NSLayoutConstraint constraintWithItem:textField attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeCenterY multiplier:1 constant:0],
-          // Take full width.
-          [NSLayoutConstraint constraintWithItem:textField attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeWidth multiplier:1 constant:0],
-        ]];
+        [self makeViewCenterAlign:textField];
+        break;
+      }
+
+      case nu::Table::ColumnType::Checkbox: {
+        NSButton* button = [NSButton
+            checkboxWithTitle:@""
+                       target:self
+                       action:@selector(onToggleCheckbox:)];
+        [button setImagePosition:NSImageOnly];
+        [self addSubview:button];
+        [self makeViewCenterAlign:button];
         break;
       }
 
@@ -115,6 +120,14 @@
       break;
     }
 
+    case nu::Table::ColumnType::Checkbox: {
+      if (value.is_bool()) {
+        auto* button = static_cast<NSButton*>([[self subviews] firstObject]);
+        [button setState:(value.GetBool() ? NSOnState : NSOffState)];
+      }
+      break;
+    }
+
     case nu::Table::ColumnType::Custom: {
       auto* customView = static_cast<NUCustomTableCellView*>(
           [[self subviews] firstObject]);
@@ -130,6 +143,25 @@
     return;
   model_->SetValue(column_, row_,
                    base::Value(base::SysNSStringToUTF8([sender stringValue])));
+}
+
+- (void)onToggleCheckbox:(id)sender {
+  if (!model_)
+    return;
+  model_->SetValue(column_, row_, base::Value([sender state] == NSOnState));
+  shell_->on_toggle_checkbox.Emit(shell_, column_, row_);
+}
+
+- (void)makeViewCenterAlign:(NSView*)view {
+  // Remove default layout.
+  [view setTranslatesAutoresizingMaskIntoConstraints:NO];
+  // Make the view has vertical center alignment.
+  [NSLayoutConstraint activateConstraints:@[
+    // Vertical center.
+    [NSLayoutConstraint constraintWithItem:view attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeCenterY multiplier:1 constant:0],
+    // Take full width.
+    [NSLayoutConstraint constraintWithItem:view attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeWidth multiplier:1 constant:0],
+  ]];
 }
 
 @end

@@ -35,12 +35,13 @@
       [tableView makeViewWithIdentifier:[tableColumn identifier] owner:self]);
   if (!tableCell) {
     tableCell = [[[NUTableCell alloc]
-        initWithColumnOptions:[tableColumn options]] autorelease];
+        initWithShell:shell_
+        columnOptions:[tableColumn options]] autorelease];
     [tableCell setIdentifier:[tableColumn identifier]];
-    [tableCell setTableModel:shell_->GetModel()
-                      column:[tableColumn columnInModel]
-                         row:row];
   }
+  [tableCell setTableModel:shell_->GetModel()
+                    column:[tableColumn columnInModel]
+                       row:row];
   return tableCell;
 }
 
