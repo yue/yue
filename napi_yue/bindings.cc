@@ -87,6 +87,28 @@ struct Type<std::wstring> {
     return s;
   }
 };
+
+template<>
+struct Type<HWND> {
+  static constexpr const char* name = "HWND";
+  static inline napi_status ToNode(napi_env env,
+                                   HWND value,
+                                   napi_value* result) {
+    return ConvertToNode(env, static_cast<void*>(value), result);
+  }
+};
+#endif
+
+#if defined(OS_LINUX) || defined(OS_MAC)
+template<>
+struct Type<nu::NativeResponder> {
+  static constexpr const char* name = "NativeResponder";
+  static inline napi_status ToNode(napi_env env,
+                                   nu::NativeResponder value,
+                                   napi_value* result) {
+    return ConvertToNode(env, static_cast<void*>(value), result);
+  }
+};
 #endif
 
 template<>
@@ -2394,7 +2416,7 @@ struct Type<nu::Responder> {
         "releaseCapture", &nu::Responder::ReleaseCapture,
         "hasCapture", &nu::Responder::HasCapture);
 #if defined(OS_LINUX) || defined(OS_MAC)
-    Set(env, prototype, "getNative", GetNative);
+    Set(env, prototype, "getNative", &nu::Responder::GetNative);
 #endif
     DefineProperties(
         env, prototype,
@@ -2407,21 +2429,6 @@ struct Type<nu::Responder> {
         Signal("onKeyUp", &nu::Responder::on_key_up),
         Signal("onCaptureLost", &nu::View::on_capture_lost));
   }
-#if defined(OS_LINUX) || defined(OS_MAC)
-  static napi_value GetNative(Arguments args) {
-    nu::Responder* responder;
-    if (!args.GetThis(&responder))
-      return nullptr;
-    napi_value buffer;
-    void* data;
-    if (napi_create_buffer(args.Env(), sizeof(nu::NativeResponder), &data,
-                           &buffer) != napi_ok)
-      return nullptr;
-    nu::NativeResponder native = responder->GetNative();
-    memcpy(data, &native, sizeof(nu::NativeResponder));
-    return buffer;
-  }
-#endif
 };
 
 template<>
@@ -3206,6 +3213,9 @@ struct Type<nu::Window> {
         }),
         "getMenuBar", &nu::Window::GetMenuBar,
         "setMenuBarVisible", &nu::Window::SetMenuBarVisible,
+#endif
+#if defined(OS_WIN)
+        "getHWND", &nu::Window::GetHWND,
 #endif
         "addChildWindow",
         WrapMethod(&nu::Window::AddChildWindow, [](Arguments args) {

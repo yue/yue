@@ -18,6 +18,26 @@
 
 namespace lua {
 
+#if defined(OS_WIN)
+template<>
+struct Type<HWND> {
+  static constexpr const char* name = "HWND";
+  static inline void Push(State* state, HWND value) {
+    lua::Push(state, static_cast<void*>(value));
+  }
+};
+#endif
+
+#if defined(OS_LINUX) || defined(OS_MAC)
+template<>
+struct Type<nu::NativeResponder> {
+  static constexpr const char* name = "NativeResponder";
+  static inline void Push(State* state, nu::NativeResponder value) {
+    lua::Push(state, static_cast<void*>(value));
+  }
+};
+#endif
+
 template<>
 struct Type<nu::Accelerator> {
   static constexpr const char* name = "Accelerator";
@@ -2160,7 +2180,7 @@ struct Type<nu::Responder> {
            "releasecapture", &nu::Responder::ReleaseCapture,
            "hascapture", &nu::Responder::HasCapture);
 #if defined(OS_LINUX) || defined(OS_MAC)
-    RawSet(state, metatable, "getnative", GetNative);
+    RawSet(state, metatable, "getnative", &nu::Responder::GetNative);
 #endif
     RawSetProperty(state, metatable,
                    "onmousedown", &nu::Responder::on_mouse_down,
@@ -2172,11 +2192,6 @@ struct Type<nu::Responder> {
                    "onkeyup", &nu::Responder::on_key_up,
                    "oncapturelost", &nu::View::on_capture_lost);
   }
-#if defined(OS_LINUX) || defined(OS_MAC)
-  static void* GetNative(nu::Responder* responder) {
-    return responder->GetNative();
-  }
-#endif
 };
 
 template<>
@@ -2905,6 +2920,9 @@ struct Type<nu::Window> {
            RefMethod(state, &nu::Window::SetMenuBar, RefType::Reset, "menubar"),
            "getmenubar", &nu::Window::GetMenuBar,
            "setmenubarvisible", &nu::Window::SetMenuBarVisible,
+#endif
+#if defined(OS_WIN)
+           "gethwnd", &nu::Window::GetHWND,
 #endif
            "addchildwindow",
            RefMethod(state, &nu::Window::AddChildWindow, RefType::Ref),

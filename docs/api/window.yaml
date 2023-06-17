@@ -225,6 +225,24 @@ methods:
 
       Calling `<!name>SetMenu` will reset the menu bar to visible.
 
+  - signature: HWND GetHWND() const
+    lang: ['cpp']
+    platform: ['Windows']
+    description: Return the HWND of the native window.
+
+  - signature: Buffer GetHWND() const
+    lang: ['js']
+    platform: ['Windows']
+    description: Return a Node.js `Buffer` containing the HWND of the native window.
+
+  - signature: userdata GetHWND() const
+    lang: ['lua']
+    platform: ['Windows']
+    description: Return a light userdata representing the HWND of the native window.
+    detail: |
+      To get the value of HWND, you should directly convert the light userdata
+      to HWND, instead of reading the memory of the light userdata.
+
   - signature: Window* GetParentWindow() const
     description: Return the parent window.
 

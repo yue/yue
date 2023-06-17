@@ -138,6 +138,10 @@ class NATIVEUI_EXPORT Window : public Responder {
   void SetMenuBarVisible(bool visible);
 #endif
 
+#if defined(OS_WIN)
+  HWND GetHWND() const;
+#endif
+
   Window* GetParentWindow() const { return parent_; }
   void AddChildWindow(scoped_refptr<Window> child);
   void RemoveChildWindow(Window* child);

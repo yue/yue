@@ -1106,6 +1106,10 @@ void Window::SetMenuBarVisible(bool visible) {
   ::SetMenu(window_->hwnd(), visible ? menu_bar_->GetNative() : NULL);
 }
 
+HWND Window::GetHWND() const {
+  return window_->hwnd();
+}
+
 void Window::PlatformAddChildWindow(Window* child) {
   ::SetParent(child->GetNative()->hwnd(), window_->hwnd());
 }
