@@ -18,7 +18,7 @@ build scripts before actually building Yue.
 
 * Visual Studio 2022
   * "Desktop development with C++" component
-  * Latest Windows 10 SDK
+  * [Windows 11 SDK (10.0.22621.0)](https://go.microsoft.com/fwlink/?linkid=2237387)
 
 ### Linux
 
