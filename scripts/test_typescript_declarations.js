@@ -15,5 +15,6 @@ useTmpDir((cwd) => {
   execSync(`git clone https://github.com/yue/node-gui "${cwd}"`)
   execSync('npm install', {cwd})
   fs.copySync('out/Dist/index.d.ts', path.join(cwd, 'index.d.ts'))
+  execSync('npm test', {cwd})
   execSync('npm pack', {cwd})
 })

@@ -1,0 +1,40 @@
+name: post-release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  post-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.NODE_GUI_PUSH_TOKEN }}
+          repository: yue/node-gui
+
+      - name: Get tag
+        run: echo "VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+
+      - name: Set package version
+        run: |
+          npm config set git-tag-version=false
+          npm version $VERSION
+
+      - name: Install deps
+        run: npm install
+
+      - uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+
+      - name: Push commits
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git commit package.json -m $VERSION
+          git tag $VERSION
+          git push
+          git push --tags
