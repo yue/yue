@@ -50,3 +50,9 @@ TEST_F(ImageTest, ToJPEG) {
   EXPECT_EQ(jpg->GetSize(), nu::SizeF(10, 10));
   EXPECT_EQ(jpg->GetScaleFactor(), 1);
 }
+
+TEST_F(ImageTest, Clear) {
+  EXPECT_FALSE(static_img_->IsEmpty());
+  static_img_->Clear();
+  EXPECT_TRUE(static_img_->IsEmpty());
+}

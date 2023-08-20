@@ -49,6 +49,14 @@ class_methods:
     description: *ref3
 
 methods:
+  - signature: void Clear()
+    description: Make the image empty.
+    detail: |
+      On Windows creating an image from filesystem path will also lock the
+      file, by calling this method the image file will be unlocked.
+      The original image file will not be modified, and APIs that accepted
+      this image will not be affected.
+
   - signature: bool IsEmpty() const
     description: Return whether the image has any data.
 

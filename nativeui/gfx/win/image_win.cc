@@ -82,6 +82,11 @@ Image::~Image() {
   delete image_;
 }
 
+void Image::Clear() {
+  delete image_;
+  image_ = new Gdiplus::Image(L"");
+}
+
 bool Image::IsEmpty() const {
   Gdiplus::Image* image = const_cast<Gdiplus::Image*>(image_);
   return image->GetWidth() == 0 || image->GetHeight() == 0;

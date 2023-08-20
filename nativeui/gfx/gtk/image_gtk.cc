@@ -61,6 +61,10 @@ Image::~Image() {
     g_object_unref(iter_);
 }
 
+void Image::Clear() {
+  is_empty_ = true;
+}
+
 bool Image::IsEmpty() const {
   return is_empty_;
 }

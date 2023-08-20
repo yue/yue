@@ -44,6 +44,10 @@ class NATIVEUI_EXPORT Image : public base::RefCounted<Image> {
   // Create an image from memory.
   Image(const Buffer& buffer, float scale_factor);
 
+  // Clear the content of the image, on Windows it will also release the file
+  // lock on the image file.
+  void Clear();
+
   // Whether the image is empty.
   bool IsEmpty() const;
 

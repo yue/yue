@@ -120,6 +120,11 @@ Image::~Image() {
   [image_ release];
 }
 
+void Image::Clear() {
+  [image_ release];
+  image_ = [[NSImage alloc] init];
+}
+
 bool Image::IsEmpty() const {
   return [[image_ representations] count] == 0;
 }

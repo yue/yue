@@ -1565,6 +1565,7 @@ struct Type<nu::Image> {
            "createfrombuffer", &CreateOnHeap<nu::Image,
                                              const nu::Buffer&,
                                              float>,
+           "clear", &nu::Image::Clear,
            "isempty", &nu::Image::IsEmpty,
 #if defined(OS_MAC)
            "settemplate", &nu::Image::SetTemplate,
