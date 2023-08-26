@@ -12,7 +12,7 @@
 #include "nativeui/signal.h"
 
 #if defined(OS_MAC)
-#include "base/mac/scoped_nsautorelease_pool.h"
+#include "base/apple/scoped_nsautorelease_pool.h"
 #ifdef __OBJC__
 @class NUApplicationDelegate;
 #else
@@ -57,7 +57,7 @@ class NATIVEUI_EXPORT Lifetime {
   void PlatformDestroy();
 
 #if defined(OS_MAC)
-  base::mac::ScopedNSAutoreleasePool autorelease_pool_;
+  base::apple::ScopedNSAutoreleasePool autorelease_pool_;
   NUApplicationDelegate* app_delegate_;
 #endif
 

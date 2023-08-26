@@ -9,7 +9,7 @@
 #include <Carbon/Carbon.h>
 #include <IOKit/hidsystem/ev_keymap.h>
 
-#include "base/mac/foundation_util.h"
+#include "base/apple/foundation_util.h"
 #include "nativeui/accelerator.h"
 #include "nativeui/events/mac/keyboard_code_conversion_mac.h"
 
@@ -55,7 +55,7 @@ bool GlobalShortcut::PlatformRegister(const Accelerator& accelerator, int id) {
   EventHotKeyID event_hot_key_id;
 
   // Signature uniquely identifies the application that owns this hot_key.
-  event_hot_key_id.signature = base::mac::CreatorCodeForApplication();
+  event_hot_key_id.signature = base::apple::CreatorCodeForApplication();
   event_hot_key_id.id = id;
 
   // Translate ui::Accelerator modifiers to cmdKey, altKey, etc.

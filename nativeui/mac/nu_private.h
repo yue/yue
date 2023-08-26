@@ -9,7 +9,7 @@
 #include <map>
 #include <memory>
 
-#include "base/mac/scoped_nsobject.h"
+#include "base/apple/scoped_nsobject.h"
 
 @class DataProvider;
 @class NSCursor;
@@ -27,7 +27,7 @@ class Responder;
 struct NUPrivate {
   Responder* shell = nullptr;
   bool hovered = false;
-  base::scoped_nsobject<NSTrackingArea> tracking_area;
+  base::apple::scoped_nsobject<NSTrackingArea> tracking_area;
   std::unique_ptr<MouseCapture> mouse_capture;
 
  protected:
@@ -52,7 +52,7 @@ struct NUViewPrivate : public NUPrivate {
   bool is_content_view = false;
   bool wants_layer = false;  // default value for wantsLayer
   bool wants_layer_infected = false;  // infects the wantsLayer property
-  base::scoped_nsobject<NSCursor> cursor;
+  base::apple::scoped_nsobject<NSCursor> cursor;
 
   // Drag target properties.
   int last_drop_operation = -1;  // cached drop result
@@ -61,10 +61,10 @@ struct NUViewPrivate : public NUPrivate {
   int supported_drag_operation = 0;  // supported drag operation
   int drag_result = 0;  // cached drag result
   std::function<void()> quit_dragging;  // quit current drag session
-  base::scoped_nsobject<DataProvider> data_source;  // data of drag source
+  base::apple::scoped_nsobject<DataProvider> data_source;  // drag source data
 
   // Tooltip strings.
-  std::map<int, base::scoped_nsobject<NSString>> tooltips;
+  std::map<int, base::apple::scoped_nsobject<NSString>> tooltips;
 };
 
 }  // namespace nu

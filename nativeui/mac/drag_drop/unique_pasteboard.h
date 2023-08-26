@@ -8,7 +8,7 @@
 
 #import <AppKit/AppKit.h>
 
-#include "base/mac/scoped_nsobject.h"
+#include "base/apple/scoped_nsobject.h"
 
 namespace nu {
 
@@ -20,7 +20,7 @@ class UniquePasteboard {
   NSPasteboard* get() { return pasteboard_; }
 
  private:
-  base::scoped_nsobject<NSPasteboard> pasteboard_;
+  base::apple::scoped_nsobject<NSPasteboard> pasteboard_;
 };
 
 }  // namespace nu

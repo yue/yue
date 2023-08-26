@@ -79,7 +79,7 @@ RectF Tray::GetBounds() const {
 }
 
 void Tray::SetTitle(const std::string& title) {
-  [tray_ setTitle:base::SysUTF8ToNSString(title)];
+  [[tray_ button] setTitle:base::SysUTF8ToNSString(title)];
 }
 
 void Tray::SetImage(scoped_refptr<Image> icon) {

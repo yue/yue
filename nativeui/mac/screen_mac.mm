@@ -9,7 +9,7 @@
 
 #include <map>
 
-#include "base/mac/scoped_nsobject.h"
+#include "base/apple/scoped_nsobject.h"
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/events/event.h"
 #include "nativeui/gfx/mac/coordinate_conversion.h"
@@ -68,7 +68,7 @@ class ScreenObserverImpl : public ScreenObserver {
   }
 
   Screen* screen_;
-  base::scoped_nsobject<id> screen_params_change_observer_;
+  base::apple::scoped_nsobject<id> screen_params_change_observer_;
 };
 
 // static

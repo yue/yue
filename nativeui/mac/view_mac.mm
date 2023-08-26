@@ -6,8 +6,8 @@
 #include "nativeui/mac/nu_view.h"
 
 #include "base/strings/sys_string_conversions.h"
-#include "base/mac/foundation_util.h"
-#include "base/mac/scoped_cftyperef.h"
+#include "base/apple/foundation_util.h"
+#include "base/apple/scoped_cftyperef.h"
 #include "nativeui/browser.h"
 #include "nativeui/container.h"
 #include "nativeui/cursor.h"
@@ -19,6 +19,7 @@
 #include "nativeui/mac/drag_drop/data_provider.h"
 #include "nativeui/mac/drag_drop/nested_run_loop.h"
 #include "nativeui/mac/events_handler.h"
+#include "nativeui/mac/legacy_bridging.h"
 #include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/nu_responder.h"
 #include "nativeui/window.h"
@@ -28,15 +29,14 @@ namespace nu {
 namespace {
 
 // It's much more convenient to return an NSString than a
-// base::ScopedCFTypeRef<CFStringRef>, since the methods on NSPasteboardItem
+// base::apple::ScopedCFTypeRef<CFStringRef>, since the methods on NSPasteboardItem
 // require an NSString*.
 NSString* UTIFromPboardType(NSString* type) {
   // Some PboardType are already valid UTI strings.
   if ([type rangeOfString:@"public."].location == 0)
     return type;
-  return [base::mac::CFToNSCast(UTTypeCreatePreferredIdentifierForTag(
-      kUTTagClassNSPboardType, base::mac::NSToCFCast(type), kUTTypeData))
-      autorelease];
+  return [CFToNSCast(UTTypeCreatePreferredIdentifierForTag(
+      kUTTagClassNSPboardType, NSToCFCast(type), kUTTypeData)) autorelease];
 }
 
 }  // namespace
@@ -224,11 +224,11 @@ int View::DoDragWithOptions(std::vector<Clipboard::Data> data,
   for (NSString* type in types)
     [newTypes addObject:UTIFromPboardType(type)];
 
-  base::scoped_nsobject<NSPasteboardItem> item([[NSPasteboardItem alloc] init]);
+  base::apple::scoped_nsobject<NSPasteboardItem> item([[NSPasteboardItem alloc] init]);
   [item setDataProvider:priv->data_source
                forTypes:newTypes];
 
-  base::scoped_nsobject<NSDraggingItem> drag_item(
+  base::apple::scoped_nsobject<NSDraggingItem> drag_item(
       [[NSDraggingItem alloc] initWithPasteboardWriter:item.get()]);
 
   // Set drag image.
@@ -274,14 +274,17 @@ void View::RegisterDraggedTypes(std::set<Clipboard::Data::Type> types) {
         [newTypes addObject:NSPasteboardTypeString];
         break;
       case Clipboard::Data::Type::HTML:
-        [newTypes addObject:NSHTMLPboardType];
-        [newTypes addObject:NSRTFPboardType];
+        [newTypes addObject:NSPasteboardTypeHTML];
+        [newTypes addObject:NSPasteboardTypeRTF];
         break;
       case Clipboard::Data::Type::Image:
         [newTypes addObject:NSPasteboardTypeTIFF];
         break;
       case Clipboard::Data::Type::FilePaths:
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
         [newTypes addObject:NSFilenamesPboardType];
+#pragma clang diagnostic pop
         break;
       default:
         break;
@@ -305,7 +308,7 @@ void View::PlatformSetTooltip(const std::string& tooltip) {
 }
 
 int View::PlatformAddTooltipForRect(const std::string& tooltip, RectF rect) {
-  base::scoped_nsobject<NSString> str(
+  base::apple::scoped_nsobject<NSString> str(
       [base::SysUTF8ToNSString(tooltip) retain]);
   int tag = [view_ addToolTipRect:rect.ToCGRect() owner:str.get() userData:nil];
   // The method only takes a weak ref of passed object.

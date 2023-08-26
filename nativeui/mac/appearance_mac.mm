@@ -7,15 +7,35 @@
 
 #import <Cocoa/Cocoa.h>
 
-#include "base/mac/scoped_block.h"
-#include "base/mac/scoped_nsobject.h"
+#include "base/apple/scoped_typeref.h"
+#include "base/apple/scoped_nsobject.h"
+
+namespace base::apple {
+
+namespace internal {
+
+template <typename B>
+struct ScopedBlockTraits {
+  static B InvalidValue() { return nullptr; }
+  static B Retain(B block) { return Block_copy(block); }
+  static void Release(B block) { Block_release(block); }
+};
+
+}  // namespace internal
+
+// ScopedBlock<> is patterned after ScopedCFTypeRef<>, but uses Block_copy() and
+// Block_release() instead of CFRetain() and CFRelease().
+template <typename B>
+using ScopedBlock = ScopedTypeRef<B, internal::ScopedBlockTraits<B>>;
+
+}  // namespace base::apple
 
 // Helper object to respond to light mode/dark mode changeovers.
 @interface NUEffectiveAppearanceObserver : NSObject
 @end
 
 @implementation NUEffectiveAppearanceObserver {
-  base::mac::ScopedBlock<void (^)()> handler_;
+  base::apple::ScopedBlock<void (^)()> handler_;
 }
 
 - (instancetype)initWithHandler:(void (^)())handler {
@@ -62,7 +82,7 @@ class ColorSchemeObserverImpl : public ColorSchemeObserver {
   }
 
  private:
-  base::scoped_nsobject<NUEffectiveAppearanceObserver> appearance_observer_;
+  base::apple::scoped_nsobject<NUEffectiveAppearanceObserver> appearance_observer_;
 };
 
 // static

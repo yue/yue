@@ -56,8 +56,8 @@ void Type<base::Value>::Push(State* state, const base::Value& value) {
                       value.GetBlob().size());
       return;
     case base::Value::Type::DICT: {
-      NewTable(state, 0, static_cast<int>(value.DictSize()));
-      for (const auto it : value.DictItems()) {
+      NewTable(state, 0, static_cast<int>(value.GetDict().size()));
+      for (const auto it : value.GetDict()) {
         lua::Push(state, it.first);
         Type<base::Value>::Push(state, it.second);
         lua_rawset(state, -3);

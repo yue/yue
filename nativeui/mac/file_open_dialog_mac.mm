@@ -6,7 +6,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-#include "base/mac/foundation_util.h"
+#include "base/apple/foundation_util.h"
 #include "base/strings/sys_string_conversions.h"
 
 namespace nu {
@@ -22,7 +22,7 @@ std::vector<base::FilePath> FileOpenDialog::GetResults() const {
   NSArray* urls = [static_cast<NSOpenPanel*>(GetNative()) URLs];
   for (NSURL* url in urls) {
     if ([url isFileURL])
-      results.push_back(base::mac::NSStringToFilePath([url path]));
+      results.push_back(base::apple::NSStringToFilePath([url path]));
   }
   return results;
 }

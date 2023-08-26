@@ -6,8 +6,8 @@
 
 #import <Cocoa/Cocoa.h>
 
-#include "base/mac/scoped_cftyperef.h"
-#include "base/mac/scoped_nsobject.h"
+#include "base/apple/scoped_cftyperef.h"
+#include "base/apple/scoped_nsobject.h"
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/gfx/attributed_text.h"
 #include "nativeui/gfx/canvas.h"
@@ -48,12 +48,12 @@ CGBlendMode g_blend_modes[static_cast<size_t>(BlendMode::Size)] = {
 };
 
 // Create a NSImage from bitmap.
-base::scoped_nsobject<NSImage> CreateNSImageFromCanvas(Canvas* canvas) {
-  base::ScopedCFTypeRef<CGImageRef> cgimage(
+base::apple::scoped_nsobject<NSImage> CreateNSImageFromCanvas(Canvas* canvas) {
+  base::apple::ScopedCFTypeRef<CGImageRef> cgimage(
       CGBitmapContextCreateImage(canvas->GetBitmap()));
-  base::scoped_nsobject<NSBitmapImageRep> bitmap(
+  base::apple::scoped_nsobject<NSBitmapImageRep> bitmap(
       [[NSBitmapImageRep alloc] initWithCGImage:cgimage]);
-  base::scoped_nsobject<NSImage> image(
+  base::apple::scoped_nsobject<NSImage> image(
       [[NSImage alloc] initWithSize:canvas->GetSize().ToCGSize()]);
   [image addRepresentation:bitmap.get()];
   return image;
@@ -87,14 +87,13 @@ class GraphicsContextScope {
 
 PainterMac::PainterMac(NSView* view)
     : target_context_(nil),  // no context switching
-      context_(reinterpret_cast<CGContextRef>(
-                   [[NSGraphicsContext currentContext] graphicsPort])),
+      context_([[NSGraphicsContext currentContext] CGContext]),
       size_(view.bounds.size) {
 }
 
 PainterMac::PainterMac(NativeBitmap bitmap, SizeF size, float scale_factor)
     : target_context_([[NSGraphicsContext
-          graphicsContextWithGraphicsPort:bitmap flipped:YES] retain]),
+          graphicsContextWithCGContext:bitmap flipped:YES] retain]),
       context_(bitmap),
       size_(std::move(size)) {
   // There is no way to directly set scale factor for NSGraphicsContext, so just
@@ -238,7 +237,7 @@ void PainterMac::DrawImageFromRect(const Image* image, const RectF& src,
 }
 
 void PainterMac::DrawCanvas(Canvas* canvas, const RectF& rect) {
-  base::scoped_nsobject<NSImage> image(CreateNSImageFromCanvas(canvas));
+  base::apple::scoped_nsobject<NSImage> image(CreateNSImageFromCanvas(canvas));
   GraphicsContextScope scoped(target_context_);
   [image drawInRect:rect.ToCGRect()
            fromRect:NSZeroRect
@@ -250,7 +249,7 @@ void PainterMac::DrawCanvas(Canvas* canvas, const RectF& rect) {
 
 void PainterMac::DrawCanvasFromRect(Canvas* canvas, const RectF& src,
                                     const RectF& dest) {
-  base::scoped_nsobject<NSImage> image(CreateNSImageFromCanvas(canvas));
+  base::apple::scoped_nsobject<NSImage> image(CreateNSImageFromCanvas(canvas));
   GraphicsContextScope scoped(target_context_);
   [image drawInRect:dest.ToCGRect()
            fromRect:src.ToCGRect()

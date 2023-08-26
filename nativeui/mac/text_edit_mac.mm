@@ -4,7 +4,7 @@
 
 #include "nativeui/text_edit.h"
 
-#include "base/mac/scoped_nsobject.h"
+#include "base/apple/scoped_nsobject.h"
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/mac/nu_private.h"
@@ -42,8 +42,8 @@
 
 @interface NUTextEdit : NSScrollView<NUViewMethods> {
  @private
-  base::scoped_nsobject<NSTextView> textView_;
-  base::scoped_nsobject<NUTextViewDelegate> delegate_;
+  base::apple::scoped_nsobject<NSTextView> textView_;
+  base::apple::scoped_nsobject<NUTextViewDelegate> delegate_;
   nu::NUViewPrivate private_;
 }
 - (id)initWithShell:(nu::TextEdit*)shell;

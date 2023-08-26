@@ -6,8 +6,8 @@
 
 #import <Cocoa/Cocoa.h>
 
-#include "base/mac/scoped_cftyperef.h"
-#include "base/mac/scoped_nsobject.h"
+#include "base/apple/scoped_cftyperef.h"
+#include "base/apple/scoped_nsobject.h"
 #include "base/strings/pattern.h"
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/gfx/geometry/rect_f.h"
@@ -42,7 +42,7 @@ Buffer EncodeImage(NSImage* image,
                    NSDictionary* properties) {
   CGImageRef cg_image =
       [image CGImageForProposedRect:nullptr context:nil hints:nil];
-  base::scoped_nsobject<NSBitmapImageRep> rep(
+  base::apple::scoped_nsobject<NSBitmapImageRep> rep(
       [[NSBitmapImageRep alloc] initWithCGImage:cg_image]);
   NSData* data = [[rep representationUsingType:type
                                     properties:properties] retain];
@@ -80,7 +80,7 @@ Image::Image(const base::FilePath& p)
   NSBitmapImageRep* rep = GetAnimationRep();
   if (rep) {
     NSString* u = base::SysUTF8ToNSString(p.value());
-    base::ScopedCFTypeRef<CGImageSourceRef> source(
+    base::apple::ScopedCFTypeRef<CGImageSourceRef> source(
         CGImageSourceCreateWithURL((__bridge CFURLRef)[NSURL fileURLWithPath:u],
                                    nullptr));
     durations_ = GetFrameDurations(rep, source);
@@ -109,7 +109,7 @@ Image::Image(const Buffer& buffer, float scale_factor)
   // Read image with CGImage for animations.
   NSBitmapImageRep* rep = GetAnimationRep();
   if (rep) {
-    base::ScopedCFTypeRef<CGImageSourceRef> source(
+    base::apple::ScopedCFTypeRef<CGImageSourceRef> source(
         CGImageSourceCreateWithData((__bridge CFDataRef)buffer.ToNSData(),
                                     nullptr));
     durations_ = GetFrameDurations(rep, source);
@@ -156,7 +156,7 @@ Image* Image::Tint(Color color) const {
 }
 
 Image* Image::Resize(SizeF new_size, float scale_factor) const {
-  base::scoped_nsobject<NSBitmapImageRep> rep([[NSBitmapImageRep alloc]
+  base::apple::scoped_nsobject<NSBitmapImageRep> rep([[NSBitmapImageRep alloc]
       initWithBitmapDataPlanes:nullptr
                     pixelsWide:new_size.width() * scale_factor
                     pixelsHigh:new_size.height() * scale_factor

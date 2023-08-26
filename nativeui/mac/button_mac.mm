@@ -14,11 +14,11 @@
 namespace {
 
 nu::InsetsF GetButtonInsets(NSButton* button) {
-  if ([button bezelStyle] == NSSmallSquareBezelStyle) {
+  if ([button bezelStyle] == NSBezelStyleSmallSquare) {
     return nu::InsetsF(1, 0, 1, 0);
-  } else if ([button bezelStyle] == NSRegularSquareBezelStyle) {
+  } else if ([button bezelStyle] == NSBezelStyleRegularSquare) {
     return nu::InsetsF(3, 2, 4, 2);
-  } else if ([button bezelStyle] == NSRoundedBezelStyle) {
+  } else if ([button bezelStyle] == NSBezelStyleRounded) {
     NSControlSize size = [[button cell] controlSize];
     switch (size) {
 #if defined(MAC_OS_VERSION_11_0)
@@ -67,7 +67,7 @@ nu::InsetsF GetButtonInsets(NSButton* button) {
 }
 
 - (void)setNUColor:(nu::Color)color {
-  base::scoped_nsobject<NSMutableAttributedString> colored_title(
+  base::apple::scoped_nsobject<NSMutableAttributedString> colored_title(
       [[NSMutableAttributedString alloc]
           initWithAttributedString:[self attributedTitle]]);
   [colored_title addAttribute:NSForegroundColorAttributeName
@@ -112,11 +112,11 @@ namespace nu {
 Button::Button(const std::string& title, Type type) {
   NSButton* button = [[NUButton alloc] initWithShell:this];
   if (type == Type::Normal) {
-    [button setBezelStyle:NSRoundedBezelStyle];
+    [button setBezelStyle:NSBezelStyleRounded];
   } else if (type == Type::Checkbox) {
-    [button setButtonType:NSSwitchButton];
+    [button setButtonType:NSButtonTypeSwitch];
   } else if (type == Type::Radio) {
-    [button setButtonType:NSRadioButton];
+    [button setButtonType:NSButtonTypeRadio];
   } else if (type == Type::Disclosure) {
     [button setButtonType:NSButtonTypeOnOff];
     [button setBezelStyle:NSBezelStyleDisclosure];
@@ -139,11 +139,12 @@ std::string Button::GetTitle() const {
 }
 
 void Button::SetChecked(bool checked) {
-  static_cast<NSButton*>(GetNative()).state = checked ? NSOnState : NSOffState;
+  static_cast<NSButton*>(GetNative()).state =
+      checked ? NSControlStateValueOn : NSControlStateValueOff;
 }
 
 bool Button::IsChecked() const {
-  return static_cast<NSButton*>(GetNative()).state == NSOnState;
+  return static_cast<NSButton*>(GetNative()).state == NSControlStateValueOn;
 }
 
 void Button::PlatformSetImage(Image* image) {

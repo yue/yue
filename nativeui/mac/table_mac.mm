@@ -4,7 +4,7 @@
 
 #include "nativeui/table.h"
 
-#include "base/mac/scoped_nsobject.h"
+#include "base/apple/scoped_nsobject.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/mac/nu_private.h"
 #include "nativeui/mac/nu_view.h"
@@ -59,10 +59,10 @@
 
 @interface NUTable : NSScrollView<NUViewMethods> {
  @private
-  base::scoped_nsobject<NSTableView> tableView_;
-  base::scoped_nsobject<NUTableDelegate> delegate_;
-  base::scoped_nsobject<NUTableDataSource> dataSource_;
-  base::scoped_nsobject<NSTableHeaderView> headerView_;
+  base::apple::scoped_nsobject<NSTableView> tableView_;
+  base::apple::scoped_nsobject<NUTableDelegate> delegate_;
+  base::apple::scoped_nsobject<NUTableDataSource> dataSource_;
+  base::apple::scoped_nsobject<NSTableHeaderView> headerView_;
   nu::NUViewPrivate private_;
 }
 - (id)initWithShell:(nu::Table*)shell;
@@ -150,7 +150,7 @@ void Table::AddColumnWithOptions(const std::string& title,
                                  const ColumnOptions& options) {
   auto* tableView = static_cast<NSTableView*>(
       [static_cast<NUTable*>(GetNative()) documentView]);
-  base::scoped_nsobject<NUTableColumn> tableColumn(
+  base::apple::scoped_nsobject<NUTableColumn> tableColumn(
      [[NUTableColumn alloc] initWithTable:this
                                     title:title
                                   options:options]);

@@ -8,9 +8,9 @@
 #import <Cocoa/Cocoa.h>
 #import <CoreServices/CoreServices.h>
 
-#include "base/mac/foundation_util.h"
-#include "base/mac/scoped_cftyperef.h"
+#include "base/apple/scoped_cftyperef.h"
 #include "base/strings/sys_string_conversions.h"
+#include "nativeui/mac/legacy_bridging.h"
 #include "nativeui/window.h"
 
 namespace nu {
@@ -27,7 +27,7 @@ FileDialog::~FileDialog() {
 }
 
 base::FilePath FileDialog::GetResult() const {
-  return base::mac::NSStringToFilePath([[dialog_ URL] path]);
+  return base::apple::NSStringToFilePath([[dialog_ URL] path]);
 }
 
 bool FileDialog::Run() {
@@ -89,9 +89,9 @@ void FileDialog::SetFilters(const std::vector<Filter>& filters) {
         dialog_.allowsOtherFileTypes = YES;
         return;
       }
-      base::ScopedCFTypeRef<CFStringRef> ext_cf(
+      base::apple::ScopedCFTypeRef<CFStringRef> ext_cf(
           base::SysUTF8ToCFStringRef(extension));
-      [file_type_set addObject:base::mac::CFToNSCast(ext_cf.get())];
+      [file_type_set addObject:CFToNSCast(ext_cf.get())];
     }
   }
 

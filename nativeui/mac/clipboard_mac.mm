@@ -7,8 +7,8 @@
 #import <Cocoa/Cocoa.h>
 
 #include "base/notreached.h"
-#include "base/mac/foundation_util.h"
-#include "base/mac/scoped_nsobject.h"
+#include "base/apple/foundation_util.h"
+#include "base/apple/scoped_nsobject.h"
 #include "base/strings/string_util.h"
 #include "base/strings/sys_string_conversions.h"
 
@@ -23,7 +23,7 @@ const char kMarkupPrefix[] = "<meta charset='utf-8'>";
 // If there is RTF data on the pasteboard, returns an HTML version of it.
 // Otherwise returns nil.
 NSString* GetHTMLFromRTFOnPasteboard(NSPasteboard* pboard) {
-  NSData* rtfData = [pboard dataForType:NSRTFPboardType];
+  NSData* rtfData = [pboard dataForType:NSPasteboardTypeRTF];
   if (!rtfData)
     return nil;
   auto* rtf = [[[NSAttributedString alloc] initWithRTF:rtfData
@@ -69,12 +69,15 @@ bool Clipboard::IsDataAvailable(Data::Type type) const {
     case Data::Type::Text:
       return [types containsObject:NSPasteboardTypeString];
     case Data::Type::HTML:
-      return [types containsObject:NSHTMLPboardType] ||
-             [types containsObject:NSRTFPboardType];
+      return [types containsObject:NSPasteboardTypeHTML] ||
+             [types containsObject:NSPasteboardTypeRTF];
     case Data::Type::Image:
       return [types containsObject:NSPasteboardTypeTIFF];
     case Data::Type::FilePaths:
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
       return [types containsObject:NSFilenamesPboardType];
+#pragma clang diagnostic pop
     default:
       NOTREACHED() << "Can not get clipboard data without type";
       return false;
@@ -89,12 +92,12 @@ Clipboard::Data Clipboard::GetData(Data::Type type) const {
                  : Data();
     }
     case Data::Type::HTML: {
-      NSArray* supportedTypes = @[NSHTMLPboardType, NSRTFPboardType];
+      NSArray* supportedTypes = @[NSPasteboardTypeHTML, NSPasteboardTypeRTF];
       NSString* bestType = [clipboard_ availableTypeFromArray:supportedTypes];
       if (!bestType)
         return Data();
       NSString* contents;
-      if ([bestType isEqualToString:NSRTFPboardType])
+      if ([bestType isEqualToString:NSPasteboardTypeRTF])
         contents = GetHTMLFromRTFOnPasteboard(clipboard_);
       else
         contents = [clipboard_ stringForType:bestType];
@@ -109,7 +112,7 @@ Clipboard::Data Clipboard::GetData(Data::Type type) const {
       // If the pasteboard's image data is not to its liking, the guts of
       // NSImage may throw, and that exception will leak. Prevent a crash in
       // that case; a blank image is better.
-      base::scoped_nsobject<NSImage> image;
+      base::apple::scoped_nsobject<NSImage> image;
       @try {
         image.reset([[NSImage alloc] initWithPasteboard:clipboard_]);
       } @catch (id exception) {
@@ -117,13 +120,16 @@ Clipboard::Data Clipboard::GetData(Data::Type type) const {
       return image ? Data(new Image(image.release())) : Data();
     }
     case Data::Type::FilePaths: {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
       NSArray* paths = [clipboard_ propertyListForType:NSFilenamesPboardType];
+#pragma clang diagnostic pop
       if (!paths)
         return Data();
       std::vector<base::FilePath> result;
       result.reserve([paths count]);
       for (NSString* path in paths)
-        result.push_back(base::mac::NSStringToFilePath(path));
+        result.push_back(base::apple::NSStringToFilePath(path));
       return Data(std::move(result));
     }
     default:
@@ -143,11 +149,11 @@ void Clipboard::SetData(std::vector<Data> objects) {
                       forType:NSPasteboardTypeString];
         break;
       case Data::Type::HTML: {
-        [clipboard_ addTypes:@[NSHTMLPboardType] owner:nil];
+        [clipboard_ addTypes:@[NSPasteboardTypeHTML] owner:nil];
         // We need to mark it as utf-8. (see crbug.com/11957)
         std::string html = kMarkupPrefix + data.str();
         [clipboard_ setString:base::SysUTF8ToNSString(html)
-                      forType:NSHTMLPboardType];
+                      forType:NSPasteboardTypeHTML];
         break;
       }
       case Data::Type::Image:
@@ -157,8 +163,11 @@ void Clipboard::SetData(std::vector<Data> objects) {
         NSMutableArray* filePaths = [NSMutableArray array];
         for (const auto& path : data.file_paths())
           [filePaths addObject:base::SysUTF8ToNSString(path.value())];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
         [clipboard_ addTypes:@[NSFilenamesPboardType] owner:nil];
         [clipboard_ setPropertyList:filePaths forType:NSFilenamesPboardType];
+#pragma clang diagnostic pop
         break;
       }
       default:

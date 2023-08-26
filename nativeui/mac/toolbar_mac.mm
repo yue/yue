@@ -9,7 +9,7 @@
 #include <map>
 #include <utility>
 
-#include "base/mac/scoped_nsobject.h"
+#include "base/apple/scoped_nsobject.h"
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/gfx/image.h"
 #include "nativeui/view.h"
@@ -17,11 +17,11 @@
 @interface NUToolbarDelegate : NSObject<NSToolbarDelegate> {
  @private
   nu::Toolbar* shell_;
-  base::scoped_nsobject<NSMutableArray> default_identifiers_;
-  base::scoped_nsobject<NSMutableArray> allowed_identifiers_;
+  base::apple::scoped_nsobject<NSMutableArray> default_identifiers_;
+  base::apple::scoped_nsobject<NSMutableArray> allowed_identifiers_;
   std::map<std::string,
            std::pair<nu::Toolbar::Item,
-                     base::scoped_nsobject<NSToolbarItem>>> items_;
+                     base::apple::scoped_nsobject<NSToolbarItem>>> items_;
 }
 - (id)initWithShell:(nu::Toolbar*)shell;
 - (void)setDefaultItemIdentifiers:(const std::vector<std::string>&)identifiers;
@@ -77,7 +77,7 @@ willBeInsertedIntoToolbar:(BOOL)flag {
     NSToolbarItemGroup* group =
         [[NSToolbarItemGroup alloc] initWithItemIdentifier:identifier];
     // Get subitems.
-    base::scoped_nsobject<NSMutableArray> subitems(
+    base::apple::scoped_nsobject<NSMutableArray> subitems(
         [NSMutableArray arrayWithCapacity:config.subitems.size()]);
     for (const std::string& sub_ident : config.subitems) {
       [subitems addObject:[self toolbar:toolbar
@@ -107,7 +107,7 @@ willBeInsertedIntoToolbar:(BOOL)flag {
   items_.emplace(ident,
                  std::make_pair(
                      std::move(config),
-                     base::scoped_nsobject<NSToolbarItem>(item)));
+                     base::apple::scoped_nsobject<NSToolbarItem>(item)));
   return item;
 }
 

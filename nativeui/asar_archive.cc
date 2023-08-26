@@ -26,7 +26,7 @@ const base::Value* FindPathInValue(const base::Value& value,
                                    const std::vector<base::StringPiece>& path) {
   const base::Value* cur = &value;
   for (const base::StringPiece& component : path) {
-    if (!cur->is_dict() || (cur = cur->FindKey(component)) == nullptr)
+    if (!cur->is_dict() || (cur = cur->GetDict().Find(component)) == nullptr)
       return nullptr;
   }
   return cur;
@@ -97,16 +97,16 @@ bool AsarArchive::GetFileInfo(const std::string& path, FileInfo* info) {
     return false;
 
   // Read file information.
-  const base::Value* link = node->FindKey("link");
+  const base::Value* link = node->GetDict().Find("link");
   if (link && link->is_string())
     return GetFileInfo(link->GetString(), info);
 
-  const base::Value* size = node->FindKey("size");
+  const base::Value* size = node->GetDict().Find("size");
   if (!size || !size->is_int())
     return false;
   info->size = size->GetInt();
 
-  const base::Value* offset = node->FindKey("offset");
+  const base::Value* offset = node->GetDict().Find("offset");
   if (!offset || !offset->is_string() ||
       !base::StringToUint64(offset->GetString(), &info->offset))
     return false;

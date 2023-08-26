@@ -6,7 +6,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-#include "base/mac/scoped_cftyperef.h"
+#include "base/apple/scoped_cftyperef.h"
 #include "nativeui/gfx/mac/painter_mac.h"
 
 namespace nu {
@@ -18,7 +18,7 @@ NativeBitmap Canvas::PlatformCreateBitmap(const SizeF& size,
   // graphicsContextWithGraphicsPort API, which only accepts a CGContextRef.
   // So the only solution left to us is to use CGContextRef instead of
   // NSBitmapImageRep as bitmap representation.
-  base::ScopedCFTypeRef<CGColorSpaceRef> color_space(
+  base::apple::ScopedCFTypeRef<CGColorSpaceRef> color_space(
         CGColorSpaceCreateDeviceRGB());
   CGContextRef bitmap = CGBitmapContextCreate(
       nullptr, size.width() * scale_factor, size.height() * scale_factor,

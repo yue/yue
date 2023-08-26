@@ -4,7 +4,7 @@
 
 #include "nativeui/mac/table/nu_table_cell.h"
 
-#include "base/mac/scoped_nsobject.h"
+#include "base/apple/scoped_nsobject.h"
 #include "base/strings/sys_string_conversions.h"
 #include "base/values.h"
 #include "nativeui/gfx/mac/painter_mac.h"
@@ -54,7 +54,7 @@
     switch (type_) {
       case nu::Table::ColumnType::Text:
       case nu::Table::ColumnType::Edit: {
-        base::scoped_nsobject<NSTextField> textField(
+        base::apple::scoped_nsobject<NSTextField> textField(
             [[NSTextField alloc] initWithFrame:NSZeroRect]);
         if (type_ == nu::Table::ColumnType::Edit) {
           [textField setTarget:self];
@@ -83,7 +83,7 @@
       }
 
       case nu::Table::ColumnType::Custom: {
-        base::scoped_nsobject<NUCustomTableCellView> customView(
+        base::apple::scoped_nsobject<NUCustomTableCellView> customView(
             [[NUCustomTableCellView alloc] initWithColumnOptions:options]);
         [customView setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
         [self addSubview:customView];
@@ -123,7 +123,7 @@
     case nu::Table::ColumnType::Checkbox: {
       if (value.is_bool()) {
         auto* button = static_cast<NSButton*>([[self subviews] firstObject]);
-        [button setState:(value.GetBool() ? NSOnState : NSOffState)];
+        [button setState:(value.GetBool() ? NSControlStateValueOn : NSControlStateValueOff)];
       }
       break;
     }
@@ -148,7 +148,7 @@
 - (void)onToggleCheckbox:(id)sender {
   if (!model_)
     return;
-  model_->SetValue(column_, row_, base::Value([sender state] == NSOnState));
+  model_->SetValue(column_, row_, base::Value([sender state] == NSControlStateValueOn));
   shell_->on_toggle_checkbox.Emit(shell_, column_, row_);
 }
 

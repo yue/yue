@@ -6,7 +6,7 @@
 
 #include <map>
 
-#include "base/mac/scoped_nsobject.h"
+#include "base/apple/scoped_nsobject.h"
 #include "base/no_destructor.h"
 #include "base/strings/sys_string_conversions.h"
 #include "base/synchronization/lock.h"
@@ -129,7 +129,7 @@ ProtocolHandlerMap& GetProtocolHandlers() {
     std::string mime_type;
     protocol_job_->GetMimeType(&mime_type);
     // Send response.
-    base::scoped_nsobject<NSURLResponse> response(
+    base::apple::scoped_nsobject<NSURLResponse> response(
         [[NSURLResponse alloc] initWithURL:self.request.URL
                                   MIMEType:base::SysUTF8ToNSString(mime_type)
                      expectedContentLength:size

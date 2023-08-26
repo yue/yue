@@ -8,7 +8,7 @@
 
 #include <WebKit/WebKit.h>
 
-#include "base/mac/scoped_nsobject.h"
+#include "base/apple/scoped_nsobject.h"
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/mac/browser/nu_custom_protocol.h"
 #include "nativeui/mac/browser/nu_web_ui_delegate.h"
@@ -47,7 +47,7 @@
   nu::NUViewPrivate private_;
   nu::Browser::Options options_;
   nu::Browser* shell_;
-  base::scoped_nsobject<NUScriptMessageHandler> handler_;
+  base::apple::scoped_nsobject<NUScriptMessageHandler> handler_;
 }
 - (id)initWithShell:(nu::Browser*)shell
             options:(nu::Browser::Options)options;
@@ -63,7 +63,7 @@
   shell_ = shell;
   // Initialize with configuration.
   handler_.reset([[NUScriptMessageHandler alloc] initWithShell:shell]);
-  base::scoped_nsobject<WKWebViewConfiguration> config(
+  base::apple::scoped_nsobject<WKWebViewConfiguration> config(
       [[WKWebViewConfiguration alloc] init]);
   if (options.devtools)
     [[config preferences] setValue:@YES forKey:@"developerExtrasEnabled"];

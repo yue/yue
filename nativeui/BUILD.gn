@@ -276,6 +276,8 @@ jumbo_component("nativeui") {
       "gfx/mac/painter_mac.mm",
       "mac/events_handler.h",
       "mac/events_handler.mm",
+      "mac/legacy_bridging.h",
+      "mac/legacy_bridging.mm",
       "mac/mouse_capture.h",
       "mac/mouse_capture.mm",
       "mac/value_conversion.h",
@@ -545,6 +547,7 @@ jumbo_component("nativeui") {
       "Carbon.framework",
       "WebKit.framework",
     ]
+    configs -= [ "//build/config/compiler:enable_arc" ]
   } else if (is_win) {
     libs = [
       "comctl32.lib",

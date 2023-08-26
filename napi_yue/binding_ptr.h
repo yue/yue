@@ -48,7 +48,7 @@ struct TypeBridge<T, typename std::enable_if<std::is_base_of<
 // For classes that produce weak ptrs, store weak ptr in JS object.
 template<typename T>
 struct TypeBridge<T, typename std::enable_if<std::is_base_of<
-                         base::internal::WeakPtrBase,
+                         base::WeakPtr<T>,
                          decltype(((T*)nullptr)->GetWeakPtr())>::value>::type> {  // NOLINT
   static constexpr bool can_cache_pointer = false;
   static base::WeakPtr<T>* Wrap(T* ptr) {

@@ -180,12 +180,13 @@ bool NativeTheme::IsAppDarkMode() const {
 
 bool NativeTheme::IsSystemDarkMode() const {
   base::win::RegKey hkcu_themes_regkey;
-  hkcu_themes_regkey.Open(HKEY_CURRENT_USER,
-                          L"Software\\Microsoft\\Windows\\CurrentVersion\\"
-                          L"Themes\\Personalize",
-                          KEY_READ);
-  if (!hkcu_themes_regkey.Valid())
+  if (ERROR_SUCCESS != hkcu_themes_regkey.Open(
+          HKEY_CURRENT_USER,
+          L"Software\\Microsoft\\Windows\\CurrentVersion\\"
+          L"Themes\\Personalize",
+          KEY_READ)) {
     return false;
+  }
   DWORD apps_use_light_theme = 1;
   hkcu_themes_regkey.ReadValueDW(L"AppsUseLightTheme",
                                  &apps_use_light_theme);

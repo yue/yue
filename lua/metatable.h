@@ -31,7 +31,7 @@ struct UserData<T, typename std::enable_if<std::is_base_of<
 // Defines how the wrapper of WeakPtr is destructed.
 template<typename T>
 struct UserData<T, typename std::enable_if<std::is_base_of<
-                       base::internal::WeakPtrBase,
+                       base::WeakPtr<T>,
                        decltype(((T*)nullptr)->GetWeakPtr())>::value>::type> {  // NOLINT
   using Type = base::WeakPtr<T>;
   static inline void Construct(State* state, base::WeakPtr<T>* data, T* ptr) {
@@ -118,7 +118,7 @@ struct Type<scoped_refptr<T>> {
 // The default type information for WeakPtr class.
 template<typename T>
 struct Type<T*, typename std::enable_if<std::is_base_of<
-                    base::internal::WeakPtrBase,
+                    base::WeakPtr<T>,
                     decltype(((T*)nullptr)->GetWeakPtr())>::value>::type> {  // NOLINT
   static constexpr const char* name = Type<T>::name;
   static bool To(State* state, int index, T** out) {

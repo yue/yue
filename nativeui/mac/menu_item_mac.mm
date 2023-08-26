@@ -80,13 +80,13 @@ std::string MenuItem::GetLabel() const {
 }
 
 void MenuItem::SetChecked(bool checked) {
-  menu_item_.state = checked ? NSOnState : NSOffState;
+  menu_item_.state = checked ? NSControlStateValueOn : NSControlStateValueOff;
   if (checked && type_ == nu::MenuItem::Type::Radio && menu_)
     FlipRadioMenuItems(menu_, this);
 }
 
 bool MenuItem::IsChecked() const {
-  return menu_item_.state == NSOnState;
+  return menu_item_.state == NSControlStateValueOn;
 }
 
 void MenuItem::SetEnabled(bool enabled) {

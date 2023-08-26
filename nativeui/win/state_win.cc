@@ -9,9 +9,7 @@
 #include "base/base_paths.h"
 #include "base/path_service.h"
 #include "base/scoped_native_library.h"
-#include "base/win/core_winrt_util.h"
 #include "base/win/scoped_com_initializer.h"
-#include "base/win/scoped_hstring.h"
 #include "base/win/win_util.h"
 #include "base/win/windows_version.h"
 #include "nativeui/gfx/win/native_theme.h"
@@ -26,6 +24,63 @@
 #include "third_party/yoga/yoga/Yoga.h"
 
 namespace nu {
+
+namespace {
+
+FARPROC LoadComBaseFunction(const char* function_name) {
+  static HMODULE const handle =
+      ::LoadLibraryEx(L"combase.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
+  return handle ? ::GetProcAddress(handle, function_name) : nullptr;
+}
+
+decltype(&::RoActivateInstance) GetRoActivateInstanceFunction() {
+  static decltype(&::RoActivateInstance) const function =
+      reinterpret_cast<decltype(&::RoActivateInstance)>(
+          LoadComBaseFunction("RoActivateInstance"));
+  return function;
+}
+
+decltype(&::RoGetActivationFactory) GetRoGetActivationFactoryFunction() {
+  static decltype(&::RoGetActivationFactory) const function =
+      reinterpret_cast<decltype(&::RoGetActivationFactory)>(
+          LoadComBaseFunction("RoGetActivationFactory"));
+  return function;
+}
+
+bool ResolveCoreWinRTDelayload() {
+  return GetRoActivateInstanceFunction() && GetRoGetActivationFactoryFunction();
+}
+
+decltype(&::WindowsCreateString) GetWindowsCreateString() {
+  static decltype(&::WindowsCreateString) const function =
+      reinterpret_cast<decltype(&::WindowsCreateString)>(
+          LoadComBaseFunction("WindowsCreateString"));
+  return function;
+}
+
+decltype(&::WindowsDeleteString) GetWindowsDeleteString() {
+  static decltype(&::WindowsDeleteString) const function =
+      reinterpret_cast<decltype(&::WindowsDeleteString)>(
+          LoadComBaseFunction("WindowsDeleteString"));
+  return function;
+}
+
+decltype(&::WindowsGetStringRawBuffer) GetWindowsGetStringRawBuffer() {
+  static decltype(&::WindowsGetStringRawBuffer) const function =
+      reinterpret_cast<decltype(&::WindowsGetStringRawBuffer)>(
+          LoadComBaseFunction("WindowsGetStringRawBuffer"));
+  return function;
+}
+
+bool ResolveCoreWinRTStringDelayload() {
+  static const bool load_succeeded = []() {
+    return GetWindowsCreateString() && GetWindowsDeleteString() &&
+                   GetWindowsGetStringRawBuffer();
+  }();
+  return load_succeeded;
+}
+
+}  // namespace
 
 void State::PlatformInit() {
   base::win::EnableHighDPISupport();
@@ -52,9 +107,10 @@ void State::InitializeCOM() {
   }
 }
 
+// TODO(zcbenz): This can be removed after stopping support Windows 7.
 bool State::InitializeWinRT() {
-  return base::win::ResolveCoreWinRTDelayload() &&
-         base::win::ScopedHString::ResolveCoreWinRTStringDelayload();
+  return ResolveCoreWinRTDelayload() &&
+         ResolveCoreWinRTStringDelayload();
 }
 
 bool State::InitWebView2Loader() {

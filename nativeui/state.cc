@@ -31,6 +31,31 @@
 #include "nativeui/gfx/gtk/gtk_theme.h"
 #endif
 
+namespace base {
+
+// This class has been removed from base but we are still requiring it.
+template <typename T>
+class ThreadLocalPointer {
+ public:
+  ThreadLocalPointer() = default;
+
+  ThreadLocalPointer(const ThreadLocalPointer&) = delete;
+  ThreadLocalPointer& operator=(const ThreadLocalPointer&) = delete;
+
+  ~ThreadLocalPointer() = default;
+
+  T* Get() const { return static_cast<T*>(slot_.Get()); }
+
+  void Set(T* ptr) {
+    slot_.Set(const_cast<void*>(static_cast<const void*>(ptr)));
+  }
+
+ private:
+  ThreadLocalStorage::Slot slot_;
+};
+
+}  // namespace base
+
 namespace nu {
 
 namespace {

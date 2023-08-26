@@ -6,7 +6,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-#include "base/mac/scoped_nsobject.h"
+#include "base/apple/scoped_nsobject.h"
 
 @interface NSCursor(Undocumented)
 + (NSCursor*)busyButClickableCursor;
@@ -23,7 +23,7 @@ NSCursor* LoadFromHIServices(NSString* name) {
         "/Versions/A/Resources/cursors" stringByAppendingPathComponent:name];
   NSString* imagePath =
       [cursorPath stringByAppendingPathComponent:@"cursor.pdf"];
-  base::scoped_nsobject<NSImage> image(
+  base::apple::scoped_nsobject<NSImage> image(
       [[NSImage alloc] initByReferencingFile:imagePath]);
   NSString* plistPath =
       [cursorPath stringByAppendingPathComponent:@"info.plist"];

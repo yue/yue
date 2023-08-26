@@ -4,7 +4,7 @@
 
 #include "nativeui/tab.h"
 
-#include "base/mac/scoped_nsobject.h"
+#include "base/apple/scoped_nsobject.h"
 #include "base/strings/sys_string_conversions.h"
 #include "nativeui/gfx/font.h"
 #include "nativeui/mac/nu_private.h"
@@ -35,7 +35,7 @@
 
 @interface NUTab : NSTabView<NUViewMethods> {
  @private
-  base::scoped_nsobject<NUTabDelegate> delegate_;
+  base::apple::scoped_nsobject<NUTabDelegate> delegate_;
   nu::NUViewPrivate private_;
 }
 - (id)initWithShell:(nu::Tab*)shell;
@@ -83,7 +83,7 @@ NativeView Tab::PlatformCreate() {
 
 void Tab::PlatformAddPage(const std::string& title, View* view) {
   auto* tab = static_cast<NUTab*>(GetNative());
-  base::scoped_nsobject<NSTabViewItem> item([[NSTabViewItem alloc] init]);
+  base::apple::scoped_nsobject<NSTabViewItem> item([[NSTabViewItem alloc] init]);
   [item setLabel:base::SysUTF8ToNSString(title)];
   [item setView:view->GetNative()];
   [tab addTabViewItem:item];
