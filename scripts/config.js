@@ -5,15 +5,14 @@ const webview2Version = '1.0.1722.45'
 
 // The versions of language bindings to test against.
 const nodeVersions = [
-  '14.19.1',
-  '16.15.0',
-  '18.14.0',
-  '19.6.0',
+  '16.20.2',
+  '18.17.1',
+  '20.5.1',
 ]
 const electronVersions = [
-  '21.4.1',
-  '22.3.0',
-  '23.1.0',
+  '24.8.1',
+  '25.7.0',
+  '26.1.0',
 ]
 const luaVersions = [
   '5.3.6',
