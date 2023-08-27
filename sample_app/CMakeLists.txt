@@ -27,6 +27,11 @@ endif()
 # The Yue library to link to.
 if(APPLE)
   file(GLOB_RECURSE YUE_SOURCES src/mac/*.cc src/mac/*.mm src/mac/*.S src/mac/*.c)
+  # Separate files that disable ARC.
+  set(YUE_NO_ARC_SOURCES ${YUE_SOURCES})
+  set(MAC_NO_ARC_SOURCES allocator|nativeui)
+  list(FILTER YUE_SOURCES EXCLUDE REGEX ${MAC_NO_ARC_SOURCES})
+  list(FILTER YUE_NO_ARC_SOURCES INCLUDE REGEX ${MAC_NO_ARC_SOURCES})
 elseif(WIN32)
   file(GLOB_RECURSE YUE_SOURCES src/win/*.cc src/win/*.c)
 elseif(UNIX AND NOT APPLE)
@@ -35,7 +40,7 @@ endif()
 add_library(${LIBYUE} ${YUE_SOURCES})
 target_include_directories(${LIBYUE} PUBLIC include)
 
-# Use C++17 standard.
+# Use C++20 standard.
 target_compile_features(${LIBYUE} PUBLIC cxx_std_20)
 
 # macOS configuration.
@@ -48,11 +53,27 @@ if(APPLE)
   find_library(OD OpenDirectory)
   target_link_libraries(${LIBYUE} PUBLIC
                         ${APPKIT} ${CARBON} ${IOKIT} ${SECURITY} ${WEBKIT} ${OD})
-  target_compile_definitions(${LIBYUE} PUBLIC SYSTEM_NATIVE_UTF8)
-  set_target_properties(${LIBYUE} PROPERTIES COMPILE_FLAGS
-                        "-Wno-deprecated-declarations")
   target_link_options(${LIBYUE} PUBLIC
-                      "-Wl,-dead_strip")
+                      -Wl,-dead_strip)
+  target_compile_definitions(${LIBYUE} PUBLIC
+                             SYSTEM_NATIVE_UTF8)
+  target_compile_options(${LIBYUE} PRIVATE
+                         -Wno-deprecated-declarations
+                         -Wno-unguarded-availability-new)
+  # Compile files that disable ARC as a separate target.
+  set(LIBYUE_NO_ARC "YueNoARC")
+  add_library(${LIBYUE_NO_ARC} ${YUE_NO_ARC_SOURCES})
+  # Copy properties to the new target.
+  foreach(PROPERTY INCLUDE_DIRECTORIES COMPILE_FEATURES COMPILE_DEFINITIONS COMPILE_OPTIONS LINK_LIBRARIES LINK_OPTIONS)
+    get_target_property(COPIED ${LIBYUE} ${PROPERTY})
+    set_target_properties(${LIBYUE_NO_ARC} PROPERTIES ${PROPERTY} "${COPIED}")
+  endforeach()
+  # Add the new target as a dependency to LIBYUE.
+  set_property(TARGET ${LIBYUE} APPEND PROPERTY INTERFACE_LINK_LIBRARIES
+               ${LIBYUE_NO_ARC})
+  # Enable ARC for LIBYUE.
+  set_property(TARGET ${LIBYUE} APPEND PROPERTY COMPILE_OPTIONS
+               -fobjc-arc -fno-objc-arc-exceptions)
 endif()
 
 # win32 configuration
@@ -69,10 +90,13 @@ if(WIN32)
                         gdi32.lib gdiplus.lib urlmon.lib userenv.lib
                         uxtheme.lib delayimp.lib runtimeobject.lib ntdll.lib
                         shcore.lib)
-  set_target_properties(${LIBYUE} PROPERTIES COMPILE_FLAGS
-                        "/wd4005 /wd4101 /wd4244 /wd4267 /wd4996")
+  target_compile_options(${LIBYUE} PRIVATE
+                        /wd4005 /wd4101 /wd4244 /wd4267 /wd4996)
   target_link_options(${LIBYUE} PUBLIC
-                      "/DELAYLOAD:setupapi.dll;/DELAYLOAD:powrprof.dll;/DELAYLOAD:dwmapi.dll;/SUBSYSTEM:WINDOWS")
+                      /SUBSYSTEM:WINDOWS
+                      /DELAYLOAD:setupapi.dll
+                      /DELAYLOAD:powrprof.dll
+                      /DELAYLOAD:dwmapi.dll)
 endif()
 
 # Linux configuration
@@ -103,8 +127,10 @@ if(UNIX AND NOT APPLE)
                         ${X11_LIBRARIES}
                         ${WEBKIT2GTK_LIBRARIES})
   target_compile_definitions(${LIBYUE} PUBLIC USE_GLIB)
-  set_target_properties(${LIBYUE} PROPERTIES COMPILE_FLAGS
-                        "-fdata-sections -ffunction-sections -Wno-deprecated-declarations")
+  target_compile_options(${LIBYUE} PRIVATE
+                         -Wno-deprecated-declarations
+                         -fdata-sections
+                         -ffunction-sections)
   target_link_options(${LIBYUE} PUBLIC
-                      "-Wl,--as-needed,--gc-section")
+                      -Wl,--as-needed,--gc-section)
 endif()
