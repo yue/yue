@@ -23,11 +23,16 @@ class NATIVEUI_EXPORT MessageLoop {
   // Function type for tasks.
   using Task = std::function<void()>;
 
+  // Function type used for the MessageLoop::Enqueue* methods, a return value of "false" is to stop repeating the function
+  using RepeatedTask = std::function<bool()>;
+
   // Control message loop.
   static void Run();
   static void Quit();
   static void PostTask(Task task);
   static void PostDelayedTask(int ms, Task task);
+  static void EnqueueTask(RepeatedTask task);
+  static void EnqueueDelayedTask(int ms, RepeatedTask task);
 
   // Internal: Cancellable timers.
 #if defined(OS_WIN)

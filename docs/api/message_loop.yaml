@@ -52,3 +52,16 @@ class_methods:
     parameters:
       ms:
         description: The number of milliseconds to wait
+
+  - signature: void EnqueueTask(RepeatedTask task);
+    description: |
+      Enqueue a task `task` to be run multiple times on the main thread's message loop, stopping if the task returns `false`
+
+  - signature: void EnqueueDelayedTask(int ms, RepeatedTask task);
+    description: |
+      Enqueue a task `task` to be run multiple times on the main thread's message loop, delaying every `ms` miliseconds, and stopping if the task returns `false`
+    parameters:
+      ms:
+        description: The number of milliseconds to wait
+
+

@@ -5,6 +5,7 @@
 #include "nativeui/message_loop.h"
 
 #import <Cocoa/Cocoa.h>
+#import <CoreFoundation/CoreFoundation.h>
 
 namespace nu {
 
@@ -56,6 +57,28 @@ void MessageLoop::PostDelayedTask(int ms, Task task) {
   dispatch_after(t, dispatch_get_main_queue(), ^{
     callback();
   });
+}
+
+
+//Enqueue a task to run multiple times
+void MessageLoop::EnqueueTask(RepeatedTask task)
+{ EnqueueDelayedTask(1, std::move(task)); }
+
+void MessageLoop::EnqueueDelayedTask(int ms, RepeatedTask task)
+{
+    RepeatedTask callback = std::move(task);
+    CFRunLoopRef run_loop = NSRunLoop.mainRunLoop.getCFRunLoop;
+    CFRunLoopTimerContext context = { .info = new RepeatedTask(std::move(callback)) };
+    CFRunLoopTimerRef timer = CFRunLoopTimerCreate(nullptr, 0, static_cast<float>(ms)/100, 0, 0, [](CFRunLoopTimerRef timer, void *ptr) {
+        RepeatedTask callback = std::move(*static_cast<RepeatedTask *>(ptr));
+        if (!callback()) {
+          delete static_cast<RepeatedTask *>(ptr);
+          CFRunLoopTimerInvalidate(timer);
+        }
+    }, &context);
+
+    CFRunLoopAddTimer(run_loop, timer, kCFRunLoopCommonModes);
+    CFRelease(timer);
 }
 
 // static

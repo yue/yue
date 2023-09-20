@@ -2157,7 +2157,9 @@ struct Type<nu::MessageLoop> {
     Set(env, constructor,
         "quit", &nu::MessageLoop::Quit,
         "postTask", &nu::MessageLoop::PostTask,
-        "postDelayedTask", &nu::MessageLoop::PostDelayedTask);
+        "postDelayedTask", &nu::MessageLoop::PostDelayedTask,
+        "enqueueTask", &nu::MessageLoop::EnqueueTask,
+        "enqueueDelayedTask", &nu::MessageLoop::EnqueueDelayedTask);
     // The "run" method should never be used in yode runtime.
     if (!is_yode) {
       Set(env, constructor, "run", &nu::MessageLoop::Run);
