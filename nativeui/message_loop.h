@@ -31,8 +31,7 @@ class NATIVEUI_EXPORT MessageLoop {
   static void Quit();
   static void PostTask(Task task);
   static void PostDelayedTask(int ms, Task task);
-  static void EnqueueTask(RepeatedTask task);
-  static void EnqueueDelayedTask(int ms, RepeatedTask task);
+  static void SetTimer(int ms, RepeatedTask task);
 
   // Internal: Cancellable timers.
 #if defined(OS_WIN)

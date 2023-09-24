@@ -35,13 +35,8 @@ void MessageLoop::PostDelayedTask(int ms, Task task) {
   SetTimeout(ms, std::move(task));
 }
 
-
-void MessageLoop::EnqueueTask(RepeatedTask task) {
-  EnqueueDelayedTask(1, std::move(task));
-}
-
-void MessageLoop::EnqueueDelayedTask(int ms, RepeatedTask task) {
-  SetTimer(NULL, 0, ms, [task](HWND, UINT, UINT_PTR id, DWORD) mutable {
+void MessageLoop::SetTimer(int ms, RepeatedTask task) {
+  ::SetTimer(NULL, 0, ms, [task](HWND, UINT, UINT_PTR id, DWORD) mutable {
       if (!task()) { // Run task, check return value
         KillTimer(NULL, id); // Stop the timer if task() returns false
       }

@@ -59,12 +59,7 @@ void MessageLoop::PostDelayedTask(int ms, Task task) {
   });
 }
 
-
-//Enqueue a task to run multiple times
-void MessageLoop::EnqueueTask(RepeatedTask task)
-{ EnqueueDelayedTask(1, std::move(task)); }
-
-void MessageLoop::EnqueueDelayedTask(int ms, RepeatedTask task)
+void MessageLoop::SetTimer(int ms, RepeatedTask task)
 {
     RepeatedTask callback = std::move(task);
     CFRunLoopRef run_loop = NSRunLoop.mainRunLoop.getCFRunLoop;

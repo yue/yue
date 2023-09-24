@@ -40,11 +40,8 @@ void MessageLoop::PostDelayedTask(int ms, Task task) {
   SetTimeout(ms, std::move(task));
 }
 
-void MessageLoop::EnqueueTask(RepeatedTask task) {
-  EnqueueDelayedTask(1, std::move(task));
-}
 
-void MessageLoop::EnqueueDelayedTask(int ms, RepeatedTask task) {
+void MessageLoop::SetTimer(int ms, RepeatedTask task) {
   g_timeout_add_full(G_PRIORITY_DEFAULT, ms,
                      [](void *src) -> int {
                         auto *task = static_cast<RepeatedTask*>(src);

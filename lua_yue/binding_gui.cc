@@ -1937,8 +1937,7 @@ struct Type<nu::MessageLoop> {
     RawSet(state, index,
            "run", &nu::MessageLoop::Run,
            "quit", &nu::MessageLoop::Quit,
-           "enqueuetask", &nu::MessageLoop::EnqueueTask,
-           "enqueuedelayedtask", &nu::MessageLoop::EnqueueDelayedTask,
+           "settimer", &nu::MessageLoop::SetTimer,
            "posttask", &nu::MessageLoop::PostTask,
            "postdelayedtask", &nu::MessageLoop::PostDelayedTask);
   }
