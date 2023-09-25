@@ -37,11 +37,7 @@ void MessageLoop::PostDelayedTask(int ms, Task task) {
 
 // static
 void MessageLoop::SetTimer(int ms, RepeatedTask task) {
-  ::SetTimer(NULL, 0, ms, [task](HWND, UINT, UINT_PTR id, DWORD) mutable {
-    if (!task()) {  // run task, check return value
-      ::KillTimer(NULL, id);  // stop the timer if task() returns false
-    }
-  });
+  State::GetMain()->GetTimerHost()->SetInterval(ms, std::move(task));
 }
 
 // static

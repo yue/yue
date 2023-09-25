@@ -16,28 +16,59 @@ TimerHost::TimerId TimerHost::SetTimeout(int ms, Task task) {
   base::AutoLock auto_lock(lock_);
   TimerId id = NextTimerId();
   if (::SetTimer(hwnd(), id, ms, nullptr))
-    tasks_[id] = std::move(task);
+    timeouts_[id] = std::move(task);
   return id;
 }
 
 void TimerHost::ClearTimeout(TimerId id) {
-  ::KillTimer(hwnd(), id);
   base::AutoLock auto_lock(lock_);
-  tasks_.erase(id);
+  if (timeouts_.erase(id) > 0)
+    ::KillTimer(hwnd(), id);
+}
+
+TimerHost::TimerId TimerHost::SetInterval(int ms, RepeatedTask task) {
+  base::AutoLock auto_lock(lock_);
+  TimerId id = NextTimerId();
+  if (::SetTimer(hwnd(), id, ms, nullptr))
+    intervals_[id] = std::move(task);
+  return id;
+}
+
+void TimerHost::ClearInterval(TimerId id) {
+  base::AutoLock auto_lock(lock_);
+  if (intervals_.erase(id) > 0)
+    ::KillTimer(hwnd(), id);
 }
 
 void TimerHost::OnTimer(UINT_PTR id) {
-  ::KillTimer(hwnd(), id);
-  std::function<void()> task;
+  // First search for timeouts.
+  Task task;
   {
     base::AutoLock auto_lock(lock_);
-    auto it = tasks_.find(id);
-    if (it == tasks_.end())
-      return;
-    task = std::move(it->second);
-    tasks_.erase(it);
+    auto it = timeouts_.find(id);
+    if (it != timeouts_.end()) {
+      task = std::move(it->second);
+      timeouts_.erase(it);
+    }
   }
-  task();
+  if (task) {
+    ::KillTimer(hwnd(), id);
+    task();
+    return;
+  }
+  // Then search for intervals.
+  RepeatedTask repeated_task;
+  {
+    base::AutoLock auto_lock(lock_);
+    auto it = intervals_.find(id);
+    if (it != intervals_.end())
+      repeated_task = it->second;
+  }
+  if (repeated_task && !repeated_task()) {
+    ::KillTimer(hwnd(), id);
+    base::AutoLock auto_lock(lock_);
+    intervals_.erase(id);
+  }
 }
 
 UINT_PTR TimerHost::NextTimerId() {

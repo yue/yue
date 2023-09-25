@@ -6,7 +6,7 @@
 #define NATIVEUI_WIN_UTIL_TIMER_HOST_H_
 
 #include <functional>
-#include <unordered_map>
+#include <map>
 
 #include "base/synchronization/lock.h"
 #include "nativeui/win/util/win32_window.h"
@@ -16,6 +16,7 @@ namespace nu {
 class TimerHost : public Win32Window {
  public:
   using Task = std::function<void()>;
+  using RepeatedTask = std::function<bool()>;
   using TimerId = UINT_PTR;
 
   TimerHost();
@@ -23,6 +24,8 @@ class TimerHost : public Win32Window {
 
   TimerId SetTimeout(int ms, Task task);
   void ClearTimeout(TimerId id);
+  TimerId SetInterval(int ms, RepeatedTask task);
+  void ClearInterval(TimerId id);
 
  protected:
   CR_BEGIN_MSG_MAP_EX(TimerHost, Win32Window)
@@ -38,7 +41,8 @@ class TimerHost : public Win32Window {
   UINT next_timer_id_ = 0;
 
   base::Lock lock_;
-  std::unordered_map<TimerId, Task> tasks_;
+  std::map<TimerId, Task> timeouts_;
+  std::map<TimerId, RepeatedTask> intervals_;
 };
 
 }  // namespace nu
