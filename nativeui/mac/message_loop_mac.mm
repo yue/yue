@@ -59,21 +59,23 @@ void MessageLoop::PostDelayedTask(int ms, Task task) {
   });
 }
 
-void MessageLoop::SetTimer(int ms, RepeatedTask task)
-{
-    RepeatedTask callback = std::move(task);
-    CFRunLoopRef run_loop = NSRunLoop.mainRunLoop.getCFRunLoop;
-    CFRunLoopTimerContext context = { .info = new RepeatedTask(std::move(callback)) };
-    CFRunLoopTimerRef timer = CFRunLoopTimerCreate(nullptr, 0, static_cast<float>(ms)/100, 0, 0, [](CFRunLoopTimerRef timer, void *ptr) {
-        RepeatedTask callback = std::move(*static_cast<RepeatedTask *>(ptr));
+// static
+void MessageLoop::SetTimer(int ms, RepeatedTask task) {
+  CFRunLoopRef run_loop = NSRunLoop.mainRunLoop.getCFRunLoop;
+  CFRunLoopTimerContext context = { .info = new RepeatedTask(std::move(task)) };
+  CFRunLoopTimerRef timer = CFRunLoopTimerCreate(
+      nullptr, 0, static_cast<float>(ms) / 100, 0, 0,
+      [](CFRunLoopTimerRef timer, void* ptr) {
+        const RepeatedTask& callback = *static_cast<RepeatedTask*>(ptr);
         if (!callback()) {
-          delete static_cast<RepeatedTask *>(ptr);
+          delete static_cast<RepeatedTask*>(ptr);
           CFRunLoopTimerInvalidate(timer);
         }
-    }, &context);
+      },
+      &context);
 
-    CFRunLoopAddTimer(run_loop, timer, kCFRunLoopCommonModes);
-    CFRelease(timer);
+  CFRunLoopAddTimer(run_loop, timer, kCFRunLoopCommonModes);
+  CFRelease(timer);
 }
 
 // static
