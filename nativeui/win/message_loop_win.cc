@@ -36,6 +36,11 @@ void MessageLoop::PostDelayedTask(int ms, Task task) {
 }
 
 // static
+void MessageLoop::SetTimer(int ms, RepeatedTask task) {
+  State::GetMain()->GetTimerHost()->SetInterval(ms, std::move(task));
+}
+
+// static
 UINT_PTR MessageLoop::SetTimeout(int ms, Task task) {
   return State::GetMain()->GetTimerHost()->SetTimeout(ms, std::move(task));
 }

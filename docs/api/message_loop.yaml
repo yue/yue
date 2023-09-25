@@ -46,9 +46,18 @@ class_methods:
   - signature: void PostTask(std::function<void()> task)
     description: Post a `task` to main thread's message loop.
 
-  - signature: void PostDelayedTask(int ms, std::function<void()> task);
+  - signature: void PostDelayedTask(int ms, std::function<void()> task)
     description: |
       Post a `task` to main thread's message loop and execute it after `ms`.
+    parameters:
+      ms:
+        description: The number of milliseconds to wait
+
+  - signature: void SetTimer(int ms, std::function<bool()> task)
+    description: |
+      Enqueue a task `task` to be run multiple times on the main thread's
+      message loop, delaying every `ms` miliseconds, and stopping if the task
+      returns `false`.
     parameters:
       ms:
         description: The number of milliseconds to wait

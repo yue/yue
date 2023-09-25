@@ -1938,7 +1938,8 @@ struct Type<nu::MessageLoop> {
            "run", &nu::MessageLoop::Run,
            "quit", &nu::MessageLoop::Quit,
            "posttask", &nu::MessageLoop::PostTask,
-           "postdelayedtask", &nu::MessageLoop::PostDelayedTask);
+           "postdelayedtask", &nu::MessageLoop::PostDelayedTask,
+           "settimer", &nu::MessageLoop::SetTimer);
   }
 };
 
