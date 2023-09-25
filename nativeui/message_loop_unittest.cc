@@ -20,3 +20,24 @@ TEST_F(MessageLoopTest, PostTask) {
   });
   nu::MessageLoop::Run();
 }
+
+TEST_F(MessageLoopTest, PostDelayedTask) {
+  nu::MessageLoop::PostDelayedTask(10, []() {
+    nu::MessageLoop::Quit();
+  });
+  nu::MessageLoop::Run();
+}
+
+TEST_F(MessageLoopTest, SetTimer) {
+  int count = 0;
+  nu::MessageLoop::SetTimer(10, [&count]() {
+    if (++count == 3) {
+      nu::MessageLoop::Quit();
+      return false;
+    } else {
+      return true;
+    }
+  });
+  nu::MessageLoop::Run();
+  ASSERT_EQ(count, 3);
+}
