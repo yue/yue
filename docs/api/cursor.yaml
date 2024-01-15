@@ -11,7 +11,6 @@ constructors:
     description: &ref1 Create a cursor of `type`.
 
 class_methods:
-  - signature: Font* CreateWithType(Cursor::Type type)
+  - signature: Cursor* CreateWithType(Cursor::Type type)
     lang: ['lua', 'js']
     description: *ref1
-
