@@ -56,10 +56,19 @@ jobs:
 
       - uses: actions/setup-python@v3
         with:
-          python-version: '3.x'
+          python-version: '3.11'
+
+      - name: Install Python Dependencies
+        run: python -m pip install --upgrade setuptools
 
       - name: Checkout
         uses: actions/checkout@v3
+
+      # Work around CI bug https://github.com/actions/runner-images/issues/8659.
+      - uses: mjp41/workaround8649@c8550b715ccdc17f89c8d5c28d7a48eeff9c94a8
+        if: matrix.os == 'ubuntu-22.04' && matrix.arch == 'x64'
+        with:
+          os: ${{ matrix.os }}
 
       - name: Build and Test
         env:

@@ -129,6 +129,7 @@ if(UNIX AND NOT APPLE)
   target_compile_definitions(${LIBYUE} PUBLIC USE_GLIB)
   target_compile_options(${LIBYUE} PRIVATE
                          -Wno-deprecated-declarations
+                         -Wno-unknown-attributes
                          -fdata-sections
                          -ffunction-sections)
   target_link_options(${LIBYUE} PUBLIC
