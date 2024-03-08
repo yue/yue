@@ -102,7 +102,7 @@ function CopySources(sources, headers) {
     ],
   }
   if (targetOs === 'win') {
-    CopySource('//base/allocator/partition_allocator/partition_alloc_base/win/win_handle_types_list.inc', path.join(targetDir, 'include'))
+    CopySource('//base/allocator/partition_allocator/src/partition_alloc/partition_alloc_base/win/win_handle_types_list.inc', path.join(targetDir, 'include'))
     CopySource('//base/win/win_handle_types_list.inc', path.join(targetDir, 'include'))
     CopySource('//base/win/windows_defines.inc', path.join(targetDir, 'include'))
     CopySource('//base/win/windows_undefines.inc', path.join(targetDir, 'include'))

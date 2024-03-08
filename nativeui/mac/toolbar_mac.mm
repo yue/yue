@@ -42,13 +42,13 @@
 - (void)setDefaultItemIdentifiers:(const std::vector<std::string>&)identifiers {
   default_identifiers_.reset([NSMutableArray arrayWithCapacity:identifiers.size()]);
   for (const auto& ident : identifiers)
-    [default_identifiers_ addObject:[self translateIdentifier:ident]];
+    [default_identifiers_.get() addObject:[self translateIdentifier:ident]];
 }
 
 - (void)setAllowedItemIdentifiers:(const std::vector<std::string>&)identifiers {
   allowed_identifiers_.reset([NSMutableArray arrayWithCapacity:identifiers.size()]);
   for (const auto& ident : identifiers)
-    [allowed_identifiers_ addObject:[self translateIdentifier:ident]];
+    [allowed_identifiers_.get() addObject:[self translateIdentifier:ident]];
 }
 
 - (NSToolbarItem*)toolbar:(NSToolbar*)toolbar
@@ -58,7 +58,7 @@ willBeInsertedIntoToolbar:(BOOL)flag {
   std::string ident = base::SysNSStringToUTF8(identifier);
   auto it = items_.find(ident);
   if (it != items_.end())
-    return it->second.second;
+    return it->second.second.get();
 
   // Checks.
   if (!shell_->get_item)
@@ -80,11 +80,11 @@ willBeInsertedIntoToolbar:(BOOL)flag {
     base::apple::scoped_nsobject<NSMutableArray> subitems(
         [NSMutableArray arrayWithCapacity:config.subitems.size()]);
     for (const std::string& sub_ident : config.subitems) {
-      [subitems addObject:[self toolbar:toolbar
+      [subitems.get() addObject:[self toolbar:toolbar
                   itemForItemIdentifier:base::SysUTF8ToNSString(sub_ident)
               willBeInsertedIntoToolbar:flag]];
     }
-    [group setSubitems:subitems];
+    [group setSubitems:subitems.get()];
     item = group;
   }
 

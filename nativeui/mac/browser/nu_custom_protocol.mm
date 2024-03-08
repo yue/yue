@@ -135,7 +135,7 @@ ProtocolHandlerMap& GetProtocolHandlers() {
                      expectedContentLength:size
                           textEncodingName:nil]);
     [[self client] URLProtocol:self
-            didReceiveResponse:response
+            didReceiveResponse:response.get()
             cacheStoragePolicy:NSURLCacheStorageNotAllowed];
     // Read data.
     char bytes[4089];

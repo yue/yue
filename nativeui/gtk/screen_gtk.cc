@@ -146,7 +146,16 @@ uint32_t Screen::DisplayIdFromNative(GdkMonitor* monitor) {
 
 // static
 NativeDisplay Screen::GetNativePrimaryDisplay() {
-  return gdk_display_get_primary_monitor(gdk_display_get_default());
+  GdkDisplay* display = gdk_display_get_default();
+  GdkMonitor* primary = gdk_display_get_primary_monitor(display);
+  if (primary)
+    return primary;
+  // In wayland there is no concept of primary display, so just return the
+  // first one found.
+  int n_monitors = gdk_display_get_n_monitors(display);
+  if (n_monitors > 0)
+    return gdk_display_get_monitor(display, 0);
+  return nullptr;
 }
 
 // static

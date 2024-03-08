@@ -109,7 +109,7 @@ STGMEDIUM* GetStorageForFileNames(const std::vector<base::FilePath>& paths) {
   HANDLE hdata = ::GlobalAlloc(GHND, total_bytes);
 
   base::win::ScopedHGlobal<DROPFILES*> locked_mem(hdata);
-  DROPFILES* drop_files = locked_mem.get();
+  DROPFILES* drop_files = locked_mem.data();
   drop_files->pFiles = sizeof(DROPFILES);
   drop_files->fWide = TRUE;
 

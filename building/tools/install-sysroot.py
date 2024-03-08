@@ -42,7 +42,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 URL_PREFIX = 'https://github.com'
 URL_PATH = 'yue/debian-sysroot-image-creator/releases/download'
 
-VALID_ARCHS = ('arm', 'arm64', 'i386', 'amd64', 'mips', 'mips64el')
+VALID_ARCHS = ('arm64', 'armhf', 'i386', 'amd64', 'mips', 'mips64el')
 
 ARCH_TRANSLATIONS = {
     'x64': 'amd64',
@@ -51,7 +51,7 @@ ARCH_TRANSLATIONS = {
     'mips64': 'mips64el',
 }
 
-DEFAULT_TARGET_PLATFORM = 'sid'
+DEFAULT_TARGET_PLATFORM = 'bullseye'
 
 class Error(Exception):
   pass

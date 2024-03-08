@@ -44,8 +44,8 @@ Buffer EncodeImage(NSImage* image,
       [image CGImageForProposedRect:nullptr context:nil hints:nil];
   base::apple::scoped_nsobject<NSBitmapImageRep> rep(
       [[NSBitmapImageRep alloc] initWithCGImage:cg_image]);
-  NSData* data = [[rep representationUsingType:type
-                                    properties:properties] retain];
+  NSData* data = [[rep.get() representationUsingType:type
+                                          properties:properties] retain];
   return Buffer::TakeOver(const_cast<void*>(data.bytes), data.length,
                           [data](void*) { [data release]; });
 }
@@ -83,7 +83,7 @@ Image::Image(const base::FilePath& p)
     base::apple::ScopedCFTypeRef<CGImageSourceRef> source(
         CGImageSourceCreateWithURL((__bridge CFURLRef)[NSURL fileURLWithPath:u],
                                    nullptr));
-    durations_ = GetFrameDurations(rep, source);
+    durations_ = GetFrameDurations(rep, source.get());
   }
   // Is template image.
   if (base::MatchPattern(p.value(), "*Template.*") ||
@@ -112,7 +112,7 @@ Image::Image(const Buffer& buffer, float scale_factor)
     base::apple::ScopedCFTypeRef<CGImageSourceRef> source(
         CGImageSourceCreateWithData((__bridge CFDataRef)buffer.ToNSData(),
                                     nullptr));
-    durations_ = GetFrameDurations(rep, source);
+    durations_ = GetFrameDurations(rep, source.get());
   }
 }
 
@@ -167,10 +167,10 @@ Image* Image::Resize(SizeF new_size, float scale_factor) const {
                 colorSpaceName:NSCalibratedRGBColorSpace
                    bytesPerRow:0
                   bitsPerPixel:0]);
-  [rep setSize:new_size.ToCGSize()];
+  [rep.get() setSize:new_size.ToCGSize()];
 
   NSGraphicsContext* context =
-      [NSGraphicsContext graphicsContextWithBitmapImageRep:rep];
+      [NSGraphicsContext graphicsContextWithBitmapImageRep:rep.get()];
   [NSGraphicsContext saveGraphicsState];
   [NSGraphicsContext setCurrentContext:context];
   [image_ drawInRect:RectF(new_size).ToCGRect()
@@ -179,7 +179,7 @@ Image* Image::Resize(SizeF new_size, float scale_factor) const {
   [NSGraphicsContext restoreGraphicsState];
 
   NSImage* resized = [[NSImage alloc] initWithSize:new_size.ToCGSize()];
-  [resized addRepresentation:rep];
+  [resized addRepresentation:rep.get()];
   return new Image(resized, scale_factor);
 }
 

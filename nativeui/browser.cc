@@ -31,7 +31,7 @@ const char Browser::kClassName[] = "Browser";
 Browser::Browser(Options options) {
   PlatformInit(std::move(options));
   // Generate a random number as security key.
-  base::Base64Encode(base::RandBytesAsString(16), &security_key_);
+  security_key_ = base::Base64Encode(base::RandBytesAsString(16));
 }
 
 Browser::~Browser() {
@@ -87,7 +87,7 @@ bool Browser::InvokeBindings(const std::string& json_str) {
   if (stop_serving_)
     return false;
 
-  absl::optional<base::Value> tup = base::JSONReader::Read(json_str);
+  std::optional<base::Value> tup = base::JSONReader::Read(json_str);
   if (!tup)
     return false;
   if (!tup->is_list() || tup->GetList().size() != 3 ||

@@ -9,8 +9,6 @@
 
 #include <string>
 
-#include "base/logging.h"
-#include "base/strings/string_piece.h"
 #include "nativeui/gfx/geometry/rect.h"
 #include "nativeui/win/util/msg_util.h"
 
@@ -37,7 +35,7 @@ class Win32Window {
   static const DWORD kWindowDefaultChildStyle;
   static const DWORD kWindowDefaultStyle;
 
-  Win32Window(base::WStringPiece class_name = L"",
+  Win32Window(std::wstring_view class_name = L"",
               HWND parent = NULL,
               DWORD window_style = kWindowDefaultStyle,
               DWORD window_ex_style = 0);

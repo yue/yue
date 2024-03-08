@@ -39,10 +39,10 @@ using napi_yue::Signal;
 using napi_yue::Delegate;
 
 template<typename T>
-struct Type<absl::optional<T>> {
+struct Type<std::optional<T>> {
   static constexpr const char* name = Type<T>::name;
   static napi_status ToNode(napi_env env,
-                            const absl::optional<T>& value,
+                            const std::optional<T>& value,
                             napi_value* result) {
     if (value)
       return ConvertToNode(env, *value, result);
@@ -51,7 +51,7 @@ struct Type<absl::optional<T>> {
   }
   static napi_status FromNode(napi_env env,
                               napi_value value,
-                              absl::optional<T>* out) {
+                              std::optional<T>* out) {
     napi_valuetype type;
     napi_status s = napi_typeof(env, value, &type);
     if (s == napi_ok) {
@@ -174,13 +174,13 @@ struct Type<base::Time> {
   static napi_status ToNode(napi_env env,
                             const base::Time& value,
                             napi_value* result) {
-    return napi_create_date(env, value.ToJsTimeIgnoringNull(), result);
+    return napi_create_date(env, value.InMillisecondsSinceUnixEpoch(), result);
   }
   static napi_status FromNode(napi_env env, napi_value value, base::Time* out) {
     double date;
     napi_status s = napi_get_date_value(env, value, &date);
     if (s == napi_ok)
-      *out = base::Time::FromJsTime(date);
+      *out = base::Time::FromMillisecondsSinceUnixEpoch(date);
     return s;
   }
 };

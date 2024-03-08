@@ -6,6 +6,7 @@
 #define NATIVEUI_NOTIFICATION_H_
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -15,7 +16,6 @@
 
 #if defined(OS_LINUX) || defined(OS_WIN)
 #include "base/files/scoped_temp_dir.h"
-#include "third_party/abseil-cpp/absl/types/optional.h"
 #endif
 
 namespace base {
@@ -46,8 +46,8 @@ class NATIVEUI_EXPORT Notification : public base::RefCounted<Notification> {
   std::string GetIdentifier() const;
 #endif
 #if defined(OS_WIN)
-  void SetImagePlacement(absl::optional<std::wstring> placement);
-  void SetXML(absl::optional<std::wstring> xml);
+  void SetImagePlacement(std::optional<std::wstring> placement);
+  void SetXML(std::optional<std::wstring> xml);
   std::wstring GetXML() const;
 #endif
 

@@ -5,13 +5,13 @@
 // LICENSE file.
 
 const {argv, clang, hostCpu, targetCpu, targetOs, execSync, spawnSync} = require('./common')
-const {gnConfig, gnSysrootConfig, luaVersions} = require('./config')
+const {gnConfig, luaVersions} = require('./config')
 
 // Get the arch of sysroot.
 let sysrootArch = {
   x64: 'amd64',
   x86: 'i386',
-  arm: 'arm',
+  arm: 'armhf',
   arm64: 'arm64',
 }[targetCpu]
 
@@ -52,12 +52,6 @@ const releaseConfig = [
   'is_debug=false',
   'is_official_build=true',
 ]
-if (targetOs == 'linux') {
-  debugConfig.push(...gnSysrootConfig)
-  releaseConfig.push(...gnSysrootConfig)
-  if (targetCpu != hostCpu)
-    componentConfig.push(...gnSysrootConfig)
-}
 
 gen('out/Component', componentConfig)
 gen('out/Debug', debugConfig)

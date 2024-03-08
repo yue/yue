@@ -1,22 +1,22 @@
 {
-    "sid_amd64": {
-        "Version": "20220402",
-        "SysrootDir": "debian_sid_amd64-sysroot",
-        "Tarball": "debian_sid_amd64_sysroot.tar.xz"
+    "bullseye_amd64": {
+        "Version": "20240308",
+        "SysrootDir": "debian_bullseye_amd64-sysroot",
+        "Tarball": "debian_bullseye_amd64_sysroot.tar.xz"
     },
-    "sid_arm": {
-        "Version": "20220402",
-        "SysrootDir": "debian_sid_arm-sysroot",
-        "Tarball": "debian_sid_arm_sysroot.tar.xz"
+    "bullseye_armhf": {
+        "Version": "20240308",
+        "SysrootDir": "debian_bullseye_armhf-sysroot",
+        "Tarball": "debian_bullseye_armhf_sysroot.tar.xz"
     },
-    "sid_arm64": {
-        "Version": "20220402",
-        "SysrootDir": "debian_sid_arm64-sysroot",
-        "Tarball": "debian_sid_arm64_sysroot.tar.xz"
+    "bullseye_arm64": {
+        "Version": "20240308",
+        "SysrootDir": "debian_bullseye_arm64-sysroot",
+        "Tarball": "debian_bullseye_arm64_sysroot.tar.xz"
     },
-    "sid_i386": {
-        "Version": "20220402",
-        "SysrootDir": "debian_sid_i386-sysroot",
-        "Tarball": "debian_sid_i386_sysroot.tar.xz"
+    "bullseye_i386": {
+        "Version": "20240308",
+        "SysrootDir": "debian_bullseye_i386-sysroot",
+        "Tarball": "debian_bullseye_i386_sysroot.tar.xz"
     }
 }

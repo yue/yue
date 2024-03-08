@@ -46,7 +46,7 @@
 - (id)initWithShell:(nu::Tab*)shell {
   if ((self = [super init])) {
     delegate_.reset([[NUTabDelegate alloc] initWithShell:shell]);
-    [self setDelegate:delegate_];
+    [self setDelegate:delegate_.get()];
   }
   return self;
 }
@@ -84,9 +84,9 @@ NativeView Tab::PlatformCreate() {
 void Tab::PlatformAddPage(const std::string& title, View* view) {
   auto* tab = static_cast<NUTab*>(GetNative());
   base::apple::scoped_nsobject<NSTabViewItem> item([[NSTabViewItem alloc] init]);
-  [item setLabel:base::SysUTF8ToNSString(title)];
-  [item setView:view->GetNative()];
-  [tab addTabViewItem:item];
+  [item.get() setLabel:base::SysUTF8ToNSString(title)];
+  [item.get() setView:view->GetNative()];
+  [tab addTabViewItem:item.get()];
 }
 
 void Tab::PlatformRemovePage(int index, View* view) {

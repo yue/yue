@@ -5,13 +5,13 @@
 #ifndef NATIVEUI_GFX_ATTRIBUTED_TEXT_H_
 #define NATIVEUI_GFX_ATTRIBUTED_TEXT_H_
 
+#include <optional>
 #include <string>
 
 #include "base/memory/ref_counted.h"
 #include "nativeui/gfx/color.h"
 #include "nativeui/gfx/text.h"
 #include "nativeui/types.h"
-#include "third_party/abseil-cpp/absl/types/optional.h"
 
 namespace nu {
 
@@ -62,7 +62,7 @@ class NATIVEUI_EXPORT AttributedText : public base::RefCounted<AttributedText> {
   // impossible to add attribute that applies on full text. We work around it
   // by keeping a record of the attributes to add.
   scoped_refptr<Font> font_;
-  absl::optional<Color> color_;
+  std::optional<Color> color_;
 #endif
 
   NativeAttributedText text_;

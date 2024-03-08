@@ -14,7 +14,7 @@ namespace nu {
 class SubwinView : public Win32Window, public ViewImpl {
  public:
   SubwinView(View* delegate,
-             base::WStringPiece class_name = L"",
+             std::wstring_view class_name = L"",
              DWORD window_style = kWindowDefaultChildStyle,
              DWORD window_ex_style = 0);
   ~SubwinView() override;

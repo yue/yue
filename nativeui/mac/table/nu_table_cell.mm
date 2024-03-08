@@ -57,17 +57,17 @@
         base::apple::scoped_nsobject<NSTextField> textField(
             [[NSTextField alloc] initWithFrame:NSZeroRect]);
         if (type_ == nu::Table::ColumnType::Edit) {
-          [textField setTarget:self];
-          [textField setAction:@selector(onEditDone:)];
+          [textField.get() setTarget:self];
+          [textField.get() setAction:@selector(onEditDone:)];
         } else {
-          [textField setEditable:NO];
+          [textField.get() setEditable:NO];
         }
-        [textField setDrawsBackground:NO];
-        [textField setBezeled:NO];
-        [textField setSelectable:YES];
-        [self setTextField:textField];
-        [self addSubview:textField];
-        [self makeViewCenterAlign:textField];
+        [textField.get() setDrawsBackground:NO];
+        [textField.get() setBezeled:NO];
+        [textField.get() setSelectable:YES];
+        [self setTextField:textField.get()];
+        [self addSubview:textField.get()];
+        [self makeViewCenterAlign:textField.get()];
         break;
       }
 
@@ -85,8 +85,8 @@
       case nu::Table::ColumnType::Custom: {
         base::apple::scoped_nsobject<NUCustomTableCellView> customView(
             [[NUCustomTableCellView alloc] initWithColumnOptions:options]);
-        [customView setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
-        [self addSubview:customView];
+        [customView.get() setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
+        [self addSubview:customView.get()];
         break;
       }
     }

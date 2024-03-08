@@ -25,8 +25,8 @@ mswr::ComPtr<IToastNotification> BuildNotification(
 
 mswr::ComPtr<INotificationData> CreateNotificationData();
 HRESULT NotificationDataInsert(INotificationData* data,
-                               base::WStringPiece key,
-                               base::WStringPiece value);
+                               std::wstring_view key,
+                               std::wstring_view value);
 
 }  // namespace nu
 

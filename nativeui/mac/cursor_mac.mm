@@ -31,7 +31,7 @@ NSCursor* LoadFromHIServices(NSString* name) {
   NSPoint hotSpot = NSMakePoint(
       [[info valueForKey:@"hotx"] doubleValue],
       [[info valueForKey:@"hoty"] doubleValue]);
-  return [[NSCursor alloc] initWithImage:image hotSpot:hotSpot];
+  return [[NSCursor alloc] initWithImage:image.get() hotSpot:hotSpot];
 }
 
 }  // namespace

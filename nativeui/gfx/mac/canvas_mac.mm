@@ -22,7 +22,7 @@ NativeBitmap Canvas::PlatformCreateBitmap(const SizeF& size,
         CGColorSpaceCreateDeviceRGB());
   CGContextRef bitmap = CGBitmapContextCreate(
       nullptr, size.width() * scale_factor, size.height() * scale_factor,
-      8, 0, color_space,
+      8, 0, color_space.get(),
       kCGImageAlphaPremultipliedFirst |
           static_cast<CGImageAlphaInfo>(kCGBitmapByteOrder32Host));
   return bitmap;

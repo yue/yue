@@ -56,17 +56,17 @@
     self.drawsBackground = NO; // disable super NSScrollView background
     delegate_.reset([[NUTextViewDelegate alloc] initWithShell:shell]);
     textView_.reset([[NSTextView alloc] init]);
-    [textView_ setDelegate:delegate_.get()];
-    [textView_ setRichText:NO];
-    [textView_ setAllowsUndo:YES];
+    [textView_.get() setDelegate:delegate_.get()];
+    [textView_.get() setRichText:NO];
+    [textView_.get() setAllowsUndo:YES];
     // Do not change width to fix text, i.e. alwasys wrap text.
-    [textView_ setHorizontallyResizable:NO];
-    [textView_ setVerticallyResizable:YES];
-    [textView_ setTextContainerInset:NSMakeSize(0, 0)];
-    [textView_ setAutoresizingMask:NSViewWidthSizable];
-    [[textView_ textContainer] setContainerSize:NSMakeSize(FLT_MAX, FLT_MAX)];
-    [[textView_ textContainer] setWidthTracksTextView:YES];
-    [[textView_ textContainer] setLineFragmentPadding:0];
+    [textView_.get() setHorizontallyResizable:NO];
+    [textView_.get() setVerticallyResizable:YES];
+    [textView_.get() setTextContainerInset:NSMakeSize(0, 0)];
+    [textView_.get() setAutoresizingMask:NSViewWidthSizable];
+    [[textView_.get() textContainer] setContainerSize:NSMakeSize(FLT_MAX, FLT_MAX)];
+    [[textView_.get() textContainer] setWidthTracksTextView:YES];
+    [[textView_.get() textContainer] setLineFragmentPadding:0];
     self.documentView = textView_.get();
   }
   return self;
@@ -77,23 +77,23 @@
 }
 
 - (void)setNUFont:(nu::Font*)font {
-  [textView_ setFont:font->GetNative()];
+  [textView_.get() setFont:font->GetNative()];
 }
 
 - (void)setNUColor:(nu::Color)color {
-  [textView_ setTextColor:color.ToNSColor()];
+  [textView_.get() setTextColor:color.ToNSColor()];
 }
 
 - (void)setNUBackgroundColor:(nu::Color)color {
-  [textView_ setBackgroundColor:color.ToNSColor()];
+  [textView_.get() setBackgroundColor:color.ToNSColor()];
 }
 
 - (void)setNUEnabled:(BOOL)enabled {
-  [textView_ setEditable:enabled];
+  [textView_.get() setEditable:enabled];
 }
 
 - (BOOL)isNUEnabled {
-  return [textView_ isEditable];
+  return [textView_.get() isEditable];
 }
 
 @end

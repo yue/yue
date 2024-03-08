@@ -373,7 +373,7 @@ function parseType(lang, str) {
       type.args = matchedType.split(',').map((t) => parseType(lang, t.trim()))
     } else if (type.name == 'scoped_refptr') {
       type.name = matchedType
-    } else if (type.name == 'base::Optional' || type.name == 'absl::optional') {
+    } else if (type.name == 'base::Optional' || type.name == 'std::optional') {
       type.name = matchedType
       type.nullable = true
     }

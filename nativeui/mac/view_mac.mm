@@ -219,14 +219,14 @@ int View::DoDragWithOptions(std::vector<Clipboard::Data> data,
                                       pressure:1.0];
 
   // The drag pasteboard only accepts UTI type strings.
-  NSArray* types = [[priv->data_source pasteboard] types];
+  NSArray* types = [[priv->data_source.get() pasteboard] types];
   NSMutableArray* newTypes = [NSMutableArray array];
   for (NSString* type in types)
     [newTypes addObject:UTIFromPboardType(type)];
 
   base::apple::scoped_nsobject<NSPasteboardItem> item([[NSPasteboardItem alloc] init]);
-  [item setDataProvider:priv->data_source
-               forTypes:newTypes];
+  [item.get() setDataProvider:priv->data_source.get()
+                     forTypes:newTypes];
 
   base::apple::scoped_nsobject<NSDraggingItem> drag_item(
       [[NSDraggingItem alloc] initWithPasteboardWriter:item.get()]);
@@ -236,9 +236,9 @@ int View::DoDragWithOptions(std::vector<Clipboard::Data> data,
     NSImage* image = options.image->GetNative();
     NSRect dragging_frame = NSMakeRect([event locationInWindow].x, 0,
                                        [image size].width, [image size].height);
-    [drag_item setDraggingFrame:dragging_frame contents:image];
+    [drag_item.get() setDraggingFrame:dragging_frame contents:image];
   } else {
-    [drag_item setDraggingFrame:NSMakeRect(0, 0, 100, 100) contents:nil];
+    [drag_item.get() setDraggingFrame:NSMakeRect(0, 0, 100, 100) contents:nil];
   }
 
   [view_ beginDraggingSessionWithItems:@[drag_item.get()]

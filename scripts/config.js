@@ -5,14 +5,14 @@ const webview2Version = '1.0.1722.45'
 
 // The versions of language bindings to test against.
 const nodeVersions = [
-  '16.20.2',
-  '18.17.1',
-  '20.5.1',
+  '18.19.1',
+  '20.11.1',
+  '21.7.1',
 ]
 const electronVersions = [
-  '24.8.1',
-  '25.7.0',
-  '26.1.0',
+  '27.3.5',
+  '28.2.6',
+  '29.1.1',
 ]
 const luaVersions = [
   '5.3.6',
@@ -21,7 +21,7 @@ const luaVersions = [
 ]
 
 // The version of gn.
-const gnVersion = '0.10.0'
+const gnVersion = '0.11.0'
 
 // The common build configurations.
 const gnConfig = [
@@ -37,9 +37,11 @@ if (targetOs == 'win') {
 // The build configuration for sysroot.
 const gnSysrootConfig = [
   'use_sysroot=true',
-  'debian_platform="sid"',
   'target_sysroot_dir="//third_party/"',
 ]
+if (process.platform == 'linux') {
+  gnConfig.push(...gnSysrootConfig);
+}
 
 module.exports = {
   webview2Version,
@@ -48,5 +50,4 @@ module.exports = {
   luaVersions,
   gnVersion,
   gnConfig,
-  gnSysrootConfig,
 }

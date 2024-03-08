@@ -82,21 +82,21 @@ base::Time DatePicker::GetDate() const {
   return base::Time::FromNSDate(date);
 }
 
-void DatePicker::SetRange(const absl::optional<base::Time>& min,
-                          const absl::optional<base::Time>& max) {
+void DatePicker::SetRange(const std::optional<base::Time>& min,
+                          const std::optional<base::Time>& max) {
   auto* picker = static_cast<NSDatePicker*>(GetNative());
   [picker setMinDate:min ? min->ToNSDate() : nil];
   [picker setMaxDate:max ? max->ToNSDate() : nil];
 }
 
-std::tuple<absl::optional<base::Time>,
-           absl::optional<base::Time>> DatePicker::GetRange() const {
+std::tuple<std::optional<base::Time>,
+           std::optional<base::Time>> DatePicker::GetRange() const {
   auto* picker = static_cast<NSDatePicker*>(GetNative());
   return std::make_tuple(
       [picker minDate] ? base::Time::FromNSDate([picker minDate])
-                       : absl::optional<base::Time>(),
+                       : std::optional<base::Time>(),
       [picker maxDate] ? base::Time::FromNSDate([picker maxDate])
-                       : absl::optional<base::Time>());
+                       : std::optional<base::Time>());
 }
 
 bool DatePicker::HasStepper() const {

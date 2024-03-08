@@ -47,7 +47,7 @@ void DisableWindowTracking(NSWindow* self, SEL _cmd) {
 }
 
 bool HasWindowTrackingArea(NSWindow* self, SEL _cmd) {
-  return [self nuPrivate]->tracking_area;
+  return [self nuPrivate]->tracking_area.get();
 }
 
 void UpdateWindowTrackingAreas(NSWindow* self, SEL _cmd) {

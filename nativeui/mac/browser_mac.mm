@@ -66,11 +66,11 @@
   base::apple::scoped_nsobject<WKWebViewConfiguration> config(
       [[WKWebViewConfiguration alloc] init]);
   if (options.devtools)
-    [[config preferences] setValue:@YES forKey:@"developerExtrasEnabled"];
+    [[config.get() preferences] setValue:@YES forKey:@"developerExtrasEnabled"];
   if (options.allow_file_access_from_files)
-    [[config preferences] setValue:@YES forKey:@"allowFileAccessFromFileURLs"];
-  [[config userContentController] addScriptMessageHandler:handler_.get()
-                                                     name:@"yue"];
+    [[config.get() preferences] setValue:@YES forKey:@"allowFileAccessFromFileURLs"];
+  [[config.get() userContentController] addScriptMessageHandler:handler_.get()
+                                                           name:@"yue"];
   [super initWithFrame:NSZeroRect configuration:config.get()];
 
   // Watch the webview events

@@ -26,7 +26,7 @@ class YueValuesTest : public testing::Test {
 };
 
 TEST_F(YueValuesTest, ValueConversions) {
-  absl::optional<base::Value> in = base::JSONReader::Read(
+  std::optional<base::Value> in = base::JSONReader::Read(
       "{ \"a\": " ONE ",\"b\": { \"c\": [\"t\", \"e\"], \"d\": \"st\" } }");
   lua::Push(state_, *in);
   base::Value out;

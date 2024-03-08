@@ -13,7 +13,7 @@ UniquePasteboard::UniquePasteboard()
     : pasteboard_([[NSPasteboard pasteboardWithUniqueName] retain]) {}
 
 UniquePasteboard::~UniquePasteboard() {
-  [pasteboard_ releaseGlobally];
+  [pasteboard_.get() releaseGlobally];
 }
 
 }  // namespace nu

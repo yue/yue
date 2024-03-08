@@ -8,6 +8,7 @@
 #define LUA_TYPES_H_
 
 #include <map>
+#include <optional>
 #include <set>
 #include <string>
 #include <tuple>
@@ -17,7 +18,6 @@
 #include "base/strings/string_piece.h"
 #include "base/strings/utf_string_conversions.h"
 #include "lua/stack_auto_reset.h"
-#include "third_party/abseil-cpp/absl/types/optional.h"
 
 namespace lua {
 
@@ -240,15 +240,15 @@ struct Type<const char[n]> {
 };
 
 template<typename T>
-struct Type<absl::optional<T>> {
+struct Type<std::optional<T>> {
   static constexpr const char* name = Type<T>::name;
-  static inline void Push(State* state, const absl::optional<T>& value) {
+  static inline void Push(State* state, const std::optional<T>& value) {
     if (value)
       Type<T>::Push(state, *value);
     else
       lua_pushnil(state);
   }
-  static inline bool To(State* state, int index, absl::optional<T>* out) {
+  static inline bool To(State* state, int index, std::optional<T>* out) {
     if (GetType(state, index) == LuaType::Nil) {
       out->reset();
       return true;

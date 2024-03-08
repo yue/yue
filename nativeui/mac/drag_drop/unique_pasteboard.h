@@ -17,7 +17,7 @@ class UniquePasteboard {
   UniquePasteboard();
   ~UniquePasteboard();
 
-  NSPasteboard* get() { return pasteboard_; }
+  NSPasteboard* get() { return pasteboard_.get(); }
 
  private:
   base::apple::scoped_nsobject<NSPasteboard> pasteboard_;

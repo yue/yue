@@ -16,7 +16,6 @@
 #include "base/win/shortcut.h"
 #include "nativeui/notification_center.h"
 #include "nativeui/state.h"
-#include "third_party/abseil-cpp/absl/types/optional.h"
 
 namespace nu {
 
@@ -29,7 +28,7 @@ std::string App::GetID() const {
 }
 
 bool App::IsRunningAsUWP() const {
-  static absl::optional<bool> result;
+  static std::optional<bool> result;
   if (!result) {
     result.emplace(false);
     auto get_package_family_name =

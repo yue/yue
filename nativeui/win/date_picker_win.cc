@@ -134,8 +134,8 @@ base::Time DatePicker::GetDate() const {
   return SystemTimeToBaseTime(systemtime);
 }
 
-void DatePicker::SetRange(const absl::optional<base::Time>& min,
-                          const absl::optional<base::Time>& max) {
+void DatePicker::SetRange(const std::optional<base::Time>& min,
+                          const std::optional<base::Time>& max) {
   WPARAM flags = 0;
   SYSTEMTIME systemtimes[2] = {0};
   if (min) {
@@ -150,16 +150,16 @@ void DatePicker::SetRange(const absl::optional<base::Time>& min,
                     flags, &systemtimes);
 }
 
-std::tuple<absl::optional<base::Time>,
-           absl::optional<base::Time>> DatePicker::GetRange() const {
+std::tuple<std::optional<base::Time>,
+           std::optional<base::Time>> DatePicker::GetRange() const {
   SYSTEMTIME systemtimes[2] = {0};
   DWORD flags = DateTime_GetRange(
       static_cast<DatePickerImpl*>(GetNative())->hwnd(), &systemtimes);
   return std::make_tuple(
       flags & GDTR_MIN ? SystemTimeToBaseTime(systemtimes[0])
-                       : absl::optional<base::Time>(),
+                       : std::optional<base::Time>(),
       flags & GDTR_MAX ? SystemTimeToBaseTime(systemtimes[1])
-                       : absl::optional<base::Time>());
+                       : std::optional<base::Time>());
 }
 
 bool DatePicker::HasStepper() const {

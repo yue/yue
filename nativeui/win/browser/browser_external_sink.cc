@@ -69,7 +69,7 @@ IFACEMETHODIMP BrowserExternalSink::GetIDsOfNames(
     __RPC__out_ecount_full(cNames) DISPID *rgDispId) {
   if (browser_->delegate()->stop_serving())
     return DISP_E_UNKNOWNNAME;
-  if (cNames == 1 && base::WStringPiece(rgszNames[0]) == L"postMessage") {
+  if (cNames == 1 && std::wstring_view(rgszNames[0]) == L"postMessage") {
     rgDispId[0] = kInvokeId;
     return S_OK;
   }

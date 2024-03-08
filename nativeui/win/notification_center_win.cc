@@ -136,7 +136,7 @@ const std::wstring& NotificationCenter::GetToastActivatorCLSID() {
     // Generate one from AppUserModelID if not set.
     ::GUID clsid;
     uint32_t h = base::Hash(
-        base::as_u16cstr(App::GetCurrent()->GetAppUserModelID()));
+        base::WideToUTF8(App::GetCurrent()->GetAppUserModelID()));
     for (size_t i = 0; i < sizeof(GUID); i += sizeof(uint32_t))
       memcpy(reinterpret_cast<char*>(&clsid) + i, &h, sizeof(uint32_t));
     base::win::ScopedCoMem<OLECHAR> clsid_string;

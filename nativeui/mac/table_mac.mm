@@ -75,13 +75,13 @@
   if ((self = [super init])) {
     tableView_.reset([[NSTableView alloc] init]);
     delegate_.reset([[NUTableDelegate alloc] initWithShell:shell]);
-    [tableView_ setDelegate:delegate_];
-    [tableView_ setTarget:delegate_];
-    [tableView_ setDoubleAction:@selector(doubleAction:)];
+    [tableView_.get() setDelegate:delegate_.get()];
+    [tableView_.get() setTarget:delegate_.get()];
+    [tableView_.get() setDoubleAction:@selector(doubleAction:)];
     [self setBorderType:NSNoBorder];
     [self setHasVerticalScroller:YES];
     [self setHasHorizontalScroller:YES];
-    [self setDocumentView:tableView_];
+    [self setDocumentView:tableView_.get()];
     // Table with header is incorrectly scrolled.
     // https://bugs.eclipse.org/bugs/show_bug.cgi?id=575259
     [self setFrame:NSMakeRect(0, 0, 100, 100)];
@@ -91,11 +91,11 @@
 
 - (void)setColumnsVisible:(bool)visible {
   if (visible) {
-    [tableView_ setHeaderView:headerView_];
+    [tableView_.get() setHeaderView:headerView_.get()];
     headerView_.reset();
   } else {
-    headerView_.reset([tableView_ headerView]);
-    [tableView_ setHeaderView:nil];
+    headerView_.reset([tableView_.get() headerView]);
+    [tableView_.get() setHeaderView:nil];
   }
 }
 
@@ -104,7 +104,7 @@
     dataSource_.reset([[NUTableDataSource alloc] initWithTableModel:model]);
   else
     dataSource_.reset();
-  [tableView_ setDataSource:dataSource_];
+  [tableView_.get() setDataSource:dataSource_.get()];
 }
 
 - (nu::NUViewPrivate*)nuPrivate {
@@ -112,22 +112,22 @@
 }
 
 - (void)setNUFont:(nu::Font*)font {
-  [tableView_ setFont:font->GetNative()];
+  [tableView_.get() setFont:font->GetNative()];
 }
 
 - (void)setNUColor:(nu::Color)color {
 }
 
 - (void)setNUBackgroundColor:(nu::Color)color {
-  [tableView_ setBackgroundColor:color.ToNSColor()];
+  [tableView_.get() setBackgroundColor:color.ToNSColor()];
 }
 
 - (void)setNUEnabled:(BOOL)enabled {
-  [tableView_ setEnabled:enabled];
+  [tableView_.get() setEnabled:enabled];
 }
 
 - (BOOL)isNUEnabled {
-  return [tableView_ isEnabled];
+  return [tableView_.get() isEnabled];
 }
 
 @end
@@ -154,7 +154,7 @@ void Table::AddColumnWithOptions(const std::string& title,
      [[NUTableColumn alloc] initWithTable:this
                                     title:title
                                   options:options]);
-  [tableView addTableColumn:tableColumn];
+  [tableView addTableColumn:tableColumn.get()];
 }
 
 int Table::GetColumnCount() const {

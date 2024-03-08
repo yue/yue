@@ -28,7 +28,7 @@ base::apple::ScopedCFTypeRef<CFURLRef> FilePathToCFURL(const base::FilePath& pat
   if (!path_cfstring)
     return base::apple::ScopedCFTypeRef<CFURLRef>();
   return base::apple::ScopedCFTypeRef<CFURLRef>(CFURLCreateWithFileSystemPath(
-      kCFAllocatorDefault, path_cfstring, kCFURLPOSIXPathStyle,
+      kCFAllocatorDefault, path_cfstring.get(), kCFURLPOSIXPathStyle,
       /*isDirectory=*/FALSE));
 }
 
@@ -120,8 +120,8 @@ NSFont* NSFontWithSpec(const std::string& font_name, float font_size,
 NSFont* NSFontFromPath(const base::FilePath& path, float size) {
   base::apple::ScopedCFTypeRef<CFURLRef> url = FilePathToCFURL(path);
   base::apple::ScopedCFTypeRef<CFArrayRef> descriptors(
-      CTFontManagerCreateFontDescriptorsFromURL(url));
-  NSArray* descriptors_list = CFToNSCast(descriptors);
+      CTFontManagerCreateFontDescriptorsFromURL(url.get()));
+  NSArray* descriptors_list = CFToNSCast(descriptors.get());
   for (NSFontDescriptor* descriptor in descriptors_list)
     return [NSFont fontWithDescriptor:descriptor size:size];
   return [NSFont systemFontOfSize:13];

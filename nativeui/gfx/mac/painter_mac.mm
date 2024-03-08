@@ -52,10 +52,10 @@ base::apple::scoped_nsobject<NSImage> CreateNSImageFromCanvas(Canvas* canvas) {
   base::apple::ScopedCFTypeRef<CGImageRef> cgimage(
       CGBitmapContextCreateImage(canvas->GetBitmap()));
   base::apple::scoped_nsobject<NSBitmapImageRep> bitmap(
-      [[NSBitmapImageRep alloc] initWithCGImage:cgimage]);
+      [[NSBitmapImageRep alloc] initWithCGImage:cgimage.get()]);
   base::apple::scoped_nsobject<NSImage> image(
       [[NSImage alloc] initWithSize:canvas->GetSize().ToCGSize()]);
-  [image addRepresentation:bitmap.get()];
+  [image.get() addRepresentation:bitmap.get()];
   return image;
 }
 
@@ -239,24 +239,24 @@ void PainterMac::DrawImageFromRect(const Image* image, const RectF& src,
 void PainterMac::DrawCanvas(Canvas* canvas, const RectF& rect) {
   base::apple::scoped_nsobject<NSImage> image(CreateNSImageFromCanvas(canvas));
   GraphicsContextScope scoped(target_context_);
-  [image drawInRect:rect.ToCGRect()
-           fromRect:NSZeroRect
-          operation:NSCompositingOperationSourceOver
-           fraction:1.0
-     respectFlipped:NO
-              hints:nil];
+  [image.get() drawInRect:rect.ToCGRect()
+                 fromRect:NSZeroRect
+                operation:NSCompositingOperationSourceOver
+                 fraction:1.0
+           respectFlipped:NO
+                    hints:nil];
 }
 
 void PainterMac::DrawCanvasFromRect(Canvas* canvas, const RectF& src,
                                     const RectF& dest) {
   base::apple::scoped_nsobject<NSImage> image(CreateNSImageFromCanvas(canvas));
   GraphicsContextScope scoped(target_context_);
-  [image drawInRect:dest.ToCGRect()
-           fromRect:src.ToCGRect()
-          operation:NSCompositingOperationSourceOver
-           fraction:1.0
-     respectFlipped:NO
-              hints:nil];
+  [image.get() drawInRect:dest.ToCGRect()
+                 fromRect:src.ToCGRect()
+                operation:NSCompositingOperationSourceOver
+                 fraction:1.0
+           respectFlipped:NO
+                    hints:nil];
 }
 
 void PainterMac::DrawAttributedText(scoped_refptr<AttributedText> text,

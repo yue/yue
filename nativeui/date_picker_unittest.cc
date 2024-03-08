@@ -41,7 +41,7 @@ TEST_F(DatePickerTest, SetRange) {
   ASSERT_TRUE(base::Time::FromString("7 Oct 1990", &time2));
 
   scoped_refptr<nu::DatePicker> picker(new nu::DatePicker({}));
-  picker->SetRange(time1, absl::nullopt);
+  picker->SetRange(time1, std::nullopt);
   auto range = picker->GetRange();
   EXPECT_TRUE(std::get<0>(range));
   EXPECT_FALSE(std::get<1>(range));
@@ -54,7 +54,7 @@ TEST_F(DatePickerTest, SetRange) {
   EXPECT_EQ(time1, *std::get<0>(range));
   EXPECT_EQ(time2, *std::get<1>(range));
 
-  picker->SetRange(absl::nullopt, absl::nullopt);
+  picker->SetRange(std::nullopt, std::nullopt);
   range = picker->GetRange();
   EXPECT_FALSE(std::get<0>(range));
   EXPECT_FALSE(std::get<1>(range));

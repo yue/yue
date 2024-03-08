@@ -24,7 +24,7 @@ STGMEDIUM* GetStorageForBytes(const void* data, size_t bytes) {
   HANDLE handle = GlobalAlloc(GPTR, static_cast<int>(bytes));
   if (handle) {
     base::win::ScopedHGlobal<uint8_t*> scoped(handle);
-    memcpy(scoped.get(), data, bytes);
+    memcpy(scoped.data(), data, bytes);
   }
 
   STGMEDIUM* storage = new STGMEDIUM;

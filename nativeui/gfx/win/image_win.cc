@@ -19,7 +19,7 @@ namespace nu {
 
 namespace {
 
-bool GetEncoderClsid(base::WStringPiece format, CLSID* clsid) {
+bool GetEncoderClsid(std::wstring_view format, CLSID* clsid) {
   UINT num = 0, size = 0;
   if (Gdiplus::GetImageEncodersSize(&num, &size) != Gdiplus::Ok)
     return false;
@@ -36,7 +36,7 @@ bool GetEncoderClsid(base::WStringPiece format, CLSID* clsid) {
 }
 
 Buffer EncodeImage(const Gdiplus::Image* image,
-                   base::WStringPiece mime_type,
+                   std::wstring_view mime_type,
                    Gdiplus::EncoderParameters* params = nullptr) {
   // Create an IStream object in memory.
   Microsoft::WRL::ComPtr<IStream> stream;
@@ -51,7 +51,7 @@ Buffer EncodeImage(const Gdiplus::Image* image,
   if (FAILED(::GetHGlobalFromStream(stream.Get(), &hdata)))
     return Buffer();
   base::win::ScopedHGlobal<void*> locked_data(hdata);
-  size_t size = locked_data.Size();
+  size_t size = locked_data.size();
   void* memory = new char[size];
   memcpy(memory, locked_data.release(), size);
   return Buffer::TakeOver(memory, size,
@@ -71,7 +71,7 @@ Image::Image(const Buffer& buffer, float scale_factor)
   HGLOBAL glob = ::GlobalAlloc(GPTR, buffer.size());
   {
     base::win::ScopedHGlobal<void*> global_lock(glob);
-    memcpy(global_lock.get(), buffer.content(), buffer.size());
+    memcpy(global_lock.data(), buffer.content(), buffer.size());
   }
   Microsoft::WRL::ComPtr<IStream> stream;
   ::CreateStreamOnHGlobal(glob, TRUE, &stream);

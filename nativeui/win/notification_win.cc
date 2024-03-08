@@ -300,13 +300,13 @@ std::string Notification::GetIdentifier() const {
   return base::WideToUTF8(notification_->id);
 }
 
-void Notification::SetImagePlacement(absl::optional<std::wstring> placement) {
+void Notification::SetImagePlacement(std::optional<std::wstring> placement) {
   if (!notification_)
     return;
   notification_->image_placement = std::move(placement);
 }
 
-void Notification::SetXML(absl::optional<std::wstring> xml) {
+void Notification::SetXML(std::optional<std::wstring> xml) {
   if (!notification_)
     return;
   notification_->xml = std::move(xml);

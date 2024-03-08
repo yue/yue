@@ -5,10 +5,10 @@
 #ifndef NATIVEUI_DATE_PICKER_H_
 #define NATIVEUI_DATE_PICKER_H_
 
+#include <optional>
 #include <tuple>
 
 #include "nativeui/view.h"
-#include "third_party/abseil-cpp/absl/types/optional.h"
 
 namespace base {
 class Time;
@@ -38,10 +38,10 @@ class NATIVEUI_EXPORT DatePicker : public View {
 
   void SetDate(const base::Time& time);
   base::Time GetDate() const;
-  void SetRange(const absl::optional<base::Time>& min,
-                const absl::optional<base::Time>& max);
-  std::tuple<absl::optional<base::Time>,
-             absl::optional<base::Time>> GetRange() const;
+  void SetRange(const std::optional<base::Time>& min,
+                const std::optional<base::Time>& max);
+  std::tuple<std::optional<base::Time>,
+             std::optional<base::Time>> GetRange() const;
   bool HasStepper() const;
 
   // View:

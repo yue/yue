@@ -101,7 +101,7 @@ BOOL MouseDownCanMoveWindow(NSView* self, SEL _cmd) {
 void ResetCursorRects(NSView* self, SEL _cmd) {
   NUViewPrivate* priv = [self nuPrivate];
   if (priv->cursor) {
-    [self addCursorRect:[self bounds] cursor:priv->cursor];
+    [self addCursorRect:[self bounds] cursor:priv->cursor.get()];
   } else {
     auto super_impl = reinterpret_cast<decltype(&ResetCursorRects)>(
         [[self superclass] instanceMethodForSelector:_cmd]);

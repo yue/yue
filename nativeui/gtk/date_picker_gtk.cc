@@ -65,8 +65,8 @@ struct NUDatePickerPrivate {
 
   int elements = 0;
   base::Time date = base::Time::Now();
-  absl::optional<base::Time> min_date;
-  absl::optional<base::Time> max_date;
+  std::optional<base::Time> min_date;
+  std::optional<base::Time> max_date;
 
   scoped_refptr<Popover> popover;
   Calendar* calendar;  // managed by popover
@@ -347,16 +347,16 @@ base::Time DatePicker::GetDate() const {
   return NUDatePickerPrivate::From(this)->date;
 }
 
-void DatePicker::SetRange(const absl::optional<base::Time>& min,
-                          const absl::optional<base::Time>& max) {
+void DatePicker::SetRange(const std::optional<base::Time>& min,
+                          const std::optional<base::Time>& max) {
   auto* priv = NUDatePickerPrivate::From(this);
   priv->min_date = min;
   priv->max_date = max;
   priv->UpdateDate();
 }
 
-std::tuple<absl::optional<base::Time>,
-           absl::optional<base::Time>> DatePicker::GetRange() const {
+std::tuple<std::optional<base::Time>,
+           std::optional<base::Time>> DatePicker::GetRange() const {
   auto* priv = NUDatePickerPrivate::From(this);
   return std::make_tuple(priv->min_date, priv->max_date);
 }

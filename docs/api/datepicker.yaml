@@ -40,11 +40,11 @@ methods:
   - signature: base::Time GetDate() const
     description: Get the selected date.
 
-  - signature: void SetRange(const absl::optional<base::Time>& minimum,
-                             const absl::optional<base::Time>& maximum)
+  - signature: void SetRange(const std::optional<base::Time>& minimum,
+                             const std::optional<base::Time>& maximum)
     description: Set the `minimum` and `maximum` date values.
 
-  - signature: std::tuple<absl::optional<base::Time>, absl::optional<base::Time>> GetRange() const
+  - signature: std::tuple<std::optional<base::Time>, std::optional<base::Time>> GetRange() const
     description: Return  the `minimum` and `maximum` date values.
 
   - signature: bool HasStepper() const

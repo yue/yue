@@ -21,12 +21,6 @@ jobs:
             arch: x86
 
     steps:
-      - name: Select XCode Version
-        if: startsWith(matrix.os, 'macos')
-        uses: mobiledevops/xcode-select-version-action@v1
-        with:
-          xcode-select-version: 14.3.1
-
       - name: Install Edge Canary
         if: startsWith(matrix.os, 'windows')
         shell: pwsh

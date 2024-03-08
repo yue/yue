@@ -25,7 +25,7 @@ const wchar_t kEmptyTemplate[] =
     L"</toast>";
 
 mswr::ComPtr<winxml::Dom::IXmlDocument> XMLStringToDocument(
-    base::WStringPiece xml_template) {
+    std::wstring_view xml_template) {
   ScopedHString ref_class_name =
       ScopedHString::Create(RuntimeClass_Windows_Data_Xml_Dom_XmlDocument);
   mswr::ComPtr<IInspectable> inspectable;
@@ -64,7 +64,7 @@ mswr::ComPtr<winxml::Dom::IXmlDocument> XMLStringToDocument(
 
 mswr::ComPtr<winxml::Dom::IXmlNodeList> GetElementsByTagName(
     winxml::Dom::IXmlDocument* document,
-    base::WStringPiece tag_str,
+    std::wstring_view tag_str,
     UINT32 expected_length) {
   ScopedHString tag = ScopedHString::Create(tag_str);
   mswr::ComPtr<winxml::Dom::IXmlNodeList> elements;
@@ -86,7 +86,7 @@ mswr::ComPtr<winxml::Dom::IXmlNodeList> GetElementsByTagName(
 
 mswr::ComPtr<winxml::Dom::IXmlNode> GetNthElementByTagName(
     winxml::Dom::IXmlDocument* document,
-    base::WStringPiece tag_str,
+    std::wstring_view tag_str,
     UINT32 index) {
   mswr::ComPtr<winxml::Dom::IXmlNodeList> node_list =
       GetElementsByTagName(document, tag_str, index + 1);
@@ -100,8 +100,8 @@ mswr::ComPtr<winxml::Dom::IXmlNode> GetNthElementByTagName(
 
 HRESULT SetAttribute(winxml::Dom::IXmlDocument* document,
                      winxml::Dom::IXmlNode* node,
-                     base::WStringPiece name,
-                     base::WStringPiece value) {
+                     std::wstring_view name,
+                     std::wstring_view value) {
   mswr::ComPtr<winxml::Dom::IXmlAttribute> attribute;
   HRESULT hr = document->CreateAttribute(ScopedHString::Create(name).get(),
                                          &attribute);
@@ -132,7 +132,7 @@ HRESULT SetAttribute(winxml::Dom::IXmlDocument* document,
 
 HRESULT AppendNode(winxml::Dom::IXmlDocument* document,
                    winxml::Dom::IXmlNode* parent,
-                   base::WStringPiece tag,
+                   std::wstring_view tag,
                    mswr::ComPtr<winxml::Dom::IXmlNode>* node) {
   mswr::ComPtr<winxml::Dom::IXmlElement> element;
   HRESULT hr = document->CreateElement(ScopedHString::Create(tag).get(),
@@ -267,7 +267,7 @@ std::wstring GetNotificationXMLRepresentation(NotificationImpl* notification) {
   if (FAILED(serializer->GetXml(&xml)))
     return std::wstring();
   ScopedHString hstr(xml);
-  base::WStringPiece str = hstr.Get();
+  std::wstring_view str = hstr.Get();
   return std::wstring(str.data(), str.length());
 }
 
@@ -301,8 +301,8 @@ mswr::ComPtr<INotificationData> CreateNotificationData() {
 }
 
 HRESULT NotificationDataInsert(INotificationData* data,
-                               base::WStringPiece key,
-                               base::WStringPiece value) {
+                               std::wstring_view key,
+                               std::wstring_view value) {
   mswr::ComPtr<winfoundtn::Collections::IMap<HSTRING, HSTRING>> values;
   HRESULT hr = data->get_Values(&values);
   if (FAILED(hr))

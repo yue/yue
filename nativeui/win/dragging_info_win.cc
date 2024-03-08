@@ -41,14 +41,14 @@ Clipboard::Data DraggingInfoWin::GetData(Data::Type type) const {
   switch (type) {
     case Data::Type::Text: {
       base::win::ScopedHGlobal<wchar_t*> data(medium.hGlobal);
-      std::wstring result(data.get());
+      std::wstring result(data.data());
       ret = Data(Data::Type::Text, base::WideToUTF8(result));
       break;
     }
     case Data::Type::HTML: {
       base::win::ScopedHGlobal<char*> data(medium.hGlobal);
       std::string result;
-      CFHtmlToHtml(data.get(), &result, nullptr);
+      CFHtmlToHtml(data.data(), &result, nullptr);
       ret = Data(Data::Type::HTML, std::move(result));
       break;
     }
@@ -60,9 +60,9 @@ Clipboard::Data DraggingInfoWin::GetData(Data::Type type) const {
     }
     case Data::Type::FilePaths: {
       base::win::ScopedHGlobal<HDROP> hdrop(medium.hGlobal);
-      if (hdrop.get()) {
+      if (hdrop.data()) {
         std::vector<base::FilePath> result;
-        GetFilePathsFromHDrop(hdrop.get(), &result);
+        GetFilePathsFromHDrop(hdrop.data(), &result);
         ret = Data(std::move(result));
       }
       break;

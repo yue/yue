@@ -55,7 +55,7 @@ class ScreenObserverImpl : public ScreenObserver {
 
   ~ScreenObserverImpl() {
     NSNotificationCenter* center = [NSNotificationCenter defaultCenter];
-    [center removeObserver:screen_params_change_observer_];
+    [center removeObserver:screen_params_change_observer_.get()];
     CGDisplayRemoveReconfigurationCallback(DisplayReconfigurationCallBack,
                                            screen_);
   }

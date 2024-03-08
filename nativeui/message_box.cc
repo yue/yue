@@ -94,7 +94,7 @@ void MessageBox::SetImage(scoped_refptr<Image> image) {
   image_ = std::move(image);
 }
 
-void MessageBox::OnClose(absl::optional<int> response) {
+void MessageBox::OnClose(std::optional<int> response) {
   is_showing_ = false;
   on_response.Emit(this, response ? *response : cancel_response_);
   Release();

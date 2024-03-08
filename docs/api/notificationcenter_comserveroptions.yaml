@@ -18,7 +18,7 @@ properties:
       The arguments to pass to the executable when system starts the app after
       a notification is activated. Default is empty string.
 
-  - property: absl::optional<std::wstring> toast_activator_clsid
+  - property: std::optional<std::wstring> toast_activator_clsid
     optional: true
     description: |
       The `ToastActivatorCLSID`, which can be generated with `uuidgen.exe`. It

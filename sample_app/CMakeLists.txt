@@ -18,6 +18,8 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
   add_executable(${APP_NAME} sample_app/main.cc)
   if(WIN32)
     target_sources(${APP_NAME} PRIVATE sample_app/exe.manifest)
+  elseif(UNIX AND NOT APPLE)
+    target_compile_options(${APP_NAME} PRIVATE -Wno-unknown-attributes)
   endif()
   target_link_libraries(${APP_NAME} ${LIBYUE})
   set_property(DIRECTORY ${CMAKE_SOURCE_DIR}
@@ -38,7 +40,7 @@ elseif(UNIX AND NOT APPLE)
   file(GLOB_RECURSE YUE_SOURCES src/linux/*.cc src/linux/*.c)
 endif()
 add_library(${LIBYUE} ${YUE_SOURCES})
-target_include_directories(${LIBYUE} PUBLIC include)
+target_include_directories(${LIBYUE} PUBLIC include include/base/allocator/partition_allocator/src)
 
 # Use C++20 standard.
 target_compile_features(${LIBYUE} PUBLIC cxx_std_20)
@@ -89,7 +91,7 @@ if(WIN32)
                         psapi.lib dwmapi.lib propsys.lib comctl32.lib
                         gdi32.lib gdiplus.lib urlmon.lib userenv.lib
                         uxtheme.lib delayimp.lib runtimeobject.lib ntdll.lib
-                        shcore.lib)
+                        shcore.lib pdh.lib)
   target_compile_options(${LIBYUE} PRIVATE
                         /wd4005 /wd4101 /wd4244 /wd4267 /wd4996)
   target_link_options(${LIBYUE} PUBLIC

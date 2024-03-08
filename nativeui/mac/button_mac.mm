@@ -70,10 +70,10 @@ nu::InsetsF GetButtonInsets(NSButton* button) {
   base::apple::scoped_nsobject<NSMutableAttributedString> colored_title(
       [[NSMutableAttributedString alloc]
           initWithAttributedString:[self attributedTitle]]);
-  [colored_title addAttribute:NSForegroundColorAttributeName
-                        value:color.ToNSColor()
-                        range:NSMakeRange(0, [colored_title length])];
-  [self setAttributedTitle:colored_title];
+  [colored_title.get() addAttribute:NSForegroundColorAttributeName
+                              value:color.ToNSColor()
+                              range:NSMakeRange(0, [colored_title.get() length])];
+  [self setAttributedTitle:colored_title.get()];
 }
 
 - (void)setNUBackgroundColor:(nu::Color)color {

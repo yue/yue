@@ -5,7 +5,7 @@
 // LICENSE file.
 
 const {version, clang, argv, targetCpu, targetOs, hostCpu, strip, execSync, spawnSync} = require('./common')
-const {gnConfig, gnSysrootConfig} = require('./config')
+const {gnConfig} = require('./config')
 const {createZip} = require('./zip_utils')
 
 const path = require('path')
@@ -33,8 +33,6 @@ const args = gnConfig.concat([
   'is_debug=false',
   'is_official_build=true',
 ])
-if (targetOs == 'linux')
-  args.push(...gnSysrootConfig)
 
 console.log(`Creating native extension for ${runtime} ${shortver} ${targetCpu}...`)
 

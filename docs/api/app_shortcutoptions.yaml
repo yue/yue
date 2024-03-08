@@ -6,14 +6,14 @@ namespace: nu
 description: Options for creating start menu shortcut.
 
 properties:
-  - property: absl::optional<std::wstring> arguments
+  - property: std::optional<std::wstring> arguments
     optional: true
     description: The arguments passed to the executable, default is empty string.
 
-  - property: absl::optional<std::wstring> description
+  - property: std::optional<std::wstring> description
     optional: true
     description: The description of the shortcut, default is the executable's description.
 
-  - property: absl::optional<base::FilePath> working_dir
+  - property: std::optional<base::FilePath> working_dir
     optional: true
     description: The working directory that the executable will run under.
