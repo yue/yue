@@ -38,7 +38,7 @@ const targetOs = {
 const hostOs = targetOs
 
 // Get target_cpu from args.gn.
-let targetCpu = 'x64'
+let targetCpu = process.arch
 let clang = hostOs != 'win'
 let goma = false
 if (fs.existsSync('out/Release/args.gn')) {

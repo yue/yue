@@ -33,7 +33,7 @@ if ((targetCpu == hostCpu) || (targetOs == 'win' && targetCpu == 'x86')) {
 }
 
 // Test node modules can load.
-if (targetCpu == 'x64') {
+if (targetCpu == hostCpu) {
   for (const config of ['Release', 'Debug'])
     execSync(`node napi_yue/test out/${config}`)
 }
