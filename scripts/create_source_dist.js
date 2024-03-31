@@ -95,7 +95,7 @@ function CopySources(sources, headers) {
 
   // Copy some extra files.
   const EXTRA_HEADERS = {
-    'building/tools/gn': [
+    'third_party/build-gn': [
       'build',
       'testing/gtest',
       'third_party/googletest/src/googletest/include'
@@ -145,10 +145,10 @@ function CopySource(file, targetDir, baseDir = '') {
   }
   targetName = targetName.substr(baseDir.length)
   // Move generated headers out of dirs.
-  if (file.startsWith('building/tools/gn/'))
-    targetName = path.join.apply(path, path.normalize(file).split(path.sep).slice(3))
-  else if (file.startsWith('out/Source/gen/building/tools/gn/'))
-    targetName = path.join.apply(path, path.normalize(file).split(path.sep).slice(6))
+  if (file.startsWith('third_party/build-gn/'))
+    targetName = path.join.apply(path, path.normalize(file).split(path.sep).slice(2))
+  else if (file.startsWith('out/Source/gen/third_party/build-gn/'))
+    targetName = path.join.apply(path, path.normalize(file).split(path.sep).slice(5))
   else if (file.startsWith('out/Source/gen/'))
     targetName = path.join.apply(path, path.normalize(file).split(path.sep).slice(3))
   // Rename cpp files to cc.

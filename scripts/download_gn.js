@@ -14,7 +14,7 @@ const extract = require('extract-zip')
 const version = 'v' + gnVersion
 const url = `https://github.com/yue/build-gn/releases/download/${version}/gn_${version}_${targetOs}_x64.zip`
 
-const gnDir = path.resolve('building', 'tools', 'gn')
+const gnDir = path.resolve('third_party', 'build-gn')
 const verFile = path.join(gnDir, '.version')
 if (fs.existsSync(verFile) && fs.readFileSync(verFile) == version)
   return

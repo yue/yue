@@ -23,7 +23,7 @@ process.env.DEPOT_TOOLS_WIN_TOOLCHAIN = 0
 module.parent.paths.push(path.resolve(__dirname, '..', 'third_party', 'bundled_node_modules'))
 
 // Expose ninja and gn to PATH.
-const gnDir = path.resolve('building', 'tools', 'gn')
+const gnDir = path.resolve('third_party', 'build-gn')
 process.env.PATH = `${gnDir}${path.delimiter}${process.env.PATH}`
 
 // Get yue's version.

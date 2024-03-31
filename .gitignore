@@ -1,8 +1,8 @@
 .DS_Store
 .tags*
-/building/tools/gn/
 /out/
 /third_party/nuget.exe
+/third_party/build-gn/
 /third_party/llvm-build/
 /third_party/Microsoft.Web.WebView2.*/
 /third_party/node-v*/

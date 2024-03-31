@@ -27,7 +27,7 @@ execSync(`node scripts/download_node_headers.js node ${process.version} ${target
 execSync(`node scripts/download_lua_sources.js lua ${luaVersions[0]}`)
 
 if (clang && process.platform != 'darwin')
-  execSync('python3 building/tools/gn/tools/clang/scripts/update.py')
+  execSync('python3 third_party/build-gn/tools/clang/scripts/update.py')
 
 const commonConfig = gnConfig.slice()
 if (process.env.CI === 'true')
