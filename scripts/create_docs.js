@@ -10,9 +10,9 @@ const {createZip} = require('./zip_utils')
 const path   = require('path')
 const fs     = require('fs-extra')
 const marked = require('marked')
-const yaml   = loadYaml()
-const pug    = loadPug()
-const hljs   = loadHighlight()
+const yaml   = require('yaml')
+const pug    = require('pug')
+const hljs   = require('highlight')
 
 // Supported languages.
 const langs = ['cpp', 'lua', 'js']
@@ -123,34 +123,6 @@ for (let lang of langs) {
 createZip()
   .addFile('out/Dist/docs', 'out/Dist/docs')
   .writeToFile(`yue_docs_${version}`)
-
-// Load js-yaml from its browserify pack.
-function loadYaml() {
-  const vm = require('vm')
-  const script = new vm.Script(fs.readFileSync('third_party/bundled_node_modules/yaml.js'))
-  const sandbox = {}
-  script.runInNewContext(sandbox)
-  return sandbox.jsyaml
-}
-
-// Load pug.js from its browserify pack.
-function loadPug() {
-  const vm = require('vm')
-  const script = new vm.Script(fs.readFileSync('third_party/bundled_node_modules/pug.js'))
-  const sandbox = {fs: fs}
-  script.runInNewContext(sandbox)
-  return sandbox.require('pug')
-}
-
-// Load hightlight.js from its browserify pack.
-function loadHighlight() {
-  const vm = require('vm')
-  const script = new vm.Script(fs.readFileSync('third_party/bundled_node_modules/highlight.js'))
-  const sandbox = {}
-  sandbox.window = sandbox
-  script.runInNewContext(sandbox)
-  return sandbox.hljs
-}
 
 // Read markdown and parse yaml header if there is one.
 function parseMarkdown(lang, content) {
