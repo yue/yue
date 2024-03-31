@@ -16,7 +16,7 @@ let sysrootArch = {
 }[targetCpu]
 
 if (process.platform == 'linux')
-  execSync(`python3 building/tools/install-sysroot.py --arch ${sysrootArch}`)
+  execSync(`python3 third_party/sysroots/install-sysroot.py --arch ${sysrootArch}`)
 else if (process.platform == 'win32')
   execSync('node scripts/download_nuget_packages.js')
 

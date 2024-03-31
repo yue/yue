@@ -11,4 +11,4 @@ use_chromium_config = true
 # The secondary source root is a parallel directory tree where
 # GN build files are placed when they can not be placed directly
 # in the source tree, e.g. for third party source trees.
-secondary_source = "//building/secondary/"
+secondary_source = "//third_party/lua-gn-configs/"

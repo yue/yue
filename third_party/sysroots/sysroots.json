@@ -1,0 +1,51 @@
+{
+    "bullseye_amd64": {
+        "Key": "20230329T085712Z-1",
+        "Sha1Sum": "5dce909f6bb00b32c1ceb0944a4bb3a9fb94c7bf",
+        "SysrootDir": "debian_bullseye_amd64-sysroot",
+        "Tarball": "debian_bullseye_amd64_sysroot.tar.xz",
+        "URL": "https://dev-cdn.electronjs.org/linux-sysroots"
+    },
+    "bullseye_arm64": {
+        "Key": "20230329T085712Z-1",
+        "Sha1Sum": "097a11a531da316e16c5f90253b0ab4306a51cba",
+        "SysrootDir": "debian_bullseye_arm64-sysroot",
+        "Tarball": "debian_bullseye_arm64_sysroot.tar.xz",
+        "URL": "https://dev-cdn.electronjs.org/linux-sysroots"
+    },
+    "bullseye_armel": {
+        "Key": "20230329T085712Z-1",
+        "Sha1Sum": "31c99f4fb20dd003381be76e64ab02971571b0ca",
+        "SysrootDir": "debian_bullseye_armel-sysroot",
+        "Tarball": "debian_bullseye_armel_sysroot.tar.xz",
+        "URL": "https://dev-cdn.electronjs.org/linux-sysroots"
+    },
+    "bullseye_armhf": {
+        "Key": "20230329T085712Z-1",
+        "Sha1Sum": "fb349ddbaae970e43ec02ed9719f14e24b018e89",
+        "SysrootDir": "debian_bullseye_armhf-sysroot",
+        "Tarball": "debian_bullseye_armhf_sysroot.tar.xz",
+        "URL": "https://dev-cdn.electronjs.org/linux-sysroots"
+    },
+    "bullseye_i386": {
+        "Key": "20230329T085712Z-1",
+        "Sha1Sum": "6b24a5a208e85c236ce55e20dffe6a2f05a99ede",
+        "SysrootDir": "debian_bullseye_i386-sysroot",
+        "Tarball": "debian_bullseye_i386_sysroot.tar.xz",
+        "URL": "https://dev-cdn.electronjs.org/linux-sysroots"
+    },
+    "bullseye_mips64el": {
+        "Key": "20230329T085712Z-1",
+        "Sha1Sum": "2be52ba14f879aa461e72e5710929074f701a4c6",
+        "SysrootDir": "debian_bullseye_mips64el-sysroot",
+        "Tarball": "debian_bullseye_mips64el_sysroot.tar.xz",
+        "URL": "https://dev-cdn.electronjs.org/linux-sysroots"
+    },
+    "bullseye_mipsel": {
+        "Key": "20230329T085712Z-1",
+        "Sha1Sum": "e118c967928d16736cb151e92e01e7a340596021",
+        "SysrootDir": "debian_bullseye_mipsel-sysroot",
+        "Tarball": "debian_bullseye_mipsel_sysroot.tar.xz",
+        "URL": "https://dev-cdn.electronjs.org/linux-sysroots"
+    }
+}

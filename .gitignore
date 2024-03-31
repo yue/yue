@@ -9,7 +9,7 @@
 /third_party/electron-v*/
 /third_party/lua-v*/
 /third_party/luajit-*/
-/third_party/debian_*/
+/third_party/sysroots/debian_*/
 *.xcodeproj
 *.swp
 *.pyc

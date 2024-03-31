@@ -37,7 +37,7 @@ if (targetOs == 'win') {
 // The build configuration for sysroot.
 const gnSysrootConfig = [
   'use_sysroot=true',
-  'target_sysroot_dir="//third_party/"',
+  'target_sysroot_dir="//third_party/sysroots"',
 ]
 if (process.platform == 'linux') {
   gnConfig.push(...gnSysrootConfig);
