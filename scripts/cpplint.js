@@ -47,7 +47,7 @@ const sourceFiles = listFiles([
 
 // Call cpplint.
 let hasError = false
-const cpplint = path.join('building', 'tools', 'cpplint.py')
+const cpplint = path.join('third_party', 'cpplint', 'cpplint.py')
 while (sourceFiles.length) {
   const chunck = sourceFiles.splice(0, 100)
   const child = spawn('python', [cpplint, ...chunck], {stdio: 'inherit'})
