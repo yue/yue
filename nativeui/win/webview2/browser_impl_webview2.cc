@@ -7,6 +7,10 @@
 
 #include "nativeui/win/webview2/browser_impl_webview2.h"
 
+#include <wrl.h>
+#include <WebView2EnvironmentOptions.h>
+
+#include <map>
 #include <string>
 #include <utility>
 #include <vector>
@@ -14,16 +18,26 @@
 #include "base/base_paths.h"
 #include "base/base_paths_win.h"
 #include "base/json/json_reader.h"
+#include "base/no_destructor.h"
 #include "base/path_service.h"
 #include "base/scoped_native_library.h"
+#include "base/strings/stringprintf.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/win/scoped_co_mem.h"
+#include "nativeui/win/webview2/browser_protocol_stream.h"
 #include "nativeui/app.h"
 #include "nativeui/state.h"
 
 namespace nu {
 
 namespace {
+
+// Stores the protocol factories.
+using ProtocolHandlerMap = std::map<std::wstring, Browser::ProtocolHandler>;
+ProtocolHandlerMap& GetProtocolHandlers() {
+  static base::NoDestructor<ProtocolHandlerMap> handlers;
+  return *handlers;
+}
 
 // C:\Users\USER_NAME\AppData\Local\APPLICATION_NAME
 base::FilePath GetUserDataDir() {
@@ -33,7 +47,42 @@ base::FilePath GetUserDataDir() {
   return path.Append(base::UTF8ToWide(App::GetCurrent()->GetName()));
 }
 
+// Return the options used for creating WebView2.
+Microsoft::WRL::ComPtr<CoreWebView2EnvironmentOptions> GetWebView2Options() {
+  auto options = Microsoft::WRL::Make<CoreWebView2EnvironmentOptions>();
+  Microsoft::WRL::ComPtr<ICoreWebView2EnvironmentOptions4> options4;
+  if (SUCCEEDED(options.As(&options4))) {
+    for (const auto& it : GetProtocolHandlers()) {
+      // Create a scheme that is allowed to load everything.
+      auto scheme = Microsoft::WRL::Make<CoreWebView2CustomSchemeRegistration>(
+          it.first.c_str());
+      const wchar_t* everything = L"*";
+      scheme->SetAllowedOrigins(1, &everything);
+      scheme->put_TreatAsSecure(TRUE);
+      scheme->put_HasAuthorityComponent(TRUE);
+      // Register the scheme.
+      std::vector<ICoreWebView2CustomSchemeRegistration*> registrations;
+      registrations.push_back(scheme.Get());
+      options4->SetCustomSchemeRegistrations(registrations.size(),
+                                             registrations.data());
+    }
+  }
+  return options;
+}
+
 }  // namespace
+
+// static
+bool BrowserImplWebview2::RegisterProtocol(std::wstring scheme,
+                                           Browser::ProtocolHandler handler) {
+  GetProtocolHandlers().emplace(std::move(scheme), std::move(handler));
+  return true;
+}
+
+// static
+void BrowserImplWebview2::UnregisterProtocol(const std::wstring& scheme) {
+  GetProtocolHandlers().erase(scheme);
+}
 
 BrowserImplWebview2::BrowserImplWebview2(Browser::Options options,
                                          BrowserHolder* holder)
@@ -53,8 +102,8 @@ BrowserImplWebview2::BrowserImplWebview2(Browser::Options options,
           State::GetCurrent()->GetWebView2Loader()->GetFunctionPointer(
               "CreateCoreWebView2EnvironmentWithOptions"));
   if (!create ||
-      FAILED(create(nullptr, GetUserDataDir().value().c_str(), nullptr,
-                    callback.Get()))) {
+      FAILED(create(nullptr, GetUserDataDir().value().c_str(),
+                    GetWebView2Options().Get(), callback.Get()))) {
     CreationFailed();
     return;
   }
@@ -75,6 +124,7 @@ BrowserImplWebview2::~BrowserImplWebview2() {
     webview_->remove_DocumentTitleChanged(on_document_title_changed_);
     webview_->remove_SourceChanged(on_source_changed_);
     webview_->remove_WebMessageReceived(on_web_message_received_);
+    webview_->remove_WebResourceRequested(on_web_resource_requested_);
   }
 }
 
@@ -349,6 +399,11 @@ void BrowserImplWebview2::OnReady() {
     settings->put_AreDevToolsEnabled(options().devtools);
     settings->put_IsWebMessageEnabled(true);
   }
+  // Add hooks for custom schemes.
+  for (const auto& it : GetProtocolHandlers()) {
+    webview_->AddWebResourceRequestedFilter(
+        (it.first + L":*").c_str(), COREWEBVIEW2_WEB_RESOURCE_CONTEXT_ALL);
+  }
   // Register event handlers.
   controller_->add_GotFocus(
       Microsoft::WRL::Callback<
@@ -400,6 +455,11 @@ void BrowserImplWebview2::OnReady() {
           ICoreWebView2WebMessageReceivedEventHandler>(
               this, &BrowserImplWebview2::OnWebMessageReceived).Get(),
       &on_web_message_received_);
+  webview_->add_WebResourceRequested(
+      Microsoft::WRL::Callback<
+          ICoreWebView2WebResourceRequestedEventHandler>(
+              this, &BrowserImplWebview2::OnWebResourceRequested).Get(),
+      &on_web_resource_requested_);
   // Notify the holder.
   holder()->OnWebView2Completed(this, true);
 }
@@ -543,6 +603,62 @@ HRESULT BrowserImplWebview2::OnWebMessageReceived(
     return E_INVALIDARG;
   return delegate()->InvokeBindings(
      base::WideToUTF8(message.get())) ? S_OK : E_INVALIDARG;
+}
+
+HRESULT BrowserImplWebview2::OnWebResourceRequested(
+    ICoreWebView2* sender, ICoreWebView2WebResourceRequestedEventArgs* args) {
+  // Get request and url.
+  Microsoft::WRL::ComPtr<ICoreWebView2WebResourceRequest> request;
+  args->get_Request(&request);
+  base::win::ScopedCoMem<wchar_t> url_mem;
+  request->get_Uri(&url_mem);
+  std::wstring url(url_mem.get());
+  // Get scheme.
+  size_t colon = url.find_first_of(L':');
+  if (colon != std::string::npos) {
+    std::wstring scheme = url.substr(0, colon);
+    // Get handler.
+    auto it = GetProtocolHandlers().find(scheme);
+    if (it != GetProtocolHandlers().end()) {
+      // Invoke handler.
+      scoped_refptr<ProtocolJob> job = it->second(base::WideToUTF8(url));
+      if (job) {
+        // Sending response is async.
+        Microsoft::WRL::ComPtr<ICoreWebView2Deferral> deferral;
+        args->GetDeferral(&deferral);
+        // Start protocol job.
+        // Note that job is passed as raw ptr, passing scoped_refptr would
+        // cause a circular reference.
+        job->Plug([this, args, deferral, job = job.get()](int size) {
+          // Create header.
+          std::string mime_type;
+          job->GetMimeType(&mime_type);
+          std::string header = base::StringPrintf(
+              "Content-Type: %s\nContent-Length:%d\n",
+              mime_type.c_str(), size);
+          // Create stream and pass it as response.
+          Microsoft::WRL::ComPtr<BrowserProtocolStream> protocol_stream(
+              new BrowserProtocolStream(job));
+          Microsoft::WRL::ComPtr<ICoreWebView2WebResourceResponse> response;
+          env_->CreateWebResourceResponse(
+              protocol_stream.Get(), 200, L"OK",
+              base::UTF8ToWide(header).c_str(), &response);
+          args->put_Response(response.Get());
+          deferral->Complete();
+        });
+        if (job->Start())
+          return S_OK;
+        // Failed to start, fallback to error.
+        deferral->Complete();
+      }
+    }
+  }
+  // Return error.
+  Microsoft::WRL::ComPtr<ICoreWebView2WebResourceResponse> response;
+  env_->CreateWebResourceResponse(nullptr, 500, L"Bad Request", L"",
+                                  &response);
+  args->put_Response(response.Get());
+  return S_OK;
 }
 
 }  // namespace nu

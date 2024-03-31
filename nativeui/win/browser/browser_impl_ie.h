@@ -27,7 +27,7 @@ class BrowserImplIE : public BrowserImpl {
  public:
   static bool RegisterProtocol(std::wstring scheme,
                                Browser::ProtocolHandler handler);
-  static void UnregisterProtocol(std::wstring scheme);
+  static void UnregisterProtocol(const std::wstring& scheme);
 
   BrowserImplIE(Browser::Options options, BrowserHolder* holder);
   ~BrowserImplIE() override;

@@ -19,6 +19,10 @@ namespace nu {
 
 class BrowserImplWebview2 : public BrowserImpl {
  public:
+  static bool RegisterProtocol(std::wstring scheme,
+                               Browser::ProtocolHandler handler);
+  static void UnregisterProtocol(const std::wstring& scheme);
+
   BrowserImplWebview2(Browser::Options options, BrowserHolder* holder);
   ~BrowserImplWebview2() override;
 
@@ -72,6 +76,8 @@ class BrowserImplWebview2 : public BrowserImpl {
                           ICoreWebView2SourceChangedEventArgs*);
   HRESULT OnWebMessageReceived(ICoreWebView2* sender,
                                ICoreWebView2WebMessageReceivedEventArgs* args);
+  HRESULT OnWebResourceRequested(
+      ICoreWebView2* sender, ICoreWebView2WebResourceRequestedEventArgs* args);
 
   // Whether this webview has loaded anything.
   bool is_first_load_ = true;
@@ -97,6 +103,7 @@ class BrowserImplWebview2 : public BrowserImpl {
   EventRegistrationToken on_document_title_changed_;
   EventRegistrationToken on_source_changed_;
   EventRegistrationToken on_web_message_received_;
+  EventRegistrationToken on_web_resource_requested_;
 
   Microsoft::WRL::ComPtr<ICoreWebView2Environment> env_;
   Microsoft::WRL::ComPtr<ICoreWebView2Controller> controller_;

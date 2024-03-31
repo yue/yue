@@ -22,18 +22,18 @@ enum TestOptions {
 class BrowserTest : public testing::TestWithParam<TestOptions> {
  protected:
   void SetUp() override {
-    nu::Browser::Options options;
 #if defined(OS_WIN) && defined(WEBVIEW2_SUPPORT)
     if (GetParam() == WEBVIEW2 || GetParam() == WEBVIEW2_IE)
-      options.webview2_support = true;
+      options_.webview2_support = true;
     if (GetParam() == WEBVIEW2_IE)
-      options.webview2_force_ie = true;
+      options_.webview2_force_ie = true;
 #endif
-    browser_ = new nu::Browser(options);
+    browser_ = new nu::Browser(options_);
   }
 
   nu::Lifetime lifetime_;
   nu::State state_;
+  nu::Browser::Options options_;
   scoped_refptr<nu::Browser> browser_;
 };
 
@@ -420,9 +420,15 @@ TEST_P(BrowserTest, MalicousCall) {
 }
 
 TEST_P(BrowserTest, StringProtocol) {
+  nu::Browser::RegisterProtocol("str", [](const std::string& url) {
+    EXPECT_EQ(url, "str://host/path");
+    return new nu::ProtocolStringJob("text/html",
+                                     "<html><body>" + url + "</body></html>");
+  });
 #if defined(OS_WIN) && defined(WEBVIEW2_SUPPORT)
+  // Re-create Browser otherwise RegisterProtocol won't work.
   if (browser_->IsWebView2())
-    return;
+    browser_ = new nu::Browser(options_);
 #endif
   browser_->on_finish_navigation.Connect([](nu::Browser* browser,
                                             const std::string& url) {
@@ -435,11 +441,6 @@ TEST_P(BrowserTest, StringProtocol) {
       EXPECT_EQ(result.GetString(), "str://host/path");
     });
   });
-  nu::Browser::RegisterProtocol("str", [](const std::string& url) {
-    EXPECT_EQ(url, "str://host/path");
-    return new nu::ProtocolStringJob("text/html",
-                                     "<html><body>" + url + "</body></html>");
-  });
   nu::MessageLoop::PostTask([&]() {
     browser_->LoadURL("str://host/path");
   });
@@ -447,10 +448,6 @@ TEST_P(BrowserTest, StringProtocol) {
 }
 
 TEST_P(BrowserTest, FileProtocol) {
-#if defined(OS_WIN) && defined(WEBVIEW2_SUPPORT)
-  if (browser_->IsWebView2())
-    return;
-#endif
   // Write html to file.
   base::ScopedTempDir dir;
   ASSERT_TRUE(dir.CreateUniqueTempDir());
@@ -462,12 +459,17 @@ TEST_P(BrowserTest, FileProtocol) {
     std::string path = url.substr(15);
     return new nu::ProtocolFileJob(base::FilePath::FromUTF8Unsafe(path));
   });
+#if defined(OS_WIN) && defined(WEBVIEW2_SUPPORT)
+  // Re-create Browser otherwise RegisterProtocol won't work.
+  if (browser_->IsWebView2())
+    browser_ = new nu::Browser(options_);
+#endif
   // Start test.
   browser_->on_finish_navigation.Connect([](nu::Browser* browser,
                                             const std::string& url) {
     browser->ExecuteJavaScript("document.body.textContent",
                                [](bool success, base::Value result) {
-      nu::Browser::UnregisterProtocol("str");
+      nu::Browser::UnregisterProtocol("wenjian");
       nu::MessageLoop::Quit();
       ASSERT_TRUE(result.is_string());
       EXPECT_EQ(result.GetString(), "file");
@@ -480,10 +482,6 @@ TEST_P(BrowserTest, FileProtocol) {
 }
 
 TEST_P(BrowserTest, LargeFileProtocol) {
-#if defined(OS_WIN) && defined(WEBVIEW2_SUPPORT)
-  if (browser_->IsWebView2())
-    return;
-#endif
   // Serve the pug.js, which should be large enough.
   base::FilePath exe_path;
   base::PathService::Get(base::FILE_EXE, &exe_path);
@@ -500,6 +498,11 @@ TEST_P(BrowserTest, LargeFileProtocol) {
         "<html><body><script id='s'>" + content + "</script>"
         "<div id='after'>text</div></body></html>");
   });
+#if defined(OS_WIN) && defined(WEBVIEW2_SUPPORT)
+  // Re-create Browser otherwise RegisterProtocol won't work.
+  if (browser_->IsWebView2())
+    browser_ = new nu::Browser(options_);
+#endif
   browser_->on_finish_navigation.Connect([](nu::Browser* browser,
                                             const std::string& url) {
     std::string command =

@@ -47,7 +47,7 @@ bool BrowserImplIE::RegisterProtocol(std::wstring scheme,
 }
 
 // static
-void BrowserImplIE::UnregisterProtocol(std::wstring scheme) {
+void BrowserImplIE::UnregisterProtocol(const std::wstring& scheme) {
   Microsoft::WRL::ComPtr<IInternetSession> session;
   if (FAILED(::CoInternetGetSession(0, &session, 0)))
     return;

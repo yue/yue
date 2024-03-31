@@ -1,7 +1,7 @@
 const {clang, targetCpu, targetOs} = require('./common')
 
 // The version of nuget WebView2 package.
-const webview2Version = '1.0.1722.45'
+const webview2Version = '1.0.2420.47'
 
 // The versions of language bindings to test against.
 const nodeVersions = [

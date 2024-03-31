@@ -572,6 +572,8 @@ jumbo_component("nativeui") {
       sources += [
         "win/webview2/browser_impl_webview2.cc",
         "win/webview2/browser_impl_webview2.h",
+        "win/webview2/browser_protocol_stream.cc",
+        "win/webview2/browser_protocol_stream.h",
       ]
     }
   }

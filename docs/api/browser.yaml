@@ -56,11 +56,11 @@ class_methods:
 
       The `handler` is guaranteed to be called in the main thread.
 
-      This API is not supported on Windows with WebView2 backend.
+      On Windows with WebView2 backend, this method must be called before
+      creating the Browser view.
 
   - signature: void UnregisterProtocol(const std::string& scheme);
     description: Unregister the custom protocol with `scheme`.
-    detail: This API is not supported on Windows with WebView2 backend.
 
 class_properties:
   - property: const char* kClassName

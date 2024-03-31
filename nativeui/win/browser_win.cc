@@ -292,13 +292,24 @@ void Browser::PlatformUpdateBindings() {
 // static
 bool Browser::RegisterProtocol(const std::string& scheme,
                                ProtocolHandler handler) {
+#if defined(WEBVIEW2_SUPPORT)
+  std::wstring wscheme = base::UTF8ToWide(scheme);
+  return BrowserImplIE::RegisterProtocol(wscheme, handler) &
+         BrowserImplWebview2::RegisterProtocol(std::move(wscheme),
+                                               std::move(handler));
+#else
   return BrowserImplIE::RegisterProtocol(base::UTF8ToWide(scheme),
                                          std::move(handler));
+#endif
 }
 
 // static
 void Browser::UnregisterProtocol(const std::string& scheme) {
-  return BrowserImplIE::UnregisterProtocol(base::UTF8ToWide(scheme));
+  std::wstring wscheme = base::UTF8ToWide(scheme);
+  BrowserImplIE::UnregisterProtocol(wscheme);
+#if defined(WEBVIEW2_SUPPORT)
+  BrowserImplWebview2::UnregisterProtocol(wscheme);
+#endif
 }
 
 }  // namespace nu
