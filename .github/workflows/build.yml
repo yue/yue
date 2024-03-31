@@ -56,7 +56,7 @@ jobs:
         run: python -m pip install --upgrade setuptools
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Work around CI bug https://github.com/actions/runner-images/issues/8659.
       - uses: mjp41/workaround8649@c8550b715ccdc17f89c8d5c28d7a48eeff9c94a8
@@ -99,7 +99,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Lint
         run: node ./scripts/cpplint.js

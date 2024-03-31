@@ -1,0 +1,22 @@
+doctype html
+head
+  title Yue
+  style
+    | * { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    | a { margin-right: 6px; }
+    | html { max-width: 38rem; padding: 2rem; margin: auto; color: #333; font-size: 1.2em; }
+
+body
+  h1 Yue
+  p A library for creating native cross-platform GUI apps.
+  h2 Links
+  a(href=`https://github.com/yue/yue`) Repo
+  a(href=`https://github.com/yue/yue/releases`) Releases
+  a(href="https://github.com/yue/yue-sample-apps") Sample Apps
+  h2 Latest Docs (#{latest})
+  a(href=`docs/latest/cpp/`) C++
+  a(href=`docs/latest/lua/`) Lua
+  a(href=`docs/latest/js/`) JavaScript
+  h2 Versions
+  each v in versions
+    a(href=`docs/${v}/cpp/`) #{v}
