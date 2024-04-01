@@ -10,8 +10,9 @@ A library for creating native cross-platform GUI apps.
 
 ### Examples
 
-* [Sample apps (with screenshots)](https://github.com/yue/yue-sample-apps)
-* [Muban](https://github.com/yue/muban) - Build desktop apps with webview
+* [Sample apps (with screenshots📷)](https://github.com/yue/yue-sample-apps)
+* [boilerplate-cpp](https://github.com/yue/boilerplate-cpp) - Boilerplate for building C++ apps
+* [Chie](https://chie.app) - Extensible desktop app for LLMs
 * [Wey](https://github.com/yue/wey) - Open source Slack app
 * [CrossClip](https://github.com/yue/crossclip) - Sync clipboard across platforms
 * [React-Yue](https://github.com/oyyd/react-yue) - Render the views of Yue with React
