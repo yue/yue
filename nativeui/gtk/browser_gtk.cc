@@ -8,6 +8,7 @@
 #include <webkit2/webkit2.h>
 
 #include "base/json/json_reader.h"
+#include "base/no_destructor.h"
 #include "nativeui/gtk/nu_protocol_stream.h"
 #include "nativeui/gtk/util/widget_util.h"
 
@@ -16,6 +17,13 @@ namespace nu {
 namespace {
 
 const char* kIgnoreNextFinish = "ignore-next-finish";
+
+// Stores the protocol factories.
+using ProtocolHandlerMap = std::map<std::string, Browser::ProtocolHandler>;
+ProtocolHandlerMap& GetProtocolHandlers() {
+  static base::NoDestructor<ProtocolHandlerMap> handlers;
+  return *handlers;
+}
 
 std::string JSStringToString(JSStringRef js) {
   size_t max_size = JSStringGetMaximumUTF8CStringSize(js);
@@ -361,18 +369,23 @@ void Browser::PlatformUpdateBindings() {
 // static
 bool Browser::RegisterProtocol(const std::string& scheme,
                                ProtocolHandler handler) {
+  ProtocolHandler& ref = GetProtocolHandlers()[scheme] = std::move(handler);
   WebKitWebContext* context = webkit_web_context_get_default();
   webkit_web_context_register_uri_scheme(
       context,
       scheme.c_str(),
       reinterpret_cast<WebKitURISchemeRequestCallback>(&OnProtocolRequest),
-      new ProtocolHandler(std::move(handler)),
-      Delete<ProtocolHandler>);
+      &ref,
+      // The deleter is set to null as the pointer is managed by us. Please do
+      // not try to manage the handler with a deleter, which would make GTK
+      // delete the handler on exit and result in crashes in js bindings.
+      nullptr);
   return true;
 }
 
 // static
 void Browser::UnregisterProtocol(const std::string& scheme) {
+  GetProtocolHandlers().erase(scheme);
   // There is no unregister API, just replace with a handler to return error.
   WebKitWebContext* context = webkit_web_context_get_default();
   webkit_web_context_register_uri_scheme(
