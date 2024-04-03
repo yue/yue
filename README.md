@@ -11,7 +11,8 @@ A library for creating native cross-platform GUI apps.
 ### Examples
 
 * [Sample apps (with screenshots📷)](https://github.com/yue/yue-sample-apps)
-* [boilerplate-cpp](https://github.com/yue/boilerplate-cpp) - Boilerplate for building C++ apps
+* [boilerplate-nodejs](https://github.com/yue/boilerplate-nodejs) - Boilerplate for building C++ apps
+* [boilerplate-cpp](https://github.com/yue/boilerplate-cpp) - Boilerplate for building Node.js apps
 * [Chie](https://chie.app) - Extensible desktop app for LLMs
 * [Wey](https://github.com/yue/wey) - Open source Slack app
 * [CrossClip](https://github.com/yue/crossclip) - Sync clipboard across platforms
