@@ -475,7 +475,7 @@ TEST_P(BrowserTest, FileProtocol) {
       EXPECT_EQ(result.GetString(), "file");
     });
   });
-  nu::MessageLoop::PostTask([=]() {
+  nu::MessageLoop::PostTask([=, this]() {
     browser_->LoadURL("wenjian://read/" + file.AsUTF8Unsafe());
   });
   nu::MessageLoop::Run();
@@ -514,7 +514,7 @@ TEST_P(BrowserTest, LargeFileProtocol) {
       EXPECT_TRUE(result.GetBool());
     });
   });
-  nu::MessageLoop::PostTask([=]() {
+  nu::MessageLoop::PostTask([=, this]() {
     browser_->LoadURL("large://file");
   });
   nu::MessageLoop::Run();

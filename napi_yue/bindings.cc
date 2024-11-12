@@ -1897,6 +1897,8 @@ struct Type<nu::MessageBox> {
 #endif
         "setImage", &nu::MessageBox::SetImage,
         "getImage", &nu::MessageBox::GetImage);
+    DefineProperties(env, prototype,
+                     Signal("onResponse", &nu::MessageBox::on_response));
   }
 };
 
