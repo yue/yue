@@ -52,7 +52,7 @@
 
   nu::PainterMac painter(self);
   painter.SetColor(background_color_);
-  painter.FillRect(nu::RectF(dirtyRect));
+  painter.FillRect(nu::RectF(self.bounds)); // See why we need to use bounds: https://stackoverflow.com/q/77375566/1418981
 
   auto* gif = static_cast<nu::GifPlayer*>([self shell]);
   gif->Paint(&painter);

@@ -12,3 +12,11 @@ use_chromium_config = true
 # GN build files are placed when they can not be placed directly
 # in the source tree, e.g. for third party source trees.
 secondary_source = "//third_party/lua-gn-configs/"
+
+# If, on macOS, you are getting error shown below, then, to override Python executable, uncomment below setting.
+# ```
+# ERROR at //build_overrides/build.gni:103:15: Script returned non-zero exit code.
+# Command: python /Volumes/Shared/Git/Web/UI/yue/third_party/build-gn/build/mac/should_use_hermetic_xcode.py mac
+# Returned 127.
+# ```
+# script_executable = "python3"

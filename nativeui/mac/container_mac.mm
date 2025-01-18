@@ -40,7 +40,7 @@
   if (!shell)
     return;
 
-  nu::RectF dirty(dirtyRect);
+  nu::RectF dirty(self.bounds); // See why we need to use bounds: https://stackoverflow.com/q/77375566/1418981
   nu::PainterMac painter(self);
   painter.SetColor(background_color_);
   painter.FillRect(dirty);
