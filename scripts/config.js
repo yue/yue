@@ -1,27 +1,27 @@
 const {ccWrapper, clang, targetCpu, targetOs} = require('./common')
 
 // The version of nuget WebView2 package.
-const webview2Version = '1.0.2420.47'
+const webview2Version = '1.0.2903.40'
 
 // The versions of language bindings to test against.
 const nodeVersions = [
   '18.19.1',
-  '20.11.1',
-  '21.7.1',
+  '20.18.1',
+  '22.12.0',
 ]
 const electronVersions = [
-  '27.3.5',
-  '28.2.6',
-  '29.1.1',
+  '32.2.8',
+  '33.3.1',
+  '34.0.0',
 ]
 const luaVersions = [
-  '5.3.6',
-  '5.4.3',
   '5.1.5',
+  '5.3.6',
+  '5.4.7',
 ]
 
 // The version of gn.
-const gnVersion = '0.11.0'
+const gnVersion = '0.11.3'
 
 // The common build configurations.
 const gnConfig = [
