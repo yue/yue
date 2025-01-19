@@ -20,7 +20,7 @@ if (process.platform == 'linux')
 else if (process.platform == 'win32')
   execSync('node scripts/download_nuget_packages.js')
 
-execSync('git submodule sync --recursive')
+execSync('git submodule sync --recursive', {stdio: null})
 execSync('git submodule update --init --recursive')
 execSync('node scripts/download_gn.js')
 execSync(`node scripts/download_node_headers.js node ${process.version} ${targetOs} ${targetCpu}`)

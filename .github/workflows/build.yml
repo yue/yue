@@ -6,28 +6,28 @@ jobs:
   build:
     runs-on: >-
       ${{
-        (matrix.targetOs == 'mac' && matrix.targetArch == 'x64') &&
+        (matrix.os == 'mac' && matrix.arch == 'x64') &&
           'macos-13' ||
-          (fromJson('{"linux":"ubuntu-22.04","mac":"macos-14","win":"windows-2022"}')[matrix.targetOs])
+          (fromJson('{"linux":"ubuntu-22.04","mac":"macos-14","win":"windows-2022"}')[matrix.os])
       }}
     continue-on-error: false
 
     strategy:
       fail-fast: false
       matrix:
-        targetOs: [linux, mac, win]
-        targetArch: [x64, arm64]
+        os: [linux, mac, win]
+        arch: [x64, arm64]
         include:
-          - targetOs: linux
-            targetArch: x86
-          - targetOs: linux
-            targetArch: arm
-          - targetOs: win
-            targetArch: x86
+          - os: linux
+            arch: x86
+          - os: linux
+            arch: arm
+          - os: win
+            arch: x86
 
     steps:
       - name: Install Edge Canary
-        if: matrix.targetOs == 'win'
+        if: matrix.os == 'win'
         shell: pwsh
         run: |
           Start-BitsTransfer -Source 'https://go.microsoft.com/fwlink/?linkid=2084649&Channel=Canary&language=en-us' -Destination EdgeSetup.exe
@@ -37,7 +37,7 @@ jobs:
           Start-Process -Wait -FilePath './EdgeSetup.exe' -ArgumentList '/silent', '/install'
 
       - name: Install Linux Dependencies
-        if: matrix.targetOs == 'linux'
+        if: matrix.os == 'linux'
         run: |
           sudo apt update
           sudo apt install -y cmake libgtk-3-dev libnotify-dev libwebkit2gtk-4.0-dev
@@ -46,11 +46,11 @@ jobs:
           /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
 
       - name: Install Linux Cross Compilation Toolchains
-        if: matrix.targetOs == 'linux'  && matrix.targetArch != 'x64'
+        if: matrix.os == 'linux'  && matrix.arch != 'x64'
         run: sudo apt install -y gcc-multilib g++-multilib
 
       - name: Install Linux Arm Toolchains
-        if: matrix.targetOs == 'linux' && startsWith(matrix.targetArch, 'arm')
+        if: matrix.os == 'linux' && startsWith(matrix.arch, 'arm')
         run: sudo apt install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf libc6-dev-armhf-cross linux-libc-dev-armhf-cross binutils-aarch64-linux-gnu
 
       - uses: actions/setup-python@v3
@@ -63,35 +63,33 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Work around CI bug https://github.com/actions/runner-images/issues/8659.
-      - uses: mjp41/workaround8649@c8550b715ccdc17f89c8d5c28d7a48eeff9c94a8
-        if: matrix.targetOs == 'linux' && matrix.targetArch == 'x64'
-
       - name: Build and Test
         env:
           DISPLAY: ':99.0'
-        run: node scripts/cibuild.js --target-cpu=${{ matrix.targetArch }}
+        run: node scripts/cibuild.js --target-cpu=${{ matrix.arch }}
 
       - name: Upload Binary Files
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
+          name: binaries-${{ matrix.os }}-${{ matrix.arch }}
           path: |
             out/Dist/lua_yue_*.zip
             out/Dist/napi_yue_*.zip
           retention-days: 1
 
       - name: Upload Library Files
-        if: matrix.targetArch == 'x64'
-        uses: actions/upload-artifact@v3
+        if: matrix.arch == 'x64'
+        uses: actions/upload-artifact@v4
         with:
-          path: |
-            out/Dist/libyue_*.zip
+          name: sources-${{ matrix.os }}
+          path: out/Dist/libyue_*.zip
           retention-days: 1
 
       - name: Upload Document Files
-        if: matrix.targetOs == 'linux' && matrix.targetArch == 'x64'
-        uses: actions/upload-artifact@v3
+        if: matrix.os == 'linux' && matrix.arch == 'x64'
+        uses: actions/upload-artifact@v4
         with:
+          name: docs
           path: |
             out/Dist/yue_typescript_declarations_*.zip
             out/Dist/yue_docs_*.zip
@@ -111,16 +109,20 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
     needs: [build, lint]
     runs-on: ubuntu-latest
+    permissions:
+      # Needed by action-gh-release.
+      contents: write
 
     steps:
       - name: Download Files
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
 
       - name: Release
-        uses: ncipollo/release-action@v1
+        uses: softprops/action-gh-release@v2
         with:
+          draft: true
           name: Yue ${{ github.ref_name }}
           body: '## Changelog'
-          draft: true
-          artifacts: artifact/*.zip
-          artifactErrorsFailBuild: true
+          files: '*.zip'

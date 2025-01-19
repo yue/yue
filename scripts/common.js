@@ -166,7 +166,7 @@ function streamPromise(stream) {
 // Helper around execSync.
 const execSyncWrapper = (command, options = {}) => {
   // Print command output by default.
-  if (!options.stdio)
+  if (options.stdio === undefined)
     options.stdio = 'inherit'
   // Merge the custom env to global env.
   if (options.env)
@@ -176,7 +176,7 @@ const execSyncWrapper = (command, options = {}) => {
 
 const spawnSyncWrapper = (exec, args, options = {}) => {
   // Print command output by default.
-  if (!options.stdio)
+  if (options.stdio === undefined)
     options.stdio = 'inherit'
   // Merge the custom env to global env.
   if (options.env)
