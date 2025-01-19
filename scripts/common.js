@@ -39,8 +39,8 @@ const hostOs = targetOs
 
 // Get target_cpu from args.gn.
 let targetCpu = process.arch
+let ccWrapper = null
 let clang = hostOs != 'win'
-let goma = false
 if (fs.existsSync('out/Release/args.gn')) {
   const content = String(fs.readFileSync('out/Release/args.gn'))
   const matchCpu = content.match(/target_cpu = "(.*)"/)
@@ -49,8 +49,10 @@ if (fs.existsSync('out/Release/args.gn')) {
   const matchOs = content.match(/target_os = "(.*)"/)
   if (matchOs && matchOs.length > 1)
     targetOs = matchOs[1]
+  const matchCcWrapper = content.match(/cc_wrapper = "(.*)"/)
+  if (matchCcWrapper && matchCcWrapper.length > 1)
+    ccWrapper = matchCcWrapper[1]
   clang = content.includes('is_clang = true')
-  goma = content.includes('use_goma = true') || content.includes('goma.gn')
 }
 
 let hostCpu = process.arch
@@ -68,6 +70,9 @@ const argv = process.argv.slice(2).filter((arg) => {
     return false
   } else if (arg == '--no-clang') {
     clang = false
+    return false
+  } else if (arg.startsWith('--cc-wrapper=')) {
+    ccWrapper = arg.substr(arg.indexOf('=') + 1)
     return false
   } else if (arg.startsWith('--target-cpu=')) {
     targetCpu = arg.substr(arg.indexOf('=') + 1)
@@ -201,8 +206,8 @@ if (!verbose) {
 module.exports = {
   verbose,
   version,
+  ccWrapper,
   clang,
-  goma,
   argv,
   targetCpu,
   targetOs,

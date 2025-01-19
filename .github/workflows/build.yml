@@ -48,7 +48,7 @@ jobs:
           /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
 
       - name: Install Linux Cross Compilation Toolchains
-        if: matrix.os == 'linux'  && matrix.arch != 'x64'
+        if: matrix.os == 'linux'  && matrix.arch != runner.arch
         run: sudo apt install -y gcc-multilib g++-multilib
 
       - name: Install Linux Arm Toolchains
@@ -64,6 +64,11 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Use ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ccache-${{ matrix.os }}-${{ matrix.arch }}
 
       - name: Build and Test
         env:

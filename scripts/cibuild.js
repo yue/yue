@@ -14,7 +14,12 @@ const fs = require('fs-extra')
 process.env.CI = 'true'
 
 // Bootstrap.
-execSync(`node ./scripts/bootstrap.js --target-cpu=${targetCpu}`)
+const bootstrapArgs = [`--target-cpu=${targetCpu}`]
+try {
+  execSync('ccache', {stdio: null})
+  bootstrapArgs.push('--cc-wrapper=ccache')
+} catch (error) {}
+execSync(`node ./scripts/bootstrap.js ${bootstrapArgs.join(' ')}`)
 
 // Build common targets.
 execSync('node ./scripts/build.js out/Release')
@@ -53,7 +58,7 @@ if (process.env.CI != 'true' || (targetOs == 'linux' && targetCpu == 'x64')) {
 
 // Build lua extensions.
 for (const luaver of luaVersions)
-  execSync(`node ./scripts/create_lua_extension.js --target-cpu=${targetCpu} lua ${luaver}`)
+  execSync(`node ./scripts/create_lua_extension.js lua ${luaver}`)
 
 // Build node extensions.
 if (!(targetOs == 'win' && targetCpu == 'arm'))

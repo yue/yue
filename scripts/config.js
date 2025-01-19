@@ -1,4 +1,4 @@
-const {clang, targetCpu, targetOs} = require('./common')
+const {ccWrapper, clang, targetCpu, targetOs} = require('./common')
 
 // The version of nuget WebView2 package.
 const webview2Version = '1.0.2420.47'
@@ -30,6 +30,10 @@ const gnConfig = [
   `lua_version="v${luaVersions[0]}"`,
   'fatal_linker_warnings=false',
 ]
+if (ccWrapper) {
+  gnConfig.push(`cc_wrapper="${ccWrapper}"`,
+                'clang_use_chrome_plugins=false')
+}
 if (targetOs == 'win') {
   gnConfig.push(`webview2_version="${webview2Version}"`)
 }

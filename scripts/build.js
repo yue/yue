@@ -4,7 +4,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {argv, goma, verbose, execSync} = require('./common')
+const {argv, verbose, execSync} = require('./common')
 
 let dir = 'out/Component'
 const args = argv.filter((arg) => {
@@ -16,8 +16,6 @@ const args = argv.filter((arg) => {
   }
 })
 
-if (goma)
-  args.push('-j 200')
 if (verbose)
   args.push('-v')
 

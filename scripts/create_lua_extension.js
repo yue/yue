@@ -4,7 +4,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {version, clang, argv, targetCpu, targetOs, hostCpu, strip, execSync, spawnSync} = require('./common')
+const {version, argv, targetCpu, targetOs, hostCpu, strip, execSync, spawnSync} = require('./common')
 const {gnConfig} = require('./config')
 const {createZip} = require('./zip_utils')
 
