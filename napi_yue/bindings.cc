@@ -1443,7 +1443,8 @@ struct Type<nu::Event> {
         "isShiftPressed", &nu::Event::IsShiftPressed,
         "isControlPressed", &nu::Event::IsControlPressed,
         "isAltPressed", &nu::Event::IsAltPressed,
-        "isMetaPressed", &nu::Event::IsMetaPressed);
+        "isMetaPressed", &nu::Event::IsMetaPressed,
+        "getMouseLocation", &nu::Event::GetMouseLocation);
   }
   // Used by subclasses.
   static void SetEventProperties(napi_env env,

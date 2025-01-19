@@ -1291,7 +1291,8 @@ struct Type<nu::Event> {
            "isshiftpressed", &nu::Event::IsShiftPressed,
            "iscontrolpressed", &nu::Event::IsControlPressed,
            "isaltpressed", &nu::Event::IsAltPressed,
-           "ismetapressed", &nu::Event::IsMetaPressed);
+           "ismetapressed", &nu::Event::IsMetaPressed,
+           "getmouselocation", &nu::Event::GetMouseLocation);
   }
   // Used by subclasses.
   static void SetEventProperties(State* state,
