@@ -6,9 +6,11 @@ jobs:
   build:
     runs-on: >-
       ${{
-        (matrix.os == 'mac' && matrix.arch == 'x64') &&
-          'macos-13' ||
-          (fromJson('{"linux":"ubuntu-22.04","mac":"macos-14","win":"windows-2022"}')[matrix.os])
+        ((matrix.os == 'linux' && matrix.arch == 'arm64') &&
+          'ubuntu-22.04-arm' ||
+        ((matrix.os == 'mac' && matrix.arch == 'arm64') &&
+          'macos-15' ||
+        (fromJson('{"linux":"ubuntu-22.04","mac":"macos-13","win":"windows-2022"}')[matrix.os])))
       }}
     continue-on-error: false
 
@@ -50,7 +52,7 @@ jobs:
         run: sudo apt install -y gcc-multilib g++-multilib
 
       - name: Install Linux Arm Toolchains
-        if: matrix.os == 'linux' && startsWith(matrix.arch, 'arm')
+        if: matrix.os == 'linux' && matrix.arch == 'arm'
         run: sudo apt install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf libc6-dev-armhf-cross linux-libc-dev-armhf-cross binutils-aarch64-linux-gnu
 
       - uses: actions/setup-python@v3
