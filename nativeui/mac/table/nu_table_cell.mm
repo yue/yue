@@ -36,7 +36,7 @@
 - (void)drawRect:(NSRect)dirtyRect {
   if (options_.on_draw) {
     nu::PainterMac painter(self);
-    options_.on_draw(&painter, nu::RectF(self.bounds), value_); // See why we need to use bounds: https://stackoverflow.com/q/77375566/1418981
+    options_.on_draw(&painter, nu::RectF(dirtyRect), value_);
   }
 }
 

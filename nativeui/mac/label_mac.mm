@@ -21,7 +21,7 @@
 - (void)drawRect:(NSRect)dirtyRect {
   nu::PainterMac painter(self);
   painter.SetColor(background_color_);
-  painter.FillRect(nu::RectF(self.bounds)); // See why we need to use bounds: https://stackoverflow.com/q/77375566/1418981
+  painter.FillRect(nu::RectF(dirtyRect));
 
   auto* label = static_cast<nu::Label*>([self shell]);
   label->UpdateColor();
