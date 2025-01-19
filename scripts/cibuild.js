@@ -16,7 +16,7 @@ process.env.CI = 'true'
 // Bootstrap.
 const bootstrapArgs = [`--target-cpu=${targetCpu}`]
 try {
-  execSync('ccache', {stdio: null})
+  execSync('ccache --version', {stdio: 'ignore'})
   bootstrapArgs.push('--cc-wrapper=ccache')
 } catch (error) {}
 execSync(`node ./scripts/bootstrap.js ${bootstrapArgs.join(' ')}`)

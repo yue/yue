@@ -4,7 +4,7 @@
 // Use of this source code is governed by the license that can be found in the
 // LICENSE file.
 
-const {targetOs, download} = require('./common')
+const {hostCpu, targetOs, download} = require('./common')
 const {gnVersion} = require('./config')
 
 const fs = require('fs')
@@ -12,7 +12,7 @@ const path = require('path')
 const extract = require('extract-zip')
 
 const version = 'v' + gnVersion
-const url = `https://github.com/yue/build-gn/releases/download/${version}/gn_${version}_${targetOs}_x64.zip`
+const url = `https://github.com/yue/build-gn/releases/download/${version}/gn_${version}_${targetOs}_${hostCpu}.zip`
 
 const gnDir = path.resolve('third_party', 'build-gn')
 const verFile = path.join(gnDir, '.version')
