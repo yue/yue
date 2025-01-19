@@ -24,8 +24,10 @@
 @implementation NUCustomTableCellView
 
 - (id)initWithColumnOptions:(const nu::Table::ColumnOptions&)options {
-  if ((self = [super init]))
+  if ((self = [super init])) {
     options_ = options;
+    [self setClipsToBounds:YES]; // See why we need to clip to bounds: https://stackoverflow.com/q/77375566/1418981
+  }
   return self;
 }
 
