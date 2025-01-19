@@ -57,6 +57,8 @@ void View::PlatformDestroy() {
 void View::TakeOverView(NativeView view) {
   InitResponder(view_ = view, Type::View);
 
+  [view_ setClipsToBounds:YES]; // See why we need to clip to bounds: https://stackoverflow.com/q/77375566/1418981
+
   if (!IsNUResponder(view))
     return;
 
