@@ -6,11 +6,9 @@ jobs:
   build:
     runs-on: >-
       ${{
-        ((matrix.os == 'linux' && matrix.arch == 'arm64') &&
-          'ubuntu-22.04-arm' ||
-        ((matrix.os == 'mac' && matrix.arch == 'arm64') &&
+        (matrix.os == 'mac' && matrix.arch == 'arm64') &&
           'macos-15' ||
-        (fromJson('{"linux":"ubuntu-22.04","mac":"macos-13","win":"windows-2022"}')[matrix.os])))
+        (fromJson('{"linux":"ubuntu-22.04","mac":"macos-13","win":"windows-2022"}')[matrix.os])
       }}
     continue-on-error: false
 
@@ -48,11 +46,11 @@ jobs:
           /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
 
       - name: Install Linux Cross Compilation Toolchains
-        if: matrix.os == 'linux'  && matrix.arch != runner.arch
+        if: matrix.os == 'linux' && matrix.arch != runner.arch
         run: sudo apt install -y gcc-multilib g++-multilib
 
       - name: Install Linux Arm Toolchains
-        if: matrix.os == 'linux' && matrix.arch == 'arm'
+        if: matrix.os == 'linux' && matrix.arch != runner.arch && startsWith(matrix.arch, 'arm')
         run: sudo apt install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf libc6-dev-armhf-cross linux-libc-dev-armhf-cross binutils-aarch64-linux-gnu
 
       - uses: actions/setup-python@v3
