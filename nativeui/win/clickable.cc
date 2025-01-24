@@ -66,6 +66,7 @@ bool Clickable::OnMouseClick(NativeEvent event) {
       OnClick();
     if (window())
       window()->ReleaseCapture();
+    ResetState();
   }
   return true;
 }
