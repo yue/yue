@@ -15,9 +15,11 @@
 #include <utility>
 
 #include "base/strings/utf_string_conversions.h"
+#include "base/win/dark_mode_support.h"
 #include "base/win/windows_version.h"
 #include "nativeui/accelerator.h"
 #include "nativeui/accelerator_manager.h"
+#include "nativeui/appearance.h"
 #include "nativeui/events/event.h"
 #include "nativeui/events/win/event_win.h"
 #include "nativeui/gfx/geometry/insets.h"
@@ -105,9 +107,13 @@ WindowImpl::WindowImpl(const Window::Options& options, Window* delegate)
     // Change default background color to transparent.
     background_color_ = Color(0, 0, 0, 0);
   }
-  NativeTheme* theme = State::GetCurrent()->GetNativeTheme();
-  if (theme->IsAppDarkMode()) {
-    theme->EnableDarkModeForWindow(hwnd());
+  if (Appearance::GetCurrent()->IsDarkScheme()) {
+    base::win::AllowDarkModeForWindow(hwnd(), true);
+    const BOOL dark_titlebar_enabled = true;
+    ::DwmSetWindowAttribute(hwnd(),
+                            DWMWA_USE_IMMERSIVE_DARK_MODE,
+                            &dark_titlebar_enabled,
+                            sizeof(dark_titlebar_enabled));
   }
 }
 

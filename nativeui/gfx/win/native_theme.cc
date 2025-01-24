@@ -5,14 +5,12 @@
 
 #include "nativeui/gfx/win/native_theme.h"
 
-#include <stddef.h>
 #include <uxtheme.h>
 #include <vsstyle.h>
-#include <vssym32.h>
 
 #include "base/check_op.h"
 #include "base/notreached.h"
-#include "base/win/registry.h"
+#include "base/win/dark_mode_support.h"
 #include "base/win/win_util.h"
 #include "base/win/windows_version.h"
 
@@ -80,17 +78,10 @@ int GetWindowsState(NativeTheme::Part part, ControlState state) {
   }
 }
 
-bool IsHighContrast() {
-  HIGHCONTRASTW high_contrast = {sizeof(high_contrast)};
-  if (SystemParametersInfoW(SPI_GETHIGHCONTRAST, sizeof(high_contrast),
-                            &high_contrast, FALSE))
-    return high_contrast.dwFlags & HCF_HIGHCONTRASTON;
-  return false;
-}
-
 }  // namespace
 
-NativeTheme::NativeTheme() {
+NativeTheme::NativeTheme()
+    : supports_windows_dark_mode_(base::win::IsDarkModeAvailable()) {
   memset(theme_handles_, 0, sizeof(theme_handles_));
 }
 
@@ -99,98 +90,6 @@ NativeTheme::~NativeTheme() {
     CloseHandles();
     FreeLibrary(theme_dll_);
   }
-}
-
-bool NativeTheme::InitializeDarkMode() {
-  if (!dark_mode_supported_) {
-    theme_dll_ = LoadLibrary(L"uxtheme.dll");
-    DCHECK(theme_dll_);
-
-    const auto* os_info = base::win::OSInfo::GetInstance();
-    const auto version = os_info->version();
-    if ((version >= base::win::Version::WIN10_RS5) &&
-        (version <= base::win::Version::WIN10_20H1)) {
-      open_nc_theme_date_ = reinterpret_cast<OpenNcThemeDataPtr>(
-          GetProcAddress(theme_dll_, MAKEINTRESOURCEA(49)));
-      should_app_use_dark_mode_ = reinterpret_cast<ShouldAppsUseDarkModePtr>(
-          GetProcAddress(theme_dll_, MAKEINTRESOURCEA(132)));
-      allow_dark_mode_for_window_ = reinterpret_cast<AllowDarkModeForWindowPtr>(
-          GetProcAddress(theme_dll_, MAKEINTRESOURCEA(133)));
-      if (os_info->version_number().build < 18362)
-        allow_dark_mode_for_app_ = reinterpret_cast<AllowDarkModeForAppPtr>(
-            GetProcAddress(theme_dll_, MAKEINTRESOURCEA(135)));
-      else
-        set_preferred_app_mode_ = reinterpret_cast<SetPreferredAppModePtr>(
-            GetProcAddress(theme_dll_, MAKEINTRESOURCEA(135)));
-      refresh_color_policy_ =
-          reinterpret_cast<RefreshImmersiveColorPolicyStatePtr>(
-              GetProcAddress(theme_dll_, MAKEINTRESOURCEA(104)));
-      set_window_attribute_ =
-          reinterpret_cast<SetWindowCompositionAttributePtr>(
-              base::win::GetUser32FunctionPointer(
-                  "SetWindowCompositionAttribute"));
-
-      dark_mode_supported_ =
-          open_nc_theme_date_ &&
-          should_app_use_dark_mode_ &&
-          allow_dark_mode_for_window_ &&
-          (allow_dark_mode_for_app_ || set_preferred_app_mode_) &&
-          refresh_color_policy_;
-    }
-  }
-  return *dark_mode_supported_;
-}
-
-bool NativeTheme::IsDarkModeSupported() const {
-  return dark_mode_supported_.value_or(false);
-}
-
-void NativeTheme::SetAppDarkModeEnabled(bool enable) {
-  if (!IsDarkModeSupported())
-    return;
-  if (allow_dark_mode_for_app_)
-    allow_dark_mode_for_app_(enable);
-  else if (set_preferred_app_mode_)
-    set_preferred_app_mode_(enable ? AllowDark : Default);
-  refresh_color_policy_();
-}
-
-void NativeTheme::EnableDarkModeForWindow(HWND hwnd) {
-  if (!IsDarkModeSupported())
-    return;
-  allow_dark_mode_for_window_(hwnd, true);
-  const auto* os_info = base::win::OSInfo::GetInstance();
-  BOOL dark = TRUE;
-  if (os_info->version_number().build < 18362) {
-    ::SetPropW(hwnd, L"UseImmersiveDarkModeColors",
-               reinterpret_cast<HANDLE>(static_cast<INT_PTR>(dark)));
-  } else if (set_window_attribute_) {
-    WINDOWCOMPOSITIONATTRIBDATA data = {
-      WCA_USEDARKMODECOLORS, &dark, sizeof(dark)
-    };
-    set_window_attribute_(hwnd, &data);
-  }
-}
-
-bool NativeTheme::IsAppDarkMode() const {
-  if (!IsDarkModeSupported())
-    return false;
-  return should_app_use_dark_mode_() && !IsHighContrast();
-}
-
-bool NativeTheme::IsSystemDarkMode() const {
-  base::win::RegKey hkcu_themes_regkey;
-  if (ERROR_SUCCESS != hkcu_themes_regkey.Open(
-          HKEY_CURRENT_USER,
-          L"Software\\Microsoft\\Windows\\CurrentVersion\\"
-          L"Themes\\Personalize",
-          KEY_READ)) {
-    return false;
-  }
-  DWORD apps_use_light_theme = 1;
-  hkcu_themes_regkey.ReadValueDW(L"AppsUseLightTheme",
-                                 &apps_use_light_theme);
-  return apps_use_light_theme == 0;
 }
 
 Size NativeTheme::GetThemePartSize(HDC hdc,
@@ -686,12 +585,12 @@ HANDLE NativeTheme::GetThemeHandle(Part part) const {
   HANDLE handle = 0;
   switch (part) {
     case Part::Button:
-      handle = dark_mode ? open_nc_theme_date_(NULL, L"Explorer::Button")
-                         : ::OpenThemeData(NULL, L"Button");
+      handle = ::OpenThemeData(NULL, L"Button");
       break;
     case Part::ScrollbarDownArrow:
-      handle = dark_mode ? open_nc_theme_date_(NULL, L"Explorer::Scrollbar")
-                         : ::OpenThemeData(NULL, L"Scrollbar");
+      handle = ::OpenThemeData(NULL, supports_windows_dark_mode_
+                                         ? L"Explorer::Scrollbar"
+                                         : L"Scrollbar");
       break;
     case Part::TabPanel:
       handle = ::OpenThemeData(NULL, L"Tab");

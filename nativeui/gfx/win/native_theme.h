@@ -21,15 +21,6 @@
 #include "nativeui/gfx/geometry/rect.h"
 #include "nativeui/gfx/geometry/size.h"
 
-// Structurs used by private win32 APIs.
-enum PreferredAppMode { Default, AllowDark, ForceDark, ForceLight, Max };
-enum WINDOWCOMPOSITIONATTRIB { WCA_USEDARKMODECOLORS = 26 };
-struct WINDOWCOMPOSITIONATTRIBDATA {
-  WINDOWCOMPOSITIONATTRIB Attrib;
-  PVOID pvData;
-  SIZE_T cbData;
-};
-
 namespace nu {
 
 // The state of the control.
@@ -105,24 +96,6 @@ class NativeTheme {
     ScrollbarTrackExtraParams scrollbar_track;
   };
 
-  // Initialize dark mode related functions.
-  bool InitializeDarkMode();
-
-  // Return whether dark mode is supported.
-  bool IsDarkModeSupported() const;
-
-  // Set whether to allow dark mode for the app.
-  void SetAppDarkModeEnabled(bool enable);
-
-  // Enable dark mode for the window.
-  void EnableDarkModeForWindow(HWND hwnd);
-
-  // Return whether app is using dark mode.
-  bool IsAppDarkMode() const;
-
-  // Return whether system is using dark mode.
-  bool IsSystemDarkMode() const;
-
   // Return the size that a control takes.
   Size GetThemePartSize(HDC hdc, Part part, ControlState state) const;
 
@@ -192,25 +165,10 @@ class NativeTheme {
   // for a theme change.
   void CloseHandles() const;
 
-  using OpenNcThemeDataPtr = HTHEME (WINAPI*)(HWND, LPCWSTR);    //NOLINT
-  using ShouldAppsUseDarkModePtr = bool (WINAPI*)();             //NOLINT
-  using AllowDarkModeForWindowPtr = bool (WINAPI*)(HWND, bool);  //NOLINT
-  using AllowDarkModeForAppPtr = bool (WINAPI*)(bool);           //NOLINT
-  using RefreshImmersiveColorPolicyStatePtr = void (WINAPI*)();  //NOLINT
-  using SetPreferredAppModePtr = PreferredAppMode (WINAPI*)(PreferredAppMode);                  //NOLINT
-  using SetWindowCompositionAttributePtr = BOOL (WINAPI*)(HWND, WINDOWCOMPOSITIONATTRIBDATA*);  //NOLINT
-
-  // Function pointers into uxtheme.dll.
-  OpenNcThemeDataPtr open_nc_theme_date_ = nullptr;
-  ShouldAppsUseDarkModePtr should_app_use_dark_mode_ = nullptr;
-  AllowDarkModeForWindowPtr allow_dark_mode_for_window_ = nullptr;
-  AllowDarkModeForAppPtr allow_dark_mode_for_app_ = nullptr;
-  SetPreferredAppModePtr set_preferred_app_mode_ = nullptr;
-  RefreshImmersiveColorPolicyStatePtr refresh_color_policy_ = nullptr;
-  SetWindowCompositionAttributePtr set_window_attribute_ = nullptr;
-
-  // Whether dark mode is supported.
-  std::optional<bool> dark_mode_supported_;
+  // True if Windows supports dark mode. This does NOT indicate whether the
+  // system is in dark mode, only that it is supported by this version of
+  // Windows.
+  const bool supports_windows_dark_mode_;
 
   // Handle to uxtheme.dll.
   HMODULE theme_dll_ = NULL;

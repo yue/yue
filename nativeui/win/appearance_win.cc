@@ -5,8 +5,8 @@
 #include "nativeui/appearance.h"
 
 #include "base/time/time.h"
-#include "nativeui/gfx/win/native_theme.h"
-#include "nativeui/state.h"
+#include "base/win/dark_mode_support.h"
+#include "base/win/registry.h"
 #include "nativeui/win/util/win32_window.h"
 
 namespace nu {
@@ -52,14 +52,27 @@ ColorSchemeObserver* ColorSchemeObserver::Create(Appearance* appearance) {
 }  // namespace internal
 
 void Appearance::SetDarkModeEnabled(bool enable) {
-  NativeTheme* theme = State::GetCurrent()->GetNativeTheme();
-  if (theme->InitializeDarkMode())
-    theme->SetAppDarkModeEnabled(enable);
+  if (!base::win::IsDarkModeAvailable())
+    return;
+  dark_mode_enabled_ = enable;
+  base::win::AllowDarkModeForApp(enable);
 }
 
 bool Appearance::IsDarkScheme() const {
-  NativeTheme* theme = State::GetCurrent()->GetNativeTheme();
-  return theme->IsAppDarkMode();
+  if (!dark_mode_enabled_)
+    return false;
+  base::win::RegKey hkcu_themes_regkey;
+  if (ERROR_SUCCESS != hkcu_themes_regkey.Open(
+          HKEY_CURRENT_USER,
+          L"Software\\Microsoft\\Windows\\CurrentVersion\\"
+          L"Themes\\Personalize",
+          KEY_READ)) {
+    return false;
+  }
+  DWORD apps_use_light_theme = 1;
+  hkcu_themes_regkey.ReadValueDW(L"AppsUseLightTheme",
+                                 &apps_use_light_theme);
+  return apps_use_light_theme == 0;
 }
 
 }  // namespace nu

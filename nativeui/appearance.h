@@ -53,6 +53,9 @@ class NATIVEUI_EXPORT Appearance : public SignalDelegate {
   enum { kColorSchemeChange };
 
   std::unique_ptr<internal::ColorSchemeObserver> color_scheme_observer_;
+#if defined(OS_WIN)
+  bool dark_mode_enabled_ = false;
+#endif
 
   base::WeakPtrFactory<Appearance> weak_factory_;
 };
